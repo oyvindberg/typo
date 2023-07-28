@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CheckConstraintRoutineUsageViewRow(
@@ -27,43 +29,39 @@ case class CheckConstraintRoutineUsageViewRow(
 )
 
 object CheckConstraintRoutineUsageViewRow {
-  def rowParser(idx: Int): RowParser[CheckConstraintRoutineUsageViewRow] =
-    RowParser[CheckConstraintRoutineUsageViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CheckConstraintRoutineUsageViewRow] = Reads[CheckConstraintRoutineUsageViewRow](json => JsResult.fromTry(
+      Try(
         CheckConstraintRoutineUsageViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
-          constraintSchema = row[Option[SqlIdentifier]](idx + 1),
-          constraintName = row[Option[SqlIdentifier]](idx + 2),
-          specificCatalog = row[Option[SqlIdentifier]](idx + 3),
-          specificSchema = row[Option[SqlIdentifier]](idx + 4),
-          specificName = row[Option[SqlIdentifier]](idx + 5)
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
+          constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
+          specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
+          specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[CheckConstraintRoutineUsageViewRow] = new OFormat[CheckConstraintRoutineUsageViewRow]{
-    override def writes(o: CheckConstraintRoutineUsageViewRow): JsObject =
-      Json.obj(
-        "constraint_catalog" -> o.constraintCatalog,
-        "constraint_schema" -> o.constraintSchema,
-        "constraint_name" -> o.constraintName,
-        "specific_catalog" -> o.specificCatalog,
-        "specific_schema" -> o.specificSchema,
-        "specific_name" -> o.specificName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CheckConstraintRoutineUsageViewRow] = RowParser[CheckConstraintRoutineUsageViewRow] { row =>
+    Success(
+      CheckConstraintRoutineUsageViewRow(
+        constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
+        constraintSchema = row[Option[SqlIdentifier]](idx + 1),
+        constraintName = row[Option[SqlIdentifier]](idx + 2),
+        specificCatalog = row[Option[SqlIdentifier]](idx + 3),
+        specificSchema = row[Option[SqlIdentifier]](idx + 4),
+        specificName = row[Option[SqlIdentifier]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[CheckConstraintRoutineUsageViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CheckConstraintRoutineUsageViewRow(
-            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-            constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
-            constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
-            specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
-            specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
-            specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CheckConstraintRoutineUsageViewRow] = OWrites[CheckConstraintRoutineUsageViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "constraint_catalog" -> Json.toJson(o.constraintCatalog),
+      "constraint_schema" -> Json.toJson(o.constraintSchema),
+      "constraint_name" -> Json.toJson(o.constraintName),
+      "specific_catalog" -> Json.toJson(o.specificCatalog),
+      "specific_schema" -> Json.toJson(o.specificSchema),
+      "specific_name" -> Json.toJson(o.specificName)
+    ))
+  )
 }

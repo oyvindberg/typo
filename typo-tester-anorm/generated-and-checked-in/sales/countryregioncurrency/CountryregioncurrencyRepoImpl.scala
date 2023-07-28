@@ -8,11 +8,11 @@ package sales
 package countryregioncurrency
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
           values (${unsaved.countryregioncode}, ${unsaved.currencycode}::bpchar, ${unsaved.modifieddate}::timestamp)
-          returning countryregioncode, currencycode, modifieddate
+          returning countryregioncode, currencycode, modifieddate::text
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
   
@@ -32,19 +32,19 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
       Some((NamedParameter("currencycode", ParameterValue.from(unsaved.currencycode)), "::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.countryregioncurrency default values
-            returning countryregioncode, currencycode, modifieddate
+            returning countryregioncode, currencycode, modifieddate::text
          """
         .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.countryregioncurrency(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning countryregioncode, currencycode, modifieddate
+                  returning countryregioncode, currencycode, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -55,12 +55,12 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
-    SQL"""select countryregioncode, currencycode, modifieddate
+    SQL"""select countryregioncode, currencycode, modifieddate::text
           from sales.countryregioncurrency
        """.as(CountryregioncurrencyRow.rowParser(1).*)
   }
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
-    SQL"""select countryregioncode, currencycode, modifieddate
+    SQL"""select countryregioncode, currencycode, modifieddate::text
           from sales.countryregioncurrency
           where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
        """.as(CountryregioncurrencyRow.rowParser(1).singleOpt)
@@ -82,7 +82,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           on conflict (countryregioncode, currencycode)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning countryregioncode, currencycode, modifieddate
+          returning countryregioncode, currencycode, modifieddate::text
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
   

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgUserMappingsViewRow(
@@ -26,43 +28,39 @@ case class PgUserMappingsViewRow(
 )
 
 object PgUserMappingsViewRow {
-  def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] =
-    RowParser[PgUserMappingsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgUserMappingsViewRow] = Reads[PgUserMappingsViewRow](json => JsResult.fromTry(
+      Try(
         PgUserMappingsViewRow(
-          umid = row[Option[/* oid */ Long]](idx + 0),
-          srvid = row[Option[/* oid */ Long]](idx + 1),
-          srvname = row[Option[String]](idx + 2),
-          umuser = row[Option[/* oid */ Long]](idx + 3),
-          usename = row[Option[String]](idx + 4),
-          umoptions = row[Option[Array[String]]](idx + 5)
+          umid = json.\("umid").toOption.map(_.as[/* oid */ Long]),
+          srvid = json.\("srvid").toOption.map(_.as[/* oid */ Long]),
+          srvname = json.\("srvname").toOption.map(_.as[String]),
+          umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
+          usename = json.\("usename").toOption.map(_.as[String]),
+          umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgUserMappingsViewRow] = new OFormat[PgUserMappingsViewRow]{
-    override def writes(o: PgUserMappingsViewRow): JsObject =
-      Json.obj(
-        "umid" -> o.umid,
-        "srvid" -> o.srvid,
-        "srvname" -> o.srvname,
-        "umuser" -> o.umuser,
-        "usename" -> o.usename,
-        "umoptions" -> o.umoptions
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] = RowParser[PgUserMappingsViewRow] { row =>
+    Success(
+      PgUserMappingsViewRow(
+        umid = row[Option[/* oid */ Long]](idx + 0),
+        srvid = row[Option[/* oid */ Long]](idx + 1),
+        srvname = row[Option[String]](idx + 2),
+        umuser = row[Option[/* oid */ Long]](idx + 3),
+        usename = row[Option[String]](idx + 4),
+        umoptions = row[Option[Array[String]]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PgUserMappingsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgUserMappingsViewRow(
-            umid = json.\("umid").toOption.map(_.as[/* oid */ Long]),
-            srvid = json.\("srvid").toOption.map(_.as[/* oid */ Long]),
-            srvname = json.\("srvname").toOption.map(_.as[String]),
-            umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
-            usename = json.\("usename").toOption.map(_.as[String]),
-            umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgUserMappingsViewRow] = OWrites[PgUserMappingsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "umid" -> Json.toJson(o.umid),
+      "srvid" -> Json.toJson(o.srvid),
+      "srvname" -> Json.toJson(o.srvname),
+      "umuser" -> Json.toJson(o.umuser),
+      "usename" -> Json.toJson(o.usename),
+      "umoptions" -> Json.toJson(o.umoptions)
+    ))
+  )
 }

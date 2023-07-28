@@ -8,13 +8,11 @@ package information_schema
 package column_udt_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ColumnUdtUsageViewRow(
@@ -28,50 +26,26 @@ case class ColumnUdtUsageViewRow(
 )
 
 object ColumnUdtUsageViewRow {
-  implicit val decoder: Decoder[ColumnUdtUsageViewRow] =
-    (c: HCursor) =>
-      for {
-        udtCatalog <- c.downField("udt_catalog").as[Option[SqlIdentifier]]
-        udtSchema <- c.downField("udt_schema").as[Option[SqlIdentifier]]
-        udtName <- c.downField("udt_name").as[Option[SqlIdentifier]]
-        tableCatalog <- c.downField("table_catalog").as[Option[SqlIdentifier]]
-        tableSchema <- c.downField("table_schema").as[Option[SqlIdentifier]]
-        tableName <- c.downField("table_name").as[Option[SqlIdentifier]]
-        columnName <- c.downField("column_name").as[Option[SqlIdentifier]]
-      } yield ColumnUdtUsageViewRow(udtCatalog, udtSchema, udtName, tableCatalog, tableSchema, tableName, columnName)
-  implicit val encoder: Encoder[ColumnUdtUsageViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "udt_catalog" := row.udtCatalog,
-        "udt_schema" := row.udtSchema,
-        "udt_name" := row.udtName,
-        "table_catalog" := row.tableCatalog,
-        "table_schema" := row.tableSchema,
-        "table_name" := row.tableName,
-        "column_name" := row.columnName
-      )}
-  implicit val read: Read[ColumnUdtUsageViewRow] =
-    new Read[ColumnUdtUsageViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ColumnUdtUsageViewRow(
-        udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[ColumnUdtUsageViewRow] = Decoder.forProduct7[ColumnUdtUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("udt_catalog", "udt_schema", "udt_name", "table_catalog", "table_schema", "table_name", "column_name")(ColumnUdtUsageViewRow.apply)
+  implicit val encoder: Encoder[ColumnUdtUsageViewRow] = Encoder.forProduct7[ColumnUdtUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("udt_catalog", "udt_schema", "udt_name", "table_catalog", "table_schema", "table_name", "column_name")(x => (x.udtCatalog, x.udtSchema, x.udtName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName))
+  implicit val read: Read[ColumnUdtUsageViewRow] = new Read[ColumnUdtUsageViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ColumnUdtUsageViewRow(
+      udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

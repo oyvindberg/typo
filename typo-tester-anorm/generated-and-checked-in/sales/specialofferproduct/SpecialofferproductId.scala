@@ -13,29 +13,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `sales.specialofferproduct` */
 case class SpecialofferproductId(specialofferid: SpecialofferId, productid: ProductId)
 object SpecialofferproductId {
   implicit val ordering: Ordering[SpecialofferproductId] = Ordering.by(x => (x.specialofferid, x.productid))
-  implicit val oFormat: OFormat[SpecialofferproductId] = new OFormat[SpecialofferproductId]{
-    override def writes(o: SpecialofferproductId): JsObject =
-      Json.obj(
-        "specialofferid" -> o.specialofferid,
-        "productid" -> o.productid
-      )
-  
-    override def reads(json: JsValue): JsResult[SpecialofferproductId] = {
-      JsResult.fromTry(
-        Try(
-          SpecialofferproductId(
-            specialofferid = json.\("specialofferid").as[SpecialofferId],
-            productid = json.\("productid").as[ProductId]
-          )
+  implicit val reads: Reads[SpecialofferproductId] = Reads[SpecialofferproductId](json => JsResult.fromTry(
+      Try(
+        SpecialofferproductId(
+          specialofferid = json.\("specialofferid").as[SpecialofferId],
+          productid = json.\("productid").as[ProductId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SpecialofferproductId] = OWrites[SpecialofferproductId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "specialofferid" -> Json.toJson(o.specialofferid),
+      "productid" -> Json.toJson(o.productid)
+    ))
+  )
 }

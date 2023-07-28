@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPolicyRow(
@@ -29,49 +31,45 @@ case class PgPolicyRow(
 )
 
 object PgPolicyRow {
-  def rowParser(idx: Int): RowParser[PgPolicyRow] =
-    RowParser[PgPolicyRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPolicyRow] = Reads[PgPolicyRow](json => JsResult.fromTry(
+      Try(
         PgPolicyRow(
-          oid = row[PgPolicyId](idx + 0),
-          polname = row[String](idx + 1),
-          polrelid = row[/* oid */ Long](idx + 2),
-          polcmd = row[String](idx + 3),
-          polpermissive = row[Boolean](idx + 4),
-          polroles = row[Array[/* oid */ Long]](idx + 5),
-          polqual = row[Option[TypoPgNodeTree]](idx + 6),
-          polwithcheck = row[Option[TypoPgNodeTree]](idx + 7)
+          oid = json.\("oid").as[PgPolicyId],
+          polname = json.\("polname").as[String],
+          polrelid = json.\("polrelid").as[/* oid */ Long],
+          polcmd = json.\("polcmd").as[String],
+          polpermissive = json.\("polpermissive").as[Boolean],
+          polroles = json.\("polroles").as[Array[/* oid */ Long]],
+          polqual = json.\("polqual").toOption.map(_.as[TypoPgNodeTree]),
+          polwithcheck = json.\("polwithcheck").toOption.map(_.as[TypoPgNodeTree])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPolicyRow] = new OFormat[PgPolicyRow]{
-    override def writes(o: PgPolicyRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "polname" -> o.polname,
-        "polrelid" -> o.polrelid,
-        "polcmd" -> o.polcmd,
-        "polpermissive" -> o.polpermissive,
-        "polroles" -> o.polroles,
-        "polqual" -> o.polqual,
-        "polwithcheck" -> o.polwithcheck
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPolicyRow] = RowParser[PgPolicyRow] { row =>
+    Success(
+      PgPolicyRow(
+        oid = row[PgPolicyId](idx + 0),
+        polname = row[String](idx + 1),
+        polrelid = row[/* oid */ Long](idx + 2),
+        polcmd = row[String](idx + 3),
+        polpermissive = row[Boolean](idx + 4),
+        polroles = row[Array[/* oid */ Long]](idx + 5),
+        polqual = row[Option[TypoPgNodeTree]](idx + 6),
+        polwithcheck = row[Option[TypoPgNodeTree]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPolicyRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPolicyRow(
-            oid = json.\("oid").as[PgPolicyId],
-            polname = json.\("polname").as[String],
-            polrelid = json.\("polrelid").as[/* oid */ Long],
-            polcmd = json.\("polcmd").as[String],
-            polpermissive = json.\("polpermissive").as[Boolean],
-            polroles = json.\("polroles").as[Array[/* oid */ Long]],
-            polqual = json.\("polqual").toOption.map(_.as[TypoPgNodeTree]),
-            polwithcheck = json.\("polwithcheck").toOption.map(_.as[TypoPgNodeTree])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPolicyRow] = OWrites[PgPolicyRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "polname" -> Json.toJson(o.polname),
+      "polrelid" -> Json.toJson(o.polrelid),
+      "polcmd" -> Json.toJson(o.polcmd),
+      "polpermissive" -> Json.toJson(o.polpermissive),
+      "polroles" -> Json.toJson(o.polroles),
+      "polqual" -> Json.toJson(o.polqual),
+      "polwithcheck" -> Json.toJson(o.polwithcheck)
+    ))
+  )
 }

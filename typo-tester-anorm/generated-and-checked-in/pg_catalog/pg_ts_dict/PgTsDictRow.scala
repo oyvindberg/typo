@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTsDictRow(
@@ -26,43 +28,39 @@ case class PgTsDictRow(
 )
 
 object PgTsDictRow {
-  def rowParser(idx: Int): RowParser[PgTsDictRow] =
-    RowParser[PgTsDictRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTsDictRow] = Reads[PgTsDictRow](json => JsResult.fromTry(
+      Try(
         PgTsDictRow(
-          oid = row[PgTsDictId](idx + 0),
-          dictname = row[String](idx + 1),
-          dictnamespace = row[/* oid */ Long](idx + 2),
-          dictowner = row[/* oid */ Long](idx + 3),
-          dicttemplate = row[/* oid */ Long](idx + 4),
-          dictinitoption = row[Option[String]](idx + 5)
+          oid = json.\("oid").as[PgTsDictId],
+          dictname = json.\("dictname").as[String],
+          dictnamespace = json.\("dictnamespace").as[/* oid */ Long],
+          dictowner = json.\("dictowner").as[/* oid */ Long],
+          dicttemplate = json.\("dicttemplate").as[/* oid */ Long],
+          dictinitoption = json.\("dictinitoption").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTsDictRow] = new OFormat[PgTsDictRow]{
-    override def writes(o: PgTsDictRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "dictname" -> o.dictname,
-        "dictnamespace" -> o.dictnamespace,
-        "dictowner" -> o.dictowner,
-        "dicttemplate" -> o.dicttemplate,
-        "dictinitoption" -> o.dictinitoption
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTsDictRow] = RowParser[PgTsDictRow] { row =>
+    Success(
+      PgTsDictRow(
+        oid = row[PgTsDictId](idx + 0),
+        dictname = row[String](idx + 1),
+        dictnamespace = row[/* oid */ Long](idx + 2),
+        dictowner = row[/* oid */ Long](idx + 3),
+        dicttemplate = row[/* oid */ Long](idx + 4),
+        dictinitoption = row[Option[String]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTsDictRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTsDictRow(
-            oid = json.\("oid").as[PgTsDictId],
-            dictname = json.\("dictname").as[String],
-            dictnamespace = json.\("dictnamespace").as[/* oid */ Long],
-            dictowner = json.\("dictowner").as[/* oid */ Long],
-            dicttemplate = json.\("dicttemplate").as[/* oid */ Long],
-            dictinitoption = json.\("dictinitoption").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTsDictRow] = OWrites[PgTsDictRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "dictname" -> Json.toJson(o.dictname),
+      "dictnamespace" -> Json.toJson(o.dictnamespace),
+      "dictowner" -> Json.toJson(o.dictowner),
+      "dicttemplate" -> Json.toJson(o.dicttemplate),
+      "dictinitoption" -> Json.toJson(o.dictinitoption)
+    ))
+  )
 }

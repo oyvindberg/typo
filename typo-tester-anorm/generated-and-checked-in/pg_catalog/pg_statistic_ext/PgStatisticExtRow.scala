@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatisticExtRow(
@@ -31,52 +33,48 @@ case class PgStatisticExtRow(
 )
 
 object PgStatisticExtRow {
-  def rowParser(idx: Int): RowParser[PgStatisticExtRow] =
-    RowParser[PgStatisticExtRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatisticExtRow] = Reads[PgStatisticExtRow](json => JsResult.fromTry(
+      Try(
         PgStatisticExtRow(
-          oid = row[PgStatisticExtId](idx + 0),
-          stxrelid = row[/* oid */ Long](idx + 1),
-          stxname = row[String](idx + 2),
-          stxnamespace = row[/* oid */ Long](idx + 3),
-          stxowner = row[/* oid */ Long](idx + 4),
-          stxstattarget = row[Int](idx + 5),
-          stxkeys = row[TypoInt2Vector](idx + 6),
-          stxkind = row[Array[String]](idx + 7),
-          stxexprs = row[Option[TypoPgNodeTree]](idx + 8)
+          oid = json.\("oid").as[PgStatisticExtId],
+          stxrelid = json.\("stxrelid").as[/* oid */ Long],
+          stxname = json.\("stxname").as[String],
+          stxnamespace = json.\("stxnamespace").as[/* oid */ Long],
+          stxowner = json.\("stxowner").as[/* oid */ Long],
+          stxstattarget = json.\("stxstattarget").as[Int],
+          stxkeys = json.\("stxkeys").as[TypoInt2Vector],
+          stxkind = json.\("stxkind").as[Array[String]],
+          stxexprs = json.\("stxexprs").toOption.map(_.as[TypoPgNodeTree])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatisticExtRow] = new OFormat[PgStatisticExtRow]{
-    override def writes(o: PgStatisticExtRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "stxrelid" -> o.stxrelid,
-        "stxname" -> o.stxname,
-        "stxnamespace" -> o.stxnamespace,
-        "stxowner" -> o.stxowner,
-        "stxstattarget" -> o.stxstattarget,
-        "stxkeys" -> o.stxkeys,
-        "stxkind" -> o.stxkind,
-        "stxexprs" -> o.stxexprs
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatisticExtRow] = RowParser[PgStatisticExtRow] { row =>
+    Success(
+      PgStatisticExtRow(
+        oid = row[PgStatisticExtId](idx + 0),
+        stxrelid = row[/* oid */ Long](idx + 1),
+        stxname = row[String](idx + 2),
+        stxnamespace = row[/* oid */ Long](idx + 3),
+        stxowner = row[/* oid */ Long](idx + 4),
+        stxstattarget = row[Int](idx + 5),
+        stxkeys = row[TypoInt2Vector](idx + 6),
+        stxkind = row[Array[String]](idx + 7),
+        stxexprs = row[Option[TypoPgNodeTree]](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatisticExtRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatisticExtRow(
-            oid = json.\("oid").as[PgStatisticExtId],
-            stxrelid = json.\("stxrelid").as[/* oid */ Long],
-            stxname = json.\("stxname").as[String],
-            stxnamespace = json.\("stxnamespace").as[/* oid */ Long],
-            stxowner = json.\("stxowner").as[/* oid */ Long],
-            stxstattarget = json.\("stxstattarget").as[Int],
-            stxkeys = json.\("stxkeys").as[TypoInt2Vector],
-            stxkind = json.\("stxkind").as[Array[String]],
-            stxexprs = json.\("stxexprs").toOption.map(_.as[TypoPgNodeTree])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatisticExtRow] = OWrites[PgStatisticExtRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "stxrelid" -> Json.toJson(o.stxrelid),
+      "stxname" -> Json.toJson(o.stxname),
+      "stxnamespace" -> Json.toJson(o.stxnamespace),
+      "stxowner" -> Json.toJson(o.stxowner),
+      "stxstattarget" -> Json.toJson(o.stxstattarget),
+      "stxkeys" -> Json.toJson(o.stxkeys),
+      "stxkind" -> Json.toJson(o.stxkind),
+      "stxexprs" -> Json.toJson(o.stxexprs)
+    ))
+  )
 }

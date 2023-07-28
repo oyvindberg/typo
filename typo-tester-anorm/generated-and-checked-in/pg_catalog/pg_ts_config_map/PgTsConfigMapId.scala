@@ -11,31 +11,30 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `pg_catalog.pg_ts_config_map` */
 case class PgTsConfigMapId(mapcfg: /* oid */ Long, maptokentype: Int, mapseqno: Int)
 object PgTsConfigMapId {
   implicit val ordering: Ordering[PgTsConfigMapId] = Ordering.by(x => (x.mapcfg, x.maptokentype, x.mapseqno))
-  implicit val oFormat: OFormat[PgTsConfigMapId] = new OFormat[PgTsConfigMapId]{
-    override def writes(o: PgTsConfigMapId): JsObject =
-      Json.obj(
-        "mapcfg" -> o.mapcfg,
-        "maptokentype" -> o.maptokentype,
-        "mapseqno" -> o.mapseqno
-      )
-  
-    override def reads(json: JsValue): JsResult[PgTsConfigMapId] = {
-      JsResult.fromTry(
-        Try(
-          PgTsConfigMapId(
-            mapcfg = json.\("mapcfg").as[/* oid */ Long],
-            maptokentype = json.\("maptokentype").as[Int],
-            mapseqno = json.\("mapseqno").as[Int]
-          )
+  implicit val reads: Reads[PgTsConfigMapId] = Reads[PgTsConfigMapId](json => JsResult.fromTry(
+      Try(
+        PgTsConfigMapId(
+          mapcfg = json.\("mapcfg").as[/* oid */ Long],
+          maptokentype = json.\("maptokentype").as[Int],
+          mapseqno = json.\("mapseqno").as[Int]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PgTsConfigMapId] = OWrites[PgTsConfigMapId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "mapcfg" -> Json.toJson(o.mapcfg),
+      "maptokentype" -> Json.toJson(o.maptokentype),
+      "mapseqno" -> Json.toJson(o.mapseqno)
+    ))
+  )
 }

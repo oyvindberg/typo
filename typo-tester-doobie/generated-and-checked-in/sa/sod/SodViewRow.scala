@@ -7,18 +7,16 @@ package adventureworks
 package sa
 package sod
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SodViewRow(
@@ -42,70 +40,38 @@ case class SodViewRow(
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SodViewRow {
-  implicit val decoder: Decoder[SodViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        salesorderid <- c.downField("salesorderid").as[Option[SalesorderheaderId]]
-        salesorderdetailid <- c.downField("salesorderdetailid").as[Option[Int]]
-        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[/* max 25 chars */ String]]
-        orderqty <- c.downField("orderqty").as[Option[Int]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        specialofferid <- c.downField("specialofferid").as[Option[SpecialofferId]]
-        unitprice <- c.downField("unitprice").as[Option[BigDecimal]]
-        unitpricediscount <- c.downField("unitpricediscount").as[Option[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SodViewRow(id, salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
-  implicit val encoder: Encoder[SodViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "salesorderid" := row.salesorderid,
-        "salesorderdetailid" := row.salesorderdetailid,
-        "carriertrackingnumber" := row.carriertrackingnumber,
-        "orderqty" := row.orderqty,
-        "productid" := row.productid,
-        "specialofferid" := row.specialofferid,
-        "unitprice" := row.unitprice,
-        "unitpricediscount" := row.unitpricediscount,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SodViewRow] =
-    new Read[SodViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[SalesorderheaderId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 25 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[SpecialofferId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SodViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 1),
-        salesorderdetailid = Get[Int].unsafeGetNullable(rs, i + 2),
-        carriertrackingnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
-        orderqty = Get[Int].unsafeGetNullable(rs, i + 4),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 5),
-        specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 6),
-        unitprice = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-        unitpricediscount = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[SodViewRow] = Decoder.forProduct11[SodViewRow, Option[Int], Option[SalesorderheaderId], Option[Int], Option[/* max 25 chars */ String], Option[Int], Option[ProductId], Option[SpecialofferId], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(SodViewRow.apply)
+  implicit val encoder: Encoder[SodViewRow] = Encoder.forProduct11[SodViewRow, Option[Int], Option[SalesorderheaderId], Option[Int], Option[/* max 25 chars */ String], Option[Int], Option[ProductId], Option[SpecialofferId], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(x => (x.id, x.salesorderid, x.salesorderdetailid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.unitpricediscount, x.rowguid, x.modifieddate))
+  implicit val read: Read[SodViewRow] = new Read[SodViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[SalesorderheaderId], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 25 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[SpecialofferId], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SodViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 1),
+      salesorderdetailid = Get[Int].unsafeGetNullable(rs, i + 2),
+      carriertrackingnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
+      orderqty = Get[Int].unsafeGetNullable(rs, i + 4),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 5),
+      specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 6),
+      unitprice = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
+      unitpricediscount = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

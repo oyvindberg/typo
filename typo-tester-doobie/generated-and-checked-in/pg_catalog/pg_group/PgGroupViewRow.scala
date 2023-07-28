@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_group
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgGroupViewRow(
@@ -23,34 +21,18 @@ case class PgGroupViewRow(
 )
 
 object PgGroupViewRow {
-  implicit val decoder: Decoder[PgGroupViewRow] =
-    (c: HCursor) =>
-      for {
-        groname <- c.downField("groname").as[Option[String]]
-        grosysid <- c.downField("grosysid").as[Option[/* oid */ Long]]
-        grolist <- c.downField("grolist").as[Option[Array[/* oid */ Long]]]
-      } yield PgGroupViewRow(groname, grosysid, grolist)
-  implicit val encoder: Encoder[PgGroupViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "groname" := row.groname,
-        "grosysid" := row.grosysid,
-        "grolist" := row.grolist
-      )}
-  implicit val read: Read[PgGroupViewRow] =
-    new Read[PgGroupViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[Array[/* oid */ Long]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgGroupViewRow(
-        groname = Get[String].unsafeGetNullable(rs, i + 0),
-        grosysid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        grolist = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PgGroupViewRow] = Decoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(PgGroupViewRow.apply)
+  implicit val encoder: Encoder[PgGroupViewRow] = Encoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(x => (x.groname, x.grosysid, x.grolist))
+  implicit val read: Read[PgGroupViewRow] = new Read[PgGroupViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[Array[/* oid */ Long]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgGroupViewRow(
+      groname = Get[String].unsafeGetNullable(rs, i + 0),
+      grosysid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      grolist = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

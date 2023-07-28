@@ -8,13 +8,11 @@ package information_schema
 package `_pg_user_mappings`
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgUserMappingsViewRow(
@@ -32,50 +30,26 @@ case class PgUserMappingsViewRow(
 )
 
 object PgUserMappingsViewRow {
-  implicit val decoder: Decoder[PgUserMappingsViewRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[Option[/* oid */ Long]]
-        umoptions <- c.downField("umoptions").as[Option[Array[String]]]
-        umuser <- c.downField("umuser").as[Option[/* oid */ Long]]
-        authorizationIdentifier <- c.downField("authorization_identifier").as[Option[SqlIdentifier]]
-        foreignServerCatalog <- c.downField("foreign_server_catalog").as[Option[SqlIdentifier]]
-        foreignServerName <- c.downField("foreign_server_name").as[Option[SqlIdentifier]]
-        srvowner <- c.downField("srvowner").as[Option[SqlIdentifier]]
-      } yield PgUserMappingsViewRow(oid, umoptions, umuser, authorizationIdentifier, foreignServerCatalog, foreignServerName, srvowner)
-  implicit val encoder: Encoder[PgUserMappingsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "umoptions" := row.umoptions,
-        "umuser" := row.umuser,
-        "authorization_identifier" := row.authorizationIdentifier,
-        "foreign_server_catalog" := row.foreignServerCatalog,
-        "foreign_server_name" := row.foreignServerName,
-        "srvowner" := row.srvowner
-      )}
-  implicit val read: Read[PgUserMappingsViewRow] =
-    new Read[PgUserMappingsViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgUserMappingsViewRow(
-        oid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        umoptions = Get[Array[String]].unsafeGetNullable(rs, i + 1),
-        umuser = Get[/* oid */ Long].unsafeGetNullable(rs, i + 2),
-        authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        srvowner = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct7[PgUserMappingsViewRow, Option[/* oid */ Long], Option[Array[String]], Option[/* oid */ Long], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("oid", "umoptions", "umuser", "authorization_identifier", "foreign_server_catalog", "foreign_server_name", "srvowner")(PgUserMappingsViewRow.apply)
+  implicit val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct7[PgUserMappingsViewRow, Option[/* oid */ Long], Option[Array[String]], Option[/* oid */ Long], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("oid", "umoptions", "umuser", "authorization_identifier", "foreign_server_catalog", "foreign_server_name", "srvowner")(x => (x.oid, x.umoptions, x.umuser, x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.srvowner))
+  implicit val read: Read[PgUserMappingsViewRow] = new Read[PgUserMappingsViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgUserMappingsViewRow(
+      oid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      umoptions = Get[Array[String]].unsafeGetNullable(rs, i + 1),
+      umuser = Get[/* oid */ Long].unsafeGetNullable(rs, i + 2),
+      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      srvowner = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

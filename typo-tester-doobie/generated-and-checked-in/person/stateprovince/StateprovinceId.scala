@@ -7,18 +7,19 @@ package adventureworks
 package person
 package stateprovince
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `person.stateprovince` */
 case class StateprovinceId(value: Int) extends AnyVal
 object StateprovinceId {
+  implicit val arrayGet: Get[Array[StateprovinceId]] = Get[Array[Int]].map(_.map(StateprovinceId.apply))
+  implicit val arrayPut: Put[Array[StateprovinceId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[StateprovinceId] = Decoder[Int].map(StateprovinceId.apply)
+  implicit val encoder: Encoder[StateprovinceId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[StateprovinceId] = Get[Int].map(StateprovinceId.apply)
   implicit val ordering: Ordering[StateprovinceId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[StateprovinceId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[StateprovinceId] =
-    Decoder[Int].map(StateprovinceId(_))
-  implicit val meta: Meta[StateprovinceId] = Meta[Int].imap(StateprovinceId.apply)(_.value)
-  implicit val metaArray: Meta[Array[StateprovinceId]] = Meta[Array[Int]].imap(_.map(StateprovinceId.apply))(_.map(_.value))
+  implicit val put: Put[StateprovinceId] = Put[Int].contramap(_.value)
 }

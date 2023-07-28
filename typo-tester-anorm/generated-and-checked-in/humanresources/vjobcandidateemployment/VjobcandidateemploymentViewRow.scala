@@ -7,22 +7,24 @@ package adventureworks
 package humanresources
 package vjobcandidateemployment
 
+import adventureworks.TypoLocalDate
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VjobcandidateemploymentViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: Option[JobcandidateId],
-  `Emp.StartDate`: Option[LocalDate],
-  `Emp.EndDate`: Option[LocalDate],
+  `Emp.StartDate`: Option[TypoLocalDate],
+  `Emp.EndDate`: Option[TypoLocalDate],
   `Emp.OrgName`: Option[/* max 100 chars */ String],
   `Emp.JobTitle`: Option[/* max 100 chars */ String],
   `Emp.Responsibility`: Option[String],
@@ -34,58 +36,54 @@ case class VjobcandidateemploymentViewRow(
 )
 
 object VjobcandidateemploymentViewRow {
-  def rowParser(idx: Int): RowParser[VjobcandidateemploymentViewRow] =
-    RowParser[VjobcandidateemploymentViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VjobcandidateemploymentViewRow] = Reads[VjobcandidateemploymentViewRow](json => JsResult.fromTry(
+      Try(
         VjobcandidateemploymentViewRow(
-          jobcandidateid = row[Option[JobcandidateId]](idx + 0),
-          `Emp.StartDate` = row[Option[LocalDate]](idx + 1),
-          `Emp.EndDate` = row[Option[LocalDate]](idx + 2),
-          `Emp.OrgName` = row[Option[/* max 100 chars */ String]](idx + 3),
-          `Emp.JobTitle` = row[Option[/* max 100 chars */ String]](idx + 4),
-          `Emp.Responsibility` = row[Option[String]](idx + 5),
-          `Emp.FunctionCategory` = row[Option[String]](idx + 6),
-          `Emp.IndustryCategory` = row[Option[String]](idx + 7),
-          `Emp.Loc.CountryRegion` = row[Option[String]](idx + 8),
-          `Emp.Loc.State` = row[Option[String]](idx + 9),
-          `Emp.Loc.City` = row[Option[String]](idx + 10)
+          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
+          `Emp.StartDate` = json.\("Emp.StartDate").toOption.map(_.as[TypoLocalDate]),
+          `Emp.EndDate` = json.\("Emp.EndDate").toOption.map(_.as[TypoLocalDate]),
+          `Emp.OrgName` = json.\("Emp.OrgName").toOption.map(_.as[/* max 100 chars */ String]),
+          `Emp.JobTitle` = json.\("Emp.JobTitle").toOption.map(_.as[/* max 100 chars */ String]),
+          `Emp.Responsibility` = json.\("Emp.Responsibility").toOption.map(_.as[String]),
+          `Emp.FunctionCategory` = json.\("Emp.FunctionCategory").toOption.map(_.as[String]),
+          `Emp.IndustryCategory` = json.\("Emp.IndustryCategory").toOption.map(_.as[String]),
+          `Emp.Loc.CountryRegion` = json.\("Emp.Loc.CountryRegion").toOption.map(_.as[String]),
+          `Emp.Loc.State` = json.\("Emp.Loc.State").toOption.map(_.as[String]),
+          `Emp.Loc.City` = json.\("Emp.Loc.City").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[VjobcandidateemploymentViewRow] = new OFormat[VjobcandidateemploymentViewRow]{
-    override def writes(o: VjobcandidateemploymentViewRow): JsObject =
-      Json.obj(
-        "jobcandidateid" -> o.jobcandidateid,
-        "Emp.StartDate" -> o.`Emp.StartDate`,
-        "Emp.EndDate" -> o.`Emp.EndDate`,
-        "Emp.OrgName" -> o.`Emp.OrgName`,
-        "Emp.JobTitle" -> o.`Emp.JobTitle`,
-        "Emp.Responsibility" -> o.`Emp.Responsibility`,
-        "Emp.FunctionCategory" -> o.`Emp.FunctionCategory`,
-        "Emp.IndustryCategory" -> o.`Emp.IndustryCategory`,
-        "Emp.Loc.CountryRegion" -> o.`Emp.Loc.CountryRegion`,
-        "Emp.Loc.State" -> o.`Emp.Loc.State`,
-        "Emp.Loc.City" -> o.`Emp.Loc.City`
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VjobcandidateemploymentViewRow] = RowParser[VjobcandidateemploymentViewRow] { row =>
+    Success(
+      VjobcandidateemploymentViewRow(
+        jobcandidateid = row[Option[JobcandidateId]](idx + 0),
+        `Emp.StartDate` = row[Option[TypoLocalDate]](idx + 1),
+        `Emp.EndDate` = row[Option[TypoLocalDate]](idx + 2),
+        `Emp.OrgName` = row[Option[/* max 100 chars */ String]](idx + 3),
+        `Emp.JobTitle` = row[Option[/* max 100 chars */ String]](idx + 4),
+        `Emp.Responsibility` = row[Option[String]](idx + 5),
+        `Emp.FunctionCategory` = row[Option[String]](idx + 6),
+        `Emp.IndustryCategory` = row[Option[String]](idx + 7),
+        `Emp.Loc.CountryRegion` = row[Option[String]](idx + 8),
+        `Emp.Loc.State` = row[Option[String]](idx + 9),
+        `Emp.Loc.City` = row[Option[String]](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[VjobcandidateemploymentViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VjobcandidateemploymentViewRow(
-            jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
-            `Emp.StartDate` = json.\("Emp.StartDate").toOption.map(_.as[LocalDate]),
-            `Emp.EndDate` = json.\("Emp.EndDate").toOption.map(_.as[LocalDate]),
-            `Emp.OrgName` = json.\("Emp.OrgName").toOption.map(_.as[/* max 100 chars */ String]),
-            `Emp.JobTitle` = json.\("Emp.JobTitle").toOption.map(_.as[/* max 100 chars */ String]),
-            `Emp.Responsibility` = json.\("Emp.Responsibility").toOption.map(_.as[String]),
-            `Emp.FunctionCategory` = json.\("Emp.FunctionCategory").toOption.map(_.as[String]),
-            `Emp.IndustryCategory` = json.\("Emp.IndustryCategory").toOption.map(_.as[String]),
-            `Emp.Loc.CountryRegion` = json.\("Emp.Loc.CountryRegion").toOption.map(_.as[String]),
-            `Emp.Loc.State` = json.\("Emp.Loc.State").toOption.map(_.as[String]),
-            `Emp.Loc.City` = json.\("Emp.Loc.City").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VjobcandidateemploymentViewRow] = OWrites[VjobcandidateemploymentViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "jobcandidateid" -> Json.toJson(o.jobcandidateid),
+      "Emp.StartDate" -> Json.toJson(o.`Emp.StartDate`),
+      "Emp.EndDate" -> Json.toJson(o.`Emp.EndDate`),
+      "Emp.OrgName" -> Json.toJson(o.`Emp.OrgName`),
+      "Emp.JobTitle" -> Json.toJson(o.`Emp.JobTitle`),
+      "Emp.Responsibility" -> Json.toJson(o.`Emp.Responsibility`),
+      "Emp.FunctionCategory" -> Json.toJson(o.`Emp.FunctionCategory`),
+      "Emp.IndustryCategory" -> Json.toJson(o.`Emp.IndustryCategory`),
+      "Emp.Loc.CountryRegion" -> Json.toJson(o.`Emp.Loc.CountryRegion`),
+      "Emp.Loc.State" -> Json.toJson(o.`Emp.Loc.State`),
+      "Emp.Loc.City" -> Json.toJson(o.`Emp.Loc.City`)
+    ))
+  )
 }

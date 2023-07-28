@@ -7,21 +7,23 @@ package adventureworks
 package production
 package product
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
+import scala.util.Try
 
 case class ProductRow(
   /** Primary key for Product records. */
@@ -69,132 +71,134 @@ case class ProductRow(
       Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: Option[ProductmodelId],
   /** Date the product was available for sale. */
-  sellstartdate: LocalDateTime,
+  sellstartdate: TypoLocalDateTime,
   /** Date the product was no longer available for sale. */
-  sellenddate: Option[LocalDateTime],
+  sellenddate: Option[TypoLocalDateTime],
   /** Date the product was discontinued. */
-  discontinueddate: Option[LocalDateTime],
+  discontinueddate: Option[TypoLocalDateTime],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductRow {
-  implicit val decoder: Decoder[ProductRow] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        name <- c.downField("name").as[Name]
-        productnumber <- c.downField("productnumber").as[/* max 25 chars */ String]
-        makeflag <- c.downField("makeflag").as[Flag]
-        finishedgoodsflag <- c.downField("finishedgoodsflag").as[Flag]
-        color <- c.downField("color").as[Option[/* max 15 chars */ String]]
-        safetystocklevel <- c.downField("safetystocklevel").as[Int]
-        reorderpoint <- c.downField("reorderpoint").as[Int]
-        standardcost <- c.downField("standardcost").as[BigDecimal]
-        listprice <- c.downField("listprice").as[BigDecimal]
-        size <- c.downField("size").as[Option[/* max 5 chars */ String]]
-        sizeunitmeasurecode <- c.downField("sizeunitmeasurecode").as[Option[UnitmeasureId]]
-        weightunitmeasurecode <- c.downField("weightunitmeasurecode").as[Option[UnitmeasureId]]
-        weight <- c.downField("weight").as[Option[BigDecimal]]
-        daystomanufacture <- c.downField("daystomanufacture").as[Int]
-        productline <- c.downField("productline").as[Option[/* bpchar */ String]]
-        `class` <- c.downField("class").as[Option[/* bpchar */ String]]
-        style <- c.downField("style").as[Option[/* bpchar */ String]]
-        productsubcategoryid <- c.downField("productsubcategoryid").as[Option[ProductsubcategoryId]]
-        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
-        sellstartdate <- c.downField("sellstartdate").as[LocalDateTime]
-        sellenddate <- c.downField("sellenddate").as[Option[LocalDateTime]]
-        discontinueddate <- c.downField("discontinueddate").as[Option[LocalDateTime]]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductRow(productid, name, productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, `class`, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
-  implicit val encoder: Encoder[ProductRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "name" := row.name,
-        "productnumber" := row.productnumber,
-        "makeflag" := row.makeflag,
-        "finishedgoodsflag" := row.finishedgoodsflag,
-        "color" := row.color,
-        "safetystocklevel" := row.safetystocklevel,
-        "reorderpoint" := row.reorderpoint,
-        "standardcost" := row.standardcost,
-        "listprice" := row.listprice,
-        "size" := row.size,
-        "sizeunitmeasurecode" := row.sizeunitmeasurecode,
-        "weightunitmeasurecode" := row.weightunitmeasurecode,
-        "weight" := row.weight,
-        "daystomanufacture" := row.daystomanufacture,
-        "productline" := row.productline,
-        "class" := row.`class`,
-        "style" := row.style,
-        "productsubcategoryid" := row.productsubcategoryid,
-        "productmodelid" := row.productmodelid,
-        "sellstartdate" := row.sellstartdate,
-        "sellenddate" := row.sellenddate,
-        "discontinueddate" := row.discontinueddate,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductRow] =
-    new Read[ProductRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[/* max 25 chars */ String], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[/* max 5 chars */ String], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[ProductsubcategoryId], Nullability.Nullable),
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        productnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        makeflag = Get[Flag].unsafeGetNonNullable(rs, i + 3),
-        finishedgoodsflag = Get[Flag].unsafeGetNonNullable(rs, i + 4),
-        color = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 5),
-        safetystocklevel = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        reorderpoint = Get[Int].unsafeGetNonNullable(rs, i + 7),
-        standardcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 8),
-        listprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 9),
-        size = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 10),
-        sizeunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 11),
-        weightunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 12),
-        weight = Get[BigDecimal].unsafeGetNullable(rs, i + 13),
-        daystomanufacture = Get[Int].unsafeGetNonNullable(rs, i + 14),
-        productline = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 15),
-        `class` = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 16),
-        style = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 17),
-        productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 18),
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 19),
-        sellstartdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 20),
-        sellenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 21),
-        discontinueddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 22),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 23),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 24)
+  implicit val decoder: Decoder[ProductRow] = Decoder.instanceTry[ProductRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      ProductRow(
+        productid = orThrow(c.get("productid")(Decoder[ProductId])),
+        name = orThrow(c.get("name")(Decoder[Name])),
+        productnumber = orThrow(c.get("productnumber")(Decoder[/* max 25 chars */ String])),
+        makeflag = orThrow(c.get("makeflag")(Decoder[Flag])),
+        finishedgoodsflag = orThrow(c.get("finishedgoodsflag")(Decoder[Flag])),
+        color = orThrow(c.get("color")(Decoder[Option[/* max 15 chars */ String]])),
+        safetystocklevel = orThrow(c.get("safetystocklevel")(Decoder[Int])),
+        reorderpoint = orThrow(c.get("reorderpoint")(Decoder[Int])),
+        standardcost = orThrow(c.get("standardcost")(Decoder[BigDecimal])),
+        listprice = orThrow(c.get("listprice")(Decoder[BigDecimal])),
+        size = orThrow(c.get("size")(Decoder[Option[/* max 5 chars */ String]])),
+        sizeunitmeasurecode = orThrow(c.get("sizeunitmeasurecode")(Decoder[Option[UnitmeasureId]])),
+        weightunitmeasurecode = orThrow(c.get("weightunitmeasurecode")(Decoder[Option[UnitmeasureId]])),
+        weight = orThrow(c.get("weight")(Decoder[Option[BigDecimal]])),
+        daystomanufacture = orThrow(c.get("daystomanufacture")(Decoder[Int])),
+        productline = orThrow(c.get("productline")(Decoder[Option[/* bpchar */ String]])),
+        `class` = orThrow(c.get("class")(Decoder[Option[/* bpchar */ String]])),
+        style = orThrow(c.get("style")(Decoder[Option[/* bpchar */ String]])),
+        productsubcategoryid = orThrow(c.get("productsubcategoryid")(Decoder[Option[ProductsubcategoryId]])),
+        productmodelid = orThrow(c.get("productmodelid")(Decoder[Option[ProductmodelId]])),
+        sellstartdate = orThrow(c.get("sellstartdate")(Decoder[TypoLocalDateTime])),
+        sellenddate = orThrow(c.get("sellenddate")(Decoder[Option[TypoLocalDateTime]])),
+        discontinueddate = orThrow(c.get("discontinueddate")(Decoder[Option[TypoLocalDateTime]])),
+        rowguid = orThrow(c.get("rowguid")(Decoder[UUID])),
+        modifieddate = orThrow(c.get("modifieddate")(Decoder[TypoLocalDateTime]))
       )
+    }
+  )
+  implicit val encoder: Encoder[ProductRow] = Encoder[ProductRow](row =>
+    Json.obj(
+      "productid" -> Encoder[ProductId].apply(row.productid),
+      "name" -> Encoder[Name].apply(row.name),
+      "productnumber" -> Encoder[/* max 25 chars */ String].apply(row.productnumber),
+      "makeflag" -> Encoder[Flag].apply(row.makeflag),
+      "finishedgoodsflag" -> Encoder[Flag].apply(row.finishedgoodsflag),
+      "color" -> Encoder[Option[/* max 15 chars */ String]].apply(row.color),
+      "safetystocklevel" -> Encoder[Int].apply(row.safetystocklevel),
+      "reorderpoint" -> Encoder[Int].apply(row.reorderpoint),
+      "standardcost" -> Encoder[BigDecimal].apply(row.standardcost),
+      "listprice" -> Encoder[BigDecimal].apply(row.listprice),
+      "size" -> Encoder[Option[/* max 5 chars */ String]].apply(row.size),
+      "sizeunitmeasurecode" -> Encoder[Option[UnitmeasureId]].apply(row.sizeunitmeasurecode),
+      "weightunitmeasurecode" -> Encoder[Option[UnitmeasureId]].apply(row.weightunitmeasurecode),
+      "weight" -> Encoder[Option[BigDecimal]].apply(row.weight),
+      "daystomanufacture" -> Encoder[Int].apply(row.daystomanufacture),
+      "productline" -> Encoder[Option[/* bpchar */ String]].apply(row.productline),
+      "class" -> Encoder[Option[/* bpchar */ String]].apply(row.`class`),
+      "style" -> Encoder[Option[/* bpchar */ String]].apply(row.style),
+      "productsubcategoryid" -> Encoder[Option[ProductsubcategoryId]].apply(row.productsubcategoryid),
+      "productmodelid" -> Encoder[Option[ProductmodelId]].apply(row.productmodelid),
+      "sellstartdate" -> Encoder[TypoLocalDateTime].apply(row.sellstartdate),
+      "sellenddate" -> Encoder[Option[TypoLocalDateTime]].apply(row.sellenddate),
+      "discontinueddate" -> Encoder[Option[TypoLocalDateTime]].apply(row.discontinueddate),
+      "rowguid" -> Encoder[UUID].apply(row.rowguid),
+      "modifieddate" -> Encoder[TypoLocalDateTime].apply(row.modifieddate)
     )
-  
-
+  )
+  implicit val read: Read[ProductRow] = new Read[ProductRow](
+    gets = List(
+      (Get[ProductId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[/* max 25 chars */ String], Nullability.NoNulls),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[/* max 15 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[/* max 5 chars */ String], Nullability.Nullable),
+      (Get[UnitmeasureId], Nullability.Nullable),
+      (Get[UnitmeasureId], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* bpchar */ String], Nullability.Nullable),
+      (Get[/* bpchar */ String], Nullability.Nullable),
+      (Get[/* bpchar */ String], Nullability.Nullable),
+      (Get[ProductsubcategoryId], Nullability.Nullable),
+      (Get[ProductmodelId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductRow(
+      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      productnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
+      makeflag = Get[Flag].unsafeGetNonNullable(rs, i + 3),
+      finishedgoodsflag = Get[Flag].unsafeGetNonNullable(rs, i + 4),
+      color = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 5),
+      safetystocklevel = Get[Int].unsafeGetNonNullable(rs, i + 6),
+      reorderpoint = Get[Int].unsafeGetNonNullable(rs, i + 7),
+      standardcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 8),
+      listprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 9),
+      size = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 10),
+      sizeunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 11),
+      weightunitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 12),
+      weight = Get[BigDecimal].unsafeGetNullable(rs, i + 13),
+      daystomanufacture = Get[Int].unsafeGetNonNullable(rs, i + 14),
+      productline = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 15),
+      `class` = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 16),
+      style = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 17),
+      productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 18),
+      productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 19),
+      sellstartdate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 20),
+      sellenddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 21),
+      discontinueddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 22),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 23),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 24)
+    )
+  )
 }

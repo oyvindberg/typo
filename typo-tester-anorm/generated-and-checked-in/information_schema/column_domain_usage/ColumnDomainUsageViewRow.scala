@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ColumnDomainUsageViewRow(
@@ -28,46 +30,42 @@ case class ColumnDomainUsageViewRow(
 )
 
 object ColumnDomainUsageViewRow {
-  def rowParser(idx: Int): RowParser[ColumnDomainUsageViewRow] =
-    RowParser[ColumnDomainUsageViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ColumnDomainUsageViewRow] = Reads[ColumnDomainUsageViewRow](json => JsResult.fromTry(
+      Try(
         ColumnDomainUsageViewRow(
-          domainCatalog = row[Option[SqlIdentifier]](idx + 0),
-          domainSchema = row[Option[SqlIdentifier]](idx + 1),
-          domainName = row[Option[SqlIdentifier]](idx + 2),
-          tableCatalog = row[Option[SqlIdentifier]](idx + 3),
-          tableSchema = row[Option[SqlIdentifier]](idx + 4),
-          tableName = row[Option[SqlIdentifier]](idx + 5),
-          columnName = row[Option[SqlIdentifier]](idx + 6)
+          domainCatalog = json.\("domain_catalog").toOption.map(_.as[SqlIdentifier]),
+          domainSchema = json.\("domain_schema").toOption.map(_.as[SqlIdentifier]),
+          domainName = json.\("domain_name").toOption.map(_.as[SqlIdentifier]),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[ColumnDomainUsageViewRow] = new OFormat[ColumnDomainUsageViewRow]{
-    override def writes(o: ColumnDomainUsageViewRow): JsObject =
-      Json.obj(
-        "domain_catalog" -> o.domainCatalog,
-        "domain_schema" -> o.domainSchema,
-        "domain_name" -> o.domainName,
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "column_name" -> o.columnName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ColumnDomainUsageViewRow] = RowParser[ColumnDomainUsageViewRow] { row =>
+    Success(
+      ColumnDomainUsageViewRow(
+        domainCatalog = row[Option[SqlIdentifier]](idx + 0),
+        domainSchema = row[Option[SqlIdentifier]](idx + 1),
+        domainName = row[Option[SqlIdentifier]](idx + 2),
+        tableCatalog = row[Option[SqlIdentifier]](idx + 3),
+        tableSchema = row[Option[SqlIdentifier]](idx + 4),
+        tableName = row[Option[SqlIdentifier]](idx + 5),
+        columnName = row[Option[SqlIdentifier]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[ColumnDomainUsageViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ColumnDomainUsageViewRow(
-            domainCatalog = json.\("domain_catalog").toOption.map(_.as[SqlIdentifier]),
-            domainSchema = json.\("domain_schema").toOption.map(_.as[SqlIdentifier]),
-            domainName = json.\("domain_name").toOption.map(_.as[SqlIdentifier]),
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ColumnDomainUsageViewRow] = OWrites[ColumnDomainUsageViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "domain_catalog" -> Json.toJson(o.domainCatalog),
+      "domain_schema" -> Json.toJson(o.domainSchema),
+      "domain_name" -> Json.toJson(o.domainName),
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "column_name" -> Json.toJson(o.columnName)
+    ))
+  )
 }

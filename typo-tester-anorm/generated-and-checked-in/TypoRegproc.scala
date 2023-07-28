@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
@@ -19,65 +16,63 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** regproc (via PGObject) */
 case class TypoRegproc(value: String)
+
 object TypoRegproc {
-  implicit val oFormat: OFormat[TypoRegproc] = new OFormat[TypoRegproc]{
-    override def writes(o: TypoRegproc): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoRegproc] = {
-      JsResult.fromTry(
-        Try(
-          TypoRegproc(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoRegprocDb: ToStatement[TypoRegproc] with ParameterMetaData[TypoRegproc] with Column[TypoRegproc] = new ToStatement[TypoRegproc] with ParameterMetaData[TypoRegproc] with Column[TypoRegproc] {
-    override def sqlType: String = "regproc"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoRegproc): Unit =
-      s.setObject(index, {
-                           val obj = new PGobject
-                           obj.setType("regproc")
-                           obj.setValue(v.value)
-                           obj
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoRegproc] =
-      v match {
-        case v: PGobject => Right(TypoRegproc(v.getValue))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGobject from JDBC to produce a TypoRegproc, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoRegprocDbArray: ToStatement[Array[TypoRegproc]] with ParameterMetaData[Array[TypoRegproc]] with Column[Array[TypoRegproc]] = new ToStatement[Array[TypoRegproc]] with ParameterMetaData[Array[TypoRegproc]] with Column[Array[TypoRegproc]] {
-    override def sqlType: String = "_regproc"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoRegproc]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("regproc", v.map(v => {
-                                                                              val obj = new PGobject
-                                                                              obj.setType("regproc")
-                                                                              obj.setValue(v.value)
-                                                                              obj
-                                                                            })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoRegproc]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoRegproc]] = Column.nonNull[Array[TypoRegproc]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoRegproc(v.asInstanceOf[String])))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoRegproc, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoRegproc, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoRegproc]] = new ParameterMetaData[Array[TypoRegproc]] {
+    override def sqlType: String = "_regproc"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoRegproc]] = ToStatement[Array[TypoRegproc]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("regproc", v.map(v => {
+                                                                                                                           val obj = new PGobject
+                                                                                                                           obj.setType("regproc")
+                                                                                                                           obj.setValue(v.value)
+                                                                                                                           obj
+                                                                                                                         }))))
+  implicit val column: Column[TypoRegproc] = Column.nonNull[TypoRegproc]((v1: Any, _) =>
+    v1 match {
+      case v: PGobject => Right(TypoRegproc(v.getValue))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoRegproc] = new ParameterMetaData[TypoRegproc] {
+    override def sqlType: String = "regproc"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoRegproc] = Reads[TypoRegproc](json => JsResult.fromTry(
+      Try(
+        TypoRegproc(
+          value = json.\("value").as[String]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoRegproc] = ToStatement[TypoRegproc]((s, index, v) => s.setObject(index, {
+                                                                 val obj = new PGobject
+                                                                 obj.setType("regproc")
+                                                                 obj.setValue(v.value)
+                                                                 obj
+                                                               }))
+  implicit val writes: OWrites[TypoRegproc] = OWrites[TypoRegproc](o =>
+    new JsObject(ListMap[String, JsValue](
+      "value" -> Json.toJson(o.value)
+    ))
+  )
 }

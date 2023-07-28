@@ -10,19 +10,20 @@ package scrapreason
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `production.scrapreason` */
 case class ScrapreasonId(value: Int) extends AnyVal
 object ScrapreasonId {
-  implicit val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)
-  implicit val format: Format[ScrapreasonId] = implicitly[Format[Int]].bimap(ScrapreasonId.apply, _.value)
-  implicit val toStatement: ToStatement[ScrapreasonId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[ScrapreasonId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[ScrapreasonId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[ScrapreasonId] = implicitly[Column[Int]].map(ScrapreasonId.apply)
+  implicit val ordering: Ordering[ScrapreasonId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[ScrapreasonId] = new ParameterMetaData[ScrapreasonId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[ScrapreasonId] = implicitly[Reads[Int]].map(ScrapreasonId.apply)
+  implicit val toStatement: ToStatement[ScrapreasonId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[ScrapreasonId] = implicitly[Writes[Int]].contramap(_.value)
 }

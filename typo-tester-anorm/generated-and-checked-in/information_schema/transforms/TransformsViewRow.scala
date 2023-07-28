@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TransformsViewRow(
@@ -30,49 +32,45 @@ case class TransformsViewRow(
 )
 
 object TransformsViewRow {
-  def rowParser(idx: Int): RowParser[TransformsViewRow] =
-    RowParser[TransformsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[TransformsViewRow] = Reads[TransformsViewRow](json => JsResult.fromTry(
+      Try(
         TransformsViewRow(
-          udtCatalog = row[Option[SqlIdentifier]](idx + 0),
-          udtSchema = row[Option[SqlIdentifier]](idx + 1),
-          udtName = row[Option[SqlIdentifier]](idx + 2),
-          specificCatalog = row[Option[SqlIdentifier]](idx + 3),
-          specificSchema = row[Option[SqlIdentifier]](idx + 4),
-          specificName = row[Option[SqlIdentifier]](idx + 5),
-          groupName = row[Option[SqlIdentifier]](idx + 6),
-          transformType = row[Option[CharacterData]](idx + 7)
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
+          udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
+          udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
+          specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
+          specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
+          groupName = json.\("group_name").toOption.map(_.as[SqlIdentifier]),
+          transformType = json.\("transform_type").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[TransformsViewRow] = new OFormat[TransformsViewRow]{
-    override def writes(o: TransformsViewRow): JsObject =
-      Json.obj(
-        "udt_catalog" -> o.udtCatalog,
-        "udt_schema" -> o.udtSchema,
-        "udt_name" -> o.udtName,
-        "specific_catalog" -> o.specificCatalog,
-        "specific_schema" -> o.specificSchema,
-        "specific_name" -> o.specificName,
-        "group_name" -> o.groupName,
-        "transform_type" -> o.transformType
+    ),
+  )
+  def rowParser(idx: Int): RowParser[TransformsViewRow] = RowParser[TransformsViewRow] { row =>
+    Success(
+      TransformsViewRow(
+        udtCatalog = row[Option[SqlIdentifier]](idx + 0),
+        udtSchema = row[Option[SqlIdentifier]](idx + 1),
+        udtName = row[Option[SqlIdentifier]](idx + 2),
+        specificCatalog = row[Option[SqlIdentifier]](idx + 3),
+        specificSchema = row[Option[SqlIdentifier]](idx + 4),
+        specificName = row[Option[SqlIdentifier]](idx + 5),
+        groupName = row[Option[SqlIdentifier]](idx + 6),
+        transformType = row[Option[CharacterData]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[TransformsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          TransformsViewRow(
-            udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
-            udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
-            udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
-            specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
-            specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
-            specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
-            groupName = json.\("group_name").toOption.map(_.as[SqlIdentifier]),
-            transformType = json.\("transform_type").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[TransformsViewRow] = OWrites[TransformsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "udt_catalog" -> Json.toJson(o.udtCatalog),
+      "udt_schema" -> Json.toJson(o.udtSchema),
+      "udt_name" -> Json.toJson(o.udtName),
+      "specific_catalog" -> Json.toJson(o.specificCatalog),
+      "specific_schema" -> Json.toJson(o.specificSchema),
+      "specific_name" -> Json.toJson(o.specificName),
+      "group_name" -> Json.toJson(o.groupName),
+      "transform_type" -> Json.toJson(o.transformType)
+    ))
+  )
 }

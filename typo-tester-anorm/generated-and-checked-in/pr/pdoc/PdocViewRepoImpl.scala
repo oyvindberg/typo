@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PdocViewRepoImpl extends PdocViewRepo {
   override def selectAll(implicit c: Connection): List[PdocViewRow] = {
-    SQL"""select "id", productid, modifieddate, documentnode
+    SQL"""select "id", productid, modifieddate::text, documentnode
           from pr.pdoc
        """.as(PdocViewRow.rowParser(1).*)
   }

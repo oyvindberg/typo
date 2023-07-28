@@ -7,15 +7,17 @@ package adventureworks
 package humanresources
 package employeepayhistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EmployeepayhistoryRow(
@@ -23,51 +25,47 @@ case class EmployeepayhistoryRow(
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Date the change in pay is effective */
-  ratechangedate: LocalDateTime,
+  ratechangedate: TypoLocalDateTime,
   /** Salary hourly rate. */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly */
   payfrequency: Int,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeepayhistoryId = EmployeepayhistoryId(businessentityid, ratechangedate)
  }
 
 object EmployeepayhistoryRow {
-  def rowParser(idx: Int): RowParser[EmployeepayhistoryRow] =
-    RowParser[EmployeepayhistoryRow] { row =>
-      Success(
+  implicit val reads: Reads[EmployeepayhistoryRow] = Reads[EmployeepayhistoryRow](json => JsResult.fromTry(
+      Try(
         EmployeepayhistoryRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          ratechangedate = row[LocalDateTime](idx + 1),
-          rate = row[BigDecimal](idx + 2),
-          payfrequency = row[Int](idx + 3),
-          modifieddate = row[LocalDateTime](idx + 4)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          ratechangedate = json.\("ratechangedate").as[TypoLocalDateTime],
+          rate = json.\("rate").as[BigDecimal],
+          payfrequency = json.\("payfrequency").as[Int],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[EmployeepayhistoryRow] = new OFormat[EmployeepayhistoryRow]{
-    override def writes(o: EmployeepayhistoryRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "ratechangedate" -> o.ratechangedate,
-        "rate" -> o.rate,
-        "payfrequency" -> o.payfrequency,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[EmployeepayhistoryRow] = RowParser[EmployeepayhistoryRow] { row =>
+    Success(
+      EmployeepayhistoryRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        ratechangedate = row[TypoLocalDateTime](idx + 1),
+        rate = row[BigDecimal](idx + 2),
+        payfrequency = row[Int](idx + 3),
+        modifieddate = row[TypoLocalDateTime](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[EmployeepayhistoryRow] = {
-      JsResult.fromTry(
-        Try(
-          EmployeepayhistoryRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            ratechangedate = json.\("ratechangedate").as[LocalDateTime],
-            rate = json.\("rate").as[BigDecimal],
-            payfrequency = json.\("payfrequency").as[Int],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[EmployeepayhistoryRow] = OWrites[EmployeepayhistoryRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "ratechangedate" -> Json.toJson(o.ratechangedate),
+      "rate" -> Json.toJson(o.rate),
+      "payfrequency" -> Json.toJson(o.payfrequency),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

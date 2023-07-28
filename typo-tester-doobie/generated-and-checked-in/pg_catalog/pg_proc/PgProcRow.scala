@@ -11,14 +11,16 @@ import adventureworks.TypoAclItem
 import adventureworks.TypoOidVector
 import adventureworks.TypoPgNodeTree
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import scala.util.Try
 
 case class PgProcRow(
   oid: PgProcId,
@@ -54,142 +56,144 @@ case class PgProcRow(
 )
 
 object PgProcRow {
-  implicit val decoder: Decoder[PgProcRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgProcId]
-        proname <- c.downField("proname").as[String]
-        pronamespace <- c.downField("pronamespace").as[/* oid */ Long]
-        proowner <- c.downField("proowner").as[/* oid */ Long]
-        prolang <- c.downField("prolang").as[/* oid */ Long]
-        procost <- c.downField("procost").as[Float]
-        prorows <- c.downField("prorows").as[Float]
-        provariadic <- c.downField("provariadic").as[/* oid */ Long]
-        prosupport <- c.downField("prosupport").as[TypoRegproc]
-        prokind <- c.downField("prokind").as[String]
-        prosecdef <- c.downField("prosecdef").as[Boolean]
-        proleakproof <- c.downField("proleakproof").as[Boolean]
-        proisstrict <- c.downField("proisstrict").as[Boolean]
-        proretset <- c.downField("proretset").as[Boolean]
-        provolatile <- c.downField("provolatile").as[String]
-        proparallel <- c.downField("proparallel").as[String]
-        pronargs <- c.downField("pronargs").as[Int]
-        pronargdefaults <- c.downField("pronargdefaults").as[Int]
-        prorettype <- c.downField("prorettype").as[/* oid */ Long]
-        proargtypes <- c.downField("proargtypes").as[TypoOidVector]
-        proallargtypes <- c.downField("proallargtypes").as[Option[Array[/* oid */ Long]]]
-        proargmodes <- c.downField("proargmodes").as[Option[Array[String]]]
-        proargnames <- c.downField("proargnames").as[Option[Array[String]]]
-        proargdefaults <- c.downField("proargdefaults").as[Option[TypoPgNodeTree]]
-        protrftypes <- c.downField("protrftypes").as[Option[Array[/* oid */ Long]]]
-        prosrc <- c.downField("prosrc").as[String]
-        probin <- c.downField("probin").as[Option[String]]
-        prosqlbody <- c.downField("prosqlbody").as[Option[TypoPgNodeTree]]
-        proconfig <- c.downField("proconfig").as[Option[Array[String]]]
-        proacl <- c.downField("proacl").as[Option[Array[TypoAclItem]]]
-      } yield PgProcRow(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)
-  implicit val encoder: Encoder[PgProcRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "proname" := row.proname,
-        "pronamespace" := row.pronamespace,
-        "proowner" := row.proowner,
-        "prolang" := row.prolang,
-        "procost" := row.procost,
-        "prorows" := row.prorows,
-        "provariadic" := row.provariadic,
-        "prosupport" := row.prosupport,
-        "prokind" := row.prokind,
-        "prosecdef" := row.prosecdef,
-        "proleakproof" := row.proleakproof,
-        "proisstrict" := row.proisstrict,
-        "proretset" := row.proretset,
-        "provolatile" := row.provolatile,
-        "proparallel" := row.proparallel,
-        "pronargs" := row.pronargs,
-        "pronargdefaults" := row.pronargdefaults,
-        "prorettype" := row.prorettype,
-        "proargtypes" := row.proargtypes,
-        "proallargtypes" := row.proallargtypes,
-        "proargmodes" := row.proargmodes,
-        "proargnames" := row.proargnames,
-        "proargdefaults" := row.proargdefaults,
-        "protrftypes" := row.protrftypes,
-        "prosrc" := row.prosrc,
-        "probin" := row.probin,
-        "prosqlbody" := row.prosqlbody,
-        "proconfig" := row.proconfig,
-        "proacl" := row.proacl
-      )}
-  implicit val read: Read[PgProcRow] =
-    new Read[PgProcRow](
-      gets = List(
-        (Get[PgProcId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Float], Nullability.NoNulls),
-        (Get[Float], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoOidVector], Nullability.NoNulls),
-        (Get[Array[/* oid */ Long]], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[TypoPgNodeTree], Nullability.Nullable),
-        (Get[Array[/* oid */ Long]], Nullability.Nullable),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[TypoPgNodeTree], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[Array[TypoAclItem]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgProcRow(
-        oid = Get[PgProcId].unsafeGetNonNullable(rs, i + 0),
-        proname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        pronamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        proowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        prolang = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-        procost = Get[Float].unsafeGetNonNullable(rs, i + 5),
-        prorows = Get[Float].unsafeGetNonNullable(rs, i + 6),
-        provariadic = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
-        prosupport = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 8),
-        prokind = Get[String].unsafeGetNonNullable(rs, i + 9),
-        prosecdef = Get[Boolean].unsafeGetNonNullable(rs, i + 10),
-        proleakproof = Get[Boolean].unsafeGetNonNullable(rs, i + 11),
-        proisstrict = Get[Boolean].unsafeGetNonNullable(rs, i + 12),
-        proretset = Get[Boolean].unsafeGetNonNullable(rs, i + 13),
-        provolatile = Get[String].unsafeGetNonNullable(rs, i + 14),
-        proparallel = Get[String].unsafeGetNonNullable(rs, i + 15),
-        pronargs = Get[Int].unsafeGetNonNullable(rs, i + 16),
-        pronargdefaults = Get[Int].unsafeGetNonNullable(rs, i + 17),
-        prorettype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 18),
-        proargtypes = Get[TypoOidVector].unsafeGetNonNullable(rs, i + 19),
-        proallargtypes = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 20),
-        proargmodes = Get[Array[String]].unsafeGetNullable(rs, i + 21),
-        proargnames = Get[Array[String]].unsafeGetNullable(rs, i + 22),
-        proargdefaults = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 23),
-        protrftypes = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 24),
-        prosrc = Get[String].unsafeGetNonNullable(rs, i + 25),
-        probin = Get[String].unsafeGetNullable(rs, i + 26),
-        prosqlbody = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 27),
-        proconfig = Get[Array[String]].unsafeGetNullable(rs, i + 28),
-        proacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 29)
+  implicit val decoder: Decoder[PgProcRow] = Decoder.instanceTry[PgProcRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      PgProcRow(
+        oid = orThrow(c.get("oid")(Decoder[PgProcId])),
+        proname = orThrow(c.get("proname")(Decoder[String])),
+        pronamespace = orThrow(c.get("pronamespace")(Decoder[/* oid */ Long])),
+        proowner = orThrow(c.get("proowner")(Decoder[/* oid */ Long])),
+        prolang = orThrow(c.get("prolang")(Decoder[/* oid */ Long])),
+        procost = orThrow(c.get("procost")(Decoder[Float])),
+        prorows = orThrow(c.get("prorows")(Decoder[Float])),
+        provariadic = orThrow(c.get("provariadic")(Decoder[/* oid */ Long])),
+        prosupport = orThrow(c.get("prosupport")(Decoder[TypoRegproc])),
+        prokind = orThrow(c.get("prokind")(Decoder[String])),
+        prosecdef = orThrow(c.get("prosecdef")(Decoder[Boolean])),
+        proleakproof = orThrow(c.get("proleakproof")(Decoder[Boolean])),
+        proisstrict = orThrow(c.get("proisstrict")(Decoder[Boolean])),
+        proretset = orThrow(c.get("proretset")(Decoder[Boolean])),
+        provolatile = orThrow(c.get("provolatile")(Decoder[String])),
+        proparallel = orThrow(c.get("proparallel")(Decoder[String])),
+        pronargs = orThrow(c.get("pronargs")(Decoder[Int])),
+        pronargdefaults = orThrow(c.get("pronargdefaults")(Decoder[Int])),
+        prorettype = orThrow(c.get("prorettype")(Decoder[/* oid */ Long])),
+        proargtypes = orThrow(c.get("proargtypes")(Decoder[TypoOidVector])),
+        proallargtypes = orThrow(c.get("proallargtypes")(Decoder[Option[Array[/* oid */ Long]]])),
+        proargmodes = orThrow(c.get("proargmodes")(Decoder[Option[Array[String]]])),
+        proargnames = orThrow(c.get("proargnames")(Decoder[Option[Array[String]]])),
+        proargdefaults = orThrow(c.get("proargdefaults")(Decoder[Option[TypoPgNodeTree]])),
+        protrftypes = orThrow(c.get("protrftypes")(Decoder[Option[Array[/* oid */ Long]]])),
+        prosrc = orThrow(c.get("prosrc")(Decoder[String])),
+        probin = orThrow(c.get("probin")(Decoder[Option[String]])),
+        prosqlbody = orThrow(c.get("prosqlbody")(Decoder[Option[TypoPgNodeTree]])),
+        proconfig = orThrow(c.get("proconfig")(Decoder[Option[Array[String]]])),
+        proacl = orThrow(c.get("proacl")(Decoder[Option[Array[TypoAclItem]]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[PgProcRow] = Encoder[PgProcRow](row =>
+    Json.obj(
+      "oid" -> Encoder[PgProcId].apply(row.oid),
+      "proname" -> Encoder[String].apply(row.proname),
+      "pronamespace" -> Encoder[/* oid */ Long].apply(row.pronamespace),
+      "proowner" -> Encoder[/* oid */ Long].apply(row.proowner),
+      "prolang" -> Encoder[/* oid */ Long].apply(row.prolang),
+      "procost" -> Encoder[Float].apply(row.procost),
+      "prorows" -> Encoder[Float].apply(row.prorows),
+      "provariadic" -> Encoder[/* oid */ Long].apply(row.provariadic),
+      "prosupport" -> Encoder[TypoRegproc].apply(row.prosupport),
+      "prokind" -> Encoder[String].apply(row.prokind),
+      "prosecdef" -> Encoder[Boolean].apply(row.prosecdef),
+      "proleakproof" -> Encoder[Boolean].apply(row.proleakproof),
+      "proisstrict" -> Encoder[Boolean].apply(row.proisstrict),
+      "proretset" -> Encoder[Boolean].apply(row.proretset),
+      "provolatile" -> Encoder[String].apply(row.provolatile),
+      "proparallel" -> Encoder[String].apply(row.proparallel),
+      "pronargs" -> Encoder[Int].apply(row.pronargs),
+      "pronargdefaults" -> Encoder[Int].apply(row.pronargdefaults),
+      "prorettype" -> Encoder[/* oid */ Long].apply(row.prorettype),
+      "proargtypes" -> Encoder[TypoOidVector].apply(row.proargtypes),
+      "proallargtypes" -> Encoder[Option[Array[/* oid */ Long]]].apply(row.proallargtypes),
+      "proargmodes" -> Encoder[Option[Array[String]]].apply(row.proargmodes),
+      "proargnames" -> Encoder[Option[Array[String]]].apply(row.proargnames),
+      "proargdefaults" -> Encoder[Option[TypoPgNodeTree]].apply(row.proargdefaults),
+      "protrftypes" -> Encoder[Option[Array[/* oid */ Long]]].apply(row.protrftypes),
+      "prosrc" -> Encoder[String].apply(row.prosrc),
+      "probin" -> Encoder[Option[String]].apply(row.probin),
+      "prosqlbody" -> Encoder[Option[TypoPgNodeTree]].apply(row.prosqlbody),
+      "proconfig" -> Encoder[Option[Array[String]]].apply(row.proconfig),
+      "proacl" -> Encoder[Option[Array[TypoAclItem]]].apply(row.proacl)
     )
-  
-
+  )
+  implicit val read: Read[PgProcRow] = new Read[PgProcRow](
+    gets = List(
+      (Get[PgProcId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Float], Nullability.NoNulls),
+      (Get[Float], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoOidVector], Nullability.NoNulls),
+      (Get[Array[/* oid */ Long]], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[TypoPgNodeTree], Nullability.Nullable),
+      (Get[Array[/* oid */ Long]], Nullability.Nullable),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoPgNodeTree], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[Array[TypoAclItem]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgProcRow(
+      oid = Get[PgProcId].unsafeGetNonNullable(rs, i + 0),
+      proname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      pronamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      proowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      prolang = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
+      procost = Get[Float].unsafeGetNonNullable(rs, i + 5),
+      prorows = Get[Float].unsafeGetNonNullable(rs, i + 6),
+      provariadic = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
+      prosupport = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 8),
+      prokind = Get[String].unsafeGetNonNullable(rs, i + 9),
+      prosecdef = Get[Boolean].unsafeGetNonNullable(rs, i + 10),
+      proleakproof = Get[Boolean].unsafeGetNonNullable(rs, i + 11),
+      proisstrict = Get[Boolean].unsafeGetNonNullable(rs, i + 12),
+      proretset = Get[Boolean].unsafeGetNonNullable(rs, i + 13),
+      provolatile = Get[String].unsafeGetNonNullable(rs, i + 14),
+      proparallel = Get[String].unsafeGetNonNullable(rs, i + 15),
+      pronargs = Get[Int].unsafeGetNonNullable(rs, i + 16),
+      pronargdefaults = Get[Int].unsafeGetNonNullable(rs, i + 17),
+      prorettype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 18),
+      proargtypes = Get[TypoOidVector].unsafeGetNonNullable(rs, i + 19),
+      proallargtypes = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 20),
+      proargmodes = Get[Array[String]].unsafeGetNullable(rs, i + 21),
+      proargnames = Get[Array[String]].unsafeGetNullable(rs, i + 22),
+      proargdefaults = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 23),
+      protrftypes = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 24),
+      prosrc = Get[String].unsafeGetNonNullable(rs, i + 25),
+      probin = Get[String].unsafeGetNullable(rs, i + 26),
+      prosqlbody = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 27),
+      proconfig = Get[Array[String]].unsafeGetNullable(rs, i + 28),
+      proacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 29)
+    )
+  )
 }

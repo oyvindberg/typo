@@ -8,21 +8,21 @@ package sales
 package salestaxrate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salestaxrate where salestaxrateid = $salestaxrateid".update.run.map(_ > 0)
+    sql"delete from sales.salestaxrate where salestaxrateid = ${salestaxrateid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
           values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """.query[SalestaxrateRow].unique
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow] = {
@@ -44,32 +44,32 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.salestaxrate default values
-            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salestaxrate(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
          """
     }
     q.query[SalestaxrateRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate""".query[SalestaxrateRow].stream
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate""".query[SalestaxrateRow].stream
   }
   override def selectById(salestaxrateid: SalestaxrateId): ConnectionIO[Option[SalestaxrateRow]] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid""".query[SalestaxrateRow].option
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ${salestaxrateid}""".query[SalestaxrateRow].option
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate where salestaxrateid = ANY($salestaxrateids)""".query[SalestaxrateRow].stream
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ANY(${salestaxrateids})""".query[SalestaxrateRow].stream
   }
   override def update(row: SalestaxrateRow): ConnectionIO[Boolean] = {
     val salestaxrateid = row.salestaxrateid
@@ -80,7 +80,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
               "name" = ${row.name}::"public"."Name",
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where salestaxrateid = $salestaxrateid
+          where salestaxrateid = ${salestaxrateid}
        """
       .update
       .run
@@ -105,7 +105,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             "name" = EXCLUDED."name",
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """.query[SalestaxrateRow].unique
   }
 }

@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgStatWalReceiverViewRepoImpl extends PgStatWalReceiverViewRepo {
   override def selectAll(implicit c: Connection): List[PgStatWalReceiverViewRow] = {
-    SQL"""select pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time, slot_name, sender_host, sender_port, conninfo
+    SQL"""select pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time::text, last_msg_receipt_time::text, latest_end_lsn, latest_end_time::text, slot_name, sender_host, sender_port, conninfo
           from pg_catalog.pg_stat_wal_receiver
        """.as(PgStatWalReceiverViewRow.rowParser(1).*)
   }

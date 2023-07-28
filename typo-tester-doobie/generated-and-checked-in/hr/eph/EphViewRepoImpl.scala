@@ -13,6 +13,6 @@ import fs2.Stream
 
 object EphViewRepoImpl extends EphViewRepo {
   override def selectAll: Stream[ConnectionIO, EphViewRow] = {
-    sql"""select "id", businessentityid, ratechangedate, rate, payfrequency, modifieddate from hr.eph""".query[EphViewRow].stream
+    sql"""select "id", businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from hr.eph""".query[EphViewRow].stream
   }
 }

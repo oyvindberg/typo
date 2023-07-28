@@ -8,20 +8,20 @@ package sales
 package currency
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId): ConnectionIO[Boolean] = {
-    sql"delete from sales.currency where currencycode = $currencycode".update.run.map(_ > 0)
+    sql"delete from sales.currency where currencycode = ${currencycode}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
           values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning currencycode, "name", modifieddate
+          returning currencycode, "name", modifieddate::text
        """.query[CurrencyRow].unique
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
@@ -30,39 +30,39 @@ object CurrencyRepoImpl extends CurrencyRepo {
       Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.currency default values
-            returning currencycode, "name", modifieddate
+            returning currencycode, "name", modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.currency(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning currencycode, "name", modifieddate
+            returning currencycode, "name", modifieddate::text
          """
     }
     q.query[CurrencyRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select currencycode, "name", modifieddate from sales.currency""".query[CurrencyRow].stream
+    sql"""select currencycode, "name", modifieddate::text from sales.currency""".query[CurrencyRow].stream
   }
   override def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]] = {
-    sql"""select currencycode, "name", modifieddate from sales.currency where currencycode = $currencycode""".query[CurrencyRow].option
+    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ${currencycode}""".query[CurrencyRow].option
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select currencycode, "name", modifieddate from sales.currency where currencycode = ANY($currencycodes)""".query[CurrencyRow].stream
+    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ANY(${currencycodes})""".query[CurrencyRow].stream
   }
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode
     sql"""update sales.currency
           set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
-          where currencycode = $currencycode
+          where currencycode = ${currencycode}
        """
       .update
       .run
@@ -79,7 +79,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning currencycode, "name", modifieddate
+          returning currencycode, "name", modifieddate::text
        """.query[CurrencyRow].unique
   }
 }

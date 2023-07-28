@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAuthMembersRow(
@@ -26,37 +28,33 @@ case class PgAuthMembersRow(
  }
 
 object PgAuthMembersRow {
-  def rowParser(idx: Int): RowParser[PgAuthMembersRow] =
-    RowParser[PgAuthMembersRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAuthMembersRow] = Reads[PgAuthMembersRow](json => JsResult.fromTry(
+      Try(
         PgAuthMembersRow(
-          roleid = row[/* oid */ Long](idx + 0),
-          member = row[/* oid */ Long](idx + 1),
-          grantor = row[/* oid */ Long](idx + 2),
-          adminOption = row[Boolean](idx + 3)
+          roleid = json.\("roleid").as[/* oid */ Long],
+          member = json.\("member").as[/* oid */ Long],
+          grantor = json.\("grantor").as[/* oid */ Long],
+          adminOption = json.\("admin_option").as[Boolean]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAuthMembersRow] = new OFormat[PgAuthMembersRow]{
-    override def writes(o: PgAuthMembersRow): JsObject =
-      Json.obj(
-        "roleid" -> o.roleid,
-        "member" -> o.member,
-        "grantor" -> o.grantor,
-        "admin_option" -> o.adminOption
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAuthMembersRow] = RowParser[PgAuthMembersRow] { row =>
+    Success(
+      PgAuthMembersRow(
+        roleid = row[/* oid */ Long](idx + 0),
+        member = row[/* oid */ Long](idx + 1),
+        grantor = row[/* oid */ Long](idx + 2),
+        adminOption = row[Boolean](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAuthMembersRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAuthMembersRow(
-            roleid = json.\("roleid").as[/* oid */ Long],
-            member = json.\("member").as[/* oid */ Long],
-            grantor = json.\("grantor").as[/* oid */ Long],
-            adminOption = json.\("admin_option").as[Boolean]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAuthMembersRow] = OWrites[PgAuthMembersRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "roleid" -> Json.toJson(o.roleid),
+      "member" -> Json.toJson(o.member),
+      "grantor" -> Json.toJson(o.grantor),
+      "admin_option" -> Json.toJson(o.adminOption)
+    ))
+  )
 }

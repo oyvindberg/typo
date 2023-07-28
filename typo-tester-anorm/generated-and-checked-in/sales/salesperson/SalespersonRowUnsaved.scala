@@ -8,15 +8,17 @@ package sales
 package salesperson
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesperson` which has not been persisted yet */
@@ -44,9 +46,9 @@ case class SalespersonRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(bonusDefault: => BigDecimal, commissionpctDefault: => BigDecimal, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalespersonRow =
+  def toRow(bonusDefault: => BigDecimal, commissionpctDefault: => BigDecimal, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalespersonRow =
     SalespersonRow(
       businessentityid = businessentityid,
       territoryid = territoryid,
@@ -78,36 +80,33 @@ case class SalespersonRowUnsaved(
     )
 }
 object SalespersonRowUnsaved {
-  implicit val oFormat: OFormat[SalespersonRowUnsaved] = new OFormat[SalespersonRowUnsaved]{
-    override def writes(o: SalespersonRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "territoryid" -> o.territoryid,
-        "salesquota" -> o.salesquota,
-        "bonus" -> o.bonus,
-        "commissionpct" -> o.commissionpct,
-        "salesytd" -> o.salesytd,
-        "saleslastyear" -> o.saleslastyear,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[SalespersonRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          SalespersonRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-            salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
-            bonus = json.\("bonus").as[Defaulted[BigDecimal]],
-            commissionpct = json.\("commissionpct").as[Defaulted[BigDecimal]],
-            salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],
-            saleslastyear = json.\("saleslastyear").as[Defaulted[BigDecimal]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[SalespersonRowUnsaved] = Reads[SalespersonRowUnsaved](json => JsResult.fromTry(
+      Try(
+        SalespersonRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
+          salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
+          bonus = json.\("bonus").as[Defaulted[BigDecimal]],
+          commissionpct = json.\("commissionpct").as[Defaulted[BigDecimal]],
+          salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],
+          saleslastyear = json.\("saleslastyear").as[Defaulted[BigDecimal]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalespersonRowUnsaved] = OWrites[SalespersonRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "salesquota" -> Json.toJson(o.salesquota),
+      "bonus" -> Json.toJson(o.bonus),
+      "commissionpct" -> Json.toJson(o.commissionpct),
+      "salesytd" -> Json.toJson(o.salesytd),
+      "saleslastyear" -> Json.toJson(o.saleslastyear),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

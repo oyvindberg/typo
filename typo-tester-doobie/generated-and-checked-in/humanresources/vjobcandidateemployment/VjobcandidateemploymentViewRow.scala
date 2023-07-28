@@ -7,22 +7,20 @@ package adventureworks
 package humanresources
 package vjobcandidateemployment
 
+import adventureworks.TypoLocalDate
 import adventureworks.humanresources.jobcandidate.JobcandidateId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDate
 
 case class VjobcandidateemploymentViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: Option[JobcandidateId],
-  `Emp.StartDate`: Option[LocalDate],
-  `Emp.EndDate`: Option[LocalDate],
+  `Emp.StartDate`: Option[TypoLocalDate],
+  `Emp.EndDate`: Option[TypoLocalDate],
   `Emp.OrgName`: Option[/* max 100 chars */ String],
   `Emp.JobTitle`: Option[/* max 100 chars */ String],
   `Emp.Responsibility`: Option[String],
@@ -34,66 +32,34 @@ case class VjobcandidateemploymentViewRow(
 )
 
 object VjobcandidateemploymentViewRow {
-  implicit val decoder: Decoder[VjobcandidateemploymentViewRow] =
-    (c: HCursor) =>
-      for {
-        jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
-        `Emp.StartDate` <- c.downField("Emp.StartDate").as[Option[LocalDate]]
-        `Emp.EndDate` <- c.downField("Emp.EndDate").as[Option[LocalDate]]
-        `Emp.OrgName` <- c.downField("Emp.OrgName").as[Option[/* max 100 chars */ String]]
-        `Emp.JobTitle` <- c.downField("Emp.JobTitle").as[Option[/* max 100 chars */ String]]
-        `Emp.Responsibility` <- c.downField("Emp.Responsibility").as[Option[String]]
-        `Emp.FunctionCategory` <- c.downField("Emp.FunctionCategory").as[Option[String]]
-        `Emp.IndustryCategory` <- c.downField("Emp.IndustryCategory").as[Option[String]]
-        `Emp.Loc.CountryRegion` <- c.downField("Emp.Loc.CountryRegion").as[Option[String]]
-        `Emp.Loc.State` <- c.downField("Emp.Loc.State").as[Option[String]]
-        `Emp.Loc.City` <- c.downField("Emp.Loc.City").as[Option[String]]
-      } yield VjobcandidateemploymentViewRow(jobcandidateid, `Emp.StartDate`, `Emp.EndDate`, `Emp.OrgName`, `Emp.JobTitle`, `Emp.Responsibility`, `Emp.FunctionCategory`, `Emp.IndustryCategory`, `Emp.Loc.CountryRegion`, `Emp.Loc.State`, `Emp.Loc.City`)
-  implicit val encoder: Encoder[VjobcandidateemploymentViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "jobcandidateid" := row.jobcandidateid,
-        "Emp.StartDate" := row.`Emp.StartDate`,
-        "Emp.EndDate" := row.`Emp.EndDate`,
-        "Emp.OrgName" := row.`Emp.OrgName`,
-        "Emp.JobTitle" := row.`Emp.JobTitle`,
-        "Emp.Responsibility" := row.`Emp.Responsibility`,
-        "Emp.FunctionCategory" := row.`Emp.FunctionCategory`,
-        "Emp.IndustryCategory" := row.`Emp.IndustryCategory`,
-        "Emp.Loc.CountryRegion" := row.`Emp.Loc.CountryRegion`,
-        "Emp.Loc.State" := row.`Emp.Loc.State`,
-        "Emp.Loc.City" := row.`Emp.Loc.City`
-      )}
-  implicit val read: Read[VjobcandidateemploymentViewRow] =
-    new Read[VjobcandidateemploymentViewRow](
-      gets = List(
-        (Get[JobcandidateId], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateemploymentViewRow(
-        jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 0),
-        `Emp.StartDate` = Get[LocalDate].unsafeGetNullable(rs, i + 1),
-        `Emp.EndDate` = Get[LocalDate].unsafeGetNullable(rs, i + 2),
-        `Emp.OrgName` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 3),
-        `Emp.JobTitle` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
-        `Emp.Responsibility` = Get[String].unsafeGetNullable(rs, i + 5),
-        `Emp.FunctionCategory` = Get[String].unsafeGetNullable(rs, i + 6),
-        `Emp.IndustryCategory` = Get[String].unsafeGetNullable(rs, i + 7),
-        `Emp.Loc.CountryRegion` = Get[String].unsafeGetNullable(rs, i + 8),
-        `Emp.Loc.State` = Get[String].unsafeGetNullable(rs, i + 9),
-        `Emp.Loc.City` = Get[String].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[VjobcandidateemploymentViewRow] = Decoder.forProduct11[VjobcandidateemploymentViewRow, Option[JobcandidateId], Option[TypoLocalDate], Option[TypoLocalDate], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[String]]("jobcandidateid", "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City")(VjobcandidateemploymentViewRow.apply)
+  implicit val encoder: Encoder[VjobcandidateemploymentViewRow] = Encoder.forProduct11[VjobcandidateemploymentViewRow, Option[JobcandidateId], Option[TypoLocalDate], Option[TypoLocalDate], Option[/* max 100 chars */ String], Option[/* max 100 chars */ String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[String]]("jobcandidateid", "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City")(x => (x.jobcandidateid, x.`Emp.StartDate`, x.`Emp.EndDate`, x.`Emp.OrgName`, x.`Emp.JobTitle`, x.`Emp.Responsibility`, x.`Emp.FunctionCategory`, x.`Emp.IndustryCategory`, x.`Emp.Loc.CountryRegion`, x.`Emp.Loc.State`, x.`Emp.Loc.City`))
+  implicit val read: Read[VjobcandidateemploymentViewRow] = new Read[VjobcandidateemploymentViewRow](
+    gets = List(
+      (Get[JobcandidateId], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[/* max 100 chars */ String], Nullability.Nullable),
+      (Get[/* max 100 chars */ String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateemploymentViewRow(
+      jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 0),
+      `Emp.StartDate` = Get[TypoLocalDate].unsafeGetNullable(rs, i + 1),
+      `Emp.EndDate` = Get[TypoLocalDate].unsafeGetNullable(rs, i + 2),
+      `Emp.OrgName` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 3),
+      `Emp.JobTitle` = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
+      `Emp.Responsibility` = Get[String].unsafeGetNullable(rs, i + 5),
+      `Emp.FunctionCategory` = Get[String].unsafeGetNullable(rs, i + 6),
+      `Emp.IndustryCategory` = Get[String].unsafeGetNullable(rs, i + 7),
+      `Emp.Loc.CountryRegion` = Get[String].unsafeGetNullable(rs, i + 8),
+      `Emp.Loc.State` = Get[String].unsafeGetNullable(rs, i + 9),
+      `Emp.Loc.City` = Get[String].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

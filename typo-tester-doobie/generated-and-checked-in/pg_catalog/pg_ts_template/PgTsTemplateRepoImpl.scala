@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def delete(oid: PgTsTemplateId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_template where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_template where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsTemplateRow): ConnectionIO[PgTsTemplateRow] = {
     sql"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
@@ -25,10 +25,10 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template".query[PgTsTemplateRow].stream
   }
   override def selectById(oid: PgTsTemplateId): ConnectionIO[Option[PgTsTemplateRow]] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = $oid".query[PgTsTemplateRow].option
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ${oid}".query[PgTsTemplateRow].option
   }
   override def selectByIds(oids: Array[PgTsTemplateId]): Stream[ConnectionIO, PgTsTemplateRow] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY($oids)".query[PgTsTemplateRow].stream
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${oids})".query[PgTsTemplateRow].stream
   }
   override def update(row: PgTsTemplateRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -37,7 +37,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
               tmplnamespace = ${row.tmplnamespace}::oid,
               tmplinit = ${row.tmplinit}::regproc,
               tmpllexize = ${row.tmpllexize}::regproc
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

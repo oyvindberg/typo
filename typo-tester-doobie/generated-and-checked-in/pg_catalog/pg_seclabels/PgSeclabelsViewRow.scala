@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_seclabels
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgSeclabelsViewRow(
@@ -28,54 +26,28 @@ case class PgSeclabelsViewRow(
 )
 
 object PgSeclabelsViewRow {
-  implicit val decoder: Decoder[PgSeclabelsViewRow] =
-    (c: HCursor) =>
-      for {
-        objoid <- c.downField("objoid").as[Option[/* oid */ Long]]
-        classoid <- c.downField("classoid").as[Option[/* oid */ Long]]
-        objsubid <- c.downField("objsubid").as[Option[Int]]
-        objtype <- c.downField("objtype").as[Option[String]]
-        objnamespace <- c.downField("objnamespace").as[Option[/* oid */ Long]]
-        objname <- c.downField("objname").as[Option[String]]
-        provider <- c.downField("provider").as[Option[String]]
-        label <- c.downField("label").as[Option[String]]
-      } yield PgSeclabelsViewRow(objoid, classoid, objsubid, objtype, objnamespace, objname, provider, label)
-  implicit val encoder: Encoder[PgSeclabelsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "objoid" := row.objoid,
-        "classoid" := row.classoid,
-        "objsubid" := row.objsubid,
-        "objtype" := row.objtype,
-        "objnamespace" := row.objnamespace,
-        "objname" := row.objname,
-        "provider" := row.provider,
-        "label" := row.label
-      )}
-  implicit val read: Read[PgSeclabelsViewRow] =
-    new Read[PgSeclabelsViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgSeclabelsViewRow(
-        objoid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        classoid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        objsubid = Get[Int].unsafeGetNullable(rs, i + 2),
-        objtype = Get[String].unsafeGetNullable(rs, i + 3),
-        objnamespace = Get[/* oid */ Long].unsafeGetNullable(rs, i + 4),
-        objname = Get[String].unsafeGetNullable(rs, i + 5),
-        provider = Get[String].unsafeGetNullable(rs, i + 6),
-        label = Get[String].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgSeclabelsViewRow] = Decoder.forProduct8[PgSeclabelsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[String]]("objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label")(PgSeclabelsViewRow.apply)
+  implicit val encoder: Encoder[PgSeclabelsViewRow] = Encoder.forProduct8[PgSeclabelsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[String]]("objoid", "classoid", "objsubid", "objtype", "objnamespace", "objname", "provider", "label")(x => (x.objoid, x.classoid, x.objsubid, x.objtype, x.objnamespace, x.objname, x.provider, x.label))
+  implicit val read: Read[PgSeclabelsViewRow] = new Read[PgSeclabelsViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgSeclabelsViewRow(
+      objoid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      classoid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      objsubid = Get[Int].unsafeGetNullable(rs, i + 2),
+      objtype = Get[String].unsafeGetNullable(rs, i + 3),
+      objnamespace = Get[/* oid */ Long].unsafeGetNullable(rs, i + 4),
+      objname = Get[String].unsafeGetNullable(rs, i + 5),
+      provider = Get[String].unsafeGetNullable(rs, i + 6),
+      label = Get[String].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

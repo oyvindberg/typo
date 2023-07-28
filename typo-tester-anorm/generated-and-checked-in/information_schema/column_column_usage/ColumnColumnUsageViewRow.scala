@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ColumnColumnUsageViewRow(
@@ -26,40 +28,36 @@ case class ColumnColumnUsageViewRow(
 )
 
 object ColumnColumnUsageViewRow {
-  def rowParser(idx: Int): RowParser[ColumnColumnUsageViewRow] =
-    RowParser[ColumnColumnUsageViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ColumnColumnUsageViewRow] = Reads[ColumnColumnUsageViewRow](json => JsResult.fromTry(
+      Try(
         ColumnColumnUsageViewRow(
-          tableCatalog = row[Option[SqlIdentifier]](idx + 0),
-          tableSchema = row[Option[SqlIdentifier]](idx + 1),
-          tableName = row[Option[SqlIdentifier]](idx + 2),
-          columnName = row[Option[SqlIdentifier]](idx + 3),
-          dependentColumn = row[Option[SqlIdentifier]](idx + 4)
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier]),
+          dependentColumn = json.\("dependent_column").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[ColumnColumnUsageViewRow] = new OFormat[ColumnColumnUsageViewRow]{
-    override def writes(o: ColumnColumnUsageViewRow): JsObject =
-      Json.obj(
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "column_name" -> o.columnName,
-        "dependent_column" -> o.dependentColumn
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ColumnColumnUsageViewRow] = RowParser[ColumnColumnUsageViewRow] { row =>
+    Success(
+      ColumnColumnUsageViewRow(
+        tableCatalog = row[Option[SqlIdentifier]](idx + 0),
+        tableSchema = row[Option[SqlIdentifier]](idx + 1),
+        tableName = row[Option[SqlIdentifier]](idx + 2),
+        columnName = row[Option[SqlIdentifier]](idx + 3),
+        dependentColumn = row[Option[SqlIdentifier]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[ColumnColumnUsageViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ColumnColumnUsageViewRow(
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier]),
-            dependentColumn = json.\("dependent_column").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ColumnColumnUsageViewRow] = OWrites[ColumnColumnUsageViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "column_name" -> Json.toJson(o.columnName),
+      "dependent_column" -> Json.toJson(o.dependentColumn)
+    ))
+  )
 }

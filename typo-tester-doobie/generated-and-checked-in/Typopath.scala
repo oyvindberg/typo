@@ -6,48 +6,24 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.geometric.PGpath
 import org.postgresql.geometric.PGpoint
 
 /** This implements a path (a multiple segmented line, which may be closed) */
 case class TypoPath(open: Boolean, points: List[TypoPoint])
+
 object TypoPath {
-  implicit val decoder: Decoder[TypoPath] =
-    (c: HCursor) =>
-      for {
-        open <- c.downField("open").as[Boolean]
-        points <- c.downField("points").as[List[TypoPoint]]
-      } yield TypoPath(open, points)
-  implicit val encoder: Encoder[TypoPath] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "open" := row.open,
-        "points" := row.points
-      )}
-  implicit val get: Get[TypoPath] =
-    Get.Advanced.other[PGpath](cats.data.NonEmptyList.one("path"))
-      .map(v => TypoPath(v.isOpen, v.points.map(p => TypoPoint(p.x, p.y)).toList))
-  
-  implicit val put: Put[TypoPath] =
-    Put.Advanced.other[PGpath](NonEmptyList.one("path"))
-      .contramap(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open))
-  
-  implicit val meta: Meta[TypoPath] = new Meta(get, put)
-  val gets: Get[Array[TypoPath]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_path"))
-      .map(_.map(v => TypoPath(v.asInstanceOf[PGpath].isOpen, v.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList)))
-  
-  val puts: Put[Array[TypoPath]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_path"), "path")
-      .contramap(_.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
-  
-  implicit val metas: Meta[Array[TypoPath]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoPath]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_path"))
+    .map(_.map(v => TypoPath(v.asInstanceOf[PGpath].isOpen, v.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList)))
+  implicit val arrayPut: Put[Array[TypoPath]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_path"), "path")
+    .contramap(_.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
+  implicit val decoder: Decoder[TypoPath] = Decoder.forProduct2[TypoPath, Boolean, List[TypoPoint]]("open", "points")(TypoPath.apply)
+  implicit val encoder: Encoder[TypoPath] = Encoder.forProduct2[TypoPath, Boolean, List[TypoPoint]]("open", "points")(x => (x.open, x.points))
+  implicit val get: Get[TypoPath] = Get.Advanced.other[PGpath](NonEmptyList.one("path"))
+    .map(v => TypoPath(v.isOpen, v.points.map(p => TypoPoint(p.x, p.y)).toList))
+  implicit val put: Put[TypoPath] = Put.Advanced.other[PGpath](NonEmptyList.one("path")).contramap(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open))
 }

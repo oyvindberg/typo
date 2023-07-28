@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgPreparedXactsViewRepoImpl extends PgPreparedXactsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgPreparedXactsViewRow] = {
-    sql"""select "transaction", gid, "prepared", "owner", "database" from pg_catalog.pg_prepared_xacts""".query[PgPreparedXactsViewRow].stream
+    sql"""select "transaction", gid, "prepared"::text, "owner", "database" from pg_catalog.pg_prepared_xacts""".query[PgPreparedXactsViewRow].stream
   }
 }

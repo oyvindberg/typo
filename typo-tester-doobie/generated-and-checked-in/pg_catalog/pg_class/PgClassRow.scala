@@ -10,14 +10,16 @@ package pg_class
 import adventureworks.TypoAclItem
 import adventureworks.TypoPgNodeTree
 import adventureworks.TypoXid
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import scala.util.Try
 
 case class PgClassRow(
   oid: PgClassId,
@@ -56,154 +58,156 @@ case class PgClassRow(
 )
 
 object PgClassRow {
-  implicit val decoder: Decoder[PgClassRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgClassId]
-        relname <- c.downField("relname").as[String]
-        relnamespace <- c.downField("relnamespace").as[/* oid */ Long]
-        reltype <- c.downField("reltype").as[/* oid */ Long]
-        reloftype <- c.downField("reloftype").as[/* oid */ Long]
-        relowner <- c.downField("relowner").as[/* oid */ Long]
-        relam <- c.downField("relam").as[/* oid */ Long]
-        relfilenode <- c.downField("relfilenode").as[/* oid */ Long]
-        reltablespace <- c.downField("reltablespace").as[/* oid */ Long]
-        relpages <- c.downField("relpages").as[Int]
-        reltuples <- c.downField("reltuples").as[Float]
-        relallvisible <- c.downField("relallvisible").as[Int]
-        reltoastrelid <- c.downField("reltoastrelid").as[/* oid */ Long]
-        relhasindex <- c.downField("relhasindex").as[Boolean]
-        relisshared <- c.downField("relisshared").as[Boolean]
-        relpersistence <- c.downField("relpersistence").as[String]
-        relkind <- c.downField("relkind").as[String]
-        relnatts <- c.downField("relnatts").as[Int]
-        relchecks <- c.downField("relchecks").as[Int]
-        relhasrules <- c.downField("relhasrules").as[Boolean]
-        relhastriggers <- c.downField("relhastriggers").as[Boolean]
-        relhassubclass <- c.downField("relhassubclass").as[Boolean]
-        relrowsecurity <- c.downField("relrowsecurity").as[Boolean]
-        relforcerowsecurity <- c.downField("relforcerowsecurity").as[Boolean]
-        relispopulated <- c.downField("relispopulated").as[Boolean]
-        relreplident <- c.downField("relreplident").as[String]
-        relispartition <- c.downField("relispartition").as[Boolean]
-        relrewrite <- c.downField("relrewrite").as[/* oid */ Long]
-        relfrozenxid <- c.downField("relfrozenxid").as[TypoXid]
-        relminmxid <- c.downField("relminmxid").as[TypoXid]
-        relacl <- c.downField("relacl").as[Option[Array[TypoAclItem]]]
-        reloptions <- c.downField("reloptions").as[Option[Array[String]]]
-        relpartbound <- c.downField("relpartbound").as[Option[TypoPgNodeTree]]
-      } yield PgClassRow(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
-  implicit val encoder: Encoder[PgClassRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "relname" := row.relname,
-        "relnamespace" := row.relnamespace,
-        "reltype" := row.reltype,
-        "reloftype" := row.reloftype,
-        "relowner" := row.relowner,
-        "relam" := row.relam,
-        "relfilenode" := row.relfilenode,
-        "reltablespace" := row.reltablespace,
-        "relpages" := row.relpages,
-        "reltuples" := row.reltuples,
-        "relallvisible" := row.relallvisible,
-        "reltoastrelid" := row.reltoastrelid,
-        "relhasindex" := row.relhasindex,
-        "relisshared" := row.relisshared,
-        "relpersistence" := row.relpersistence,
-        "relkind" := row.relkind,
-        "relnatts" := row.relnatts,
-        "relchecks" := row.relchecks,
-        "relhasrules" := row.relhasrules,
-        "relhastriggers" := row.relhastriggers,
-        "relhassubclass" := row.relhassubclass,
-        "relrowsecurity" := row.relrowsecurity,
-        "relforcerowsecurity" := row.relforcerowsecurity,
-        "relispopulated" := row.relispopulated,
-        "relreplident" := row.relreplident,
-        "relispartition" := row.relispartition,
-        "relrewrite" := row.relrewrite,
-        "relfrozenxid" := row.relfrozenxid,
-        "relminmxid" := row.relminmxid,
-        "relacl" := row.relacl,
-        "reloptions" := row.reloptions,
-        "relpartbound" := row.relpartbound
-      )}
-  implicit val read: Read[PgClassRow] =
-    new Read[PgClassRow](
-      gets = List(
-        (Get[PgClassId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Float], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoXid], Nullability.NoNulls),
-        (Get[TypoXid], Nullability.NoNulls),
-        (Get[Array[TypoAclItem]], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[TypoPgNodeTree], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgClassRow(
-        oid = Get[PgClassId].unsafeGetNonNullable(rs, i + 0),
-        relname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        relnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        reltype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        reloftype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-        relowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 5),
-        relam = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
-        relfilenode = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
-        reltablespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8),
-        relpages = Get[Int].unsafeGetNonNullable(rs, i + 9),
-        reltuples = Get[Float].unsafeGetNonNullable(rs, i + 10),
-        relallvisible = Get[Int].unsafeGetNonNullable(rs, i + 11),
-        reltoastrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 12),
-        relhasindex = Get[Boolean].unsafeGetNonNullable(rs, i + 13),
-        relisshared = Get[Boolean].unsafeGetNonNullable(rs, i + 14),
-        relpersistence = Get[String].unsafeGetNonNullable(rs, i + 15),
-        relkind = Get[String].unsafeGetNonNullable(rs, i + 16),
-        relnatts = Get[Int].unsafeGetNonNullable(rs, i + 17),
-        relchecks = Get[Int].unsafeGetNonNullable(rs, i + 18),
-        relhasrules = Get[Boolean].unsafeGetNonNullable(rs, i + 19),
-        relhastriggers = Get[Boolean].unsafeGetNonNullable(rs, i + 20),
-        relhassubclass = Get[Boolean].unsafeGetNonNullable(rs, i + 21),
-        relrowsecurity = Get[Boolean].unsafeGetNonNullable(rs, i + 22),
-        relforcerowsecurity = Get[Boolean].unsafeGetNonNullable(rs, i + 23),
-        relispopulated = Get[Boolean].unsafeGetNonNullable(rs, i + 24),
-        relreplident = Get[String].unsafeGetNonNullable(rs, i + 25),
-        relispartition = Get[Boolean].unsafeGetNonNullable(rs, i + 26),
-        relrewrite = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 27),
-        relfrozenxid = Get[TypoXid].unsafeGetNonNullable(rs, i + 28),
-        relminmxid = Get[TypoXid].unsafeGetNonNullable(rs, i + 29),
-        relacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 30),
-        reloptions = Get[Array[String]].unsafeGetNullable(rs, i + 31),
-        relpartbound = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 32)
+  implicit val decoder: Decoder[PgClassRow] = Decoder.instanceTry[PgClassRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      PgClassRow(
+        oid = orThrow(c.get("oid")(Decoder[PgClassId])),
+        relname = orThrow(c.get("relname")(Decoder[String])),
+        relnamespace = orThrow(c.get("relnamespace")(Decoder[/* oid */ Long])),
+        reltype = orThrow(c.get("reltype")(Decoder[/* oid */ Long])),
+        reloftype = orThrow(c.get("reloftype")(Decoder[/* oid */ Long])),
+        relowner = orThrow(c.get("relowner")(Decoder[/* oid */ Long])),
+        relam = orThrow(c.get("relam")(Decoder[/* oid */ Long])),
+        relfilenode = orThrow(c.get("relfilenode")(Decoder[/* oid */ Long])),
+        reltablespace = orThrow(c.get("reltablespace")(Decoder[/* oid */ Long])),
+        relpages = orThrow(c.get("relpages")(Decoder[Int])),
+        reltuples = orThrow(c.get("reltuples")(Decoder[Float])),
+        relallvisible = orThrow(c.get("relallvisible")(Decoder[Int])),
+        reltoastrelid = orThrow(c.get("reltoastrelid")(Decoder[/* oid */ Long])),
+        relhasindex = orThrow(c.get("relhasindex")(Decoder[Boolean])),
+        relisshared = orThrow(c.get("relisshared")(Decoder[Boolean])),
+        relpersistence = orThrow(c.get("relpersistence")(Decoder[String])),
+        relkind = orThrow(c.get("relkind")(Decoder[String])),
+        relnatts = orThrow(c.get("relnatts")(Decoder[Int])),
+        relchecks = orThrow(c.get("relchecks")(Decoder[Int])),
+        relhasrules = orThrow(c.get("relhasrules")(Decoder[Boolean])),
+        relhastriggers = orThrow(c.get("relhastriggers")(Decoder[Boolean])),
+        relhassubclass = orThrow(c.get("relhassubclass")(Decoder[Boolean])),
+        relrowsecurity = orThrow(c.get("relrowsecurity")(Decoder[Boolean])),
+        relforcerowsecurity = orThrow(c.get("relforcerowsecurity")(Decoder[Boolean])),
+        relispopulated = orThrow(c.get("relispopulated")(Decoder[Boolean])),
+        relreplident = orThrow(c.get("relreplident")(Decoder[String])),
+        relispartition = orThrow(c.get("relispartition")(Decoder[Boolean])),
+        relrewrite = orThrow(c.get("relrewrite")(Decoder[/* oid */ Long])),
+        relfrozenxid = orThrow(c.get("relfrozenxid")(Decoder[TypoXid])),
+        relminmxid = orThrow(c.get("relminmxid")(Decoder[TypoXid])),
+        relacl = orThrow(c.get("relacl")(Decoder[Option[Array[TypoAclItem]]])),
+        reloptions = orThrow(c.get("reloptions")(Decoder[Option[Array[String]]])),
+        relpartbound = orThrow(c.get("relpartbound")(Decoder[Option[TypoPgNodeTree]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[PgClassRow] = Encoder[PgClassRow](row =>
+    Json.obj(
+      "oid" -> Encoder[PgClassId].apply(row.oid),
+      "relname" -> Encoder[String].apply(row.relname),
+      "relnamespace" -> Encoder[/* oid */ Long].apply(row.relnamespace),
+      "reltype" -> Encoder[/* oid */ Long].apply(row.reltype),
+      "reloftype" -> Encoder[/* oid */ Long].apply(row.reloftype),
+      "relowner" -> Encoder[/* oid */ Long].apply(row.relowner),
+      "relam" -> Encoder[/* oid */ Long].apply(row.relam),
+      "relfilenode" -> Encoder[/* oid */ Long].apply(row.relfilenode),
+      "reltablespace" -> Encoder[/* oid */ Long].apply(row.reltablespace),
+      "relpages" -> Encoder[Int].apply(row.relpages),
+      "reltuples" -> Encoder[Float].apply(row.reltuples),
+      "relallvisible" -> Encoder[Int].apply(row.relallvisible),
+      "reltoastrelid" -> Encoder[/* oid */ Long].apply(row.reltoastrelid),
+      "relhasindex" -> Encoder[Boolean].apply(row.relhasindex),
+      "relisshared" -> Encoder[Boolean].apply(row.relisshared),
+      "relpersistence" -> Encoder[String].apply(row.relpersistence),
+      "relkind" -> Encoder[String].apply(row.relkind),
+      "relnatts" -> Encoder[Int].apply(row.relnatts),
+      "relchecks" -> Encoder[Int].apply(row.relchecks),
+      "relhasrules" -> Encoder[Boolean].apply(row.relhasrules),
+      "relhastriggers" -> Encoder[Boolean].apply(row.relhastriggers),
+      "relhassubclass" -> Encoder[Boolean].apply(row.relhassubclass),
+      "relrowsecurity" -> Encoder[Boolean].apply(row.relrowsecurity),
+      "relforcerowsecurity" -> Encoder[Boolean].apply(row.relforcerowsecurity),
+      "relispopulated" -> Encoder[Boolean].apply(row.relispopulated),
+      "relreplident" -> Encoder[String].apply(row.relreplident),
+      "relispartition" -> Encoder[Boolean].apply(row.relispartition),
+      "relrewrite" -> Encoder[/* oid */ Long].apply(row.relrewrite),
+      "relfrozenxid" -> Encoder[TypoXid].apply(row.relfrozenxid),
+      "relminmxid" -> Encoder[TypoXid].apply(row.relminmxid),
+      "relacl" -> Encoder[Option[Array[TypoAclItem]]].apply(row.relacl),
+      "reloptions" -> Encoder[Option[Array[String]]].apply(row.reloptions),
+      "relpartbound" -> Encoder[Option[TypoPgNodeTree]].apply(row.relpartbound)
     )
-  
-
+  )
+  implicit val read: Read[PgClassRow] = new Read[PgClassRow](
+    gets = List(
+      (Get[PgClassId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Float], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoXid], Nullability.NoNulls),
+      (Get[TypoXid], Nullability.NoNulls),
+      (Get[Array[TypoAclItem]], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[TypoPgNodeTree], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgClassRow(
+      oid = Get[PgClassId].unsafeGetNonNullable(rs, i + 0),
+      relname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      relnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      reltype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      reloftype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
+      relowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 5),
+      relam = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
+      relfilenode = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
+      reltablespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8),
+      relpages = Get[Int].unsafeGetNonNullable(rs, i + 9),
+      reltuples = Get[Float].unsafeGetNonNullable(rs, i + 10),
+      relallvisible = Get[Int].unsafeGetNonNullable(rs, i + 11),
+      reltoastrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 12),
+      relhasindex = Get[Boolean].unsafeGetNonNullable(rs, i + 13),
+      relisshared = Get[Boolean].unsafeGetNonNullable(rs, i + 14),
+      relpersistence = Get[String].unsafeGetNonNullable(rs, i + 15),
+      relkind = Get[String].unsafeGetNonNullable(rs, i + 16),
+      relnatts = Get[Int].unsafeGetNonNullable(rs, i + 17),
+      relchecks = Get[Int].unsafeGetNonNullable(rs, i + 18),
+      relhasrules = Get[Boolean].unsafeGetNonNullable(rs, i + 19),
+      relhastriggers = Get[Boolean].unsafeGetNonNullable(rs, i + 20),
+      relhassubclass = Get[Boolean].unsafeGetNonNullable(rs, i + 21),
+      relrowsecurity = Get[Boolean].unsafeGetNonNullable(rs, i + 22),
+      relforcerowsecurity = Get[Boolean].unsafeGetNonNullable(rs, i + 23),
+      relispopulated = Get[Boolean].unsafeGetNonNullable(rs, i + 24),
+      relreplident = Get[String].unsafeGetNonNullable(rs, i + 25),
+      relispartition = Get[Boolean].unsafeGetNonNullable(rs, i + 26),
+      relrewrite = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 27),
+      relfrozenxid = Get[TypoXid].unsafeGetNonNullable(rs, i + 28),
+      relminmxid = Get[TypoXid].unsafeGetNonNullable(rs, i + 29),
+      relacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 30),
+      reloptions = Get[Array[String]].unsafeGetNullable(rs, i + 31),
+      relpartbound = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 32)
+    )
+  )
 }

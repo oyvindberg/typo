@@ -12,29 +12,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `person.emailaddress` */
 case class EmailaddressId(businessentityid: BusinessentityId, emailaddressid: Int)
 object EmailaddressId {
   implicit val ordering: Ordering[EmailaddressId] = Ordering.by(x => (x.businessentityid, x.emailaddressid))
-  implicit val oFormat: OFormat[EmailaddressId] = new OFormat[EmailaddressId]{
-    override def writes(o: EmailaddressId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "emailaddressid" -> o.emailaddressid
-      )
-  
-    override def reads(json: JsValue): JsResult[EmailaddressId] = {
-      JsResult.fromTry(
-        Try(
-          EmailaddressId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            emailaddressid = json.\("emailaddressid").as[Int]
-          )
+  implicit val reads: Reads[EmailaddressId] = Reads[EmailaddressId](json => JsResult.fromTry(
+      Try(
+        EmailaddressId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          emailaddressid = json.\("emailaddressid").as[Int]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[EmailaddressId] = OWrites[EmailaddressId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "emailaddressid" -> Json.toJson(o.emailaddressid)
+    ))
+  )
 }

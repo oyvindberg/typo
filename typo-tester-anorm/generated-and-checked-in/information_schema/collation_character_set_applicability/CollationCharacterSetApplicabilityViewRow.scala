@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CollationCharacterSetApplicabilityViewRow(
@@ -27,43 +29,39 @@ case class CollationCharacterSetApplicabilityViewRow(
 )
 
 object CollationCharacterSetApplicabilityViewRow {
-  def rowParser(idx: Int): RowParser[CollationCharacterSetApplicabilityViewRow] =
-    RowParser[CollationCharacterSetApplicabilityViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CollationCharacterSetApplicabilityViewRow] = Reads[CollationCharacterSetApplicabilityViewRow](json => JsResult.fromTry(
+      Try(
         CollationCharacterSetApplicabilityViewRow(
-          collationCatalog = row[Option[SqlIdentifier]](idx + 0),
-          collationSchema = row[Option[SqlIdentifier]](idx + 1),
-          collationName = row[Option[SqlIdentifier]](idx + 2),
-          characterSetCatalog = row[Option[SqlIdentifier]](idx + 3),
-          characterSetSchema = row[Option[SqlIdentifier]](idx + 4),
-          characterSetName = row[Option[SqlIdentifier]](idx + 5)
+          collationCatalog = json.\("collation_catalog").toOption.map(_.as[SqlIdentifier]),
+          collationSchema = json.\("collation_schema").toOption.map(_.as[SqlIdentifier]),
+          collationName = json.\("collation_name").toOption.map(_.as[SqlIdentifier]),
+          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
+          characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
+          characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[CollationCharacterSetApplicabilityViewRow] = new OFormat[CollationCharacterSetApplicabilityViewRow]{
-    override def writes(o: CollationCharacterSetApplicabilityViewRow): JsObject =
-      Json.obj(
-        "collation_catalog" -> o.collationCatalog,
-        "collation_schema" -> o.collationSchema,
-        "collation_name" -> o.collationName,
-        "character_set_catalog" -> o.characterSetCatalog,
-        "character_set_schema" -> o.characterSetSchema,
-        "character_set_name" -> o.characterSetName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CollationCharacterSetApplicabilityViewRow] = RowParser[CollationCharacterSetApplicabilityViewRow] { row =>
+    Success(
+      CollationCharacterSetApplicabilityViewRow(
+        collationCatalog = row[Option[SqlIdentifier]](idx + 0),
+        collationSchema = row[Option[SqlIdentifier]](idx + 1),
+        collationName = row[Option[SqlIdentifier]](idx + 2),
+        characterSetCatalog = row[Option[SqlIdentifier]](idx + 3),
+        characterSetSchema = row[Option[SqlIdentifier]](idx + 4),
+        characterSetName = row[Option[SqlIdentifier]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[CollationCharacterSetApplicabilityViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CollationCharacterSetApplicabilityViewRow(
-            collationCatalog = json.\("collation_catalog").toOption.map(_.as[SqlIdentifier]),
-            collationSchema = json.\("collation_schema").toOption.map(_.as[SqlIdentifier]),
-            collationName = json.\("collation_name").toOption.map(_.as[SqlIdentifier]),
-            characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
-            characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
-            characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CollationCharacterSetApplicabilityViewRow] = OWrites[CollationCharacterSetApplicabilityViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "collation_catalog" -> Json.toJson(o.collationCatalog),
+      "collation_schema" -> Json.toJson(o.collationSchema),
+      "collation_name" -> Json.toJson(o.collationName),
+      "character_set_catalog" -> Json.toJson(o.characterSetCatalog),
+      "character_set_schema" -> Json.toJson(o.characterSetSchema),
+      "character_set_name" -> Json.toJson(o.characterSetName)
+    ))
+  )
 }

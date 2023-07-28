@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatSlruViewRepoImpl extends PgStatSlruViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatSlruViewRow] = {
-    sql"""select "name", blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset from pg_catalog.pg_stat_slru""".query[PgStatSlruViewRow].stream
+    sql"""select "name", blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset::text from pg_catalog.pg_stat_slru""".query[PgStatSlruViewRow].stream
   }
 }

@@ -8,11 +8,11 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)
           values (${unsaved.illustrationid}::int4, ${unsaved.diagram}::xml, ${unsaved.modifieddate}::timestamp)
-          returning illustrationid, diagram, modifieddate
+          returning illustrationid, diagram, modifieddate::text
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
   
@@ -35,19 +35,19 @@ object IllustrationRepoImpl extends IllustrationRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.illustration default values
-            returning illustrationid, diagram, modifieddate
+            returning illustrationid, diagram, modifieddate::text
          """
         .executeInsert(IllustrationRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.illustration(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning illustrationid, diagram, modifieddate
+                  returning illustrationid, diagram, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -58,18 +58,18 @@ object IllustrationRepoImpl extends IllustrationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate
+    SQL"""select illustrationid, diagram, modifieddate::text
           from production.illustration
        """.as(IllustrationRow.rowParser(1).*)
   }
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate
+    SQL"""select illustrationid, diagram, modifieddate::text
           from production.illustration
           where illustrationid = $illustrationid
        """.as(IllustrationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
-    SQL"""select illustrationid, diagram, modifieddate
+    SQL"""select illustrationid, diagram, modifieddate::text
           from production.illustration
           where illustrationid = ANY($illustrationids)
        """.as(IllustrationRow.rowParser(1).*)
@@ -94,7 +94,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           do update set
             diagram = EXCLUDED.diagram,
             modifieddate = EXCLUDED.modifieddate
-          returning illustrationid, diagram, modifieddate
+          returning illustrationid, diagram, modifieddate::text
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
   

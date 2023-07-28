@@ -7,60 +7,58 @@ package adventureworks
 package pg_catalog
 package pg_prepared_xacts
 
+import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPreparedXactsViewRow(
   transaction: Option[TypoXid],
   gid: Option[String],
-  prepared: Option[OffsetDateTime],
+  prepared: Option[TypoOffsetDateTime],
   owner: Option[String],
   database: Option[String]
 )
 
 object PgPreparedXactsViewRow {
-  def rowParser(idx: Int): RowParser[PgPreparedXactsViewRow] =
-    RowParser[PgPreparedXactsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPreparedXactsViewRow] = Reads[PgPreparedXactsViewRow](json => JsResult.fromTry(
+      Try(
         PgPreparedXactsViewRow(
-          transaction = row[Option[TypoXid]](idx + 0),
-          gid = row[Option[String]](idx + 1),
-          prepared = row[Option[OffsetDateTime]](idx + 2),
-          owner = row[Option[String]](idx + 3),
-          database = row[Option[String]](idx + 4)
+          transaction = json.\("transaction").toOption.map(_.as[TypoXid]),
+          gid = json.\("gid").toOption.map(_.as[String]),
+          prepared = json.\("prepared").toOption.map(_.as[TypoOffsetDateTime]),
+          owner = json.\("owner").toOption.map(_.as[String]),
+          database = json.\("database").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPreparedXactsViewRow] = new OFormat[PgPreparedXactsViewRow]{
-    override def writes(o: PgPreparedXactsViewRow): JsObject =
-      Json.obj(
-        "transaction" -> o.transaction,
-        "gid" -> o.gid,
-        "prepared" -> o.prepared,
-        "owner" -> o.owner,
-        "database" -> o.database
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPreparedXactsViewRow] = RowParser[PgPreparedXactsViewRow] { row =>
+    Success(
+      PgPreparedXactsViewRow(
+        transaction = row[Option[TypoXid]](idx + 0),
+        gid = row[Option[String]](idx + 1),
+        prepared = row[Option[TypoOffsetDateTime]](idx + 2),
+        owner = row[Option[String]](idx + 3),
+        database = row[Option[String]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPreparedXactsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPreparedXactsViewRow(
-            transaction = json.\("transaction").toOption.map(_.as[TypoXid]),
-            gid = json.\("gid").toOption.map(_.as[String]),
-            prepared = json.\("prepared").toOption.map(_.as[OffsetDateTime]),
-            owner = json.\("owner").toOption.map(_.as[String]),
-            database = json.\("database").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPreparedXactsViewRow] = OWrites[PgPreparedXactsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "transaction" -> Json.toJson(o.transaction),
+      "gid" -> Json.toJson(o.gid),
+      "prepared" -> Json.toJson(o.prepared),
+      "owner" -> Json.toJson(o.owner),
+      "database" -> Json.toJson(o.database)
+    ))
+  )
 }

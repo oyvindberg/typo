@@ -8,11 +8,11 @@ package person
 package phonenumbertype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
           values (${unsaved.phonenumbertypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning phonenumbertypeid, "name", modifieddate
+          returning phonenumbertypeid, "name", modifieddate::text
        """
       .executeInsert(PhonenumbertypeRow.rowParser(1).single)
   
@@ -35,19 +35,19 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.phonenumbertype default values
-            returning phonenumbertypeid, "name", modifieddate
+            returning phonenumbertypeid, "name", modifieddate::text
          """
         .executeInsert(PhonenumbertypeRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.phonenumbertype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning phonenumbertypeid, "name", modifieddate
+                  returning phonenumbertypeid, "name", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -58,18 +58,18 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, "name", modifieddate
+    SQL"""select phonenumbertypeid, "name", modifieddate::text
           from person.phonenumbertype
        """.as(PhonenumbertypeRow.rowParser(1).*)
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, "name", modifieddate
+    SQL"""select phonenumbertypeid, "name", modifieddate::text
           from person.phonenumbertype
           where phonenumbertypeid = $phonenumbertypeid
        """.as(PhonenumbertypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
-    SQL"""select phonenumbertypeid, "name", modifieddate
+    SQL"""select phonenumbertypeid, "name", modifieddate::text
           from person.phonenumbertype
           where phonenumbertypeid = ANY($phonenumbertypeids)
        """.as(PhonenumbertypeRow.rowParser(1).*)
@@ -94,7 +94,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning phonenumbertypeid, "name", modifieddate
+          returning phonenumbertypeid, "name", modifieddate::text
        """
       .executeInsert(PhonenumbertypeRow.rowParser(1).single)
   

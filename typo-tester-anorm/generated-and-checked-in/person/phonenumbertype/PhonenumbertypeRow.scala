@@ -7,15 +7,17 @@ package adventureworks
 package person
 package phonenumbertype
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PhonenumbertypeRow(
@@ -23,38 +25,34 @@ case class PhonenumbertypeRow(
   phonenumbertypeid: PhonenumbertypeId,
   /** Name of the telephone number type */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object PhonenumbertypeRow {
-  def rowParser(idx: Int): RowParser[PhonenumbertypeRow] =
-    RowParser[PhonenumbertypeRow] { row =>
-      Success(
+  implicit val reads: Reads[PhonenumbertypeRow] = Reads[PhonenumbertypeRow](json => JsResult.fromTry(
+      Try(
         PhonenumbertypeRow(
-          phonenumbertypeid = row[PhonenumbertypeId](idx + 0),
-          name = row[Name](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[PhonenumbertypeRow] = new OFormat[PhonenumbertypeRow]{
-    override def writes(o: PhonenumbertypeRow): JsObject =
-      Json.obj(
-        "phonenumbertypeid" -> o.phonenumbertypeid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PhonenumbertypeRow] = RowParser[PhonenumbertypeRow] { row =>
+    Success(
+      PhonenumbertypeRow(
+        phonenumbertypeid = row[PhonenumbertypeId](idx + 0),
+        name = row[Name](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PhonenumbertypeRow] = {
-      JsResult.fromTry(
-        Try(
-          PhonenumbertypeRow(
-            phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PhonenumbertypeRow] = OWrites[PhonenumbertypeRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

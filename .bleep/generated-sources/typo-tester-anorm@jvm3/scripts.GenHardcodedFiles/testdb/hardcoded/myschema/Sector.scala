@@ -23,33 +23,29 @@ import play.api.libs.json.Writes
   *  - OTHER
   */
 sealed abstract class Sector(val value: String)
+
 object Sector {
   case object `_public` extends Sector("PUBLIC")
   case object `_private` extends Sector("PRIVATE")
   case object `_other` extends Sector("OTHER")
-
   val All: List[Sector] = List(`_public`, `_private`, `_other`)
   val Names: String = All.map(_.value).mkString(", ")
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
-
-  implicit val column: Column[Sector] =
-    implicitly[Column[String]]
-      .mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
-  implicit val toStatement: ToStatement[Sector] =
-    implicitly[ToStatement[String]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[Sector]] =
-    implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+              
+  implicit val arrayToStatement: ToStatement[Array[Sector]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit val column: Column[Sector] = implicitly[Column[String]].mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
   implicit val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[Sector] = (value: JsValue) =>
-    value.validate[String].flatMap { str =>
+  implicit val reads: Reads[Sector] = Reads[Sector]((value: JsValue) =>
+    value.validate(implicitly[Reads[String]]).flatMap { str =>
       ByName.get(str) match {
         case Some(value) => JsSuccess(value)
         case None => JsError(s"'$str' does not match any of the following legal values: $Names")
       }
     }
-  
-  implicit val writes: Writes[Sector] = value => implicitly[Writes[String]].writes(value.value)
+  )
+  implicit val toStatement: ToStatement[Sector] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit val writes: Writes[Sector] = Writes[Sector](value => implicitly[Writes[String]].writes(value.value))
 }

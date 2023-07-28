@@ -7,19 +7,17 @@ package adventureworks
 package purchasing
 package vendor
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class VendorRow(
   /** Primary key for Vendor records.  Foreign key to BusinessEntity.BusinessEntityID
@@ -37,58 +35,32 @@ case class VendorRow(
   activeflag: Flag,
   /** Vendor URL. */
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object VendorRow {
-  implicit val decoder: Decoder[VendorRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        accountnumber <- c.downField("accountnumber").as[AccountNumber]
-        name <- c.downField("name").as[Name]
-        creditrating <- c.downField("creditrating").as[Int]
-        preferredvendorstatus <- c.downField("preferredvendorstatus").as[Flag]
-        activeflag <- c.downField("activeflag").as[Flag]
-        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[/* max 1024 chars */ String]]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield VendorRow(businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
-  implicit val encoder: Encoder[VendorRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "accountnumber" := row.accountnumber,
-        "name" := row.name,
-        "creditrating" := row.creditrating,
-        "preferredvendorstatus" := row.preferredvendorstatus,
-        "activeflag" := row.activeflag,
-        "purchasingwebserviceurl" := row.purchasingwebserviceurl,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[VendorRow] =
-    new Read[VendorRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[AccountNumber], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VendorRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        accountnumber = Get[AccountNumber].unsafeGetNonNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        creditrating = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 4),
-        activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-        purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 6),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[VendorRow] = Decoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VendorRow.apply)
+  implicit val encoder: Encoder[VendorRow] = Encoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))
+  implicit val read: Read[VendorRow] = new Read[VendorRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[AccountNumber], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[/* max 1024 chars */ String], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VendorRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      accountnumber = Get[AccountNumber].unsafeGetNonNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 2),
+      creditrating = Get[Int].unsafeGetNonNullable(rs, i + 3),
+      preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 4),
+      activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 5),
+      purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 6),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 7)
     )
-  
-
+  )
 }

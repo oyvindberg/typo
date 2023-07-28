@@ -7,14 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal
 
+import adventureworks.TypoOffsetDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatWalViewRow(
@@ -26,56 +28,52 @@ case class PgStatWalViewRow(
   walSync: Option[Long],
   walWriteTime: Option[Double],
   walSyncTime: Option[Double],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatWalViewRow {
-  def rowParser(idx: Int): RowParser[PgStatWalViewRow] =
-    RowParser[PgStatWalViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatWalViewRow] = Reads[PgStatWalViewRow](json => JsResult.fromTry(
+      Try(
         PgStatWalViewRow(
-          walRecords = row[Option[Long]](idx + 0),
-          walFpi = row[Option[Long]](idx + 1),
-          walBytes = row[Option[BigDecimal]](idx + 2),
-          walBuffersFull = row[Option[Long]](idx + 3),
-          walWrite = row[Option[Long]](idx + 4),
-          walSync = row[Option[Long]](idx + 5),
-          walWriteTime = row[Option[Double]](idx + 6),
-          walSyncTime = row[Option[Double]](idx + 7),
-          statsReset = row[Option[OffsetDateTime]](idx + 8)
+          walRecords = json.\("wal_records").toOption.map(_.as[Long]),
+          walFpi = json.\("wal_fpi").toOption.map(_.as[Long]),
+          walBytes = json.\("wal_bytes").toOption.map(_.as[BigDecimal]),
+          walBuffersFull = json.\("wal_buffers_full").toOption.map(_.as[Long]),
+          walWrite = json.\("wal_write").toOption.map(_.as[Long]),
+          walSync = json.\("wal_sync").toOption.map(_.as[Long]),
+          walWriteTime = json.\("wal_write_time").toOption.map(_.as[Double]),
+          walSyncTime = json.\("wal_sync_time").toOption.map(_.as[Double]),
+          statsReset = json.\("stats_reset").toOption.map(_.as[TypoOffsetDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatWalViewRow] = new OFormat[PgStatWalViewRow]{
-    override def writes(o: PgStatWalViewRow): JsObject =
-      Json.obj(
-        "wal_records" -> o.walRecords,
-        "wal_fpi" -> o.walFpi,
-        "wal_bytes" -> o.walBytes,
-        "wal_buffers_full" -> o.walBuffersFull,
-        "wal_write" -> o.walWrite,
-        "wal_sync" -> o.walSync,
-        "wal_write_time" -> o.walWriteTime,
-        "wal_sync_time" -> o.walSyncTime,
-        "stats_reset" -> o.statsReset
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatWalViewRow] = RowParser[PgStatWalViewRow] { row =>
+    Success(
+      PgStatWalViewRow(
+        walRecords = row[Option[Long]](idx + 0),
+        walFpi = row[Option[Long]](idx + 1),
+        walBytes = row[Option[BigDecimal]](idx + 2),
+        walBuffersFull = row[Option[Long]](idx + 3),
+        walWrite = row[Option[Long]](idx + 4),
+        walSync = row[Option[Long]](idx + 5),
+        walWriteTime = row[Option[Double]](idx + 6),
+        walSyncTime = row[Option[Double]](idx + 7),
+        statsReset = row[Option[TypoOffsetDateTime]](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatWalViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatWalViewRow(
-            walRecords = json.\("wal_records").toOption.map(_.as[Long]),
-            walFpi = json.\("wal_fpi").toOption.map(_.as[Long]),
-            walBytes = json.\("wal_bytes").toOption.map(_.as[BigDecimal]),
-            walBuffersFull = json.\("wal_buffers_full").toOption.map(_.as[Long]),
-            walWrite = json.\("wal_write").toOption.map(_.as[Long]),
-            walSync = json.\("wal_sync").toOption.map(_.as[Long]),
-            walWriteTime = json.\("wal_write_time").toOption.map(_.as[Double]),
-            walSyncTime = json.\("wal_sync_time").toOption.map(_.as[Double]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[OffsetDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatWalViewRow] = OWrites[PgStatWalViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "wal_records" -> Json.toJson(o.walRecords),
+      "wal_fpi" -> Json.toJson(o.walFpi),
+      "wal_bytes" -> Json.toJson(o.walBytes),
+      "wal_buffers_full" -> Json.toJson(o.walBuffersFull),
+      "wal_write" -> Json.toJson(o.walWrite),
+      "wal_sync" -> Json.toJson(o.walSync),
+      "wal_write_time" -> Json.toJson(o.walWriteTime),
+      "wal_sync_time" -> Json.toJson(o.walSyncTime),
+      "stats_reset" -> Json.toJson(o.statsReset)
+    ))
+  )
 }

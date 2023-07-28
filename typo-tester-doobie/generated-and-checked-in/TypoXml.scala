@@ -6,51 +6,29 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.jdbc.PgSQLXML
 import org.postgresql.util.PGobject
 
 /** XML */
 case class TypoXml(value: String)
+
 object TypoXml {
-  implicit val decoder: Decoder[TypoXml] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[String]
-      } yield TypoXml(value)
-  implicit val encoder: Encoder[TypoXml] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoXml] =
-    Get.Advanced.other[PgSQLXML](cats.data.NonEmptyList.one("xml"))
-      .map(v => TypoXml(v.getString))
-  
-  implicit val put: Put[TypoXml] =
-    Put.Advanced.other[String](NonEmptyList.one("xml"))
-      .contramap(v => v.value)
-  
-  implicit val meta: Meta[TypoXml] = new Meta(get, put)
-  val gets: Get[Array[TypoXml]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_xml"))
-      .map(_.map(v => TypoXml(v.asInstanceOf[PGobject].getValue)))
-  
-  val puts: Put[Array[TypoXml]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_xml"), "xml")
-      .contramap(_.map(v => {
-                              val obj = new PGobject
-                              obj.setType("xml")
-                              obj.setValue(v.value)
-                              obj
-                            }))
-  
-  implicit val metas: Meta[Array[TypoXml]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoXml]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_xml"))
+    .map(_.map(v => TypoXml(v.asInstanceOf[PGobject].getValue)))
+  implicit val arrayPut: Put[Array[TypoXml]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_xml"), "xml")
+    .contramap(_.map(v => {
+                            val obj = new PGobject
+                            obj.setType("xml")
+                            obj.setValue(v.value)
+                            obj
+                          }))
+  implicit val decoder: Decoder[TypoXml] = Decoder.forProduct1[TypoXml, String]("value")(TypoXml.apply)
+  implicit val encoder: Encoder[TypoXml] = Encoder.forProduct1[TypoXml, String]("value")(x => (x.value))
+  implicit val get: Get[TypoXml] = Get.Advanced.other[PgSQLXML](NonEmptyList.one("xml"))
+    .map(v => TypoXml(v.getString))
+  implicit val put: Put[TypoXml] = Put.Advanced.other[String](NonEmptyList.one("xml")).contramap(v => v.value)
 }

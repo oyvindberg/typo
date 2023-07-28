@@ -6,55 +6,33 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.util.PGobject
 
 /** xid (via PGObject) */
 case class TypoXid(value: String)
+
 object TypoXid {
-  implicit val decoder: Decoder[TypoXid] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[String]
-      } yield TypoXid(value)
-  implicit val encoder: Encoder[TypoXid] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoXid] =
-    Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("xid"))
-      .map(v => TypoXid(v.getValue))
-  
-  implicit val put: Put[TypoXid] =
-    Put.Advanced.other[PGobject](NonEmptyList.one("xid"))
-      .contramap(v => {
-                        val obj = new PGobject
-                        obj.setType("xid")
-                        obj.setValue(v.value)
-                        obj
-                      })
-  
-  implicit val meta: Meta[TypoXid] = new Meta(get, put)
-  val gets: Get[Array[TypoXid]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_xid"))
-      .map(_.map(v => TypoXid(v.asInstanceOf[String])))
-  
-  val puts: Put[Array[TypoXid]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_xid"), "xid")
-      .contramap(_.map(v => {
-                              val obj = new PGobject
-                              obj.setType("xid")
-                              obj.setValue(v.value)
-                              obj
-                            }))
-  
-  implicit val metas: Meta[Array[TypoXid]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoXid]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_xid"))
+    .map(_.map(v => TypoXid(v.asInstanceOf[String])))
+  implicit val arrayPut: Put[Array[TypoXid]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_xid"), "xid")
+    .contramap(_.map(v => {
+                            val obj = new PGobject
+                            obj.setType("xid")
+                            obj.setValue(v.value)
+                            obj
+                          }))
+  implicit val decoder: Decoder[TypoXid] = Decoder.forProduct1[TypoXid, String]("value")(TypoXid.apply)
+  implicit val encoder: Encoder[TypoXid] = Encoder.forProduct1[TypoXid, String]("value")(x => (x.value))
+  implicit val get: Get[TypoXid] = Get.Advanced.other[PGobject](NonEmptyList.one("xid"))
+    .map(v => TypoXid(v.getValue))
+  implicit val put: Put[TypoXid] = Put.Advanced.other[PGobject](NonEmptyList.one("xid")).contramap(v => {
+                                                                         val obj = new PGobject
+                                                                         obj.setType("xid")
+                                                                         obj.setValue(v.value)
+                                                                         obj
+                                                                       })
 }

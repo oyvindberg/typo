@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_publication
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgPublicationRow(
@@ -29,58 +27,30 @@ case class PgPublicationRow(
 )
 
 object PgPublicationRow {
-  implicit val decoder: Decoder[PgPublicationRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgPublicationId]
-        pubname <- c.downField("pubname").as[String]
-        pubowner <- c.downField("pubowner").as[/* oid */ Long]
-        puballtables <- c.downField("puballtables").as[Boolean]
-        pubinsert <- c.downField("pubinsert").as[Boolean]
-        pubupdate <- c.downField("pubupdate").as[Boolean]
-        pubdelete <- c.downField("pubdelete").as[Boolean]
-        pubtruncate <- c.downField("pubtruncate").as[Boolean]
-        pubviaroot <- c.downField("pubviaroot").as[Boolean]
-      } yield PgPublicationRow(oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot)
-  implicit val encoder: Encoder[PgPublicationRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "pubname" := row.pubname,
-        "pubowner" := row.pubowner,
-        "puballtables" := row.puballtables,
-        "pubinsert" := row.pubinsert,
-        "pubupdate" := row.pubupdate,
-        "pubdelete" := row.pubdelete,
-        "pubtruncate" := row.pubtruncate,
-        "pubviaroot" := row.pubviaroot
-      )}
-  implicit val read: Read[PgPublicationRow] =
-    new Read[PgPublicationRow](
-      gets = List(
-        (Get[PgPublicationId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgPublicationRow(
-        oid = Get[PgPublicationId].unsafeGetNonNullable(rs, i + 0),
-        pubname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        pubowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        puballtables = Get[Boolean].unsafeGetNonNullable(rs, i + 3),
-        pubinsert = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-        pubupdate = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-        pubdelete = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
-        pubtruncate = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-        pubviaroot = Get[Boolean].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgPublicationRow] = Decoder.forProduct9[PgPublicationRow, PgPublicationId, String, /* oid */ Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean]("oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot")(PgPublicationRow.apply)
+  implicit val encoder: Encoder[PgPublicationRow] = Encoder.forProduct9[PgPublicationRow, PgPublicationId, String, /* oid */ Long, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean]("oid", "pubname", "pubowner", "puballtables", "pubinsert", "pubupdate", "pubdelete", "pubtruncate", "pubviaroot")(x => (x.oid, x.pubname, x.pubowner, x.puballtables, x.pubinsert, x.pubupdate, x.pubdelete, x.pubtruncate, x.pubviaroot))
+  implicit val read: Read[PgPublicationRow] = new Read[PgPublicationRow](
+    gets = List(
+      (Get[PgPublicationId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgPublicationRow(
+      oid = Get[PgPublicationId].unsafeGetNonNullable(rs, i + 0),
+      pubname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      pubowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      puballtables = Get[Boolean].unsafeGetNonNullable(rs, i + 3),
+      pubinsert = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
+      pubupdate = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
+      pubdelete = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
+      pubtruncate = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
+      pubviaroot = Get[Boolean].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

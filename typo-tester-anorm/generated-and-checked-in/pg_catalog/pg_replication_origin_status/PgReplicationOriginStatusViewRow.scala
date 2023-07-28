@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgReplicationOriginStatusViewRow(
@@ -24,37 +26,33 @@ case class PgReplicationOriginStatusViewRow(
 )
 
 object PgReplicationOriginStatusViewRow {
-  def rowParser(idx: Int): RowParser[PgReplicationOriginStatusViewRow] =
-    RowParser[PgReplicationOriginStatusViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgReplicationOriginStatusViewRow] = Reads[PgReplicationOriginStatusViewRow](json => JsResult.fromTry(
+      Try(
         PgReplicationOriginStatusViewRow(
-          localId = row[Option[/* oid */ Long]](idx + 0),
-          externalId = row[Option[String]](idx + 1),
-          remoteLsn = row[Option[/* pg_lsn */ Long]](idx + 2),
-          localLsn = row[Option[/* pg_lsn */ Long]](idx + 3)
+          localId = json.\("local_id").toOption.map(_.as[/* oid */ Long]),
+          externalId = json.\("external_id").toOption.map(_.as[String]),
+          remoteLsn = json.\("remote_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
+          localLsn = json.\("local_lsn").toOption.map(_.as[/* pg_lsn */ Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgReplicationOriginStatusViewRow] = new OFormat[PgReplicationOriginStatusViewRow]{
-    override def writes(o: PgReplicationOriginStatusViewRow): JsObject =
-      Json.obj(
-        "local_id" -> o.localId,
-        "external_id" -> o.externalId,
-        "remote_lsn" -> o.remoteLsn,
-        "local_lsn" -> o.localLsn
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgReplicationOriginStatusViewRow] = RowParser[PgReplicationOriginStatusViewRow] { row =>
+    Success(
+      PgReplicationOriginStatusViewRow(
+        localId = row[Option[/* oid */ Long]](idx + 0),
+        externalId = row[Option[String]](idx + 1),
+        remoteLsn = row[Option[/* pg_lsn */ Long]](idx + 2),
+        localLsn = row[Option[/* pg_lsn */ Long]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgReplicationOriginStatusViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgReplicationOriginStatusViewRow(
-            localId = json.\("local_id").toOption.map(_.as[/* oid */ Long]),
-            externalId = json.\("external_id").toOption.map(_.as[String]),
-            remoteLsn = json.\("remote_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-            localLsn = json.\("local_lsn").toOption.map(_.as[/* pg_lsn */ Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgReplicationOriginStatusViewRow] = OWrites[PgReplicationOriginStatusViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "local_id" -> Json.toJson(o.localId),
+      "external_id" -> Json.toJson(o.externalId),
+      "remote_lsn" -> Json.toJson(o.remoteLsn),
+      "local_lsn" -> Json.toJson(o.localLsn)
+    ))
+  )
 }

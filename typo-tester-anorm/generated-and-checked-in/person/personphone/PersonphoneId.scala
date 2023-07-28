@@ -14,31 +14,30 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `person.personphone` */
 case class PersonphoneId(businessentityid: BusinessentityId, phonenumber: Phone, phonenumbertypeid: PhonenumbertypeId)
 object PersonphoneId {
   implicit val ordering: Ordering[PersonphoneId] = Ordering.by(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))
-  implicit val oFormat: OFormat[PersonphoneId] = new OFormat[PersonphoneId]{
-    override def writes(o: PersonphoneId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "phonenumber" -> o.phonenumber,
-        "phonenumbertypeid" -> o.phonenumbertypeid
-      )
-  
-    override def reads(json: JsValue): JsResult[PersonphoneId] = {
-      JsResult.fromTry(
-        Try(
-          PersonphoneId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            phonenumber = json.\("phonenumber").as[Phone],
-            phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId]
-          )
+  implicit val reads: Reads[PersonphoneId] = Reads[PersonphoneId](json => JsResult.fromTry(
+      Try(
+        PersonphoneId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          phonenumber = json.\("phonenumber").as[Phone],
+          phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PersonphoneId] = OWrites[PersonphoneId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "phonenumber" -> Json.toJson(o.phonenumber),
+      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid)
+    ))
+  )
 }

@@ -7,18 +7,16 @@ package adventureworks
 package pe
 package bea
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class BeaViewRow(
@@ -32,50 +30,28 @@ case class BeaViewRow(
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object BeaViewRow {
-  implicit val decoder: Decoder[BeaViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        addressid <- c.downField("addressid").as[Option[AddressId]]
-        addresstypeid <- c.downField("addresstypeid").as[Option[AddresstypeId]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield BeaViewRow(id, businessentityid, addressid, addresstypeid, rowguid, modifieddate)
-  implicit val encoder: Encoder[BeaViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "addressid" := row.addressid,
-        "addresstypeid" := row.addresstypeid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[BeaViewRow] =
-    new Read[BeaViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[AddressId], Nullability.Nullable),
-        (Get[AddresstypeId], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BeaViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        addressid = Get[AddressId].unsafeGetNullable(rs, i + 2),
-        addresstypeid = Get[AddresstypeId].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[BeaViewRow] = Decoder.forProduct6[BeaViewRow, Option[Int], Option[BusinessentityId], Option[AddressId], Option[AddresstypeId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BeaViewRow.apply)
+  implicit val encoder: Encoder[BeaViewRow] = Encoder.forProduct6[BeaViewRow, Option[Int], Option[BusinessentityId], Option[AddressId], Option[AddresstypeId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))
+  implicit val read: Read[BeaViewRow] = new Read[BeaViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[AddressId], Nullability.Nullable),
+      (Get[AddresstypeId], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => BeaViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      addressid = Get[AddressId].unsafeGetNullable(rs, i + 2),
+      addresstypeid = Get[AddresstypeId].unsafeGetNullable(rs, i + 3),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

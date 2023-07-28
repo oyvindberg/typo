@@ -11,19 +11,20 @@ package person
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `myschema.person` */
 case class PersonId(value: Long) extends AnyVal
 object PersonId {
-  implicit val ordering: Ordering[PersonId] = Ordering.by(_.value)
-  implicit val format: Format[PersonId] = implicitly[Format[Long]].bimap(PersonId.apply, _.value)
-  implicit val toStatement: ToStatement[PersonId] = implicitly[ToStatement[Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PersonId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PersonId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
   implicit val column: Column[PersonId] = implicitly[Column[Long]].map(PersonId.apply)
+  implicit val ordering: Ordering[PersonId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PersonId] = new ParameterMetaData[PersonId] {
     override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Long]].jdbcType
   }
-
+  implicit val reads: Reads[PersonId] = implicitly[Reads[Long]].map(PersonId.apply)
+  implicit val toStatement: ToStatement[PersonId] = implicitly[ToStatement[Long]].contramap(_.value)
+  implicit val writes: Writes[PersonId] = implicitly[Writes[Long]].contramap(_.value)
 }

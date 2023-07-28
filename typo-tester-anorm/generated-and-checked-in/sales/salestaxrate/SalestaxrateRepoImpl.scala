@@ -8,11 +8,11 @@ package sales
 package salestaxrate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
@@ -22,7 +22,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
           values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
   
@@ -46,19 +46,19 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salestaxrate default values
-            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+            returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
          """
         .executeInsert(SalestaxrateRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salestaxrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+                  returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -69,18 +69,18 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
           from sales.salestaxrate
        """.as(SalestaxrateRow.rowParser(1).*)
   }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
           from sales.salestaxrate
           where salestaxrateid = $salestaxrateid
        """.as(SalestaxrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
-    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+    SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
           from sales.salestaxrate
           where salestaxrateid = ANY($salestaxrateids)
        """.as(SalestaxrateRow.rowParser(1).*)
@@ -117,7 +117,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             "name" = EXCLUDED."name",
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+          returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
   

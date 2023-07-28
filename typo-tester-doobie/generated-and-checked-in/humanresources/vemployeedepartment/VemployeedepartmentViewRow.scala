@@ -7,17 +7,15 @@ package adventureworks
 package humanresources
 package vemployeedepartment
 
+import adventureworks.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDate
 
 case class VemployeedepartmentViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
@@ -38,66 +36,36 @@ case class VemployeedepartmentViewRow(
   /** Points to [[department.DepartmentRow.groupname]] */
   groupname: Option[Name],
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[LocalDate]
+  startdate: Option[TypoLocalDate]
 )
 
 object VemployeedepartmentViewRow {
-  implicit val decoder: Decoder[VemployeedepartmentViewRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Option[Name]]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
-        jobtitle <- c.downField("jobtitle").as[Option[/* max 50 chars */ String]]
-        department <- c.downField("department").as[Option[Name]]
-        groupname <- c.downField("groupname").as[Option[Name]]
-        startdate <- c.downField("startdate").as[Option[LocalDate]]
-      } yield VemployeedepartmentViewRow(businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate)
-  implicit val encoder: Encoder[VemployeedepartmentViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "suffix" := row.suffix,
-        "jobtitle" := row.jobtitle,
-        "department" := row.department,
-        "groupname" := row.groupname,
-        "startdate" := row.startdate
-      )}
-  implicit val read: Read[VemployeedepartmentViewRow] =
-    new Read[VemployeedepartmentViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmentViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-        firstname = Get[Name].unsafeGetNullable(rs, i + 2),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-        lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
-        jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
-        department = Get[Name].unsafeGetNullable(rs, i + 7),
-        groupname = Get[Name].unsafeGetNullable(rs, i + 8),
-        startdate = Get[LocalDate].unsafeGetNullable(rs, i + 9)
-      )
+  implicit val decoder: Decoder[VemployeedepartmentViewRow] = Decoder.forProduct10[VemployeedepartmentViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Name], Option[Name], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate")(VemployeedepartmentViewRow.apply)
+  implicit val encoder: Encoder[VemployeedepartmentViewRow] = Encoder.forProduct10[VemployeedepartmentViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Name], Option[Name], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.department, x.groupname, x.startdate))
+  implicit val read: Read[VemployeedepartmentViewRow] = new Read[VemployeedepartmentViewRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmentViewRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
+      firstname = Get[Name].unsafeGetNullable(rs, i + 2),
+      middlename = Get[Name].unsafeGetNullable(rs, i + 3),
+      lastname = Get[Name].unsafeGetNullable(rs, i + 4),
+      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
+      jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
+      department = Get[Name].unsafeGetNullable(rs, i + 7),
+      groupname = Get[Name].unsafeGetNullable(rs, i + 8),
+      startdate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 9)
     )
-  
-
+  )
 }

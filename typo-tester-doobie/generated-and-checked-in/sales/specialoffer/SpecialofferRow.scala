@@ -7,15 +7,13 @@ package adventureworks
 package sales
 package specialoffer
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SpecialofferRow(
@@ -30,78 +28,46 @@ case class SpecialofferRow(
   /** Group the discount applies to such as Reseller or Customer. */
   category: /* max 50 chars */ String,
   /** Discount start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Discount end date. */
-  enddate: LocalDateTime,
+  enddate: TypoLocalDateTime,
   /** Minimum discount percent allowed. */
   minqty: Int,
   /** Maximum discount percent allowed. */
   maxqty: Option[Int],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object SpecialofferRow {
-  implicit val decoder: Decoder[SpecialofferRow] =
-    (c: HCursor) =>
-      for {
-        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
-        description <- c.downField("description").as[/* max 255 chars */ String]
-        discountpct <- c.downField("discountpct").as[BigDecimal]
-        `type` <- c.downField("type").as[/* max 50 chars */ String]
-        category <- c.downField("category").as[/* max 50 chars */ String]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        enddate <- c.downField("enddate").as[LocalDateTime]
-        minqty <- c.downField("minqty").as[Int]
-        maxqty <- c.downField("maxqty").as[Option[Int]]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield SpecialofferRow(specialofferid, description, discountpct, `type`, category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)
-  implicit val encoder: Encoder[SpecialofferRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "specialofferid" := row.specialofferid,
-        "description" := row.description,
-        "discountpct" := row.discountpct,
-        "type" := row.`type`,
-        "category" := row.category,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "minqty" := row.minqty,
-        "maxqty" := row.maxqty,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SpecialofferRow] =
-    new Read[SpecialofferRow](
-      gets = List(
-        (Get[SpecialofferId], Nullability.NoNulls),
-        (Get[/* max 255 chars */ String], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SpecialofferRow(
-        specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
-        description = Get[/* max 255 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        discountpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        `type` = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
-        category = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
-        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5),
-        enddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6),
-        minqty = Get[Int].unsafeGetNonNullable(rs, i + 7),
-        maxqty = Get[Int].unsafeGetNullable(rs, i + 8),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[SpecialofferRow] = Decoder.forProduct11[SpecialofferRow, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], UUID, TypoLocalDateTime]("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(SpecialofferRow.apply)
+  implicit val encoder: Encoder[SpecialofferRow] = Encoder.forProduct11[SpecialofferRow, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], UUID, TypoLocalDateTime]("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(x => (x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate))
+  implicit val read: Read[SpecialofferRow] = new Read[SpecialofferRow](
+    gets = List(
+      (Get[SpecialofferId], Nullability.NoNulls),
+      (Get[/* max 255 chars */ String], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[/* max 50 chars */ String], Nullability.NoNulls),
+      (Get[/* max 50 chars */ String], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.Nullable),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SpecialofferRow(
+      specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
+      description = Get[/* max 255 chars */ String].unsafeGetNonNullable(rs, i + 1),
+      discountpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
+      `type` = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
+      category = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
+      startdate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5),
+      enddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 6),
+      minqty = Get[Int].unsafeGetNonNullable(rs, i + 7),
+      maxqty = Get[Int].unsafeGetNullable(rs, i + 8),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 9),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 10)
     )
-  
-
+  )
 }

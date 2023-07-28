@@ -7,35 +7,34 @@ package adventureworks
 package production
 package productcosthistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `production.productcosthistory` */
-case class ProductcosthistoryId(productid: ProductId, startdate: LocalDateTime)
+case class ProductcosthistoryId(productid: ProductId, startdate: TypoLocalDateTime)
 object ProductcosthistoryId {
-  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[ProductcosthistoryId] = Ordering.by(x => (x.productid, x.startdate))
-  implicit val oFormat: OFormat[ProductcosthistoryId] = new OFormat[ProductcosthistoryId]{
-    override def writes(o: ProductcosthistoryId): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "startdate" -> o.startdate
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductcosthistoryId] = {
-      JsResult.fromTry(
-        Try(
-          ProductcosthistoryId(
-            productid = json.\("productid").as[ProductId],
-            startdate = json.\("startdate").as[LocalDateTime]
-          )
+  implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[ProductcosthistoryId] = Ordering.by(x => (x.productid, x.startdate))
+  implicit val reads: Reads[ProductcosthistoryId] = Reads[ProductcosthistoryId](json => JsResult.fromTry(
+      Try(
+        ProductcosthistoryId(
+          productid = json.\("productid").as[ProductId],
+          startdate = json.\("startdate").as[TypoLocalDateTime]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductcosthistoryId] = OWrites[ProductcosthistoryId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "startdate" -> Json.toJson(o.startdate)
+    ))
+  )
 }

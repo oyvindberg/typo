@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PersonRow(
@@ -26,34 +28,30 @@ case class PersonRow(
  }
 
 object PersonRow {
-  def rowParser(idx: Int): RowParser[PersonRow] =
-    RowParser[PersonRow] { row =>
-      Success(
+  implicit val reads: Reads[PersonRow] = Reads[PersonRow](json => JsResult.fromTry(
+      Try(
         PersonRow(
-          one = row[Long](idx + 0),
-          two = row[Option[String]](idx + 1),
-          name = row[Option[String]](idx + 2)
+          one = json.\("one").as[Long],
+          two = json.\("two").toOption.map(_.as[String]),
+          name = json.\("name").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
-    override def writes(o: PersonRow): JsObject =
-      Json.obj(
-        "one" -> o.one,
-        "two" -> o.two,
-        "name" -> o.name
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PersonRow] = RowParser[PersonRow] { row =>
+    Success(
+      PersonRow(
+        one = row[Long](idx + 0),
+        two = row[Option[String]](idx + 1),
+        name = row[Option[String]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PersonRow] = {
-      JsResult.fromTry(
-        Try(
-          PersonRow(
-            one = json.\("one").as[Long],
-            two = json.\("two").toOption.map(_.as[String]),
-            name = json.\("name").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PersonRow] = OWrites[PersonRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "one" -> Json.toJson(o.one),
+      "two" -> Json.toJson(o.two),
+      "name" -> Json.toJson(o.name)
+    ))
+  )
 }

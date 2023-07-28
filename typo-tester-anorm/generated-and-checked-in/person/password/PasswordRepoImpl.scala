@@ -8,12 +8,12 @@ package person
 package password
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object PasswordRepoImpl extends PasswordRepo {
@@ -23,7 +23,7 @@ object PasswordRepoImpl extends PasswordRepo {
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.passwordhash}, ${unsaved.passwordsalt}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
        """
       .executeInsert(PasswordRow.rowParser(1).single)
   
@@ -39,19 +39,19 @@ object PasswordRepoImpl extends PasswordRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person."password" default values
-            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
          """
         .executeInsert(PasswordRow.rowParser(1).single)
     } else {
       val q = s"""insert into person."password"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+                  returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -62,18 +62,18 @@ object PasswordRepoImpl extends PasswordRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
           from person."password"
        """.as(PasswordRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
           from person."password"
           where businessentityid = $businessentityid
        """.as(PasswordRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
-    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+    SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
           from person."password"
           where businessentityid = ANY($businessentityids)
        """.as(PasswordRow.rowParser(1).*)
@@ -104,7 +104,7 @@ object PasswordRepoImpl extends PasswordRepo {
             passwordsalt = EXCLUDED.passwordsalt,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
        """
       .executeInsert(PasswordRow.rowParser(1).single)
   

@@ -8,13 +8,15 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.shoppingcartitem` which has not been persisted yet */
@@ -32,11 +34,11 @@ case class ShoppingcartitemRowUnsaved(
   quantity: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date the time the record was created. */
-  datecreated: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  datecreated: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(shoppingcartitemidDefault: => ShoppingcartitemId, quantityDefault: => Int, datecreatedDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): ShoppingcartitemRow =
+  def toRow(shoppingcartitemidDefault: => ShoppingcartitemId, quantityDefault: => Int, datecreatedDefault: => TypoLocalDateTime, modifieddateDefault: => TypoLocalDateTime): ShoppingcartitemRow =
     ShoppingcartitemRow(
       shoppingcartid = shoppingcartid,
       productid = productid,
@@ -59,30 +61,27 @@ case class ShoppingcartitemRowUnsaved(
     )
 }
 object ShoppingcartitemRowUnsaved {
-  implicit val oFormat: OFormat[ShoppingcartitemRowUnsaved] = new OFormat[ShoppingcartitemRowUnsaved]{
-    override def writes(o: ShoppingcartitemRowUnsaved): JsObject =
-      Json.obj(
-        "shoppingcartid" -> o.shoppingcartid,
-        "productid" -> o.productid,
-        "shoppingcartitemid" -> o.shoppingcartitemid,
-        "quantity" -> o.quantity,
-        "datecreated" -> o.datecreated,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ShoppingcartitemRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ShoppingcartitemRowUnsaved(
-            shoppingcartid = json.\("shoppingcartid").as[/* max 50 chars */ String],
-            productid = json.\("productid").as[ProductId],
-            shoppingcartitemid = json.\("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]],
-            quantity = json.\("quantity").as[Defaulted[Int]],
-            datecreated = json.\("datecreated").as[Defaulted[LocalDateTime]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ShoppingcartitemRowUnsaved] = Reads[ShoppingcartitemRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ShoppingcartitemRowUnsaved(
+          shoppingcartid = json.\("shoppingcartid").as[/* max 50 chars */ String],
+          productid = json.\("productid").as[ProductId],
+          shoppingcartitemid = json.\("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]],
+          quantity = json.\("quantity").as[Defaulted[Int]],
+          datecreated = json.\("datecreated").as[Defaulted[TypoLocalDateTime]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ShoppingcartitemRowUnsaved] = OWrites[ShoppingcartitemRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "shoppingcartid" -> Json.toJson(o.shoppingcartid),
+      "productid" -> Json.toJson(o.productid),
+      "shoppingcartitemid" -> Json.toJson(o.shoppingcartitemid),
+      "quantity" -> Json.toJson(o.quantity),
+      "datecreated" -> Json.toJson(o.datecreated),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

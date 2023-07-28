@@ -8,22 +8,22 @@ package sales
 package salesperson
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SalespersonRepoImpl extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesperson where businessentityid = $businessentityid".update.run.map(_ > 0)
+    sql"delete from sales.salesperson where businessentityid = ${businessentityid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow] = {
     sql"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.salesquota}::numeric, ${unsaved.bonus}::numeric, ${unsaved.commissionpct}::numeric, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
+          returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
        """.query[SalespersonRow].unique
   }
   override def insert(unsaved: SalespersonRowUnsaved): ConnectionIO[SalespersonRow] = {
@@ -53,32 +53,32 @@ object SalespersonRepoImpl extends SalespersonRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.salesperson default values
-            returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
+            returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesperson(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
+            returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
          """
     }
     q.query[SalespersonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
-    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson".query[SalespersonRow].stream
+    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson".query[SalespersonRow].stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[SalespersonRow]] = {
-    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid".query[SalespersonRow].option
+    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson where businessentityid = ${businessentityid}".query[SalespersonRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, SalespersonRow] = {
-    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = ANY($businessentityids)".query[SalespersonRow].stream
+    sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson where businessentityid = ANY(${businessentityids})".query[SalespersonRow].stream
   }
   override def update(row: SalespersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -91,7 +91,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
               saleslastyear = ${row.saleslastyear}::numeric,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          where businessentityid = ${businessentityid}
        """
       .update
       .run
@@ -120,7 +120,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
             saleslastyear = EXCLUDED.saleslastyear,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
+          returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
        """.query[SalespersonRow].unique
   }
 }

@@ -8,12 +8,10 @@ package production
 package productlistpricehistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productlistpricehistory` which has not been persisted yet */
 case class ProductlistpricehistoryRowUnsaved(
@@ -21,15 +19,15 @@ case class ProductlistpricehistoryRowUnsaved(
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** List price start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** List price end date */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Product list price. */
   listprice: BigDecimal,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): ProductlistpricehistoryRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductlistpricehistoryRow =
     ProductlistpricehistoryRow(
       productid = productid,
       startdate = startdate,
@@ -42,23 +40,6 @@ case class ProductlistpricehistoryRowUnsaved(
     )
 }
 object ProductlistpricehistoryRowUnsaved {
-  implicit val decoder: Decoder[ProductlistpricehistoryRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        listprice <- c.downField("listprice").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductlistpricehistoryRowUnsaved(productid, startdate, enddate, listprice, modifieddate)
-  implicit val encoder: Encoder[ProductlistpricehistoryRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "listprice" := row.listprice,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductlistpricehistoryRowUnsaved] = Decoder.forProduct5[ProductlistpricehistoryRowUnsaved, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, Defaulted[TypoLocalDateTime]]("productid", "startdate", "enddate", "listprice", "modifieddate")(ProductlistpricehistoryRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductlistpricehistoryRowUnsaved] = Encoder.forProduct5[ProductlistpricehistoryRowUnsaved, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, Defaulted[TypoLocalDateTime]]("productid", "startdate", "enddate", "listprice", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.listprice, x.modifieddate))
 }

@@ -8,12 +8,12 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
@@ -22,7 +22,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.productphotoid}::int4, ${unsaved.primary}::"public"."Flag", ${unsaved.modifieddate}::timestamp)
-          returning productid, productphotoid, "primary", modifieddate
+          returning productid, productphotoid, "primary", modifieddate::text
        """
       .executeInsert(ProductproductphotoRow.rowParser(1).single)
   
@@ -37,19 +37,19 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productproductphoto default values
-            returning productid, productphotoid, "primary", modifieddate
+            returning productid, productphotoid, "primary", modifieddate::text
          """
         .executeInsert(ProductproductphotoRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productproductphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productid, productphotoid, "primary", modifieddate
+                  returning productid, productphotoid, "primary", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -60,12 +60,12 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {
-    SQL"""select productid, productphotoid, "primary", modifieddate
+    SQL"""select productid, productphotoid, "primary", modifieddate::text
           from production.productproductphoto
        """.as(ProductproductphotoRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductproductphotoId)(implicit c: Connection): Option[ProductproductphotoRow] = {
-    SQL"""select productid, productphotoid, "primary", modifieddate
+    SQL"""select productid, productphotoid, "primary", modifieddate::text
           from production.productproductphoto
           where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
        """.as(ProductproductphotoRow.rowParser(1).singleOpt)
@@ -90,7 +90,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           do update set
             "primary" = EXCLUDED."primary",
             modifieddate = EXCLUDED.modifieddate
-          returning productid, productphotoid, "primary", modifieddate
+          returning productid, productphotoid, "primary", modifieddate::text
        """
       .executeInsert(ProductproductphotoRow.rowParser(1).single)
   

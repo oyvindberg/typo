@@ -7,7 +7,7 @@ import adventureworks.person.countryregion.{CountryregionId, CountryregionRepoIm
 import adventureworks.person.stateprovince.{StateprovinceId, StateprovinceRepoImpl, StateprovinceRowUnsaved}
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.{SalesterritoryRepoImpl, SalesterritoryRowUnsaved}
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.{Defaulted, TypoLocalDateTime, withConnection}
 import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
@@ -80,14 +80,14 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
           addressid = address.addressid,
           addresstypeid = addressType.addresstypeid,
           rowguid = Defaulted.Provided(UUID.randomUUID()),
-          modifieddate = Defaulted.Provided(java.time.LocalDateTime.now.withNano(0))
+          modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
         )
         // insert and round trip check
         saved1 <- repo.insert(unsaved1)
         saved2 = unsaved1.toRow(???, ???)
         _ <- delay(assert(saved1 === saved2))
         // check field values
-        newModifiedDate = saved1.modifieddate.minusDays(1)
+        newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
         _ <- repo.update(saved1.copy(modifieddate = newModifiedDate))
         saved3 <- repo.selectAll.compile.toList.map {
           case List(x) => x

@@ -7,17 +7,15 @@ package adventureworks
 package purchasing
 package purchaseorderdetail
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PurchaseorderdetailRow(
   /** Primary key. Foreign key to PurchaseOrderHeader.PurchaseOrderID.
@@ -26,7 +24,7 @@ case class PurchaseorderdetailRow(
   /** Primary key. One line number per purchased product. */
   purchaseorderdetailid: Int,
   /** Date the product is expected to be received. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Quantity ordered. */
   orderqty: Int,
   /** Product identification number. Foreign key to Product.ProductID.
@@ -38,64 +36,36 @@ case class PurchaseorderdetailRow(
   receivedqty: BigDecimal,
   /** Quantity rejected during inspection. */
   rejectedqty: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: PurchaseorderdetailId = PurchaseorderdetailId(purchaseorderid, purchaseorderdetailid)
  }
 
 object PurchaseorderdetailRow {
-  implicit val decoder: Decoder[PurchaseorderdetailRow] =
-    (c: HCursor) =>
-      for {
-        purchaseorderid <- c.downField("purchaseorderid").as[PurchaseorderheaderId]
-        purchaseorderdetailid <- c.downField("purchaseorderdetailid").as[Int]
-        duedate <- c.downField("duedate").as[LocalDateTime]
-        orderqty <- c.downField("orderqty").as[Int]
-        productid <- c.downField("productid").as[ProductId]
-        unitprice <- c.downField("unitprice").as[BigDecimal]
-        receivedqty <- c.downField("receivedqty").as[BigDecimal]
-        rejectedqty <- c.downField("rejectedqty").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield PurchaseorderdetailRow(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
-  implicit val encoder: Encoder[PurchaseorderdetailRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "purchaseorderid" := row.purchaseorderid,
-        "purchaseorderdetailid" := row.purchaseorderdetailid,
-        "duedate" := row.duedate,
-        "orderqty" := row.orderqty,
-        "productid" := row.productid,
-        "unitprice" := row.unitprice,
-        "receivedqty" := row.receivedqty,
-        "rejectedqty" := row.rejectedqty,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PurchaseorderdetailRow] =
-    new Read[PurchaseorderdetailRow](
-      gets = List(
-        (Get[PurchaseorderheaderId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderdetailRow(
-        purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNonNullable(rs, i + 0),
-        purchaseorderdetailid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        duedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2),
-        orderqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 4),
-        unitprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
-        receivedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
-        rejectedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PurchaseorderdetailRow] = Decoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(PurchaseorderdetailRow.apply)
+  implicit val encoder: Encoder[PurchaseorderdetailRow] = Encoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(x => (x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate))
+  implicit val read: Read[PurchaseorderdetailRow] = new Read[PurchaseorderdetailRow](
+    gets = List(
+      (Get[PurchaseorderheaderId], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[ProductId], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderdetailRow(
+      purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNonNullable(rs, i + 0),
+      purchaseorderdetailid = Get[Int].unsafeGetNonNullable(rs, i + 1),
+      duedate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2),
+      orderqty = Get[Int].unsafeGetNonNullable(rs, i + 3),
+      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 4),
+      unitprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
+      receivedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
+      rejectedqty = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

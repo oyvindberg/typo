@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo {
   override def selectAll: Stream[ConnectionIO, VjobcandidateeducationViewRow] = {
-    sql"""select jobcandidateid, "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City" from humanresources.vjobcandidateeducation""".query[VjobcandidateeducationViewRow].stream
+    sql"""select jobcandidateid, "Edu.Level", "Edu.StartDate"::text, "Edu.EndDate"::text, "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City" from humanresources.vjobcandidateeducation""".query[VjobcandidateeducationViewRow].stream
   }
 }

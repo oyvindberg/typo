@@ -7,18 +7,20 @@ package adventureworks
 package pe
 package bea
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BeaViewRow(
@@ -32,47 +34,43 @@ case class BeaViewRow(
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.businessentityaddress.BusinessentityaddressRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object BeaViewRow {
-  def rowParser(idx: Int): RowParser[BeaViewRow] =
-    RowParser[BeaViewRow] { row =>
-      Success(
+  implicit val reads: Reads[BeaViewRow] = Reads[BeaViewRow](json => JsResult.fromTry(
+      Try(
         BeaViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          addressid = row[Option[AddressId]](idx + 2),
-          addresstypeid = row[Option[AddresstypeId]](idx + 3),
-          rowguid = row[Option[UUID]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          addressid = json.\("addressid").toOption.map(_.as[AddressId]),
+          addresstypeid = json.\("addresstypeid").toOption.map(_.as[AddresstypeId]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[BeaViewRow] = new OFormat[BeaViewRow]{
-    override def writes(o: BeaViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "addressid" -> o.addressid,
-        "addresstypeid" -> o.addresstypeid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[BeaViewRow] = RowParser[BeaViewRow] { row =>
+    Success(
+      BeaViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        addressid = row[Option[AddressId]](idx + 2),
+        addresstypeid = row[Option[AddresstypeId]](idx + 3),
+        rowguid = row[Option[UUID]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[BeaViewRow] = {
-      JsResult.fromTry(
-        Try(
-          BeaViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            addressid = json.\("addressid").toOption.map(_.as[AddressId]),
-            addresstypeid = json.\("addresstypeid").toOption.map(_.as[AddresstypeId]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[BeaViewRow] = OWrites[BeaViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "addressid" -> Json.toJson(o.addressid),
+      "addresstypeid" -> Json.toJson(o.addresstypeid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

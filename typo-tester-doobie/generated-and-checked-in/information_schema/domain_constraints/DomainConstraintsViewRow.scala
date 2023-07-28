@@ -9,13 +9,11 @@ package domain_constraints
 
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class DomainConstraintsViewRow(
@@ -30,54 +28,28 @@ case class DomainConstraintsViewRow(
 )
 
 object DomainConstraintsViewRow {
-  implicit val decoder: Decoder[DomainConstraintsViewRow] =
-    (c: HCursor) =>
-      for {
-        constraintCatalog <- c.downField("constraint_catalog").as[Option[SqlIdentifier]]
-        constraintSchema <- c.downField("constraint_schema").as[Option[SqlIdentifier]]
-        constraintName <- c.downField("constraint_name").as[Option[SqlIdentifier]]
-        domainCatalog <- c.downField("domain_catalog").as[Option[SqlIdentifier]]
-        domainSchema <- c.downField("domain_schema").as[Option[SqlIdentifier]]
-        domainName <- c.downField("domain_name").as[Option[SqlIdentifier]]
-        isDeferrable <- c.downField("is_deferrable").as[Option[YesOrNo]]
-        initiallyDeferred <- c.downField("initially_deferred").as[Option[YesOrNo]]
-      } yield DomainConstraintsViewRow(constraintCatalog, constraintSchema, constraintName, domainCatalog, domainSchema, domainName, isDeferrable, initiallyDeferred)
-  implicit val encoder: Encoder[DomainConstraintsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "constraint_catalog" := row.constraintCatalog,
-        "constraint_schema" := row.constraintSchema,
-        "constraint_name" := row.constraintName,
-        "domain_catalog" := row.domainCatalog,
-        "domain_schema" := row.domainSchema,
-        "domain_name" := row.domainName,
-        "is_deferrable" := row.isDeferrable,
-        "initially_deferred" := row.initiallyDeferred
-      )}
-  implicit val read: Read[DomainConstraintsViewRow] =
-    new Read[DomainConstraintsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DomainConstraintsViewRow(
-        constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        domainCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        domainSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        domainName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        isDeferrable = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
-        initiallyDeferred = Get[YesOrNo].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[DomainConstraintsViewRow] = Decoder.forProduct8[DomainConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred")(DomainConstraintsViewRow.apply)
+  implicit val encoder: Encoder[DomainConstraintsViewRow] = Encoder.forProduct8[DomainConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "domain_catalog", "domain_schema", "domain_name", "is_deferrable", "initially_deferred")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.domainCatalog, x.domainSchema, x.domainName, x.isDeferrable, x.initiallyDeferred))
+  implicit val read: Read[DomainConstraintsViewRow] = new Read[DomainConstraintsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => DomainConstraintsViewRow(
+      constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      domainCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      domainSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      domainName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      isDeferrable = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
+      initiallyDeferred = Get[YesOrNo].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgPreparedStatementsViewRepoImpl extends PgPreparedStatementsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgPreparedStatementsViewRow] = {
-    sql"""select "name", "statement", prepare_time, parameter_types, from_sql, generic_plans, custom_plans from pg_catalog.pg_prepared_statements""".query[PgPreparedStatementsViewRow].stream
+    sql"""select "name", "statement", prepare_time::text, parameter_types, from_sql, generic_plans, custom_plans from pg_catalog.pg_prepared_statements""".query[PgPreparedStatementsViewRow].stream
   }
 }

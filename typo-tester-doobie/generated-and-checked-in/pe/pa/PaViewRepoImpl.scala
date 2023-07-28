@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PaViewRepoImpl extends PaViewRepo {
   override def selectAll: Stream[ConnectionIO, PaViewRow] = {
-    sql"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from pe.pa""".query[PaViewRow].stream
+    sql"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from pe.pa""".query[PaViewRow].stream
   }
 }

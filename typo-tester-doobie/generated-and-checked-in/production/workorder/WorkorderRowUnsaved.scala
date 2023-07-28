@@ -8,13 +8,11 @@ package production
 package workorder
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.workorder` which has not been persisted yet */
 case class WorkorderRowUnsaved(
@@ -26,11 +24,11 @@ case class WorkorderRowUnsaved(
   /** Quantity that failed inspection. */
   scrappedqty: Int,
   /** Work order start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Work order end date. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Work order due date. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Reason for inspection failure.
       Points to [[scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: Option[ScrapreasonId],
@@ -38,9 +36,9 @@ case class WorkorderRowUnsaved(
       Primary key for WorkOrder records. */
   workorderid: Defaulted[WorkorderId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(workorderidDefault: => WorkorderId, modifieddateDefault: => LocalDateTime): WorkorderRow =
+  def toRow(workorderidDefault: => WorkorderId, modifieddateDefault: => TypoLocalDateTime): WorkorderRow =
     WorkorderRow(
       productid = productid,
       orderqty = orderqty,
@@ -60,31 +58,6 @@ case class WorkorderRowUnsaved(
     )
 }
 object WorkorderRowUnsaved {
-  implicit val decoder: Decoder[WorkorderRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        orderqty <- c.downField("orderqty").as[Int]
-        scrappedqty <- c.downField("scrappedqty").as[Int]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        duedate <- c.downField("duedate").as[LocalDateTime]
-        scrapreasonid <- c.downField("scrapreasonid").as[Option[ScrapreasonId]]
-        workorderid <- c.downField("workorderid").as[Defaulted[WorkorderId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield WorkorderRowUnsaved(productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, workorderid, modifieddate)
-  implicit val encoder: Encoder[WorkorderRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "orderqty" := row.orderqty,
-        "scrappedqty" := row.scrappedqty,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "duedate" := row.duedate,
-        "scrapreasonid" := row.scrapreasonid,
-        "workorderid" := row.workorderid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[WorkorderRowUnsaved] = Decoder.forProduct9[WorkorderRowUnsaved, ProductId, Int, Int, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], Defaulted[WorkorderId], Defaulted[TypoLocalDateTime]]("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate")(WorkorderRowUnsaved.apply)
+  implicit val encoder: Encoder[WorkorderRowUnsaved] = Encoder.forProduct9[WorkorderRowUnsaved, ProductId, Int, Int, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], Defaulted[WorkorderId], Defaulted[TypoLocalDateTime]]("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate")(x => (x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.workorderid, x.modifieddate))
 }

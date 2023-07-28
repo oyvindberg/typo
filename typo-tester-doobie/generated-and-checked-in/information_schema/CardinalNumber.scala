@@ -6,7 +6,8 @@
 package adventureworks
 package information_schema
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -15,11 +16,11 @@ import io.circe.Encoder
   */
 case class CardinalNumber(value: Int) extends AnyVal
 object CardinalNumber {
-  implicit def ordering(implicit ev: Ordering[Int]): Ordering[CardinalNumber] = Ordering.by(_.value)
-  implicit val encoder: Encoder[CardinalNumber] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[CardinalNumber] =
-    Decoder[Int].map(CardinalNumber(_))
-  implicit val meta: Meta[CardinalNumber] = Meta[Int].imap(CardinalNumber.apply)(_.value)
-  implicit val metaArray: Meta[Array[CardinalNumber]] = Meta[Array[Int]].imap(_.map(CardinalNumber.apply))(_.map(_.value))
+  implicit val arrayGet: Get[Array[CardinalNumber]] = Get[Array[Int]].map(_.map(CardinalNumber.apply))
+  implicit val arrayPut: Put[Array[CardinalNumber]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[CardinalNumber] = Decoder[Int].map(CardinalNumber.apply)
+  implicit val encoder: Encoder[CardinalNumber] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[CardinalNumber] = Get[Int].map(CardinalNumber.apply)
+  implicit val ordering: Ordering[CardinalNumber] = Ordering.by(_.value)
+  implicit val put: Put[CardinalNumber] = Put[Int].contramap(_.value)
 }

@@ -8,13 +8,11 @@ package production
 package productsubcategory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `production.productsubcategory` which has not been persisted yet */
@@ -30,9 +28,9 @@ case class ProductsubcategoryRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productsubcategoryidDefault: => ProductsubcategoryId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductsubcategoryRow =
+  def toRow(productsubcategoryidDefault: => ProductsubcategoryId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductsubcategoryRow =
     ProductsubcategoryRow(
       productcategoryid = productcategoryid,
       name = name,
@@ -51,23 +49,6 @@ case class ProductsubcategoryRowUnsaved(
     )
 }
 object ProductsubcategoryRowUnsaved {
-  implicit val decoder: Decoder[ProductsubcategoryRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productcategoryid <- c.downField("productcategoryid").as[ProductcategoryId]
-        name <- c.downField("name").as[Name]
-        productsubcategoryid <- c.downField("productsubcategoryid").as[Defaulted[ProductsubcategoryId]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductsubcategoryRowUnsaved(productcategoryid, name, productsubcategoryid, rowguid, modifieddate)
-  implicit val encoder: Encoder[ProductsubcategoryRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productcategoryid" := row.productcategoryid,
-        "name" := row.name,
-        "productsubcategoryid" := row.productsubcategoryid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductsubcategoryRowUnsaved] = Decoder.forProduct5[ProductsubcategoryRowUnsaved, ProductcategoryId, Name, Defaulted[ProductsubcategoryId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate")(ProductsubcategoryRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductsubcategoryRowUnsaved] = Encoder.forProduct5[ProductsubcategoryRowUnsaved, ProductcategoryId, Name, Defaulted[ProductsubcategoryId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate")(x => (x.productcategoryid, x.name, x.productsubcategoryid, x.rowguid, x.modifieddate))
 }

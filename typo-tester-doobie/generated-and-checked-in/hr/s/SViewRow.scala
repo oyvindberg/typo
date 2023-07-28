@@ -7,18 +7,16 @@ package adventureworks
 package hr
 package s
 
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 case class SViewRow(
   id: Option[Int],
@@ -27,54 +25,32 @@ case class SViewRow(
   /** Points to [[humanresources.shift.ShiftRow.name]] */
   name: Option[Name],
   /** Points to [[humanresources.shift.ShiftRow.starttime]] */
-  starttime: Option[LocalTime],
+  starttime: Option[TypoLocalTime],
   /** Points to [[humanresources.shift.ShiftRow.endtime]] */
-  endtime: Option[LocalTime],
+  endtime: Option[TypoLocalTime],
   /** Points to [[humanresources.shift.ShiftRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SViewRow {
-  implicit val decoder: Decoder[SViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        shiftid <- c.downField("shiftid").as[Option[ShiftId]]
-        name <- c.downField("name").as[Option[Name]]
-        starttime <- c.downField("starttime").as[Option[LocalTime]]
-        endtime <- c.downField("endtime").as[Option[LocalTime]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SViewRow(id, shiftid, name, starttime, endtime, modifieddate)
-  implicit val encoder: Encoder[SViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "shiftid" := row.shiftid,
-        "name" := row.name,
-        "starttime" := row.starttime,
-        "endtime" := row.endtime,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SViewRow] =
-    new Read[SViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ShiftId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalTime], Nullability.Nullable),
-        (Get[LocalTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        shiftid = Get[ShiftId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        starttime = Get[LocalTime].unsafeGetNullable(rs, i + 3),
-        endtime = Get[LocalTime].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[SViewRow] = Decoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(SViewRow.apply)
+  implicit val encoder: Encoder[SViewRow] = Encoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.id, x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))
+  implicit val read: Read[SViewRow] = new Read[SViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ShiftId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalTime], Nullability.Nullable),
+      (Get[TypoLocalTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      shiftid = Get[ShiftId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      starttime = Get[TypoLocalTime].unsafeGetNullable(rs, i + 3),
+      endtime = Get[TypoLocalTime].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

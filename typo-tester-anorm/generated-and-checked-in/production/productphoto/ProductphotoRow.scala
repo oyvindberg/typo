@@ -7,14 +7,16 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.TypoLocalDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ProductphotoRow(
@@ -28,47 +30,43 @@ case class ProductphotoRow(
   largephoto: Option[Array[Byte]],
   /** Large image file name. */
   largephotofilename: Option[/* max 50 chars */ String],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductphotoRow {
-  def rowParser(idx: Int): RowParser[ProductphotoRow] =
-    RowParser[ProductphotoRow] { row =>
-      Success(
+  implicit val reads: Reads[ProductphotoRow] = Reads[ProductphotoRow](json => JsResult.fromTry(
+      Try(
         ProductphotoRow(
-          productphotoid = row[ProductphotoId](idx + 0),
-          thumbnailphoto = row[Option[Array[Byte]]](idx + 1),
-          thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 2),
-          largephoto = row[Option[Array[Byte]]](idx + 3),
-          largephotofilename = row[Option[/* max 50 chars */ String]](idx + 4),
-          modifieddate = row[LocalDateTime](idx + 5)
+          productphotoid = json.\("productphotoid").as[ProductphotoId],
+          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Array[Byte]]),
+          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
+          largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
+          largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ProductphotoRow] = new OFormat[ProductphotoRow]{
-    override def writes(o: ProductphotoRow): JsObject =
-      Json.obj(
-        "productphotoid" -> o.productphotoid,
-        "thumbnailphoto" -> o.thumbnailphoto,
-        "thumbnailphotofilename" -> o.thumbnailphotofilename,
-        "largephoto" -> o.largephoto,
-        "largephotofilename" -> o.largephotofilename,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ProductphotoRow] = RowParser[ProductphotoRow] { row =>
+    Success(
+      ProductphotoRow(
+        productphotoid = row[ProductphotoId](idx + 0),
+        thumbnailphoto = row[Option[Array[Byte]]](idx + 1),
+        thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 2),
+        largephoto = row[Option[Array[Byte]]](idx + 3),
+        largephotofilename = row[Option[/* max 50 chars */ String]](idx + 4),
+        modifieddate = row[TypoLocalDateTime](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[ProductphotoRow] = {
-      JsResult.fromTry(
-        Try(
-          ProductphotoRow(
-            productphotoid = json.\("productphotoid").as[ProductphotoId],
-            thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Array[Byte]]),
-            thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-            largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
-            largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ProductphotoRow] = OWrites[ProductphotoRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productphotoid" -> Json.toJson(o.productphotoid),
+      "thumbnailphoto" -> Json.toJson(o.thumbnailphoto),
+      "thumbnailphotofilename" -> Json.toJson(o.thumbnailphotofilename),
+      "largephoto" -> Json.toJson(o.largephoto),
+      "largephotofilename" -> Json.toJson(o.largephotofilename),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package soh
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -18,16 +19,17 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
+import scala.util.Try
 
 case class SohViewRow(
   id: Option[Int],
@@ -36,11 +38,11 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.revisionnumber]] */
   revisionnumber: Option[Int],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.orderdate]] */
-  orderdate: Option[LocalDateTime],
+  orderdate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.duedate]] */
-  duedate: Option[LocalDateTime],
+  duedate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipdate]] */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.status]] */
   status: Option[Int],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.onlineorderflag]] */
@@ -80,130 +82,132 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SohViewRow {
-  implicit val decoder: Decoder[SohViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        salesorderid <- c.downField("salesorderid").as[Option[SalesorderheaderId]]
-        revisionnumber <- c.downField("revisionnumber").as[Option[Int]]
-        orderdate <- c.downField("orderdate").as[Option[LocalDateTime]]
-        duedate <- c.downField("duedate").as[Option[LocalDateTime]]
-        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
-        status <- c.downField("status").as[Option[Int]]
-        onlineorderflag <- c.downField("onlineorderflag").as[Flag]
-        purchaseordernumber <- c.downField("purchaseordernumber").as[Option[OrderNumber]]
-        accountnumber <- c.downField("accountnumber").as[Option[AccountNumber]]
-        customerid <- c.downField("customerid").as[Option[CustomerId]]
-        salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        billtoaddressid <- c.downField("billtoaddressid").as[Option[AddressId]]
-        shiptoaddressid <- c.downField("shiptoaddressid").as[Option[AddressId]]
-        shipmethodid <- c.downField("shipmethodid").as[Option[ShipmethodId]]
-        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[/* max 15 chars */ String]]
-        currencyrateid <- c.downField("currencyrateid").as[Option[CurrencyrateId]]
-        subtotal <- c.downField("subtotal").as[Option[BigDecimal]]
-        taxamt <- c.downField("taxamt").as[Option[BigDecimal]]
-        freight <- c.downField("freight").as[Option[BigDecimal]]
-        totaldue <- c.downField("totaldue").as[Option[BigDecimal]]
-        comment <- c.downField("comment").as[Option[/* max 128 chars */ String]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SohViewRow(id, salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, comment, rowguid, modifieddate)
-  implicit val encoder: Encoder[SohViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "salesorderid" := row.salesorderid,
-        "revisionnumber" := row.revisionnumber,
-        "orderdate" := row.orderdate,
-        "duedate" := row.duedate,
-        "shipdate" := row.shipdate,
-        "status" := row.status,
-        "onlineorderflag" := row.onlineorderflag,
-        "purchaseordernumber" := row.purchaseordernumber,
-        "accountnumber" := row.accountnumber,
-        "customerid" := row.customerid,
-        "salespersonid" := row.salespersonid,
-        "territoryid" := row.territoryid,
-        "billtoaddressid" := row.billtoaddressid,
-        "shiptoaddressid" := row.shiptoaddressid,
-        "shipmethodid" := row.shipmethodid,
-        "creditcardid" := row.creditcardid,
-        "creditcardapprovalcode" := row.creditcardapprovalcode,
-        "currencyrateid" := row.currencyrateid,
-        "subtotal" := row.subtotal,
-        "taxamt" := row.taxamt,
-        "freight" := row.freight,
-        "totaldue" := row.totaldue,
-        "comment" := row.comment,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SohViewRow] =
-    new Read[SohViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[SalesorderheaderId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[OrderNumber], Nullability.Nullable),
-        (Get[AccountNumber], Nullability.Nullable),
-        (Get[CustomerId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[AddressId], Nullability.Nullable),
-        (Get[AddressId], Nullability.Nullable),
-        (Get[ShipmethodId], Nullability.Nullable),
-        (Get[CreditcardId], Nullability.Nullable),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[CurrencyrateId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[/* max 128 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SohViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 1),
-        revisionnumber = Get[Int].unsafeGetNullable(rs, i + 2),
-        orderdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
-        duedate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        shipdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        status = Get[Int].unsafeGetNullable(rs, i + 6),
-        onlineorderflag = Get[Flag].unsafeGetNonNullable(rs, i + 7),
-        purchaseordernumber = Get[OrderNumber].unsafeGetNullable(rs, i + 8),
-        accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 9),
-        customerid = Get[CustomerId].unsafeGetNullable(rs, i + 10),
-        salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 11),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 12),
-        billtoaddressid = Get[AddressId].unsafeGetNullable(rs, i + 13),
-        shiptoaddressid = Get[AddressId].unsafeGetNullable(rs, i + 14),
-        shipmethodid = Get[ShipmethodId].unsafeGetNullable(rs, i + 15),
-        creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 16),
-        creditcardapprovalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 17),
-        currencyrateid = Get[CurrencyrateId].unsafeGetNullable(rs, i + 18),
-        subtotal = Get[BigDecimal].unsafeGetNullable(rs, i + 19),
-        taxamt = Get[BigDecimal].unsafeGetNullable(rs, i + 20),
-        freight = Get[BigDecimal].unsafeGetNullable(rs, i + 21),
-        totaldue = Get[BigDecimal].unsafeGetNullable(rs, i + 22),
-        comment = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 23),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 24),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 25)
+  implicit val decoder: Decoder[SohViewRow] = Decoder.instanceTry[SohViewRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      SohViewRow(
+        id = orThrow(c.get("id")(Decoder[Option[Int]])),
+        salesorderid = orThrow(c.get("salesorderid")(Decoder[Option[SalesorderheaderId]])),
+        revisionnumber = orThrow(c.get("revisionnumber")(Decoder[Option[Int]])),
+        orderdate = orThrow(c.get("orderdate")(Decoder[Option[TypoLocalDateTime]])),
+        duedate = orThrow(c.get("duedate")(Decoder[Option[TypoLocalDateTime]])),
+        shipdate = orThrow(c.get("shipdate")(Decoder[Option[TypoLocalDateTime]])),
+        status = orThrow(c.get("status")(Decoder[Option[Int]])),
+        onlineorderflag = orThrow(c.get("onlineorderflag")(Decoder[Flag])),
+        purchaseordernumber = orThrow(c.get("purchaseordernumber")(Decoder[Option[OrderNumber]])),
+        accountnumber = orThrow(c.get("accountnumber")(Decoder[Option[AccountNumber]])),
+        customerid = orThrow(c.get("customerid")(Decoder[Option[CustomerId]])),
+        salespersonid = orThrow(c.get("salespersonid")(Decoder[Option[BusinessentityId]])),
+        territoryid = orThrow(c.get("territoryid")(Decoder[Option[SalesterritoryId]])),
+        billtoaddressid = orThrow(c.get("billtoaddressid")(Decoder[Option[AddressId]])),
+        shiptoaddressid = orThrow(c.get("shiptoaddressid")(Decoder[Option[AddressId]])),
+        shipmethodid = orThrow(c.get("shipmethodid")(Decoder[Option[ShipmethodId]])),
+        creditcardid = orThrow(c.get("creditcardid")(Decoder[Option[CreditcardId]])),
+        creditcardapprovalcode = orThrow(c.get("creditcardapprovalcode")(Decoder[Option[/* max 15 chars */ String]])),
+        currencyrateid = orThrow(c.get("currencyrateid")(Decoder[Option[CurrencyrateId]])),
+        subtotal = orThrow(c.get("subtotal")(Decoder[Option[BigDecimal]])),
+        taxamt = orThrow(c.get("taxamt")(Decoder[Option[BigDecimal]])),
+        freight = orThrow(c.get("freight")(Decoder[Option[BigDecimal]])),
+        totaldue = orThrow(c.get("totaldue")(Decoder[Option[BigDecimal]])),
+        comment = orThrow(c.get("comment")(Decoder[Option[/* max 128 chars */ String]])),
+        rowguid = orThrow(c.get("rowguid")(Decoder[Option[UUID]])),
+        modifieddate = orThrow(c.get("modifieddate")(Decoder[Option[TypoLocalDateTime]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[SohViewRow] = Encoder[SohViewRow](row =>
+    Json.obj(
+      "id" -> Encoder[Option[Int]].apply(row.id),
+      "salesorderid" -> Encoder[Option[SalesorderheaderId]].apply(row.salesorderid),
+      "revisionnumber" -> Encoder[Option[Int]].apply(row.revisionnumber),
+      "orderdate" -> Encoder[Option[TypoLocalDateTime]].apply(row.orderdate),
+      "duedate" -> Encoder[Option[TypoLocalDateTime]].apply(row.duedate),
+      "shipdate" -> Encoder[Option[TypoLocalDateTime]].apply(row.shipdate),
+      "status" -> Encoder[Option[Int]].apply(row.status),
+      "onlineorderflag" -> Encoder[Flag].apply(row.onlineorderflag),
+      "purchaseordernumber" -> Encoder[Option[OrderNumber]].apply(row.purchaseordernumber),
+      "accountnumber" -> Encoder[Option[AccountNumber]].apply(row.accountnumber),
+      "customerid" -> Encoder[Option[CustomerId]].apply(row.customerid),
+      "salespersonid" -> Encoder[Option[BusinessentityId]].apply(row.salespersonid),
+      "territoryid" -> Encoder[Option[SalesterritoryId]].apply(row.territoryid),
+      "billtoaddressid" -> Encoder[Option[AddressId]].apply(row.billtoaddressid),
+      "shiptoaddressid" -> Encoder[Option[AddressId]].apply(row.shiptoaddressid),
+      "shipmethodid" -> Encoder[Option[ShipmethodId]].apply(row.shipmethodid),
+      "creditcardid" -> Encoder[Option[CreditcardId]].apply(row.creditcardid),
+      "creditcardapprovalcode" -> Encoder[Option[/* max 15 chars */ String]].apply(row.creditcardapprovalcode),
+      "currencyrateid" -> Encoder[Option[CurrencyrateId]].apply(row.currencyrateid),
+      "subtotal" -> Encoder[Option[BigDecimal]].apply(row.subtotal),
+      "taxamt" -> Encoder[Option[BigDecimal]].apply(row.taxamt),
+      "freight" -> Encoder[Option[BigDecimal]].apply(row.freight),
+      "totaldue" -> Encoder[Option[BigDecimal]].apply(row.totaldue),
+      "comment" -> Encoder[Option[/* max 128 chars */ String]].apply(row.comment),
+      "rowguid" -> Encoder[Option[UUID]].apply(row.rowguid),
+      "modifieddate" -> Encoder[Option[TypoLocalDateTime]].apply(row.modifieddate)
     )
-  
-
+  )
+  implicit val read: Read[SohViewRow] = new Read[SohViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[SalesorderheaderId], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[OrderNumber], Nullability.Nullable),
+      (Get[AccountNumber], Nullability.Nullable),
+      (Get[CustomerId], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[SalesterritoryId], Nullability.Nullable),
+      (Get[AddressId], Nullability.Nullable),
+      (Get[AddressId], Nullability.Nullable),
+      (Get[ShipmethodId], Nullability.Nullable),
+      (Get[CreditcardId], Nullability.Nullable),
+      (Get[/* max 15 chars */ String], Nullability.Nullable),
+      (Get[CurrencyrateId], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[/* max 128 chars */ String], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SohViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 1),
+      revisionnumber = Get[Int].unsafeGetNullable(rs, i + 2),
+      orderdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3),
+      duedate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4),
+      shipdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5),
+      status = Get[Int].unsafeGetNullable(rs, i + 6),
+      onlineorderflag = Get[Flag].unsafeGetNonNullable(rs, i + 7),
+      purchaseordernumber = Get[OrderNumber].unsafeGetNullable(rs, i + 8),
+      accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 9),
+      customerid = Get[CustomerId].unsafeGetNullable(rs, i + 10),
+      salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 11),
+      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 12),
+      billtoaddressid = Get[AddressId].unsafeGetNullable(rs, i + 13),
+      shiptoaddressid = Get[AddressId].unsafeGetNullable(rs, i + 14),
+      shipmethodid = Get[ShipmethodId].unsafeGetNullable(rs, i + 15),
+      creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 16),
+      creditcardapprovalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 17),
+      currencyrateid = Get[CurrencyrateId].unsafeGetNullable(rs, i + 18),
+      subtotal = Get[BigDecimal].unsafeGetNullable(rs, i + 19),
+      taxamt = Get[BigDecimal].unsafeGetNullable(rs, i + 20),
+      freight = Get[BigDecimal].unsafeGetNullable(rs, i + 21),
+      totaldue = Get[BigDecimal].unsafeGetNullable(rs, i + 22),
+      comment = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 23),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 24),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 25)
+    )
+  )
 }

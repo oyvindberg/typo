@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
@@ -19,65 +16,63 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** pg_node_tree (via PGObject) */
 case class TypoPgNodeTree(value: String)
+
 object TypoPgNodeTree {
-  implicit val oFormat: OFormat[TypoPgNodeTree] = new OFormat[TypoPgNodeTree]{
-    override def writes(o: TypoPgNodeTree): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoPgNodeTree] = {
-      JsResult.fromTry(
-        Try(
-          TypoPgNodeTree(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoPgNodeTreeDb: ToStatement[TypoPgNodeTree] with ParameterMetaData[TypoPgNodeTree] with Column[TypoPgNodeTree] = new ToStatement[TypoPgNodeTree] with ParameterMetaData[TypoPgNodeTree] with Column[TypoPgNodeTree] {
-    override def sqlType: String = "pg_node_tree"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoPgNodeTree): Unit =
-      s.setObject(index, {
-                           val obj = new PGobject
-                           obj.setType("pg_node_tree")
-                           obj.setValue(v.value)
-                           obj
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoPgNodeTree] =
-      v match {
-        case v: PGobject => Right(TypoPgNodeTree(v.getValue))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGobject from JDBC to produce a TypoPgNodeTree, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoPgNodeTreeDbArray: ToStatement[Array[TypoPgNodeTree]] with ParameterMetaData[Array[TypoPgNodeTree]] with Column[Array[TypoPgNodeTree]] = new ToStatement[Array[TypoPgNodeTree]] with ParameterMetaData[Array[TypoPgNodeTree]] with Column[Array[TypoPgNodeTree]] {
-    override def sqlType: String = "_pg_node_tree"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoPgNodeTree]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("pg_node_tree", v.map(v => {
-                                                                                   val obj = new PGobject
-                                                                                   obj.setType("pg_node_tree")
-                                                                                   obj.setValue(v.value)
-                                                                                   obj
-                                                                                 })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoPgNodeTree]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoPgNodeTree]] = Column.nonNull[Array[TypoPgNodeTree]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoPgNodeTree(v.asInstanceOf[String])))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoPgNodeTree, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoPgNodeTree, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoPgNodeTree]] = new ParameterMetaData[Array[TypoPgNodeTree]] {
+    override def sqlType: String = "_pg_node_tree"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoPgNodeTree]] = ToStatement[Array[TypoPgNodeTree]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("pg_node_tree", v.map(v => {
+                                                                                                                                   val obj = new PGobject
+                                                                                                                                   obj.setType("pg_node_tree")
+                                                                                                                                   obj.setValue(v.value)
+                                                                                                                                   obj
+                                                                                                                                 }))))
+  implicit val column: Column[TypoPgNodeTree] = Column.nonNull[TypoPgNodeTree]((v1: Any, _) =>
+    v1 match {
+      case v: PGobject => Right(TypoPgNodeTree(v.getValue))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoPgNodeTree] = new ParameterMetaData[TypoPgNodeTree] {
+    override def sqlType: String = "pg_node_tree"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoPgNodeTree] = Reads[TypoPgNodeTree](json => JsResult.fromTry(
+      Try(
+        TypoPgNodeTree(
+          value = json.\("value").as[String]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoPgNodeTree] = ToStatement[TypoPgNodeTree]((s, index, v) => s.setObject(index, {
+                                                                    val obj = new PGobject
+                                                                    obj.setType("pg_node_tree")
+                                                                    obj.setValue(v.value)
+                                                                    obj
+                                                                  }))
+  implicit val writes: OWrites[TypoPgNodeTree] = OWrites[TypoPgNodeTree](o =>
+    new JsObject(ListMap[String, JsValue](
+      "value" -> Json.toJson(o.value)
+    ))
+  )
 }

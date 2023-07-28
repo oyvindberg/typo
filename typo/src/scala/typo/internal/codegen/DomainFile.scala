@@ -3,7 +3,7 @@ package internal
 package codegen
 
 object DomainFile {
-  def apply(naming: Naming, options: InternalOptions, typeMapperScala: TypeMapperScala)(dom: db.Domain): sc.File = {
+  def apply(naming: Naming, options: InternalOptions, typeMapperScala: TypeMapperScala, genOrdering: GenOrdering)(dom: db.Domain): sc.File = {
     val qident = naming.domainName(dom.name)
     val tpe = sc.Type.Qualified(qident)
 
@@ -15,16 +15,19 @@ object DomainFile {
     )
 
     val underlying: sc.Type = typeMapperScala.domain(dom.tpe)
-    // todo: the implicit evidence below is to accommodate scala 2.12.4, which doesn't have an automatic `Ordering[ZonedDateTime]` (and maybe more)
+    val instances = List(
+      List(
+        genOrdering.ordering(tpe, NonEmptyList(sc.Param(sc.Ident("value"), underlying, None)))
+      ),
+      options.jsonLibs.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying)),
+      options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying))
+    ).flatten
+
     val str =
       code"""$comments
             |case class ${qident.name}(value: $underlying) extends AnyVal
-            |object ${qident.name} {
-            |  implicit def ordering(implicit ev: ${sc.Type.Ordering.of(underlying)}): ${sc.Type.Ordering.of(tpe)} = ${sc.Type.Ordering}.by(_.value)
-            |  ${options.jsonLibs.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying)).mkCode("\n")}
-            |  ${options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying)).mkCode("\n")}
-            |}
-""".stripMargin
+            |${genObject(qident, instances)}
+            |""".stripMargin
 
     sc.File(tpe, str, secondaryTypes = Nil)
   }

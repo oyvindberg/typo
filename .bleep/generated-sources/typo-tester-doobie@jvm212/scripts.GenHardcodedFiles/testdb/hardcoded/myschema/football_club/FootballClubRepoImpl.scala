@@ -14,7 +14,7 @@ import fs2.Stream
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
-    sql"""delete from myschema.football_club where "id" = $id""".update.run.map(_ > 0)
+    sql"""delete from myschema.football_club where "id" = ${id}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
@@ -26,16 +26,16 @@ object FootballClubRepoImpl extends FootballClubRepo {
     sql"""select "id", "name" from myschema.football_club""".query[FootballClubRow].stream
   }
   override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = $id""".query[FootballClubRow].option
+    sql"""select "id", "name" from myschema.football_club where "id" = ${id}""".query[FootballClubRow].option
   }
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY($ids)""".query[FootballClubRow].stream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query[FootballClubRow].stream
   }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
     sql"""update myschema.football_club
           set "name" = ${row.name}
-          where "id" = $id
+          where "id" = ${id}
        """
       .update
       .run

@@ -12,19 +12,22 @@ object addPackageAndImports {
 
     val contents = file.contents
     val withShortenedNames = contents.mapTrees { tree =>
-      shortenNames(tree) {
-        case currentQName if currentQName.value.idents.length <= 1 => currentQName
-        case currentQName =>
-          val currentName = currentQName.value.name
-          val shortenedQName = sc.Type.Qualified(currentName)
-          knownNamesByPkg(file.pkg).get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
-            case Some(alreadyAvailable) =>
-              if (alreadyAvailable == currentQName) shortenedQName else currentQName
-            case None =>
-              newImports += ((currentName, currentQName))
-              shortenedQName
-          }
-      }
+      shortenNames(
+        tree,
+        {
+          case currentQName if currentQName.value.idents.length <= 1 => currentQName
+          case currentQName =>
+            val currentName = currentQName.value.name
+            val shortenedQName = sc.Type.Qualified(currentName)
+            knownNamesByPkg(file.pkg).get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
+              case Some(alreadyAvailable) =>
+                if (alreadyAvailable == currentQName) shortenedQName else currentQName
+              case None =>
+                newImports += ((currentName, currentQName))
+                shortenedQName
+            }
+        }
+      )
     }
 
     val withPrefix =
@@ -38,25 +41,48 @@ object addPackageAndImports {
   }
 
   // traverse tree and rewrite qualified names
-  def shortenNames(tree: sc.Tree)(f: sc.Type.Qualified => sc.Type.Qualified): sc.Tree =
+  def shortenNames(tree: sc.Tree, f: sc.Type.Qualified => sc.Type.Qualified): sc.Tree =
     tree match {
-      case x: sc.Ident                              => x
-      case x: sc.QIdent                             => x
-      case sc.Param(name, tpe, maybeDefault)        => sc.Param(name, shortenNames(tpe, f), maybeDefault.map(code => code.mapTrees(shortenNames(_)(f))))
-      case x: sc.StrLit                             => x
-      case tpe: sc.Type                             => shortenNames(tpe, f)
-      case sc.StringInterpolate(i, prefix, content) => sc.StringInterpolate(shortenNames(i, f), prefix, content.mapTrees(shortenNames(_)(f)))
+      case x: sc.Ident =>
+        x
+      case x: sc.QIdent =>
+        x
+      case x: sc.Param =>
+        shortenNamesParam(x, f)
+      case x: sc.StrLit =>
+        x
+      case x: sc.Summon =>
+        sc.Summon(shortenNamesType(x.tpe, f))
+      case tpe: sc.Type =>
+        shortenNamesType(tpe, f)
+      case sc.StringInterpolate(i, prefix, content) =>
+        sc.StringInterpolate(shortenNamesType(i, f), prefix, content.mapTrees(t => shortenNames(t, f)))
+      case x: sc.ClassMember =>
+        shortenNamesClassMember(x, f)
+      case sc.Obj(name, members, body) =>
+        sc.Obj(name, members.map(cm => shortenNamesClassMember(cm, f)), body.map(_.mapTrees(t => shortenNames(t, f))))
+    }
+
+  def shortenNamesParam(param: sc.Param, f: sc.Type.Qualified => sc.Type.Qualified): sc.Param =
+    sc.Param(param.name, shortenNamesType(param.tpe, f), param.default.map(code => code.mapTrees(t => shortenNames(t, f))))
+
+  def shortenNamesClassMember(cm: sc.ClassMember, f: sc.Type.Qualified => sc.Type.Qualified): sc.ClassMember =
+    cm match {
+      case sc.Given(tparams, name, implicitParams, tpe, body) =>
+        sc.Given(tparams, name, implicitParams.map(p => shortenNamesParam(p, f)), shortenNamesType(tpe, f), body.mapTrees(t => shortenNames(t, f)))
+      case sc.Value(tparams, name, params, tpe, body) =>
+        sc.Value(tparams, name, params.map(p => shortenNamesParam(p, f)), shortenNamesType(tpe, f), body.mapTrees(t => shortenNames(t, f)))
     }
 
   // traverse type tree and rewrite qualified names
-  def shortenNames(tpe: sc.Type, f: sc.Type.Qualified => sc.Type.Qualified): sc.Type =
+  def shortenNamesType(tpe: sc.Type, f: sc.Type.Qualified => sc.Type.Qualified): sc.Type =
     tpe match {
       case sc.Type.Abstract(value)                => sc.Type.Abstract(value)
       case sc.Type.Wildcard                       => sc.Type.Wildcard
-      case sc.Type.TApply(underlying, targs)      => sc.Type.TApply(shortenNames(underlying, f), targs.map(targ => shortenNames(targ, f)))
+      case sc.Type.TApply(underlying, targs)      => sc.Type.TApply(shortenNamesType(underlying, f), targs.map(targ => shortenNamesType(targ, f)))
       case sc.Type.Qualified(value)               => f(sc.Type.Qualified(value))
-      case sc.Type.Commented(underlying, comment) => sc.Type.Commented(shortenNames(underlying, f), comment)
-      case sc.Type.ByName(underlying)             => sc.Type.ByName(shortenNames(underlying, f))
-      case sc.Type.UserDefined(underlying)        => sc.Type.UserDefined(shortenNames(underlying, f))
+      case sc.Type.Commented(underlying, comment) => sc.Type.Commented(shortenNamesType(underlying, f), comment)
+      case sc.Type.ByName(underlying)             => sc.Type.ByName(shortenNamesType(underlying, f))
+      case sc.Type.UserDefined(underlying)        => sc.Type.UserDefined(shortenNamesType(underlying, f))
     }
 }

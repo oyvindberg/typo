@@ -7,18 +7,19 @@ package adventureworks
 package humanresources
 package department
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `humanresources.department` */
 case class DepartmentId(value: Int) extends AnyVal
 object DepartmentId {
+  implicit val arrayGet: Get[Array[DepartmentId]] = Get[Array[Int]].map(_.map(DepartmentId.apply))
+  implicit val arrayPut: Put[Array[DepartmentId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[DepartmentId] = Decoder[Int].map(DepartmentId.apply)
+  implicit val encoder: Encoder[DepartmentId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[DepartmentId] = Get[Int].map(DepartmentId.apply)
   implicit val ordering: Ordering[DepartmentId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[DepartmentId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[DepartmentId] =
-    Decoder[Int].map(DepartmentId(_))
-  implicit val meta: Meta[DepartmentId] = Meta[Int].imap(DepartmentId.apply)(_.value)
-  implicit val metaArray: Meta[Array[DepartmentId]] = Meta[Array[Int]].imap(_.map(DepartmentId.apply))(_.map(_.value))
+  implicit val put: Put[DepartmentId] = Put[Int].contramap(_.value)
 }

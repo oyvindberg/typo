@@ -8,11 +8,11 @@ package production
 package productreview
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
           values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
-          returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+          returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
   
@@ -39,23 +39,23 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       },
       unsaved.reviewdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("reviewdate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("reviewdate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productreview default values
-            returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+            returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
          """
         .executeInsert(ProductreviewRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productreview(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+                  returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -66,18 +66,18 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+    SQL"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
           from production.productreview
        """.as(ProductreviewRow.rowParser(1).*)
   }
   override def selectById(productreviewid: ProductreviewId)(implicit c: Connection): Option[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+    SQL"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
           from production.productreview
           where productreviewid = $productreviewid
        """.as(ProductreviewRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
-    SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+    SQL"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
           from production.productreview
           where productreviewid = ANY($productreviewids)
        """.as(ProductreviewRow.rowParser(1).*)
@@ -117,7 +117,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             rating = EXCLUDED.rating,
             "comments" = EXCLUDED."comments",
             modifieddate = EXCLUDED.modifieddate
-          returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+          returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
   

@@ -8,12 +8,10 @@ package person
 package addresstype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `person.addresstype` which has not been persisted yet */
@@ -26,9 +24,9 @@ case class AddresstypeRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(addresstypeidDefault: => AddresstypeId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): AddresstypeRow =
+  def toRow(addresstypeidDefault: => AddresstypeId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): AddresstypeRow =
     AddresstypeRow(
       name = name,
       addresstypeid = addresstypeid match {
@@ -46,21 +44,6 @@ case class AddresstypeRowUnsaved(
     )
 }
 object AddresstypeRowUnsaved {
-  implicit val decoder: Decoder[AddresstypeRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        addresstypeid <- c.downField("addresstypeid").as[Defaulted[AddresstypeId]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield AddresstypeRowUnsaved(name, addresstypeid, rowguid, modifieddate)
-  implicit val encoder: Encoder[AddresstypeRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "addresstypeid" := row.addresstypeid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[AddresstypeRowUnsaved] = Decoder.forProduct4[AddresstypeRowUnsaved, Name, Defaulted[AddresstypeId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "addresstypeid", "rowguid", "modifieddate")(AddresstypeRowUnsaved.apply)
+  implicit val encoder: Encoder[AddresstypeRowUnsaved] = Encoder.forProduct4[AddresstypeRowUnsaved, Name, Defaulted[AddresstypeId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "addresstypeid", "rowguid", "modifieddate")(x => (x.name, x.addresstypeid, x.rowguid, x.modifieddate))
 }

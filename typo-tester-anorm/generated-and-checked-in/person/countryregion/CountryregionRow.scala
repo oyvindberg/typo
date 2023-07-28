@@ -7,15 +7,17 @@ package adventureworks
 package person
 package countryregion
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CountryregionRow(
@@ -23,38 +25,34 @@ case class CountryregionRow(
   countryregioncode: CountryregionId,
   /** Country or region name. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CountryregionRow {
-  def rowParser(idx: Int): RowParser[CountryregionRow] =
-    RowParser[CountryregionRow] { row =>
-      Success(
+  implicit val reads: Reads[CountryregionRow] = Reads[CountryregionRow](json => JsResult.fromTry(
+      Try(
         CountryregionRow(
-          countryregioncode = row[CountryregionId](idx + 0),
-          name = row[Name](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          countryregioncode = json.\("countryregioncode").as[CountryregionId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[CountryregionRow] = new OFormat[CountryregionRow]{
-    override def writes(o: CountryregionRow): JsObject =
-      Json.obj(
-        "countryregioncode" -> o.countryregioncode,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CountryregionRow] = RowParser[CountryregionRow] { row =>
+    Success(
+      CountryregionRow(
+        countryregioncode = row[CountryregionId](idx + 0),
+        name = row[Name](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[CountryregionRow] = {
-      JsResult.fromTry(
-        Try(
-          CountryregionRow(
-            countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CountryregionRow] = OWrites[CountryregionRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "countryregioncode" -> Json.toJson(o.countryregioncode),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

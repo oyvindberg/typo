@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object CuViewRepoImpl extends CuViewRepo {
   override def selectAll(implicit c: Connection): List[CuViewRow] = {
-    SQL"""select "id", currencycode, "name", modifieddate
+    SQL"""select "id", currencycode, "name", modifieddate::text
           from sa.cu
        """.as(CuViewRow.rowParser(1).*)
   }

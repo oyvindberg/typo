@@ -8,12 +8,10 @@ package sales
 package currency
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.currency` which has not been persisted yet */
 case class CurrencyRowUnsaved(
@@ -22,9 +20,9 @@ case class CurrencyRowUnsaved(
   /** Currency name. */
   name: Name,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): CurrencyRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CurrencyRow =
     CurrencyRow(
       currencycode = currencycode,
       name = name,
@@ -35,19 +33,6 @@ case class CurrencyRowUnsaved(
     )
 }
 object CurrencyRowUnsaved {
-  implicit val decoder: Decoder[CurrencyRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        currencycode <- c.downField("currencycode").as[CurrencyId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield CurrencyRowUnsaved(currencycode, name, modifieddate)
-  implicit val encoder: Encoder[CurrencyRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "currencycode" := row.currencycode,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[CurrencyRowUnsaved] = Decoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(CurrencyRowUnsaved.apply)
+  implicit val encoder: Encoder[CurrencyRowUnsaved] = Encoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))
 }

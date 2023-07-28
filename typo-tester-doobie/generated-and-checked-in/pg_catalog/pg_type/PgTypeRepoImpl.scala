@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_type where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_type where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow] = {
     sql"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
@@ -25,10 +25,10 @@ object PgTypeRepoImpl extends PgTypeRepo {
     sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type".query[PgTypeRow].stream
   }
   override def selectById(oid: PgTypeId): ConnectionIO[Option[PgTypeRow]] = {
-    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = $oid".query[PgTypeRow].option
+    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ${oid}".query[PgTypeRow].option
   }
   override def selectByIds(oids: Array[PgTypeId]): Stream[ConnectionIO, PgTypeRow] = {
-    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ANY($oids)".query[PgTypeRow].stream
+    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ANY(${oids})".query[PgTypeRow].stream
   }
   override def update(row: PgTypeRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -64,7 +64,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
               typdefaultbin = ${row.typdefaultbin}::pg_node_tree,
               typdefault = ${row.typdefault},
               typacl = ${row.typacl}::_aclitem
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

@@ -6,55 +6,33 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.util.PGobject
 
 /** inet (via PGObject) */
 case class TypoInet(value: String)
+
 object TypoInet {
-  implicit val decoder: Decoder[TypoInet] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[String]
-      } yield TypoInet(value)
-  implicit val encoder: Encoder[TypoInet] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoInet] =
-    Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("inet"))
-      .map(v => TypoInet(v.getValue))
-  
-  implicit val put: Put[TypoInet] =
-    Put.Advanced.other[PGobject](NonEmptyList.one("inet"))
-      .contramap(v => {
-                        val obj = new PGobject
-                        obj.setType("inet")
-                        obj.setValue(v.value)
-                        obj
-                      })
-  
-  implicit val meta: Meta[TypoInet] = new Meta(get, put)
-  val gets: Get[Array[TypoInet]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_inet"))
-      .map(_.map(v => TypoInet(v.asInstanceOf[PGobject].getValue)))
-  
-  val puts: Put[Array[TypoInet]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_inet"), "inet")
-      .contramap(_.map(v => {
-                              val obj = new PGobject
-                              obj.setType("inet")
-                              obj.setValue(v.value)
-                              obj
-                            }))
-  
-  implicit val metas: Meta[Array[TypoInet]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoInet]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_inet"))
+    .map(_.map(v => TypoInet(v.asInstanceOf[PGobject].getValue)))
+  implicit val arrayPut: Put[Array[TypoInet]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_inet"), "inet")
+    .contramap(_.map(v => {
+                            val obj = new PGobject
+                            obj.setType("inet")
+                            obj.setValue(v.value)
+                            obj
+                          }))
+  implicit val decoder: Decoder[TypoInet] = Decoder.forProduct1[TypoInet, String]("value")(TypoInet.apply)
+  implicit val encoder: Encoder[TypoInet] = Encoder.forProduct1[TypoInet, String]("value")(x => (x.value))
+  implicit val get: Get[TypoInet] = Get.Advanced.other[PGobject](NonEmptyList.one("inet"))
+    .map(v => TypoInet(v.getValue))
+  implicit val put: Put[TypoInet] = Put.Advanced.other[PGobject](NonEmptyList.one("inet")).contramap(v => {
+                                                                          val obj = new PGobject
+                                                                          obj.setType("inet")
+                                                                          obj.setValue(v.value)
+                                                                          obj
+                                                                        })
 }

@@ -7,17 +7,19 @@ package adventureworks
 package hr
 package s
 
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
-import java.time.LocalTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SViewRow(
@@ -27,51 +29,47 @@ case class SViewRow(
   /** Points to [[humanresources.shift.ShiftRow.name]] */
   name: Option[Name],
   /** Points to [[humanresources.shift.ShiftRow.starttime]] */
-  starttime: Option[LocalTime],
+  starttime: Option[TypoLocalTime],
   /** Points to [[humanresources.shift.ShiftRow.endtime]] */
-  endtime: Option[LocalTime],
+  endtime: Option[TypoLocalTime],
   /** Points to [[humanresources.shift.ShiftRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SViewRow {
-  def rowParser(idx: Int): RowParser[SViewRow] =
-    RowParser[SViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SViewRow] = Reads[SViewRow](json => JsResult.fromTry(
+      Try(
         SViewRow(
-          id = row[Option[Int]](idx + 0),
-          shiftid = row[Option[ShiftId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          starttime = row[Option[LocalTime]](idx + 3),
-          endtime = row[Option[LocalTime]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          starttime = json.\("starttime").toOption.map(_.as[TypoLocalTime]),
+          endtime = json.\("endtime").toOption.map(_.as[TypoLocalTime]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SViewRow] = new OFormat[SViewRow]{
-    override def writes(o: SViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "shiftid" -> o.shiftid,
-        "name" -> o.name,
-        "starttime" -> o.starttime,
-        "endtime" -> o.endtime,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SViewRow] = RowParser[SViewRow] { row =>
+    Success(
+      SViewRow(
+        id = row[Option[Int]](idx + 0),
+        shiftid = row[Option[ShiftId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        starttime = row[Option[TypoLocalTime]](idx + 3),
+        endtime = row[Option[TypoLocalTime]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[SViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            starttime = json.\("starttime").toOption.map(_.as[LocalTime]),
-            endtime = json.\("endtime").toOption.map(_.as[LocalTime]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SViewRow] = OWrites[SViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "shiftid" -> Json.toJson(o.shiftid),
+      "name" -> Json.toJson(o.name),
+      "starttime" -> Json.toJson(o.starttime),
+      "endtime" -> Json.toJson(o.endtime),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_file_settings
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgFileSettingsViewRow(
@@ -27,50 +25,26 @@ case class PgFileSettingsViewRow(
 )
 
 object PgFileSettingsViewRow {
-  implicit val decoder: Decoder[PgFileSettingsViewRow] =
-    (c: HCursor) =>
-      for {
-        sourcefile <- c.downField("sourcefile").as[Option[String]]
-        sourceline <- c.downField("sourceline").as[Option[Int]]
-        seqno <- c.downField("seqno").as[Option[Int]]
-        name <- c.downField("name").as[Option[String]]
-        setting <- c.downField("setting").as[Option[String]]
-        applied <- c.downField("applied").as[Option[Boolean]]
-        error <- c.downField("error").as[Option[String]]
-      } yield PgFileSettingsViewRow(sourcefile, sourceline, seqno, name, setting, applied, error)
-  implicit val encoder: Encoder[PgFileSettingsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "sourcefile" := row.sourcefile,
-        "sourceline" := row.sourceline,
-        "seqno" := row.seqno,
-        "name" := row.name,
-        "setting" := row.setting,
-        "applied" := row.applied,
-        "error" := row.error
-      )}
-  implicit val read: Read[PgFileSettingsViewRow] =
-    new Read[PgFileSettingsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgFileSettingsViewRow(
-        sourcefile = Get[String].unsafeGetNullable(rs, i + 0),
-        sourceline = Get[Int].unsafeGetNullable(rs, i + 1),
-        seqno = Get[Int].unsafeGetNullable(rs, i + 2),
-        name = Get[String].unsafeGetNullable(rs, i + 3),
-        setting = Get[String].unsafeGetNullable(rs, i + 4),
-        applied = Get[Boolean].unsafeGetNullable(rs, i + 5),
-        error = Get[String].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgFileSettingsViewRow] = Decoder.forProduct7[PgFileSettingsViewRow, Option[String], Option[Int], Option[Int], Option[String], Option[String], Option[Boolean], Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(PgFileSettingsViewRow.apply)
+  implicit val encoder: Encoder[PgFileSettingsViewRow] = Encoder.forProduct7[PgFileSettingsViewRow, Option[String], Option[Int], Option[Int], Option[String], Option[String], Option[Boolean], Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(x => (x.sourcefile, x.sourceline, x.seqno, x.name, x.setting, x.applied, x.error))
+  implicit val read: Read[PgFileSettingsViewRow] = new Read[PgFileSettingsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgFileSettingsViewRow(
+      sourcefile = Get[String].unsafeGetNullable(rs, i + 0),
+      sourceline = Get[Int].unsafeGetNullable(rs, i + 1),
+      seqno = Get[Int].unsafeGetNullable(rs, i + 2),
+      name = Get[String].unsafeGetNullable(rs, i + 3),
+      setting = Get[String].unsafeGetNullable(rs, i + 4),
+      applied = Get[Boolean].unsafeGetNullable(rs, i + 5),
+      error = Get[String].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

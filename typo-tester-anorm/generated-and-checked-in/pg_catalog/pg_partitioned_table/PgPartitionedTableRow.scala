@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPartitionedTableRow(
@@ -31,49 +33,45 @@ case class PgPartitionedTableRow(
 )
 
 object PgPartitionedTableRow {
-  def rowParser(idx: Int): RowParser[PgPartitionedTableRow] =
-    RowParser[PgPartitionedTableRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPartitionedTableRow] = Reads[PgPartitionedTableRow](json => JsResult.fromTry(
+      Try(
         PgPartitionedTableRow(
-          partrelid = row[PgPartitionedTableId](idx + 0),
-          partstrat = row[String](idx + 1),
-          partnatts = row[Int](idx + 2),
-          partdefid = row[/* oid */ Long](idx + 3),
-          partattrs = row[TypoInt2Vector](idx + 4),
-          partclass = row[TypoOidVector](idx + 5),
-          partcollation = row[TypoOidVector](idx + 6),
-          partexprs = row[Option[TypoPgNodeTree]](idx + 7)
+          partrelid = json.\("partrelid").as[PgPartitionedTableId],
+          partstrat = json.\("partstrat").as[String],
+          partnatts = json.\("partnatts").as[Int],
+          partdefid = json.\("partdefid").as[/* oid */ Long],
+          partattrs = json.\("partattrs").as[TypoInt2Vector],
+          partclass = json.\("partclass").as[TypoOidVector],
+          partcollation = json.\("partcollation").as[TypoOidVector],
+          partexprs = json.\("partexprs").toOption.map(_.as[TypoPgNodeTree])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPartitionedTableRow] = new OFormat[PgPartitionedTableRow]{
-    override def writes(o: PgPartitionedTableRow): JsObject =
-      Json.obj(
-        "partrelid" -> o.partrelid,
-        "partstrat" -> o.partstrat,
-        "partnatts" -> o.partnatts,
-        "partdefid" -> o.partdefid,
-        "partattrs" -> o.partattrs,
-        "partclass" -> o.partclass,
-        "partcollation" -> o.partcollation,
-        "partexprs" -> o.partexprs
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPartitionedTableRow] = RowParser[PgPartitionedTableRow] { row =>
+    Success(
+      PgPartitionedTableRow(
+        partrelid = row[PgPartitionedTableId](idx + 0),
+        partstrat = row[String](idx + 1),
+        partnatts = row[Int](idx + 2),
+        partdefid = row[/* oid */ Long](idx + 3),
+        partattrs = row[TypoInt2Vector](idx + 4),
+        partclass = row[TypoOidVector](idx + 5),
+        partcollation = row[TypoOidVector](idx + 6),
+        partexprs = row[Option[TypoPgNodeTree]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPartitionedTableRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPartitionedTableRow(
-            partrelid = json.\("partrelid").as[PgPartitionedTableId],
-            partstrat = json.\("partstrat").as[String],
-            partnatts = json.\("partnatts").as[Int],
-            partdefid = json.\("partdefid").as[/* oid */ Long],
-            partattrs = json.\("partattrs").as[TypoInt2Vector],
-            partclass = json.\("partclass").as[TypoOidVector],
-            partcollation = json.\("partcollation").as[TypoOidVector],
-            partexprs = json.\("partexprs").toOption.map(_.as[TypoPgNodeTree])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPartitionedTableRow] = OWrites[PgPartitionedTableRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "partrelid" -> Json.toJson(o.partrelid),
+      "partstrat" -> Json.toJson(o.partstrat),
+      "partnatts" -> Json.toJson(o.partnatts),
+      "partdefid" -> Json.toJson(o.partdefid),
+      "partattrs" -> Json.toJson(o.partattrs),
+      "partclass" -> Json.toJson(o.partclass),
+      "partcollation" -> Json.toJson(o.partcollation),
+      "partexprs" -> Json.toJson(o.partexprs)
+    ))
+  )
 }

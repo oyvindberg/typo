@@ -16,18 +16,26 @@ import adventureworks.TypoJson
 import adventureworks.TypoJsonb
 import adventureworks.TypoLine
 import adventureworks.TypoLineSegment
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
 import adventureworks.TypoMoney
+import adventureworks.TypoOffsetDateTime
+import adventureworks.TypoOffsetTime
 import adventureworks.TypoPath
 import adventureworks.TypoPoint
 import adventureworks.TypoPolygon
 import adventureworks.TypoXml
 import anorm.RowParser
 import anorm.Success
+import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgtestnullRow(
@@ -45,6 +53,12 @@ case class PgtestnullRow(
   jsonb: Option[TypoJsonb],
   hstore: Option[TypoHStore],
   inet: Option[TypoInet],
+  timestamp: Option[TypoLocalDateTime],
+  timestampz: Option[TypoOffsetDateTime],
+  time: Option[TypoLocalTime],
+  timez: Option[TypoOffsetTime],
+  date: Option[TypoLocalDate],
+  uuid: Option[UUID],
   boxes: Option[Array[TypoBox]],
   circlees: Option[Array[TypoCircle]],
   linees: Option[Array[TypoLine]],
@@ -58,113 +72,151 @@ case class PgtestnullRow(
   jsones: Option[Array[TypoJson]],
   jsonbes: Option[Array[TypoJsonb]],
   hstores: Option[Array[TypoHStore]],
-  inets: Option[Array[TypoInet]]
+  inets: Option[Array[TypoInet]],
+  timestamps: Option[Array[TypoLocalDateTime]],
+  timestampzs: Option[Array[TypoOffsetDateTime]],
+  times: Option[Array[TypoLocalTime]],
+  timezs: Option[Array[TypoOffsetTime]],
+  dates: Option[Array[TypoLocalDate]],
+  uuids: Option[Array[UUID]]
 )
 
 object PgtestnullRow {
-  def rowParser(idx: Int): RowParser[PgtestnullRow] =
-    RowParser[PgtestnullRow] { row =>
-      Success(
+  implicit val reads: Reads[PgtestnullRow] = Reads[PgtestnullRow](json => JsResult.fromTry(
+      Try(
         PgtestnullRow(
-          box = row[Option[TypoBox]](idx + 0),
-          circle = row[Option[TypoCircle]](idx + 1),
-          line = row[Option[TypoLine]](idx + 2),
-          lseg = row[Option[TypoLineSegment]](idx + 3),
-          path = row[Option[TypoPath]](idx + 4),
-          point = row[Option[TypoPoint]](idx + 5),
-          polygon = row[Option[TypoPolygon]](idx + 6),
-          interval = row[Option[TypoInterval]](idx + 7),
-          money = row[Option[TypoMoney]](idx + 8),
-          xml = row[Option[TypoXml]](idx + 9),
-          json = row[Option[TypoJson]](idx + 10),
-          jsonb = row[Option[TypoJsonb]](idx + 11),
-          hstore = row[Option[TypoHStore]](idx + 12),
-          inet = row[Option[TypoInet]](idx + 13),
-          boxes = row[Option[Array[TypoBox]]](idx + 14),
-          circlees = row[Option[Array[TypoCircle]]](idx + 15),
-          linees = row[Option[Array[TypoLine]]](idx + 16),
-          lseges = row[Option[Array[TypoLineSegment]]](idx + 17),
-          pathes = row[Option[Array[TypoPath]]](idx + 18),
-          pointes = row[Option[Array[TypoPoint]]](idx + 19),
-          polygones = row[Option[Array[TypoPolygon]]](idx + 20),
-          intervales = row[Option[Array[TypoInterval]]](idx + 21),
-          moneyes = row[Option[Array[TypoMoney]]](idx + 22),
-          xmles = row[Option[Array[TypoXml]]](idx + 23),
-          jsones = row[Option[Array[TypoJson]]](idx + 24),
-          jsonbes = row[Option[Array[TypoJsonb]]](idx + 25),
-          hstores = row[Option[Array[TypoHStore]]](idx + 26),
-          inets = row[Option[Array[TypoInet]]](idx + 27)
+          box = json.\("box").toOption.map(_.as[TypoBox]),
+          circle = json.\("circle").toOption.map(_.as[TypoCircle]),
+          line = json.\("line").toOption.map(_.as[TypoLine]),
+          lseg = json.\("lseg").toOption.map(_.as[TypoLineSegment]),
+          path = json.\("path").toOption.map(_.as[TypoPath]),
+          point = json.\("point").toOption.map(_.as[TypoPoint]),
+          polygon = json.\("polygon").toOption.map(_.as[TypoPolygon]),
+          interval = json.\("interval").toOption.map(_.as[TypoInterval]),
+          money = json.\("money").toOption.map(_.as[TypoMoney]),
+          xml = json.\("xml").toOption.map(_.as[TypoXml]),
+          json = json.\("json").toOption.map(_.as[TypoJson]),
+          jsonb = json.\("jsonb").toOption.map(_.as[TypoJsonb]),
+          hstore = json.\("hstore").toOption.map(_.as[TypoHStore]),
+          inet = json.\("inet").toOption.map(_.as[TypoInet]),
+          timestamp = json.\("timestamp").toOption.map(_.as[TypoLocalDateTime]),
+          timestampz = json.\("timestampz").toOption.map(_.as[TypoOffsetDateTime]),
+          time = json.\("time").toOption.map(_.as[TypoLocalTime]),
+          timez = json.\("timez").toOption.map(_.as[TypoOffsetTime]),
+          date = json.\("date").toOption.map(_.as[TypoLocalDate]),
+          uuid = json.\("uuid").toOption.map(_.as[UUID]),
+          boxes = json.\("boxes").toOption.map(_.as[Array[TypoBox]]),
+          circlees = json.\("circlees").toOption.map(_.as[Array[TypoCircle]]),
+          linees = json.\("linees").toOption.map(_.as[Array[TypoLine]]),
+          lseges = json.\("lseges").toOption.map(_.as[Array[TypoLineSegment]]),
+          pathes = json.\("pathes").toOption.map(_.as[Array[TypoPath]]),
+          pointes = json.\("pointes").toOption.map(_.as[Array[TypoPoint]]),
+          polygones = json.\("polygones").toOption.map(_.as[Array[TypoPolygon]]),
+          intervales = json.\("intervales").toOption.map(_.as[Array[TypoInterval]]),
+          moneyes = json.\("moneyes").toOption.map(_.as[Array[TypoMoney]]),
+          xmles = json.\("xmles").toOption.map(_.as[Array[TypoXml]]),
+          jsones = json.\("jsones").toOption.map(_.as[Array[TypoJson]]),
+          jsonbes = json.\("jsonbes").toOption.map(_.as[Array[TypoJsonb]]),
+          hstores = json.\("hstores").toOption.map(_.as[Array[TypoHStore]]),
+          inets = json.\("inets").toOption.map(_.as[Array[TypoInet]]),
+          timestamps = json.\("timestamps").toOption.map(_.as[Array[TypoLocalDateTime]]),
+          timestampzs = json.\("timestampzs").toOption.map(_.as[Array[TypoOffsetDateTime]]),
+          times = json.\("times").toOption.map(_.as[Array[TypoLocalTime]]),
+          timezs = json.\("timezs").toOption.map(_.as[Array[TypoOffsetTime]]),
+          dates = json.\("dates").toOption.map(_.as[Array[TypoLocalDate]]),
+          uuids = json.\("uuids").toOption.map(_.as[Array[UUID]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgtestnullRow] = new OFormat[PgtestnullRow]{
-    override def writes(o: PgtestnullRow): JsObject =
-      Json.obj(
-        "box" -> o.box,
-        "circle" -> o.circle,
-        "line" -> o.line,
-        "lseg" -> o.lseg,
-        "path" -> o.path,
-        "point" -> o.point,
-        "polygon" -> o.polygon,
-        "interval" -> o.interval,
-        "money" -> o.money,
-        "xml" -> o.xml,
-        "json" -> o.json,
-        "jsonb" -> o.jsonb,
-        "hstore" -> o.hstore,
-        "inet" -> o.inet,
-        "boxes" -> o.boxes,
-        "circlees" -> o.circlees,
-        "linees" -> o.linees,
-        "lseges" -> o.lseges,
-        "pathes" -> o.pathes,
-        "pointes" -> o.pointes,
-        "polygones" -> o.polygones,
-        "intervales" -> o.intervales,
-        "moneyes" -> o.moneyes,
-        "xmles" -> o.xmles,
-        "jsones" -> o.jsones,
-        "jsonbes" -> o.jsonbes,
-        "hstores" -> o.hstores,
-        "inets" -> o.inets
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgtestnullRow] = RowParser[PgtestnullRow] { row =>
+    Success(
+      PgtestnullRow(
+        box = row[Option[TypoBox]](idx + 0),
+        circle = row[Option[TypoCircle]](idx + 1),
+        line = row[Option[TypoLine]](idx + 2),
+        lseg = row[Option[TypoLineSegment]](idx + 3),
+        path = row[Option[TypoPath]](idx + 4),
+        point = row[Option[TypoPoint]](idx + 5),
+        polygon = row[Option[TypoPolygon]](idx + 6),
+        interval = row[Option[TypoInterval]](idx + 7),
+        money = row[Option[TypoMoney]](idx + 8),
+        xml = row[Option[TypoXml]](idx + 9),
+        json = row[Option[TypoJson]](idx + 10),
+        jsonb = row[Option[TypoJsonb]](idx + 11),
+        hstore = row[Option[TypoHStore]](idx + 12),
+        inet = row[Option[TypoInet]](idx + 13),
+        timestamp = row[Option[TypoLocalDateTime]](idx + 14),
+        timestampz = row[Option[TypoOffsetDateTime]](idx + 15),
+        time = row[Option[TypoLocalTime]](idx + 16),
+        timez = row[Option[TypoOffsetTime]](idx + 17),
+        date = row[Option[TypoLocalDate]](idx + 18),
+        uuid = row[Option[UUID]](idx + 19),
+        boxes = row[Option[Array[TypoBox]]](idx + 20),
+        circlees = row[Option[Array[TypoCircle]]](idx + 21),
+        linees = row[Option[Array[TypoLine]]](idx + 22),
+        lseges = row[Option[Array[TypoLineSegment]]](idx + 23),
+        pathes = row[Option[Array[TypoPath]]](idx + 24),
+        pointes = row[Option[Array[TypoPoint]]](idx + 25),
+        polygones = row[Option[Array[TypoPolygon]]](idx + 26),
+        intervales = row[Option[Array[TypoInterval]]](idx + 27),
+        moneyes = row[Option[Array[TypoMoney]]](idx + 28),
+        xmles = row[Option[Array[TypoXml]]](idx + 29),
+        jsones = row[Option[Array[TypoJson]]](idx + 30),
+        jsonbes = row[Option[Array[TypoJsonb]]](idx + 31),
+        hstores = row[Option[Array[TypoHStore]]](idx + 32),
+        inets = row[Option[Array[TypoInet]]](idx + 33),
+        timestamps = row[Option[Array[TypoLocalDateTime]]](idx + 34),
+        timestampzs = row[Option[Array[TypoOffsetDateTime]]](idx + 35),
+        times = row[Option[Array[TypoLocalTime]]](idx + 36),
+        timezs = row[Option[Array[TypoOffsetTime]]](idx + 37),
+        dates = row[Option[Array[TypoLocalDate]]](idx + 38),
+        uuids = row[Option[Array[UUID]]](idx + 39)
       )
-  
-    override def reads(json: JsValue): JsResult[PgtestnullRow] = {
-      JsResult.fromTry(
-        Try(
-          PgtestnullRow(
-            box = json.\("box").toOption.map(_.as[TypoBox]),
-            circle = json.\("circle").toOption.map(_.as[TypoCircle]),
-            line = json.\("line").toOption.map(_.as[TypoLine]),
-            lseg = json.\("lseg").toOption.map(_.as[TypoLineSegment]),
-            path = json.\("path").toOption.map(_.as[TypoPath]),
-            point = json.\("point").toOption.map(_.as[TypoPoint]),
-            polygon = json.\("polygon").toOption.map(_.as[TypoPolygon]),
-            interval = json.\("interval").toOption.map(_.as[TypoInterval]),
-            money = json.\("money").toOption.map(_.as[TypoMoney]),
-            xml = json.\("xml").toOption.map(_.as[TypoXml]),
-            json = json.\("json").toOption.map(_.as[TypoJson]),
-            jsonb = json.\("jsonb").toOption.map(_.as[TypoJsonb]),
-            hstore = json.\("hstore").toOption.map(_.as[TypoHStore]),
-            inet = json.\("inet").toOption.map(_.as[TypoInet]),
-            boxes = json.\("boxes").toOption.map(_.as[Array[TypoBox]]),
-            circlees = json.\("circlees").toOption.map(_.as[Array[TypoCircle]]),
-            linees = json.\("linees").toOption.map(_.as[Array[TypoLine]]),
-            lseges = json.\("lseges").toOption.map(_.as[Array[TypoLineSegment]]),
-            pathes = json.\("pathes").toOption.map(_.as[Array[TypoPath]]),
-            pointes = json.\("pointes").toOption.map(_.as[Array[TypoPoint]]),
-            polygones = json.\("polygones").toOption.map(_.as[Array[TypoPolygon]]),
-            intervales = json.\("intervales").toOption.map(_.as[Array[TypoInterval]]),
-            moneyes = json.\("moneyes").toOption.map(_.as[Array[TypoMoney]]),
-            xmles = json.\("xmles").toOption.map(_.as[Array[TypoXml]]),
-            jsones = json.\("jsones").toOption.map(_.as[Array[TypoJson]]),
-            jsonbes = json.\("jsonbes").toOption.map(_.as[Array[TypoJsonb]]),
-            hstores = json.\("hstores").toOption.map(_.as[Array[TypoHStore]]),
-            inets = json.\("inets").toOption.map(_.as[Array[TypoInet]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgtestnullRow] = OWrites[PgtestnullRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "box" -> Json.toJson(o.box),
+      "circle" -> Json.toJson(o.circle),
+      "line" -> Json.toJson(o.line),
+      "lseg" -> Json.toJson(o.lseg),
+      "path" -> Json.toJson(o.path),
+      "point" -> Json.toJson(o.point),
+      "polygon" -> Json.toJson(o.polygon),
+      "interval" -> Json.toJson(o.interval),
+      "money" -> Json.toJson(o.money),
+      "xml" -> Json.toJson(o.xml),
+      "json" -> Json.toJson(o.json),
+      "jsonb" -> Json.toJson(o.jsonb),
+      "hstore" -> Json.toJson(o.hstore),
+      "inet" -> Json.toJson(o.inet),
+      "timestamp" -> Json.toJson(o.timestamp),
+      "timestampz" -> Json.toJson(o.timestampz),
+      "time" -> Json.toJson(o.time),
+      "timez" -> Json.toJson(o.timez),
+      "date" -> Json.toJson(o.date),
+      "uuid" -> Json.toJson(o.uuid),
+      "boxes" -> Json.toJson(o.boxes),
+      "circlees" -> Json.toJson(o.circlees),
+      "linees" -> Json.toJson(o.linees),
+      "lseges" -> Json.toJson(o.lseges),
+      "pathes" -> Json.toJson(o.pathes),
+      "pointes" -> Json.toJson(o.pointes),
+      "polygones" -> Json.toJson(o.polygones),
+      "intervales" -> Json.toJson(o.intervales),
+      "moneyes" -> Json.toJson(o.moneyes),
+      "xmles" -> Json.toJson(o.xmles),
+      "jsones" -> Json.toJson(o.jsones),
+      "jsonbes" -> Json.toJson(o.jsonbes),
+      "hstores" -> Json.toJson(o.hstores),
+      "inets" -> Json.toJson(o.inets),
+      "timestamps" -> Json.toJson(o.timestamps),
+      "timestampzs" -> Json.toJson(o.timestampzs),
+      "times" -> Json.toJson(o.times),
+      "timezs" -> Json.toJson(o.timezs),
+      "dates" -> Json.toJson(o.dates),
+      "uuids" -> Json.toJson(o.uuids)
+    ))
+  )
 }

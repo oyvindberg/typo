@@ -13,29 +13,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `production.productproductphoto` */
 case class ProductproductphotoId(productid: ProductId, productphotoid: ProductphotoId)
 object ProductproductphotoId {
   implicit val ordering: Ordering[ProductproductphotoId] = Ordering.by(x => (x.productid, x.productphotoid))
-  implicit val oFormat: OFormat[ProductproductphotoId] = new OFormat[ProductproductphotoId]{
-    override def writes(o: ProductproductphotoId): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "productphotoid" -> o.productphotoid
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductproductphotoId] = {
-      JsResult.fromTry(
-        Try(
-          ProductproductphotoId(
-            productid = json.\("productid").as[ProductId],
-            productphotoid = json.\("productphotoid").as[ProductphotoId]
-          )
+  implicit val reads: Reads[ProductproductphotoId] = Reads[ProductproductphotoId](json => JsResult.fromTry(
+      Try(
+        ProductproductphotoId(
+          productid = json.\("productid").as[ProductId],
+          productphotoid = json.\("productphotoid").as[ProductphotoId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductproductphotoId] = OWrites[ProductproductphotoId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "productphotoid" -> Json.toJson(o.productphotoid)
+    ))
+  )
 }

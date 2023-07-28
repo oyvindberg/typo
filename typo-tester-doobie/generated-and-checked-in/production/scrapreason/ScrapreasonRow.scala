@@ -7,54 +7,36 @@ package adventureworks
 package production
 package scrapreason
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class ScrapreasonRow(
   /** Primary key for ScrapReason records. */
   scrapreasonid: ScrapreasonId,
   /** Failure description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ScrapreasonRow {
-  implicit val decoder: Decoder[ScrapreasonRow] =
-    (c: HCursor) =>
-      for {
-        scrapreasonid <- c.downField("scrapreasonid").as[ScrapreasonId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ScrapreasonRow(scrapreasonid, name, modifieddate)
-  implicit val encoder: Encoder[ScrapreasonRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "scrapreasonid" := row.scrapreasonid,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ScrapreasonRow] =
-    new Read[ScrapreasonRow](
-      gets = List(
-        (Get[ScrapreasonId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ScrapreasonRow(
-        scrapreasonid = Get[ScrapreasonId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[ScrapreasonRow] = Decoder.forProduct3[ScrapreasonRow, ScrapreasonId, Name, TypoLocalDateTime]("scrapreasonid", "name", "modifieddate")(ScrapreasonRow.apply)
+  implicit val encoder: Encoder[ScrapreasonRow] = Encoder.forProduct3[ScrapreasonRow, ScrapreasonId, Name, TypoLocalDateTime]("scrapreasonid", "name", "modifieddate")(x => (x.scrapreasonid, x.name, x.modifieddate))
+  implicit val read: Read[ScrapreasonRow] = new Read[ScrapreasonRow](
+    gets = List(
+      (Get[ScrapreasonId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ScrapreasonRow(
+      scrapreasonid = Get[ScrapreasonId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

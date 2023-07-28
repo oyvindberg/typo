@@ -40,6 +40,34 @@ object sc {
 
   case class StringInterpolate(`import`: sc.Type, prefix: sc.Ident, content: sc.Code) extends Tree
 
+  sealed trait ClassMember extends Tree {
+    def name: sc.Ident
+  }
+
+  case class Summon(tpe: Type) extends Tree
+
+  case class Given(
+      tparams: List[Type.Abstract],
+      name: sc.Ident,
+      implicitParams: List[Param],
+      tpe: sc.Type,
+      body: sc.Code
+  ) extends ClassMember
+
+  case class Value(
+      tparams: List[Type.Abstract],
+      name: sc.Ident,
+      params: List[Param],
+      tpe: sc.Type,
+      body: sc.Code
+  ) extends ClassMember
+
+  case class Obj(
+      name: sc.QIdent,
+      members: List[ClassMember],
+      body: Option[sc.Code]
+  ) extends Tree
+
   sealed trait Type extends Tree {
     def of(targs: Type*): Type = Type.TApply(this, targs.toList)
     def withComment(str: String): Type = Type.Commented(this, s"/* $str */")
@@ -67,8 +95,11 @@ object sc {
 
     val JavaBigDecimal = Qualified("java.math.BigDecimal")
     val JavaCharacter = Qualified("java.lang.Character")
+    val JavaBoolean = Qualified("java.lang.Boolean")
     val JavaDouble = Qualified("java.lang.Double")
     val JavaInteger = Qualified("java.lang.Integer")
+    val JavaLong = Qualified("java.lang.Long")
+    val JavaFloat = Qualified("java.lang.Float")
 
     val String = Qualified("java.lang.String")
     val Connection = Qualified("java.sql.Connection")
@@ -81,6 +112,7 @@ object sc {
     val LocalTime = Qualified("java.time.LocalTime")
     val OffsetDateTime = Qualified("java.time.OffsetDateTime")
     val OffsetTime = Qualified("java.time.OffsetTime")
+    val DateTimeParseException = Qualified("java.time.format.DateTimeParseException")
     val JavaHashMap = Qualified("java.util.HashMap")
     val JavaMap = Qualified("java.util.Map")
     val UUID = Qualified("java.util.UUID")
@@ -119,10 +151,15 @@ object sc {
     val StringContext = Qualified("scala.StringContext")
     val Unit = Qualified("scala.Unit")
     val Map = Qualified("scala.collection.immutable.Map")
+    val ListMap = Qualified("scala.collection.immutable.ListMap")
     val mutableMap = Qualified("scala.collection.mutable.Map")
     val BigDecimal = Qualified("scala.math.BigDecimal")
     val Ordering = Qualified("scala.math.Ordering")
     val Try = Qualified("scala.util.Try")
+    val DateTimeFormatter = Qualified("java.time.format.DateTimeFormatter")
+    val DateTimeFormatterBuilder = Qualified("java.time.format.DateTimeFormatterBuilder")
+    val ChronoField = Qualified("java.time.temporal.ChronoField")
+    val ChronoUnit = Qualified("java.time.temporal.ChronoUnit")
 
     // don't generate imports for these
     val BuiltIn: Map[Ident, Type.Qualified] =
@@ -178,10 +215,10 @@ object sc {
     def boxedType(tpe: sc.Type): Option[Qualified] =
       tpe match {
         case Int                      => scala.Some(JavaInteger)
-        case Long                     => scala.Some(Qualified("java.lang.Long"))
+        case Long                     => scala.Some(JavaLong)
         case Float                    => scala.Some(Qualified("java.lang.Float"))
         case Double                   => scala.Some(JavaDouble)
-        case Boolean                  => scala.Some(Qualified("java.lang.Boolean"))
+        case Boolean                  => scala.Some(JavaBoolean)
         case Short                    => scala.Some(Qualified("java.lang.Short"))
         case Byte                     => scala.Some(Qualified("java.lang.Byte"))
         case Char                     => scala.Some(JavaCharacter)
@@ -202,13 +239,13 @@ object sc {
     }
 
     def base(tpe: sc.Type): sc.Type = tpe match {
-      case Wildcard                 => tpe
-      case TApply(underlying, _)    => base(underlying)
-      case Qualified(_)             => tpe
-      case Abstract(_)              => tpe
-      case Commented(underlying, _) => base(underlying)
-      case ByName(underlying)       => base(underlying)
-      case UserDefined(_)           => tpe
+      case Wildcard                  => tpe
+      case TApply(underlying, targs) => TApply(base(underlying), targs.map(base))
+      case Qualified(_)              => tpe
+      case Abstract(_)               => tpe
+      case Commented(underlying, _)  => base(underlying)
+      case ByName(underlying)        => base(underlying)
+      case UserDefined(_)            => tpe
     }
   }
 
@@ -288,10 +325,11 @@ object sc {
       case Param(name, tpe, None)             => renderTree(name) + ": " + renderTree(tpe)
       case StrLit(str) if str.contains(Quote) => TripleQuote + str + TripleQuote
       case StrLit(str)                        => Quote + str + Quote
+      case Summon(tpe)                        => s"implicitly[${renderTree(tpe)}]"
       case tpe: Type =>
         tpe match {
           case Type.Abstract(value)                => renderTree(value)
-          case Type.Wildcard                       => "_"
+          case Type.Wildcard                       => "?"
           case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
           case Type.Qualified(value)               => renderTree(value)
           case Type.Commented(underlying, comment) => s"$comment ${renderTree(underlying)}"
@@ -312,6 +350,40 @@ object sc {
               s"\n${" " * pre.length}",
               s"\n${" " * renderedPrefix.length}$TripleQuote"
             )
+        }
+      case Given(tparams, name, implicitParams, tpe, body) =>
+        val renderedName = renderTree(name)
+        val renderedTpe = renderTree(tpe)
+        val renderedBody = body.render
+
+        if (tparams.isEmpty && implicitParams.isEmpty)
+          s"implicit val $renderedName: $renderedTpe = $renderedBody"
+        else {
+          val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
+          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
+          s"implicit def $renderedName${renderedTparams}$renderedImplicitParams: $renderedTpe = $renderedBody"
+        }
+      case Value(tparams, name, implicitParams, tpe, body) =>
+        val renderedName = renderTree(name)
+        val renderedTpe = renderTree(tpe)
+        val renderedBody = body.render
+
+        if (tparams.isEmpty && implicitParams.isEmpty)
+          s"val $renderedName: $renderedTpe = $renderedBody"
+        else {
+          val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
+          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(", ", ", ")")
+          s"def $renderedName${renderedTparams}$renderedImplicitParams: $renderedTpe = $renderedBody"
+        }
+      case Obj(name, members, body) =>
+        if (members.isEmpty && body.isEmpty) ""
+        else {
+          val codeMembers: List[String] =
+            body.map(_.render).toList ++ members.sortBy(_.name).map(renderTree)
+
+          s"""|object ${name.name.value} {
+              |${codeMembers.flatMap(_.linesIterator).map("  " + _).mkString("\n")}
+              |}""".stripMargin
         }
     }
 

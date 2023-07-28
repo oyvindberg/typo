@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgAmopRow(
@@ -29,58 +27,30 @@ case class PgAmopRow(
 )
 
 object PgAmopRow {
-  implicit val decoder: Decoder[PgAmopRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgAmopId]
-        amopfamily <- c.downField("amopfamily").as[/* oid */ Long]
-        amoplefttype <- c.downField("amoplefttype").as[/* oid */ Long]
-        amoprighttype <- c.downField("amoprighttype").as[/* oid */ Long]
-        amopstrategy <- c.downField("amopstrategy").as[Int]
-        amoppurpose <- c.downField("amoppurpose").as[String]
-        amopopr <- c.downField("amopopr").as[/* oid */ Long]
-        amopmethod <- c.downField("amopmethod").as[/* oid */ Long]
-        amopsortfamily <- c.downField("amopsortfamily").as[/* oid */ Long]
-      } yield PgAmopRow(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)
-  implicit val encoder: Encoder[PgAmopRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "amopfamily" := row.amopfamily,
-        "amoplefttype" := row.amoplefttype,
-        "amoprighttype" := row.amoprighttype,
-        "amopstrategy" := row.amopstrategy,
-        "amoppurpose" := row.amoppurpose,
-        "amopopr" := row.amopopr,
-        "amopmethod" := row.amopmethod,
-        "amopsortfamily" := row.amopsortfamily
-      )}
-  implicit val read: Read[PgAmopRow] =
-    new Read[PgAmopRow](
-      gets = List(
-        (Get[PgAmopId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAmopRow(
-        oid = Get[PgAmopId].unsafeGetNonNullable(rs, i + 0),
-        amopfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        amoplefttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        amoprighttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        amopstrategy = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        amoppurpose = Get[String].unsafeGetNonNullable(rs, i + 5),
-        amopopr = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
-        amopmethod = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
-        amopsortfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgAmopRow] = Decoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(PgAmopRow.apply)
+  implicit val encoder: Encoder[PgAmopRow] = Encoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(x => (x.oid, x.amopfamily, x.amoplefttype, x.amoprighttype, x.amopstrategy, x.amoppurpose, x.amopopr, x.amopmethod, x.amopsortfamily))
+  implicit val read: Read[PgAmopRow] = new Read[PgAmopRow](
+    gets = List(
+      (Get[PgAmopId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAmopRow(
+      oid = Get[PgAmopId].unsafeGetNonNullable(rs, i + 0),
+      amopfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      amoplefttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      amoprighttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      amopstrategy = Get[Int].unsafeGetNonNullable(rs, i + 4),
+      amoppurpose = Get[String].unsafeGetNonNullable(rs, i + 5),
+      amopopr = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
+      amopmethod = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
+      amopsortfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

@@ -7,18 +7,20 @@ package adventureworks
 package humanresources
 package employeedepartmenthistory
 
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDate
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EmployeedepartmenthistoryRow(
@@ -32,52 +34,48 @@ case class EmployeedepartmenthistoryRow(
       Points to [[shift.ShiftRow.shiftid]] */
   shiftid: ShiftId,
   /** Date the employee started work in the department. */
-  startdate: LocalDate,
+  startdate: TypoLocalDate,
   /** Date the employee left the department. NULL = Current department. */
-  enddate: Option[LocalDate],
-  modifieddate: LocalDateTime
+  enddate: Option[TypoLocalDate],
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeedepartmenthistoryId = EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)
  }
 
 object EmployeedepartmenthistoryRow {
-  def rowParser(idx: Int): RowParser[EmployeedepartmenthistoryRow] =
-    RowParser[EmployeedepartmenthistoryRow] { row =>
-      Success(
+  implicit val reads: Reads[EmployeedepartmenthistoryRow] = Reads[EmployeedepartmenthistoryRow](json => JsResult.fromTry(
+      Try(
         EmployeedepartmenthistoryRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          departmentid = row[DepartmentId](idx + 1),
-          shiftid = row[ShiftId](idx + 2),
-          startdate = row[LocalDate](idx + 3),
-          enddate = row[Option[LocalDate]](idx + 4),
-          modifieddate = row[LocalDateTime](idx + 5)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          departmentid = json.\("departmentid").as[DepartmentId],
+          shiftid = json.\("shiftid").as[ShiftId],
+          startdate = json.\("startdate").as[TypoLocalDate],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate]),
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[EmployeedepartmenthistoryRow] = new OFormat[EmployeedepartmenthistoryRow]{
-    override def writes(o: EmployeedepartmenthistoryRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "departmentid" -> o.departmentid,
-        "shiftid" -> o.shiftid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[EmployeedepartmenthistoryRow] = RowParser[EmployeedepartmenthistoryRow] { row =>
+    Success(
+      EmployeedepartmenthistoryRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        departmentid = row[DepartmentId](idx + 1),
+        shiftid = row[ShiftId](idx + 2),
+        startdate = row[TypoLocalDate](idx + 3),
+        enddate = row[Option[TypoLocalDate]](idx + 4),
+        modifieddate = row[TypoLocalDateTime](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[EmployeedepartmenthistoryRow] = {
-      JsResult.fromTry(
-        Try(
-          EmployeedepartmenthistoryRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            departmentid = json.\("departmentid").as[DepartmentId],
-            shiftid = json.\("shiftid").as[ShiftId],
-            startdate = json.\("startdate").as[LocalDate],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDate]),
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[EmployeedepartmenthistoryRow] = OWrites[EmployeedepartmenthistoryRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "departmentid" -> Json.toJson(o.departmentid),
+      "shiftid" -> Json.toJson(o.shiftid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

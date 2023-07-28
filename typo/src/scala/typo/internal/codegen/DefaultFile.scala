@@ -3,6 +3,12 @@ package internal
 package codegen
 
 case class DefaultFile(default: ComputedDefault, jsonLibs: List[JsonLib]) {
+  val instances: List[sc.Given] = jsonLibs.flatMap(_.defaultedInstance(default))
+
+  val obj: sc.Code = genObject.withBody(default.Defaulted.value, instances)(
+    code"""|case class ${default.Provided}[T](value: T) extends ${default.Defaulted.name}[T]
+           |case object ${default.UseDefault} extends ${default.Defaulted.name}[Nothing]""".stripMargin
+  )
   val contents =
     code"""
 /**
@@ -10,11 +16,7 @@ case class DefaultFile(default: ComputedDefault, jsonLibs: List[JsonLib]) {
  */
 sealed trait ${default.Defaulted.name}[+T]
 
-object ${default.Defaulted.name} {
-  case class ${default.Provided}[T](value: T) extends ${default.Defaulted.name}[T]
-  case object ${default.UseDefault} extends ${default.Defaulted.name}[Nothing]
-  ${jsonLibs.flatMap(_.defaultedInstance(default)).mkCode("\n")}
-}
+$obj
 """
 
   val file = sc.File(default.Defaulted, contents, secondaryTypes = Nil)

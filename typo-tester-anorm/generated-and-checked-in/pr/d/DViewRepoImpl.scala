@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object DViewRepoImpl extends DViewRepo {
   override def selectAll(implicit c: Connection): List[DViewRow] = {
-    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+    SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
           from pr.d
        """.as(DViewRow.rowParser(1).*)
   }

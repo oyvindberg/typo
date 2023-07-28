@@ -8,15 +8,13 @@ package person
 package stateprovince
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `person.stateprovince` which has not been persisted yet */
@@ -40,9 +38,9 @@ case class StateprovinceRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(stateprovinceidDefault: => StateprovinceId, isonlystateprovinceflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): StateprovinceRow =
+  def toRow(stateprovinceidDefault: => StateprovinceId, isonlystateprovinceflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): StateprovinceRow =
     StateprovinceRow(
       stateprovincecode = stateprovincecode,
       countryregioncode = countryregioncode,
@@ -67,29 +65,6 @@ case class StateprovinceRowUnsaved(
     )
 }
 object StateprovinceRowUnsaved {
-  implicit val decoder: Decoder[StateprovinceRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        stateprovincecode <- c.downField("stateprovincecode").as[/* bpchar */ String]
-        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
-        name <- c.downField("name").as[Name]
-        territoryid <- c.downField("territoryid").as[SalesterritoryId]
-        stateprovinceid <- c.downField("stateprovinceid").as[Defaulted[StateprovinceId]]
-        isonlystateprovinceflag <- c.downField("isonlystateprovinceflag").as[Defaulted[Flag]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield StateprovinceRowUnsaved(stateprovincecode, countryregioncode, name, territoryid, stateprovinceid, isonlystateprovinceflag, rowguid, modifieddate)
-  implicit val encoder: Encoder[StateprovinceRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "stateprovincecode" := row.stateprovincecode,
-        "countryregioncode" := row.countryregioncode,
-        "name" := row.name,
-        "territoryid" := row.territoryid,
-        "stateprovinceid" := row.stateprovinceid,
-        "isonlystateprovinceflag" := row.isonlystateprovinceflag,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[StateprovinceRowUnsaved] = Decoder.forProduct8[StateprovinceRowUnsaved, /* bpchar */ String, CountryregionId, Name, SalesterritoryId, Defaulted[StateprovinceId], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate")(StateprovinceRowUnsaved.apply)
+  implicit val encoder: Encoder[StateprovinceRowUnsaved] = Encoder.forProduct8[StateprovinceRowUnsaved, /* bpchar */ String, CountryregionId, Name, SalesterritoryId, Defaulted[StateprovinceId], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate")(x => (x.stateprovincecode, x.countryregioncode, x.name, x.territoryid, x.stateprovinceid, x.isonlystateprovinceflag, x.rowguid, x.modifieddate))
 }

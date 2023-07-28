@@ -7,21 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
+import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoRegtype
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgPreparedStatementsViewRow(
   name: Option[String],
   statement: Option[String],
-  prepareTime: Option[OffsetDateTime],
+  prepareTime: Option[TypoOffsetDateTime],
   parameterTypes: Option[Array[TypoRegtype]],
   fromSql: Option[Boolean],
   genericPlans: Option[Long],
@@ -29,50 +27,26 @@ case class PgPreparedStatementsViewRow(
 )
 
 object PgPreparedStatementsViewRow {
-  implicit val decoder: Decoder[PgPreparedStatementsViewRow] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Option[String]]
-        statement <- c.downField("statement").as[Option[String]]
-        prepareTime <- c.downField("prepare_time").as[Option[OffsetDateTime]]
-        parameterTypes <- c.downField("parameter_types").as[Option[Array[TypoRegtype]]]
-        fromSql <- c.downField("from_sql").as[Option[Boolean]]
-        genericPlans <- c.downField("generic_plans").as[Option[Long]]
-        customPlans <- c.downField("custom_plans").as[Option[Long]]
-      } yield PgPreparedStatementsViewRow(name, statement, prepareTime, parameterTypes, fromSql, genericPlans, customPlans)
-  implicit val encoder: Encoder[PgPreparedStatementsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "statement" := row.statement,
-        "prepare_time" := row.prepareTime,
-        "parameter_types" := row.parameterTypes,
-        "from_sql" := row.fromSql,
-        "generic_plans" := row.genericPlans,
-        "custom_plans" := row.customPlans
-      )}
-  implicit val read: Read[PgPreparedStatementsViewRow] =
-    new Read[PgPreparedStatementsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[Array[TypoRegtype]], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgPreparedStatementsViewRow(
-        name = Get[String].unsafeGetNullable(rs, i + 0),
-        statement = Get[String].unsafeGetNullable(rs, i + 1),
-        prepareTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 2),
-        parameterTypes = Get[Array[TypoRegtype]].unsafeGetNullable(rs, i + 3),
-        fromSql = Get[Boolean].unsafeGetNullable(rs, i + 4),
-        genericPlans = Get[Long].unsafeGetNullable(rs, i + 5),
-        customPlans = Get[Long].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgPreparedStatementsViewRow] = Decoder.forProduct7[PgPreparedStatementsViewRow, Option[String], Option[String], Option[TypoOffsetDateTime], Option[Array[TypoRegtype]], Option[Boolean], Option[Long], Option[Long]]("name", "statement", "prepare_time", "parameter_types", "from_sql", "generic_plans", "custom_plans")(PgPreparedStatementsViewRow.apply)
+  implicit val encoder: Encoder[PgPreparedStatementsViewRow] = Encoder.forProduct7[PgPreparedStatementsViewRow, Option[String], Option[String], Option[TypoOffsetDateTime], Option[Array[TypoRegtype]], Option[Boolean], Option[Long], Option[Long]]("name", "statement", "prepare_time", "parameter_types", "from_sql", "generic_plans", "custom_plans")(x => (x.name, x.statement, x.prepareTime, x.parameterTypes, x.fromSql, x.genericPlans, x.customPlans))
+  implicit val read: Read[PgPreparedStatementsViewRow] = new Read[PgPreparedStatementsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[Array[TypoRegtype]], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgPreparedStatementsViewRow(
+      name = Get[String].unsafeGetNullable(rs, i + 0),
+      statement = Get[String].unsafeGetNullable(rs, i + 1),
+      prepareTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 2),
+      parameterTypes = Get[Array[TypoRegtype]].unsafeGetNullable(rs, i + 3),
+      fromSql = Get[Boolean].unsafeGetNullable(rs, i + 4),
+      genericPlans = Get[Long].unsafeGetNullable(rs, i + 5),
+      customPlans = Get[Long].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

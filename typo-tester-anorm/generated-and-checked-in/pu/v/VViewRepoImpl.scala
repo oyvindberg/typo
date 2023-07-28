@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object VViewRepoImpl extends VViewRepo {
   override def selectAll(implicit c: Connection): List[VViewRow] = {
-    SQL"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+    SQL"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
           from pu.v
        """.as(VViewRow.rowParser(1).*)
   }

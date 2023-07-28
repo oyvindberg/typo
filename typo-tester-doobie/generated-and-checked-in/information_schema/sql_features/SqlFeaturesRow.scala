@@ -9,13 +9,11 @@ package sql_features
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class SqlFeaturesRow(
@@ -29,50 +27,26 @@ case class SqlFeaturesRow(
 )
 
 object SqlFeaturesRow {
-  implicit val decoder: Decoder[SqlFeaturesRow] =
-    (c: HCursor) =>
-      for {
-        featureId <- c.downField("feature_id").as[Option[CharacterData]]
-        featureName <- c.downField("feature_name").as[Option[CharacterData]]
-        subFeatureId <- c.downField("sub_feature_id").as[Option[CharacterData]]
-        subFeatureName <- c.downField("sub_feature_name").as[Option[CharacterData]]
-        isSupported <- c.downField("is_supported").as[Option[YesOrNo]]
-        isVerifiedBy <- c.downField("is_verified_by").as[Option[CharacterData]]
-        comments <- c.downField("comments").as[Option[CharacterData]]
-      } yield SqlFeaturesRow(featureId, featureName, subFeatureId, subFeatureName, isSupported, isVerifiedBy, comments)
-  implicit val encoder: Encoder[SqlFeaturesRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "feature_id" := row.featureId,
-        "feature_name" := row.featureName,
-        "sub_feature_id" := row.subFeatureId,
-        "sub_feature_name" := row.subFeatureName,
-        "is_supported" := row.isSupported,
-        "is_verified_by" := row.isVerifiedBy,
-        "comments" := row.comments
-      )}
-  implicit val read: Read[SqlFeaturesRow] =
-    new Read[SqlFeaturesRow](
-      gets = List(
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SqlFeaturesRow(
-        featureId = Get[CharacterData].unsafeGetNullable(rs, i + 0),
-        featureName = Get[CharacterData].unsafeGetNullable(rs, i + 1),
-        subFeatureId = Get[CharacterData].unsafeGetNullable(rs, i + 2),
-        subFeatureName = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-        isSupported = Get[YesOrNo].unsafeGetNullable(rs, i + 4),
-        isVerifiedBy = Get[CharacterData].unsafeGetNullable(rs, i + 5),
-        comments = Get[CharacterData].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[SqlFeaturesRow] = Decoder.forProduct7[SqlFeaturesRow, Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "sub_feature_id", "sub_feature_name", "is_supported", "is_verified_by", "comments")(SqlFeaturesRow.apply)
+  implicit val encoder: Encoder[SqlFeaturesRow] = Encoder.forProduct7[SqlFeaturesRow, Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "sub_feature_id", "sub_feature_name", "is_supported", "is_verified_by", "comments")(x => (x.featureId, x.featureName, x.subFeatureId, x.subFeatureName, x.isSupported, x.isVerifiedBy, x.comments))
+  implicit val read: Read[SqlFeaturesRow] = new Read[SqlFeaturesRow](
+    gets = List(
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SqlFeaturesRow(
+      featureId = Get[CharacterData].unsafeGetNullable(rs, i + 0),
+      featureName = Get[CharacterData].unsafeGetNullable(rs, i + 1),
+      subFeatureId = Get[CharacterData].unsafeGetNullable(rs, i + 2),
+      subFeatureName = Get[CharacterData].unsafeGetNullable(rs, i + 3),
+      isSupported = Get[YesOrNo].unsafeGetNullable(rs, i + 4),
+      isVerifiedBy = Get[CharacterData].unsafeGetNullable(rs, i + 5),
+      comments = Get[CharacterData].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_inherits
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgInheritsRow(
@@ -26,38 +24,20 @@ case class PgInheritsRow(
  }
 
 object PgInheritsRow {
-  implicit val decoder: Decoder[PgInheritsRow] =
-    (c: HCursor) =>
-      for {
-        inhrelid <- c.downField("inhrelid").as[/* oid */ Long]
-        inhparent <- c.downField("inhparent").as[/* oid */ Long]
-        inhseqno <- c.downField("inhseqno").as[Int]
-        inhdetachpending <- c.downField("inhdetachpending").as[Boolean]
-      } yield PgInheritsRow(inhrelid, inhparent, inhseqno, inhdetachpending)
-  implicit val encoder: Encoder[PgInheritsRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "inhrelid" := row.inhrelid,
-        "inhparent" := row.inhparent,
-        "inhseqno" := row.inhseqno,
-        "inhdetachpending" := row.inhdetachpending
-      )}
-  implicit val read: Read[PgInheritsRow] =
-    new Read[PgInheritsRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgInheritsRow(
-        inhrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        inhparent = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        inhseqno = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        inhdetachpending = Get[Boolean].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgInheritsRow] = Decoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(PgInheritsRow.apply)
+  implicit val encoder: Encoder[PgInheritsRow] = Encoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(x => (x.inhrelid, x.inhparent, x.inhseqno, x.inhdetachpending))
+  implicit val read: Read[PgInheritsRow] = new Read[PgInheritsRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgInheritsRow(
+      inhrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      inhparent = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      inhseqno = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      inhdetachpending = Get[Boolean].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTransformRow(
@@ -26,40 +28,36 @@ case class PgTransformRow(
 )
 
 object PgTransformRow {
-  def rowParser(idx: Int): RowParser[PgTransformRow] =
-    RowParser[PgTransformRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTransformRow] = Reads[PgTransformRow](json => JsResult.fromTry(
+      Try(
         PgTransformRow(
-          oid = row[PgTransformId](idx + 0),
-          trftype = row[/* oid */ Long](idx + 1),
-          trflang = row[/* oid */ Long](idx + 2),
-          trffromsql = row[TypoRegproc](idx + 3),
-          trftosql = row[TypoRegproc](idx + 4)
+          oid = json.\("oid").as[PgTransformId],
+          trftype = json.\("trftype").as[/* oid */ Long],
+          trflang = json.\("trflang").as[/* oid */ Long],
+          trffromsql = json.\("trffromsql").as[TypoRegproc],
+          trftosql = json.\("trftosql").as[TypoRegproc]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTransformRow] = new OFormat[PgTransformRow]{
-    override def writes(o: PgTransformRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "trftype" -> o.trftype,
-        "trflang" -> o.trflang,
-        "trffromsql" -> o.trffromsql,
-        "trftosql" -> o.trftosql
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTransformRow] = RowParser[PgTransformRow] { row =>
+    Success(
+      PgTransformRow(
+        oid = row[PgTransformId](idx + 0),
+        trftype = row[/* oid */ Long](idx + 1),
+        trflang = row[/* oid */ Long](idx + 2),
+        trffromsql = row[TypoRegproc](idx + 3),
+        trftosql = row[TypoRegproc](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTransformRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTransformRow(
-            oid = json.\("oid").as[PgTransformId],
-            trftype = json.\("trftype").as[/* oid */ Long],
-            trflang = json.\("trflang").as[/* oid */ Long],
-            trffromsql = json.\("trffromsql").as[TypoRegproc],
-            trftosql = json.\("trftosql").as[TypoRegproc]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTransformRow] = OWrites[PgTransformRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "trftype" -> Json.toJson(o.trftype),
+      "trflang" -> Json.toJson(o.trflang),
+      "trffromsql" -> Json.toJson(o.trffromsql),
+      "trftosql" -> Json.toJson(o.trftosql)
+    ))
+  )
 }

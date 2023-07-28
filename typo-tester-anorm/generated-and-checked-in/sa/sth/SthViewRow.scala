@@ -7,17 +7,19 @@ package adventureworks
 package sa
 package sth
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SthViewRow(
@@ -27,56 +29,52 @@ case class SthViewRow(
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.startdate]] */
-  startdate: Option[LocalDateTime],
+  startdate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.enddate]] */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SthViewRow {
-  def rowParser(idx: Int): RowParser[SthViewRow] =
-    RowParser[SthViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SthViewRow] = Reads[SthViewRow](json => JsResult.fromTry(
+      Try(
         SthViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          territoryid = row[Option[SalesterritoryId]](idx + 2),
-          startdate = row[Option[LocalDateTime]](idx + 3),
-          enddate = row[Option[LocalDateTime]](idx + 4),
-          rowguid = row[Option[UUID]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
+          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDateTime]),
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SthViewRow] = new OFormat[SthViewRow]{
-    override def writes(o: SthViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "territoryid" -> o.territoryid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SthViewRow] = RowParser[SthViewRow] { row =>
+    Success(
+      SthViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        territoryid = row[Option[SalesterritoryId]](idx + 2),
+        startdate = row[Option[TypoLocalDateTime]](idx + 3),
+        enddate = row[Option[TypoLocalDateTime]](idx + 4),
+        rowguid = row[Option[UUID]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[SthViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SthViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-            startdate = json.\("startdate").toOption.map(_.as[LocalDateTime]),
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SthViewRow] = OWrites[SthViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

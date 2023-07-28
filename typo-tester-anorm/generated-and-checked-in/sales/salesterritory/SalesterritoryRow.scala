@@ -7,17 +7,19 @@ package adventureworks
 package sales
 package salesterritory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SalesterritoryRow(
@@ -39,59 +41,55 @@ case class SalesterritoryRow(
   /** Business costs in the territory the previous year. */
   costlastyear: BigDecimal,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object SalesterritoryRow {
-  def rowParser(idx: Int): RowParser[SalesterritoryRow] =
-    RowParser[SalesterritoryRow] { row =>
-      Success(
+  implicit val reads: Reads[SalesterritoryRow] = Reads[SalesterritoryRow](json => JsResult.fromTry(
+      Try(
         SalesterritoryRow(
-          territoryid = row[SalesterritoryId](idx + 0),
-          name = row[Name](idx + 1),
-          countryregioncode = row[CountryregionId](idx + 2),
-          group = row[/* max 50 chars */ String](idx + 3),
-          salesytd = row[BigDecimal](idx + 4),
-          saleslastyear = row[BigDecimal](idx + 5),
-          costytd = row[BigDecimal](idx + 6),
-          costlastyear = row[BigDecimal](idx + 7),
-          rowguid = row[UUID](idx + 8),
-          modifieddate = row[LocalDateTime](idx + 9)
+          territoryid = json.\("territoryid").as[SalesterritoryId],
+          name = json.\("name").as[Name],
+          countryregioncode = json.\("countryregioncode").as[CountryregionId],
+          group = json.\("group").as[/* max 50 chars */ String],
+          salesytd = json.\("salesytd").as[BigDecimal],
+          saleslastyear = json.\("saleslastyear").as[BigDecimal],
+          costytd = json.\("costytd").as[BigDecimal],
+          costlastyear = json.\("costlastyear").as[BigDecimal],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[SalesterritoryRow] = new OFormat[SalesterritoryRow]{
-    override def writes(o: SalesterritoryRow): JsObject =
-      Json.obj(
-        "territoryid" -> o.territoryid,
-        "name" -> o.name,
-        "countryregioncode" -> o.countryregioncode,
-        "group" -> o.group,
-        "salesytd" -> o.salesytd,
-        "saleslastyear" -> o.saleslastyear,
-        "costytd" -> o.costytd,
-        "costlastyear" -> o.costlastyear,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SalesterritoryRow] = RowParser[SalesterritoryRow] { row =>
+    Success(
+      SalesterritoryRow(
+        territoryid = row[SalesterritoryId](idx + 0),
+        name = row[Name](idx + 1),
+        countryregioncode = row[CountryregionId](idx + 2),
+        group = row[/* max 50 chars */ String](idx + 3),
+        salesytd = row[BigDecimal](idx + 4),
+        saleslastyear = row[BigDecimal](idx + 5),
+        costytd = row[BigDecimal](idx + 6),
+        costlastyear = row[BigDecimal](idx + 7),
+        rowguid = row[UUID](idx + 8),
+        modifieddate = row[TypoLocalDateTime](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[SalesterritoryRow] = {
-      JsResult.fromTry(
-        Try(
-          SalesterritoryRow(
-            territoryid = json.\("territoryid").as[SalesterritoryId],
-            name = json.\("name").as[Name],
-            countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            group = json.\("group").as[/* max 50 chars */ String],
-            salesytd = json.\("salesytd").as[BigDecimal],
-            saleslastyear = json.\("saleslastyear").as[BigDecimal],
-            costytd = json.\("costytd").as[BigDecimal],
-            costlastyear = json.\("costlastyear").as[BigDecimal],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SalesterritoryRow] = OWrites[SalesterritoryRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "territoryid" -> Json.toJson(o.territoryid),
+      "name" -> Json.toJson(o.name),
+      "countryregioncode" -> Json.toJson(o.countryregioncode),
+      "group" -> Json.toJson(o.group),
+      "salesytd" -> Json.toJson(o.salesytd),
+      "saleslastyear" -> Json.toJson(o.saleslastyear),
+      "costytd" -> Json.toJson(o.costytd),
+      "costlastyear" -> Json.toJson(o.costlastyear),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

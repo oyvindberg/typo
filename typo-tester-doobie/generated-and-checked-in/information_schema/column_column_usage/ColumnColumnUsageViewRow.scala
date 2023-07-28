@@ -8,13 +8,11 @@ package information_schema
 package column_column_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ColumnColumnUsageViewRow(
@@ -26,42 +24,22 @@ case class ColumnColumnUsageViewRow(
 )
 
 object ColumnColumnUsageViewRow {
-  implicit val decoder: Decoder[ColumnColumnUsageViewRow] =
-    (c: HCursor) =>
-      for {
-        tableCatalog <- c.downField("table_catalog").as[Option[SqlIdentifier]]
-        tableSchema <- c.downField("table_schema").as[Option[SqlIdentifier]]
-        tableName <- c.downField("table_name").as[Option[SqlIdentifier]]
-        columnName <- c.downField("column_name").as[Option[SqlIdentifier]]
-        dependentColumn <- c.downField("dependent_column").as[Option[SqlIdentifier]]
-      } yield ColumnColumnUsageViewRow(tableCatalog, tableSchema, tableName, columnName, dependentColumn)
-  implicit val encoder: Encoder[ColumnColumnUsageViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "table_catalog" := row.tableCatalog,
-        "table_schema" := row.tableSchema,
-        "table_name" := row.tableName,
-        "column_name" := row.columnName,
-        "dependent_column" := row.dependentColumn
-      )}
-  implicit val read: Read[ColumnColumnUsageViewRow] =
-    new Read[ColumnColumnUsageViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ColumnColumnUsageViewRow(
-        tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        dependentColumn = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[ColumnColumnUsageViewRow] = Decoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(ColumnColumnUsageViewRow.apply)
+  implicit val encoder: Encoder[ColumnColumnUsageViewRow] = Encoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.dependentColumn))
+  implicit val read: Read[ColumnColumnUsageViewRow] = new Read[ColumnColumnUsageViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ColumnColumnUsageViewRow(
+      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      dependentColumn = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

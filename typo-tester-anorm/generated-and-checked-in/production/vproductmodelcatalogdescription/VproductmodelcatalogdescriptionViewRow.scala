@@ -7,17 +7,19 @@ package adventureworks
 package production
 package vproductmodelcatalogdescription
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VproductmodelcatalogdescriptionViewRow(
@@ -49,104 +51,100 @@ case class VproductmodelcatalogdescriptionViewRow(
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object VproductmodelcatalogdescriptionViewRow {
-  def rowParser(idx: Int): RowParser[VproductmodelcatalogdescriptionViewRow] =
-    RowParser[VproductmodelcatalogdescriptionViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VproductmodelcatalogdescriptionViewRow] = Reads[VproductmodelcatalogdescriptionViewRow](json => JsResult.fromTry(
+      Try(
         VproductmodelcatalogdescriptionViewRow(
-          productmodelid = row[Option[ProductmodelId]](idx + 0),
-          name = row[Option[Name]](idx + 1),
-          Summary = row[Option[String]](idx + 2),
-          manufacturer = row[Option[String]](idx + 3),
-          copyright = row[Option[/* max 30 chars */ String]](idx + 4),
-          producturl = row[Option[/* max 256 chars */ String]](idx + 5),
-          warrantyperiod = row[Option[/* max 256 chars */ String]](idx + 6),
-          warrantydescription = row[Option[/* max 256 chars */ String]](idx + 7),
-          noofyears = row[Option[/* max 256 chars */ String]](idx + 8),
-          maintenancedescription = row[Option[/* max 256 chars */ String]](idx + 9),
-          wheel = row[Option[/* max 256 chars */ String]](idx + 10),
-          saddle = row[Option[/* max 256 chars */ String]](idx + 11),
-          pedal = row[Option[/* max 256 chars */ String]](idx + 12),
-          bikeframe = row[Option[String]](idx + 13),
-          crankset = row[Option[/* max 256 chars */ String]](idx + 14),
-          pictureangle = row[Option[/* max 256 chars */ String]](idx + 15),
-          picturesize = row[Option[/* max 256 chars */ String]](idx + 16),
-          productphotoid = row[Option[/* max 256 chars */ String]](idx + 17),
-          material = row[Option[/* max 256 chars */ String]](idx + 18),
-          color = row[Option[/* max 256 chars */ String]](idx + 19),
-          productline = row[Option[/* max 256 chars */ String]](idx + 20),
-          style = row[Option[/* max 256 chars */ String]](idx + 21),
-          riderexperience = row[Option[/* max 1024 chars */ String]](idx + 22),
-          rowguid = row[Option[UUID]](idx + 23),
-          modifieddate = row[Option[LocalDateTime]](idx + 24)
+          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          Summary = json.\("Summary").toOption.map(_.as[String]),
+          manufacturer = json.\("manufacturer").toOption.map(_.as[String]),
+          copyright = json.\("copyright").toOption.map(_.as[/* max 30 chars */ String]),
+          producturl = json.\("producturl").toOption.map(_.as[/* max 256 chars */ String]),
+          warrantyperiod = json.\("warrantyperiod").toOption.map(_.as[/* max 256 chars */ String]),
+          warrantydescription = json.\("warrantydescription").toOption.map(_.as[/* max 256 chars */ String]),
+          noofyears = json.\("noofyears").toOption.map(_.as[/* max 256 chars */ String]),
+          maintenancedescription = json.\("maintenancedescription").toOption.map(_.as[/* max 256 chars */ String]),
+          wheel = json.\("wheel").toOption.map(_.as[/* max 256 chars */ String]),
+          saddle = json.\("saddle").toOption.map(_.as[/* max 256 chars */ String]),
+          pedal = json.\("pedal").toOption.map(_.as[/* max 256 chars */ String]),
+          bikeframe = json.\("bikeframe").toOption.map(_.as[String]),
+          crankset = json.\("crankset").toOption.map(_.as[/* max 256 chars */ String]),
+          pictureangle = json.\("pictureangle").toOption.map(_.as[/* max 256 chars */ String]),
+          picturesize = json.\("picturesize").toOption.map(_.as[/* max 256 chars */ String]),
+          productphotoid = json.\("productphotoid").toOption.map(_.as[/* max 256 chars */ String]),
+          material = json.\("material").toOption.map(_.as[/* max 256 chars */ String]),
+          color = json.\("color").toOption.map(_.as[/* max 256 chars */ String]),
+          productline = json.\("productline").toOption.map(_.as[/* max 256 chars */ String]),
+          style = json.\("style").toOption.map(_.as[/* max 256 chars */ String]),
+          riderexperience = json.\("riderexperience").toOption.map(_.as[/* max 1024 chars */ String]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[VproductmodelcatalogdescriptionViewRow] = new OFormat[VproductmodelcatalogdescriptionViewRow]{
-    override def writes(o: VproductmodelcatalogdescriptionViewRow): JsObject =
-      Json.obj(
-        "productmodelid" -> o.productmodelid,
-        "name" -> o.name,
-        "Summary" -> o.Summary,
-        "manufacturer" -> o.manufacturer,
-        "copyright" -> o.copyright,
-        "producturl" -> o.producturl,
-        "warrantyperiod" -> o.warrantyperiod,
-        "warrantydescription" -> o.warrantydescription,
-        "noofyears" -> o.noofyears,
-        "maintenancedescription" -> o.maintenancedescription,
-        "wheel" -> o.wheel,
-        "saddle" -> o.saddle,
-        "pedal" -> o.pedal,
-        "bikeframe" -> o.bikeframe,
-        "crankset" -> o.crankset,
-        "pictureangle" -> o.pictureangle,
-        "picturesize" -> o.picturesize,
-        "productphotoid" -> o.productphotoid,
-        "material" -> o.material,
-        "color" -> o.color,
-        "productline" -> o.productline,
-        "style" -> o.style,
-        "riderexperience" -> o.riderexperience,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VproductmodelcatalogdescriptionViewRow] = RowParser[VproductmodelcatalogdescriptionViewRow] { row =>
+    Success(
+      VproductmodelcatalogdescriptionViewRow(
+        productmodelid = row[Option[ProductmodelId]](idx + 0),
+        name = row[Option[Name]](idx + 1),
+        Summary = row[Option[String]](idx + 2),
+        manufacturer = row[Option[String]](idx + 3),
+        copyright = row[Option[/* max 30 chars */ String]](idx + 4),
+        producturl = row[Option[/* max 256 chars */ String]](idx + 5),
+        warrantyperiod = row[Option[/* max 256 chars */ String]](idx + 6),
+        warrantydescription = row[Option[/* max 256 chars */ String]](idx + 7),
+        noofyears = row[Option[/* max 256 chars */ String]](idx + 8),
+        maintenancedescription = row[Option[/* max 256 chars */ String]](idx + 9),
+        wheel = row[Option[/* max 256 chars */ String]](idx + 10),
+        saddle = row[Option[/* max 256 chars */ String]](idx + 11),
+        pedal = row[Option[/* max 256 chars */ String]](idx + 12),
+        bikeframe = row[Option[String]](idx + 13),
+        crankset = row[Option[/* max 256 chars */ String]](idx + 14),
+        pictureangle = row[Option[/* max 256 chars */ String]](idx + 15),
+        picturesize = row[Option[/* max 256 chars */ String]](idx + 16),
+        productphotoid = row[Option[/* max 256 chars */ String]](idx + 17),
+        material = row[Option[/* max 256 chars */ String]](idx + 18),
+        color = row[Option[/* max 256 chars */ String]](idx + 19),
+        productline = row[Option[/* max 256 chars */ String]](idx + 20),
+        style = row[Option[/* max 256 chars */ String]](idx + 21),
+        riderexperience = row[Option[/* max 1024 chars */ String]](idx + 22),
+        rowguid = row[Option[UUID]](idx + 23),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 24)
       )
-  
-    override def reads(json: JsValue): JsResult[VproductmodelcatalogdescriptionViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VproductmodelcatalogdescriptionViewRow(
-            productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            Summary = json.\("Summary").toOption.map(_.as[String]),
-            manufacturer = json.\("manufacturer").toOption.map(_.as[String]),
-            copyright = json.\("copyright").toOption.map(_.as[/* max 30 chars */ String]),
-            producturl = json.\("producturl").toOption.map(_.as[/* max 256 chars */ String]),
-            warrantyperiod = json.\("warrantyperiod").toOption.map(_.as[/* max 256 chars */ String]),
-            warrantydescription = json.\("warrantydescription").toOption.map(_.as[/* max 256 chars */ String]),
-            noofyears = json.\("noofyears").toOption.map(_.as[/* max 256 chars */ String]),
-            maintenancedescription = json.\("maintenancedescription").toOption.map(_.as[/* max 256 chars */ String]),
-            wheel = json.\("wheel").toOption.map(_.as[/* max 256 chars */ String]),
-            saddle = json.\("saddle").toOption.map(_.as[/* max 256 chars */ String]),
-            pedal = json.\("pedal").toOption.map(_.as[/* max 256 chars */ String]),
-            bikeframe = json.\("bikeframe").toOption.map(_.as[String]),
-            crankset = json.\("crankset").toOption.map(_.as[/* max 256 chars */ String]),
-            pictureangle = json.\("pictureangle").toOption.map(_.as[/* max 256 chars */ String]),
-            picturesize = json.\("picturesize").toOption.map(_.as[/* max 256 chars */ String]),
-            productphotoid = json.\("productphotoid").toOption.map(_.as[/* max 256 chars */ String]),
-            material = json.\("material").toOption.map(_.as[/* max 256 chars */ String]),
-            color = json.\("color").toOption.map(_.as[/* max 256 chars */ String]),
-            productline = json.\("productline").toOption.map(_.as[/* max 256 chars */ String]),
-            style = json.\("style").toOption.map(_.as[/* max 256 chars */ String]),
-            riderexperience = json.\("riderexperience").toOption.map(_.as[/* max 1024 chars */ String]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VproductmodelcatalogdescriptionViewRow] = OWrites[VproductmodelcatalogdescriptionViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "name" -> Json.toJson(o.name),
+      "Summary" -> Json.toJson(o.Summary),
+      "manufacturer" -> Json.toJson(o.manufacturer),
+      "copyright" -> Json.toJson(o.copyright),
+      "producturl" -> Json.toJson(o.producturl),
+      "warrantyperiod" -> Json.toJson(o.warrantyperiod),
+      "warrantydescription" -> Json.toJson(o.warrantydescription),
+      "noofyears" -> Json.toJson(o.noofyears),
+      "maintenancedescription" -> Json.toJson(o.maintenancedescription),
+      "wheel" -> Json.toJson(o.wheel),
+      "saddle" -> Json.toJson(o.saddle),
+      "pedal" -> Json.toJson(o.pedal),
+      "bikeframe" -> Json.toJson(o.bikeframe),
+      "crankset" -> Json.toJson(o.crankset),
+      "pictureangle" -> Json.toJson(o.pictureangle),
+      "picturesize" -> Json.toJson(o.picturesize),
+      "productphotoid" -> Json.toJson(o.productphotoid),
+      "material" -> Json.toJson(o.material),
+      "color" -> Json.toJson(o.color),
+      "productline" -> Json.toJson(o.productline),
+      "style" -> Json.toJson(o.style),
+      "riderexperience" -> Json.toJson(o.riderexperience),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

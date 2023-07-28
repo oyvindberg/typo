@@ -7,23 +7,25 @@ package adventureworks
 package humanresources
 package vjobcandidateeducation
 
+import adventureworks.TypoLocalDate
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VjobcandidateeducationViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: Option[JobcandidateId],
   `Edu.Level`: Option[/* max 50 chars */ String],
-  `Edu.StartDate`: Option[LocalDate],
-  `Edu.EndDate`: Option[LocalDate],
+  `Edu.StartDate`: Option[TypoLocalDate],
+  `Edu.EndDate`: Option[TypoLocalDate],
   `Edu.Degree`: Option[/* max 50 chars */ String],
   `Edu.Major`: Option[/* max 50 chars */ String],
   `Edu.Minor`: Option[/* max 50 chars */ String],
@@ -36,64 +38,60 @@ case class VjobcandidateeducationViewRow(
 )
 
 object VjobcandidateeducationViewRow {
-  def rowParser(idx: Int): RowParser[VjobcandidateeducationViewRow] =
-    RowParser[VjobcandidateeducationViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VjobcandidateeducationViewRow] = Reads[VjobcandidateeducationViewRow](json => JsResult.fromTry(
+      Try(
         VjobcandidateeducationViewRow(
-          jobcandidateid = row[Option[JobcandidateId]](idx + 0),
-          `Edu.Level` = row[Option[/* max 50 chars */ String]](idx + 1),
-          `Edu.StartDate` = row[Option[LocalDate]](idx + 2),
-          `Edu.EndDate` = row[Option[LocalDate]](idx + 3),
-          `Edu.Degree` = row[Option[/* max 50 chars */ String]](idx + 4),
-          `Edu.Major` = row[Option[/* max 50 chars */ String]](idx + 5),
-          `Edu.Minor` = row[Option[/* max 50 chars */ String]](idx + 6),
-          `Edu.GPA` = row[Option[/* max 5 chars */ String]](idx + 7),
-          `Edu.GPAScale` = row[Option[/* max 5 chars */ String]](idx + 8),
-          `Edu.School` = row[Option[/* max 100 chars */ String]](idx + 9),
-          `Edu.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]](idx + 10),
-          `Edu.Loc.State` = row[Option[/* max 100 chars */ String]](idx + 11),
-          `Edu.Loc.City` = row[Option[/* max 100 chars */ String]](idx + 12)
+          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
+          `Edu.Level` = json.\("Edu.Level").toOption.map(_.as[/* max 50 chars */ String]),
+          `Edu.StartDate` = json.\("Edu.StartDate").toOption.map(_.as[TypoLocalDate]),
+          `Edu.EndDate` = json.\("Edu.EndDate").toOption.map(_.as[TypoLocalDate]),
+          `Edu.Degree` = json.\("Edu.Degree").toOption.map(_.as[/* max 50 chars */ String]),
+          `Edu.Major` = json.\("Edu.Major").toOption.map(_.as[/* max 50 chars */ String]),
+          `Edu.Minor` = json.\("Edu.Minor").toOption.map(_.as[/* max 50 chars */ String]),
+          `Edu.GPA` = json.\("Edu.GPA").toOption.map(_.as[/* max 5 chars */ String]),
+          `Edu.GPAScale` = json.\("Edu.GPAScale").toOption.map(_.as[/* max 5 chars */ String]),
+          `Edu.School` = json.\("Edu.School").toOption.map(_.as[/* max 100 chars */ String]),
+          `Edu.Loc.CountryRegion` = json.\("Edu.Loc.CountryRegion").toOption.map(_.as[/* max 100 chars */ String]),
+          `Edu.Loc.State` = json.\("Edu.Loc.State").toOption.map(_.as[/* max 100 chars */ String]),
+          `Edu.Loc.City` = json.\("Edu.Loc.City").toOption.map(_.as[/* max 100 chars */ String])
         )
       )
-    }
-  implicit val oFormat: OFormat[VjobcandidateeducationViewRow] = new OFormat[VjobcandidateeducationViewRow]{
-    override def writes(o: VjobcandidateeducationViewRow): JsObject =
-      Json.obj(
-        "jobcandidateid" -> o.jobcandidateid,
-        "Edu.Level" -> o.`Edu.Level`,
-        "Edu.StartDate" -> o.`Edu.StartDate`,
-        "Edu.EndDate" -> o.`Edu.EndDate`,
-        "Edu.Degree" -> o.`Edu.Degree`,
-        "Edu.Major" -> o.`Edu.Major`,
-        "Edu.Minor" -> o.`Edu.Minor`,
-        "Edu.GPA" -> o.`Edu.GPA`,
-        "Edu.GPAScale" -> o.`Edu.GPAScale`,
-        "Edu.School" -> o.`Edu.School`,
-        "Edu.Loc.CountryRegion" -> o.`Edu.Loc.CountryRegion`,
-        "Edu.Loc.State" -> o.`Edu.Loc.State`,
-        "Edu.Loc.City" -> o.`Edu.Loc.City`
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VjobcandidateeducationViewRow] = RowParser[VjobcandidateeducationViewRow] { row =>
+    Success(
+      VjobcandidateeducationViewRow(
+        jobcandidateid = row[Option[JobcandidateId]](idx + 0),
+        `Edu.Level` = row[Option[/* max 50 chars */ String]](idx + 1),
+        `Edu.StartDate` = row[Option[TypoLocalDate]](idx + 2),
+        `Edu.EndDate` = row[Option[TypoLocalDate]](idx + 3),
+        `Edu.Degree` = row[Option[/* max 50 chars */ String]](idx + 4),
+        `Edu.Major` = row[Option[/* max 50 chars */ String]](idx + 5),
+        `Edu.Minor` = row[Option[/* max 50 chars */ String]](idx + 6),
+        `Edu.GPA` = row[Option[/* max 5 chars */ String]](idx + 7),
+        `Edu.GPAScale` = row[Option[/* max 5 chars */ String]](idx + 8),
+        `Edu.School` = row[Option[/* max 100 chars */ String]](idx + 9),
+        `Edu.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]](idx + 10),
+        `Edu.Loc.State` = row[Option[/* max 100 chars */ String]](idx + 11),
+        `Edu.Loc.City` = row[Option[/* max 100 chars */ String]](idx + 12)
       )
-  
-    override def reads(json: JsValue): JsResult[VjobcandidateeducationViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VjobcandidateeducationViewRow(
-            jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
-            `Edu.Level` = json.\("Edu.Level").toOption.map(_.as[/* max 50 chars */ String]),
-            `Edu.StartDate` = json.\("Edu.StartDate").toOption.map(_.as[LocalDate]),
-            `Edu.EndDate` = json.\("Edu.EndDate").toOption.map(_.as[LocalDate]),
-            `Edu.Degree` = json.\("Edu.Degree").toOption.map(_.as[/* max 50 chars */ String]),
-            `Edu.Major` = json.\("Edu.Major").toOption.map(_.as[/* max 50 chars */ String]),
-            `Edu.Minor` = json.\("Edu.Minor").toOption.map(_.as[/* max 50 chars */ String]),
-            `Edu.GPA` = json.\("Edu.GPA").toOption.map(_.as[/* max 5 chars */ String]),
-            `Edu.GPAScale` = json.\("Edu.GPAScale").toOption.map(_.as[/* max 5 chars */ String]),
-            `Edu.School` = json.\("Edu.School").toOption.map(_.as[/* max 100 chars */ String]),
-            `Edu.Loc.CountryRegion` = json.\("Edu.Loc.CountryRegion").toOption.map(_.as[/* max 100 chars */ String]),
-            `Edu.Loc.State` = json.\("Edu.Loc.State").toOption.map(_.as[/* max 100 chars */ String]),
-            `Edu.Loc.City` = json.\("Edu.Loc.City").toOption.map(_.as[/* max 100 chars */ String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VjobcandidateeducationViewRow] = OWrites[VjobcandidateeducationViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "jobcandidateid" -> Json.toJson(o.jobcandidateid),
+      "Edu.Level" -> Json.toJson(o.`Edu.Level`),
+      "Edu.StartDate" -> Json.toJson(o.`Edu.StartDate`),
+      "Edu.EndDate" -> Json.toJson(o.`Edu.EndDate`),
+      "Edu.Degree" -> Json.toJson(o.`Edu.Degree`),
+      "Edu.Major" -> Json.toJson(o.`Edu.Major`),
+      "Edu.Minor" -> Json.toJson(o.`Edu.Minor`),
+      "Edu.GPA" -> Json.toJson(o.`Edu.GPA`),
+      "Edu.GPAScale" -> Json.toJson(o.`Edu.GPAScale`),
+      "Edu.School" -> Json.toJson(o.`Edu.School`),
+      "Edu.Loc.CountryRegion" -> Json.toJson(o.`Edu.Loc.CountryRegion`),
+      "Edu.Loc.State" -> Json.toJson(o.`Edu.Loc.State`),
+      "Edu.Loc.City" -> Json.toJson(o.`Edu.Loc.City`)
+    ))
+  )
 }

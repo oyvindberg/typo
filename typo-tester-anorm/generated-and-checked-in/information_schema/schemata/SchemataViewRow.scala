@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SchemataViewRow(
@@ -29,46 +31,42 @@ case class SchemataViewRow(
 )
 
 object SchemataViewRow {
-  def rowParser(idx: Int): RowParser[SchemataViewRow] =
-    RowParser[SchemataViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SchemataViewRow] = Reads[SchemataViewRow](json => JsResult.fromTry(
+      Try(
         SchemataViewRow(
-          catalogName = row[Option[SqlIdentifier]](idx + 0),
-          schemaName = row[Option[SqlIdentifier]](idx + 1),
-          schemaOwner = row[Option[SqlIdentifier]](idx + 2),
-          defaultCharacterSetCatalog = row[Option[SqlIdentifier]](idx + 3),
-          defaultCharacterSetSchema = row[Option[SqlIdentifier]](idx + 4),
-          defaultCharacterSetName = row[Option[SqlIdentifier]](idx + 5),
-          sqlPath = row[Option[CharacterData]](idx + 6)
+          catalogName = json.\("catalog_name").toOption.map(_.as[SqlIdentifier]),
+          schemaName = json.\("schema_name").toOption.map(_.as[SqlIdentifier]),
+          schemaOwner = json.\("schema_owner").toOption.map(_.as[SqlIdentifier]),
+          defaultCharacterSetCatalog = json.\("default_character_set_catalog").toOption.map(_.as[SqlIdentifier]),
+          defaultCharacterSetSchema = json.\("default_character_set_schema").toOption.map(_.as[SqlIdentifier]),
+          defaultCharacterSetName = json.\("default_character_set_name").toOption.map(_.as[SqlIdentifier]),
+          sqlPath = json.\("sql_path").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[SchemataViewRow] = new OFormat[SchemataViewRow]{
-    override def writes(o: SchemataViewRow): JsObject =
-      Json.obj(
-        "catalog_name" -> o.catalogName,
-        "schema_name" -> o.schemaName,
-        "schema_owner" -> o.schemaOwner,
-        "default_character_set_catalog" -> o.defaultCharacterSetCatalog,
-        "default_character_set_schema" -> o.defaultCharacterSetSchema,
-        "default_character_set_name" -> o.defaultCharacterSetName,
-        "sql_path" -> o.sqlPath
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SchemataViewRow] = RowParser[SchemataViewRow] { row =>
+    Success(
+      SchemataViewRow(
+        catalogName = row[Option[SqlIdentifier]](idx + 0),
+        schemaName = row[Option[SqlIdentifier]](idx + 1),
+        schemaOwner = row[Option[SqlIdentifier]](idx + 2),
+        defaultCharacterSetCatalog = row[Option[SqlIdentifier]](idx + 3),
+        defaultCharacterSetSchema = row[Option[SqlIdentifier]](idx + 4),
+        defaultCharacterSetName = row[Option[SqlIdentifier]](idx + 5),
+        sqlPath = row[Option[CharacterData]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[SchemataViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SchemataViewRow(
-            catalogName = json.\("catalog_name").toOption.map(_.as[SqlIdentifier]),
-            schemaName = json.\("schema_name").toOption.map(_.as[SqlIdentifier]),
-            schemaOwner = json.\("schema_owner").toOption.map(_.as[SqlIdentifier]),
-            defaultCharacterSetCatalog = json.\("default_character_set_catalog").toOption.map(_.as[SqlIdentifier]),
-            defaultCharacterSetSchema = json.\("default_character_set_schema").toOption.map(_.as[SqlIdentifier]),
-            defaultCharacterSetName = json.\("default_character_set_name").toOption.map(_.as[SqlIdentifier]),
-            sqlPath = json.\("sql_path").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SchemataViewRow] = OWrites[SchemataViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "catalog_name" -> Json.toJson(o.catalogName),
+      "schema_name" -> Json.toJson(o.schemaName),
+      "schema_owner" -> Json.toJson(o.schemaOwner),
+      "default_character_set_catalog" -> Json.toJson(o.defaultCharacterSetCatalog),
+      "default_character_set_schema" -> Json.toJson(o.defaultCharacterSetSchema),
+      "default_character_set_name" -> Json.toJson(o.defaultCharacterSetName),
+      "sql_path" -> Json.toJson(o.sqlPath)
+    ))
+  )
 }

@@ -17,7 +17,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SequencesViewRow(
@@ -36,61 +38,57 @@ case class SequencesViewRow(
 )
 
 object SequencesViewRow {
-  def rowParser(idx: Int): RowParser[SequencesViewRow] =
-    RowParser[SequencesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SequencesViewRow] = Reads[SequencesViewRow](json => JsResult.fromTry(
+      Try(
         SequencesViewRow(
-          sequenceCatalog = row[Option[SqlIdentifier]](idx + 0),
-          sequenceSchema = row[Option[SqlIdentifier]](idx + 1),
-          sequenceName = row[Option[SqlIdentifier]](idx + 2),
-          dataType = row[Option[CharacterData]](idx + 3),
-          numericPrecision = row[Option[CardinalNumber]](idx + 4),
-          numericPrecisionRadix = row[Option[CardinalNumber]](idx + 5),
-          numericScale = row[Option[CardinalNumber]](idx + 6),
-          startValue = row[Option[CharacterData]](idx + 7),
-          minimumValue = row[Option[CharacterData]](idx + 8),
-          maximumValue = row[Option[CharacterData]](idx + 9),
-          increment = row[Option[CharacterData]](idx + 10),
-          cycleOption = row[Option[YesOrNo]](idx + 11)
+          sequenceCatalog = json.\("sequence_catalog").toOption.map(_.as[SqlIdentifier]),
+          sequenceSchema = json.\("sequence_schema").toOption.map(_.as[SqlIdentifier]),
+          sequenceName = json.\("sequence_name").toOption.map(_.as[SqlIdentifier]),
+          dataType = json.\("data_type").toOption.map(_.as[CharacterData]),
+          numericPrecision = json.\("numeric_precision").toOption.map(_.as[CardinalNumber]),
+          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as[CardinalNumber]),
+          numericScale = json.\("numeric_scale").toOption.map(_.as[CardinalNumber]),
+          startValue = json.\("start_value").toOption.map(_.as[CharacterData]),
+          minimumValue = json.\("minimum_value").toOption.map(_.as[CharacterData]),
+          maximumValue = json.\("maximum_value").toOption.map(_.as[CharacterData]),
+          increment = json.\("increment").toOption.map(_.as[CharacterData]),
+          cycleOption = json.\("cycle_option").toOption.map(_.as[YesOrNo])
         )
       )
-    }
-  implicit val oFormat: OFormat[SequencesViewRow] = new OFormat[SequencesViewRow]{
-    override def writes(o: SequencesViewRow): JsObject =
-      Json.obj(
-        "sequence_catalog" -> o.sequenceCatalog,
-        "sequence_schema" -> o.sequenceSchema,
-        "sequence_name" -> o.sequenceName,
-        "data_type" -> o.dataType,
-        "numeric_precision" -> o.numericPrecision,
-        "numeric_precision_radix" -> o.numericPrecisionRadix,
-        "numeric_scale" -> o.numericScale,
-        "start_value" -> o.startValue,
-        "minimum_value" -> o.minimumValue,
-        "maximum_value" -> o.maximumValue,
-        "increment" -> o.increment,
-        "cycle_option" -> o.cycleOption
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SequencesViewRow] = RowParser[SequencesViewRow] { row =>
+    Success(
+      SequencesViewRow(
+        sequenceCatalog = row[Option[SqlIdentifier]](idx + 0),
+        sequenceSchema = row[Option[SqlIdentifier]](idx + 1),
+        sequenceName = row[Option[SqlIdentifier]](idx + 2),
+        dataType = row[Option[CharacterData]](idx + 3),
+        numericPrecision = row[Option[CardinalNumber]](idx + 4),
+        numericPrecisionRadix = row[Option[CardinalNumber]](idx + 5),
+        numericScale = row[Option[CardinalNumber]](idx + 6),
+        startValue = row[Option[CharacterData]](idx + 7),
+        minimumValue = row[Option[CharacterData]](idx + 8),
+        maximumValue = row[Option[CharacterData]](idx + 9),
+        increment = row[Option[CharacterData]](idx + 10),
+        cycleOption = row[Option[YesOrNo]](idx + 11)
       )
-  
-    override def reads(json: JsValue): JsResult[SequencesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SequencesViewRow(
-            sequenceCatalog = json.\("sequence_catalog").toOption.map(_.as[SqlIdentifier]),
-            sequenceSchema = json.\("sequence_schema").toOption.map(_.as[SqlIdentifier]),
-            sequenceName = json.\("sequence_name").toOption.map(_.as[SqlIdentifier]),
-            dataType = json.\("data_type").toOption.map(_.as[CharacterData]),
-            numericPrecision = json.\("numeric_precision").toOption.map(_.as[CardinalNumber]),
-            numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as[CardinalNumber]),
-            numericScale = json.\("numeric_scale").toOption.map(_.as[CardinalNumber]),
-            startValue = json.\("start_value").toOption.map(_.as[CharacterData]),
-            minimumValue = json.\("minimum_value").toOption.map(_.as[CharacterData]),
-            maximumValue = json.\("maximum_value").toOption.map(_.as[CharacterData]),
-            increment = json.\("increment").toOption.map(_.as[CharacterData]),
-            cycleOption = json.\("cycle_option").toOption.map(_.as[YesOrNo])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SequencesViewRow] = OWrites[SequencesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "sequence_catalog" -> Json.toJson(o.sequenceCatalog),
+      "sequence_schema" -> Json.toJson(o.sequenceSchema),
+      "sequence_name" -> Json.toJson(o.sequenceName),
+      "data_type" -> Json.toJson(o.dataType),
+      "numeric_precision" -> Json.toJson(o.numericPrecision),
+      "numeric_precision_radix" -> Json.toJson(o.numericPrecisionRadix),
+      "numeric_scale" -> Json.toJson(o.numericScale),
+      "start_value" -> Json.toJson(o.startValue),
+      "minimum_value" -> Json.toJson(o.minimumValue),
+      "maximum_value" -> Json.toJson(o.maximumValue),
+      "increment" -> Json.toJson(o.increment),
+      "cycle_option" -> Json.toJson(o.cycleOption)
+    ))
+  )
 }

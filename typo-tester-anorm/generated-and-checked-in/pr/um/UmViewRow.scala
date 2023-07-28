@@ -7,16 +7,18 @@ package adventureworks
 package pr
 package um
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UmViewRow(
@@ -26,41 +28,37 @@ case class UmViewRow(
   /** Points to [[production.unitmeasure.UnitmeasureRow.name]] */
   name: Option[Name],
   /** Points to [[production.unitmeasure.UnitmeasureRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object UmViewRow {
-  def rowParser(idx: Int): RowParser[UmViewRow] =
-    RowParser[UmViewRow] { row =>
-      Success(
+  implicit val reads: Reads[UmViewRow] = Reads[UmViewRow](json => JsResult.fromTry(
+      Try(
         UmViewRow(
-          id = row[Option[/* bpchar */ String]](idx + 0),
-          unitmeasurecode = row[Option[UnitmeasureId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
+          unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as[UnitmeasureId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[UmViewRow] = new OFormat[UmViewRow]{
-    override def writes(o: UmViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "unitmeasurecode" -> o.unitmeasurecode,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[UmViewRow] = RowParser[UmViewRow] { row =>
+    Success(
+      UmViewRow(
+        id = row[Option[/* bpchar */ String]](idx + 0),
+        unitmeasurecode = row[Option[UnitmeasureId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[UmViewRow] = {
-      JsResult.fromTry(
-        Try(
-          UmViewRow(
-            id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
-            unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as[UnitmeasureId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[UmViewRow] = OWrites[UmViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

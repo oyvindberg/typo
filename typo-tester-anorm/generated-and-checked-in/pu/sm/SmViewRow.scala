@@ -7,17 +7,19 @@ package adventureworks
 package pu
 package sm
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SmViewRow(
@@ -33,50 +35,46 @@ case class SmViewRow(
   /** Points to [[purchasing.shipmethod.ShipmethodRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[purchasing.shipmethod.ShipmethodRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SmViewRow {
-  def rowParser(idx: Int): RowParser[SmViewRow] =
-    RowParser[SmViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SmViewRow] = Reads[SmViewRow](json => JsResult.fromTry(
+      Try(
         SmViewRow(
-          id = row[Option[Int]](idx + 0),
-          shipmethodid = row[Option[ShipmethodId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          shipbase = row[Option[BigDecimal]](idx + 3),
-          shiprate = row[Option[BigDecimal]](idx + 4),
-          rowguid = row[Option[UUID]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          shipbase = json.\("shipbase").toOption.map(_.as[BigDecimal]),
+          shiprate = json.\("shiprate").toOption.map(_.as[BigDecimal]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SmViewRow] = new OFormat[SmViewRow]{
-    override def writes(o: SmViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "shipmethodid" -> o.shipmethodid,
-        "name" -> o.name,
-        "shipbase" -> o.shipbase,
-        "shiprate" -> o.shiprate,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SmViewRow] = RowParser[SmViewRow] { row =>
+    Success(
+      SmViewRow(
+        id = row[Option[Int]](idx + 0),
+        shipmethodid = row[Option[ShipmethodId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        shipbase = row[Option[BigDecimal]](idx + 3),
+        shiprate = row[Option[BigDecimal]](idx + 4),
+        rowguid = row[Option[UUID]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[SmViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SmViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            shipbase = json.\("shipbase").toOption.map(_.as[BigDecimal]),
-            shiprate = json.\("shiprate").toOption.map(_.as[BigDecimal]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SmViewRow] = OWrites[SmViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "shipmethodid" -> Json.toJson(o.shipmethodid),
+      "name" -> Json.toJson(o.name),
+      "shipbase" -> Json.toJson(o.shipbase),
+      "shiprate" -> Json.toJson(o.shiprate),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

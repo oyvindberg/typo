@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAmopRow(
@@ -29,52 +31,48 @@ case class PgAmopRow(
 )
 
 object PgAmopRow {
-  def rowParser(idx: Int): RowParser[PgAmopRow] =
-    RowParser[PgAmopRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAmopRow] = Reads[PgAmopRow](json => JsResult.fromTry(
+      Try(
         PgAmopRow(
-          oid = row[PgAmopId](idx + 0),
-          amopfamily = row[/* oid */ Long](idx + 1),
-          amoplefttype = row[/* oid */ Long](idx + 2),
-          amoprighttype = row[/* oid */ Long](idx + 3),
-          amopstrategy = row[Int](idx + 4),
-          amoppurpose = row[String](idx + 5),
-          amopopr = row[/* oid */ Long](idx + 6),
-          amopmethod = row[/* oid */ Long](idx + 7),
-          amopsortfamily = row[/* oid */ Long](idx + 8)
+          oid = json.\("oid").as[PgAmopId],
+          amopfamily = json.\("amopfamily").as[/* oid */ Long],
+          amoplefttype = json.\("amoplefttype").as[/* oid */ Long],
+          amoprighttype = json.\("amoprighttype").as[/* oid */ Long],
+          amopstrategy = json.\("amopstrategy").as[Int],
+          amoppurpose = json.\("amoppurpose").as[String],
+          amopopr = json.\("amopopr").as[/* oid */ Long],
+          amopmethod = json.\("amopmethod").as[/* oid */ Long],
+          amopsortfamily = json.\("amopsortfamily").as[/* oid */ Long]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAmopRow] = new OFormat[PgAmopRow]{
-    override def writes(o: PgAmopRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "amopfamily" -> o.amopfamily,
-        "amoplefttype" -> o.amoplefttype,
-        "amoprighttype" -> o.amoprighttype,
-        "amopstrategy" -> o.amopstrategy,
-        "amoppurpose" -> o.amoppurpose,
-        "amopopr" -> o.amopopr,
-        "amopmethod" -> o.amopmethod,
-        "amopsortfamily" -> o.amopsortfamily
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAmopRow] = RowParser[PgAmopRow] { row =>
+    Success(
+      PgAmopRow(
+        oid = row[PgAmopId](idx + 0),
+        amopfamily = row[/* oid */ Long](idx + 1),
+        amoplefttype = row[/* oid */ Long](idx + 2),
+        amoprighttype = row[/* oid */ Long](idx + 3),
+        amopstrategy = row[Int](idx + 4),
+        amoppurpose = row[String](idx + 5),
+        amopopr = row[/* oid */ Long](idx + 6),
+        amopmethod = row[/* oid */ Long](idx + 7),
+        amopsortfamily = row[/* oid */ Long](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAmopRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAmopRow(
-            oid = json.\("oid").as[PgAmopId],
-            amopfamily = json.\("amopfamily").as[/* oid */ Long],
-            amoplefttype = json.\("amoplefttype").as[/* oid */ Long],
-            amoprighttype = json.\("amoprighttype").as[/* oid */ Long],
-            amopstrategy = json.\("amopstrategy").as[Int],
-            amoppurpose = json.\("amoppurpose").as[String],
-            amopopr = json.\("amopopr").as[/* oid */ Long],
-            amopmethod = json.\("amopmethod").as[/* oid */ Long],
-            amopsortfamily = json.\("amopsortfamily").as[/* oid */ Long]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAmopRow] = OWrites[PgAmopRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "amopfamily" -> Json.toJson(o.amopfamily),
+      "amoplefttype" -> Json.toJson(o.amoplefttype),
+      "amoprighttype" -> Json.toJson(o.amoprighttype),
+      "amopstrategy" -> Json.toJson(o.amopstrategy),
+      "amoppurpose" -> Json.toJson(o.amoppurpose),
+      "amopopr" -> Json.toJson(o.amopopr),
+      "amopmethod" -> Json.toJson(o.amopmethod),
+      "amopsortfamily" -> Json.toJson(o.amopsortfamily)
+    ))
+  )
 }

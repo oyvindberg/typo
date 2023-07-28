@@ -7,17 +7,15 @@ package adventureworks
 package sa
 package sth
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SthViewRow(
@@ -27,60 +25,36 @@ case class SthViewRow(
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.territoryid]] */
   territoryid: Option[SalesterritoryId],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.startdate]] */
-  startdate: Option[LocalDateTime],
+  startdate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.enddate]] */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesterritoryhistory.SalesterritoryhistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SthViewRow {
-  implicit val decoder: Decoder[SthViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        startdate <- c.downField("startdate").as[Option[LocalDateTime]]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SthViewRow(id, businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
-  implicit val encoder: Encoder[SthViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "territoryid" := row.territoryid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SthViewRow] =
-    new Read[SthViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SthViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 2),
-        startdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[SthViewRow] = Decoder.forProduct7[SthViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SthViewRow.apply)
+  implicit val encoder: Encoder[SthViewRow] = Encoder.forProduct7[SthViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))
+  implicit val read: Read[SthViewRow] = new Read[SthViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[SalesterritoryId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SthViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 2),
+      startdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3),
+      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

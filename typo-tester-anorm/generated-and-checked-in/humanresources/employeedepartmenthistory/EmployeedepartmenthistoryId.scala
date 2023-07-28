@@ -7,41 +7,40 @@ package adventureworks
 package humanresources
 package employeedepartmenthistory
 
+import adventureworks.TypoLocalDate
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `humanresources.employeedepartmenthistory` */
-case class EmployeedepartmenthistoryId(businessentityid: BusinessentityId, startdate: LocalDate, departmentid: DepartmentId, shiftid: ShiftId)
+case class EmployeedepartmenthistoryId(businessentityid: BusinessentityId, startdate: TypoLocalDate, departmentid: DepartmentId, shiftid: ShiftId)
 object EmployeedepartmenthistoryId {
-  implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[EmployeedepartmenthistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.departmentid, x.shiftid))
-  implicit val oFormat: OFormat[EmployeedepartmenthistoryId] = new OFormat[EmployeedepartmenthistoryId]{
-    override def writes(o: EmployeedepartmenthistoryId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "startdate" -> o.startdate,
-        "departmentid" -> o.departmentid,
-        "shiftid" -> o.shiftid
-      )
-  
-    override def reads(json: JsValue): JsResult[EmployeedepartmenthistoryId] = {
-      JsResult.fromTry(
-        Try(
-          EmployeedepartmenthistoryId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            startdate = json.\("startdate").as[LocalDate],
-            departmentid = json.\("departmentid").as[DepartmentId],
-            shiftid = json.\("shiftid").as[ShiftId]
-          )
+  implicit def ordering(implicit O0: Ordering[TypoLocalDate]): Ordering[EmployeedepartmenthistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.departmentid, x.shiftid))
+  implicit val reads: Reads[EmployeedepartmenthistoryId] = Reads[EmployeedepartmenthistoryId](json => JsResult.fromTry(
+      Try(
+        EmployeedepartmenthistoryId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          startdate = json.\("startdate").as[TypoLocalDate],
+          departmentid = json.\("departmentid").as[DepartmentId],
+          shiftid = json.\("shiftid").as[ShiftId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[EmployeedepartmenthistoryId] = OWrites[EmployeedepartmenthistoryId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "startdate" -> Json.toJson(o.startdate),
+      "departmentid" -> Json.toJson(o.departmentid),
+      "shiftid" -> Json.toJson(o.shiftid)
+    ))
+  )
 }

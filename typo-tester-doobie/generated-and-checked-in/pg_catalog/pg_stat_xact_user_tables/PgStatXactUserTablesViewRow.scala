@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_xact_user_tables
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatXactUserTablesViewRow(
@@ -42,66 +40,34 @@ case class PgStatXactUserTablesViewRow(
 )
 
 object PgStatXactUserTablesViewRow {
-  implicit val decoder: Decoder[PgStatXactUserTablesViewRow] =
-    (c: HCursor) =>
-      for {
-        relid <- c.downField("relid").as[Option[/* oid */ Long]]
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        relname <- c.downField("relname").as[Option[String]]
-        seqScan <- c.downField("seq_scan").as[Option[Long]]
-        seqTupRead <- c.downField("seq_tup_read").as[Option[Long]]
-        idxScan <- c.downField("idx_scan").as[Option[Long]]
-        idxTupFetch <- c.downField("idx_tup_fetch").as[Option[Long]]
-        nTupIns <- c.downField("n_tup_ins").as[Option[Long]]
-        nTupUpd <- c.downField("n_tup_upd").as[Option[Long]]
-        nTupDel <- c.downField("n_tup_del").as[Option[Long]]
-        nTupHotUpd <- c.downField("n_tup_hot_upd").as[Option[Long]]
-      } yield PgStatXactUserTablesViewRow(relid, schemaname, relname, seqScan, seqTupRead, idxScan, idxTupFetch, nTupIns, nTupUpd, nTupDel, nTupHotUpd)
-  implicit val encoder: Encoder[PgStatXactUserTablesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "relid" := row.relid,
-        "schemaname" := row.schemaname,
-        "relname" := row.relname,
-        "seq_scan" := row.seqScan,
-        "seq_tup_read" := row.seqTupRead,
-        "idx_scan" := row.idxScan,
-        "idx_tup_fetch" := row.idxTupFetch,
-        "n_tup_ins" := row.nTupIns,
-        "n_tup_upd" := row.nTupUpd,
-        "n_tup_del" := row.nTupDel,
-        "n_tup_hot_upd" := row.nTupHotUpd
-      )}
-  implicit val read: Read[PgStatXactUserTablesViewRow] =
-    new Read[PgStatXactUserTablesViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatXactUserTablesViewRow(
-        relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        schemaname = Get[String].unsafeGetNullable(rs, i + 1),
-        relname = Get[String].unsafeGetNullable(rs, i + 2),
-        seqScan = Get[Long].unsafeGetNullable(rs, i + 3),
-        seqTupRead = Get[Long].unsafeGetNullable(rs, i + 4),
-        idxScan = Get[Long].unsafeGetNullable(rs, i + 5),
-        idxTupFetch = Get[Long].unsafeGetNullable(rs, i + 6),
-        nTupIns = Get[Long].unsafeGetNullable(rs, i + 7),
-        nTupUpd = Get[Long].unsafeGetNullable(rs, i + 8),
-        nTupDel = Get[Long].unsafeGetNullable(rs, i + 9),
-        nTupHotUpd = Get[Long].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[PgStatXactUserTablesViewRow] = Decoder.forProduct11[PgStatXactUserTablesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd")(PgStatXactUserTablesViewRow.apply)
+  implicit val encoder: Encoder[PgStatXactUserTablesViewRow] = Encoder.forProduct11[PgStatXactUserTablesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("relid", "schemaname", "relname", "seq_scan", "seq_tup_read", "idx_scan", "idx_tup_fetch", "n_tup_ins", "n_tup_upd", "n_tup_del", "n_tup_hot_upd")(x => (x.relid, x.schemaname, x.relname, x.seqScan, x.seqTupRead, x.idxScan, x.idxTupFetch, x.nTupIns, x.nTupUpd, x.nTupDel, x.nTupHotUpd))
+  implicit val read: Read[PgStatXactUserTablesViewRow] = new Read[PgStatXactUserTablesViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatXactUserTablesViewRow(
+      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      schemaname = Get[String].unsafeGetNullable(rs, i + 1),
+      relname = Get[String].unsafeGetNullable(rs, i + 2),
+      seqScan = Get[Long].unsafeGetNullable(rs, i + 3),
+      seqTupRead = Get[Long].unsafeGetNullable(rs, i + 4),
+      idxScan = Get[Long].unsafeGetNullable(rs, i + 5),
+      idxTupFetch = Get[Long].unsafeGetNullable(rs, i + 6),
+      nTupIns = Get[Long].unsafeGetNullable(rs, i + 7),
+      nTupUpd = Get[Long].unsafeGetNullable(rs, i + 8),
+      nTupDel = Get[Long].unsafeGetNullable(rs, i + 9),
+      nTupHotUpd = Get[Long].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

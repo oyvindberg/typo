@@ -7,18 +7,19 @@ package adventureworks
 package sales
 package salestaxrate
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `sales.salestaxrate` */
 case class SalestaxrateId(value: Int) extends AnyVal
 object SalestaxrateId {
+  implicit val arrayGet: Get[Array[SalestaxrateId]] = Get[Array[Int]].map(_.map(SalestaxrateId.apply))
+  implicit val arrayPut: Put[Array[SalestaxrateId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[SalestaxrateId] = Decoder[Int].map(SalestaxrateId.apply)
+  implicit val encoder: Encoder[SalestaxrateId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[SalestaxrateId] = Get[Int].map(SalestaxrateId.apply)
   implicit val ordering: Ordering[SalestaxrateId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[SalestaxrateId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[SalestaxrateId] =
-    Decoder[Int].map(SalestaxrateId(_))
-  implicit val meta: Meta[SalestaxrateId] = Meta[Int].imap(SalestaxrateId.apply)(_.value)
-  implicit val metaArray: Meta[Array[SalestaxrateId]] = Meta[Array[Int]].imap(_.map(SalestaxrateId.apply))(_.map(_.value))
+  implicit val put: Put[SalestaxrateId] = Put[Int].contramap(_.value)
 }

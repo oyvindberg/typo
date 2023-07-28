@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgLargeobjectRow(
@@ -25,34 +27,30 @@ case class PgLargeobjectRow(
  }
 
 object PgLargeobjectRow {
-  def rowParser(idx: Int): RowParser[PgLargeobjectRow] =
-    RowParser[PgLargeobjectRow] { row =>
-      Success(
+  implicit val reads: Reads[PgLargeobjectRow] = Reads[PgLargeobjectRow](json => JsResult.fromTry(
+      Try(
         PgLargeobjectRow(
-          loid = row[/* oid */ Long](idx + 0),
-          pageno = row[Int](idx + 1),
-          data = row[Array[Byte]](idx + 2)
+          loid = json.\("loid").as[/* oid */ Long],
+          pageno = json.\("pageno").as[Int],
+          data = json.\("data").as[Array[Byte]]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgLargeobjectRow] = new OFormat[PgLargeobjectRow]{
-    override def writes(o: PgLargeobjectRow): JsObject =
-      Json.obj(
-        "loid" -> o.loid,
-        "pageno" -> o.pageno,
-        "data" -> o.data
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgLargeobjectRow] = RowParser[PgLargeobjectRow] { row =>
+    Success(
+      PgLargeobjectRow(
+        loid = row[/* oid */ Long](idx + 0),
+        pageno = row[Int](idx + 1),
+        data = row[Array[Byte]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PgLargeobjectRow] = {
-      JsResult.fromTry(
-        Try(
-          PgLargeobjectRow(
-            loid = json.\("loid").as[/* oid */ Long],
-            pageno = json.\("pageno").as[Int],
-            data = json.\("data").as[Array[Byte]]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgLargeobjectRow] = OWrites[PgLargeobjectRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "loid" -> Json.toJson(o.loid),
+      "pageno" -> Json.toJson(o.pageno),
+      "data" -> Json.toJson(o.data)
+    ))
+  )
 }

@@ -12,31 +12,30 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `production.workorderrouting` */
 case class WorkorderroutingId(workorderid: WorkorderId, productid: Int, operationsequence: Int)
 object WorkorderroutingId {
   implicit val ordering: Ordering[WorkorderroutingId] = Ordering.by(x => (x.workorderid, x.productid, x.operationsequence))
-  implicit val oFormat: OFormat[WorkorderroutingId] = new OFormat[WorkorderroutingId]{
-    override def writes(o: WorkorderroutingId): JsObject =
-      Json.obj(
-        "workorderid" -> o.workorderid,
-        "productid" -> o.productid,
-        "operationsequence" -> o.operationsequence
-      )
-  
-    override def reads(json: JsValue): JsResult[WorkorderroutingId] = {
-      JsResult.fromTry(
-        Try(
-          WorkorderroutingId(
-            workorderid = json.\("workorderid").as[WorkorderId],
-            productid = json.\("productid").as[Int],
-            operationsequence = json.\("operationsequence").as[Int]
-          )
+  implicit val reads: Reads[WorkorderroutingId] = Reads[WorkorderroutingId](json => JsResult.fromTry(
+      Try(
+        WorkorderroutingId(
+          workorderid = json.\("workorderid").as[WorkorderId],
+          productid = json.\("productid").as[Int],
+          operationsequence = json.\("operationsequence").as[Int]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[WorkorderroutingId] = OWrites[WorkorderroutingId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "workorderid" -> Json.toJson(o.workorderid),
+      "productid" -> Json.toJson(o.productid),
+      "operationsequence" -> Json.toJson(o.operationsequence)
+    ))
+  )
 }

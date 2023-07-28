@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PpViewRepoImpl extends PpViewRepo {
   override def selectAll: Stream[ConnectionIO, PpViewRow] = {
-    sql"""select "id", productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from pr.pp""".query[PpViewRow].stream
+    sql"""select "id", productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from pr.pp""".query[PpViewRow].stream
   }
 }

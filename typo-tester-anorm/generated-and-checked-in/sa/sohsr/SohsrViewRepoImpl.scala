@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object SohsrViewRepoImpl extends SohsrViewRepo {
   override def selectAll(implicit c: Connection): List[SohsrViewRow] = {
-    SQL"""select salesorderid, salesreasonid, modifieddate
+    SQL"""select salesorderid, salesreasonid, modifieddate::text
           from sa.sohsr
        """.as(SohsrViewRow.rowParser(1).*)
   }

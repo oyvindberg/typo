@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PdocViewRepoImpl extends PdocViewRepo {
   override def selectAll: Stream[ConnectionIO, PdocViewRow] = {
-    sql"""select "id", productid, modifieddate, documentnode from pr.pdoc""".query[PdocViewRow].stream
+    sql"""select "id", productid, modifieddate::text, documentnode from pr.pdoc""".query[PdocViewRow].stream
   }
 }

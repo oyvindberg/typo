@@ -7,17 +7,15 @@ package adventureworks
 package sa
 package sp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SpViewRow(
@@ -39,66 +37,36 @@ case class SpViewRow(
   /** Points to [[sales.salesperson.SalespersonRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesperson.SalespersonRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SpViewRow {
-  implicit val decoder: Decoder[SpViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        salesquota <- c.downField("salesquota").as[Option[BigDecimal]]
-        bonus <- c.downField("bonus").as[Option[BigDecimal]]
-        commissionpct <- c.downField("commissionpct").as[Option[BigDecimal]]
-        salesytd <- c.downField("salesytd").as[Option[BigDecimal]]
-        saleslastyear <- c.downField("saleslastyear").as[Option[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SpViewRow(id, businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
-  implicit val encoder: Encoder[SpViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "territoryid" := row.territoryid,
-        "salesquota" := row.salesquota,
-        "bonus" := row.bonus,
-        "commissionpct" := row.commissionpct,
-        "salesytd" := row.salesytd,
-        "saleslastyear" := row.saleslastyear,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SpViewRow] =
-    new Read[SpViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 2),
-        salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-        bonus = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        commissionpct = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 9)
-      )
+  implicit val decoder: Decoder[SpViewRow] = Decoder.forProduct10[SpViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SpViewRow.apply)
+  implicit val encoder: Encoder[SpViewRow] = Encoder.forProduct10[SpViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))
+  implicit val read: Read[SpViewRow] = new Read[SpViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[SalesterritoryId], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 2),
+      salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
+      bonus = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+      commissionpct = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
+      salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
+      saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 8),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 9)
     )
-  
-
+  )
 }

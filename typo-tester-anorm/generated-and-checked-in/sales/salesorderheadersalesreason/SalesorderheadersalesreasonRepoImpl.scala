@@ -8,11 +8,11 @@ package sales
 package salesorderheadersalesreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def insert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
           values (${unsaved.salesorderid}::int4, ${unsaved.salesreasonid}::int4, ${unsaved.modifieddate}::timestamp)
-          returning salesorderid, salesreasonid, modifieddate
+          returning salesorderid, salesreasonid, modifieddate::text
        """
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
   
@@ -32,19 +32,19 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
       Some((NamedParameter("salesreasonid", ParameterValue.from(unsaved.salesreasonid)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salesorderheadersalesreason default values
-            returning salesorderid, salesreasonid, modifieddate
+            returning salesorderid, salesreasonid, modifieddate::text
          """
         .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesorderheadersalesreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning salesorderid, salesreasonid, modifieddate
+                  returning salesorderid, salesreasonid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -55,12 +55,12 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
-    SQL"""select salesorderid, salesreasonid, modifieddate
+    SQL"""select salesorderid, salesreasonid, modifieddate::text
           from sales.salesorderheadersalesreason
        """.as(SalesorderheadersalesreasonRow.rowParser(1).*)
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow] = {
-    SQL"""select salesorderid, salesreasonid, modifieddate
+    SQL"""select salesorderid, salesreasonid, modifieddate::text
           from sales.salesorderheadersalesreason
           where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
        """.as(SalesorderheadersalesreasonRow.rowParser(1).singleOpt)
@@ -82,7 +82,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           on conflict (salesorderid, salesreasonid)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning salesorderid, salesreasonid, modifieddate
+          returning salesorderid, salesreasonid, modifieddate::text
        """
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
   

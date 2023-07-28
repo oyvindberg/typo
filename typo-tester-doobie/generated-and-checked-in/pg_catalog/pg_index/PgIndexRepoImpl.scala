@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgIndexRepoImpl extends PgIndexRepo {
   override def delete(indexrelid: PgIndexId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_index where indexrelid = $indexrelid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_index where indexrelid = ${indexrelid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow] = {
     sql"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)
@@ -25,10 +25,10 @@ object PgIndexRepoImpl extends PgIndexRepo {
     sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index".query[PgIndexRow].stream
   }
   override def selectById(indexrelid: PgIndexId): ConnectionIO[Option[PgIndexRow]] = {
-    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = $indexrelid".query[PgIndexRow].option
+    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ${indexrelid}".query[PgIndexRow].option
   }
   override def selectByIds(indexrelids: Array[PgIndexId]): Stream[ConnectionIO, PgIndexRow] = {
-    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ANY($indexrelids)".query[PgIndexRow].stream
+    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ANY(${indexrelids})".query[PgIndexRow].stream
   }
   override def update(row: PgIndexRow): ConnectionIO[Boolean] = {
     val indexrelid = row.indexrelid
@@ -52,7 +52,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
               indoption = ${row.indoption}::int2vector,
               indexprs = ${row.indexprs}::pg_node_tree,
               indpred = ${row.indpred}::pg_node_tree
-          where indexrelid = $indexrelid
+          where indexrelid = ${indexrelid}
        """
       .update
       .run

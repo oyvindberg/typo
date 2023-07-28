@@ -8,20 +8,20 @@ package sales
 package creditcard
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: CreditcardId): ConnectionIO[Boolean] = {
-    sql"delete from sales.creditcard where creditcardid = $creditcardid".update.run.map(_ > 0)
+    sql"delete from sales.creditcard where creditcardid = ${creditcardid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
           values (${unsaved.creditcardid}::int4, ${unsaved.cardtype}, ${unsaved.cardnumber}, ${unsaved.expmonth}::int2, ${unsaved.expyear}::int2, ${unsaved.modifieddate}::timestamp)
-          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
        """.query[CreditcardRow].unique
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
@@ -36,32 +36,32 @@ object CreditcardRepoImpl extends CreditcardRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.creditcard default values
-            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.creditcard(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
          """
     }
     q.query[CreditcardRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard".query[CreditcardRow].stream
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard".query[CreditcardRow].stream
   }
   override def selectById(creditcardid: CreditcardId): ConnectionIO[Option[CreditcardRow]] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = $creditcardid".query[CreditcardRow].option
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ${creditcardid}".query[CreditcardRow].option
   }
   override def selectByIds(creditcardids: Array[CreditcardId]): Stream[ConnectionIO, CreditcardRow] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = ANY($creditcardids)".query[CreditcardRow].stream
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ANY(${creditcardids})".query[CreditcardRow].stream
   }
   override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
     val creditcardid = row.creditcardid
@@ -71,7 +71,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
               expmonth = ${row.expmonth}::int2,
               expyear = ${row.expyear}::int2,
               modifieddate = ${row.modifieddate}::timestamp
-          where creditcardid = $creditcardid
+          where creditcardid = ${creditcardid}
        """
       .update
       .run
@@ -94,7 +94,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
             expmonth = EXCLUDED.expmonth,
             expyear = EXCLUDED.expyear,
             modifieddate = EXCLUDED.modifieddate
-          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
        """.query[CreditcardRow].unique
   }
 }

@@ -8,13 +8,11 @@ package information_schema
 package collation_character_set_applicability
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class CollationCharacterSetApplicabilityViewRow(
@@ -27,46 +25,24 @@ case class CollationCharacterSetApplicabilityViewRow(
 )
 
 object CollationCharacterSetApplicabilityViewRow {
-  implicit val decoder: Decoder[CollationCharacterSetApplicabilityViewRow] =
-    (c: HCursor) =>
-      for {
-        collationCatalog <- c.downField("collation_catalog").as[Option[SqlIdentifier]]
-        collationSchema <- c.downField("collation_schema").as[Option[SqlIdentifier]]
-        collationName <- c.downField("collation_name").as[Option[SqlIdentifier]]
-        characterSetCatalog <- c.downField("character_set_catalog").as[Option[SqlIdentifier]]
-        characterSetSchema <- c.downField("character_set_schema").as[Option[SqlIdentifier]]
-        characterSetName <- c.downField("character_set_name").as[Option[SqlIdentifier]]
-      } yield CollationCharacterSetApplicabilityViewRow(collationCatalog, collationSchema, collationName, characterSetCatalog, characterSetSchema, characterSetName)
-  implicit val encoder: Encoder[CollationCharacterSetApplicabilityViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "collation_catalog" := row.collationCatalog,
-        "collation_schema" := row.collationSchema,
-        "collation_name" := row.collationName,
-        "character_set_catalog" := row.characterSetCatalog,
-        "character_set_schema" := row.characterSetSchema,
-        "character_set_name" := row.characterSetName
-      )}
-  implicit val read: Read[CollationCharacterSetApplicabilityViewRow] =
-    new Read[CollationCharacterSetApplicabilityViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CollationCharacterSetApplicabilityViewRow(
-        collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[CollationCharacterSetApplicabilityViewRow] = Decoder.forProduct6[CollationCharacterSetApplicabilityViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name")(CollationCharacterSetApplicabilityViewRow.apply)
+  implicit val encoder: Encoder[CollationCharacterSetApplicabilityViewRow] = Encoder.forProduct6[CollationCharacterSetApplicabilityViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.characterSetCatalog, x.characterSetSchema, x.characterSetName))
+  implicit val read: Read[CollationCharacterSetApplicabilityViewRow] = new Read[CollationCharacterSetApplicabilityViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CollationCharacterSetApplicabilityViewRow(
+      collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

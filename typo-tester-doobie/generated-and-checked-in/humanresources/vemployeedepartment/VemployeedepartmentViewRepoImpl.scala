@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
   override def selectAll: Stream[ConnectionIO, VemployeedepartmentViewRow] = {
-    sql"select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate from humanresources.vemployeedepartment".query[VemployeedepartmentViewRow].stream
+    sql"select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate::text from humanresources.vemployeedepartment".query[VemployeedepartmentViewRow].stream
   }
 }

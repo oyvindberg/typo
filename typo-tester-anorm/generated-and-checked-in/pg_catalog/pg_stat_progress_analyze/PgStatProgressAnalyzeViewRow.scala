@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatProgressAnalyzeViewRow(
@@ -32,61 +34,57 @@ case class PgStatProgressAnalyzeViewRow(
 )
 
 object PgStatProgressAnalyzeViewRow {
-  def rowParser(idx: Int): RowParser[PgStatProgressAnalyzeViewRow] =
-    RowParser[PgStatProgressAnalyzeViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatProgressAnalyzeViewRow] = Reads[PgStatProgressAnalyzeViewRow](json => JsResult.fromTry(
+      Try(
         PgStatProgressAnalyzeViewRow(
-          pid = row[Option[Int]](idx + 0),
-          datid = row[Option[/* oid */ Long]](idx + 1),
-          datname = row[Option[String]](idx + 2),
-          relid = row[Option[/* oid */ Long]](idx + 3),
-          phase = row[Option[String]](idx + 4),
-          sampleBlksTotal = row[Option[Long]](idx + 5),
-          sampleBlksScanned = row[Option[Long]](idx + 6),
-          extStatsTotal = row[Option[Long]](idx + 7),
-          extStatsComputed = row[Option[Long]](idx + 8),
-          childTablesTotal = row[Option[Long]](idx + 9),
-          childTablesDone = row[Option[Long]](idx + 10),
-          currentChildTableRelid = row[Option[/* oid */ Long]](idx + 11)
+          pid = json.\("pid").toOption.map(_.as[Int]),
+          datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
+          datname = json.\("datname").toOption.map(_.as[String]),
+          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+          phase = json.\("phase").toOption.map(_.as[String]),
+          sampleBlksTotal = json.\("sample_blks_total").toOption.map(_.as[Long]),
+          sampleBlksScanned = json.\("sample_blks_scanned").toOption.map(_.as[Long]),
+          extStatsTotal = json.\("ext_stats_total").toOption.map(_.as[Long]),
+          extStatsComputed = json.\("ext_stats_computed").toOption.map(_.as[Long]),
+          childTablesTotal = json.\("child_tables_total").toOption.map(_.as[Long]),
+          childTablesDone = json.\("child_tables_done").toOption.map(_.as[Long]),
+          currentChildTableRelid = json.\("current_child_table_relid").toOption.map(_.as[/* oid */ Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatProgressAnalyzeViewRow] = new OFormat[PgStatProgressAnalyzeViewRow]{
-    override def writes(o: PgStatProgressAnalyzeViewRow): JsObject =
-      Json.obj(
-        "pid" -> o.pid,
-        "datid" -> o.datid,
-        "datname" -> o.datname,
-        "relid" -> o.relid,
-        "phase" -> o.phase,
-        "sample_blks_total" -> o.sampleBlksTotal,
-        "sample_blks_scanned" -> o.sampleBlksScanned,
-        "ext_stats_total" -> o.extStatsTotal,
-        "ext_stats_computed" -> o.extStatsComputed,
-        "child_tables_total" -> o.childTablesTotal,
-        "child_tables_done" -> o.childTablesDone,
-        "current_child_table_relid" -> o.currentChildTableRelid
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatProgressAnalyzeViewRow] = RowParser[PgStatProgressAnalyzeViewRow] { row =>
+    Success(
+      PgStatProgressAnalyzeViewRow(
+        pid = row[Option[Int]](idx + 0),
+        datid = row[Option[/* oid */ Long]](idx + 1),
+        datname = row[Option[String]](idx + 2),
+        relid = row[Option[/* oid */ Long]](idx + 3),
+        phase = row[Option[String]](idx + 4),
+        sampleBlksTotal = row[Option[Long]](idx + 5),
+        sampleBlksScanned = row[Option[Long]](idx + 6),
+        extStatsTotal = row[Option[Long]](idx + 7),
+        extStatsComputed = row[Option[Long]](idx + 8),
+        childTablesTotal = row[Option[Long]](idx + 9),
+        childTablesDone = row[Option[Long]](idx + 10),
+        currentChildTableRelid = row[Option[/* oid */ Long]](idx + 11)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatProgressAnalyzeViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatProgressAnalyzeViewRow(
-            pid = json.\("pid").toOption.map(_.as[Int]),
-            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
-            datname = json.\("datname").toOption.map(_.as[String]),
-            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            phase = json.\("phase").toOption.map(_.as[String]),
-            sampleBlksTotal = json.\("sample_blks_total").toOption.map(_.as[Long]),
-            sampleBlksScanned = json.\("sample_blks_scanned").toOption.map(_.as[Long]),
-            extStatsTotal = json.\("ext_stats_total").toOption.map(_.as[Long]),
-            extStatsComputed = json.\("ext_stats_computed").toOption.map(_.as[Long]),
-            childTablesTotal = json.\("child_tables_total").toOption.map(_.as[Long]),
-            childTablesDone = json.\("child_tables_done").toOption.map(_.as[Long]),
-            currentChildTableRelid = json.\("current_child_table_relid").toOption.map(_.as[/* oid */ Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatProgressAnalyzeViewRow] = OWrites[PgStatProgressAnalyzeViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "pid" -> Json.toJson(o.pid),
+      "datid" -> Json.toJson(o.datid),
+      "datname" -> Json.toJson(o.datname),
+      "relid" -> Json.toJson(o.relid),
+      "phase" -> Json.toJson(o.phase),
+      "sample_blks_total" -> Json.toJson(o.sampleBlksTotal),
+      "sample_blks_scanned" -> Json.toJson(o.sampleBlksScanned),
+      "ext_stats_total" -> Json.toJson(o.extStatsTotal),
+      "ext_stats_computed" -> Json.toJson(o.extStatsComputed),
+      "child_tables_total" -> Json.toJson(o.childTablesTotal),
+      "child_tables_done" -> Json.toJson(o.childTablesDone),
+      "current_child_table_relid" -> Json.toJson(o.currentChildTableRelid)
+    ))
+  )
 }

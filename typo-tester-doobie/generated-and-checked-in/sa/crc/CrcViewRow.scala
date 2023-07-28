@@ -7,17 +7,15 @@ package adventureworks
 package sa
 package crc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CrcViewRow(
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.countryregioncode]] */
@@ -25,38 +23,22 @@ case class CrcViewRow(
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.currencycode]] */
   currencycode: Option[CurrencyId],
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CrcViewRow {
-  implicit val decoder: Decoder[CrcViewRow] =
-    (c: HCursor) =>
-      for {
-        countryregioncode <- c.downField("countryregioncode").as[Option[CountryregionId]]
-        currencycode <- c.downField("currencycode").as[Option[CurrencyId]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield CrcViewRow(countryregioncode, currencycode, modifieddate)
-  implicit val encoder: Encoder[CrcViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "countryregioncode" := row.countryregioncode,
-        "currencycode" := row.currencycode,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CrcViewRow] =
-    new Read[CrcViewRow](
-      gets = List(
-        (Get[CountryregionId], Nullability.Nullable),
-        (Get[CurrencyId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
-        countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 0),
-        currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[CrcViewRow] = Decoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CrcViewRow.apply)
+  implicit val encoder: Encoder[CrcViewRow] = Encoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))
+  implicit val read: Read[CrcViewRow] = new Read[CrcViewRow](
+    gets = List(
+      (Get[CountryregionId], Nullability.Nullable),
+      (Get[CurrencyId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
+      countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 0),
+      currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgStatSubscriptionViewRepoImpl extends PgStatSubscriptionViewRepo {
   override def selectAll(implicit c: Connection): List[PgStatSubscriptionViewRow] = {
-    SQL"""select subid, subname, pid, relid, received_lsn, last_msg_send_time, last_msg_receipt_time, latest_end_lsn, latest_end_time
+    SQL"""select subid, subname, pid, relid, received_lsn, last_msg_send_time::text, last_msg_receipt_time::text, latest_end_lsn, latest_end_time::text
           from pg_catalog.pg_stat_subscription
        """.as(PgStatSubscriptionViewRow.rowParser(1).*)
   }

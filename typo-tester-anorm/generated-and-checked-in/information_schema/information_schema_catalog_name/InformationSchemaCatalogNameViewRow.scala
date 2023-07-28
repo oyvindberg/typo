@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class InformationSchemaCatalogNameViewRow(
@@ -22,28 +24,24 @@ case class InformationSchemaCatalogNameViewRow(
 )
 
 object InformationSchemaCatalogNameViewRow {
-  def rowParser(idx: Int): RowParser[InformationSchemaCatalogNameViewRow] =
-    RowParser[InformationSchemaCatalogNameViewRow] { row =>
-      Success(
+  implicit val reads: Reads[InformationSchemaCatalogNameViewRow] = Reads[InformationSchemaCatalogNameViewRow](json => JsResult.fromTry(
+      Try(
         InformationSchemaCatalogNameViewRow(
-          catalogName = row[Option[SqlIdentifier]](idx + 0)
+          catalogName = json.\("catalog_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[InformationSchemaCatalogNameViewRow] = new OFormat[InformationSchemaCatalogNameViewRow]{
-    override def writes(o: InformationSchemaCatalogNameViewRow): JsObject =
-      Json.obj(
-        "catalog_name" -> o.catalogName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[InformationSchemaCatalogNameViewRow] = RowParser[InformationSchemaCatalogNameViewRow] { row =>
+    Success(
+      InformationSchemaCatalogNameViewRow(
+        catalogName = row[Option[SqlIdentifier]](idx + 0)
       )
-  
-    override def reads(json: JsValue): JsResult[InformationSchemaCatalogNameViewRow] = {
-      JsResult.fromTry(
-        Try(
-          InformationSchemaCatalogNameViewRow(
-            catalogName = json.\("catalog_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[InformationSchemaCatalogNameViewRow] = OWrites[InformationSchemaCatalogNameViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "catalog_name" -> Json.toJson(o.catalogName)
+    ))
+  )
 }

@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgDefaultAclRow(
@@ -26,40 +28,36 @@ case class PgDefaultAclRow(
 )
 
 object PgDefaultAclRow {
-  def rowParser(idx: Int): RowParser[PgDefaultAclRow] =
-    RowParser[PgDefaultAclRow] { row =>
-      Success(
+  implicit val reads: Reads[PgDefaultAclRow] = Reads[PgDefaultAclRow](json => JsResult.fromTry(
+      Try(
         PgDefaultAclRow(
-          oid = row[PgDefaultAclId](idx + 0),
-          defaclrole = row[/* oid */ Long](idx + 1),
-          defaclnamespace = row[/* oid */ Long](idx + 2),
-          defaclobjtype = row[String](idx + 3),
-          defaclacl = row[Array[TypoAclItem]](idx + 4)
+          oid = json.\("oid").as[PgDefaultAclId],
+          defaclrole = json.\("defaclrole").as[/* oid */ Long],
+          defaclnamespace = json.\("defaclnamespace").as[/* oid */ Long],
+          defaclobjtype = json.\("defaclobjtype").as[String],
+          defaclacl = json.\("defaclacl").as[Array[TypoAclItem]]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgDefaultAclRow] = new OFormat[PgDefaultAclRow]{
-    override def writes(o: PgDefaultAclRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "defaclrole" -> o.defaclrole,
-        "defaclnamespace" -> o.defaclnamespace,
-        "defaclobjtype" -> o.defaclobjtype,
-        "defaclacl" -> o.defaclacl
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgDefaultAclRow] = RowParser[PgDefaultAclRow] { row =>
+    Success(
+      PgDefaultAclRow(
+        oid = row[PgDefaultAclId](idx + 0),
+        defaclrole = row[/* oid */ Long](idx + 1),
+        defaclnamespace = row[/* oid */ Long](idx + 2),
+        defaclobjtype = row[String](idx + 3),
+        defaclacl = row[Array[TypoAclItem]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgDefaultAclRow] = {
-      JsResult.fromTry(
-        Try(
-          PgDefaultAclRow(
-            oid = json.\("oid").as[PgDefaultAclId],
-            defaclrole = json.\("defaclrole").as[/* oid */ Long],
-            defaclnamespace = json.\("defaclnamespace").as[/* oid */ Long],
-            defaclobjtype = json.\("defaclobjtype").as[String],
-            defaclacl = json.\("defaclacl").as[Array[TypoAclItem]]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgDefaultAclRow] = OWrites[PgDefaultAclRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "defaclrole" -> Json.toJson(o.defaclrole),
+      "defaclnamespace" -> Json.toJson(o.defaclnamespace),
+      "defaclobjtype" -> Json.toJson(o.defaclobjtype),
+      "defaclacl" -> Json.toJson(o.defaclacl)
+    ))
+  )
 }

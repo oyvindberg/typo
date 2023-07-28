@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_shmem_allocations
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgShmemAllocationsViewRow(
@@ -24,38 +22,20 @@ case class PgShmemAllocationsViewRow(
 )
 
 object PgShmemAllocationsViewRow {
-  implicit val decoder: Decoder[PgShmemAllocationsViewRow] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Option[String]]
-        off <- c.downField("off").as[Option[Long]]
-        size <- c.downField("size").as[Option[Long]]
-        allocatedSize <- c.downField("allocated_size").as[Option[Long]]
-      } yield PgShmemAllocationsViewRow(name, off, size, allocatedSize)
-  implicit val encoder: Encoder[PgShmemAllocationsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "off" := row.off,
-        "size" := row.size,
-        "allocated_size" := row.allocatedSize
-      )}
-  implicit val read: Read[PgShmemAllocationsViewRow] =
-    new Read[PgShmemAllocationsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgShmemAllocationsViewRow(
-        name = Get[String].unsafeGetNullable(rs, i + 0),
-        off = Get[Long].unsafeGetNullable(rs, i + 1),
-        size = Get[Long].unsafeGetNullable(rs, i + 2),
-        allocatedSize = Get[Long].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgShmemAllocationsViewRow] = Decoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(PgShmemAllocationsViewRow.apply)
+  implicit val encoder: Encoder[PgShmemAllocationsViewRow] = Encoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(x => (x.name, x.off, x.size, x.allocatedSize))
+  implicit val read: Read[PgShmemAllocationsViewRow] = new Read[PgShmemAllocationsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgShmemAllocationsViewRow(
+      name = Get[String].unsafeGetNullable(rs, i + 0),
+      off = Get[Long].unsafeGetNullable(rs, i + 1),
+      size = Get[Long].unsafeGetNullable(rs, i + 2),
+      allocatedSize = Get[Long].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

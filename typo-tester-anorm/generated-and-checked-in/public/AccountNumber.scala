@@ -9,21 +9,22 @@ package public
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Domain `public.AccountNumber`
   * No constraint
   */
 case class AccountNumber(value: String) extends AnyVal
 object AccountNumber {
-  implicit def ordering(implicit ev: Ordering[String]): Ordering[AccountNumber] = Ordering.by(_.value)
-  implicit val format: Format[AccountNumber] = implicitly[Format[String]].bimap(AccountNumber.apply, _.value)
-  implicit val toStatement: ToStatement[AccountNumber] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[AccountNumber]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[AccountNumber]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit val column: Column[AccountNumber] = implicitly[Column[String]].map(AccountNumber.apply)
+  implicit val ordering: Ordering[AccountNumber] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[AccountNumber] = new ParameterMetaData[AccountNumber] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-
+  implicit val reads: Reads[AccountNumber] = implicitly[Reads[String]].map(AccountNumber.apply)
+  implicit val toStatement: ToStatement[AccountNumber] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit val writes: Writes[AccountNumber] = implicitly[Writes[String]].contramap(_.value)
 }

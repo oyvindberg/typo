@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def delete(oid: PgOpfamilyId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_opfamily where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_opfamily where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgOpfamilyRow): ConnectionIO[PgOpfamilyRow] = {
     sql"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)
@@ -25,10 +25,10 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
     sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily".query[PgOpfamilyRow].stream
   }
   override def selectById(oid: PgOpfamilyId): ConnectionIO[Option[PgOpfamilyRow]] = {
-    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = $oid".query[PgOpfamilyRow].option
+    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ${oid}".query[PgOpfamilyRow].option
   }
   override def selectByIds(oids: Array[PgOpfamilyId]): Stream[ConnectionIO, PgOpfamilyRow] = {
-    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ANY($oids)".query[PgOpfamilyRow].stream
+    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ANY(${oids})".query[PgOpfamilyRow].stream
   }
   override def update(row: PgOpfamilyRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -37,7 +37,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
               opfname = ${row.opfname}::name,
               opfnamespace = ${row.opfnamespace}::oid,
               opfowner = ${row.opfowner}::oid
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

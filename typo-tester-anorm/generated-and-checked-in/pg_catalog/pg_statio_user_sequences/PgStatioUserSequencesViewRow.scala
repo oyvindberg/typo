@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatioUserSequencesViewRow(
@@ -30,40 +32,36 @@ case class PgStatioUserSequencesViewRow(
 )
 
 object PgStatioUserSequencesViewRow {
-  def rowParser(idx: Int): RowParser[PgStatioUserSequencesViewRow] =
-    RowParser[PgStatioUserSequencesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatioUserSequencesViewRow] = Reads[PgStatioUserSequencesViewRow](json => JsResult.fromTry(
+      Try(
         PgStatioUserSequencesViewRow(
-          relid = row[Option[/* oid */ Long]](idx + 0),
-          schemaname = row[Option[String]](idx + 1),
-          relname = row[Option[String]](idx + 2),
-          blksRead = row[Option[Long]](idx + 3),
-          blksHit = row[Option[Long]](idx + 4)
+          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          relname = json.\("relname").toOption.map(_.as[String]),
+          blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+          blksHit = json.\("blks_hit").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatioUserSequencesViewRow] = new OFormat[PgStatioUserSequencesViewRow]{
-    override def writes(o: PgStatioUserSequencesViewRow): JsObject =
-      Json.obj(
-        "relid" -> o.relid,
-        "schemaname" -> o.schemaname,
-        "relname" -> o.relname,
-        "blks_read" -> o.blksRead,
-        "blks_hit" -> o.blksHit
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatioUserSequencesViewRow] = RowParser[PgStatioUserSequencesViewRow] { row =>
+    Success(
+      PgStatioUserSequencesViewRow(
+        relid = row[Option[/* oid */ Long]](idx + 0),
+        schemaname = row[Option[String]](idx + 1),
+        relname = row[Option[String]](idx + 2),
+        blksRead = row[Option[Long]](idx + 3),
+        blksHit = row[Option[Long]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatioUserSequencesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatioUserSequencesViewRow(
-            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            relname = json.\("relname").toOption.map(_.as[String]),
-            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
-            blksHit = json.\("blks_hit").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatioUserSequencesViewRow] = OWrites[PgStatioUserSequencesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "relid" -> Json.toJson(o.relid),
+      "schemaname" -> Json.toJson(o.schemaname),
+      "relname" -> Json.toJson(o.relname),
+      "blks_read" -> Json.toJson(o.blksRead),
+      "blks_hit" -> Json.toJson(o.blksHit)
+    ))
+  )
 }

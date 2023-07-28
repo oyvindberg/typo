@@ -7,17 +7,15 @@ package adventureworks
 package pr
 package c
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CViewRow(
   id: Option[/* bpchar */ String],
@@ -26,42 +24,24 @@ case class CViewRow(
   /** Points to [[production.culture.CultureRow.name]] */
   name: Option[Name],
   /** Points to [[production.culture.CultureRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CViewRow {
-  implicit val decoder: Decoder[CViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[/* bpchar */ String]]
-        cultureid <- c.downField("cultureid").as[Option[CultureId]]
-        name <- c.downField("name").as[Option[Name]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield CViewRow(id, cultureid, name, modifieddate)
-  implicit val encoder: Encoder[CViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "cultureid" := row.cultureid,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CViewRow] =
-    new Read[CViewRow](
-      gets = List(
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[CultureId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
-        id = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 0),
-        cultureid = Get[CultureId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[CViewRow] = Decoder.forProduct4[CViewRow, Option[/* bpchar */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(CViewRow.apply)
+  implicit val encoder: Encoder[CViewRow] = Encoder.forProduct4[CViewRow, Option[/* bpchar */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(x => (x.id, x.cultureid, x.name, x.modifieddate))
+  implicit val read: Read[CViewRow] = new Read[CViewRow](
+    gets = List(
+      (Get[/* bpchar */ String], Nullability.Nullable),
+      (Get[CultureId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
+      id = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 0),
+      cultureid = Get[CultureId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

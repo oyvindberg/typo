@@ -7,15 +7,17 @@ package adventureworks
 package humanresources
 package department
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class DepartmentRow(
@@ -25,41 +27,37 @@ case class DepartmentRow(
   name: Name,
   /** Name of the group to which the department belongs. */
   groupname: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object DepartmentRow {
-  def rowParser(idx: Int): RowParser[DepartmentRow] =
-    RowParser[DepartmentRow] { row =>
-      Success(
+  implicit val reads: Reads[DepartmentRow] = Reads[DepartmentRow](json => JsResult.fromTry(
+      Try(
         DepartmentRow(
-          departmentid = row[DepartmentId](idx + 0),
-          name = row[Name](idx + 1),
-          groupname = row[Name](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          departmentid = json.\("departmentid").as[DepartmentId],
+          name = json.\("name").as[Name],
+          groupname = json.\("groupname").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[DepartmentRow] = new OFormat[DepartmentRow]{
-    override def writes(o: DepartmentRow): JsObject =
-      Json.obj(
-        "departmentid" -> o.departmentid,
-        "name" -> o.name,
-        "groupname" -> o.groupname,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[DepartmentRow] = RowParser[DepartmentRow] { row =>
+    Success(
+      DepartmentRow(
+        departmentid = row[DepartmentId](idx + 0),
+        name = row[Name](idx + 1),
+        groupname = row[Name](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[DepartmentRow] = {
-      JsResult.fromTry(
-        Try(
-          DepartmentRow(
-            departmentid = json.\("departmentid").as[DepartmentId],
-            name = json.\("name").as[Name],
-            groupname = json.\("groupname").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[DepartmentRow] = OWrites[DepartmentRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "departmentid" -> Json.toJson(o.departmentid),
+      "name" -> Json.toJson(o.name),
+      "groupname" -> Json.toJson(o.groupname),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

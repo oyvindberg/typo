@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPublicationTablesViewRow(
@@ -23,34 +25,30 @@ case class PgPublicationTablesViewRow(
 )
 
 object PgPublicationTablesViewRow {
-  def rowParser(idx: Int): RowParser[PgPublicationTablesViewRow] =
-    RowParser[PgPublicationTablesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPublicationTablesViewRow] = Reads[PgPublicationTablesViewRow](json => JsResult.fromTry(
+      Try(
         PgPublicationTablesViewRow(
-          pubname = row[Option[String]](idx + 0),
-          schemaname = row[Option[String]](idx + 1),
-          tablename = row[Option[String]](idx + 2)
+          pubname = json.\("pubname").toOption.map(_.as[String]),
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          tablename = json.\("tablename").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPublicationTablesViewRow] = new OFormat[PgPublicationTablesViewRow]{
-    override def writes(o: PgPublicationTablesViewRow): JsObject =
-      Json.obj(
-        "pubname" -> o.pubname,
-        "schemaname" -> o.schemaname,
-        "tablename" -> o.tablename
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPublicationTablesViewRow] = RowParser[PgPublicationTablesViewRow] { row =>
+    Success(
+      PgPublicationTablesViewRow(
+        pubname = row[Option[String]](idx + 0),
+        schemaname = row[Option[String]](idx + 1),
+        tablename = row[Option[String]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPublicationTablesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPublicationTablesViewRow(
-            pubname = json.\("pubname").toOption.map(_.as[String]),
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            tablename = json.\("tablename").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPublicationTablesViewRow] = OWrites[PgPublicationTablesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "pubname" -> Json.toJson(o.pubname),
+      "schemaname" -> Json.toJson(o.schemaname),
+      "tablename" -> Json.toJson(o.tablename)
+    ))
+  )
 }

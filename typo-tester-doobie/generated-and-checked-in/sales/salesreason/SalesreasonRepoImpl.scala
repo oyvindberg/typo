@@ -8,20 +8,20 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesreason where salesreasonid = $salesreasonid".update.run.map(_ > 0)
+    sql"delete from sales.salesreason where salesreasonid = ${salesreasonid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning salesreasonid, "name", reasontype, modifieddate
+          returning salesreasonid, "name", reasontype, modifieddate::text
        """.query[SalesreasonRow].unique
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
@@ -34,32 +34,32 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.salesreason default values
-            returning salesreasonid, "name", reasontype, modifieddate
+            returning salesreasonid, "name", reasontype, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning salesreasonid, "name", reasontype, modifieddate
+            returning salesreasonid, "name", reasontype, modifieddate::text
          """
     }
     q.query[SalesreasonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason""".query[SalesreasonRow].stream
+    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason""".query[SalesreasonRow].stream
   }
   override def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid""".query[SalesreasonRow].option
+    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ${salesreasonid}""".query[SalesreasonRow].option
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason where salesreasonid = ANY($salesreasonids)""".query[SalesreasonRow].stream
+    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ANY(${salesreasonids})""".query[SalesreasonRow].stream
   }
   override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
     val salesreasonid = row.salesreasonid
@@ -67,7 +67,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           set "name" = ${row.name}::"public"."Name",
               reasontype = ${row.reasontype}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
-          where salesreasonid = $salesreasonid
+          where salesreasonid = ${salesreasonid}
        """
       .update
       .run
@@ -86,7 +86,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             "name" = EXCLUDED."name",
             reasontype = EXCLUDED.reasontype,
             modifieddate = EXCLUDED.modifieddate
-          returning salesreasonid, "name", reasontype, modifieddate
+          returning salesreasonid, "name", reasontype, modifieddate::text
        """.query[SalesreasonRow].unique
   }
 }

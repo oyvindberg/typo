@@ -1,7 +1,7 @@
 package adventureworks.humanresources.department
 
 import adventureworks.public.Name
-import adventureworks.{Defaulted, withConnection}
+import adventureworks.{Defaulted, TypoLocalDateTime, withConnection}
 import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
@@ -15,7 +15,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val unsaved = DepartmentRowUnsaved(
         name = Name("foo"),
         groupname = Name("bar"),
-        modifieddate = Defaulted.Provided(java.time.LocalDateTime.now.withNano(0))
+        modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
       )
       for {
         // insert and round trip check
@@ -39,7 +39,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val unsaved = DepartmentRowUnsaved(
         name = Name("foo"),
         groupname = Name("bar"),
-        modifieddate = Defaulted.Provided(java.time.LocalDateTime.now.withNano(0))
+        modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
       )
       for {
         // insert and round trip check

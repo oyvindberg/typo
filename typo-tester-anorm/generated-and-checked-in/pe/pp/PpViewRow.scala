@@ -7,17 +7,19 @@ package adventureworks
 package pe
 package pp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PpViewRow(
@@ -29,44 +31,40 @@ case class PpViewRow(
   /** Points to [[person.personphone.PersonphoneRow.phonenumbertypeid]] */
   phonenumbertypeid: Option[PhonenumbertypeId],
   /** Points to [[person.personphone.PersonphoneRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PpViewRow {
-  def rowParser(idx: Int): RowParser[PpViewRow] =
-    RowParser[PpViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PpViewRow] = Reads[PpViewRow](json => JsResult.fromTry(
+      Try(
         PpViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          phonenumber = row[Option[Phone]](idx + 2),
-          phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 3),
-          modifieddate = row[Option[LocalDateTime]](idx + 4)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          phonenumber = json.\("phonenumber").toOption.map(_.as[Phone]),
+          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as[PhonenumbertypeId]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PpViewRow] = new OFormat[PpViewRow]{
-    override def writes(o: PpViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "phonenumber" -> o.phonenumber,
-        "phonenumbertypeid" -> o.phonenumbertypeid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PpViewRow] = RowParser[PpViewRow] { row =>
+    Success(
+      PpViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        phonenumber = row[Option[Phone]](idx + 2),
+        phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 3),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PpViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PpViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            phonenumber = json.\("phonenumber").toOption.map(_.as[Phone]),
-            phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as[PhonenumbertypeId]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PpViewRow] = OWrites[PpViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "phonenumber" -> Json.toJson(o.phonenumber),
+      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

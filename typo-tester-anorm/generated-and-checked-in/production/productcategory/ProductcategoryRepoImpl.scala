@@ -8,11 +8,11 @@ package production
 package productcategory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object ProductcategoryRepoImpl extends ProductcategoryRepo {
@@ -22,7 +22,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
           values (${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning productcategoryid, "name", rowguid, modifieddate
+          returning productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductcategoryRow.rowParser(1).single)
   
@@ -40,19 +40,19 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productcategory default values
-            returning productcategoryid, "name", rowguid, modifieddate
+            returning productcategoryid, "name", rowguid, modifieddate::text
          """
         .executeInsert(ProductcategoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productcategory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productcategoryid, "name", rowguid, modifieddate
+                  returning productcategoryid, "name", rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -63,18 +63,18 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductcategoryRow] = {
-    SQL"""select productcategoryid, "name", rowguid, modifieddate
+    SQL"""select productcategoryid, "name", rowguid, modifieddate::text
           from production.productcategory
        """.as(ProductcategoryRow.rowParser(1).*)
   }
   override def selectById(productcategoryid: ProductcategoryId)(implicit c: Connection): Option[ProductcategoryRow] = {
-    SQL"""select productcategoryid, "name", rowguid, modifieddate
+    SQL"""select productcategoryid, "name", rowguid, modifieddate::text
           from production.productcategory
           where productcategoryid = $productcategoryid
        """.as(ProductcategoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): List[ProductcategoryRow] = {
-    SQL"""select productcategoryid, "name", rowguid, modifieddate
+    SQL"""select productcategoryid, "name", rowguid, modifieddate::text
           from production.productcategory
           where productcategoryid = ANY($productcategoryids)
        """.as(ProductcategoryRow.rowParser(1).*)
@@ -102,7 +102,7 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
             "name" = EXCLUDED."name",
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning productcategoryid, "name", rowguid, modifieddate
+          returning productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductcategoryRow.rowParser(1).single)
   

@@ -7,17 +7,19 @@ package adventureworks
 package production
 package productmodel
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ProductmodelRow(
@@ -30,47 +32,43 @@ case class ProductmodelRow(
   /** Manufacturing instructions in xml format. */
   instructions: Option[TypoXml],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductmodelRow {
-  def rowParser(idx: Int): RowParser[ProductmodelRow] =
-    RowParser[ProductmodelRow] { row =>
-      Success(
+  implicit val reads: Reads[ProductmodelRow] = Reads[ProductmodelRow](json => JsResult.fromTry(
+      Try(
         ProductmodelRow(
-          productmodelid = row[ProductmodelId](idx + 0),
-          name = row[Name](idx + 1),
-          catalogdescription = row[Option[TypoXml]](idx + 2),
-          instructions = row[Option[TypoXml]](idx + 3),
-          rowguid = row[UUID](idx + 4),
-          modifieddate = row[LocalDateTime](idx + 5)
+          productmodelid = json.\("productmodelid").as[ProductmodelId],
+          name = json.\("name").as[Name],
+          catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
+          instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ProductmodelRow] = new OFormat[ProductmodelRow]{
-    override def writes(o: ProductmodelRow): JsObject =
-      Json.obj(
-        "productmodelid" -> o.productmodelid,
-        "name" -> o.name,
-        "catalogdescription" -> o.catalogdescription,
-        "instructions" -> o.instructions,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ProductmodelRow] = RowParser[ProductmodelRow] { row =>
+    Success(
+      ProductmodelRow(
+        productmodelid = row[ProductmodelId](idx + 0),
+        name = row[Name](idx + 1),
+        catalogdescription = row[Option[TypoXml]](idx + 2),
+        instructions = row[Option[TypoXml]](idx + 3),
+        rowguid = row[UUID](idx + 4),
+        modifieddate = row[TypoLocalDateTime](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[ProductmodelRow] = {
-      JsResult.fromTry(
-        Try(
-          ProductmodelRow(
-            productmodelid = json.\("productmodelid").as[ProductmodelId],
-            name = json.\("name").as[Name],
-            catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
-            instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ProductmodelRow] = OWrites[ProductmodelRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "name" -> Json.toJson(o.name),
+      "catalogdescription" -> Json.toJson(o.catalogdescription),
+      "instructions" -> Json.toJson(o.instructions),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

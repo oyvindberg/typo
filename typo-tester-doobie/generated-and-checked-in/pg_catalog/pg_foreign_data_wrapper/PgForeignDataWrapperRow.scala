@@ -8,13 +8,11 @@ package pg_catalog
 package pg_foreign_data_wrapper
 
 import adventureworks.TypoAclItem
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgForeignDataWrapperRow(
@@ -28,50 +26,26 @@ case class PgForeignDataWrapperRow(
 )
 
 object PgForeignDataWrapperRow {
-  implicit val decoder: Decoder[PgForeignDataWrapperRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgForeignDataWrapperId]
-        fdwname <- c.downField("fdwname").as[String]
-        fdwowner <- c.downField("fdwowner").as[/* oid */ Long]
-        fdwhandler <- c.downField("fdwhandler").as[/* oid */ Long]
-        fdwvalidator <- c.downField("fdwvalidator").as[/* oid */ Long]
-        fdwacl <- c.downField("fdwacl").as[Option[Array[TypoAclItem]]]
-        fdwoptions <- c.downField("fdwoptions").as[Option[Array[String]]]
-      } yield PgForeignDataWrapperRow(oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions)
-  implicit val encoder: Encoder[PgForeignDataWrapperRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "fdwname" := row.fdwname,
-        "fdwowner" := row.fdwowner,
-        "fdwhandler" := row.fdwhandler,
-        "fdwvalidator" := row.fdwvalidator,
-        "fdwacl" := row.fdwacl,
-        "fdwoptions" := row.fdwoptions
-      )}
-  implicit val read: Read[PgForeignDataWrapperRow] =
-    new Read[PgForeignDataWrapperRow](
-      gets = List(
-        (Get[PgForeignDataWrapperId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Array[TypoAclItem]], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgForeignDataWrapperRow(
-        oid = Get[PgForeignDataWrapperId].unsafeGetNonNullable(rs, i + 0),
-        fdwname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        fdwowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        fdwhandler = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        fdwvalidator = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-        fdwacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 5),
-        fdwoptions = Get[Array[String]].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgForeignDataWrapperRow] = Decoder.forProduct7[PgForeignDataWrapperRow, PgForeignDataWrapperId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions")(PgForeignDataWrapperRow.apply)
+  implicit val encoder: Encoder[PgForeignDataWrapperRow] = Encoder.forProduct7[PgForeignDataWrapperRow, PgForeignDataWrapperId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "fdwname", "fdwowner", "fdwhandler", "fdwvalidator", "fdwacl", "fdwoptions")(x => (x.oid, x.fdwname, x.fdwowner, x.fdwhandler, x.fdwvalidator, x.fdwacl, x.fdwoptions))
+  implicit val read: Read[PgForeignDataWrapperRow] = new Read[PgForeignDataWrapperRow](
+    gets = List(
+      (Get[PgForeignDataWrapperId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Array[TypoAclItem]], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgForeignDataWrapperRow(
+      oid = Get[PgForeignDataWrapperId].unsafeGetNonNullable(rs, i + 0),
+      fdwname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      fdwowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      fdwhandler = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      fdwvalidator = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
+      fdwacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 5),
+      fdwoptions = Get[Array[String]].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

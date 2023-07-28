@@ -8,13 +8,11 @@ package purchasing
 package purchaseorderheader
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `purchasing.purchaseorderheader` which has not been persisted yet */
 case class PurchaseorderheaderRowUnsaved(
@@ -28,7 +26,7 @@ case class PurchaseorderheaderRowUnsaved(
       Points to [[shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
   /** Estimated shipment date from the vendor. */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass)
       Primary key. */
   purchaseorderid: Defaulted[PurchaseorderheaderId] = Defaulted.UseDefault,
@@ -40,7 +38,7 @@ case class PurchaseorderheaderRowUnsaved(
   status: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Purchase order creation date. */
-  orderdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 0.00
       Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID. */
   subtotal: Defaulted[BigDecimal] = Defaulted.UseDefault,
@@ -51,9 +49,9 @@ case class PurchaseorderheaderRowUnsaved(
       Shipping cost. */
   freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(purchaseorderidDefault: => PurchaseorderheaderId, revisionnumberDefault: => Int, statusDefault: => Int, orderdateDefault: => LocalDateTime, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): PurchaseorderheaderRow =
+  def toRow(purchaseorderidDefault: => PurchaseorderheaderId, revisionnumberDefault: => Int, statusDefault: => Int, orderdateDefault: => TypoLocalDateTime, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): PurchaseorderheaderRow =
     PurchaseorderheaderRow(
       employeeid = employeeid,
       vendorid = vendorid,
@@ -94,37 +92,6 @@ case class PurchaseorderheaderRowUnsaved(
     )
 }
 object PurchaseorderheaderRowUnsaved {
-  implicit val decoder: Decoder[PurchaseorderheaderRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        employeeid <- c.downField("employeeid").as[BusinessentityId]
-        vendorid <- c.downField("vendorid").as[BusinessentityId]
-        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
-        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
-        purchaseorderid <- c.downField("purchaseorderid").as[Defaulted[PurchaseorderheaderId]]
-        revisionnumber <- c.downField("revisionnumber").as[Defaulted[Int]]
-        status <- c.downField("status").as[Defaulted[Int]]
-        orderdate <- c.downField("orderdate").as[Defaulted[LocalDateTime]]
-        subtotal <- c.downField("subtotal").as[Defaulted[BigDecimal]]
-        taxamt <- c.downField("taxamt").as[Defaulted[BigDecimal]]
-        freight <- c.downField("freight").as[Defaulted[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield PurchaseorderheaderRowUnsaved(employeeid, vendorid, shipmethodid, shipdate, purchaseorderid, revisionnumber, status, orderdate, subtotal, taxamt, freight, modifieddate)
-  implicit val encoder: Encoder[PurchaseorderheaderRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "employeeid" := row.employeeid,
-        "vendorid" := row.vendorid,
-        "shipmethodid" := row.shipmethodid,
-        "shipdate" := row.shipdate,
-        "purchaseorderid" := row.purchaseorderid,
-        "revisionnumber" := row.revisionnumber,
-        "status" := row.status,
-        "orderdate" := row.orderdate,
-        "subtotal" := row.subtotal,
-        "taxamt" := row.taxamt,
-        "freight" := row.freight,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[PurchaseorderheaderRowUnsaved] = Decoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[Int], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRowUnsaved.apply)
+  implicit val encoder: Encoder[PurchaseorderheaderRowUnsaved] = Encoder.forProduct12[PurchaseorderheaderRowUnsaved, BusinessentityId, BusinessentityId, ShipmethodId, Option[TypoLocalDateTime], Defaulted[PurchaseorderheaderId], Defaulted[Int], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.employeeid, x.vendorid, x.shipmethodid, x.shipdate, x.purchaseorderid, x.revisionnumber, x.status, x.orderdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))
 }

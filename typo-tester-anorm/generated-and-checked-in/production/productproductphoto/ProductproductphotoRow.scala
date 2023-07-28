@@ -7,17 +7,19 @@ package adventureworks
 package production
 package productproductphoto
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ProductproductphotoRow(
@@ -29,43 +31,39 @@ case class ProductproductphotoRow(
   productphotoid: ProductphotoId,
   /** 0 = Photo is not the principal image. 1 = Photo is the principal image. */
   primary: Flag,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductproductphotoId = ProductproductphotoId(productid, productphotoid)
  }
 
 object ProductproductphotoRow {
-  def rowParser(idx: Int): RowParser[ProductproductphotoRow] =
-    RowParser[ProductproductphotoRow] { row =>
-      Success(
+  implicit val reads: Reads[ProductproductphotoRow] = Reads[ProductproductphotoRow](json => JsResult.fromTry(
+      Try(
         ProductproductphotoRow(
-          productid = row[ProductId](idx + 0),
-          productphotoid = row[ProductphotoId](idx + 1),
-          primary = row[Flag](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          productid = json.\("productid").as[ProductId],
+          productphotoid = json.\("productphotoid").as[ProductphotoId],
+          primary = json.\("primary").as[Flag],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ProductproductphotoRow] = new OFormat[ProductproductphotoRow]{
-    override def writes(o: ProductproductphotoRow): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "productphotoid" -> o.productphotoid,
-        "primary" -> o.primary,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ProductproductphotoRow] = RowParser[ProductproductphotoRow] { row =>
+    Success(
+      ProductproductphotoRow(
+        productid = row[ProductId](idx + 0),
+        productphotoid = row[ProductphotoId](idx + 1),
+        primary = row[Flag](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[ProductproductphotoRow] = {
-      JsResult.fromTry(
-        Try(
-          ProductproductphotoRow(
-            productid = json.\("productid").as[ProductId],
-            productphotoid = json.\("productphotoid").as[ProductphotoId],
-            primary = json.\("primary").as[Flag],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ProductproductphotoRow] = OWrites[ProductproductphotoRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "productphotoid" -> Json.toJson(o.productphotoid),
+      "primary" -> Json.toJson(o.primary),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

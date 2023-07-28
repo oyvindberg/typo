@@ -7,15 +7,17 @@ package adventureworks
 package pg_catalog
 package pg_stat_database
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
+import scala.util.Try
 
 case class PgStatDatabaseViewRow(
   datid: Option[/* oid */ Long],
@@ -35,7 +37,7 @@ case class PgStatDatabaseViewRow(
   tempBytes: Option[Long],
   deadlocks: Option[Long],
   checksumFailures: Option[Long],
-  checksumLastFailure: Option[OffsetDateTime],
+  checksumLastFailure: Option[TypoOffsetDateTime],
   blkReadTime: Option[Double],
   blkWriteTime: Option[Double],
   sessionTime: Option[Double],
@@ -45,138 +47,140 @@ case class PgStatDatabaseViewRow(
   sessionsAbandoned: Option[Long],
   sessionsFatal: Option[Long],
   sessionsKilled: Option[Long],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatDatabaseViewRow {
-  implicit val decoder: Decoder[PgStatDatabaseViewRow] =
-    (c: HCursor) =>
-      for {
-        datid <- c.downField("datid").as[Option[/* oid */ Long]]
-        datname <- c.downField("datname").as[Option[String]]
-        numbackends <- c.downField("numbackends").as[Option[Int]]
-        xactCommit <- c.downField("xact_commit").as[Option[Long]]
-        xactRollback <- c.downField("xact_rollback").as[Option[Long]]
-        blksRead <- c.downField("blks_read").as[Option[Long]]
-        blksHit <- c.downField("blks_hit").as[Option[Long]]
-        tupReturned <- c.downField("tup_returned").as[Option[Long]]
-        tupFetched <- c.downField("tup_fetched").as[Option[Long]]
-        tupInserted <- c.downField("tup_inserted").as[Option[Long]]
-        tupUpdated <- c.downField("tup_updated").as[Option[Long]]
-        tupDeleted <- c.downField("tup_deleted").as[Option[Long]]
-        conflicts <- c.downField("conflicts").as[Option[Long]]
-        tempFiles <- c.downField("temp_files").as[Option[Long]]
-        tempBytes <- c.downField("temp_bytes").as[Option[Long]]
-        deadlocks <- c.downField("deadlocks").as[Option[Long]]
-        checksumFailures <- c.downField("checksum_failures").as[Option[Long]]
-        checksumLastFailure <- c.downField("checksum_last_failure").as[Option[OffsetDateTime]]
-        blkReadTime <- c.downField("blk_read_time").as[Option[Double]]
-        blkWriteTime <- c.downField("blk_write_time").as[Option[Double]]
-        sessionTime <- c.downField("session_time").as[Option[Double]]
-        activeTime <- c.downField("active_time").as[Option[Double]]
-        idleInTransactionTime <- c.downField("idle_in_transaction_time").as[Option[Double]]
-        sessions <- c.downField("sessions").as[Option[Long]]
-        sessionsAbandoned <- c.downField("sessions_abandoned").as[Option[Long]]
-        sessionsFatal <- c.downField("sessions_fatal").as[Option[Long]]
-        sessionsKilled <- c.downField("sessions_killed").as[Option[Long]]
-        statsReset <- c.downField("stats_reset").as[Option[OffsetDateTime]]
-      } yield PgStatDatabaseViewRow(datid, datname, numbackends, xactCommit, xactRollback, blksRead, blksHit, tupReturned, tupFetched, tupInserted, tupUpdated, tupDeleted, conflicts, tempFiles, tempBytes, deadlocks, checksumFailures, checksumLastFailure, blkReadTime, blkWriteTime, sessionTime, activeTime, idleInTransactionTime, sessions, sessionsAbandoned, sessionsFatal, sessionsKilled, statsReset)
-  implicit val encoder: Encoder[PgStatDatabaseViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "datid" := row.datid,
-        "datname" := row.datname,
-        "numbackends" := row.numbackends,
-        "xact_commit" := row.xactCommit,
-        "xact_rollback" := row.xactRollback,
-        "blks_read" := row.blksRead,
-        "blks_hit" := row.blksHit,
-        "tup_returned" := row.tupReturned,
-        "tup_fetched" := row.tupFetched,
-        "tup_inserted" := row.tupInserted,
-        "tup_updated" := row.tupUpdated,
-        "tup_deleted" := row.tupDeleted,
-        "conflicts" := row.conflicts,
-        "temp_files" := row.tempFiles,
-        "temp_bytes" := row.tempBytes,
-        "deadlocks" := row.deadlocks,
-        "checksum_failures" := row.checksumFailures,
-        "checksum_last_failure" := row.checksumLastFailure,
-        "blk_read_time" := row.blkReadTime,
-        "blk_write_time" := row.blkWriteTime,
-        "session_time" := row.sessionTime,
-        "active_time" := row.activeTime,
-        "idle_in_transaction_time" := row.idleInTransactionTime,
-        "sessions" := row.sessions,
-        "sessions_abandoned" := row.sessionsAbandoned,
-        "sessions_fatal" := row.sessionsFatal,
-        "sessions_killed" := row.sessionsKilled,
-        "stats_reset" := row.statsReset
-      )}
-  implicit val read: Read[PgStatDatabaseViewRow] =
-    new Read[PgStatDatabaseViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatDatabaseViewRow(
-        datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        datname = Get[String].unsafeGetNullable(rs, i + 1),
-        numbackends = Get[Int].unsafeGetNullable(rs, i + 2),
-        xactCommit = Get[Long].unsafeGetNullable(rs, i + 3),
-        xactRollback = Get[Long].unsafeGetNullable(rs, i + 4),
-        blksRead = Get[Long].unsafeGetNullable(rs, i + 5),
-        blksHit = Get[Long].unsafeGetNullable(rs, i + 6),
-        tupReturned = Get[Long].unsafeGetNullable(rs, i + 7),
-        tupFetched = Get[Long].unsafeGetNullable(rs, i + 8),
-        tupInserted = Get[Long].unsafeGetNullable(rs, i + 9),
-        tupUpdated = Get[Long].unsafeGetNullable(rs, i + 10),
-        tupDeleted = Get[Long].unsafeGetNullable(rs, i + 11),
-        conflicts = Get[Long].unsafeGetNullable(rs, i + 12),
-        tempFiles = Get[Long].unsafeGetNullable(rs, i + 13),
-        tempBytes = Get[Long].unsafeGetNullable(rs, i + 14),
-        deadlocks = Get[Long].unsafeGetNullable(rs, i + 15),
-        checksumFailures = Get[Long].unsafeGetNullable(rs, i + 16),
-        checksumLastFailure = Get[OffsetDateTime].unsafeGetNullable(rs, i + 17),
-        blkReadTime = Get[Double].unsafeGetNullable(rs, i + 18),
-        blkWriteTime = Get[Double].unsafeGetNullable(rs, i + 19),
-        sessionTime = Get[Double].unsafeGetNullable(rs, i + 20),
-        activeTime = Get[Double].unsafeGetNullable(rs, i + 21),
-        idleInTransactionTime = Get[Double].unsafeGetNullable(rs, i + 22),
-        sessions = Get[Long].unsafeGetNullable(rs, i + 23),
-        sessionsAbandoned = Get[Long].unsafeGetNullable(rs, i + 24),
-        sessionsFatal = Get[Long].unsafeGetNullable(rs, i + 25),
-        sessionsKilled = Get[Long].unsafeGetNullable(rs, i + 26),
-        statsReset = Get[OffsetDateTime].unsafeGetNullable(rs, i + 27)
+  implicit val decoder: Decoder[PgStatDatabaseViewRow] = Decoder.instanceTry[PgStatDatabaseViewRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      PgStatDatabaseViewRow(
+        datid = orThrow(c.get("datid")(Decoder[Option[/* oid */ Long]])),
+        datname = orThrow(c.get("datname")(Decoder[Option[String]])),
+        numbackends = orThrow(c.get("numbackends")(Decoder[Option[Int]])),
+        xactCommit = orThrow(c.get("xact_commit")(Decoder[Option[Long]])),
+        xactRollback = orThrow(c.get("xact_rollback")(Decoder[Option[Long]])),
+        blksRead = orThrow(c.get("blks_read")(Decoder[Option[Long]])),
+        blksHit = orThrow(c.get("blks_hit")(Decoder[Option[Long]])),
+        tupReturned = orThrow(c.get("tup_returned")(Decoder[Option[Long]])),
+        tupFetched = orThrow(c.get("tup_fetched")(Decoder[Option[Long]])),
+        tupInserted = orThrow(c.get("tup_inserted")(Decoder[Option[Long]])),
+        tupUpdated = orThrow(c.get("tup_updated")(Decoder[Option[Long]])),
+        tupDeleted = orThrow(c.get("tup_deleted")(Decoder[Option[Long]])),
+        conflicts = orThrow(c.get("conflicts")(Decoder[Option[Long]])),
+        tempFiles = orThrow(c.get("temp_files")(Decoder[Option[Long]])),
+        tempBytes = orThrow(c.get("temp_bytes")(Decoder[Option[Long]])),
+        deadlocks = orThrow(c.get("deadlocks")(Decoder[Option[Long]])),
+        checksumFailures = orThrow(c.get("checksum_failures")(Decoder[Option[Long]])),
+        checksumLastFailure = orThrow(c.get("checksum_last_failure")(Decoder[Option[TypoOffsetDateTime]])),
+        blkReadTime = orThrow(c.get("blk_read_time")(Decoder[Option[Double]])),
+        blkWriteTime = orThrow(c.get("blk_write_time")(Decoder[Option[Double]])),
+        sessionTime = orThrow(c.get("session_time")(Decoder[Option[Double]])),
+        activeTime = orThrow(c.get("active_time")(Decoder[Option[Double]])),
+        idleInTransactionTime = orThrow(c.get("idle_in_transaction_time")(Decoder[Option[Double]])),
+        sessions = orThrow(c.get("sessions")(Decoder[Option[Long]])),
+        sessionsAbandoned = orThrow(c.get("sessions_abandoned")(Decoder[Option[Long]])),
+        sessionsFatal = orThrow(c.get("sessions_fatal")(Decoder[Option[Long]])),
+        sessionsKilled = orThrow(c.get("sessions_killed")(Decoder[Option[Long]])),
+        statsReset = orThrow(c.get("stats_reset")(Decoder[Option[TypoOffsetDateTime]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[PgStatDatabaseViewRow] = Encoder[PgStatDatabaseViewRow](row =>
+    Json.obj(
+      "datid" -> Encoder[Option[/* oid */ Long]].apply(row.datid),
+      "datname" -> Encoder[Option[String]].apply(row.datname),
+      "numbackends" -> Encoder[Option[Int]].apply(row.numbackends),
+      "xact_commit" -> Encoder[Option[Long]].apply(row.xactCommit),
+      "xact_rollback" -> Encoder[Option[Long]].apply(row.xactRollback),
+      "blks_read" -> Encoder[Option[Long]].apply(row.blksRead),
+      "blks_hit" -> Encoder[Option[Long]].apply(row.blksHit),
+      "tup_returned" -> Encoder[Option[Long]].apply(row.tupReturned),
+      "tup_fetched" -> Encoder[Option[Long]].apply(row.tupFetched),
+      "tup_inserted" -> Encoder[Option[Long]].apply(row.tupInserted),
+      "tup_updated" -> Encoder[Option[Long]].apply(row.tupUpdated),
+      "tup_deleted" -> Encoder[Option[Long]].apply(row.tupDeleted),
+      "conflicts" -> Encoder[Option[Long]].apply(row.conflicts),
+      "temp_files" -> Encoder[Option[Long]].apply(row.tempFiles),
+      "temp_bytes" -> Encoder[Option[Long]].apply(row.tempBytes),
+      "deadlocks" -> Encoder[Option[Long]].apply(row.deadlocks),
+      "checksum_failures" -> Encoder[Option[Long]].apply(row.checksumFailures),
+      "checksum_last_failure" -> Encoder[Option[TypoOffsetDateTime]].apply(row.checksumLastFailure),
+      "blk_read_time" -> Encoder[Option[Double]].apply(row.blkReadTime),
+      "blk_write_time" -> Encoder[Option[Double]].apply(row.blkWriteTime),
+      "session_time" -> Encoder[Option[Double]].apply(row.sessionTime),
+      "active_time" -> Encoder[Option[Double]].apply(row.activeTime),
+      "idle_in_transaction_time" -> Encoder[Option[Double]].apply(row.idleInTransactionTime),
+      "sessions" -> Encoder[Option[Long]].apply(row.sessions),
+      "sessions_abandoned" -> Encoder[Option[Long]].apply(row.sessionsAbandoned),
+      "sessions_fatal" -> Encoder[Option[Long]].apply(row.sessionsFatal),
+      "sessions_killed" -> Encoder[Option[Long]].apply(row.sessionsKilled),
+      "stats_reset" -> Encoder[Option[TypoOffsetDateTime]].apply(row.statsReset)
     )
-  
-
+  )
+  implicit val read: Read[PgStatDatabaseViewRow] = new Read[PgStatDatabaseViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatDatabaseViewRow(
+      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      datname = Get[String].unsafeGetNullable(rs, i + 1),
+      numbackends = Get[Int].unsafeGetNullable(rs, i + 2),
+      xactCommit = Get[Long].unsafeGetNullable(rs, i + 3),
+      xactRollback = Get[Long].unsafeGetNullable(rs, i + 4),
+      blksRead = Get[Long].unsafeGetNullable(rs, i + 5),
+      blksHit = Get[Long].unsafeGetNullable(rs, i + 6),
+      tupReturned = Get[Long].unsafeGetNullable(rs, i + 7),
+      tupFetched = Get[Long].unsafeGetNullable(rs, i + 8),
+      tupInserted = Get[Long].unsafeGetNullable(rs, i + 9),
+      tupUpdated = Get[Long].unsafeGetNullable(rs, i + 10),
+      tupDeleted = Get[Long].unsafeGetNullable(rs, i + 11),
+      conflicts = Get[Long].unsafeGetNullable(rs, i + 12),
+      tempFiles = Get[Long].unsafeGetNullable(rs, i + 13),
+      tempBytes = Get[Long].unsafeGetNullable(rs, i + 14),
+      deadlocks = Get[Long].unsafeGetNullable(rs, i + 15),
+      checksumFailures = Get[Long].unsafeGetNullable(rs, i + 16),
+      checksumLastFailure = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 17),
+      blkReadTime = Get[Double].unsafeGetNullable(rs, i + 18),
+      blkWriteTime = Get[Double].unsafeGetNullable(rs, i + 19),
+      sessionTime = Get[Double].unsafeGetNullable(rs, i + 20),
+      activeTime = Get[Double].unsafeGetNullable(rs, i + 21),
+      idleInTransactionTime = Get[Double].unsafeGetNullable(rs, i + 22),
+      sessions = Get[Long].unsafeGetNullable(rs, i + 23),
+      sessionsAbandoned = Get[Long].unsafeGetNullable(rs, i + 24),
+      sessionsFatal = Get[Long].unsafeGetNullable(rs, i + 25),
+      sessionsKilled = Get[Long].unsafeGetNullable(rs, i + 26),
+      statsReset = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 27)
+    )
+  )
 }

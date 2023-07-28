@@ -7,18 +7,19 @@ package adventureworks
 package production
 package workorder
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.workorder` */
 case class WorkorderId(value: Int) extends AnyVal
 object WorkorderId {
+  implicit val arrayGet: Get[Array[WorkorderId]] = Get[Array[Int]].map(_.map(WorkorderId.apply))
+  implicit val arrayPut: Put[Array[WorkorderId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[WorkorderId] = Decoder[Int].map(WorkorderId.apply)
+  implicit val encoder: Encoder[WorkorderId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[WorkorderId] = Get[Int].map(WorkorderId.apply)
   implicit val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[WorkorderId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[WorkorderId] =
-    Decoder[Int].map(WorkorderId(_))
-  implicit val meta: Meta[WorkorderId] = Meta[Int].imap(WorkorderId.apply)(_.value)
-  implicit val metaArray: Meta[Array[WorkorderId]] = Meta[Array[Int]].imap(_.map(WorkorderId.apply))(_.map(_.value))
+  implicit val put: Put[WorkorderId] = Put[Int].contramap(_.value)
 }

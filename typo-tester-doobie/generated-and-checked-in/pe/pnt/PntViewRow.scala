@@ -7,17 +7,15 @@ package adventureworks
 package pe
 package pnt
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PntViewRow(
   id: Option[Int],
@@ -26,42 +24,24 @@ case class PntViewRow(
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.name]] */
   name: Option[Name],
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PntViewRow {
-  implicit val decoder: Decoder[PntViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        phonenumbertypeid <- c.downField("phonenumbertypeid").as[Option[PhonenumbertypeId]]
-        name <- c.downField("name").as[Option[Name]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PntViewRow(id, phonenumbertypeid, name, modifieddate)
-  implicit val encoder: Encoder[PntViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "phonenumbertypeid" := row.phonenumbertypeid,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PntViewRow] =
-    new Read[PntViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[PhonenumbertypeId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PntViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PntViewRow] = Decoder.forProduct4[PntViewRow, Option[Int], Option[PhonenumbertypeId], Option[Name], Option[TypoLocalDateTime]]("id", "phonenumbertypeid", "name", "modifieddate")(PntViewRow.apply)
+  implicit val encoder: Encoder[PntViewRow] = Encoder.forProduct4[PntViewRow, Option[Int], Option[PhonenumbertypeId], Option[Name], Option[TypoLocalDateTime]]("id", "phonenumbertypeid", "name", "modifieddate")(x => (x.id, x.phonenumbertypeid, x.name, x.modifieddate))
+  implicit val read: Read[PntViewRow] = new Read[PntViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[PhonenumbertypeId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PntViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

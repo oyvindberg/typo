@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object BeViewRepoImpl extends BeViewRepo {
   override def selectAll(implicit c: Connection): List[BeViewRow] = {
-    SQL"""select "id", businessentityid, rowguid, modifieddate
+    SQL"""select "id", businessentityid, rowguid, modifieddate::text
           from pe.be
        """.as(BeViewRow.rowParser(1).*)
   }

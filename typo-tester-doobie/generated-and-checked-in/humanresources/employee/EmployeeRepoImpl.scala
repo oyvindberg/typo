@@ -8,23 +8,23 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object EmployeeRepoImpl extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.employee where businessentityid = $businessentityid".update.run.map(_ > 0)
+    sql"delete from humanresources.employee where businessentityid = ${businessentityid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
           values (${unsaved.businessentityid}::int4, ${unsaved.nationalidnumber}, ${unsaved.loginid}, ${unsaved.jobtitle}, ${unsaved.birthdate}::date, ${unsaved.maritalstatus}::bpchar, ${unsaved.gender}::bpchar, ${unsaved.hiredate}::date, ${unsaved.salariedflag}::"public"."Flag", ${unsaved.vacationhours}::int2, ${unsaved.sickleavehours}::int2, ${unsaved.currentflag}::"public"."Flag", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.organizationnode})
-          returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+          returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
        """.query[EmployeeRow].unique
   }
   override def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow] = {
@@ -59,7 +59,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       },
       unsaved.organizationnode match {
         case Defaulted.UseDefault => None
@@ -69,26 +69,26 @@ object EmployeeRepoImpl extends EmployeeRepo {
     
     val q = if (fs.isEmpty) {
       sql"""insert into humanresources.employee default values
-            returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+            returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.employee(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+            returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
          """
     }
     q.query[EmployeeRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
-    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee".query[EmployeeRow].stream
+    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee".query[EmployeeRow].stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]] = {
-    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid".query[EmployeeRow].option
+    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ${businessentityid}".query[EmployeeRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, EmployeeRow] = {
-    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = ANY($businessentityids)".query[EmployeeRow].stream
+    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ANY(${businessentityids})".query[EmployeeRow].stream
   }
   override def update(row: EmployeeRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -107,7 +107,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp,
               organizationnode = ${row.organizationnode}
-          where businessentityid = $businessentityid
+          where businessentityid = ${businessentityid}
        """
       .update
       .run
@@ -148,7 +148,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate,
             organizationnode = EXCLUDED.organizationnode
-          returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+          returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
        """.query[EmployeeRow].unique
   }
 }

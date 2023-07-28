@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def delete(stxoid: PgStatisticExtDataId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_statistic_ext_data where stxoid = $stxoid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_statistic_ext_data where stxoid = ${stxoid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgStatisticExtDataRow): ConnectionIO[PgStatisticExtDataRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)
@@ -25,10 +25,10 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
     sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data".query[PgStatisticExtDataRow].stream
   }
   override def selectById(stxoid: PgStatisticExtDataId): ConnectionIO[Option[PgStatisticExtDataRow]] = {
-    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = $stxoid".query[PgStatisticExtDataRow].option
+    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = ${stxoid}".query[PgStatisticExtDataRow].option
   }
   override def selectByIds(stxoids: Array[PgStatisticExtDataId]): Stream[ConnectionIO, PgStatisticExtDataRow] = {
-    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = ANY($stxoids)".query[PgStatisticExtDataRow].stream
+    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = ANY(${stxoids})".query[PgStatisticExtDataRow].stream
   }
   override def update(row: PgStatisticExtDataRow): ConnectionIO[Boolean] = {
     val stxoid = row.stxoid
@@ -37,7 +37,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
               stxddependencies = ${row.stxddependencies},
               stxdmcv = ${row.stxdmcv},
               stxdexpr = ${row.stxdexpr}
-          where stxoid = $stxoid
+          where stxoid = ${stxoid}
        """
       .update
       .run

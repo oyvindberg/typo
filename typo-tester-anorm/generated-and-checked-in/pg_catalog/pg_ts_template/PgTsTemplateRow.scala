@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTsTemplateRow(
@@ -26,40 +28,36 @@ case class PgTsTemplateRow(
 )
 
 object PgTsTemplateRow {
-  def rowParser(idx: Int): RowParser[PgTsTemplateRow] =
-    RowParser[PgTsTemplateRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTsTemplateRow] = Reads[PgTsTemplateRow](json => JsResult.fromTry(
+      Try(
         PgTsTemplateRow(
-          oid = row[PgTsTemplateId](idx + 0),
-          tmplname = row[String](idx + 1),
-          tmplnamespace = row[/* oid */ Long](idx + 2),
-          tmplinit = row[TypoRegproc](idx + 3),
-          tmpllexize = row[TypoRegproc](idx + 4)
+          oid = json.\("oid").as[PgTsTemplateId],
+          tmplname = json.\("tmplname").as[String],
+          tmplnamespace = json.\("tmplnamespace").as[/* oid */ Long],
+          tmplinit = json.\("tmplinit").as[TypoRegproc],
+          tmpllexize = json.\("tmpllexize").as[TypoRegproc]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTsTemplateRow] = new OFormat[PgTsTemplateRow]{
-    override def writes(o: PgTsTemplateRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "tmplname" -> o.tmplname,
-        "tmplnamespace" -> o.tmplnamespace,
-        "tmplinit" -> o.tmplinit,
-        "tmpllexize" -> o.tmpllexize
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTsTemplateRow] = RowParser[PgTsTemplateRow] { row =>
+    Success(
+      PgTsTemplateRow(
+        oid = row[PgTsTemplateId](idx + 0),
+        tmplname = row[String](idx + 1),
+        tmplnamespace = row[/* oid */ Long](idx + 2),
+        tmplinit = row[TypoRegproc](idx + 3),
+        tmpllexize = row[TypoRegproc](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTsTemplateRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTsTemplateRow(
-            oid = json.\("oid").as[PgTsTemplateId],
-            tmplname = json.\("tmplname").as[String],
-            tmplnamespace = json.\("tmplnamespace").as[/* oid */ Long],
-            tmplinit = json.\("tmplinit").as[TypoRegproc],
-            tmpllexize = json.\("tmpllexize").as[TypoRegproc]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTsTemplateRow] = OWrites[PgTsTemplateRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "tmplname" -> Json.toJson(o.tmplname),
+      "tmplnamespace" -> Json.toJson(o.tmplnamespace),
+      "tmplinit" -> Json.toJson(o.tmplinit),
+      "tmpllexize" -> Json.toJson(o.tmpllexize)
+    ))
+  )
 }

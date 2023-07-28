@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TablePrivilegesViewRow(
@@ -31,49 +33,45 @@ case class TablePrivilegesViewRow(
 )
 
 object TablePrivilegesViewRow {
-  def rowParser(idx: Int): RowParser[TablePrivilegesViewRow] =
-    RowParser[TablePrivilegesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[TablePrivilegesViewRow] = Reads[TablePrivilegesViewRow](json => JsResult.fromTry(
+      Try(
         TablePrivilegesViewRow(
-          grantor = row[Option[SqlIdentifier]](idx + 0),
-          grantee = row[Option[SqlIdentifier]](idx + 1),
-          tableCatalog = row[Option[SqlIdentifier]](idx + 2),
-          tableSchema = row[Option[SqlIdentifier]](idx + 3),
-          tableName = row[Option[SqlIdentifier]](idx + 4),
-          privilegeType = row[Option[CharacterData]](idx + 5),
-          isGrantable = row[Option[YesOrNo]](idx + 6),
-          withHierarchy = row[Option[YesOrNo]](idx + 7)
+          grantor = json.\("grantor").toOption.map(_.as[SqlIdentifier]),
+          grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          privilegeType = json.\("privilege_type").toOption.map(_.as[CharacterData]),
+          isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo]),
+          withHierarchy = json.\("with_hierarchy").toOption.map(_.as[YesOrNo])
         )
       )
-    }
-  implicit val oFormat: OFormat[TablePrivilegesViewRow] = new OFormat[TablePrivilegesViewRow]{
-    override def writes(o: TablePrivilegesViewRow): JsObject =
-      Json.obj(
-        "grantor" -> o.grantor,
-        "grantee" -> o.grantee,
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "privilege_type" -> o.privilegeType,
-        "is_grantable" -> o.isGrantable,
-        "with_hierarchy" -> o.withHierarchy
+    ),
+  )
+  def rowParser(idx: Int): RowParser[TablePrivilegesViewRow] = RowParser[TablePrivilegesViewRow] { row =>
+    Success(
+      TablePrivilegesViewRow(
+        grantor = row[Option[SqlIdentifier]](idx + 0),
+        grantee = row[Option[SqlIdentifier]](idx + 1),
+        tableCatalog = row[Option[SqlIdentifier]](idx + 2),
+        tableSchema = row[Option[SqlIdentifier]](idx + 3),
+        tableName = row[Option[SqlIdentifier]](idx + 4),
+        privilegeType = row[Option[CharacterData]](idx + 5),
+        isGrantable = row[Option[YesOrNo]](idx + 6),
+        withHierarchy = row[Option[YesOrNo]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[TablePrivilegesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          TablePrivilegesViewRow(
-            grantor = json.\("grantor").toOption.map(_.as[SqlIdentifier]),
-            grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            privilegeType = json.\("privilege_type").toOption.map(_.as[CharacterData]),
-            isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo]),
-            withHierarchy = json.\("with_hierarchy").toOption.map(_.as[YesOrNo])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[TablePrivilegesViewRow] = OWrites[TablePrivilegesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "grantor" -> Json.toJson(o.grantor),
+      "grantee" -> Json.toJson(o.grantee),
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "privilege_type" -> Json.toJson(o.privilegeType),
+      "is_grantable" -> Json.toJson(o.isGrantable),
+      "with_hierarchy" -> Json.toJson(o.withHierarchy)
+    ))
+  )
 }

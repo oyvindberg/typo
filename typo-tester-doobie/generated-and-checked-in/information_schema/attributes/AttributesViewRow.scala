@@ -11,14 +11,16 @@ import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import scala.util.Try
 
 case class AttributesViewRow(
   udtCatalog: Option[SqlIdentifier],
@@ -55,146 +57,148 @@ case class AttributesViewRow(
 )
 
 object AttributesViewRow {
-  implicit val decoder: Decoder[AttributesViewRow] =
-    (c: HCursor) =>
-      for {
-        udtCatalog <- c.downField("udt_catalog").as[Option[SqlIdentifier]]
-        udtSchema <- c.downField("udt_schema").as[Option[SqlIdentifier]]
-        udtName <- c.downField("udt_name").as[Option[SqlIdentifier]]
-        attributeName <- c.downField("attribute_name").as[Option[SqlIdentifier]]
-        ordinalPosition <- c.downField("ordinal_position").as[Option[CardinalNumber]]
-        attributeDefault <- c.downField("attribute_default").as[Option[CharacterData]]
-        isNullable <- c.downField("is_nullable").as[Option[YesOrNo]]
-        dataType <- c.downField("data_type").as[Option[CharacterData]]
-        characterMaximumLength <- c.downField("character_maximum_length").as[Option[CardinalNumber]]
-        characterOctetLength <- c.downField("character_octet_length").as[Option[CardinalNumber]]
-        characterSetCatalog <- c.downField("character_set_catalog").as[Option[SqlIdentifier]]
-        characterSetSchema <- c.downField("character_set_schema").as[Option[SqlIdentifier]]
-        characterSetName <- c.downField("character_set_name").as[Option[SqlIdentifier]]
-        collationCatalog <- c.downField("collation_catalog").as[Option[SqlIdentifier]]
-        collationSchema <- c.downField("collation_schema").as[Option[SqlIdentifier]]
-        collationName <- c.downField("collation_name").as[Option[SqlIdentifier]]
-        numericPrecision <- c.downField("numeric_precision").as[Option[CardinalNumber]]
-        numericPrecisionRadix <- c.downField("numeric_precision_radix").as[Option[CardinalNumber]]
-        numericScale <- c.downField("numeric_scale").as[Option[CardinalNumber]]
-        datetimePrecision <- c.downField("datetime_precision").as[Option[CardinalNumber]]
-        intervalType <- c.downField("interval_type").as[Option[CharacterData]]
-        intervalPrecision <- c.downField("interval_precision").as[Option[CardinalNumber]]
-        attributeUdtCatalog <- c.downField("attribute_udt_catalog").as[Option[SqlIdentifier]]
-        attributeUdtSchema <- c.downField("attribute_udt_schema").as[Option[SqlIdentifier]]
-        attributeUdtName <- c.downField("attribute_udt_name").as[Option[SqlIdentifier]]
-        scopeCatalog <- c.downField("scope_catalog").as[Option[SqlIdentifier]]
-        scopeSchema <- c.downField("scope_schema").as[Option[SqlIdentifier]]
-        scopeName <- c.downField("scope_name").as[Option[SqlIdentifier]]
-        maximumCardinality <- c.downField("maximum_cardinality").as[Option[CardinalNumber]]
-        dtdIdentifier <- c.downField("dtd_identifier").as[Option[SqlIdentifier]]
-        isDerivedReferenceAttribute <- c.downField("is_derived_reference_attribute").as[Option[YesOrNo]]
-      } yield AttributesViewRow(udtCatalog, udtSchema, udtName, attributeName, ordinalPosition, attributeDefault, isNullable, dataType, characterMaximumLength, characterOctetLength, characterSetCatalog, characterSetSchema, characterSetName, collationCatalog, collationSchema, collationName, numericPrecision, numericPrecisionRadix, numericScale, datetimePrecision, intervalType, intervalPrecision, attributeUdtCatalog, attributeUdtSchema, attributeUdtName, scopeCatalog, scopeSchema, scopeName, maximumCardinality, dtdIdentifier, isDerivedReferenceAttribute)
-  implicit val encoder: Encoder[AttributesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "udt_catalog" := row.udtCatalog,
-        "udt_schema" := row.udtSchema,
-        "udt_name" := row.udtName,
-        "attribute_name" := row.attributeName,
-        "ordinal_position" := row.ordinalPosition,
-        "attribute_default" := row.attributeDefault,
-        "is_nullable" := row.isNullable,
-        "data_type" := row.dataType,
-        "character_maximum_length" := row.characterMaximumLength,
-        "character_octet_length" := row.characterOctetLength,
-        "character_set_catalog" := row.characterSetCatalog,
-        "character_set_schema" := row.characterSetSchema,
-        "character_set_name" := row.characterSetName,
-        "collation_catalog" := row.collationCatalog,
-        "collation_schema" := row.collationSchema,
-        "collation_name" := row.collationName,
-        "numeric_precision" := row.numericPrecision,
-        "numeric_precision_radix" := row.numericPrecisionRadix,
-        "numeric_scale" := row.numericScale,
-        "datetime_precision" := row.datetimePrecision,
-        "interval_type" := row.intervalType,
-        "interval_precision" := row.intervalPrecision,
-        "attribute_udt_catalog" := row.attributeUdtCatalog,
-        "attribute_udt_schema" := row.attributeUdtSchema,
-        "attribute_udt_name" := row.attributeUdtName,
-        "scope_catalog" := row.scopeCatalog,
-        "scope_schema" := row.scopeSchema,
-        "scope_name" := row.scopeName,
-        "maximum_cardinality" := row.maximumCardinality,
-        "dtd_identifier" := row.dtdIdentifier,
-        "is_derived_reference_attribute" := row.isDerivedReferenceAttribute
-      )}
-  implicit val read: Read[AttributesViewRow] =
-    new Read[AttributesViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => AttributesViewRow(
-        udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        attributeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        ordinalPosition = Get[CardinalNumber].unsafeGetNullable(rs, i + 4),
-        attributeDefault = Get[CharacterData].unsafeGetNullable(rs, i + 5),
-        isNullable = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
-        dataType = Get[CharacterData].unsafeGetNullable(rs, i + 7),
-        characterMaximumLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 8),
-        characterOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 9),
-        characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 10),
-        characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 11),
-        characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 12),
-        collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 13),
-        collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 14),
-        collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 15),
-        numericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 16),
-        numericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 17),
-        numericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 18),
-        datetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 19),
-        intervalType = Get[CharacterData].unsafeGetNullable(rs, i + 20),
-        intervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 21),
-        attributeUdtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 22),
-        attributeUdtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 23),
-        attributeUdtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 24),
-        scopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 25),
-        scopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 26),
-        scopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 27),
-        maximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 28),
-        dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 29),
-        isDerivedReferenceAttribute = Get[YesOrNo].unsafeGetNullable(rs, i + 30)
+  implicit val decoder: Decoder[AttributesViewRow] = Decoder.instanceTry[AttributesViewRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      AttributesViewRow(
+        udtCatalog = orThrow(c.get("udt_catalog")(Decoder[Option[SqlIdentifier]])),
+        udtSchema = orThrow(c.get("udt_schema")(Decoder[Option[SqlIdentifier]])),
+        udtName = orThrow(c.get("udt_name")(Decoder[Option[SqlIdentifier]])),
+        attributeName = orThrow(c.get("attribute_name")(Decoder[Option[SqlIdentifier]])),
+        ordinalPosition = orThrow(c.get("ordinal_position")(Decoder[Option[CardinalNumber]])),
+        attributeDefault = orThrow(c.get("attribute_default")(Decoder[Option[CharacterData]])),
+        isNullable = orThrow(c.get("is_nullable")(Decoder[Option[YesOrNo]])),
+        dataType = orThrow(c.get("data_type")(Decoder[Option[CharacterData]])),
+        characterMaximumLength = orThrow(c.get("character_maximum_length")(Decoder[Option[CardinalNumber]])),
+        characterOctetLength = orThrow(c.get("character_octet_length")(Decoder[Option[CardinalNumber]])),
+        characterSetCatalog = orThrow(c.get("character_set_catalog")(Decoder[Option[SqlIdentifier]])),
+        characterSetSchema = orThrow(c.get("character_set_schema")(Decoder[Option[SqlIdentifier]])),
+        characterSetName = orThrow(c.get("character_set_name")(Decoder[Option[SqlIdentifier]])),
+        collationCatalog = orThrow(c.get("collation_catalog")(Decoder[Option[SqlIdentifier]])),
+        collationSchema = orThrow(c.get("collation_schema")(Decoder[Option[SqlIdentifier]])),
+        collationName = orThrow(c.get("collation_name")(Decoder[Option[SqlIdentifier]])),
+        numericPrecision = orThrow(c.get("numeric_precision")(Decoder[Option[CardinalNumber]])),
+        numericPrecisionRadix = orThrow(c.get("numeric_precision_radix")(Decoder[Option[CardinalNumber]])),
+        numericScale = orThrow(c.get("numeric_scale")(Decoder[Option[CardinalNumber]])),
+        datetimePrecision = orThrow(c.get("datetime_precision")(Decoder[Option[CardinalNumber]])),
+        intervalType = orThrow(c.get("interval_type")(Decoder[Option[CharacterData]])),
+        intervalPrecision = orThrow(c.get("interval_precision")(Decoder[Option[CardinalNumber]])),
+        attributeUdtCatalog = orThrow(c.get("attribute_udt_catalog")(Decoder[Option[SqlIdentifier]])),
+        attributeUdtSchema = orThrow(c.get("attribute_udt_schema")(Decoder[Option[SqlIdentifier]])),
+        attributeUdtName = orThrow(c.get("attribute_udt_name")(Decoder[Option[SqlIdentifier]])),
+        scopeCatalog = orThrow(c.get("scope_catalog")(Decoder[Option[SqlIdentifier]])),
+        scopeSchema = orThrow(c.get("scope_schema")(Decoder[Option[SqlIdentifier]])),
+        scopeName = orThrow(c.get("scope_name")(Decoder[Option[SqlIdentifier]])),
+        maximumCardinality = orThrow(c.get("maximum_cardinality")(Decoder[Option[CardinalNumber]])),
+        dtdIdentifier = orThrow(c.get("dtd_identifier")(Decoder[Option[SqlIdentifier]])),
+        isDerivedReferenceAttribute = orThrow(c.get("is_derived_reference_attribute")(Decoder[Option[YesOrNo]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[AttributesViewRow] = Encoder[AttributesViewRow](row =>
+    Json.obj(
+      "udt_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.udtCatalog),
+      "udt_schema" -> Encoder[Option[SqlIdentifier]].apply(row.udtSchema),
+      "udt_name" -> Encoder[Option[SqlIdentifier]].apply(row.udtName),
+      "attribute_name" -> Encoder[Option[SqlIdentifier]].apply(row.attributeName),
+      "ordinal_position" -> Encoder[Option[CardinalNumber]].apply(row.ordinalPosition),
+      "attribute_default" -> Encoder[Option[CharacterData]].apply(row.attributeDefault),
+      "is_nullable" -> Encoder[Option[YesOrNo]].apply(row.isNullable),
+      "data_type" -> Encoder[Option[CharacterData]].apply(row.dataType),
+      "character_maximum_length" -> Encoder[Option[CardinalNumber]].apply(row.characterMaximumLength),
+      "character_octet_length" -> Encoder[Option[CardinalNumber]].apply(row.characterOctetLength),
+      "character_set_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetCatalog),
+      "character_set_schema" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetSchema),
+      "character_set_name" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetName),
+      "collation_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.collationCatalog),
+      "collation_schema" -> Encoder[Option[SqlIdentifier]].apply(row.collationSchema),
+      "collation_name" -> Encoder[Option[SqlIdentifier]].apply(row.collationName),
+      "numeric_precision" -> Encoder[Option[CardinalNumber]].apply(row.numericPrecision),
+      "numeric_precision_radix" -> Encoder[Option[CardinalNumber]].apply(row.numericPrecisionRadix),
+      "numeric_scale" -> Encoder[Option[CardinalNumber]].apply(row.numericScale),
+      "datetime_precision" -> Encoder[Option[CardinalNumber]].apply(row.datetimePrecision),
+      "interval_type" -> Encoder[Option[CharacterData]].apply(row.intervalType),
+      "interval_precision" -> Encoder[Option[CardinalNumber]].apply(row.intervalPrecision),
+      "attribute_udt_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.attributeUdtCatalog),
+      "attribute_udt_schema" -> Encoder[Option[SqlIdentifier]].apply(row.attributeUdtSchema),
+      "attribute_udt_name" -> Encoder[Option[SqlIdentifier]].apply(row.attributeUdtName),
+      "scope_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.scopeCatalog),
+      "scope_schema" -> Encoder[Option[SqlIdentifier]].apply(row.scopeSchema),
+      "scope_name" -> Encoder[Option[SqlIdentifier]].apply(row.scopeName),
+      "maximum_cardinality" -> Encoder[Option[CardinalNumber]].apply(row.maximumCardinality),
+      "dtd_identifier" -> Encoder[Option[SqlIdentifier]].apply(row.dtdIdentifier),
+      "is_derived_reference_attribute" -> Encoder[Option[YesOrNo]].apply(row.isDerivedReferenceAttribute)
     )
-  
-
+  )
+  implicit val read: Read[AttributesViewRow] = new Read[AttributesViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => AttributesViewRow(
+      udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      attributeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      ordinalPosition = Get[CardinalNumber].unsafeGetNullable(rs, i + 4),
+      attributeDefault = Get[CharacterData].unsafeGetNullable(rs, i + 5),
+      isNullable = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
+      dataType = Get[CharacterData].unsafeGetNullable(rs, i + 7),
+      characterMaximumLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 8),
+      characterOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 9),
+      characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 10),
+      characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 11),
+      characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 12),
+      collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 13),
+      collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 14),
+      collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 15),
+      numericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 16),
+      numericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 17),
+      numericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 18),
+      datetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 19),
+      intervalType = Get[CharacterData].unsafeGetNullable(rs, i + 20),
+      intervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 21),
+      attributeUdtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 22),
+      attributeUdtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 23),
+      attributeUdtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 24),
+      scopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 25),
+      scopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 26),
+      scopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 27),
+      maximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 28),
+      dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 29),
+      isDerivedReferenceAttribute = Get[YesOrNo].unsafeGetNullable(rs, i + 30)
+    )
+  )
 }

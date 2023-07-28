@@ -8,11 +8,11 @@ package production
 package productmodelillustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.illustrationid}::int4, ${unsaved.modifieddate}::timestamp)
-          returning productmodelid, illustrationid, modifieddate
+          returning productmodelid, illustrationid, modifieddate::text
        """
       .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
   
@@ -32,19 +32,19 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
       Some((NamedParameter("illustrationid", ParameterValue.from(unsaved.illustrationid)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productmodelillustration default values
-            returning productmodelid, illustrationid, modifieddate
+            returning productmodelid, illustrationid, modifieddate::text
          """
         .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productmodelillustration(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productmodelid, illustrationid, modifieddate
+                  returning productmodelid, illustrationid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -55,12 +55,12 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate
+    SQL"""select productmodelid, illustrationid, modifieddate::text
           from production.productmodelillustration
        """.as(ProductmodelillustrationRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow] = {
-    SQL"""select productmodelid, illustrationid, modifieddate
+    SQL"""select productmodelid, illustrationid, modifieddate::text
           from production.productmodelillustration
           where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
        """.as(ProductmodelillustrationRow.rowParser(1).singleOpt)
@@ -82,7 +82,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           on conflict (productmodelid, illustrationid)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning productmodelid, illustrationid, modifieddate
+          returning productmodelid, illustrationid, modifieddate::text
        """
       .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
   

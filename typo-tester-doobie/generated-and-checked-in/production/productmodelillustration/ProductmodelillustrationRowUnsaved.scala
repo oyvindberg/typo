@@ -8,13 +8,11 @@ package production
 package productmodelillustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productmodelillustration` which has not been persisted yet */
 case class ProductmodelillustrationRowUnsaved(
@@ -25,9 +23,9 @@ case class ProductmodelillustrationRowUnsaved(
       Points to [[illustration.IllustrationRow.illustrationid]] */
   illustrationid: IllustrationId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): ProductmodelillustrationRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductmodelillustrationRow =
     ProductmodelillustrationRow(
       productmodelid = productmodelid,
       illustrationid = illustrationid,
@@ -38,19 +36,6 @@ case class ProductmodelillustrationRowUnsaved(
     )
 }
 object ProductmodelillustrationRowUnsaved {
-  implicit val decoder: Decoder[ProductmodelillustrationRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
-        illustrationid <- c.downField("illustrationid").as[IllustrationId]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductmodelillustrationRowUnsaved(productmodelid, illustrationid, modifieddate)
-  implicit val encoder: Encoder[ProductmodelillustrationRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "illustrationid" := row.illustrationid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductmodelillustrationRowUnsaved] = Decoder.forProduct3[ProductmodelillustrationRowUnsaved, ProductmodelId, IllustrationId, Defaulted[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(ProductmodelillustrationRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductmodelillustrationRowUnsaved] = Encoder.forProduct3[ProductmodelillustrationRowUnsaved, ProductmodelId, IllustrationId, Defaulted[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))
 }

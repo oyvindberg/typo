@@ -8,13 +8,11 @@ package production
 package productinventory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `production.productinventory` which has not been persisted yet */
@@ -35,9 +33,9 @@ case class ProductinventoryRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(quantityDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductinventoryRow =
+  def toRow(quantityDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductinventoryRow =
     ProductinventoryRow(
       productid = productid,
       locationid = locationid,
@@ -58,27 +56,6 @@ case class ProductinventoryRowUnsaved(
     )
 }
 object ProductinventoryRowUnsaved {
-  implicit val decoder: Decoder[ProductinventoryRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        locationid <- c.downField("locationid").as[LocationId]
-        shelf <- c.downField("shelf").as[/* max 10 chars */ String]
-        bin <- c.downField("bin").as[Int]
-        quantity <- c.downField("quantity").as[Defaulted[Int]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductinventoryRowUnsaved(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
-  implicit val encoder: Encoder[ProductinventoryRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "locationid" := row.locationid,
-        "shelf" := row.shelf,
-        "bin" := row.bin,
-        "quantity" := row.quantity,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductinventoryRowUnsaved] = Decoder.forProduct7[ProductinventoryRowUnsaved, ProductId, LocationId, /* max 10 chars */ String, Int, Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(ProductinventoryRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductinventoryRowUnsaved] = Encoder.forProduct7[ProductinventoryRowUnsaved, ProductId, LocationId, /* max 10 chars */ String, Int, Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))
 }

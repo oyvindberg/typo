@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgAmRepoImpl extends PgAmRepo {
   override def delete(oid: PgAmId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_am where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_am where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAmRow): ConnectionIO[PgAmRow] = {
     sql"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)
@@ -25,10 +25,10 @@ object PgAmRepoImpl extends PgAmRepo {
     sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am".query[PgAmRow].stream
   }
   override def selectById(oid: PgAmId): ConnectionIO[Option[PgAmRow]] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = $oid".query[PgAmRow].option
+    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ${oid}".query[PgAmRow].option
   }
   override def selectByIds(oids: Array[PgAmId]): Stream[ConnectionIO, PgAmRow] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY($oids)".query[PgAmRow].stream
+    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY(${oids})".query[PgAmRow].stream
   }
   override def update(row: PgAmRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -36,7 +36,7 @@ object PgAmRepoImpl extends PgAmRepo {
           set amname = ${row.amname}::name,
               amhandler = ${row.amhandler}::regproc,
               amtype = ${row.amtype}::char
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

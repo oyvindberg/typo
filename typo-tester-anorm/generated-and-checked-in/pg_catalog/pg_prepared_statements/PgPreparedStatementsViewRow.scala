@@ -7,21 +7,23 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
+import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoRegtype
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPreparedStatementsViewRow(
   name: Option[String],
   statement: Option[String],
-  prepareTime: Option[OffsetDateTime],
+  prepareTime: Option[TypoOffsetDateTime],
   parameterTypes: Option[Array[TypoRegtype]],
   fromSql: Option[Boolean],
   genericPlans: Option[Long],
@@ -29,46 +31,42 @@ case class PgPreparedStatementsViewRow(
 )
 
 object PgPreparedStatementsViewRow {
-  def rowParser(idx: Int): RowParser[PgPreparedStatementsViewRow] =
-    RowParser[PgPreparedStatementsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPreparedStatementsViewRow] = Reads[PgPreparedStatementsViewRow](json => JsResult.fromTry(
+      Try(
         PgPreparedStatementsViewRow(
-          name = row[Option[String]](idx + 0),
-          statement = row[Option[String]](idx + 1),
-          prepareTime = row[Option[OffsetDateTime]](idx + 2),
-          parameterTypes = row[Option[Array[TypoRegtype]]](idx + 3),
-          fromSql = row[Option[Boolean]](idx + 4),
-          genericPlans = row[Option[Long]](idx + 5),
-          customPlans = row[Option[Long]](idx + 6)
+          name = json.\("name").toOption.map(_.as[String]),
+          statement = json.\("statement").toOption.map(_.as[String]),
+          prepareTime = json.\("prepare_time").toOption.map(_.as[TypoOffsetDateTime]),
+          parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[TypoRegtype]]),
+          fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
+          genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
+          customPlans = json.\("custom_plans").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPreparedStatementsViewRow] = new OFormat[PgPreparedStatementsViewRow]{
-    override def writes(o: PgPreparedStatementsViewRow): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "statement" -> o.statement,
-        "prepare_time" -> o.prepareTime,
-        "parameter_types" -> o.parameterTypes,
-        "from_sql" -> o.fromSql,
-        "generic_plans" -> o.genericPlans,
-        "custom_plans" -> o.customPlans
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPreparedStatementsViewRow] = RowParser[PgPreparedStatementsViewRow] { row =>
+    Success(
+      PgPreparedStatementsViewRow(
+        name = row[Option[String]](idx + 0),
+        statement = row[Option[String]](idx + 1),
+        prepareTime = row[Option[TypoOffsetDateTime]](idx + 2),
+        parameterTypes = row[Option[Array[TypoRegtype]]](idx + 3),
+        fromSql = row[Option[Boolean]](idx + 4),
+        genericPlans = row[Option[Long]](idx + 5),
+        customPlans = row[Option[Long]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPreparedStatementsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPreparedStatementsViewRow(
-            name = json.\("name").toOption.map(_.as[String]),
-            statement = json.\("statement").toOption.map(_.as[String]),
-            prepareTime = json.\("prepare_time").toOption.map(_.as[OffsetDateTime]),
-            parameterTypes = json.\("parameter_types").toOption.map(_.as[Array[TypoRegtype]]),
-            fromSql = json.\("from_sql").toOption.map(_.as[Boolean]),
-            genericPlans = json.\("generic_plans").toOption.map(_.as[Long]),
-            customPlans = json.\("custom_plans").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPreparedStatementsViewRow] = OWrites[PgPreparedStatementsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "statement" -> Json.toJson(o.statement),
+      "prepare_time" -> Json.toJson(o.prepareTime),
+      "parameter_types" -> Json.toJson(o.parameterTypes),
+      "from_sql" -> Json.toJson(o.fromSql),
+      "generic_plans" -> Json.toJson(o.genericPlans),
+      "custom_plans" -> Json.toJson(o.customPlans)
+    ))
+  )
 }

@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object SmViewRepoImpl extends SmViewRepo {
   override def selectAll(implicit c: Connection): List[SmViewRow] = {
-    SQL"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+    SQL"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
           from pu.sm
        """.as(SmViewRow.rowParser(1).*)
   }

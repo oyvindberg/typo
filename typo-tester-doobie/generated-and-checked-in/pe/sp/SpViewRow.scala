@@ -7,20 +7,18 @@ package adventureworks
 package pe
 package sp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SpViewRow(
@@ -40,62 +38,34 @@ case class SpViewRow(
   /** Points to [[person.stateprovince.StateprovinceRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.stateprovince.StateprovinceRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SpViewRow {
-  implicit val decoder: Decoder[SpViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        stateprovinceid <- c.downField("stateprovinceid").as[Option[StateprovinceId]]
-        stateprovincecode <- c.downField("stateprovincecode").as[Option[/* bpchar */ String]]
-        countryregioncode <- c.downField("countryregioncode").as[Option[CountryregionId]]
-        isonlystateprovinceflag <- c.downField("isonlystateprovinceflag").as[Flag]
-        name <- c.downField("name").as[Option[Name]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SpViewRow(id, stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate)
-  implicit val encoder: Encoder[SpViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "stateprovinceid" := row.stateprovinceid,
-        "stateprovincecode" := row.stateprovincecode,
-        "countryregioncode" := row.countryregioncode,
-        "isonlystateprovinceflag" := row.isonlystateprovinceflag,
-        "name" := row.name,
-        "territoryid" := row.territoryid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SpViewRow] =
-    new Read[SpViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[StateprovinceId], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[CountryregionId], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Name], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        stateprovinceid = Get[StateprovinceId].unsafeGetNullable(rs, i + 1),
-        stateprovincecode = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 2),
-        countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 3),
-        isonlystateprovinceflag = Get[Flag].unsafeGetNonNullable(rs, i + 4),
-        name = Get[Name].unsafeGetNullable(rs, i + 5),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 6),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[SpViewRow] = Decoder.forProduct9[SpViewRow, Option[Int], Option[StateprovinceId], Option[/* bpchar */ String], Option[CountryregionId], Flag, Option[Name], Option[SalesterritoryId], Option[UUID], Option[TypoLocalDateTime]]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(SpViewRow.apply)
+  implicit val encoder: Encoder[SpViewRow] = Encoder.forProduct9[SpViewRow, Option[Int], Option[StateprovinceId], Option[/* bpchar */ String], Option[CountryregionId], Flag, Option[Name], Option[SalesterritoryId], Option[UUID], Option[TypoLocalDateTime]]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))
+  implicit val read: Read[SpViewRow] = new Read[SpViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[StateprovinceId], Nullability.Nullable),
+      (Get[/* bpchar */ String], Nullability.Nullable),
+      (Get[CountryregionId], Nullability.Nullable),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[Name], Nullability.Nullable),
+      (Get[SalesterritoryId], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      stateprovinceid = Get[StateprovinceId].unsafeGetNullable(rs, i + 1),
+      stateprovincecode = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 2),
+      countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 3),
+      isonlystateprovinceflag = Get[Flag].unsafeGetNonNullable(rs, i + 4),
+      name = Get[Name].unsafeGetNullable(rs, i + 5),
+      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 6),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 7),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

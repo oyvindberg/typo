@@ -7,71 +7,45 @@ package adventureworks
 package pg_catalog
 package pg_stat_archiver
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatArchiverViewRow(
   archivedCount: Option[Long],
   lastArchivedWal: Option[String],
-  lastArchivedTime: Option[OffsetDateTime],
+  lastArchivedTime: Option[TypoOffsetDateTime],
   failedCount: Option[Long],
   lastFailedWal: Option[String],
-  lastFailedTime: Option[OffsetDateTime],
-  statsReset: Option[OffsetDateTime]
+  lastFailedTime: Option[TypoOffsetDateTime],
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatArchiverViewRow {
-  implicit val decoder: Decoder[PgStatArchiverViewRow] =
-    (c: HCursor) =>
-      for {
-        archivedCount <- c.downField("archived_count").as[Option[Long]]
-        lastArchivedWal <- c.downField("last_archived_wal").as[Option[String]]
-        lastArchivedTime <- c.downField("last_archived_time").as[Option[OffsetDateTime]]
-        failedCount <- c.downField("failed_count").as[Option[Long]]
-        lastFailedWal <- c.downField("last_failed_wal").as[Option[String]]
-        lastFailedTime <- c.downField("last_failed_time").as[Option[OffsetDateTime]]
-        statsReset <- c.downField("stats_reset").as[Option[OffsetDateTime]]
-      } yield PgStatArchiverViewRow(archivedCount, lastArchivedWal, lastArchivedTime, failedCount, lastFailedWal, lastFailedTime, statsReset)
-  implicit val encoder: Encoder[PgStatArchiverViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "archived_count" := row.archivedCount,
-        "last_archived_wal" := row.lastArchivedWal,
-        "last_archived_time" := row.lastArchivedTime,
-        "failed_count" := row.failedCount,
-        "last_failed_wal" := row.lastFailedWal,
-        "last_failed_time" := row.lastFailedTime,
-        "stats_reset" := row.statsReset
-      )}
-  implicit val read: Read[PgStatArchiverViewRow] =
-    new Read[PgStatArchiverViewRow](
-      gets = List(
-        (Get[Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatArchiverViewRow(
-        archivedCount = Get[Long].unsafeGetNullable(rs, i + 0),
-        lastArchivedWal = Get[String].unsafeGetNullable(rs, i + 1),
-        lastArchivedTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 2),
-        failedCount = Get[Long].unsafeGetNullable(rs, i + 3),
-        lastFailedWal = Get[String].unsafeGetNullable(rs, i + 4),
-        lastFailedTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 5),
-        statsReset = Get[OffsetDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgStatArchiverViewRow] = Decoder.forProduct7[PgStatArchiverViewRow, Option[Long], Option[String], Option[TypoOffsetDateTime], Option[Long], Option[String], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime]]("archived_count", "last_archived_wal", "last_archived_time", "failed_count", "last_failed_wal", "last_failed_time", "stats_reset")(PgStatArchiverViewRow.apply)
+  implicit val encoder: Encoder[PgStatArchiverViewRow] = Encoder.forProduct7[PgStatArchiverViewRow, Option[Long], Option[String], Option[TypoOffsetDateTime], Option[Long], Option[String], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime]]("archived_count", "last_archived_wal", "last_archived_time", "failed_count", "last_failed_wal", "last_failed_time", "stats_reset")(x => (x.archivedCount, x.lastArchivedWal, x.lastArchivedTime, x.failedCount, x.lastFailedWal, x.lastFailedTime, x.statsReset))
+  implicit val read: Read[PgStatArchiverViewRow] = new Read[PgStatArchiverViewRow](
+    gets = List(
+      (Get[Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatArchiverViewRow(
+      archivedCount = Get[Long].unsafeGetNullable(rs, i + 0),
+      lastArchivedWal = Get[String].unsafeGetNullable(rs, i + 1),
+      lastArchivedTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 2),
+      failedCount = Get[Long].unsafeGetNullable(rs, i + 3),
+      lastFailedWal = Get[String].unsafeGetNullable(rs, i + 4),
+      lastFailedTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 5),
+      statsReset = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

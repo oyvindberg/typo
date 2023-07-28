@@ -7,18 +7,20 @@ package adventureworks
 package pr
 package d
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class DViewRow(
@@ -45,70 +47,66 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.document.DocumentRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime],
+  modifieddate: Option[TypoLocalDateTime],
   /** Points to [[production.document.DocumentRow.documentnode]] */
   documentnode: Option[DocumentId]
 )
 
 object DViewRow {
-  def rowParser(idx: Int): RowParser[DViewRow] =
-    RowParser[DViewRow] { row =>
-      Success(
+  implicit val reads: Reads[DViewRow] = Reads[DViewRow](json => JsResult.fromTry(
+      Try(
         DViewRow(
-          title = row[Option[/* max 50 chars */ String]](idx + 0),
-          owner = row[Option[BusinessentityId]](idx + 1),
-          folderflag = row[Flag](idx + 2),
-          filename = row[Option[/* max 400 chars */ String]](idx + 3),
-          fileextension = row[Option[/* max 8 chars */ String]](idx + 4),
-          revision = row[Option[/* bpchar */ String]](idx + 5),
-          changenumber = row[Option[Int]](idx + 6),
-          status = row[Option[Int]](idx + 7),
-          documentsummary = row[Option[String]](idx + 8),
-          document = row[Option[Byte]](idx + 9),
-          rowguid = row[Option[UUID]](idx + 10),
-          modifieddate = row[Option[LocalDateTime]](idx + 11),
-          documentnode = row[Option[DocumentId]](idx + 12)
+          title = json.\("title").toOption.map(_.as[/* max 50 chars */ String]),
+          owner = json.\("owner").toOption.map(_.as[BusinessentityId]),
+          folderflag = json.\("folderflag").as[Flag],
+          filename = json.\("filename").toOption.map(_.as[/* max 400 chars */ String]),
+          fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
+          revision = json.\("revision").toOption.map(_.as[/* bpchar */ String]),
+          changenumber = json.\("changenumber").toOption.map(_.as[Int]),
+          status = json.\("status").toOption.map(_.as[Int]),
+          documentsummary = json.\("documentsummary").toOption.map(_.as[String]),
+          document = json.\("document").toOption.map(_.as[Byte]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime]),
+          documentnode = json.\("documentnode").toOption.map(_.as[DocumentId])
         )
       )
-    }
-  implicit val oFormat: OFormat[DViewRow] = new OFormat[DViewRow]{
-    override def writes(o: DViewRow): JsObject =
-      Json.obj(
-        "title" -> o.title,
-        "owner" -> o.owner,
-        "folderflag" -> o.folderflag,
-        "filename" -> o.filename,
-        "fileextension" -> o.fileextension,
-        "revision" -> o.revision,
-        "changenumber" -> o.changenumber,
-        "status" -> o.status,
-        "documentsummary" -> o.documentsummary,
-        "document" -> o.document,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate,
-        "documentnode" -> o.documentnode
+    ),
+  )
+  def rowParser(idx: Int): RowParser[DViewRow] = RowParser[DViewRow] { row =>
+    Success(
+      DViewRow(
+        title = row[Option[/* max 50 chars */ String]](idx + 0),
+        owner = row[Option[BusinessentityId]](idx + 1),
+        folderflag = row[Flag](idx + 2),
+        filename = row[Option[/* max 400 chars */ String]](idx + 3),
+        fileextension = row[Option[/* max 8 chars */ String]](idx + 4),
+        revision = row[Option[/* bpchar */ String]](idx + 5),
+        changenumber = row[Option[Int]](idx + 6),
+        status = row[Option[Int]](idx + 7),
+        documentsummary = row[Option[String]](idx + 8),
+        document = row[Option[Byte]](idx + 9),
+        rowguid = row[Option[UUID]](idx + 10),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 11),
+        documentnode = row[Option[DocumentId]](idx + 12)
       )
-  
-    override def reads(json: JsValue): JsResult[DViewRow] = {
-      JsResult.fromTry(
-        Try(
-          DViewRow(
-            title = json.\("title").toOption.map(_.as[/* max 50 chars */ String]),
-            owner = json.\("owner").toOption.map(_.as[BusinessentityId]),
-            folderflag = json.\("folderflag").as[Flag],
-            filename = json.\("filename").toOption.map(_.as[/* max 400 chars */ String]),
-            fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
-            revision = json.\("revision").toOption.map(_.as[/* bpchar */ String]),
-            changenumber = json.\("changenumber").toOption.map(_.as[Int]),
-            status = json.\("status").toOption.map(_.as[Int]),
-            documentsummary = json.\("documentsummary").toOption.map(_.as[String]),
-            document = json.\("document").toOption.map(_.as[Byte]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime]),
-            documentnode = json.\("documentnode").toOption.map(_.as[DocumentId])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[DViewRow] = OWrites[DViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "title" -> Json.toJson(o.title),
+      "owner" -> Json.toJson(o.owner),
+      "folderflag" -> Json.toJson(o.folderflag),
+      "filename" -> Json.toJson(o.filename),
+      "fileextension" -> Json.toJson(o.fileextension),
+      "revision" -> Json.toJson(o.revision),
+      "changenumber" -> Json.toJson(o.changenumber),
+      "status" -> Json.toJson(o.status),
+      "documentsummary" -> Json.toJson(o.documentsummary),
+      "document" -> Json.toJson(o.document),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate),
+      "documentnode" -> Json.toJson(o.documentnode)
+    ))
+  )
 }

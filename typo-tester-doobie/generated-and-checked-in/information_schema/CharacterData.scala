@@ -6,7 +6,8 @@
 package adventureworks
 package information_schema
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -15,11 +16,11 @@ import io.circe.Encoder
   */
 case class CharacterData(value: String) extends AnyVal
 object CharacterData {
-  implicit def ordering(implicit ev: Ordering[String]): Ordering[CharacterData] = Ordering.by(_.value)
-  implicit val encoder: Encoder[CharacterData] =
-    Encoder[String].contramap(_.value)
-  implicit val decoder: Decoder[CharacterData] =
-    Decoder[String].map(CharacterData(_))
-  implicit val meta: Meta[CharacterData] = Meta[String].imap(CharacterData.apply)(_.value)
-  implicit val metaArray: Meta[Array[CharacterData]] = Meta[Array[String]].imap(_.map(CharacterData.apply))(_.map(_.value))
+  implicit val arrayGet: Get[Array[CharacterData]] = Get[Array[String]].map(_.map(CharacterData.apply))
+  implicit val arrayPut: Put[Array[CharacterData]] = Put[Array[String]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[CharacterData] = Decoder[String].map(CharacterData.apply)
+  implicit val encoder: Encoder[CharacterData] = Encoder[String].contramap(_.value)
+  implicit val get: Get[CharacterData] = Get[String].map(CharacterData.apply)
+  implicit val ordering: Ordering[CharacterData] = Ordering.by(_.value)
+  implicit val put: Put[CharacterData] = Put[String].contramap(_.value)
 }

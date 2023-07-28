@@ -9,24 +9,11 @@ package pg_inherits
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `pg_catalog.pg_inherits` */
 case class PgInheritsId(inhrelid: /* oid */ Long, inhseqno: Int)
 object PgInheritsId {
+  implicit val decoder: Decoder[PgInheritsId] = Decoder.forProduct2[PgInheritsId, /* oid */ Long, Int]("inhrelid", "inhseqno")(PgInheritsId.apply)
+  implicit val encoder: Encoder[PgInheritsId] = Encoder.forProduct2[PgInheritsId, /* oid */ Long, Int]("inhrelid", "inhseqno")(x => (x.inhrelid, x.inhseqno))
   implicit val ordering: Ordering[PgInheritsId] = Ordering.by(x => (x.inhrelid, x.inhseqno))
-  implicit val decoder: Decoder[PgInheritsId] =
-    (c: HCursor) =>
-      for {
-        inhrelid <- c.downField("inhrelid").as[/* oid */ Long]
-        inhseqno <- c.downField("inhseqno").as[Int]
-      } yield PgInheritsId(inhrelid, inhseqno)
-  implicit val encoder: Encoder[PgInheritsId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "inhrelid" := row.inhrelid,
-        "inhseqno" := row.inhseqno
-      )}
 }

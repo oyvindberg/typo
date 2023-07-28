@@ -8,15 +8,17 @@ package sales
 package salestaxrate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salestaxrate` which has not been persisted yet */
@@ -37,9 +39,9 @@ case class SalestaxrateRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salestaxrateidDefault: => SalestaxrateId, taxrateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalestaxrateRow =
+  def toRow(salestaxrateidDefault: => SalestaxrateId, taxrateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalestaxrateRow =
     SalestaxrateRow(
       stateprovinceid = stateprovinceid,
       taxtype = taxtype,
@@ -63,32 +65,29 @@ case class SalestaxrateRowUnsaved(
     )
 }
 object SalestaxrateRowUnsaved {
-  implicit val oFormat: OFormat[SalestaxrateRowUnsaved] = new OFormat[SalestaxrateRowUnsaved]{
-    override def writes(o: SalestaxrateRowUnsaved): JsObject =
-      Json.obj(
-        "stateprovinceid" -> o.stateprovinceid,
-        "taxtype" -> o.taxtype,
-        "name" -> o.name,
-        "salestaxrateid" -> o.salestaxrateid,
-        "taxrate" -> o.taxrate,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[SalestaxrateRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          SalestaxrateRowUnsaved(
-            stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-            taxtype = json.\("taxtype").as[Int],
-            name = json.\("name").as[Name],
-            salestaxrateid = json.\("salestaxrateid").as[Defaulted[SalestaxrateId]],
-            taxrate = json.\("taxrate").as[Defaulted[BigDecimal]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[SalestaxrateRowUnsaved] = Reads[SalestaxrateRowUnsaved](json => JsResult.fromTry(
+      Try(
+        SalestaxrateRowUnsaved(
+          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
+          taxtype = json.\("taxtype").as[Int],
+          name = json.\("name").as[Name],
+          salestaxrateid = json.\("salestaxrateid").as[Defaulted[SalestaxrateId]],
+          taxrate = json.\("taxrate").as[Defaulted[BigDecimal]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalestaxrateRowUnsaved] = OWrites[SalestaxrateRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
+      "taxtype" -> Json.toJson(o.taxtype),
+      "name" -> Json.toJson(o.name),
+      "salestaxrateid" -> Json.toJson(o.salestaxrateid),
+      "taxrate" -> Json.toJson(o.taxrate),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

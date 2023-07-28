@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ViewColumnUsageViewRow(
@@ -28,46 +30,42 @@ case class ViewColumnUsageViewRow(
 )
 
 object ViewColumnUsageViewRow {
-  def rowParser(idx: Int): RowParser[ViewColumnUsageViewRow] =
-    RowParser[ViewColumnUsageViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ViewColumnUsageViewRow] = Reads[ViewColumnUsageViewRow](json => JsResult.fromTry(
+      Try(
         ViewColumnUsageViewRow(
-          viewCatalog = row[Option[SqlIdentifier]](idx + 0),
-          viewSchema = row[Option[SqlIdentifier]](idx + 1),
-          viewName = row[Option[SqlIdentifier]](idx + 2),
-          tableCatalog = row[Option[SqlIdentifier]](idx + 3),
-          tableSchema = row[Option[SqlIdentifier]](idx + 4),
-          tableName = row[Option[SqlIdentifier]](idx + 5),
-          columnName = row[Option[SqlIdentifier]](idx + 6)
+          viewCatalog = json.\("view_catalog").toOption.map(_.as[SqlIdentifier]),
+          viewSchema = json.\("view_schema").toOption.map(_.as[SqlIdentifier]),
+          viewName = json.\("view_name").toOption.map(_.as[SqlIdentifier]),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[ViewColumnUsageViewRow] = new OFormat[ViewColumnUsageViewRow]{
-    override def writes(o: ViewColumnUsageViewRow): JsObject =
-      Json.obj(
-        "view_catalog" -> o.viewCatalog,
-        "view_schema" -> o.viewSchema,
-        "view_name" -> o.viewName,
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "column_name" -> o.columnName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ViewColumnUsageViewRow] = RowParser[ViewColumnUsageViewRow] { row =>
+    Success(
+      ViewColumnUsageViewRow(
+        viewCatalog = row[Option[SqlIdentifier]](idx + 0),
+        viewSchema = row[Option[SqlIdentifier]](idx + 1),
+        viewName = row[Option[SqlIdentifier]](idx + 2),
+        tableCatalog = row[Option[SqlIdentifier]](idx + 3),
+        tableSchema = row[Option[SqlIdentifier]](idx + 4),
+        tableName = row[Option[SqlIdentifier]](idx + 5),
+        columnName = row[Option[SqlIdentifier]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[ViewColumnUsageViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ViewColumnUsageViewRow(
-            viewCatalog = json.\("view_catalog").toOption.map(_.as[SqlIdentifier]),
-            viewSchema = json.\("view_schema").toOption.map(_.as[SqlIdentifier]),
-            viewName = json.\("view_name").toOption.map(_.as[SqlIdentifier]),
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ViewColumnUsageViewRow] = OWrites[ViewColumnUsageViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "view_catalog" -> Json.toJson(o.viewCatalog),
+      "view_schema" -> Json.toJson(o.viewSchema),
+      "view_name" -> Json.toJson(o.viewName),
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "column_name" -> Json.toJson(o.columnName)
+    ))
+  )
 }

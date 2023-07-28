@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgPublicationRepoImpl extends PgPublicationRepo {
   override def delete(oid: PgPublicationId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_publication where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_publication where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgPublicationRow): ConnectionIO[PgPublicationRow] = {
     sql"""insert into pg_catalog.pg_publication(oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot)
@@ -25,10 +25,10 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
     sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication".query[PgPublicationRow].stream
   }
   override def selectById(oid: PgPublicationId): ConnectionIO[Option[PgPublicationRow]] = {
-    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = $oid".query[PgPublicationRow].option
+    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ${oid}".query[PgPublicationRow].option
   }
   override def selectByIds(oids: Array[PgPublicationId]): Stream[ConnectionIO, PgPublicationRow] = {
-    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ANY($oids)".query[PgPublicationRow].stream
+    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ANY(${oids})".query[PgPublicationRow].stream
   }
   override def update(row: PgPublicationRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -41,7 +41,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
               pubdelete = ${row.pubdelete},
               pubtruncate = ${row.pubtruncate},
               pubviaroot = ${row.pubviaroot}
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

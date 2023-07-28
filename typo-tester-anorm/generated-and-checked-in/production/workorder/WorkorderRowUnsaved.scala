@@ -8,14 +8,16 @@ package production
 package workorder
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.workorder` which has not been persisted yet */
@@ -28,11 +30,11 @@ case class WorkorderRowUnsaved(
   /** Quantity that failed inspection. */
   scrappedqty: Int,
   /** Work order start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Work order end date. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Work order due date. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Reason for inspection failure.
       Points to [[scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: Option[ScrapreasonId],
@@ -40,9 +42,9 @@ case class WorkorderRowUnsaved(
       Primary key for WorkOrder records. */
   workorderid: Defaulted[WorkorderId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(workorderidDefault: => WorkorderId, modifieddateDefault: => LocalDateTime): WorkorderRow =
+  def toRow(workorderidDefault: => WorkorderId, modifieddateDefault: => TypoLocalDateTime): WorkorderRow =
     WorkorderRow(
       productid = productid,
       orderqty = orderqty,
@@ -62,36 +64,33 @@ case class WorkorderRowUnsaved(
     )
 }
 object WorkorderRowUnsaved {
-  implicit val oFormat: OFormat[WorkorderRowUnsaved] = new OFormat[WorkorderRowUnsaved]{
-    override def writes(o: WorkorderRowUnsaved): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "orderqty" -> o.orderqty,
-        "scrappedqty" -> o.scrappedqty,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "duedate" -> o.duedate,
-        "scrapreasonid" -> o.scrapreasonid,
-        "workorderid" -> o.workorderid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[WorkorderRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          WorkorderRowUnsaved(
-            productid = json.\("productid").as[ProductId],
-            orderqty = json.\("orderqty").as[Int],
-            scrappedqty = json.\("scrappedqty").as[Int],
-            startdate = json.\("startdate").as[LocalDateTime],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            duedate = json.\("duedate").as[LocalDateTime],
-            scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
-            workorderid = json.\("workorderid").as[Defaulted[WorkorderId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[WorkorderRowUnsaved] = Reads[WorkorderRowUnsaved](json => JsResult.fromTry(
+      Try(
+        WorkorderRowUnsaved(
+          productid = json.\("productid").as[ProductId],
+          orderqty = json.\("orderqty").as[Int],
+          scrappedqty = json.\("scrappedqty").as[Int],
+          startdate = json.\("startdate").as[TypoLocalDateTime],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          duedate = json.\("duedate").as[TypoLocalDateTime],
+          scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
+          workorderid = json.\("workorderid").as[Defaulted[WorkorderId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[WorkorderRowUnsaved] = OWrites[WorkorderRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "orderqty" -> Json.toJson(o.orderqty),
+      "scrappedqty" -> Json.toJson(o.scrappedqty),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "duedate" -> Json.toJson(o.duedate),
+      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
+      "workorderid" -> Json.toJson(o.workorderid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

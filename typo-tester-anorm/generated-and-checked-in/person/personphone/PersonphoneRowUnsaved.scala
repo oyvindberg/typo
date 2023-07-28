@@ -8,15 +8,17 @@ package person
 package personphone
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `person.personphone` which has not been persisted yet */
@@ -30,9 +32,9 @@ case class PersonphoneRowUnsaved(
       Points to [[phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
   phonenumbertypeid: PhonenumbertypeId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): PersonphoneRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): PersonphoneRow =
     PersonphoneRow(
       businessentityid = businessentityid,
       phonenumber = phonenumber,
@@ -44,26 +46,23 @@ case class PersonphoneRowUnsaved(
     )
 }
 object PersonphoneRowUnsaved {
-  implicit val oFormat: OFormat[PersonphoneRowUnsaved] = new OFormat[PersonphoneRowUnsaved]{
-    override def writes(o: PersonphoneRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "phonenumber" -> o.phonenumber,
-        "phonenumbertypeid" -> o.phonenumbertypeid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[PersonphoneRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          PersonphoneRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            phonenumber = json.\("phonenumber").as[Phone],
-            phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[PersonphoneRowUnsaved] = Reads[PersonphoneRowUnsaved](json => JsResult.fromTry(
+      Try(
+        PersonphoneRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          phonenumber = json.\("phonenumber").as[Phone],
+          phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PersonphoneRowUnsaved] = OWrites[PersonphoneRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "phonenumber" -> Json.toJson(o.phonenumber),
+      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

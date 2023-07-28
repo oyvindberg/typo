@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgOpclassRow(
@@ -29,52 +31,48 @@ case class PgOpclassRow(
 )
 
 object PgOpclassRow {
-  def rowParser(idx: Int): RowParser[PgOpclassRow] =
-    RowParser[PgOpclassRow] { row =>
-      Success(
+  implicit val reads: Reads[PgOpclassRow] = Reads[PgOpclassRow](json => JsResult.fromTry(
+      Try(
         PgOpclassRow(
-          oid = row[PgOpclassId](idx + 0),
-          opcmethod = row[/* oid */ Long](idx + 1),
-          opcname = row[String](idx + 2),
-          opcnamespace = row[/* oid */ Long](idx + 3),
-          opcowner = row[/* oid */ Long](idx + 4),
-          opcfamily = row[/* oid */ Long](idx + 5),
-          opcintype = row[/* oid */ Long](idx + 6),
-          opcdefault = row[Boolean](idx + 7),
-          opckeytype = row[/* oid */ Long](idx + 8)
+          oid = json.\("oid").as[PgOpclassId],
+          opcmethod = json.\("opcmethod").as[/* oid */ Long],
+          opcname = json.\("opcname").as[String],
+          opcnamespace = json.\("opcnamespace").as[/* oid */ Long],
+          opcowner = json.\("opcowner").as[/* oid */ Long],
+          opcfamily = json.\("opcfamily").as[/* oid */ Long],
+          opcintype = json.\("opcintype").as[/* oid */ Long],
+          opcdefault = json.\("opcdefault").as[Boolean],
+          opckeytype = json.\("opckeytype").as[/* oid */ Long]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgOpclassRow] = new OFormat[PgOpclassRow]{
-    override def writes(o: PgOpclassRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "opcmethod" -> o.opcmethod,
-        "opcname" -> o.opcname,
-        "opcnamespace" -> o.opcnamespace,
-        "opcowner" -> o.opcowner,
-        "opcfamily" -> o.opcfamily,
-        "opcintype" -> o.opcintype,
-        "opcdefault" -> o.opcdefault,
-        "opckeytype" -> o.opckeytype
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgOpclassRow] = RowParser[PgOpclassRow] { row =>
+    Success(
+      PgOpclassRow(
+        oid = row[PgOpclassId](idx + 0),
+        opcmethod = row[/* oid */ Long](idx + 1),
+        opcname = row[String](idx + 2),
+        opcnamespace = row[/* oid */ Long](idx + 3),
+        opcowner = row[/* oid */ Long](idx + 4),
+        opcfamily = row[/* oid */ Long](idx + 5),
+        opcintype = row[/* oid */ Long](idx + 6),
+        opcdefault = row[Boolean](idx + 7),
+        opckeytype = row[/* oid */ Long](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgOpclassRow] = {
-      JsResult.fromTry(
-        Try(
-          PgOpclassRow(
-            oid = json.\("oid").as[PgOpclassId],
-            opcmethod = json.\("opcmethod").as[/* oid */ Long],
-            opcname = json.\("opcname").as[String],
-            opcnamespace = json.\("opcnamespace").as[/* oid */ Long],
-            opcowner = json.\("opcowner").as[/* oid */ Long],
-            opcfamily = json.\("opcfamily").as[/* oid */ Long],
-            opcintype = json.\("opcintype").as[/* oid */ Long],
-            opcdefault = json.\("opcdefault").as[Boolean],
-            opckeytype = json.\("opckeytype").as[/* oid */ Long]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgOpclassRow] = OWrites[PgOpclassRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "opcmethod" -> Json.toJson(o.opcmethod),
+      "opcname" -> Json.toJson(o.opcname),
+      "opcnamespace" -> Json.toJson(o.opcnamespace),
+      "opcowner" -> Json.toJson(o.opcowner),
+      "opcfamily" -> Json.toJson(o.opcfamily),
+      "opcintype" -> Json.toJson(o.opcintype),
+      "opcdefault" -> Json.toJson(o.opcdefault),
+      "opckeytype" -> Json.toJson(o.opckeytype)
+    ))
+  )
 }

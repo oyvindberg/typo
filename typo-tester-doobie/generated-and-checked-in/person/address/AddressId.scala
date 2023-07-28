@@ -7,18 +7,19 @@ package adventureworks
 package person
 package address
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `person.address` */
 case class AddressId(value: Int) extends AnyVal
 object AddressId {
+  implicit val arrayGet: Get[Array[AddressId]] = Get[Array[Int]].map(_.map(AddressId.apply))
+  implicit val arrayPut: Put[Array[AddressId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[AddressId] = Decoder[Int].map(AddressId.apply)
+  implicit val encoder: Encoder[AddressId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[AddressId] = Get[Int].map(AddressId.apply)
   implicit val ordering: Ordering[AddressId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[AddressId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[AddressId] =
-    Decoder[Int].map(AddressId(_))
-  implicit val meta: Meta[AddressId] = Meta[Int].imap(AddressId.apply)(_.value)
-  implicit val metaArray: Meta[Array[AddressId]] = Meta[Array[Int]].imap(_.map(AddressId.apply))(_.map(_.value))
+  implicit val put: Put[AddressId] = Put[Int].contramap(_.value)
 }

@@ -8,18 +8,19 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.TypoRegproc
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_aggregate` */
 case class PgAggregateId(value: TypoRegproc) extends AnyVal
 object PgAggregateId {
+  implicit val arrayGet: Get[Array[PgAggregateId]] = Get[Array[TypoRegproc]].map(_.map(PgAggregateId.apply))
+  implicit val arrayPut: Put[Array[PgAggregateId]] = Put[Array[TypoRegproc]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgAggregateId] = Decoder[TypoRegproc].map(PgAggregateId.apply)
+  implicit val encoder: Encoder[PgAggregateId] = Encoder[TypoRegproc].contramap(_.value)
+  implicit val get: Get[PgAggregateId] = Get[TypoRegproc].map(PgAggregateId.apply)
   implicit def ordering(implicit O0: Ordering[TypoRegproc]): Ordering[PgAggregateId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgAggregateId] =
-    Encoder[TypoRegproc].contramap(_.value)
-  implicit val decoder: Decoder[PgAggregateId] =
-    Decoder[TypoRegproc].map(PgAggregateId(_))
-  implicit val meta: Meta[PgAggregateId] = Meta[TypoRegproc].imap(PgAggregateId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgAggregateId]] = Meta[Array[TypoRegproc]].imap(_.map(PgAggregateId.apply))(_.map(_.value))
+  implicit val put: Put[PgAggregateId] = Put[TypoRegproc].contramap(_.value)
 }

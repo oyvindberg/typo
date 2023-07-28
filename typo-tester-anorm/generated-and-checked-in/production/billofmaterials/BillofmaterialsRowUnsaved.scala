@@ -8,14 +8,16 @@ package production
 package billofmaterials
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.billofmaterials` which has not been persisted yet */
@@ -27,7 +29,7 @@ case class BillofmaterialsRowUnsaved(
       Points to [[product.ProductRow.productid]] */
   componentid: ProductId,
   /** Date the component stopped being used in the assembly item. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Standard code identifying the unit of measure for the quantity.
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
@@ -38,14 +40,14 @@ case class BillofmaterialsRowUnsaved(
   billofmaterialsid: Defaulted[BillofmaterialsId] = Defaulted.UseDefault,
   /** Default: now()
       Date the component started being used in the assembly item. */
-  startdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  startdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1.00
       Quantity of the component needed to create the assembly. */
   perassemblyqty: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(billofmaterialsidDefault: => BillofmaterialsId, startdateDefault: => LocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): BillofmaterialsRow =
+  def toRow(billofmaterialsidDefault: => BillofmaterialsId, startdateDefault: => TypoLocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): BillofmaterialsRow =
     BillofmaterialsRow(
       productassemblyid = productassemblyid,
       componentid = componentid,
@@ -71,36 +73,33 @@ case class BillofmaterialsRowUnsaved(
     )
 }
 object BillofmaterialsRowUnsaved {
-  implicit val oFormat: OFormat[BillofmaterialsRowUnsaved] = new OFormat[BillofmaterialsRowUnsaved]{
-    override def writes(o: BillofmaterialsRowUnsaved): JsObject =
-      Json.obj(
-        "productassemblyid" -> o.productassemblyid,
-        "componentid" -> o.componentid,
-        "enddate" -> o.enddate,
-        "unitmeasurecode" -> o.unitmeasurecode,
-        "bomlevel" -> o.bomlevel,
-        "billofmaterialsid" -> o.billofmaterialsid,
-        "startdate" -> o.startdate,
-        "perassemblyqty" -> o.perassemblyqty,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[BillofmaterialsRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          BillofmaterialsRowUnsaved(
-            productassemblyid = json.\("productassemblyid").toOption.map(_.as[ProductId]),
-            componentid = json.\("componentid").as[ProductId],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
-            bomlevel = json.\("bomlevel").as[Int],
-            billofmaterialsid = json.\("billofmaterialsid").as[Defaulted[BillofmaterialsId]],
-            startdate = json.\("startdate").as[Defaulted[LocalDateTime]],
-            perassemblyqty = json.\("perassemblyqty").as[Defaulted[BigDecimal]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[BillofmaterialsRowUnsaved] = Reads[BillofmaterialsRowUnsaved](json => JsResult.fromTry(
+      Try(
+        BillofmaterialsRowUnsaved(
+          productassemblyid = json.\("productassemblyid").toOption.map(_.as[ProductId]),
+          componentid = json.\("componentid").as[ProductId],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
+          bomlevel = json.\("bomlevel").as[Int],
+          billofmaterialsid = json.\("billofmaterialsid").as[Defaulted[BillofmaterialsId]],
+          startdate = json.\("startdate").as[Defaulted[TypoLocalDateTime]],
+          perassemblyqty = json.\("perassemblyqty").as[Defaulted[BigDecimal]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[BillofmaterialsRowUnsaved] = OWrites[BillofmaterialsRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productassemblyid" -> Json.toJson(o.productassemblyid),
+      "componentid" -> Json.toJson(o.componentid),
+      "enddate" -> Json.toJson(o.enddate),
+      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
+      "bomlevel" -> Json.toJson(o.bomlevel),
+      "billofmaterialsid" -> Json.toJson(o.billofmaterialsid),
+      "startdate" -> Json.toJson(o.startdate),
+      "perassemblyqty" -> Json.toJson(o.perassemblyqty),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

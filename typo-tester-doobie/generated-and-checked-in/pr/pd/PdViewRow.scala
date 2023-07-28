@@ -7,16 +7,14 @@ package adventureworks
 package pr
 package pd
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productdescription.ProductdescriptionId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class PdViewRow(
@@ -28,46 +26,26 @@ case class PdViewRow(
   /** Points to [[production.productdescription.ProductdescriptionRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productdescription.ProductdescriptionRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PdViewRow {
-  implicit val decoder: Decoder[PdViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productdescriptionid <- c.downField("productdescriptionid").as[Option[ProductdescriptionId]]
-        description <- c.downField("description").as[Option[/* max 400 chars */ String]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PdViewRow(id, productdescriptionid, description, rowguid, modifieddate)
-  implicit val encoder: Encoder[PdViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productdescriptionid" := row.productdescriptionid,
-        "description" := row.description,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PdViewRow] =
-    new Read[PdViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductdescriptionId], Nullability.Nullable),
-        (Get[/* max 400 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PdViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
-        description = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[PdViewRow] = Decoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(PdViewRow.apply)
+  implicit val encoder: Encoder[PdViewRow] = Encoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(x => (x.id, x.productdescriptionid, x.description, x.rowguid, x.modifieddate))
+  implicit val read: Read[PdViewRow] = new Read[PdViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductdescriptionId], Nullability.Nullable),
+      (Get[/* max 400 chars */ String], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PdViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
+      description = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 2),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

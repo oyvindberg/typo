@@ -8,11 +8,11 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     SQL"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
           values (${unsaved.shoppingcartitemid}::int4, ${unsaved.shoppingcartid}, ${unsaved.quantity}::int4, ${unsaved.productid}::int4, ${unsaved.datecreated}::timestamp, ${unsaved.modifieddate}::timestamp)
-          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
   
@@ -40,23 +40,23 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       },
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("datecreated", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("datecreated", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.shoppingcartitem default values
-            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
          """
         .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.shoppingcartitem(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+                  returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -67,18 +67,18 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
           from sales.shoppingcartitem
        """.as(ShoppingcartitemRow.rowParser(1).*)
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
           from sales.shoppingcartitem
           where shoppingcartitemid = $shoppingcartitemid
        """.as(ShoppingcartitemRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
-    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+    SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
           from sales.shoppingcartitem
           where shoppingcartitemid = ANY($shoppingcartitemids)
        """.as(ShoppingcartitemRow.rowParser(1).*)
@@ -112,7 +112,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             productid = EXCLUDED.productid,
             datecreated = EXCLUDED.datecreated,
             modifieddate = EXCLUDED.modifieddate
-          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
   

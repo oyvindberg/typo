@@ -8,14 +8,12 @@ package sales
 package salesorderdetail
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `sales.salesorderdetail` which has not been persisted yet */
@@ -44,9 +42,9 @@ case class SalesorderdetailRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderdetailidDefault: => Int, unitpricediscountDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesorderdetailRow =
+  def toRow(salesorderdetailidDefault: => Int, unitpricediscountDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderdetailRow =
     SalesorderdetailRow(
       salesorderid = salesorderid,
       carriertrackingnumber = carriertrackingnumber,
@@ -73,33 +71,6 @@ case class SalesorderdetailRowUnsaved(
     )
 }
 object SalesorderdetailRowUnsaved {
-  implicit val decoder: Decoder[SalesorderdetailRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        salesorderid <- c.downField("salesorderid").as[SalesorderheaderId]
-        carriertrackingnumber <- c.downField("carriertrackingnumber").as[Option[/* max 25 chars */ String]]
-        orderqty <- c.downField("orderqty").as[Int]
-        productid <- c.downField("productid").as[ProductId]
-        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
-        unitprice <- c.downField("unitprice").as[BigDecimal]
-        salesorderdetailid <- c.downField("salesorderdetailid").as[Defaulted[Int]]
-        unitpricediscount <- c.downField("unitpricediscount").as[Defaulted[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SalesorderdetailRowUnsaved(salesorderid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, salesorderdetailid, unitpricediscount, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalesorderdetailRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "salesorderid" := row.salesorderid,
-        "carriertrackingnumber" := row.carriertrackingnumber,
-        "orderqty" := row.orderqty,
-        "productid" := row.productid,
-        "specialofferid" := row.specialofferid,
-        "unitprice" := row.unitprice,
-        "salesorderdetailid" := row.salesorderdetailid,
-        "unitpricediscount" := row.unitpricediscount,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SalesorderdetailRowUnsaved] = Decoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], Int, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(SalesorderdetailRowUnsaved.apply)
+  implicit val encoder: Encoder[SalesorderdetailRowUnsaved] = Encoder.forProduct10[SalesorderdetailRowUnsaved, SalesorderheaderId, Option[/* max 25 chars */ String], Int, ProductId, SpecialofferId, BigDecimal, Defaulted[Int], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate")(x => (x.salesorderid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.salesorderdetailid, x.unitpricediscount, x.rowguid, x.modifieddate))
 }

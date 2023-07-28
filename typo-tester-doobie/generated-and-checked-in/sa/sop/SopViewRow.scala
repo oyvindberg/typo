@@ -7,17 +7,15 @@ package adventureworks
 package sa
 package sop
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SopViewRow(
@@ -29,46 +27,26 @@ case class SopViewRow(
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SopViewRow {
-  implicit val decoder: Decoder[SopViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        specialofferid <- c.downField("specialofferid").as[Option[SpecialofferId]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SopViewRow(id, specialofferid, productid, rowguid, modifieddate)
-  implicit val encoder: Encoder[SopViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "specialofferid" := row.specialofferid,
-        "productid" := row.productid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SopViewRow] =
-    new Read[SopViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[SpecialofferId], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SopViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 1),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[SopViewRow] = Decoder.forProduct5[SopViewRow, Option[Int], Option[SpecialofferId], Option[ProductId], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "productid", "rowguid", "modifieddate")(SopViewRow.apply)
+  implicit val encoder: Encoder[SopViewRow] = Encoder.forProduct5[SopViewRow, Option[Int], Option[SpecialofferId], Option[ProductId], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "productid", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.productid, x.rowguid, x.modifieddate))
+  implicit val read: Read[SopViewRow] = new Read[SopViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[SpecialofferId], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SopViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 1),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

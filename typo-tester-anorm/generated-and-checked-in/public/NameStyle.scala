@@ -9,21 +9,22 @@ package public
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Domain `public.NameStyle`
   * No constraint
   */
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
-  implicit def ordering(implicit ev: Ordering[Boolean]): Ordering[NameStyle] = Ordering.by(_.value)
-  implicit val format: Format[NameStyle] = implicitly[Format[Boolean]].bimap(NameStyle.apply, _.value)
-  implicit val toStatement: ToStatement[NameStyle] = implicitly[ToStatement[Boolean]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[NameStyle]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[NameStyle]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
   implicit val column: Column[NameStyle] = implicitly[Column[Boolean]].map(NameStyle.apply)
+  implicit val ordering: Ordering[NameStyle] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[NameStyle] = new ParameterMetaData[NameStyle] {
     override def sqlType: String = implicitly[ParameterMetaData[Boolean]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Boolean]].jdbcType
   }
-
+  implicit val reads: Reads[NameStyle] = implicitly[Reads[Boolean]].map(NameStyle.apply)
+  implicit val toStatement: ToStatement[NameStyle] = implicitly[ToStatement[Boolean]].contramap(_.value)
+  implicit val writes: Writes[NameStyle] = implicitly[Writes[Boolean]].contramap(_.value)
 }

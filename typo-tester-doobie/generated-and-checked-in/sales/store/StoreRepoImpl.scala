@@ -8,22 +8,22 @@ package sales
 package store
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from sales.store where businessentityid = $businessentityid".update.run.map(_ > 0)
+    sql"delete from sales.store where businessentityid = ${businessentityid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """.query[StoreRow].unique
   }
   override def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow] = {
@@ -38,32 +38,32 @@ object StoreRepoImpl extends StoreRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.store default values
-            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.store(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
          """
     }
     q.query[StoreRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store""".query[StoreRow].stream
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store""".query[StoreRow].stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[StoreRow]] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = $businessentityid""".query[StoreRow].option
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ${businessentityid}""".query[StoreRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = ANY($businessentityids)""".query[StoreRow].stream
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ANY(${businessentityids})""".query[StoreRow].stream
   }
   override def update(row: StoreRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -73,7 +73,7 @@ object StoreRepoImpl extends StoreRepo {
               demographics = ${row.demographics}::xml,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          where businessentityid = ${businessentityid}
        """
       .update
       .run
@@ -96,7 +96,7 @@ object StoreRepoImpl extends StoreRepo {
             demographics = EXCLUDED.demographics,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """.query[StoreRow].unique
   }
 }

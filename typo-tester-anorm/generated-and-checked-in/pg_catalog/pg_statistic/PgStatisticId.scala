@@ -11,31 +11,30 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `pg_catalog.pg_statistic` */
 case class PgStatisticId(starelid: /* oid */ Long, staattnum: Int, stainherit: Boolean)
 object PgStatisticId {
   implicit val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
-  implicit val oFormat: OFormat[PgStatisticId] = new OFormat[PgStatisticId]{
-    override def writes(o: PgStatisticId): JsObject =
-      Json.obj(
-        "starelid" -> o.starelid,
-        "staattnum" -> o.staattnum,
-        "stainherit" -> o.stainherit
-      )
-  
-    override def reads(json: JsValue): JsResult[PgStatisticId] = {
-      JsResult.fromTry(
-        Try(
-          PgStatisticId(
-            starelid = json.\("starelid").as[/* oid */ Long],
-            staattnum = json.\("staattnum").as[Int],
-            stainherit = json.\("stainherit").as[Boolean]
-          )
+  implicit val reads: Reads[PgStatisticId] = Reads[PgStatisticId](json => JsResult.fromTry(
+      Try(
+        PgStatisticId(
+          starelid = json.\("starelid").as[/* oid */ Long],
+          staattnum = json.\("staattnum").as[Int],
+          stainherit = json.\("stainherit").as[Boolean]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PgStatisticId] = OWrites[PgStatisticId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "starelid" -> Json.toJson(o.starelid),
+      "staattnum" -> Json.toJson(o.staattnum),
+      "stainherit" -> Json.toJson(o.stainherit)
+    ))
+  )
 }

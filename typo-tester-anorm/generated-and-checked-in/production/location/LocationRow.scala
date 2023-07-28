@@ -7,15 +7,17 @@ package adventureworks
 package production
 package location
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class LocationRow(
@@ -27,44 +29,40 @@ case class LocationRow(
   costrate: BigDecimal,
   /** Work capacity (in hours) of the manufacturing location. */
   availability: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object LocationRow {
-  def rowParser(idx: Int): RowParser[LocationRow] =
-    RowParser[LocationRow] { row =>
-      Success(
+  implicit val reads: Reads[LocationRow] = Reads[LocationRow](json => JsResult.fromTry(
+      Try(
         LocationRow(
-          locationid = row[LocationId](idx + 0),
-          name = row[Name](idx + 1),
-          costrate = row[BigDecimal](idx + 2),
-          availability = row[BigDecimal](idx + 3),
-          modifieddate = row[LocalDateTime](idx + 4)
+          locationid = json.\("locationid").as[LocationId],
+          name = json.\("name").as[Name],
+          costrate = json.\("costrate").as[BigDecimal],
+          availability = json.\("availability").as[BigDecimal],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[LocationRow] = new OFormat[LocationRow]{
-    override def writes(o: LocationRow): JsObject =
-      Json.obj(
-        "locationid" -> o.locationid,
-        "name" -> o.name,
-        "costrate" -> o.costrate,
-        "availability" -> o.availability,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[LocationRow] = RowParser[LocationRow] { row =>
+    Success(
+      LocationRow(
+        locationid = row[LocationId](idx + 0),
+        name = row[Name](idx + 1),
+        costrate = row[BigDecimal](idx + 2),
+        availability = row[BigDecimal](idx + 3),
+        modifieddate = row[TypoLocalDateTime](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[LocationRow] = {
-      JsResult.fromTry(
-        Try(
-          LocationRow(
-            locationid = json.\("locationid").as[LocationId],
-            name = json.\("name").as[Name],
-            costrate = json.\("costrate").as[BigDecimal],
-            availability = json.\("availability").as[BigDecimal],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[LocationRow] = OWrites[LocationRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "locationid" -> Json.toJson(o.locationid),
+      "name" -> Json.toJson(o.name),
+      "costrate" -> Json.toJson(o.costrate),
+      "availability" -> Json.toJson(o.availability),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

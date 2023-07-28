@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class RoleUdtGrantsViewRow(
@@ -37,46 +39,42 @@ case class RoleUdtGrantsViewRow(
 )
 
 object RoleUdtGrantsViewRow {
-  def rowParser(idx: Int): RowParser[RoleUdtGrantsViewRow] =
-    RowParser[RoleUdtGrantsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[RoleUdtGrantsViewRow] = Reads[RoleUdtGrantsViewRow](json => JsResult.fromTry(
+      Try(
         RoleUdtGrantsViewRow(
-          grantor = row[Option[SqlIdentifier]](idx + 0),
-          grantee = row[Option[SqlIdentifier]](idx + 1),
-          udtCatalog = row[Option[SqlIdentifier]](idx + 2),
-          udtSchema = row[Option[SqlIdentifier]](idx + 3),
-          udtName = row[Option[SqlIdentifier]](idx + 4),
-          privilegeType = row[Option[CharacterData]](idx + 5),
-          isGrantable = row[Option[YesOrNo]](idx + 6)
+          grantor = json.\("grantor").toOption.map(_.as[SqlIdentifier]),
+          grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
+          udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
+          udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
+          privilegeType = json.\("privilege_type").toOption.map(_.as[CharacterData]),
+          isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
         )
       )
-    }
-  implicit val oFormat: OFormat[RoleUdtGrantsViewRow] = new OFormat[RoleUdtGrantsViewRow]{
-    override def writes(o: RoleUdtGrantsViewRow): JsObject =
-      Json.obj(
-        "grantor" -> o.grantor,
-        "grantee" -> o.grantee,
-        "udt_catalog" -> o.udtCatalog,
-        "udt_schema" -> o.udtSchema,
-        "udt_name" -> o.udtName,
-        "privilege_type" -> o.privilegeType,
-        "is_grantable" -> o.isGrantable
+    ),
+  )
+  def rowParser(idx: Int): RowParser[RoleUdtGrantsViewRow] = RowParser[RoleUdtGrantsViewRow] { row =>
+    Success(
+      RoleUdtGrantsViewRow(
+        grantor = row[Option[SqlIdentifier]](idx + 0),
+        grantee = row[Option[SqlIdentifier]](idx + 1),
+        udtCatalog = row[Option[SqlIdentifier]](idx + 2),
+        udtSchema = row[Option[SqlIdentifier]](idx + 3),
+        udtName = row[Option[SqlIdentifier]](idx + 4),
+        privilegeType = row[Option[CharacterData]](idx + 5),
+        isGrantable = row[Option[YesOrNo]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[RoleUdtGrantsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          RoleUdtGrantsViewRow(
-            grantor = json.\("grantor").toOption.map(_.as[SqlIdentifier]),
-            grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
-            udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
-            udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
-            udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
-            privilegeType = json.\("privilege_type").toOption.map(_.as[CharacterData]),
-            isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[RoleUdtGrantsViewRow] = OWrites[RoleUdtGrantsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "grantor" -> Json.toJson(o.grantor),
+      "grantee" -> Json.toJson(o.grantee),
+      "udt_catalog" -> Json.toJson(o.udtCatalog),
+      "udt_schema" -> Json.toJson(o.udtSchema),
+      "udt_name" -> Json.toJson(o.udtName),
+      "privilege_type" -> Json.toJson(o.privilegeType),
+      "is_grantable" -> Json.toJson(o.isGrantable)
+    ))
+  )
 }

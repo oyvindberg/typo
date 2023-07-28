@@ -13,6 +13,6 @@ import fs2.Stream
 
 object WrViewRepoImpl extends WrViewRepo {
   override def selectAll: Stream[ConnectionIO, WrViewRow] = {
-    sql"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from pr.wr""".query[WrViewRow].stream
+    sql"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text from pr.wr""".query[WrViewRow].stream
   }
 }

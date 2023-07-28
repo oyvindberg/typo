@@ -7,16 +7,18 @@ package adventureworks
 package sa
 package sci
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SciViewRow(
@@ -30,52 +32,48 @@ case class SciViewRow(
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.productid]] */
   productid: Option[ProductId],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.datecreated]] */
-  datecreated: Option[LocalDateTime],
+  datecreated: Option[TypoLocalDateTime],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SciViewRow {
-  def rowParser(idx: Int): RowParser[SciViewRow] =
-    RowParser[SciViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SciViewRow] = Reads[SciViewRow](json => JsResult.fromTry(
+      Try(
         SciViewRow(
-          id = row[Option[Int]](idx + 0),
-          shoppingcartitemid = row[Option[ShoppingcartitemId]](idx + 1),
-          shoppingcartid = row[Option[/* max 50 chars */ String]](idx + 2),
-          quantity = row[Option[Int]](idx + 3),
-          productid = row[Option[ProductId]](idx + 4),
-          datecreated = row[Option[LocalDateTime]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          shoppingcartitemid = json.\("shoppingcartitemid").toOption.map(_.as[ShoppingcartitemId]),
+          shoppingcartid = json.\("shoppingcartid").toOption.map(_.as[/* max 50 chars */ String]),
+          quantity = json.\("quantity").toOption.map(_.as[Int]),
+          productid = json.\("productid").toOption.map(_.as[ProductId]),
+          datecreated = json.\("datecreated").toOption.map(_.as[TypoLocalDateTime]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SciViewRow] = new OFormat[SciViewRow]{
-    override def writes(o: SciViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "shoppingcartitemid" -> o.shoppingcartitemid,
-        "shoppingcartid" -> o.shoppingcartid,
-        "quantity" -> o.quantity,
-        "productid" -> o.productid,
-        "datecreated" -> o.datecreated,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SciViewRow] = RowParser[SciViewRow] { row =>
+    Success(
+      SciViewRow(
+        id = row[Option[Int]](idx + 0),
+        shoppingcartitemid = row[Option[ShoppingcartitemId]](idx + 1),
+        shoppingcartid = row[Option[/* max 50 chars */ String]](idx + 2),
+        quantity = row[Option[Int]](idx + 3),
+        productid = row[Option[ProductId]](idx + 4),
+        datecreated = row[Option[TypoLocalDateTime]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[SciViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SciViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            shoppingcartitemid = json.\("shoppingcartitemid").toOption.map(_.as[ShoppingcartitemId]),
-            shoppingcartid = json.\("shoppingcartid").toOption.map(_.as[/* max 50 chars */ String]),
-            quantity = json.\("quantity").toOption.map(_.as[Int]),
-            productid = json.\("productid").toOption.map(_.as[ProductId]),
-            datecreated = json.\("datecreated").toOption.map(_.as[LocalDateTime]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SciViewRow] = OWrites[SciViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "shoppingcartitemid" -> Json.toJson(o.shoppingcartitemid),
+      "shoppingcartid" -> Json.toJson(o.shoppingcartid),
+      "quantity" -> Json.toJson(o.quantity),
+      "productid" -> Json.toJson(o.productid),
+      "datecreated" -> Json.toJson(o.datecreated),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

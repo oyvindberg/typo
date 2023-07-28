@@ -8,22 +8,22 @@ package person
 package password
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"""delete from person."password" where businessentityid = $businessentityid""".update.run.map(_ > 0)
+    sql"""delete from person."password" where businessentityid = ${businessentityid}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.passwordhash}, ${unsaved.passwordsalt}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
        """.query[PasswordRow].unique
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
@@ -37,32 +37,32 @@ object PasswordRepoImpl extends PasswordRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person."password" default values
-            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person."password"(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+            returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
          """
     }
     q.query[PasswordRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
-    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person."password"""".query[PasswordRow].stream
+    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password"""".query[PasswordRow].stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]] = {
-    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person."password" where businessentityid = $businessentityid""".query[PasswordRow].option
+    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ${businessentityid}""".query[PasswordRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
-    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person."password" where businessentityid = ANY($businessentityids)""".query[PasswordRow].stream
+    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ANY(${businessentityids})""".query[PasswordRow].stream
   }
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -71,7 +71,7 @@ object PasswordRepoImpl extends PasswordRepo {
               passwordsalt = ${row.passwordsalt},
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          where businessentityid = ${businessentityid}
        """
       .update
       .run
@@ -92,7 +92,7 @@ object PasswordRepoImpl extends PasswordRepo {
             passwordsalt = EXCLUDED.passwordsalt,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
+          returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
        """.query[PasswordRow].unique
   }
 }

@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_statio_sys_indexes
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatioSysIndexesViewRow(
@@ -34,50 +32,26 @@ case class PgStatioSysIndexesViewRow(
 )
 
 object PgStatioSysIndexesViewRow {
-  implicit val decoder: Decoder[PgStatioSysIndexesViewRow] =
-    (c: HCursor) =>
-      for {
-        relid <- c.downField("relid").as[Option[/* oid */ Long]]
-        indexrelid <- c.downField("indexrelid").as[Option[/* oid */ Long]]
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        relname <- c.downField("relname").as[Option[String]]
-        indexrelname <- c.downField("indexrelname").as[Option[String]]
-        idxBlksRead <- c.downField("idx_blks_read").as[Option[Long]]
-        idxBlksHit <- c.downField("idx_blks_hit").as[Option[Long]]
-      } yield PgStatioSysIndexesViewRow(relid, indexrelid, schemaname, relname, indexrelname, idxBlksRead, idxBlksHit)
-  implicit val encoder: Encoder[PgStatioSysIndexesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "relid" := row.relid,
-        "indexrelid" := row.indexrelid,
-        "schemaname" := row.schemaname,
-        "relname" := row.relname,
-        "indexrelname" := row.indexrelname,
-        "idx_blks_read" := row.idxBlksRead,
-        "idx_blks_hit" := row.idxBlksHit
-      )}
-  implicit val read: Read[PgStatioSysIndexesViewRow] =
-    new Read[PgStatioSysIndexesViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatioSysIndexesViewRow(
-        relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        indexrelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        schemaname = Get[String].unsafeGetNullable(rs, i + 2),
-        relname = Get[String].unsafeGetNullable(rs, i + 3),
-        indexrelname = Get[String].unsafeGetNullable(rs, i + 4),
-        idxBlksRead = Get[Long].unsafeGetNullable(rs, i + 5),
-        idxBlksHit = Get[Long].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgStatioSysIndexesViewRow] = Decoder.forProduct7[PgStatioSysIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit")(PgStatioSysIndexesViewRow.apply)
+  implicit val encoder: Encoder[PgStatioSysIndexesViewRow] = Encoder.forProduct7[PgStatioSysIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_blks_read", "idx_blks_hit")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxBlksRead, x.idxBlksHit))
+  implicit val read: Read[PgStatioSysIndexesViewRow] = new Read[PgStatioSysIndexesViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatioSysIndexesViewRow(
+      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      indexrelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      schemaname = Get[String].unsafeGetNullable(rs, i + 2),
+      relname = Get[String].unsafeGetNullable(rs, i + 3),
+      indexrelname = Get[String].unsafeGetNullable(rs, i + 4),
+      idxBlksRead = Get[Long].unsafeGetNullable(rs, i + 5),
+      idxBlksHit = Get[Long].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

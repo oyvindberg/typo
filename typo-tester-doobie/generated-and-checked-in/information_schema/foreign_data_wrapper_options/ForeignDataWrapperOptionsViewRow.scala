@@ -9,13 +9,11 @@ package foreign_data_wrapper_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ForeignDataWrapperOptionsViewRow(
@@ -28,38 +26,20 @@ case class ForeignDataWrapperOptionsViewRow(
 )
 
 object ForeignDataWrapperOptionsViewRow {
-  implicit val decoder: Decoder[ForeignDataWrapperOptionsViewRow] =
-    (c: HCursor) =>
-      for {
-        foreignDataWrapperCatalog <- c.downField("foreign_data_wrapper_catalog").as[Option[SqlIdentifier]]
-        foreignDataWrapperName <- c.downField("foreign_data_wrapper_name").as[Option[SqlIdentifier]]
-        optionName <- c.downField("option_name").as[Option[SqlIdentifier]]
-        optionValue <- c.downField("option_value").as[Option[CharacterData]]
-      } yield ForeignDataWrapperOptionsViewRow(foreignDataWrapperCatalog, foreignDataWrapperName, optionName, optionValue)
-  implicit val encoder: Encoder[ForeignDataWrapperOptionsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "foreign_data_wrapper_catalog" := row.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" := row.foreignDataWrapperName,
-        "option_name" := row.optionName,
-        "option_value" := row.optionValue
-      )}
-  implicit val read: Read[ForeignDataWrapperOptionsViewRow] =
-    new Read[ForeignDataWrapperOptionsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ForeignDataWrapperOptionsViewRow(
-        foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[ForeignDataWrapperOptionsViewRow] = Decoder.forProduct4[ForeignDataWrapperOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(ForeignDataWrapperOptionsViewRow.apply)
+  implicit val encoder: Encoder[ForeignDataWrapperOptionsViewRow] = Encoder.forProduct4[ForeignDataWrapperOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "option_name", "option_value")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.optionName, x.optionValue))
+  implicit val read: Read[ForeignDataWrapperOptionsViewRow] = new Read[ForeignDataWrapperOptionsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ForeignDataWrapperOptionsViewRow(
+      foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

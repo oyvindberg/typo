@@ -7,18 +7,19 @@ package adventureworks
 package person
 package countryregion
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `person.countryregion` */
 case class CountryregionId(value: /* max 3 chars */ String) extends AnyVal
 object CountryregionId {
+  implicit val arrayGet: Get[Array[CountryregionId]] = Get[Array[/* max 3 chars */ String]].map(_.map(CountryregionId.apply))
+  implicit val arrayPut: Put[Array[CountryregionId]] = Put[Array[/* max 3 chars */ String]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[CountryregionId] = Decoder[/* max 3 chars */ String].map(CountryregionId.apply)
+  implicit val encoder: Encoder[CountryregionId] = Encoder[/* max 3 chars */ String].contramap(_.value)
+  implicit val get: Get[CountryregionId] = Get[/* max 3 chars */ String].map(CountryregionId.apply)
   implicit val ordering: Ordering[CountryregionId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[CountryregionId] =
-    Encoder[/* max 3 chars */ String].contramap(_.value)
-  implicit val decoder: Decoder[CountryregionId] =
-    Decoder[/* max 3 chars */ String].map(CountryregionId(_))
-  implicit val meta: Meta[CountryregionId] = Meta[/* max 3 chars */ String].imap(CountryregionId.apply)(_.value)
-  implicit val metaArray: Meta[Array[CountryregionId]] = Meta[Array[/* max 3 chars */ String]].imap(_.map(CountryregionId.apply))(_.map(_.value))
+  implicit val put: Put[CountryregionId] = Put[/* max 3 chars */ String].contramap(_.value)
 }

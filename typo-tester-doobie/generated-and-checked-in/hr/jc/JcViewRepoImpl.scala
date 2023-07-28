@@ -13,6 +13,6 @@ import fs2.Stream
 
 object JcViewRepoImpl extends JcViewRepo {
   override def selectAll: Stream[ConnectionIO, JcViewRow] = {
-    sql"""select "id", jobcandidateid, businessentityid, resume, modifieddate from hr.jc""".query[JcViewRow].stream
+    sql"""select "id", jobcandidateid, businessentityid, resume, modifieddate::text from hr.jc""".query[JcViewRow].stream
   }
 }

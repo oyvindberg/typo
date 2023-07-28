@@ -10,19 +10,20 @@ package currencyrate
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `sales.currencyrate` */
 case class CurrencyrateId(value: Int) extends AnyVal
 object CurrencyrateId {
-  implicit val ordering: Ordering[CurrencyrateId] = Ordering.by(_.value)
-  implicit val format: Format[CurrencyrateId] = implicitly[Format[Int]].bimap(CurrencyrateId.apply, _.value)
-  implicit val toStatement: ToStatement[CurrencyrateId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[CurrencyrateId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[CurrencyrateId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[CurrencyrateId] = implicitly[Column[Int]].map(CurrencyrateId.apply)
+  implicit val ordering: Ordering[CurrencyrateId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[CurrencyrateId] = new ParameterMetaData[CurrencyrateId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[CurrencyrateId] = implicitly[Reads[Int]].map(CurrencyrateId.apply)
+  implicit val toStatement: ToStatement[CurrencyrateId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[CurrencyrateId] = implicitly[Writes[Int]].contramap(_.value)
 }

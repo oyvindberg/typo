@@ -8,13 +8,11 @@ package pg_catalog
 package pg_conversion
 
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgConversionRow(
@@ -29,54 +27,28 @@ case class PgConversionRow(
 )
 
 object PgConversionRow {
-  implicit val decoder: Decoder[PgConversionRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgConversionId]
-        conname <- c.downField("conname").as[String]
-        connamespace <- c.downField("connamespace").as[/* oid */ Long]
-        conowner <- c.downField("conowner").as[/* oid */ Long]
-        conforencoding <- c.downField("conforencoding").as[Int]
-        contoencoding <- c.downField("contoencoding").as[Int]
-        conproc <- c.downField("conproc").as[TypoRegproc]
-        condefault <- c.downField("condefault").as[Boolean]
-      } yield PgConversionRow(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
-  implicit val encoder: Encoder[PgConversionRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "conname" := row.conname,
-        "connamespace" := row.connamespace,
-        "conowner" := row.conowner,
-        "conforencoding" := row.conforencoding,
-        "contoencoding" := row.contoencoding,
-        "conproc" := row.conproc,
-        "condefault" := row.condefault
-      )}
-  implicit val read: Read[PgConversionRow] =
-    new Read[PgConversionRow](
-      gets = List(
-        (Get[PgConversionId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgConversionRow(
-        oid = Get[PgConversionId].unsafeGetNonNullable(rs, i + 0),
-        conname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        connamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        conowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        conforencoding = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        contoencoding = Get[Int].unsafeGetNonNullable(rs, i + 5),
-        conproc = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 6),
-        condefault = Get[Boolean].unsafeGetNonNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgConversionRow] = Decoder.forProduct8[PgConversionRow, PgConversionId, String, /* oid */ Long, /* oid */ Long, Int, Int, TypoRegproc, Boolean]("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")(PgConversionRow.apply)
+  implicit val encoder: Encoder[PgConversionRow] = Encoder.forProduct8[PgConversionRow, PgConversionId, String, /* oid */ Long, /* oid */ Long, Int, Int, TypoRegproc, Boolean]("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")(x => (x.oid, x.conname, x.connamespace, x.conowner, x.conforencoding, x.contoencoding, x.conproc, x.condefault))
+  implicit val read: Read[PgConversionRow] = new Read[PgConversionRow](
+    gets = List(
+      (Get[PgConversionId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgConversionRow(
+      oid = Get[PgConversionId].unsafeGetNonNullable(rs, i + 0),
+      conname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      connamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      conowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      conforencoding = Get[Int].unsafeGetNonNullable(rs, i + 4),
+      contoencoding = Get[Int].unsafeGetNonNullable(rs, i + 5),
+      conproc = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 6),
+      condefault = Get[Boolean].unsafeGetNonNullable(rs, i + 7)
     )
-  
-
+  )
 }

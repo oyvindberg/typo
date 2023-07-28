@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PchViewRepoImpl extends PchViewRepo {
   override def selectAll(implicit c: Connection): List[PchViewRow] = {
-    SQL"""select "id", productid, startdate, enddate, standardcost, modifieddate
+    SQL"""select "id", productid, startdate::text, enddate::text, standardcost, modifieddate::text
           from pr.pch
        """.as(PchViewRow.rowParser(1).*)
   }

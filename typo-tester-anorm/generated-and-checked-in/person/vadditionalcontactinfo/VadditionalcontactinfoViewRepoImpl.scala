@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoViewRow] = {
-    SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate
+    SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate::text
           from person.vadditionalcontactinfo
        """.as(VadditionalcontactinfoViewRow.rowParser(1).*)
   }

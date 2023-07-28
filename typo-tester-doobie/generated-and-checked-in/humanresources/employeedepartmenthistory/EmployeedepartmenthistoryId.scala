@@ -7,34 +7,17 @@ package adventureworks
 package humanresources
 package employeedepartmenthistory
 
+import adventureworks.TypoLocalDate
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDate
 
 /** Type for the composite primary key of table `humanresources.employeedepartmenthistory` */
-case class EmployeedepartmenthistoryId(businessentityid: BusinessentityId, startdate: LocalDate, departmentid: DepartmentId, shiftid: ShiftId)
+case class EmployeedepartmenthistoryId(businessentityid: BusinessentityId, startdate: TypoLocalDate, departmentid: DepartmentId, shiftid: ShiftId)
 object EmployeedepartmenthistoryId {
-  implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[EmployeedepartmenthistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.departmentid, x.shiftid))
-  implicit val decoder: Decoder[EmployeedepartmenthistoryId] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        startdate <- c.downField("startdate").as[LocalDate]
-        departmentid <- c.downField("departmentid").as[DepartmentId]
-        shiftid <- c.downField("shiftid").as[ShiftId]
-      } yield EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)
-  implicit val encoder: Encoder[EmployeedepartmenthistoryId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "startdate" := row.startdate,
-        "departmentid" := row.departmentid,
-        "shiftid" := row.shiftid
-      )}
+  implicit val decoder: Decoder[EmployeedepartmenthistoryId] = Decoder.forProduct4[EmployeedepartmenthistoryId, BusinessentityId, TypoLocalDate, DepartmentId, ShiftId]("businessentityid", "startdate", "departmentid", "shiftid")(EmployeedepartmenthistoryId.apply)
+  implicit val encoder: Encoder[EmployeedepartmenthistoryId] = Encoder.forProduct4[EmployeedepartmenthistoryId, BusinessentityId, TypoLocalDate, DepartmentId, ShiftId]("businessentityid", "startdate", "departmentid", "shiftid")(x => (x.businessentityid, x.startdate, x.departmentid, x.shiftid))
+  implicit def ordering(implicit O0: Ordering[TypoLocalDate]): Ordering[EmployeedepartmenthistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.departmentid, x.shiftid))
 }

@@ -7,19 +7,17 @@ package adventureworks
 package pu
 package v
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class VViewRow(
   id: Option[Int],
@@ -38,62 +36,34 @@ case class VViewRow(
   /** Points to [[purchasing.vendor.VendorRow.purchasingwebserviceurl]] */
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Points to [[purchasing.vendor.VendorRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object VViewRow {
-  implicit val decoder: Decoder[VViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        accountnumber <- c.downField("accountnumber").as[Option[AccountNumber]]
-        name <- c.downField("name").as[Option[Name]]
-        creditrating <- c.downField("creditrating").as[Option[Int]]
-        preferredvendorstatus <- c.downField("preferredvendorstatus").as[Flag]
-        activeflag <- c.downField("activeflag").as[Flag]
-        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[/* max 1024 chars */ String]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield VViewRow(id, businessentityid, accountnumber, name, creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
-  implicit val encoder: Encoder[VViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "accountnumber" := row.accountnumber,
-        "name" := row.name,
-        "creditrating" := row.creditrating,
-        "preferredvendorstatus" := row.preferredvendorstatus,
-        "activeflag" := row.activeflag,
-        "purchasingwebserviceurl" := row.purchasingwebserviceurl,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[VViewRow] =
-    new Read[VViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[AccountNumber], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 2),
-        name = Get[Name].unsafeGetNullable(rs, i + 3),
-        creditrating = Get[Int].unsafeGetNullable(rs, i + 4),
-        preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-        activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 6),
-        purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[VViewRow] = Decoder.forProduct9[VViewRow, Option[Int], Option[BusinessentityId], Option[AccountNumber], Option[Name], Option[Int], Flag, Flag, Option[/* max 1024 chars */ String], Option[TypoLocalDateTime]]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VViewRow.apply)
+  implicit val encoder: Encoder[VViewRow] = Encoder.forProduct9[VViewRow, Option[Int], Option[BusinessentityId], Option[AccountNumber], Option[Name], Option[Int], Flag, Flag, Option[/* max 1024 chars */ String], Option[TypoLocalDateTime]]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.id, x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))
+  implicit val read: Read[VViewRow] = new Read[VViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[AccountNumber], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[/* max 1024 chars */ String], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 2),
+      name = Get[Name].unsafeGetNullable(rs, i + 3),
+      creditrating = Get[Int].unsafeGetNullable(rs, i + 4),
+      preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 5),
+      activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 6),
+      purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 7),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

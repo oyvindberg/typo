@@ -8,20 +8,20 @@ package person
 package countryregion
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
-    sql"delete from person.countryregion where countryregioncode = $countryregioncode".update.run.map(_ > 0)
+    sql"delete from person.countryregion where countryregioncode = ${countryregioncode}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning countryregioncode, "name", modifieddate
+          returning countryregioncode, "name", modifieddate::text
        """.query[CountryregionRow].unique
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
@@ -30,39 +30,39 @@ object CountryregionRepoImpl extends CountryregionRepo {
       Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.countryregion default values
-            returning countryregioncode, "name", modifieddate
+            returning countryregioncode, "name", modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.countryregion(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning countryregioncode, "name", modifieddate
+            returning countryregioncode, "name", modifieddate::text
          """
     }
     q.query[CountryregionRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select countryregioncode, "name", modifieddate from person.countryregion""".query[CountryregionRow].stream
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion""".query[CountryregionRow].stream
   }
   override def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]] = {
-    sql"""select countryregioncode, "name", modifieddate from person.countryregion where countryregioncode = $countryregioncode""".query[CountryregionRow].option
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ${countryregioncode}""".query[CountryregionRow].option
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select countryregioncode, "name", modifieddate from person.countryregion where countryregioncode = ANY($countryregioncodes)""".query[CountryregionRow].stream
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ANY(${countryregioncodes})""".query[CountryregionRow].stream
   }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
     sql"""update person.countryregion
           set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
-          where countryregioncode = $countryregioncode
+          where countryregioncode = ${countryregioncode}
        """
       .update
       .run
@@ -79,7 +79,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning countryregioncode, "name", modifieddate
+          returning countryregioncode, "name", modifieddate::text
        """.query[CountryregionRow].unique
   }
 }

@@ -8,12 +8,10 @@ package production
 package culture
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.culture` which has not been persisted yet */
 case class CultureRowUnsaved(
@@ -22,9 +20,9 @@ case class CultureRowUnsaved(
   /** Culture description. */
   name: Name,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): CultureRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CultureRow =
     CultureRow(
       cultureid = cultureid,
       name = name,
@@ -35,19 +33,6 @@ case class CultureRowUnsaved(
     )
 }
 object CultureRowUnsaved {
-  implicit val decoder: Decoder[CultureRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        cultureid <- c.downField("cultureid").as[CultureId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield CultureRowUnsaved(cultureid, name, modifieddate)
-  implicit val encoder: Encoder[CultureRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "cultureid" := row.cultureid,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[CultureRowUnsaved] = Decoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(CultureRowUnsaved.apply)
+  implicit val encoder: Encoder[CultureRowUnsaved] = Encoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))
 }

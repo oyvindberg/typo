@@ -9,24 +9,11 @@ package pg_attribute
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `pg_catalog.pg_attribute` */
 case class PgAttributeId(attrelid: /* oid */ Long, attnum: Int)
 object PgAttributeId {
+  implicit val decoder: Decoder[PgAttributeId] = Decoder.forProduct2[PgAttributeId, /* oid */ Long, Int]("attrelid", "attnum")(PgAttributeId.apply)
+  implicit val encoder: Encoder[PgAttributeId] = Encoder.forProduct2[PgAttributeId, /* oid */ Long, Int]("attrelid", "attnum")(x => (x.attrelid, x.attnum))
   implicit val ordering: Ordering[PgAttributeId] = Ordering.by(x => (x.attrelid, x.attnum))
-  implicit val decoder: Decoder[PgAttributeId] =
-    (c: HCursor) =>
-      for {
-        attrelid <- c.downField("attrelid").as[/* oid */ Long]
-        attnum <- c.downField("attnum").as[Int]
-      } yield PgAttributeId(attrelid, attnum)
-  implicit val encoder: Encoder[PgAttributeId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "attrelid" := row.attrelid,
-        "attnum" := row.attnum
-      )}
 }

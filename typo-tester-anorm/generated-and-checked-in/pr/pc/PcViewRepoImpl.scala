@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PcViewRepoImpl extends PcViewRepo {
   override def selectAll(implicit c: Connection): List[PcViewRow] = {
-    SQL"""select "id", productcategoryid, "name", rowguid, modifieddate
+    SQL"""select "id", productcategoryid, "name", rowguid, modifieddate::text
           from pr.pc
        """.as(PcViewRow.rowParser(1).*)
   }

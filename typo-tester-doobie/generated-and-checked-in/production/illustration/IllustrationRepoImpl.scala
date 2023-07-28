@@ -8,20 +8,20 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
-    sql"delete from production.illustration where illustrationid = $illustrationid".update.run.map(_ > 0)
+    sql"delete from production.illustration where illustrationid = ${illustrationid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into production.illustration(illustrationid, diagram, modifieddate)
           values (${unsaved.illustrationid}::int4, ${unsaved.diagram}::xml, ${unsaved.modifieddate}::timestamp)
-          returning illustrationid, diagram, modifieddate
+          returning illustrationid, diagram, modifieddate::text
        """.query[IllustrationRow].unique
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
@@ -33,39 +33,39 @@ object IllustrationRepoImpl extends IllustrationRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.illustration default values
-            returning illustrationid, diagram, modifieddate
+            returning illustrationid, diagram, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.illustration(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning illustrationid, diagram, modifieddate
+            returning illustrationid, diagram, modifieddate::text
          """
     }
     q.query[IllustrationRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
-    sql"select illustrationid, diagram, modifieddate from production.illustration".query[IllustrationRow].stream
+    sql"select illustrationid, diagram, modifieddate::text from production.illustration".query[IllustrationRow].stream
   }
   override def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]] = {
-    sql"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = $illustrationid".query[IllustrationRow].option
+    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ${illustrationid}".query[IllustrationRow].option
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow] = {
-    sql"select illustrationid, diagram, modifieddate from production.illustration where illustrationid = ANY($illustrationids)".query[IllustrationRow].stream
+    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ANY(${illustrationids})".query[IllustrationRow].stream
   }
   override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
     val illustrationid = row.illustrationid
     sql"""update production.illustration
           set diagram = ${row.diagram}::xml,
               modifieddate = ${row.modifieddate}::timestamp
-          where illustrationid = $illustrationid
+          where illustrationid = ${illustrationid}
        """
       .update
       .run
@@ -82,7 +82,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           do update set
             diagram = EXCLUDED.diagram,
             modifieddate = EXCLUDED.modifieddate
-          returning illustrationid, diagram, modifieddate
+          returning illustrationid, diagram, modifieddate::text
        """.query[IllustrationRow].unique
   }
 }

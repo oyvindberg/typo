@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object AViewRepoImpl extends AViewRepo {
   override def selectAll(implicit c: Connection): List[AViewRow] = {
-    SQL"""select "id", addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+    SQL"""select "id", addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
           from pe."a"
        """.as(AViewRow.rowParser(1).*)
   }

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgDescriptionRow(
@@ -26,37 +28,33 @@ case class PgDescriptionRow(
  }
 
 object PgDescriptionRow {
-  def rowParser(idx: Int): RowParser[PgDescriptionRow] =
-    RowParser[PgDescriptionRow] { row =>
-      Success(
+  implicit val reads: Reads[PgDescriptionRow] = Reads[PgDescriptionRow](json => JsResult.fromTry(
+      Try(
         PgDescriptionRow(
-          objoid = row[/* oid */ Long](idx + 0),
-          classoid = row[/* oid */ Long](idx + 1),
-          objsubid = row[Int](idx + 2),
-          description = row[String](idx + 3)
+          objoid = json.\("objoid").as[/* oid */ Long],
+          classoid = json.\("classoid").as[/* oid */ Long],
+          objsubid = json.\("objsubid").as[Int],
+          description = json.\("description").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgDescriptionRow] = new OFormat[PgDescriptionRow]{
-    override def writes(o: PgDescriptionRow): JsObject =
-      Json.obj(
-        "objoid" -> o.objoid,
-        "classoid" -> o.classoid,
-        "objsubid" -> o.objsubid,
-        "description" -> o.description
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgDescriptionRow] = RowParser[PgDescriptionRow] { row =>
+    Success(
+      PgDescriptionRow(
+        objoid = row[/* oid */ Long](idx + 0),
+        classoid = row[/* oid */ Long](idx + 1),
+        objsubid = row[Int](idx + 2),
+        description = row[String](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgDescriptionRow] = {
-      JsResult.fromTry(
-        Try(
-          PgDescriptionRow(
-            objoid = json.\("objoid").as[/* oid */ Long],
-            classoid = json.\("classoid").as[/* oid */ Long],
-            objsubid = json.\("objsubid").as[Int],
-            description = json.\("description").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgDescriptionRow] = OWrites[PgDescriptionRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "objoid" -> Json.toJson(o.objoid),
+      "classoid" -> Json.toJson(o.classoid),
+      "objsubid" -> Json.toJson(o.objsubid),
+      "description" -> Json.toJson(o.description)
+    ))
+  )
 }

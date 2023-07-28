@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_opclass
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgOpclassRow(
@@ -29,58 +27,30 @@ case class PgOpclassRow(
 )
 
 object PgOpclassRow {
-  implicit val decoder: Decoder[PgOpclassRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgOpclassId]
-        opcmethod <- c.downField("opcmethod").as[/* oid */ Long]
-        opcname <- c.downField("opcname").as[String]
-        opcnamespace <- c.downField("opcnamespace").as[/* oid */ Long]
-        opcowner <- c.downField("opcowner").as[/* oid */ Long]
-        opcfamily <- c.downField("opcfamily").as[/* oid */ Long]
-        opcintype <- c.downField("opcintype").as[/* oid */ Long]
-        opcdefault <- c.downField("opcdefault").as[Boolean]
-        opckeytype <- c.downField("opckeytype").as[/* oid */ Long]
-      } yield PgOpclassRow(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
-  implicit val encoder: Encoder[PgOpclassRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "opcmethod" := row.opcmethod,
-        "opcname" := row.opcname,
-        "opcnamespace" := row.opcnamespace,
-        "opcowner" := row.opcowner,
-        "opcfamily" := row.opcfamily,
-        "opcintype" := row.opcintype,
-        "opcdefault" := row.opcdefault,
-        "opckeytype" := row.opckeytype
-      )}
-  implicit val read: Read[PgOpclassRow] =
-    new Read[PgOpclassRow](
-      gets = List(
-        (Get[PgOpclassId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgOpclassRow(
-        oid = Get[PgOpclassId].unsafeGetNonNullable(rs, i + 0),
-        opcmethod = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        opcname = Get[String].unsafeGetNonNullable(rs, i + 2),
-        opcnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        opcowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-        opcfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 5),
-        opcintype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
-        opcdefault = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-        opckeytype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgOpclassRow] = Decoder.forProduct9[PgOpclassRow, PgOpclassId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, /* oid */ Long]("oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype")(PgOpclassRow.apply)
+  implicit val encoder: Encoder[PgOpclassRow] = Encoder.forProduct9[PgOpclassRow, PgOpclassId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, /* oid */ Long]("oid", "opcmethod", "opcname", "opcnamespace", "opcowner", "opcfamily", "opcintype", "opcdefault", "opckeytype")(x => (x.oid, x.opcmethod, x.opcname, x.opcnamespace, x.opcowner, x.opcfamily, x.opcintype, x.opcdefault, x.opckeytype))
+  implicit val read: Read[PgOpclassRow] = new Read[PgOpclassRow](
+    gets = List(
+      (Get[PgOpclassId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgOpclassRow(
+      oid = Get[PgOpclassId].unsafeGetNonNullable(rs, i + 0),
+      opcmethod = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      opcname = Get[String].unsafeGetNonNullable(rs, i + 2),
+      opcnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      opcowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
+      opcfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 5),
+      opcintype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
+      opcdefault = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
+      opckeytype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

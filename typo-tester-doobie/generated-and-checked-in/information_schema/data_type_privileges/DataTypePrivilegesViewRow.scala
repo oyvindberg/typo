@@ -9,13 +9,11 @@ package data_type_privileges
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class DataTypePrivilegesViewRow(
@@ -28,42 +26,22 @@ case class DataTypePrivilegesViewRow(
 )
 
 object DataTypePrivilegesViewRow {
-  implicit val decoder: Decoder[DataTypePrivilegesViewRow] =
-    (c: HCursor) =>
-      for {
-        objectCatalog <- c.downField("object_catalog").as[Option[SqlIdentifier]]
-        objectSchema <- c.downField("object_schema").as[Option[SqlIdentifier]]
-        objectName <- c.downField("object_name").as[Option[SqlIdentifier]]
-        objectType <- c.downField("object_type").as[Option[CharacterData]]
-        dtdIdentifier <- c.downField("dtd_identifier").as[Option[SqlIdentifier]]
-      } yield DataTypePrivilegesViewRow(objectCatalog, objectSchema, objectName, objectType, dtdIdentifier)
-  implicit val encoder: Encoder[DataTypePrivilegesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "object_catalog" := row.objectCatalog,
-        "object_schema" := row.objectSchema,
-        "object_name" := row.objectName,
-        "object_type" := row.objectType,
-        "dtd_identifier" := row.dtdIdentifier
-      )}
-  implicit val read: Read[DataTypePrivilegesViewRow] =
-    new Read[DataTypePrivilegesViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DataTypePrivilegesViewRow(
-        objectCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        objectSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        objectName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        objectType = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-        dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[DataTypePrivilegesViewRow] = Decoder.forProduct5[DataTypePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier]]("object_catalog", "object_schema", "object_name", "object_type", "dtd_identifier")(DataTypePrivilegesViewRow.apply)
+  implicit val encoder: Encoder[DataTypePrivilegesViewRow] = Encoder.forProduct5[DataTypePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier]]("object_catalog", "object_schema", "object_name", "object_type", "dtd_identifier")(x => (x.objectCatalog, x.objectSchema, x.objectName, x.objectType, x.dtdIdentifier))
+  implicit val read: Read[DataTypePrivilegesViewRow] = new Read[DataTypePrivilegesViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => DataTypePrivilegesViewRow(
+      objectCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      objectSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      objectName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      objectType = Get[CharacterData].unsafeGetNullable(rs, i + 3),
+      dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

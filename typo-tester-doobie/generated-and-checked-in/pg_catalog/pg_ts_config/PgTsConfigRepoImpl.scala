@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_config where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_config where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow] = {
     sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
@@ -25,10 +25,10 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config".query[PgTsConfigRow].stream
   }
   override def selectById(oid: PgTsConfigId): ConnectionIO[Option[PgTsConfigRow]] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = $oid".query[PgTsConfigRow].option
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ${oid}".query[PgTsConfigRow].option
   }
   override def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY($oids)".query[PgTsConfigRow].stream
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${oids})".query[PgTsConfigRow].stream
   }
   override def update(row: PgTsConfigRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -37,7 +37,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
               cfgnamespace = ${row.cfgnamespace}::oid,
               cfgowner = ${row.cfgowner}::oid,
               cfgparser = ${row.cfgparser}::oid
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

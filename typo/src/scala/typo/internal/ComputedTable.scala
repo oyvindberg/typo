@@ -119,7 +119,7 @@ case class ComputedTable(
 
   val maybeUnsavedRow: Option[ComputedRowUnsaved] =
     ComputedRowUnsaved(source, cols, default, naming)
-  
+
   val repoMethods: Option[NonEmptyList[RepoMethod]] = {
 
     val maybeFieldValueOrIdsParam = names.FieldOrIdValueName.map(name =>

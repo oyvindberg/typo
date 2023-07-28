@@ -8,11 +8,11 @@ package sales
 package specialofferproduct
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
@@ -22,7 +22,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     SQL"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
           values (${unsaved.specialofferid}::int4, ${unsaved.productid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning specialofferid, productid, rowguid, modifieddate
+          returning specialofferid, productid, rowguid, modifieddate::text
        """
       .executeInsert(SpecialofferproductRow.rowParser(1).single)
   
@@ -37,19 +37,19 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.specialofferproduct default values
-            returning specialofferid, productid, rowguid, modifieddate
+            returning specialofferid, productid, rowguid, modifieddate::text
          """
         .executeInsert(SpecialofferproductRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.specialofferproduct(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning specialofferid, productid, rowguid, modifieddate
+                  returning specialofferid, productid, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -60,12 +60,12 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate
+    SQL"""select specialofferid, productid, rowguid, modifieddate::text
           from sales.specialofferproduct
        """.as(SpecialofferproductRow.rowParser(1).*)
   }
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
-    SQL"""select specialofferid, productid, rowguid, modifieddate
+    SQL"""select specialofferid, productid, rowguid, modifieddate::text
           from sales.specialofferproduct
           where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
        """.as(SpecialofferproductRow.rowParser(1).singleOpt)
@@ -90,7 +90,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           do update set
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning specialofferid, productid, rowguid, modifieddate
+          returning specialofferid, productid, rowguid, modifieddate::text
        """
       .executeInsert(SpecialofferproductRow.rowParser(1).single)
   

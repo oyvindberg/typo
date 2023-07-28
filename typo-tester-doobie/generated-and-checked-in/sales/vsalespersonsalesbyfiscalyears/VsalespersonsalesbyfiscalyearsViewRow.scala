@@ -7,13 +7,11 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyears
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class VsalespersonsalesbyfiscalyearsViewRow(
@@ -27,50 +25,26 @@ case class VsalespersonsalesbyfiscalyearsViewRow(
 )
 
 object VsalespersonsalesbyfiscalyearsViewRow {
-  implicit val decoder: Decoder[VsalespersonsalesbyfiscalyearsViewRow] =
-    (c: HCursor) =>
-      for {
-        SalesPersonID <- c.downField("SalesPersonID").as[Option[Int]]
-        FullName <- c.downField("FullName").as[Option[String]]
-        JobTitle <- c.downField("JobTitle").as[Option[String]]
-        SalesTerritory <- c.downField("SalesTerritory").as[Option[String]]
-        `2012` <- c.downField("2012").as[Option[BigDecimal]]
-        `2013` <- c.downField("2013").as[Option[BigDecimal]]
-        `2014` <- c.downField("2014").as[Option[BigDecimal]]
-      } yield VsalespersonsalesbyfiscalyearsViewRow(SalesPersonID, FullName, JobTitle, SalesTerritory, `2012`, `2013`, `2014`)
-  implicit val encoder: Encoder[VsalespersonsalesbyfiscalyearsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "SalesPersonID" := row.SalesPersonID,
-        "FullName" := row.FullName,
-        "JobTitle" := row.JobTitle,
-        "SalesTerritory" := row.SalesTerritory,
-        "2012" := row.`2012`,
-        "2013" := row.`2013`,
-        "2014" := row.`2014`
-      )}
-  implicit val read: Read[VsalespersonsalesbyfiscalyearsViewRow] =
-    new Read[VsalespersonsalesbyfiscalyearsViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VsalespersonsalesbyfiscalyearsViewRow(
-        SalesPersonID = Get[Int].unsafeGetNullable(rs, i + 0),
-        FullName = Get[String].unsafeGetNullable(rs, i + 1),
-        JobTitle = Get[String].unsafeGetNullable(rs, i + 2),
-        SalesTerritory = Get[String].unsafeGetNullable(rs, i + 3),
-        `2012` = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        `2013` = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        `2014` = Get[BigDecimal].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[VsalespersonsalesbyfiscalyearsViewRow] = Decoder.forProduct7[VsalespersonsalesbyfiscalyearsViewRow, Option[Int], Option[String], Option[String], Option[String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014")(VsalespersonsalesbyfiscalyearsViewRow.apply)
+  implicit val encoder: Encoder[VsalespersonsalesbyfiscalyearsViewRow] = Encoder.forProduct7[VsalespersonsalesbyfiscalyearsViewRow, Option[Int], Option[String], Option[String], Option[String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014")(x => (x.SalesPersonID, x.FullName, x.JobTitle, x.SalesTerritory, x.`2012`, x.`2013`, x.`2014`))
+  implicit val read: Read[VsalespersonsalesbyfiscalyearsViewRow] = new Read[VsalespersonsalesbyfiscalyearsViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VsalespersonsalesbyfiscalyearsViewRow(
+      SalesPersonID = Get[Int].unsafeGetNullable(rs, i + 0),
+      FullName = Get[String].unsafeGetNullable(rs, i + 1),
+      JobTitle = Get[String].unsafeGetNullable(rs, i + 2),
+      SalesTerritory = Get[String].unsafeGetNullable(rs, i + 3),
+      `2012` = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+      `2013` = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
+      `2014` = Get[BigDecimal].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

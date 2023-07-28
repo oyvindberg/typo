@@ -8,13 +8,11 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgAmprocRow(
@@ -27,46 +25,24 @@ case class PgAmprocRow(
 )
 
 object PgAmprocRow {
-  implicit val decoder: Decoder[PgAmprocRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgAmprocId]
-        amprocfamily <- c.downField("amprocfamily").as[/* oid */ Long]
-        amproclefttype <- c.downField("amproclefttype").as[/* oid */ Long]
-        amprocrighttype <- c.downField("amprocrighttype").as[/* oid */ Long]
-        amprocnum <- c.downField("amprocnum").as[Int]
-        amproc <- c.downField("amproc").as[TypoRegproc]
-      } yield PgAmprocRow(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
-  implicit val encoder: Encoder[PgAmprocRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "amprocfamily" := row.amprocfamily,
-        "amproclefttype" := row.amproclefttype,
-        "amprocrighttype" := row.amprocrighttype,
-        "amprocnum" := row.amprocnum,
-        "amproc" := row.amproc
-      )}
-  implicit val read: Read[PgAmprocRow] =
-    new Read[PgAmprocRow](
-      gets = List(
-        (Get[PgAmprocId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAmprocRow(
-        oid = Get[PgAmprocId].unsafeGetNonNullable(rs, i + 0),
-        amprocfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        amproclefttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        amprocrighttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        amprocnum = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        amproc = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PgAmprocRow] = Decoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(PgAmprocRow.apply)
+  implicit val encoder: Encoder[PgAmprocRow] = Encoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(x => (x.oid, x.amprocfamily, x.amproclefttype, x.amprocrighttype, x.amprocnum, x.amproc))
+  implicit val read: Read[PgAmprocRow] = new Read[PgAmprocRow](
+    gets = List(
+      (Get[PgAmprocId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAmprocRow(
+      oid = Get[PgAmprocId].unsafeGetNonNullable(rs, i + 0),
+      amprocfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      amproclefttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      amprocrighttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      amprocnum = Get[Int].unsafeGetNonNullable(rs, i + 4),
+      amproc = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

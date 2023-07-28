@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAttrdefRow(
@@ -25,37 +27,33 @@ case class PgAttrdefRow(
 )
 
 object PgAttrdefRow {
-  def rowParser(idx: Int): RowParser[PgAttrdefRow] =
-    RowParser[PgAttrdefRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAttrdefRow] = Reads[PgAttrdefRow](json => JsResult.fromTry(
+      Try(
         PgAttrdefRow(
-          oid = row[PgAttrdefId](idx + 0),
-          adrelid = row[/* oid */ Long](idx + 1),
-          adnum = row[Int](idx + 2),
-          adbin = row[TypoPgNodeTree](idx + 3)
+          oid = json.\("oid").as[PgAttrdefId],
+          adrelid = json.\("adrelid").as[/* oid */ Long],
+          adnum = json.\("adnum").as[Int],
+          adbin = json.\("adbin").as[TypoPgNodeTree]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAttrdefRow] = new OFormat[PgAttrdefRow]{
-    override def writes(o: PgAttrdefRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "adrelid" -> o.adrelid,
-        "adnum" -> o.adnum,
-        "adbin" -> o.adbin
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAttrdefRow] = RowParser[PgAttrdefRow] { row =>
+    Success(
+      PgAttrdefRow(
+        oid = row[PgAttrdefId](idx + 0),
+        adrelid = row[/* oid */ Long](idx + 1),
+        adnum = row[Int](idx + 2),
+        adbin = row[TypoPgNodeTree](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAttrdefRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAttrdefRow(
-            oid = json.\("oid").as[PgAttrdefId],
-            adrelid = json.\("adrelid").as[/* oid */ Long],
-            adnum = json.\("adnum").as[Int],
-            adbin = json.\("adbin").as[TypoPgNodeTree]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAttrdefRow] = OWrites[PgAttrdefRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "adrelid" -> Json.toJson(o.adrelid),
+      "adnum" -> Json.toJson(o.adnum),
+      "adbin" -> Json.toJson(o.adbin)
+    ))
+  )
 }

@@ -8,11 +8,11 @@ package sales
 package salespersonquotahistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
@@ -22,7 +22,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     sql"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.quotadate}::timestamp, ${unsaved.salesquota}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, quotadate, salesquota, rowguid, modifieddate
+          returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
        """.query[SalespersonquotahistoryRow].unique
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow] = {
@@ -36,29 +36,29 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.salespersonquotahistory default values
-            returning businessentityid, quotadate, salesquota, rowguid, modifieddate
+            returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salespersonquotahistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, quotadate, salesquota, rowguid, modifieddate
+            returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
          """
     }
     q.query[SalespersonquotahistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
-    sql"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory".query[SalespersonquotahistoryRow].stream
+    sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory".query[SalespersonquotahistoryRow].stream
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]] = {
-    sql"select businessentityid, quotadate, salesquota, rowguid, modifieddate from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".query[SalespersonquotahistoryRow].option
+    sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".query[SalespersonquotahistoryRow].option
   }
   override def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -86,7 +86,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             salesquota = EXCLUDED.salesquota,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, quotadate, salesquota, rowguid, modifieddate
+          returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
        """.query[SalespersonquotahistoryRow].unique
   }
 }

@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_constraint where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_constraint where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgConstraintRow): ConnectionIO[PgConstraintRow] = {
     sql"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)
@@ -25,10 +25,10 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
     sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint".query[PgConstraintRow].stream
   }
   override def selectById(oid: PgConstraintId): ConnectionIO[Option[PgConstraintRow]] = {
-    sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = $oid".query[PgConstraintRow].option
+    sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ${oid}".query[PgConstraintRow].option
   }
   override def selectByIds(oids: Array[PgConstraintId]): Stream[ConnectionIO, PgConstraintRow] = {
-    sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ANY($oids)".query[PgConstraintRow].stream
+    sql"select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin from pg_catalog.pg_constraint where oid = ANY(${oids})".query[PgConstraintRow].stream
   }
   override def update(row: PgConstraintRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -57,7 +57,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
               conffeqop = ${row.conffeqop}::_oid,
               conexclop = ${row.conexclop}::_oid,
               conbin = ${row.conbin}::pg_node_tree
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

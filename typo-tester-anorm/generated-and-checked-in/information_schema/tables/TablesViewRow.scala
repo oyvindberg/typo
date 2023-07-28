@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TablesViewRow(
@@ -35,61 +37,57 @@ case class TablesViewRow(
 )
 
 object TablesViewRow {
-  def rowParser(idx: Int): RowParser[TablesViewRow] =
-    RowParser[TablesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[TablesViewRow] = Reads[TablesViewRow](json => JsResult.fromTry(
+      Try(
         TablesViewRow(
-          tableCatalog = row[Option[SqlIdentifier]](idx + 0),
-          tableSchema = row[Option[SqlIdentifier]](idx + 1),
-          tableName = row[Option[SqlIdentifier]](idx + 2),
-          tableType = row[Option[CharacterData]](idx + 3),
-          selfReferencingColumnName = row[Option[SqlIdentifier]](idx + 4),
-          referenceGeneration = row[Option[CharacterData]](idx + 5),
-          userDefinedTypeCatalog = row[Option[SqlIdentifier]](idx + 6),
-          userDefinedTypeSchema = row[Option[SqlIdentifier]](idx + 7),
-          userDefinedTypeName = row[Option[SqlIdentifier]](idx + 8),
-          isInsertableInto = row[Option[YesOrNo]](idx + 9),
-          isTyped = row[Option[YesOrNo]](idx + 10),
-          commitAction = row[Option[CharacterData]](idx + 11)
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          tableType = json.\("table_type").toOption.map(_.as[CharacterData]),
+          selfReferencingColumnName = json.\("self_referencing_column_name").toOption.map(_.as[SqlIdentifier]),
+          referenceGeneration = json.\("reference_generation").toOption.map(_.as[CharacterData]),
+          userDefinedTypeCatalog = json.\("user_defined_type_catalog").toOption.map(_.as[SqlIdentifier]),
+          userDefinedTypeSchema = json.\("user_defined_type_schema").toOption.map(_.as[SqlIdentifier]),
+          userDefinedTypeName = json.\("user_defined_type_name").toOption.map(_.as[SqlIdentifier]),
+          isInsertableInto = json.\("is_insertable_into").toOption.map(_.as[YesOrNo]),
+          isTyped = json.\("is_typed").toOption.map(_.as[YesOrNo]),
+          commitAction = json.\("commit_action").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[TablesViewRow] = new OFormat[TablesViewRow]{
-    override def writes(o: TablesViewRow): JsObject =
-      Json.obj(
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "table_type" -> o.tableType,
-        "self_referencing_column_name" -> o.selfReferencingColumnName,
-        "reference_generation" -> o.referenceGeneration,
-        "user_defined_type_catalog" -> o.userDefinedTypeCatalog,
-        "user_defined_type_schema" -> o.userDefinedTypeSchema,
-        "user_defined_type_name" -> o.userDefinedTypeName,
-        "is_insertable_into" -> o.isInsertableInto,
-        "is_typed" -> o.isTyped,
-        "commit_action" -> o.commitAction
+    ),
+  )
+  def rowParser(idx: Int): RowParser[TablesViewRow] = RowParser[TablesViewRow] { row =>
+    Success(
+      TablesViewRow(
+        tableCatalog = row[Option[SqlIdentifier]](idx + 0),
+        tableSchema = row[Option[SqlIdentifier]](idx + 1),
+        tableName = row[Option[SqlIdentifier]](idx + 2),
+        tableType = row[Option[CharacterData]](idx + 3),
+        selfReferencingColumnName = row[Option[SqlIdentifier]](idx + 4),
+        referenceGeneration = row[Option[CharacterData]](idx + 5),
+        userDefinedTypeCatalog = row[Option[SqlIdentifier]](idx + 6),
+        userDefinedTypeSchema = row[Option[SqlIdentifier]](idx + 7),
+        userDefinedTypeName = row[Option[SqlIdentifier]](idx + 8),
+        isInsertableInto = row[Option[YesOrNo]](idx + 9),
+        isTyped = row[Option[YesOrNo]](idx + 10),
+        commitAction = row[Option[CharacterData]](idx + 11)
       )
-  
-    override def reads(json: JsValue): JsResult[TablesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          TablesViewRow(
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            tableType = json.\("table_type").toOption.map(_.as[CharacterData]),
-            selfReferencingColumnName = json.\("self_referencing_column_name").toOption.map(_.as[SqlIdentifier]),
-            referenceGeneration = json.\("reference_generation").toOption.map(_.as[CharacterData]),
-            userDefinedTypeCatalog = json.\("user_defined_type_catalog").toOption.map(_.as[SqlIdentifier]),
-            userDefinedTypeSchema = json.\("user_defined_type_schema").toOption.map(_.as[SqlIdentifier]),
-            userDefinedTypeName = json.\("user_defined_type_name").toOption.map(_.as[SqlIdentifier]),
-            isInsertableInto = json.\("is_insertable_into").toOption.map(_.as[YesOrNo]),
-            isTyped = json.\("is_typed").toOption.map(_.as[YesOrNo]),
-            commitAction = json.\("commit_action").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[TablesViewRow] = OWrites[TablesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "table_type" -> Json.toJson(o.tableType),
+      "self_referencing_column_name" -> Json.toJson(o.selfReferencingColumnName),
+      "reference_generation" -> Json.toJson(o.referenceGeneration),
+      "user_defined_type_catalog" -> Json.toJson(o.userDefinedTypeCatalog),
+      "user_defined_type_schema" -> Json.toJson(o.userDefinedTypeSchema),
+      "user_defined_type_name" -> Json.toJson(o.userDefinedTypeName),
+      "is_insertable_into" -> Json.toJson(o.isInsertableInto),
+      "is_typed" -> Json.toJson(o.isTyped),
+      "commit_action" -> Json.toJson(o.commitAction)
+    ))
+  )
 }

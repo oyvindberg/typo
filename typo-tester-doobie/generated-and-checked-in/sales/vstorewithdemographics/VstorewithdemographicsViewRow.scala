@@ -10,13 +10,11 @@ package vstorewithdemographics
 import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class VstorewithdemographicsViewRow(
@@ -37,70 +35,36 @@ case class VstorewithdemographicsViewRow(
 )
 
 object VstorewithdemographicsViewRow {
-  implicit val decoder: Decoder[VstorewithdemographicsViewRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        name <- c.downField("name").as[Option[Name]]
-        AnnualSales <- c.downField("AnnualSales").as[Option[TypoMoney]]
-        AnnualRevenue <- c.downField("AnnualRevenue").as[Option[TypoMoney]]
-        BankName <- c.downField("BankName").as[Option[/* max 50 chars */ String]]
-        BusinessType <- c.downField("BusinessType").as[Option[/* max 5 chars */ String]]
-        YearOpened <- c.downField("YearOpened").as[Option[Int]]
-        Specialty <- c.downField("Specialty").as[Option[/* max 50 chars */ String]]
-        SquareFeet <- c.downField("SquareFeet").as[Option[Int]]
-        Brands <- c.downField("Brands").as[Option[/* max 30 chars */ String]]
-        Internet <- c.downField("Internet").as[Option[/* max 30 chars */ String]]
-        NumberEmployees <- c.downField("NumberEmployees").as[Option[Int]]
-      } yield VstorewithdemographicsViewRow(businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees)
-  implicit val encoder: Encoder[VstorewithdemographicsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "name" := row.name,
-        "AnnualSales" := row.AnnualSales,
-        "AnnualRevenue" := row.AnnualRevenue,
-        "BankName" := row.BankName,
-        "BusinessType" := row.BusinessType,
-        "YearOpened" := row.YearOpened,
-        "Specialty" := row.Specialty,
-        "SquareFeet" := row.SquareFeet,
-        "Brands" := row.Brands,
-        "Internet" := row.Internet,
-        "NumberEmployees" := row.NumberEmployees
-      )}
-  implicit val read: Read[VstorewithdemographicsViewRow] =
-    new Read[VstorewithdemographicsViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[TypoMoney], Nullability.Nullable),
-        (Get[TypoMoney], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[/* max 5 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VstorewithdemographicsViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        AnnualSales = Get[TypoMoney].unsafeGetNullable(rs, i + 2),
-        AnnualRevenue = Get[TypoMoney].unsafeGetNullable(rs, i + 3),
-        BankName = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        BusinessType = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 5),
-        YearOpened = Get[Int].unsafeGetNullable(rs, i + 6),
-        Specialty = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 7),
-        SquareFeet = Get[Int].unsafeGetNullable(rs, i + 8),
-        Brands = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 9),
-        Internet = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 10),
-        NumberEmployees = Get[Int].unsafeGetNullable(rs, i + 11)
-      )
+  implicit val decoder: Decoder[VstorewithdemographicsViewRow] = Decoder.forProduct12[VstorewithdemographicsViewRow, Option[BusinessentityId], Option[Name], Option[TypoMoney], Option[TypoMoney], Option[/* max 50 chars */ String], Option[/* max 5 chars */ String], Option[Int], Option[/* max 50 chars */ String], Option[Int], Option[/* max 30 chars */ String], Option[/* max 30 chars */ String], Option[Int]]("businessentityid", "name", "AnnualSales", "AnnualRevenue", "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees")(VstorewithdemographicsViewRow.apply)
+  implicit val encoder: Encoder[VstorewithdemographicsViewRow] = Encoder.forProduct12[VstorewithdemographicsViewRow, Option[BusinessentityId], Option[Name], Option[TypoMoney], Option[TypoMoney], Option[/* max 50 chars */ String], Option[/* max 5 chars */ String], Option[Int], Option[/* max 50 chars */ String], Option[Int], Option[/* max 30 chars */ String], Option[/* max 30 chars */ String], Option[Int]]("businessentityid", "name", "AnnualSales", "AnnualRevenue", "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees")(x => (x.businessentityid, x.name, x.AnnualSales, x.AnnualRevenue, x.BankName, x.BusinessType, x.YearOpened, x.Specialty, x.SquareFeet, x.Brands, x.Internet, x.NumberEmployees))
+  implicit val read: Read[VstorewithdemographicsViewRow] = new Read[VstorewithdemographicsViewRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoMoney], Nullability.Nullable),
+      (Get[TypoMoney], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[/* max 5 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VstorewithdemographicsViewRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNullable(rs, i + 1),
+      AnnualSales = Get[TypoMoney].unsafeGetNullable(rs, i + 2),
+      AnnualRevenue = Get[TypoMoney].unsafeGetNullable(rs, i + 3),
+      BankName = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
+      BusinessType = Get[/* max 5 chars */ String].unsafeGetNullable(rs, i + 5),
+      YearOpened = Get[Int].unsafeGetNullable(rs, i + 6),
+      Specialty = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 7),
+      SquareFeet = Get[Int].unsafeGetNullable(rs, i + 8),
+      Brands = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 9),
+      Internet = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 10),
+      NumberEmployees = Get[Int].unsafeGetNullable(rs, i + 11)
     )
-  
-
+  )
 }

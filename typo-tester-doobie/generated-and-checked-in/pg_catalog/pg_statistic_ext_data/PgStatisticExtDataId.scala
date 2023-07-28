@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_statistic_ext_data` */
 case class PgStatisticExtDataId(value: /* oid */ Long) extends AnyVal
 object PgStatisticExtDataId {
+  implicit val arrayGet: Get[Array[PgStatisticExtDataId]] = Get[Array[/* oid */ Long]].map(_.map(PgStatisticExtDataId.apply))
+  implicit val arrayPut: Put[Array[PgStatisticExtDataId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgStatisticExtDataId] = Decoder[/* oid */ Long].map(PgStatisticExtDataId.apply)
+  implicit val encoder: Encoder[PgStatisticExtDataId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgStatisticExtDataId] = Get[/* oid */ Long].map(PgStatisticExtDataId.apply)
   implicit val ordering: Ordering[PgStatisticExtDataId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgStatisticExtDataId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgStatisticExtDataId] =
-    Decoder[/* oid */ Long].map(PgStatisticExtDataId(_))
-  implicit val meta: Meta[PgStatisticExtDataId] = Meta[/* oid */ Long].imap(PgStatisticExtDataId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgStatisticExtDataId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgStatisticExtDataId.apply))(_.map(_.value))
+  implicit val put: Put[PgStatisticExtDataId] = Put[/* oid */ Long].contramap(_.value)
 }

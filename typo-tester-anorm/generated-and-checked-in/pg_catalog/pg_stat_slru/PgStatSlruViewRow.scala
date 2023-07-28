@@ -7,14 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_stat_slru
 
+import adventureworks.TypoOffsetDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatSlruViewRow(
@@ -26,56 +28,52 @@ case class PgStatSlruViewRow(
   blksExists: Option[Long],
   flushes: Option[Long],
   truncates: Option[Long],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatSlruViewRow {
-  def rowParser(idx: Int): RowParser[PgStatSlruViewRow] =
-    RowParser[PgStatSlruViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatSlruViewRow] = Reads[PgStatSlruViewRow](json => JsResult.fromTry(
+      Try(
         PgStatSlruViewRow(
-          name = row[Option[String]](idx + 0),
-          blksZeroed = row[Option[Long]](idx + 1),
-          blksHit = row[Option[Long]](idx + 2),
-          blksRead = row[Option[Long]](idx + 3),
-          blksWritten = row[Option[Long]](idx + 4),
-          blksExists = row[Option[Long]](idx + 5),
-          flushes = row[Option[Long]](idx + 6),
-          truncates = row[Option[Long]](idx + 7),
-          statsReset = row[Option[OffsetDateTime]](idx + 8)
+          name = json.\("name").toOption.map(_.as[String]),
+          blksZeroed = json.\("blks_zeroed").toOption.map(_.as[Long]),
+          blksHit = json.\("blks_hit").toOption.map(_.as[Long]),
+          blksRead = json.\("blks_read").toOption.map(_.as[Long]),
+          blksWritten = json.\("blks_written").toOption.map(_.as[Long]),
+          blksExists = json.\("blks_exists").toOption.map(_.as[Long]),
+          flushes = json.\("flushes").toOption.map(_.as[Long]),
+          truncates = json.\("truncates").toOption.map(_.as[Long]),
+          statsReset = json.\("stats_reset").toOption.map(_.as[TypoOffsetDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatSlruViewRow] = new OFormat[PgStatSlruViewRow]{
-    override def writes(o: PgStatSlruViewRow): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "blks_zeroed" -> o.blksZeroed,
-        "blks_hit" -> o.blksHit,
-        "blks_read" -> o.blksRead,
-        "blks_written" -> o.blksWritten,
-        "blks_exists" -> o.blksExists,
-        "flushes" -> o.flushes,
-        "truncates" -> o.truncates,
-        "stats_reset" -> o.statsReset
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatSlruViewRow] = RowParser[PgStatSlruViewRow] { row =>
+    Success(
+      PgStatSlruViewRow(
+        name = row[Option[String]](idx + 0),
+        blksZeroed = row[Option[Long]](idx + 1),
+        blksHit = row[Option[Long]](idx + 2),
+        blksRead = row[Option[Long]](idx + 3),
+        blksWritten = row[Option[Long]](idx + 4),
+        blksExists = row[Option[Long]](idx + 5),
+        flushes = row[Option[Long]](idx + 6),
+        truncates = row[Option[Long]](idx + 7),
+        statsReset = row[Option[TypoOffsetDateTime]](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatSlruViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatSlruViewRow(
-            name = json.\("name").toOption.map(_.as[String]),
-            blksZeroed = json.\("blks_zeroed").toOption.map(_.as[Long]),
-            blksHit = json.\("blks_hit").toOption.map(_.as[Long]),
-            blksRead = json.\("blks_read").toOption.map(_.as[Long]),
-            blksWritten = json.\("blks_written").toOption.map(_.as[Long]),
-            blksExists = json.\("blks_exists").toOption.map(_.as[Long]),
-            flushes = json.\("flushes").toOption.map(_.as[Long]),
-            truncates = json.\("truncates").toOption.map(_.as[Long]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[OffsetDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatSlruViewRow] = OWrites[PgStatSlruViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "blks_zeroed" -> Json.toJson(o.blksZeroed),
+      "blks_hit" -> Json.toJson(o.blksHit),
+      "blks_read" -> Json.toJson(o.blksRead),
+      "blks_written" -> Json.toJson(o.blksWritten),
+      "blks_exists" -> Json.toJson(o.blksExists),
+      "flushes" -> Json.toJson(o.flushes),
+      "truncates" -> Json.toJson(o.truncates),
+      "stats_reset" -> Json.toJson(o.statsReset)
+    ))
+  )
 }

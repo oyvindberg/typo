@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PchViewRepoImpl extends PchViewRepo {
   override def selectAll: Stream[ConnectionIO, PchViewRow] = {
-    sql"""select "id", productid, startdate, enddate, standardcost, modifieddate from pr.pch""".query[PchViewRow].stream
+    sql"""select "id", productid, startdate::text, enddate::text, standardcost, modifieddate::text from pr.pch""".query[PchViewRow].stream
   }
 }

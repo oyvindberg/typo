@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_tables
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgTablesViewRow(
@@ -28,54 +26,28 @@ case class PgTablesViewRow(
 )
 
 object PgTablesViewRow {
-  implicit val decoder: Decoder[PgTablesViewRow] =
-    (c: HCursor) =>
-      for {
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        tablename <- c.downField("tablename").as[Option[String]]
-        tableowner <- c.downField("tableowner").as[Option[String]]
-        tablespace <- c.downField("tablespace").as[Option[String]]
-        hasindexes <- c.downField("hasindexes").as[Option[Boolean]]
-        hasrules <- c.downField("hasrules").as[Option[Boolean]]
-        hastriggers <- c.downField("hastriggers").as[Option[Boolean]]
-        rowsecurity <- c.downField("rowsecurity").as[Option[Boolean]]
-      } yield PgTablesViewRow(schemaname, tablename, tableowner, tablespace, hasindexes, hasrules, hastriggers, rowsecurity)
-  implicit val encoder: Encoder[PgTablesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "schemaname" := row.schemaname,
-        "tablename" := row.tablename,
-        "tableowner" := row.tableowner,
-        "tablespace" := row.tablespace,
-        "hasindexes" := row.hasindexes,
-        "hasrules" := row.hasrules,
-        "hastriggers" := row.hastriggers,
-        "rowsecurity" := row.rowsecurity
-      )}
-  implicit val read: Read[PgTablesViewRow] =
-    new Read[PgTablesViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTablesViewRow(
-        schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-        tablename = Get[String].unsafeGetNullable(rs, i + 1),
-        tableowner = Get[String].unsafeGetNullable(rs, i + 2),
-        tablespace = Get[String].unsafeGetNullable(rs, i + 3),
-        hasindexes = Get[Boolean].unsafeGetNullable(rs, i + 4),
-        hasrules = Get[Boolean].unsafeGetNullable(rs, i + 5),
-        hastriggers = Get[Boolean].unsafeGetNullable(rs, i + 6),
-        rowsecurity = Get[Boolean].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgTablesViewRow] = Decoder.forProduct8[PgTablesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean]]("schemaname", "tablename", "tableowner", "tablespace", "hasindexes", "hasrules", "hastriggers", "rowsecurity")(PgTablesViewRow.apply)
+  implicit val encoder: Encoder[PgTablesViewRow] = Encoder.forProduct8[PgTablesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean]]("schemaname", "tablename", "tableowner", "tablespace", "hasindexes", "hasrules", "hastriggers", "rowsecurity")(x => (x.schemaname, x.tablename, x.tableowner, x.tablespace, x.hasindexes, x.hasrules, x.hastriggers, x.rowsecurity))
+  implicit val read: Read[PgTablesViewRow] = new Read[PgTablesViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTablesViewRow(
+      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
+      tablename = Get[String].unsafeGetNullable(rs, i + 1),
+      tableowner = Get[String].unsafeGetNullable(rs, i + 2),
+      tablespace = Get[String].unsafeGetNullable(rs, i + 3),
+      hasindexes = Get[Boolean].unsafeGetNullable(rs, i + 4),
+      hasrules = Get[Boolean].unsafeGetNullable(rs, i + 5),
+      hastriggers = Get[Boolean].unsafeGetNullable(rs, i + 6),
+      rowsecurity = Get[Boolean].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

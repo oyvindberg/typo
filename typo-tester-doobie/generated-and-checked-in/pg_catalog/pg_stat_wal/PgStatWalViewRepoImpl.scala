@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatWalViewRepoImpl extends PgStatWalViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatWalViewRow] = {
-    sql"select wal_records, wal_fpi, wal_bytes, wal_buffers_full, wal_write, wal_sync, wal_write_time, wal_sync_time, stats_reset from pg_catalog.pg_stat_wal".query[PgStatWalViewRow].stream
+    sql"select wal_records, wal_fpi, wal_bytes, wal_buffers_full, wal_write, wal_sync, wal_write_time, wal_sync_time, stats_reset::text from pg_catalog.pg_stat_wal".query[PgStatWalViewRow].stream
   }
 }

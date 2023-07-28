@@ -8,11 +8,9 @@ package production
 package transactionhistoryarchive
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.transactionhistoryarchive` which has not been persisted yet */
 case class TransactionhistoryarchiveRowUnsaved(
@@ -33,11 +31,11 @@ case class TransactionhistoryarchiveRowUnsaved(
   referenceorderlineid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date and time of the transaction. */
-  transactiondate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  transactiondate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(referenceorderlineidDefault: => Int, transactiondateDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): TransactionhistoryarchiveRow =
+  def toRow(referenceorderlineidDefault: => Int, transactiondateDefault: => TypoLocalDateTime, modifieddateDefault: => TypoLocalDateTime): TransactionhistoryarchiveRow =
     TransactionhistoryarchiveRow(
       transactionid = transactionid,
       productid = productid,
@@ -60,31 +58,6 @@ case class TransactionhistoryarchiveRowUnsaved(
     )
 }
 object TransactionhistoryarchiveRowUnsaved {
-  implicit val decoder: Decoder[TransactionhistoryarchiveRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        transactionid <- c.downField("transactionid").as[TransactionhistoryarchiveId]
-        productid <- c.downField("productid").as[Int]
-        referenceorderid <- c.downField("referenceorderid").as[Int]
-        transactiontype <- c.downField("transactiontype").as[/* bpchar */ String]
-        quantity <- c.downField("quantity").as[Int]
-        actualcost <- c.downField("actualcost").as[BigDecimal]
-        referenceorderlineid <- c.downField("referenceorderlineid").as[Defaulted[Int]]
-        transactiondate <- c.downField("transactiondate").as[Defaulted[LocalDateTime]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield TransactionhistoryarchiveRowUnsaved(transactionid, productid, referenceorderid, transactiontype, quantity, actualcost, referenceorderlineid, transactiondate, modifieddate)
-  implicit val encoder: Encoder[TransactionhistoryarchiveRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "transactionid" := row.transactionid,
-        "productid" := row.productid,
-        "referenceorderid" := row.referenceorderid,
-        "transactiontype" := row.transactiontype,
-        "quantity" := row.quantity,
-        "actualcost" := row.actualcost,
-        "referenceorderlineid" := row.referenceorderlineid,
-        "transactiondate" := row.transactiondate,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[TransactionhistoryarchiveRowUnsaved] = Decoder.forProduct9[TransactionhistoryarchiveRowUnsaved, TransactionhistoryarchiveId, Int, Int, /* bpchar */ String, Int, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate")(TransactionhistoryarchiveRowUnsaved.apply)
+  implicit val encoder: Encoder[TransactionhistoryarchiveRowUnsaved] = Encoder.forProduct9[TransactionhistoryarchiveRowUnsaved, TransactionhistoryarchiveId, Int, Int, /* bpchar */ String, Int, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.transactiontype, x.quantity, x.actualcost, x.referenceorderlineid, x.transactiondate, x.modifieddate))
 }

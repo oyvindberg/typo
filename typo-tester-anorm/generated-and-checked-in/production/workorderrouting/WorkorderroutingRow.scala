@@ -7,16 +7,18 @@ package adventureworks
 package production
 package workorderrouting
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class WorkorderroutingRow(
@@ -31,80 +33,76 @@ case class WorkorderroutingRow(
       Points to [[location.LocationRow.locationid]] */
   locationid: LocationId,
   /** Planned manufacturing start date. */
-  scheduledstartdate: LocalDateTime,
+  scheduledstartdate: TypoLocalDateTime,
   /** Planned manufacturing end date. */
-  scheduledenddate: LocalDateTime,
+  scheduledenddate: TypoLocalDateTime,
   /** Actual start date. */
-  actualstartdate: Option[LocalDateTime],
+  actualstartdate: Option[TypoLocalDateTime],
   /** Actual end date. */
-  actualenddate: Option[LocalDateTime],
+  actualenddate: Option[TypoLocalDateTime],
   /** Number of manufacturing hours used. */
   actualresourcehrs: Option[BigDecimal],
   /** Estimated manufacturing cost. */
   plannedcost: BigDecimal,
   /** Actual manufacturing cost. */
   actualcost: Option[BigDecimal],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: WorkorderroutingId = WorkorderroutingId(workorderid, productid, operationsequence)
  }
 
 object WorkorderroutingRow {
-  def rowParser(idx: Int): RowParser[WorkorderroutingRow] =
-    RowParser[WorkorderroutingRow] { row =>
-      Success(
+  implicit val reads: Reads[WorkorderroutingRow] = Reads[WorkorderroutingRow](json => JsResult.fromTry(
+      Try(
         WorkorderroutingRow(
-          workorderid = row[WorkorderId](idx + 0),
-          productid = row[Int](idx + 1),
-          operationsequence = row[Int](idx + 2),
-          locationid = row[LocationId](idx + 3),
-          scheduledstartdate = row[LocalDateTime](idx + 4),
-          scheduledenddate = row[LocalDateTime](idx + 5),
-          actualstartdate = row[Option[LocalDateTime]](idx + 6),
-          actualenddate = row[Option[LocalDateTime]](idx + 7),
-          actualresourcehrs = row[Option[BigDecimal]](idx + 8),
-          plannedcost = row[BigDecimal](idx + 9),
-          actualcost = row[Option[BigDecimal]](idx + 10),
-          modifieddate = row[LocalDateTime](idx + 11)
+          workorderid = json.\("workorderid").as[WorkorderId],
+          productid = json.\("productid").as[Int],
+          operationsequence = json.\("operationsequence").as[Int],
+          locationid = json.\("locationid").as[LocationId],
+          scheduledstartdate = json.\("scheduledstartdate").as[TypoLocalDateTime],
+          scheduledenddate = json.\("scheduledenddate").as[TypoLocalDateTime],
+          actualstartdate = json.\("actualstartdate").toOption.map(_.as[TypoLocalDateTime]),
+          actualenddate = json.\("actualenddate").toOption.map(_.as[TypoLocalDateTime]),
+          actualresourcehrs = json.\("actualresourcehrs").toOption.map(_.as[BigDecimal]),
+          plannedcost = json.\("plannedcost").as[BigDecimal],
+          actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[WorkorderroutingRow] = new OFormat[WorkorderroutingRow]{
-    override def writes(o: WorkorderroutingRow): JsObject =
-      Json.obj(
-        "workorderid" -> o.workorderid,
-        "productid" -> o.productid,
-        "operationsequence" -> o.operationsequence,
-        "locationid" -> o.locationid,
-        "scheduledstartdate" -> o.scheduledstartdate,
-        "scheduledenddate" -> o.scheduledenddate,
-        "actualstartdate" -> o.actualstartdate,
-        "actualenddate" -> o.actualenddate,
-        "actualresourcehrs" -> o.actualresourcehrs,
-        "plannedcost" -> o.plannedcost,
-        "actualcost" -> o.actualcost,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[WorkorderroutingRow] = RowParser[WorkorderroutingRow] { row =>
+    Success(
+      WorkorderroutingRow(
+        workorderid = row[WorkorderId](idx + 0),
+        productid = row[Int](idx + 1),
+        operationsequence = row[Int](idx + 2),
+        locationid = row[LocationId](idx + 3),
+        scheduledstartdate = row[TypoLocalDateTime](idx + 4),
+        scheduledenddate = row[TypoLocalDateTime](idx + 5),
+        actualstartdate = row[Option[TypoLocalDateTime]](idx + 6),
+        actualenddate = row[Option[TypoLocalDateTime]](idx + 7),
+        actualresourcehrs = row[Option[BigDecimal]](idx + 8),
+        plannedcost = row[BigDecimal](idx + 9),
+        actualcost = row[Option[BigDecimal]](idx + 10),
+        modifieddate = row[TypoLocalDateTime](idx + 11)
       )
-  
-    override def reads(json: JsValue): JsResult[WorkorderroutingRow] = {
-      JsResult.fromTry(
-        Try(
-          WorkorderroutingRow(
-            workorderid = json.\("workorderid").as[WorkorderId],
-            productid = json.\("productid").as[Int],
-            operationsequence = json.\("operationsequence").as[Int],
-            locationid = json.\("locationid").as[LocationId],
-            scheduledstartdate = json.\("scheduledstartdate").as[LocalDateTime],
-            scheduledenddate = json.\("scheduledenddate").as[LocalDateTime],
-            actualstartdate = json.\("actualstartdate").toOption.map(_.as[LocalDateTime]),
-            actualenddate = json.\("actualenddate").toOption.map(_.as[LocalDateTime]),
-            actualresourcehrs = json.\("actualresourcehrs").toOption.map(_.as[BigDecimal]),
-            plannedcost = json.\("plannedcost").as[BigDecimal],
-            actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[WorkorderroutingRow] = OWrites[WorkorderroutingRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "workorderid" -> Json.toJson(o.workorderid),
+      "productid" -> Json.toJson(o.productid),
+      "operationsequence" -> Json.toJson(o.operationsequence),
+      "locationid" -> Json.toJson(o.locationid),
+      "scheduledstartdate" -> Json.toJson(o.scheduledstartdate),
+      "scheduledenddate" -> Json.toJson(o.scheduledenddate),
+      "actualstartdate" -> Json.toJson(o.actualstartdate),
+      "actualenddate" -> Json.toJson(o.actualenddate),
+      "actualresourcehrs" -> Json.toJson(o.actualresourcehrs),
+      "plannedcost" -> Json.toJson(o.plannedcost),
+      "actualcost" -> Json.toJson(o.actualcost),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

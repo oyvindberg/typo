@@ -8,14 +8,12 @@ package purchasing
 package productvendor
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `purchasing.productvendor` which has not been persisted yet */
 case class ProductvendorRowUnsaved(
@@ -32,7 +30,7 @@ case class ProductvendorRowUnsaved(
   /** The selling price when last purchased. */
   lastreceiptcost: Option[BigDecimal],
   /** Date the product was last received by the vendor. */
-  lastreceiptdate: Option[LocalDateTime],
+  lastreceiptdate: Option[TypoLocalDateTime],
   /** The maximum quantity that should be ordered. */
   minorderqty: Int,
   /** The minimum quantity that should be ordered. */
@@ -43,9 +41,9 @@ case class ProductvendorRowUnsaved(
       Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): ProductvendorRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductvendorRow =
     ProductvendorRow(
       productid = productid,
       businessentityid = businessentityid,
@@ -64,35 +62,6 @@ case class ProductvendorRowUnsaved(
     )
 }
 object ProductvendorRowUnsaved {
-  implicit val decoder: Decoder[ProductvendorRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        averageleadtime <- c.downField("averageleadtime").as[Int]
-        standardprice <- c.downField("standardprice").as[BigDecimal]
-        lastreceiptcost <- c.downField("lastreceiptcost").as[Option[BigDecimal]]
-        lastreceiptdate <- c.downField("lastreceiptdate").as[Option[LocalDateTime]]
-        minorderqty <- c.downField("minorderqty").as[Int]
-        maxorderqty <- c.downField("maxorderqty").as[Int]
-        onorderqty <- c.downField("onorderqty").as[Option[Int]]
-        unitmeasurecode <- c.downField("unitmeasurecode").as[UnitmeasureId]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductvendorRowUnsaved(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
-  implicit val encoder: Encoder[ProductvendorRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "businessentityid" := row.businessentityid,
-        "averageleadtime" := row.averageleadtime,
-        "standardprice" := row.standardprice,
-        "lastreceiptcost" := row.lastreceiptcost,
-        "lastreceiptdate" := row.lastreceiptdate,
-        "minorderqty" := row.minorderqty,
-        "maxorderqty" := row.maxorderqty,
-        "onorderqty" := row.onorderqty,
-        "unitmeasurecode" := row.unitmeasurecode,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductvendorRowUnsaved] = Decoder.forProduct11[ProductvendorRowUnsaved, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, Defaulted[TypoLocalDateTime]]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(ProductvendorRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductvendorRowUnsaved] = Encoder.forProduct11[ProductvendorRowUnsaved, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, Defaulted[TypoLocalDateTime]]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(x => (x.productid, x.businessentityid, x.averageleadtime, x.standardprice, x.lastreceiptcost, x.lastreceiptdate, x.minorderqty, x.maxorderqty, x.onorderqty, x.unitmeasurecode, x.modifieddate))
 }

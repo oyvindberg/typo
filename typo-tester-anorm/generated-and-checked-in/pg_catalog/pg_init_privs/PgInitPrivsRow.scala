@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgInitPrivsRow(
@@ -28,40 +30,36 @@ case class PgInitPrivsRow(
  }
 
 object PgInitPrivsRow {
-  def rowParser(idx: Int): RowParser[PgInitPrivsRow] =
-    RowParser[PgInitPrivsRow] { row =>
-      Success(
+  implicit val reads: Reads[PgInitPrivsRow] = Reads[PgInitPrivsRow](json => JsResult.fromTry(
+      Try(
         PgInitPrivsRow(
-          objoid = row[/* oid */ Long](idx + 0),
-          classoid = row[/* oid */ Long](idx + 1),
-          objsubid = row[Int](idx + 2),
-          privtype = row[String](idx + 3),
-          initprivs = row[Array[TypoAclItem]](idx + 4)
+          objoid = json.\("objoid").as[/* oid */ Long],
+          classoid = json.\("classoid").as[/* oid */ Long],
+          objsubid = json.\("objsubid").as[Int],
+          privtype = json.\("privtype").as[String],
+          initprivs = json.\("initprivs").as[Array[TypoAclItem]]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgInitPrivsRow] = new OFormat[PgInitPrivsRow]{
-    override def writes(o: PgInitPrivsRow): JsObject =
-      Json.obj(
-        "objoid" -> o.objoid,
-        "classoid" -> o.classoid,
-        "objsubid" -> o.objsubid,
-        "privtype" -> o.privtype,
-        "initprivs" -> o.initprivs
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgInitPrivsRow] = RowParser[PgInitPrivsRow] { row =>
+    Success(
+      PgInitPrivsRow(
+        objoid = row[/* oid */ Long](idx + 0),
+        classoid = row[/* oid */ Long](idx + 1),
+        objsubid = row[Int](idx + 2),
+        privtype = row[String](idx + 3),
+        initprivs = row[Array[TypoAclItem]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgInitPrivsRow] = {
-      JsResult.fromTry(
-        Try(
-          PgInitPrivsRow(
-            objoid = json.\("objoid").as[/* oid */ Long],
-            classoid = json.\("classoid").as[/* oid */ Long],
-            objsubid = json.\("objsubid").as[Int],
-            privtype = json.\("privtype").as[String],
-            initprivs = json.\("initprivs").as[Array[TypoAclItem]]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgInitPrivsRow] = OWrites[PgInitPrivsRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "objoid" -> Json.toJson(o.objoid),
+      "classoid" -> Json.toJson(o.classoid),
+      "objsubid" -> Json.toJson(o.objsubid),
+      "privtype" -> Json.toJson(o.privtype),
+      "initprivs" -> Json.toJson(o.initprivs)
+    ))
+  )
 }

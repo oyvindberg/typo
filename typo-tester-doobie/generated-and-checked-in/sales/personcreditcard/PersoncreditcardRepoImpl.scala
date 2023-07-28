@@ -8,11 +8,11 @@ package sales
 package personcreditcard
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
@@ -21,7 +21,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, creditcardid, modifieddate
+          returning businessentityid, creditcardid, modifieddate::text
        """.query[PersoncreditcardRow].unique
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
@@ -30,29 +30,29 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
       Some((Fragment.const(s"creditcardid"), fr"${unsaved.creditcardid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.personcreditcard default values
-            returning businessentityid, creditcardid, modifieddate
+            returning businessentityid, creditcardid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.personcreditcard(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, creditcardid, modifieddate
+            returning businessentityid, creditcardid, modifieddate::text
          """
     }
     q.query[PersoncreditcardRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
-    sql"select businessentityid, creditcardid, modifieddate from sales.personcreditcard".query[PersoncreditcardRow].stream
+    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard".query[PersoncreditcardRow].stream
   }
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
-    sql"select businessentityid, creditcardid, modifieddate from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".query[PersoncreditcardRow].option
+    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".query[PersoncreditcardRow].option
   }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -74,7 +74,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           on conflict (businessentityid, creditcardid)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, creditcardid, modifieddate
+          returning businessentityid, creditcardid, modifieddate::text
        """.query[PersoncreditcardRow].unique
   }
 }

@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.geometric.PGpoint
 import org.postgresql.jdbc.PgArray
@@ -19,57 +16,55 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Point datatype in PostgreSQL */
 case class TypoPoint(x: Double, y: Double)
+
 object TypoPoint {
-  implicit val oFormat: OFormat[TypoPoint] = new OFormat[TypoPoint]{
-    override def writes(o: TypoPoint): JsObject =
-      Json.obj(
-        "x" -> o.x,
-        "y" -> o.y
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoPoint] = {
-      JsResult.fromTry(
-        Try(
-          TypoPoint(
-            x = json.\("x").as[Double],
-            y = json.\("y").as[Double]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoPointDb: ToStatement[TypoPoint] with ParameterMetaData[TypoPoint] with Column[TypoPoint] = new ToStatement[TypoPoint] with ParameterMetaData[TypoPoint] with Column[TypoPoint] {
-    override def sqlType: String = "point"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoPoint): Unit =
-      s.setObject(index, new PGpoint(v.x, v.y))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoPoint] =
-      v match {
-        case v: PGpoint => Right(TypoPoint(v.x, v.y))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGpoint from JDBC to produce a TypoPoint, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoPointDbArray: ToStatement[Array[TypoPoint]] with ParameterMetaData[Array[TypoPoint]] with Column[Array[TypoPoint]] = new ToStatement[Array[TypoPoint]] with ParameterMetaData[Array[TypoPoint]] with Column[Array[TypoPoint]] {
-    override def sqlType: String = "_point"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoPoint]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("point", v.map(v => new PGpoint(v.x, v.y))))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoPoint]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoPoint]] = Column.nonNull[Array[TypoPoint]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoPoint(v.asInstanceOf[PGpoint].x, v.asInstanceOf[PGpoint].y)))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoPoint, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoPoint, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoPoint]] = new ParameterMetaData[Array[TypoPoint]] {
+    override def sqlType: String = "_point"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoPoint]] = ToStatement[Array[TypoPoint]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("point", v.map(v => new PGpoint(v.x, v.y)))))
+  implicit val column: Column[TypoPoint] = Column.nonNull[TypoPoint]((v1: Any, _) =>
+    v1 match {
+      case v: PGpoint => Right(TypoPoint(v.x, v.y))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGpoint, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoPoint] = new ParameterMetaData[TypoPoint] {
+    override def sqlType: String = "point"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoPoint] = Reads[TypoPoint](json => JsResult.fromTry(
+      Try(
+        TypoPoint(
+          x = json.\("x").as[Double],
+          y = json.\("y").as[Double]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoPoint] = ToStatement[TypoPoint]((s, index, v) => s.setObject(index, new PGpoint(v.x, v.y)))
+  implicit val writes: OWrites[TypoPoint] = OWrites[TypoPoint](o =>
+    new JsObject(ListMap[String, JsValue](
+      "x" -> Json.toJson(o.x),
+      "y" -> Json.toJson(o.y)
+    ))
+  )
 }

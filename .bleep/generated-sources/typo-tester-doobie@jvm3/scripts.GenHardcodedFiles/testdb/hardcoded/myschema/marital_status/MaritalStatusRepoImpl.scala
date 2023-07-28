@@ -14,7 +14,7 @@ import fs2.Stream
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId): ConnectionIO[Boolean] = {
-    sql"""delete from myschema.marital_status where "id" = $id""".update.run.map(_ > 0)
+    sql"""delete from myschema.marital_status where "id" = ${id}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
@@ -26,10 +26,10 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""select "id" from myschema.marital_status""".query[MaritalStatusRow].stream
   }
   override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
-    sql"""select "id" from myschema.marital_status where "id" = $id""".query[MaritalStatusRow].option
+    sql"""select "id" from myschema.marital_status where "id" = ${id}""".query[MaritalStatusRow].option
   }
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status where "id" = ANY($ids)""".query[MaritalStatusRow].stream
+    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query[MaritalStatusRow].stream
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")

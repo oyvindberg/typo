@@ -11,14 +11,16 @@ import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import scala.util.Try
 
 case class ColumnsViewRow(
   tableCatalog: Option[SqlIdentifier],
@@ -68,198 +70,200 @@ case class ColumnsViewRow(
 )
 
 object ColumnsViewRow {
-  implicit val decoder: Decoder[ColumnsViewRow] =
-    (c: HCursor) =>
-      for {
-        tableCatalog <- c.downField("table_catalog").as[Option[SqlIdentifier]]
-        tableSchema <- c.downField("table_schema").as[Option[SqlIdentifier]]
-        tableName <- c.downField("table_name").as[Option[SqlIdentifier]]
-        columnName <- c.downField("column_name").as[Option[SqlIdentifier]]
-        ordinalPosition <- c.downField("ordinal_position").as[Option[CardinalNumber]]
-        columnDefault <- c.downField("column_default").as[Option[CharacterData]]
-        isNullable <- c.downField("is_nullable").as[Option[YesOrNo]]
-        dataType <- c.downField("data_type").as[Option[CharacterData]]
-        characterMaximumLength <- c.downField("character_maximum_length").as[Option[CardinalNumber]]
-        characterOctetLength <- c.downField("character_octet_length").as[Option[CardinalNumber]]
-        numericPrecision <- c.downField("numeric_precision").as[Option[CardinalNumber]]
-        numericPrecisionRadix <- c.downField("numeric_precision_radix").as[Option[CardinalNumber]]
-        numericScale <- c.downField("numeric_scale").as[Option[CardinalNumber]]
-        datetimePrecision <- c.downField("datetime_precision").as[Option[CardinalNumber]]
-        intervalType <- c.downField("interval_type").as[Option[CharacterData]]
-        intervalPrecision <- c.downField("interval_precision").as[Option[CardinalNumber]]
-        characterSetCatalog <- c.downField("character_set_catalog").as[Option[SqlIdentifier]]
-        characterSetSchema <- c.downField("character_set_schema").as[Option[SqlIdentifier]]
-        characterSetName <- c.downField("character_set_name").as[Option[SqlIdentifier]]
-        collationCatalog <- c.downField("collation_catalog").as[Option[SqlIdentifier]]
-        collationSchema <- c.downField("collation_schema").as[Option[SqlIdentifier]]
-        collationName <- c.downField("collation_name").as[Option[SqlIdentifier]]
-        domainCatalog <- c.downField("domain_catalog").as[Option[SqlIdentifier]]
-        domainSchema <- c.downField("domain_schema").as[Option[SqlIdentifier]]
-        domainName <- c.downField("domain_name").as[Option[SqlIdentifier]]
-        udtCatalog <- c.downField("udt_catalog").as[Option[SqlIdentifier]]
-        udtSchema <- c.downField("udt_schema").as[Option[SqlIdentifier]]
-        udtName <- c.downField("udt_name").as[Option[SqlIdentifier]]
-        scopeCatalog <- c.downField("scope_catalog").as[Option[SqlIdentifier]]
-        scopeSchema <- c.downField("scope_schema").as[Option[SqlIdentifier]]
-        scopeName <- c.downField("scope_name").as[Option[SqlIdentifier]]
-        maximumCardinality <- c.downField("maximum_cardinality").as[Option[CardinalNumber]]
-        dtdIdentifier <- c.downField("dtd_identifier").as[Option[SqlIdentifier]]
-        isSelfReferencing <- c.downField("is_self_referencing").as[Option[YesOrNo]]
-        isIdentity <- c.downField("is_identity").as[Option[YesOrNo]]
-        identityGeneration <- c.downField("identity_generation").as[Option[CharacterData]]
-        identityStart <- c.downField("identity_start").as[Option[CharacterData]]
-        identityIncrement <- c.downField("identity_increment").as[Option[CharacterData]]
-        identityMaximum <- c.downField("identity_maximum").as[Option[CharacterData]]
-        identityMinimum <- c.downField("identity_minimum").as[Option[CharacterData]]
-        identityCycle <- c.downField("identity_cycle").as[Option[YesOrNo]]
-        isGenerated <- c.downField("is_generated").as[Option[CharacterData]]
-        generationExpression <- c.downField("generation_expression").as[Option[CharacterData]]
-        isUpdatable <- c.downField("is_updatable").as[Option[YesOrNo]]
-      } yield ColumnsViewRow(tableCatalog, tableSchema, tableName, columnName, ordinalPosition, columnDefault, isNullable, dataType, characterMaximumLength, characterOctetLength, numericPrecision, numericPrecisionRadix, numericScale, datetimePrecision, intervalType, intervalPrecision, characterSetCatalog, characterSetSchema, characterSetName, collationCatalog, collationSchema, collationName, domainCatalog, domainSchema, domainName, udtCatalog, udtSchema, udtName, scopeCatalog, scopeSchema, scopeName, maximumCardinality, dtdIdentifier, isSelfReferencing, isIdentity, identityGeneration, identityStart, identityIncrement, identityMaximum, identityMinimum, identityCycle, isGenerated, generationExpression, isUpdatable)
-  implicit val encoder: Encoder[ColumnsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "table_catalog" := row.tableCatalog,
-        "table_schema" := row.tableSchema,
-        "table_name" := row.tableName,
-        "column_name" := row.columnName,
-        "ordinal_position" := row.ordinalPosition,
-        "column_default" := row.columnDefault,
-        "is_nullable" := row.isNullable,
-        "data_type" := row.dataType,
-        "character_maximum_length" := row.characterMaximumLength,
-        "character_octet_length" := row.characterOctetLength,
-        "numeric_precision" := row.numericPrecision,
-        "numeric_precision_radix" := row.numericPrecisionRadix,
-        "numeric_scale" := row.numericScale,
-        "datetime_precision" := row.datetimePrecision,
-        "interval_type" := row.intervalType,
-        "interval_precision" := row.intervalPrecision,
-        "character_set_catalog" := row.characterSetCatalog,
-        "character_set_schema" := row.characterSetSchema,
-        "character_set_name" := row.characterSetName,
-        "collation_catalog" := row.collationCatalog,
-        "collation_schema" := row.collationSchema,
-        "collation_name" := row.collationName,
-        "domain_catalog" := row.domainCatalog,
-        "domain_schema" := row.domainSchema,
-        "domain_name" := row.domainName,
-        "udt_catalog" := row.udtCatalog,
-        "udt_schema" := row.udtSchema,
-        "udt_name" := row.udtName,
-        "scope_catalog" := row.scopeCatalog,
-        "scope_schema" := row.scopeSchema,
-        "scope_name" := row.scopeName,
-        "maximum_cardinality" := row.maximumCardinality,
-        "dtd_identifier" := row.dtdIdentifier,
-        "is_self_referencing" := row.isSelfReferencing,
-        "is_identity" := row.isIdentity,
-        "identity_generation" := row.identityGeneration,
-        "identity_start" := row.identityStart,
-        "identity_increment" := row.identityIncrement,
-        "identity_maximum" := row.identityMaximum,
-        "identity_minimum" := row.identityMinimum,
-        "identity_cycle" := row.identityCycle,
-        "is_generated" := row.isGenerated,
-        "generation_expression" := row.generationExpression,
-        "is_updatable" := row.isUpdatable
-      )}
-  implicit val read: Read[ColumnsViewRow] =
-    new Read[ColumnsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ColumnsViewRow(
-        tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        ordinalPosition = Get[CardinalNumber].unsafeGetNullable(rs, i + 4),
-        columnDefault = Get[CharacterData].unsafeGetNullable(rs, i + 5),
-        isNullable = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
-        dataType = Get[CharacterData].unsafeGetNullable(rs, i + 7),
-        characterMaximumLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 8),
-        characterOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 9),
-        numericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 10),
-        numericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 11),
-        numericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 12),
-        datetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 13),
-        intervalType = Get[CharacterData].unsafeGetNullable(rs, i + 14),
-        intervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 15),
-        characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 16),
-        characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 17),
-        characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 18),
-        collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 19),
-        collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 20),
-        collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 21),
-        domainCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 22),
-        domainSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 23),
-        domainName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 24),
-        udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 25),
-        udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 26),
-        udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 27),
-        scopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 28),
-        scopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 29),
-        scopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 30),
-        maximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 31),
-        dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 32),
-        isSelfReferencing = Get[YesOrNo].unsafeGetNullable(rs, i + 33),
-        isIdentity = Get[YesOrNo].unsafeGetNullable(rs, i + 34),
-        identityGeneration = Get[CharacterData].unsafeGetNullable(rs, i + 35),
-        identityStart = Get[CharacterData].unsafeGetNullable(rs, i + 36),
-        identityIncrement = Get[CharacterData].unsafeGetNullable(rs, i + 37),
-        identityMaximum = Get[CharacterData].unsafeGetNullable(rs, i + 38),
-        identityMinimum = Get[CharacterData].unsafeGetNullable(rs, i + 39),
-        identityCycle = Get[YesOrNo].unsafeGetNullable(rs, i + 40),
-        isGenerated = Get[CharacterData].unsafeGetNullable(rs, i + 41),
-        generationExpression = Get[CharacterData].unsafeGetNullable(rs, i + 42),
-        isUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 43)
+  implicit val decoder: Decoder[ColumnsViewRow] = Decoder.instanceTry[ColumnsViewRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      ColumnsViewRow(
+        tableCatalog = orThrow(c.get("table_catalog")(Decoder[Option[SqlIdentifier]])),
+        tableSchema = orThrow(c.get("table_schema")(Decoder[Option[SqlIdentifier]])),
+        tableName = orThrow(c.get("table_name")(Decoder[Option[SqlIdentifier]])),
+        columnName = orThrow(c.get("column_name")(Decoder[Option[SqlIdentifier]])),
+        ordinalPosition = orThrow(c.get("ordinal_position")(Decoder[Option[CardinalNumber]])),
+        columnDefault = orThrow(c.get("column_default")(Decoder[Option[CharacterData]])),
+        isNullable = orThrow(c.get("is_nullable")(Decoder[Option[YesOrNo]])),
+        dataType = orThrow(c.get("data_type")(Decoder[Option[CharacterData]])),
+        characterMaximumLength = orThrow(c.get("character_maximum_length")(Decoder[Option[CardinalNumber]])),
+        characterOctetLength = orThrow(c.get("character_octet_length")(Decoder[Option[CardinalNumber]])),
+        numericPrecision = orThrow(c.get("numeric_precision")(Decoder[Option[CardinalNumber]])),
+        numericPrecisionRadix = orThrow(c.get("numeric_precision_radix")(Decoder[Option[CardinalNumber]])),
+        numericScale = orThrow(c.get("numeric_scale")(Decoder[Option[CardinalNumber]])),
+        datetimePrecision = orThrow(c.get("datetime_precision")(Decoder[Option[CardinalNumber]])),
+        intervalType = orThrow(c.get("interval_type")(Decoder[Option[CharacterData]])),
+        intervalPrecision = orThrow(c.get("interval_precision")(Decoder[Option[CardinalNumber]])),
+        characterSetCatalog = orThrow(c.get("character_set_catalog")(Decoder[Option[SqlIdentifier]])),
+        characterSetSchema = orThrow(c.get("character_set_schema")(Decoder[Option[SqlIdentifier]])),
+        characterSetName = orThrow(c.get("character_set_name")(Decoder[Option[SqlIdentifier]])),
+        collationCatalog = orThrow(c.get("collation_catalog")(Decoder[Option[SqlIdentifier]])),
+        collationSchema = orThrow(c.get("collation_schema")(Decoder[Option[SqlIdentifier]])),
+        collationName = orThrow(c.get("collation_name")(Decoder[Option[SqlIdentifier]])),
+        domainCatalog = orThrow(c.get("domain_catalog")(Decoder[Option[SqlIdentifier]])),
+        domainSchema = orThrow(c.get("domain_schema")(Decoder[Option[SqlIdentifier]])),
+        domainName = orThrow(c.get("domain_name")(Decoder[Option[SqlIdentifier]])),
+        udtCatalog = orThrow(c.get("udt_catalog")(Decoder[Option[SqlIdentifier]])),
+        udtSchema = orThrow(c.get("udt_schema")(Decoder[Option[SqlIdentifier]])),
+        udtName = orThrow(c.get("udt_name")(Decoder[Option[SqlIdentifier]])),
+        scopeCatalog = orThrow(c.get("scope_catalog")(Decoder[Option[SqlIdentifier]])),
+        scopeSchema = orThrow(c.get("scope_schema")(Decoder[Option[SqlIdentifier]])),
+        scopeName = orThrow(c.get("scope_name")(Decoder[Option[SqlIdentifier]])),
+        maximumCardinality = orThrow(c.get("maximum_cardinality")(Decoder[Option[CardinalNumber]])),
+        dtdIdentifier = orThrow(c.get("dtd_identifier")(Decoder[Option[SqlIdentifier]])),
+        isSelfReferencing = orThrow(c.get("is_self_referencing")(Decoder[Option[YesOrNo]])),
+        isIdentity = orThrow(c.get("is_identity")(Decoder[Option[YesOrNo]])),
+        identityGeneration = orThrow(c.get("identity_generation")(Decoder[Option[CharacterData]])),
+        identityStart = orThrow(c.get("identity_start")(Decoder[Option[CharacterData]])),
+        identityIncrement = orThrow(c.get("identity_increment")(Decoder[Option[CharacterData]])),
+        identityMaximum = orThrow(c.get("identity_maximum")(Decoder[Option[CharacterData]])),
+        identityMinimum = orThrow(c.get("identity_minimum")(Decoder[Option[CharacterData]])),
+        identityCycle = orThrow(c.get("identity_cycle")(Decoder[Option[YesOrNo]])),
+        isGenerated = orThrow(c.get("is_generated")(Decoder[Option[CharacterData]])),
+        generationExpression = orThrow(c.get("generation_expression")(Decoder[Option[CharacterData]])),
+        isUpdatable = orThrow(c.get("is_updatable")(Decoder[Option[YesOrNo]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[ColumnsViewRow] = Encoder[ColumnsViewRow](row =>
+    Json.obj(
+      "table_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.tableCatalog),
+      "table_schema" -> Encoder[Option[SqlIdentifier]].apply(row.tableSchema),
+      "table_name" -> Encoder[Option[SqlIdentifier]].apply(row.tableName),
+      "column_name" -> Encoder[Option[SqlIdentifier]].apply(row.columnName),
+      "ordinal_position" -> Encoder[Option[CardinalNumber]].apply(row.ordinalPosition),
+      "column_default" -> Encoder[Option[CharacterData]].apply(row.columnDefault),
+      "is_nullable" -> Encoder[Option[YesOrNo]].apply(row.isNullable),
+      "data_type" -> Encoder[Option[CharacterData]].apply(row.dataType),
+      "character_maximum_length" -> Encoder[Option[CardinalNumber]].apply(row.characterMaximumLength),
+      "character_octet_length" -> Encoder[Option[CardinalNumber]].apply(row.characterOctetLength),
+      "numeric_precision" -> Encoder[Option[CardinalNumber]].apply(row.numericPrecision),
+      "numeric_precision_radix" -> Encoder[Option[CardinalNumber]].apply(row.numericPrecisionRadix),
+      "numeric_scale" -> Encoder[Option[CardinalNumber]].apply(row.numericScale),
+      "datetime_precision" -> Encoder[Option[CardinalNumber]].apply(row.datetimePrecision),
+      "interval_type" -> Encoder[Option[CharacterData]].apply(row.intervalType),
+      "interval_precision" -> Encoder[Option[CardinalNumber]].apply(row.intervalPrecision),
+      "character_set_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetCatalog),
+      "character_set_schema" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetSchema),
+      "character_set_name" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetName),
+      "collation_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.collationCatalog),
+      "collation_schema" -> Encoder[Option[SqlIdentifier]].apply(row.collationSchema),
+      "collation_name" -> Encoder[Option[SqlIdentifier]].apply(row.collationName),
+      "domain_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.domainCatalog),
+      "domain_schema" -> Encoder[Option[SqlIdentifier]].apply(row.domainSchema),
+      "domain_name" -> Encoder[Option[SqlIdentifier]].apply(row.domainName),
+      "udt_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.udtCatalog),
+      "udt_schema" -> Encoder[Option[SqlIdentifier]].apply(row.udtSchema),
+      "udt_name" -> Encoder[Option[SqlIdentifier]].apply(row.udtName),
+      "scope_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.scopeCatalog),
+      "scope_schema" -> Encoder[Option[SqlIdentifier]].apply(row.scopeSchema),
+      "scope_name" -> Encoder[Option[SqlIdentifier]].apply(row.scopeName),
+      "maximum_cardinality" -> Encoder[Option[CardinalNumber]].apply(row.maximumCardinality),
+      "dtd_identifier" -> Encoder[Option[SqlIdentifier]].apply(row.dtdIdentifier),
+      "is_self_referencing" -> Encoder[Option[YesOrNo]].apply(row.isSelfReferencing),
+      "is_identity" -> Encoder[Option[YesOrNo]].apply(row.isIdentity),
+      "identity_generation" -> Encoder[Option[CharacterData]].apply(row.identityGeneration),
+      "identity_start" -> Encoder[Option[CharacterData]].apply(row.identityStart),
+      "identity_increment" -> Encoder[Option[CharacterData]].apply(row.identityIncrement),
+      "identity_maximum" -> Encoder[Option[CharacterData]].apply(row.identityMaximum),
+      "identity_minimum" -> Encoder[Option[CharacterData]].apply(row.identityMinimum),
+      "identity_cycle" -> Encoder[Option[YesOrNo]].apply(row.identityCycle),
+      "is_generated" -> Encoder[Option[CharacterData]].apply(row.isGenerated),
+      "generation_expression" -> Encoder[Option[CharacterData]].apply(row.generationExpression),
+      "is_updatable" -> Encoder[Option[YesOrNo]].apply(row.isUpdatable)
     )
-  
-
+  )
+  implicit val read: Read[ColumnsViewRow] = new Read[ColumnsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ColumnsViewRow(
+      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      ordinalPosition = Get[CardinalNumber].unsafeGetNullable(rs, i + 4),
+      columnDefault = Get[CharacterData].unsafeGetNullable(rs, i + 5),
+      isNullable = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
+      dataType = Get[CharacterData].unsafeGetNullable(rs, i + 7),
+      characterMaximumLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 8),
+      characterOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 9),
+      numericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 10),
+      numericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 11),
+      numericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 12),
+      datetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 13),
+      intervalType = Get[CharacterData].unsafeGetNullable(rs, i + 14),
+      intervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 15),
+      characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 16),
+      characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 17),
+      characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 18),
+      collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 19),
+      collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 20),
+      collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 21),
+      domainCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 22),
+      domainSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 23),
+      domainName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 24),
+      udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 25),
+      udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 26),
+      udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 27),
+      scopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 28),
+      scopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 29),
+      scopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 30),
+      maximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 31),
+      dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 32),
+      isSelfReferencing = Get[YesOrNo].unsafeGetNullable(rs, i + 33),
+      isIdentity = Get[YesOrNo].unsafeGetNullable(rs, i + 34),
+      identityGeneration = Get[CharacterData].unsafeGetNullable(rs, i + 35),
+      identityStart = Get[CharacterData].unsafeGetNullable(rs, i + 36),
+      identityIncrement = Get[CharacterData].unsafeGetNullable(rs, i + 37),
+      identityMaximum = Get[CharacterData].unsafeGetNullable(rs, i + 38),
+      identityMinimum = Get[CharacterData].unsafeGetNullable(rs, i + 39),
+      identityCycle = Get[YesOrNo].unsafeGetNullable(rs, i + 40),
+      isGenerated = Get[CharacterData].unsafeGetNullable(rs, i + 41),
+      generationExpression = Get[CharacterData].unsafeGetNullable(rs, i + 42),
+      isUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 43)
+    )
+  )
 }

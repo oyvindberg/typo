@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_database_conflicts
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatDatabaseConflictsViewRow(
@@ -27,50 +25,26 @@ case class PgStatDatabaseConflictsViewRow(
 )
 
 object PgStatDatabaseConflictsViewRow {
-  implicit val decoder: Decoder[PgStatDatabaseConflictsViewRow] =
-    (c: HCursor) =>
-      for {
-        datid <- c.downField("datid").as[Option[/* oid */ Long]]
-        datname <- c.downField("datname").as[Option[String]]
-        conflTablespace <- c.downField("confl_tablespace").as[Option[Long]]
-        conflLock <- c.downField("confl_lock").as[Option[Long]]
-        conflSnapshot <- c.downField("confl_snapshot").as[Option[Long]]
-        conflBufferpin <- c.downField("confl_bufferpin").as[Option[Long]]
-        conflDeadlock <- c.downField("confl_deadlock").as[Option[Long]]
-      } yield PgStatDatabaseConflictsViewRow(datid, datname, conflTablespace, conflLock, conflSnapshot, conflBufferpin, conflDeadlock)
-  implicit val encoder: Encoder[PgStatDatabaseConflictsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "datid" := row.datid,
-        "datname" := row.datname,
-        "confl_tablespace" := row.conflTablespace,
-        "confl_lock" := row.conflLock,
-        "confl_snapshot" := row.conflSnapshot,
-        "confl_bufferpin" := row.conflBufferpin,
-        "confl_deadlock" := row.conflDeadlock
-      )}
-  implicit val read: Read[PgStatDatabaseConflictsViewRow] =
-    new Read[PgStatDatabaseConflictsViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatDatabaseConflictsViewRow(
-        datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        datname = Get[String].unsafeGetNullable(rs, i + 1),
-        conflTablespace = Get[Long].unsafeGetNullable(rs, i + 2),
-        conflLock = Get[Long].unsafeGetNullable(rs, i + 3),
-        conflSnapshot = Get[Long].unsafeGetNullable(rs, i + 4),
-        conflBufferpin = Get[Long].unsafeGetNullable(rs, i + 5),
-        conflDeadlock = Get[Long].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgStatDatabaseConflictsViewRow] = Decoder.forProduct7[PgStatDatabaseConflictsViewRow, Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("datid", "datname", "confl_tablespace", "confl_lock", "confl_snapshot", "confl_bufferpin", "confl_deadlock")(PgStatDatabaseConflictsViewRow.apply)
+  implicit val encoder: Encoder[PgStatDatabaseConflictsViewRow] = Encoder.forProduct7[PgStatDatabaseConflictsViewRow, Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("datid", "datname", "confl_tablespace", "confl_lock", "confl_snapshot", "confl_bufferpin", "confl_deadlock")(x => (x.datid, x.datname, x.conflTablespace, x.conflLock, x.conflSnapshot, x.conflBufferpin, x.conflDeadlock))
+  implicit val read: Read[PgStatDatabaseConflictsViewRow] = new Read[PgStatDatabaseConflictsViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatDatabaseConflictsViewRow(
+      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      datname = Get[String].unsafeGetNullable(rs, i + 1),
+      conflTablespace = Get[Long].unsafeGetNullable(rs, i + 2),
+      conflLock = Get[Long].unsafeGetNullable(rs, i + 3),
+      conflSnapshot = Get[Long].unsafeGetNullable(rs, i + 4),
+      conflBufferpin = Get[Long].unsafeGetNullable(rs, i + 5),
+      conflDeadlock = Get[Long].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

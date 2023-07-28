@@ -7,16 +7,14 @@ package adventureworks
 package production
 package productcategory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class ProductcategoryRow(
@@ -25,42 +23,24 @@ case class ProductcategoryRow(
   /** Category description. */
   name: Name,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductcategoryRow {
-  implicit val decoder: Decoder[ProductcategoryRow] =
-    (c: HCursor) =>
-      for {
-        productcategoryid <- c.downField("productcategoryid").as[ProductcategoryId]
-        name <- c.downField("name").as[Name]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductcategoryRow(productcategoryid, name, rowguid, modifieddate)
-  implicit val encoder: Encoder[ProductcategoryRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productcategoryid" := row.productcategoryid,
-        "name" := row.name,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductcategoryRow] =
-    new Read[ProductcategoryRow](
-      gets = List(
-        (Get[ProductcategoryId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductcategoryRow(
-        productcategoryid = Get[ProductcategoryId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[ProductcategoryRow] = Decoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(ProductcategoryRow.apply)
+  implicit val encoder: Encoder[ProductcategoryRow] = Encoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productcategoryid, x.name, x.rowguid, x.modifieddate))
+  implicit val read: Read[ProductcategoryRow] = new Read[ProductcategoryRow](
+    gets = List(
+      (Get[ProductcategoryId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductcategoryRow(
+      productcategoryid = Get[ProductcategoryId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

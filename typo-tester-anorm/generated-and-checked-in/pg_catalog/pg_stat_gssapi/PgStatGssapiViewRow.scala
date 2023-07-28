@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatGssapiViewRow(
@@ -24,37 +26,33 @@ case class PgStatGssapiViewRow(
 )
 
 object PgStatGssapiViewRow {
-  def rowParser(idx: Int): RowParser[PgStatGssapiViewRow] =
-    RowParser[PgStatGssapiViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatGssapiViewRow] = Reads[PgStatGssapiViewRow](json => JsResult.fromTry(
+      Try(
         PgStatGssapiViewRow(
-          pid = row[Option[Int]](idx + 0),
-          gssAuthenticated = row[Option[Boolean]](idx + 1),
-          principal = row[Option[String]](idx + 2),
-          encrypted = row[Option[Boolean]](idx + 3)
+          pid = json.\("pid").toOption.map(_.as[Int]),
+          gssAuthenticated = json.\("gss_authenticated").toOption.map(_.as[Boolean]),
+          principal = json.\("principal").toOption.map(_.as[String]),
+          encrypted = json.\("encrypted").toOption.map(_.as[Boolean])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatGssapiViewRow] = new OFormat[PgStatGssapiViewRow]{
-    override def writes(o: PgStatGssapiViewRow): JsObject =
-      Json.obj(
-        "pid" -> o.pid,
-        "gss_authenticated" -> o.gssAuthenticated,
-        "principal" -> o.principal,
-        "encrypted" -> o.encrypted
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatGssapiViewRow] = RowParser[PgStatGssapiViewRow] { row =>
+    Success(
+      PgStatGssapiViewRow(
+        pid = row[Option[Int]](idx + 0),
+        gssAuthenticated = row[Option[Boolean]](idx + 1),
+        principal = row[Option[String]](idx + 2),
+        encrypted = row[Option[Boolean]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatGssapiViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatGssapiViewRow(
-            pid = json.\("pid").toOption.map(_.as[Int]),
-            gssAuthenticated = json.\("gss_authenticated").toOption.map(_.as[Boolean]),
-            principal = json.\("principal").toOption.map(_.as[String]),
-            encrypted = json.\("encrypted").toOption.map(_.as[Boolean])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatGssapiViewRow] = OWrites[PgStatGssapiViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "pid" -> Json.toJson(o.pid),
+      "gss_authenticated" -> Json.toJson(o.gssAuthenticated),
+      "principal" -> Json.toJson(o.principal),
+      "encrypted" -> Json.toJson(o.encrypted)
+    ))
+  )
 }

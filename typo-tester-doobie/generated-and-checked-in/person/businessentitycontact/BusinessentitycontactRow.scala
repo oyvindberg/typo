@@ -7,17 +7,15 @@ package adventureworks
 package person
 package businessentitycontact
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class BusinessentitycontactRow(
@@ -31,48 +29,28 @@ case class BusinessentitycontactRow(
       Points to [[contacttype.ContacttypeRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: BusinessentitycontactId = BusinessentitycontactId(businessentityid, personid, contacttypeid)
  }
 
 object BusinessentitycontactRow {
-  implicit val decoder: Decoder[BusinessentitycontactRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        personid <- c.downField("personid").as[BusinessentityId]
-        contacttypeid <- c.downField("contacttypeid").as[ContacttypeId]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield BusinessentitycontactRow(businessentityid, personid, contacttypeid, rowguid, modifieddate)
-  implicit val encoder: Encoder[BusinessentitycontactRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "personid" := row.personid,
-        "contacttypeid" := row.contacttypeid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[BusinessentitycontactRow] =
-    new Read[BusinessentitycontactRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[ContacttypeId], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BusinessentitycontactRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        personid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
-        contacttypeid = Get[ContacttypeId].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[BusinessentitycontactRow] = Decoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BusinessentitycontactRow.apply)
+  implicit val encoder: Encoder[BusinessentitycontactRow] = Encoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))
+  implicit val read: Read[BusinessentitycontactRow] = new Read[BusinessentitycontactRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[ContacttypeId], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => BusinessentitycontactRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      personid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
+      contacttypeid = Get[ContacttypeId].unsafeGetNonNullable(rs, i + 2),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

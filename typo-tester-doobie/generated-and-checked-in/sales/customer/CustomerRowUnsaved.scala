@@ -8,13 +8,11 @@ package sales
 package customer
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `sales.customer` which has not been persisted yet */
@@ -34,9 +32,9 @@ case class CustomerRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(customeridDefault: => CustomerId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): CustomerRow =
+  def toRow(customeridDefault: => CustomerId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): CustomerRow =
     CustomerRow(
       personid = personid,
       storeid = storeid,
@@ -56,25 +54,6 @@ case class CustomerRowUnsaved(
     )
 }
 object CustomerRowUnsaved {
-  implicit val decoder: Decoder[CustomerRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        personid <- c.downField("personid").as[Option[BusinessentityId]]
-        storeid <- c.downField("storeid").as[Option[BusinessentityId]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        customerid <- c.downField("customerid").as[Defaulted[CustomerId]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield CustomerRowUnsaved(personid, storeid, territoryid, customerid, rowguid, modifieddate)
-  implicit val encoder: Encoder[CustomerRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "personid" := row.personid,
-        "storeid" := row.storeid,
-        "territoryid" := row.territoryid,
-        "customerid" := row.customerid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[CustomerRowUnsaved] = Decoder.forProduct6[CustomerRowUnsaved, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Defaulted[CustomerId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate")(CustomerRowUnsaved.apply)
+  implicit val encoder: Encoder[CustomerRowUnsaved] = Encoder.forProduct6[CustomerRowUnsaved, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Defaulted[CustomerId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate")(x => (x.personid, x.storeid, x.territoryid, x.customerid, x.rowguid, x.modifieddate))
 }

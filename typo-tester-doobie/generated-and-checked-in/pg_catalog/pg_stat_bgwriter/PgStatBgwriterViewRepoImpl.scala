@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatBgwriterViewRepoImpl extends PgStatBgwriterViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatBgwriterViewRow] = {
-    sql"select checkpoints_timed, checkpoints_req, checkpoint_write_time, checkpoint_sync_time, buffers_checkpoint, buffers_clean, maxwritten_clean, buffers_backend, buffers_backend_fsync, buffers_alloc, stats_reset from pg_catalog.pg_stat_bgwriter".query[PgStatBgwriterViewRow].stream
+    sql"select checkpoints_timed, checkpoints_req, checkpoint_write_time, checkpoint_sync_time, buffers_checkpoint, buffers_clean, maxwritten_clean, buffers_backend, buffers_backend_fsync, buffers_alloc, stats_reset::text from pg_catalog.pg_stat_bgwriter".query[PgStatBgwriterViewRow].stream
   }
 }

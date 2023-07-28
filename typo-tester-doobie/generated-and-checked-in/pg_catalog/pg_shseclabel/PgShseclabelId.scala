@@ -9,26 +9,11 @@ package pg_shseclabel
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `pg_catalog.pg_shseclabel` */
 case class PgShseclabelId(objoid: /* oid */ Long, classoid: /* oid */ Long, provider: String)
 object PgShseclabelId {
+  implicit val decoder: Decoder[PgShseclabelId] = Decoder.forProduct3[PgShseclabelId, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "provider")(PgShseclabelId.apply)
+  implicit val encoder: Encoder[PgShseclabelId] = Encoder.forProduct3[PgShseclabelId, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "provider")(x => (x.objoid, x.classoid, x.provider))
   implicit val ordering: Ordering[PgShseclabelId] = Ordering.by(x => (x.objoid, x.classoid, x.provider))
-  implicit val decoder: Decoder[PgShseclabelId] =
-    (c: HCursor) =>
-      for {
-        objoid <- c.downField("objoid").as[/* oid */ Long]
-        classoid <- c.downField("classoid").as[/* oid */ Long]
-        provider <- c.downField("provider").as[String]
-      } yield PgShseclabelId(objoid, classoid, provider)
-  implicit val encoder: Encoder[PgShseclabelId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "objoid" := row.objoid,
-        "classoid" := row.classoid,
-        "provider" := row.provider
-      )}
 }

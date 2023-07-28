@@ -8,15 +8,17 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.productproductphoto` which has not been persisted yet */
@@ -31,9 +33,9 @@ case class ProductproductphotoRowUnsaved(
       0 = Photo is not the principal image. 1 = Photo is the principal image. */
   primary: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(primaryDefault: => Flag, modifieddateDefault: => LocalDateTime): ProductproductphotoRow =
+  def toRow(primaryDefault: => Flag, modifieddateDefault: => TypoLocalDateTime): ProductproductphotoRow =
     ProductproductphotoRow(
       productid = productid,
       productphotoid = productphotoid,
@@ -48,26 +50,23 @@ case class ProductproductphotoRowUnsaved(
     )
 }
 object ProductproductphotoRowUnsaved {
-  implicit val oFormat: OFormat[ProductproductphotoRowUnsaved] = new OFormat[ProductproductphotoRowUnsaved]{
-    override def writes(o: ProductproductphotoRowUnsaved): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "productphotoid" -> o.productphotoid,
-        "primary" -> o.primary,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductproductphotoRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ProductproductphotoRowUnsaved(
-            productid = json.\("productid").as[ProductId],
-            productphotoid = json.\("productphotoid").as[ProductphotoId],
-            primary = json.\("primary").as[Defaulted[Flag]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ProductproductphotoRowUnsaved] = Reads[ProductproductphotoRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ProductproductphotoRowUnsaved(
+          productid = json.\("productid").as[ProductId],
+          productphotoid = json.\("productphotoid").as[ProductphotoId],
+          primary = json.\("primary").as[Defaulted[Flag]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductproductphotoRowUnsaved] = OWrites[ProductproductphotoRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "productphotoid" -> Json.toJson(o.productphotoid),
+      "primary" -> Json.toJson(o.primary),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -7,18 +7,20 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VproductmodelinstructionsViewRow(
@@ -37,62 +39,58 @@ case class VproductmodelinstructionsViewRow(
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object VproductmodelinstructionsViewRow {
-  def rowParser(idx: Int): RowParser[VproductmodelinstructionsViewRow] =
-    RowParser[VproductmodelinstructionsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VproductmodelinstructionsViewRow] = Reads[VproductmodelinstructionsViewRow](json => JsResult.fromTry(
+      Try(
         VproductmodelinstructionsViewRow(
-          productmodelid = row[Option[ProductmodelId]](idx + 0),
-          name = row[Option[Name]](idx + 1),
-          instructions = row[Option[TypoXml]](idx + 2),
-          LocationID = row[Option[Int]](idx + 3),
-          SetupHours = row[Option[BigDecimal]](idx + 4),
-          MachineHours = row[Option[BigDecimal]](idx + 5),
-          LaborHours = row[Option[BigDecimal]](idx + 6),
-          LotSize = row[Option[Int]](idx + 7),
-          Step = row[Option[/* max 1024 chars */ String]](idx + 8),
-          rowguid = row[Option[UUID]](idx + 9),
-          modifieddate = row[Option[LocalDateTime]](idx + 10)
+          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
+          LocationID = json.\("LocationID").toOption.map(_.as[Int]),
+          SetupHours = json.\("SetupHours").toOption.map(_.as[BigDecimal]),
+          MachineHours = json.\("MachineHours").toOption.map(_.as[BigDecimal]),
+          LaborHours = json.\("LaborHours").toOption.map(_.as[BigDecimal]),
+          LotSize = json.\("LotSize").toOption.map(_.as[Int]),
+          Step = json.\("Step").toOption.map(_.as[/* max 1024 chars */ String]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[VproductmodelinstructionsViewRow] = new OFormat[VproductmodelinstructionsViewRow]{
-    override def writes(o: VproductmodelinstructionsViewRow): JsObject =
-      Json.obj(
-        "productmodelid" -> o.productmodelid,
-        "name" -> o.name,
-        "instructions" -> o.instructions,
-        "LocationID" -> o.LocationID,
-        "SetupHours" -> o.SetupHours,
-        "MachineHours" -> o.MachineHours,
-        "LaborHours" -> o.LaborHours,
-        "LotSize" -> o.LotSize,
-        "Step" -> o.Step,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VproductmodelinstructionsViewRow] = RowParser[VproductmodelinstructionsViewRow] { row =>
+    Success(
+      VproductmodelinstructionsViewRow(
+        productmodelid = row[Option[ProductmodelId]](idx + 0),
+        name = row[Option[Name]](idx + 1),
+        instructions = row[Option[TypoXml]](idx + 2),
+        LocationID = row[Option[Int]](idx + 3),
+        SetupHours = row[Option[BigDecimal]](idx + 4),
+        MachineHours = row[Option[BigDecimal]](idx + 5),
+        LaborHours = row[Option[BigDecimal]](idx + 6),
+        LotSize = row[Option[Int]](idx + 7),
+        Step = row[Option[/* max 1024 chars */ String]](idx + 8),
+        rowguid = row[Option[UUID]](idx + 9),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[VproductmodelinstructionsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VproductmodelinstructionsViewRow(
-            productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
-            LocationID = json.\("LocationID").toOption.map(_.as[Int]),
-            SetupHours = json.\("SetupHours").toOption.map(_.as[BigDecimal]),
-            MachineHours = json.\("MachineHours").toOption.map(_.as[BigDecimal]),
-            LaborHours = json.\("LaborHours").toOption.map(_.as[BigDecimal]),
-            LotSize = json.\("LotSize").toOption.map(_.as[Int]),
-            Step = json.\("Step").toOption.map(_.as[/* max 1024 chars */ String]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VproductmodelinstructionsViewRow] = OWrites[VproductmodelinstructionsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "name" -> Json.toJson(o.name),
+      "instructions" -> Json.toJson(o.instructions),
+      "LocationID" -> Json.toJson(o.LocationID),
+      "SetupHours" -> Json.toJson(o.SetupHours),
+      "MachineHours" -> Json.toJson(o.MachineHours),
+      "LaborHours" -> Json.toJson(o.LaborHours),
+      "LotSize" -> Json.toJson(o.LotSize),
+      "Step" -> Json.toJson(o.Step),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

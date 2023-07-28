@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object BomViewRepoImpl extends BomViewRepo {
   override def selectAll(implicit c: Connection): List[BomViewRow] = {
-    SQL"""select "id", billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+    SQL"""select "id", billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
           from pr."bom"
        """.as(BomViewRow.rowParser(1).*)
   }

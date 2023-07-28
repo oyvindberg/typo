@@ -9,24 +9,11 @@ package pg_subscription_rel
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `pg_catalog.pg_subscription_rel` */
 case class PgSubscriptionRelId(srrelid: /* oid */ Long, srsubid: /* oid */ Long)
 object PgSubscriptionRelId {
+  implicit val decoder: Decoder[PgSubscriptionRelId] = Decoder.forProduct2[PgSubscriptionRelId, /* oid */ Long, /* oid */ Long]("srrelid", "srsubid")(PgSubscriptionRelId.apply)
+  implicit val encoder: Encoder[PgSubscriptionRelId] = Encoder.forProduct2[PgSubscriptionRelId, /* oid */ Long, /* oid */ Long]("srrelid", "srsubid")(x => (x.srrelid, x.srsubid))
   implicit val ordering: Ordering[PgSubscriptionRelId] = Ordering.by(x => (x.srrelid, x.srsubid))
-  implicit val decoder: Decoder[PgSubscriptionRelId] =
-    (c: HCursor) =>
-      for {
-        srrelid <- c.downField("srrelid").as[/* oid */ Long]
-        srsubid <- c.downField("srsubid").as[/* oid */ Long]
-      } yield PgSubscriptionRelId(srrelid, srsubid)
-  implicit val encoder: Encoder[PgSubscriptionRelId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "srrelid" := row.srrelid,
-        "srsubid" := row.srsubid
-      )}
 }

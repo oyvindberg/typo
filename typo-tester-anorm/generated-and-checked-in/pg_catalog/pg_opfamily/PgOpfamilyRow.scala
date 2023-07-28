@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgOpfamilyRow(
@@ -25,40 +27,36 @@ case class PgOpfamilyRow(
 )
 
 object PgOpfamilyRow {
-  def rowParser(idx: Int): RowParser[PgOpfamilyRow] =
-    RowParser[PgOpfamilyRow] { row =>
-      Success(
+  implicit val reads: Reads[PgOpfamilyRow] = Reads[PgOpfamilyRow](json => JsResult.fromTry(
+      Try(
         PgOpfamilyRow(
-          oid = row[PgOpfamilyId](idx + 0),
-          opfmethod = row[/* oid */ Long](idx + 1),
-          opfname = row[String](idx + 2),
-          opfnamespace = row[/* oid */ Long](idx + 3),
-          opfowner = row[/* oid */ Long](idx + 4)
+          oid = json.\("oid").as[PgOpfamilyId],
+          opfmethod = json.\("opfmethod").as[/* oid */ Long],
+          opfname = json.\("opfname").as[String],
+          opfnamespace = json.\("opfnamespace").as[/* oid */ Long],
+          opfowner = json.\("opfowner").as[/* oid */ Long]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgOpfamilyRow] = new OFormat[PgOpfamilyRow]{
-    override def writes(o: PgOpfamilyRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "opfmethod" -> o.opfmethod,
-        "opfname" -> o.opfname,
-        "opfnamespace" -> o.opfnamespace,
-        "opfowner" -> o.opfowner
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgOpfamilyRow] = RowParser[PgOpfamilyRow] { row =>
+    Success(
+      PgOpfamilyRow(
+        oid = row[PgOpfamilyId](idx + 0),
+        opfmethod = row[/* oid */ Long](idx + 1),
+        opfname = row[String](idx + 2),
+        opfnamespace = row[/* oid */ Long](idx + 3),
+        opfowner = row[/* oid */ Long](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgOpfamilyRow] = {
-      JsResult.fromTry(
-        Try(
-          PgOpfamilyRow(
-            oid = json.\("oid").as[PgOpfamilyId],
-            opfmethod = json.\("opfmethod").as[/* oid */ Long],
-            opfname = json.\("opfname").as[String],
-            opfnamespace = json.\("opfnamespace").as[/* oid */ Long],
-            opfowner = json.\("opfowner").as[/* oid */ Long]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgOpfamilyRow] = OWrites[PgOpfamilyRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "opfmethod" -> Json.toJson(o.opfmethod),
+      "opfname" -> Json.toJson(o.opfname),
+      "opfnamespace" -> Json.toJson(o.opfnamespace),
+      "opfowner" -> Json.toJson(o.opfowner)
+    ))
+  )
 }

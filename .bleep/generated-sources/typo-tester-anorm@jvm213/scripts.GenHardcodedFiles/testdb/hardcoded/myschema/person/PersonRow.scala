@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
@@ -37,58 +39,54 @@ case class PersonRow(
 )
 
 object PersonRow {
-  def rowParser(idx: Int): RowParser[PersonRow] =
-    RowParser[PersonRow] { row =>
-      Success(
+  implicit val reads: Reads[PersonRow] = Reads[PersonRow](json => JsResult.fromTry(
+      Try(
         PersonRow(
-          id = row[PersonId](idx + 0),
-          favouriteFootballClubId = row[FootballClubId](idx + 1),
-          name = row[/* max 100 chars */ String](idx + 2),
-          nickName = row[Option[/* max 30 chars */ String]](idx + 3),
-          blogUrl = row[Option[/* max 100 chars */ String]](idx + 4),
-          email = row[/* max 254 chars */ String](idx + 5),
-          phone = row[/* max 8 chars */ String](idx + 6),
-          likesPizza = row[Boolean](idx + 7),
-          maritalStatusId = row[MaritalStatusId](idx + 8),
-          workEmail = row[Option[/* max 254 chars */ String]](idx + 9),
-          sector = row[Sector](idx + 10)
+          id = json.\("id").as[PersonId],
+          favouriteFootballClubId = json.\("favourite_football_club_id").as[FootballClubId],
+          name = json.\("name").as[/* max 100 chars */ String],
+          nickName = json.\("nick_name").toOption.map(_.as[/* max 30 chars */ String]),
+          blogUrl = json.\("blog_url").toOption.map(_.as[/* max 100 chars */ String]),
+          email = json.\("email").as[/* max 254 chars */ String],
+          phone = json.\("phone").as[/* max 8 chars */ String],
+          likesPizza = json.\("likes_pizza").as[Boolean],
+          maritalStatusId = json.\("marital_status_id").as[MaritalStatusId],
+          workEmail = json.\("work_email").toOption.map(_.as[/* max 254 chars */ String]),
+          sector = json.\("sector").as[Sector]
         )
       )
-    }
-  implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
-    override def writes(o: PersonRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "favourite_football_club_id" -> o.favouriteFootballClubId,
-        "name" -> o.name,
-        "nick_name" -> o.nickName,
-        "blog_url" -> o.blogUrl,
-        "email" -> o.email,
-        "phone" -> o.phone,
-        "likes_pizza" -> o.likesPizza,
-        "marital_status_id" -> o.maritalStatusId,
-        "work_email" -> o.workEmail,
-        "sector" -> o.sector
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PersonRow] = RowParser[PersonRow] { row =>
+    Success(
+      PersonRow(
+        id = row[PersonId](idx + 0),
+        favouriteFootballClubId = row[FootballClubId](idx + 1),
+        name = row[/* max 100 chars */ String](idx + 2),
+        nickName = row[Option[/* max 30 chars */ String]](idx + 3),
+        blogUrl = row[Option[/* max 100 chars */ String]](idx + 4),
+        email = row[/* max 254 chars */ String](idx + 5),
+        phone = row[/* max 8 chars */ String](idx + 6),
+        likesPizza = row[Boolean](idx + 7),
+        maritalStatusId = row[MaritalStatusId](idx + 8),
+        workEmail = row[Option[/* max 254 chars */ String]](idx + 9),
+        sector = row[Sector](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[PersonRow] = {
-      JsResult.fromTry(
-        Try(
-          PersonRow(
-            id = json.\("id").as[PersonId],
-            favouriteFootballClubId = json.\("favourite_football_club_id").as[FootballClubId],
-            name = json.\("name").as[/* max 100 chars */ String],
-            nickName = json.\("nick_name").toOption.map(_.as[/* max 30 chars */ String]),
-            blogUrl = json.\("blog_url").toOption.map(_.as[/* max 100 chars */ String]),
-            email = json.\("email").as[/* max 254 chars */ String],
-            phone = json.\("phone").as[/* max 8 chars */ String],
-            likesPizza = json.\("likes_pizza").as[Boolean],
-            maritalStatusId = json.\("marital_status_id").as[MaritalStatusId],
-            workEmail = json.\("work_email").toOption.map(_.as[/* max 254 chars */ String]),
-            sector = json.\("sector").as[Sector]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PersonRow] = OWrites[PersonRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "favourite_football_club_id" -> Json.toJson(o.favouriteFootballClubId),
+      "name" -> Json.toJson(o.name),
+      "nick_name" -> Json.toJson(o.nickName),
+      "blog_url" -> Json.toJson(o.blogUrl),
+      "email" -> Json.toJson(o.email),
+      "phone" -> Json.toJson(o.phone),
+      "likes_pizza" -> Json.toJson(o.likesPizza),
+      "marital_status_id" -> Json.toJson(o.maritalStatusId),
+      "work_email" -> Json.toJson(o.workEmail),
+      "sector" -> Json.toJson(o.sector)
+    ))
+  )
 }

@@ -7,17 +7,15 @@ package adventureworks
 package production
 package document
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class DocumentRow(
@@ -44,80 +42,44 @@ case class DocumentRow(
   document: Option[Array[Byte]],
   /** ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
   rowguid: UUID,
-  modifieddate: LocalDateTime,
+  modifieddate: TypoLocalDateTime,
   /** Primary key for Document records. */
   documentnode: DocumentId
 )
 
 object DocumentRow {
-  implicit val decoder: Decoder[DocumentRow] =
-    (c: HCursor) =>
-      for {
-        title <- c.downField("title").as[/* max 50 chars */ String]
-        owner <- c.downField("owner").as[BusinessentityId]
-        folderflag <- c.downField("folderflag").as[Flag]
-        filename <- c.downField("filename").as[/* max 400 chars */ String]
-        fileextension <- c.downField("fileextension").as[Option[/* max 8 chars */ String]]
-        revision <- c.downField("revision").as[/* bpchar */ String]
-        changenumber <- c.downField("changenumber").as[Int]
-        status <- c.downField("status").as[Int]
-        documentsummary <- c.downField("documentsummary").as[Option[String]]
-        document <- c.downField("document").as[Option[Array[Byte]]]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-        documentnode <- c.downField("documentnode").as[DocumentId]
-      } yield DocumentRow(title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode)
-  implicit val encoder: Encoder[DocumentRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "title" := row.title,
-        "owner" := row.owner,
-        "folderflag" := row.folderflag,
-        "filename" := row.filename,
-        "fileextension" := row.fileextension,
-        "revision" := row.revision,
-        "changenumber" := row.changenumber,
-        "status" := row.status,
-        "documentsummary" := row.documentsummary,
-        "document" := row.document,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate,
-        "documentnode" := row.documentnode
-      )}
-  implicit val read: Read[DocumentRow] =
-    new Read[DocumentRow](
-      gets = List(
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 400 chars */ String], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[DocumentId], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DocumentRow(
-        title = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 0),
-        owner = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
-        folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-        filename = Get[/* max 400 chars */ String].unsafeGetNonNullable(rs, i + 3),
-        fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
-        revision = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-        changenumber = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        status = Get[Int].unsafeGetNonNullable(rs, i + 7),
-        documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
-        document = Get[Array[Byte]].unsafeGetNullable(rs, i + 9),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 10),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 11),
-        documentnode = Get[DocumentId].unsafeGetNonNullable(rs, i + 12)
-      )
+  implicit val decoder: Decoder[DocumentRow] = Decoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar */ String, Int, Int, Option[String], Option[Array[Byte]], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DocumentRow.apply)
+  implicit val encoder: Encoder[DocumentRow] = Encoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar */ String, Int, Int, Option[String], Option[Array[Byte]], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))
+  implicit val read: Read[DocumentRow] = new Read[DocumentRow](
+    gets = List(
+      (Get[/* max 50 chars */ String], Nullability.NoNulls),
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[/* max 400 chars */ String], Nullability.NoNulls),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[/* bpchar */ String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable),
+      (Get[Array[Byte]], Nullability.Nullable),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[DocumentId], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => DocumentRow(
+      title = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 0),
+      owner = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
+      folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
+      filename = Get[/* max 400 chars */ String].unsafeGetNonNullable(rs, i + 3),
+      fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
+      revision = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
+      changenumber = Get[Int].unsafeGetNonNullable(rs, i + 6),
+      status = Get[Int].unsafeGetNonNullable(rs, i + 7),
+      documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
+      document = Get[Array[Byte]].unsafeGetNullable(rs, i + 9),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 10),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 11),
+      documentnode = Get[DocumentId].unsafeGetNonNullable(rs, i + 12)
     )
-  
-
+  )
 }

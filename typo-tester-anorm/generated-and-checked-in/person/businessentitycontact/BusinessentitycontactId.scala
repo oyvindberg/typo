@@ -13,31 +13,30 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `person.businessentitycontact` */
 case class BusinessentitycontactId(businessentityid: BusinessentityId, personid: BusinessentityId, contacttypeid: ContacttypeId)
 object BusinessentitycontactId {
   implicit val ordering: Ordering[BusinessentitycontactId] = Ordering.by(x => (x.businessentityid, x.personid, x.contacttypeid))
-  implicit val oFormat: OFormat[BusinessentitycontactId] = new OFormat[BusinessentitycontactId]{
-    override def writes(o: BusinessentitycontactId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "personid" -> o.personid,
-        "contacttypeid" -> o.contacttypeid
-      )
-  
-    override def reads(json: JsValue): JsResult[BusinessentitycontactId] = {
-      JsResult.fromTry(
-        Try(
-          BusinessentitycontactId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            personid = json.\("personid").as[BusinessentityId],
-            contacttypeid = json.\("contacttypeid").as[ContacttypeId]
-          )
+  implicit val reads: Reads[BusinessentitycontactId] = Reads[BusinessentitycontactId](json => JsResult.fromTry(
+      Try(
+        BusinessentitycontactId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          personid = json.\("personid").as[BusinessentityId],
+          contacttypeid = json.\("contacttypeid").as[ContacttypeId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[BusinessentitycontactId] = OWrites[BusinessentitycontactId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "personid" -> Json.toJson(o.personid),
+      "contacttypeid" -> Json.toJson(o.contacttypeid)
+    ))
+  )
 }

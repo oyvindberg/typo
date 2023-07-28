@@ -8,13 +8,11 @@ package information_schema
 package routine_sequence_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class RoutineSequenceUsageViewRow(
@@ -30,58 +28,30 @@ case class RoutineSequenceUsageViewRow(
 )
 
 object RoutineSequenceUsageViewRow {
-  implicit val decoder: Decoder[RoutineSequenceUsageViewRow] =
-    (c: HCursor) =>
-      for {
-        specificCatalog <- c.downField("specific_catalog").as[Option[SqlIdentifier]]
-        specificSchema <- c.downField("specific_schema").as[Option[SqlIdentifier]]
-        specificName <- c.downField("specific_name").as[Option[SqlIdentifier]]
-        routineCatalog <- c.downField("routine_catalog").as[Option[SqlIdentifier]]
-        routineSchema <- c.downField("routine_schema").as[Option[SqlIdentifier]]
-        routineName <- c.downField("routine_name").as[Option[SqlIdentifier]]
-        sequenceCatalog <- c.downField("sequence_catalog").as[Option[SqlIdentifier]]
-        sequenceSchema <- c.downField("sequence_schema").as[Option[SqlIdentifier]]
-        sequenceName <- c.downField("sequence_name").as[Option[SqlIdentifier]]
-      } yield RoutineSequenceUsageViewRow(specificCatalog, specificSchema, specificName, routineCatalog, routineSchema, routineName, sequenceCatalog, sequenceSchema, sequenceName)
-  implicit val encoder: Encoder[RoutineSequenceUsageViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "specific_catalog" := row.specificCatalog,
-        "specific_schema" := row.specificSchema,
-        "specific_name" := row.specificName,
-        "routine_catalog" := row.routineCatalog,
-        "routine_schema" := row.routineSchema,
-        "routine_name" := row.routineName,
-        "sequence_catalog" := row.sequenceCatalog,
-        "sequence_schema" := row.sequenceSchema,
-        "sequence_name" := row.sequenceName
-      )}
-  implicit val read: Read[RoutineSequenceUsageViewRow] =
-    new Read[RoutineSequenceUsageViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => RoutineSequenceUsageViewRow(
-        specificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        specificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        specificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        routineCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        routineSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        routineName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        sequenceCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
-        sequenceSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 7),
-        sequenceName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[RoutineSequenceUsageViewRow] = Decoder.forProduct9[RoutineSequenceUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "sequence_catalog", "sequence_schema", "sequence_name")(RoutineSequenceUsageViewRow.apply)
+  implicit val encoder: Encoder[RoutineSequenceUsageViewRow] = Encoder.forProduct9[RoutineSequenceUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "sequence_catalog", "sequence_schema", "sequence_name")(x => (x.specificCatalog, x.specificSchema, x.specificName, x.routineCatalog, x.routineSchema, x.routineName, x.sequenceCatalog, x.sequenceSchema, x.sequenceName))
+  implicit val read: Read[RoutineSequenceUsageViewRow] = new Read[RoutineSequenceUsageViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => RoutineSequenceUsageViewRow(
+      specificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      specificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      specificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      routineCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      routineSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      routineName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      sequenceCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
+      sequenceSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 7),
+      sequenceName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

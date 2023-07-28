@@ -7,16 +7,14 @@ package adventureworks
 package sales
 package shoppingcartitem
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class ShoppingcartitemRow(
   /** Primary key for ShoppingCartItem records. */
@@ -29,51 +27,29 @@ case class ShoppingcartitemRow(
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
   /** Date the time the record was created. */
-  datecreated: LocalDateTime,
-  modifieddate: LocalDateTime
+  datecreated: TypoLocalDateTime,
+  modifieddate: TypoLocalDateTime
 )
 
 object ShoppingcartitemRow {
-  implicit val decoder: Decoder[ShoppingcartitemRow] =
-    (c: HCursor) =>
-      for {
-        shoppingcartitemid <- c.downField("shoppingcartitemid").as[ShoppingcartitemId]
-        shoppingcartid <- c.downField("shoppingcartid").as[/* max 50 chars */ String]
-        quantity <- c.downField("quantity").as[Int]
-        productid <- c.downField("productid").as[ProductId]
-        datecreated <- c.downField("datecreated").as[LocalDateTime]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ShoppingcartitemRow(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
-  implicit val encoder: Encoder[ShoppingcartitemRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "shoppingcartitemid" := row.shoppingcartitemid,
-        "shoppingcartid" := row.shoppingcartid,
-        "quantity" := row.quantity,
-        "productid" := row.productid,
-        "datecreated" := row.datecreated,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ShoppingcartitemRow] =
-    new Read[ShoppingcartitemRow](
-      gets = List(
-        (Get[ShoppingcartitemId], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
-        shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNonNullable(rs, i + 0),
-        shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        quantity = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 3),
-        datecreated = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[ShoppingcartitemRow] = Decoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(ShoppingcartitemRow.apply)
+  implicit val encoder: Encoder[ShoppingcartitemRow] = Encoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))
+  implicit val read: Read[ShoppingcartitemRow] = new Read[ShoppingcartitemRow](
+    gets = List(
+      (Get[ShoppingcartitemId], Nullability.NoNulls),
+      (Get[/* max 50 chars */ String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[ProductId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
+      shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNonNullable(rs, i + 0),
+      shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
+      quantity = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 3),
+      datecreated = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

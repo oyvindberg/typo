@@ -7,16 +7,14 @@ package adventureworks
 package purchasing
 package shipmethod
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class ShipmethodRow(
@@ -29,50 +27,28 @@ case class ShipmethodRow(
   /** Shipping charge per pound. */
   shiprate: BigDecimal,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ShipmethodRow {
-  implicit val decoder: Decoder[ShipmethodRow] =
-    (c: HCursor) =>
-      for {
-        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
-        name <- c.downField("name").as[Name]
-        shipbase <- c.downField("shipbase").as[BigDecimal]
-        shiprate <- c.downField("shiprate").as[BigDecimal]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ShipmethodRow(shipmethodid, name, shipbase, shiprate, rowguid, modifieddate)
-  implicit val encoder: Encoder[ShipmethodRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "shipmethodid" := row.shipmethodid,
-        "name" := row.name,
-        "shipbase" := row.shipbase,
-        "shiprate" := row.shiprate,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ShipmethodRow] =
-    new Read[ShipmethodRow](
-      gets = List(
-        (Get[ShipmethodId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ShipmethodRow(
-        shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        shipbase = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        shiprate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[ShipmethodRow] = Decoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRow.apply)
+  implicit val encoder: Encoder[ShipmethodRow] = Encoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))
+  implicit val read: Read[ShipmethodRow] = new Read[ShipmethodRow](
+    gets = List(
+      (Get[ShipmethodId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ShipmethodRow(
+      shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      shipbase = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
+      shiprate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

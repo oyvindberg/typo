@@ -8,11 +8,11 @@ package production
 package productcosthistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
@@ -21,7 +21,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.standardcost}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning productid, startdate, enddate, standardcost, modifieddate
+          returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
        """.query[ProductcosthistoryRow].unique
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow] = {
@@ -32,29 +32,29 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       Some((Fragment.const(s"standardcost"), fr"${unsaved.standardcost}::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productcosthistory default values
-            returning productid, startdate, enddate, standardcost, modifieddate
+            returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productcosthistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productid, startdate, enddate, standardcost, modifieddate
+            returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
          """
     }
     q.query[ProductcosthistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
-    sql"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory".query[ProductcosthistoryRow].stream
+    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory".query[ProductcosthistoryRow].stream
   }
   override def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]] = {
-    sql"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query[ProductcosthistoryRow].option
+    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query[ProductcosthistoryRow].option
   }
   override def update(row: ProductcosthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -82,7 +82,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             enddate = EXCLUDED.enddate,
             standardcost = EXCLUDED.standardcost,
             modifieddate = EXCLUDED.modifieddate
-          returning productid, startdate, enddate, standardcost, modifieddate
+          returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
        """.query[ProductcosthistoryRow].unique
   }
 }

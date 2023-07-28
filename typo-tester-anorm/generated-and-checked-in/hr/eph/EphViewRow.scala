@@ -7,15 +7,17 @@ package adventureworks
 package hr
 package eph
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EphViewRow(
@@ -23,53 +25,49 @@ case class EphViewRow(
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.ratechangedate]] */
-  ratechangedate: Option[LocalDateTime],
+  ratechangedate: Option[TypoLocalDateTime],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.rate]] */
   rate: Option[BigDecimal],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.payfrequency]] */
   payfrequency: Option[Int],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object EphViewRow {
-  def rowParser(idx: Int): RowParser[EphViewRow] =
-    RowParser[EphViewRow] { row =>
-      Success(
+  implicit val reads: Reads[EphViewRow] = Reads[EphViewRow](json => JsResult.fromTry(
+      Try(
         EphViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          ratechangedate = row[Option[LocalDateTime]](idx + 2),
-          rate = row[Option[BigDecimal]](idx + 3),
-          payfrequency = row[Option[Int]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          ratechangedate = json.\("ratechangedate").toOption.map(_.as[TypoLocalDateTime]),
+          rate = json.\("rate").toOption.map(_.as[BigDecimal]),
+          payfrequency = json.\("payfrequency").toOption.map(_.as[Int]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[EphViewRow] = new OFormat[EphViewRow]{
-    override def writes(o: EphViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "ratechangedate" -> o.ratechangedate,
-        "rate" -> o.rate,
-        "payfrequency" -> o.payfrequency,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[EphViewRow] = RowParser[EphViewRow] { row =>
+    Success(
+      EphViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        ratechangedate = row[Option[TypoLocalDateTime]](idx + 2),
+        rate = row[Option[BigDecimal]](idx + 3),
+        payfrequency = row[Option[Int]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[EphViewRow] = {
-      JsResult.fromTry(
-        Try(
-          EphViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            ratechangedate = json.\("ratechangedate").toOption.map(_.as[LocalDateTime]),
-            rate = json.\("rate").toOption.map(_.as[BigDecimal]),
-            payfrequency = json.\("payfrequency").toOption.map(_.as[Int]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[EphViewRow] = OWrites[EphViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "ratechangedate" -> Json.toJson(o.ratechangedate),
+      "rate" -> Json.toJson(o.rate),
+      "payfrequency" -> Json.toJson(o.payfrequency),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

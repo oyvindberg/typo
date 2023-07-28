@@ -8,12 +8,14 @@ package production
 package productphoto
 
 import adventureworks.Defaulted
-import java.time.LocalDateTime
+import adventureworks.TypoLocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.productphoto` which has not been persisted yet */
@@ -30,9 +32,9 @@ case class ProductphotoRowUnsaved(
       Primary key for ProductPhoto records. */
   productphotoid: Defaulted[ProductphotoId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productphotoidDefault: => ProductphotoId, modifieddateDefault: => LocalDateTime): ProductphotoRow =
+  def toRow(productphotoidDefault: => ProductphotoId, modifieddateDefault: => TypoLocalDateTime): ProductphotoRow =
     ProductphotoRow(
       thumbnailphoto = thumbnailphoto,
       thumbnailphotofilename = thumbnailphotofilename,
@@ -49,30 +51,27 @@ case class ProductphotoRowUnsaved(
     )
 }
 object ProductphotoRowUnsaved {
-  implicit val oFormat: OFormat[ProductphotoRowUnsaved] = new OFormat[ProductphotoRowUnsaved]{
-    override def writes(o: ProductphotoRowUnsaved): JsObject =
-      Json.obj(
-        "thumbnailphoto" -> o.thumbnailphoto,
-        "thumbnailphotofilename" -> o.thumbnailphotofilename,
-        "largephoto" -> o.largephoto,
-        "largephotofilename" -> o.largephotofilename,
-        "productphotoid" -> o.productphotoid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductphotoRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ProductphotoRowUnsaved(
-            thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Array[Byte]]),
-            thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-            largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
-            largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-            productphotoid = json.\("productphotoid").as[Defaulted[ProductphotoId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ProductphotoRowUnsaved] = Reads[ProductphotoRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ProductphotoRowUnsaved(
+          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Array[Byte]]),
+          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
+          largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
+          largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
+          productphotoid = json.\("productphotoid").as[Defaulted[ProductphotoId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductphotoRowUnsaved] = OWrites[ProductphotoRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "thumbnailphoto" -> Json.toJson(o.thumbnailphoto),
+      "thumbnailphotofilename" -> Json.toJson(o.thumbnailphotofilename),
+      "largephoto" -> Json.toJson(o.largephoto),
+      "largephotofilename" -> Json.toJson(o.largephotofilename),
+      "productphotoid" -> Json.toJson(o.productphotoid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

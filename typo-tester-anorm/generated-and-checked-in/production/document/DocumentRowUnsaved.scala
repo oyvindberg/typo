@@ -8,15 +8,17 @@ package production
 package document
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.document` which has not been persisted yet */
@@ -48,12 +50,12 @@ case class DocumentRowUnsaved(
       ROWGUIDCOL number uniquely identifying the record. Required for FileStream. */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: '/'::character varying
       Primary key for Document records. */
   documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
 ) {
-  def toRow(folderflagDefault: => Flag, changenumberDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime, documentnodeDefault: => DocumentId): DocumentRow =
+  def toRow(folderflagDefault: => Flag, changenumberDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, documentnodeDefault: => DocumentId): DocumentRow =
     DocumentRow(
       title = title,
       owner = owner,
@@ -86,44 +88,41 @@ case class DocumentRowUnsaved(
     )
 }
 object DocumentRowUnsaved {
-  implicit val oFormat: OFormat[DocumentRowUnsaved] = new OFormat[DocumentRowUnsaved]{
-    override def writes(o: DocumentRowUnsaved): JsObject =
-      Json.obj(
-        "title" -> o.title,
-        "owner" -> o.owner,
-        "filename" -> o.filename,
-        "fileextension" -> o.fileextension,
-        "revision" -> o.revision,
-        "status" -> o.status,
-        "documentsummary" -> o.documentsummary,
-        "document" -> o.document,
-        "folderflag" -> o.folderflag,
-        "changenumber" -> o.changenumber,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate,
-        "documentnode" -> o.documentnode
-      )
-  
-    override def reads(json: JsValue): JsResult[DocumentRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          DocumentRowUnsaved(
-            title = json.\("title").as[/* max 50 chars */ String],
-            owner = json.\("owner").as[BusinessentityId],
-            filename = json.\("filename").as[/* max 400 chars */ String],
-            fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
-            revision = json.\("revision").as[/* bpchar */ String],
-            status = json.\("status").as[Int],
-            documentsummary = json.\("documentsummary").toOption.map(_.as[String]),
-            document = json.\("document").toOption.map(_.as[Array[Byte]]),
-            folderflag = json.\("folderflag").as[Defaulted[Flag]],
-            changenumber = json.\("changenumber").as[Defaulted[Int]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]],
-            documentnode = json.\("documentnode").as[Defaulted[DocumentId]]
-          )
+  implicit val reads: Reads[DocumentRowUnsaved] = Reads[DocumentRowUnsaved](json => JsResult.fromTry(
+      Try(
+        DocumentRowUnsaved(
+          title = json.\("title").as[/* max 50 chars */ String],
+          owner = json.\("owner").as[BusinessentityId],
+          filename = json.\("filename").as[/* max 400 chars */ String],
+          fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
+          revision = json.\("revision").as[/* bpchar */ String],
+          status = json.\("status").as[Int],
+          documentsummary = json.\("documentsummary").toOption.map(_.as[String]),
+          document = json.\("document").toOption.map(_.as[Array[Byte]]),
+          folderflag = json.\("folderflag").as[Defaulted[Flag]],
+          changenumber = json.\("changenumber").as[Defaulted[Int]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]],
+          documentnode = json.\("documentnode").as[Defaulted[DocumentId]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[DocumentRowUnsaved] = OWrites[DocumentRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "title" -> Json.toJson(o.title),
+      "owner" -> Json.toJson(o.owner),
+      "filename" -> Json.toJson(o.filename),
+      "fileextension" -> Json.toJson(o.fileextension),
+      "revision" -> Json.toJson(o.revision),
+      "status" -> Json.toJson(o.status),
+      "documentsummary" -> Json.toJson(o.documentsummary),
+      "document" -> Json.toJson(o.document),
+      "folderflag" -> Json.toJson(o.folderflag),
+      "changenumber" -> Json.toJson(o.changenumber),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate),
+      "documentnode" -> Json.toJson(o.documentnode)
+    ))
+  )
 }

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgUserMappingRow(
@@ -24,37 +26,33 @@ case class PgUserMappingRow(
 )
 
 object PgUserMappingRow {
-  def rowParser(idx: Int): RowParser[PgUserMappingRow] =
-    RowParser[PgUserMappingRow] { row =>
-      Success(
+  implicit val reads: Reads[PgUserMappingRow] = Reads[PgUserMappingRow](json => JsResult.fromTry(
+      Try(
         PgUserMappingRow(
-          oid = row[PgUserMappingId](idx + 0),
-          umuser = row[/* oid */ Long](idx + 1),
-          umserver = row[/* oid */ Long](idx + 2),
-          umoptions = row[Option[Array[String]]](idx + 3)
+          oid = json.\("oid").as[PgUserMappingId],
+          umuser = json.\("umuser").as[/* oid */ Long],
+          umserver = json.\("umserver").as[/* oid */ Long],
+          umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgUserMappingRow] = new OFormat[PgUserMappingRow]{
-    override def writes(o: PgUserMappingRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "umuser" -> o.umuser,
-        "umserver" -> o.umserver,
-        "umoptions" -> o.umoptions
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgUserMappingRow] = RowParser[PgUserMappingRow] { row =>
+    Success(
+      PgUserMappingRow(
+        oid = row[PgUserMappingId](idx + 0),
+        umuser = row[/* oid */ Long](idx + 1),
+        umserver = row[/* oid */ Long](idx + 2),
+        umoptions = row[Option[Array[String]]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgUserMappingRow] = {
-      JsResult.fromTry(
-        Try(
-          PgUserMappingRow(
-            oid = json.\("oid").as[PgUserMappingId],
-            umuser = json.\("umuser").as[/* oid */ Long],
-            umserver = json.\("umserver").as[/* oid */ Long],
-            umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgUserMappingRow] = OWrites[PgUserMappingRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "umuser" -> Json.toJson(o.umuser),
+      "umserver" -> Json.toJson(o.umserver),
+      "umoptions" -> Json.toJson(o.umoptions)
+    ))
+  )
 }

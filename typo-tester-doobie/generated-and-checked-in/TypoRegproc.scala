@@ -6,55 +6,33 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.util.PGobject
 
 /** regproc (via PGObject) */
 case class TypoRegproc(value: String)
+
 object TypoRegproc {
-  implicit val decoder: Decoder[TypoRegproc] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[String]
-      } yield TypoRegproc(value)
-  implicit val encoder: Encoder[TypoRegproc] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoRegproc] =
-    Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("regproc"))
-      .map(v => TypoRegproc(v.getValue))
-  
-  implicit val put: Put[TypoRegproc] =
-    Put.Advanced.other[PGobject](NonEmptyList.one("regproc"))
-      .contramap(v => {
-                        val obj = new PGobject
-                        obj.setType("regproc")
-                        obj.setValue(v.value)
-                        obj
-                      })
-  
-  implicit val meta: Meta[TypoRegproc] = new Meta(get, put)
-  val gets: Get[Array[TypoRegproc]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_regproc"))
-      .map(_.map(v => TypoRegproc(v.asInstanceOf[String])))
-  
-  val puts: Put[Array[TypoRegproc]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_regproc"), "regproc")
-      .contramap(_.map(v => {
-                              val obj = new PGobject
-                              obj.setType("regproc")
-                              obj.setValue(v.value)
-                              obj
-                            }))
-  
-  implicit val metas: Meta[Array[TypoRegproc]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoRegproc]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_regproc"))
+    .map(_.map(v => TypoRegproc(v.asInstanceOf[String])))
+  implicit val arrayPut: Put[Array[TypoRegproc]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_regproc"), "regproc")
+    .contramap(_.map(v => {
+                            val obj = new PGobject
+                            obj.setType("regproc")
+                            obj.setValue(v.value)
+                            obj
+                          }))
+  implicit val decoder: Decoder[TypoRegproc] = Decoder.forProduct1[TypoRegproc, String]("value")(TypoRegproc.apply)
+  implicit val encoder: Encoder[TypoRegproc] = Encoder.forProduct1[TypoRegproc, String]("value")(x => (x.value))
+  implicit val get: Get[TypoRegproc] = Get.Advanced.other[PGobject](NonEmptyList.one("regproc"))
+    .map(v => TypoRegproc(v.getValue))
+  implicit val put: Put[TypoRegproc] = Put.Advanced.other[PGobject](NonEmptyList.one("regproc")).contramap(v => {
+                                                                             val obj = new PGobject
+                                                                             obj.setType("regproc")
+                                                                             obj.setValue(v.value)
+                                                                             obj
+                                                                           })
 }

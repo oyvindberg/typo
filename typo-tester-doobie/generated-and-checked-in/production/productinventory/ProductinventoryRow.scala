@@ -7,17 +7,15 @@ package adventureworks
 package production
 package productinventory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class ProductinventoryRow(
@@ -34,56 +32,32 @@ case class ProductinventoryRow(
   /** Quantity of products in the inventory location. */
   quantity: Int,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductinventoryId = ProductinventoryId(productid, locationid)
  }
 
 object ProductinventoryRow {
-  implicit val decoder: Decoder[ProductinventoryRow] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        locationid <- c.downField("locationid").as[LocationId]
-        shelf <- c.downField("shelf").as[/* max 10 chars */ String]
-        bin <- c.downField("bin").as[Int]
-        quantity <- c.downField("quantity").as[Int]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductinventoryRow(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
-  implicit val encoder: Encoder[ProductinventoryRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "locationid" := row.locationid,
-        "shelf" := row.shelf,
-        "bin" := row.bin,
-        "quantity" := row.quantity,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductinventoryRow] =
-    new Read[ProductinventoryRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocationId], Nullability.NoNulls),
-        (Get[/* max 10 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductinventoryRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 1),
-        shelf = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        bin = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        quantity = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[ProductinventoryRow] = Decoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(ProductinventoryRow.apply)
+  implicit val encoder: Encoder[ProductinventoryRow] = Encoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))
+  implicit val read: Read[ProductinventoryRow] = new Read[ProductinventoryRow](
+    gets = List(
+      (Get[ProductId], Nullability.NoNulls),
+      (Get[LocationId], Nullability.NoNulls),
+      (Get[/* max 10 chars */ String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductinventoryRow(
+      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
+      locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 1),
+      shelf = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
+      bin = Get[Int].unsafeGetNonNullable(rs, i + 3),
+      quantity = Get[Int].unsafeGetNonNullable(rs, i + 4),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 6)
     )
-  
-
+  )
 }

@@ -7,19 +7,17 @@ package adventureworks
 package person
 package stateprovince
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class StateprovinceRow(
@@ -38,58 +36,32 @@ case class StateprovinceRow(
       Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object StateprovinceRow {
-  implicit val decoder: Decoder[StateprovinceRow] =
-    (c: HCursor) =>
-      for {
-        stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
-        stateprovincecode <- c.downField("stateprovincecode").as[/* bpchar */ String]
-        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
-        isonlystateprovinceflag <- c.downField("isonlystateprovinceflag").as[Flag]
-        name <- c.downField("name").as[Name]
-        territoryid <- c.downField("territoryid").as[SalesterritoryId]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield StateprovinceRow(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, name, territoryid, rowguid, modifieddate)
-  implicit val encoder: Encoder[StateprovinceRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "stateprovinceid" := row.stateprovinceid,
-        "stateprovincecode" := row.stateprovincecode,
-        "countryregioncode" := row.countryregioncode,
-        "isonlystateprovinceflag" := row.isonlystateprovinceflag,
-        "name" := row.name,
-        "territoryid" := row.territoryid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[StateprovinceRow] =
-    new Read[StateprovinceRow](
-      gets = List(
-        (Get[StateprovinceId], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[CountryregionId], Nullability.NoNulls),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[SalesterritoryId], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => StateprovinceRow(
-        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 0),
-        stateprovincecode = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 1),
-        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 2),
-        isonlystateprovinceflag = Get[Flag].unsafeGetNonNullable(rs, i + 3),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 5),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 6),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[StateprovinceRow] = Decoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(StateprovinceRow.apply)
+  implicit val encoder: Encoder[StateprovinceRow] = Encoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))
+  implicit val read: Read[StateprovinceRow] = new Read[StateprovinceRow](
+    gets = List(
+      (Get[StateprovinceId], Nullability.NoNulls),
+      (Get[/* bpchar */ String], Nullability.NoNulls),
+      (Get[CountryregionId], Nullability.NoNulls),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[SalesterritoryId], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => StateprovinceRow(
+      stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 0),
+      stateprovincecode = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 1),
+      countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 2),
+      isonlystateprovinceflag = Get[Flag].unsafeGetNonNullable(rs, i + 3),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 4),
+      territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 5),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 6),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 7)
     )
-  
-
+  )
 }

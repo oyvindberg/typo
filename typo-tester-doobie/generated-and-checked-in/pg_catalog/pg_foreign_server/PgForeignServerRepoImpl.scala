@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def delete(oid: PgForeignServerId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_foreign_server where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_foreign_server where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgForeignServerRow): ConnectionIO[PgForeignServerRow] = {
     sql"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
@@ -25,10 +25,10 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
     sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server".query[PgForeignServerRow].stream
   }
   override def selectById(oid: PgForeignServerId): ConnectionIO[Option[PgForeignServerRow]] = {
-    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = $oid".query[PgForeignServerRow].option
+    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ${oid}".query[PgForeignServerRow].option
   }
   override def selectByIds(oids: Array[PgForeignServerId]): Stream[ConnectionIO, PgForeignServerRow] = {
-    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ANY($oids)".query[PgForeignServerRow].stream
+    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ANY(${oids})".query[PgForeignServerRow].stream
   }
   override def update(row: PgForeignServerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -40,7 +40,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
               srvversion = ${row.srvversion},
               srvacl = ${row.srvacl}::_aclitem,
               srvoptions = ${row.srvoptions}::_text
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

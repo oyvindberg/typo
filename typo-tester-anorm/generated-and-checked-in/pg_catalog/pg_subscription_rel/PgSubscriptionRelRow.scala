@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgSubscriptionRelRow(
@@ -26,37 +28,33 @@ case class PgSubscriptionRelRow(
  }
 
 object PgSubscriptionRelRow {
-  def rowParser(idx: Int): RowParser[PgSubscriptionRelRow] =
-    RowParser[PgSubscriptionRelRow] { row =>
-      Success(
+  implicit val reads: Reads[PgSubscriptionRelRow] = Reads[PgSubscriptionRelRow](json => JsResult.fromTry(
+      Try(
         PgSubscriptionRelRow(
-          srsubid = row[/* oid */ Long](idx + 0),
-          srrelid = row[/* oid */ Long](idx + 1),
-          srsubstate = row[String](idx + 2),
-          srsublsn = row[Option[/* pg_lsn */ Long]](idx + 3)
+          srsubid = json.\("srsubid").as[/* oid */ Long],
+          srrelid = json.\("srrelid").as[/* oid */ Long],
+          srsubstate = json.\("srsubstate").as[String],
+          srsublsn = json.\("srsublsn").toOption.map(_.as[/* pg_lsn */ Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgSubscriptionRelRow] = new OFormat[PgSubscriptionRelRow]{
-    override def writes(o: PgSubscriptionRelRow): JsObject =
-      Json.obj(
-        "srsubid" -> o.srsubid,
-        "srrelid" -> o.srrelid,
-        "srsubstate" -> o.srsubstate,
-        "srsublsn" -> o.srsublsn
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgSubscriptionRelRow] = RowParser[PgSubscriptionRelRow] { row =>
+    Success(
+      PgSubscriptionRelRow(
+        srsubid = row[/* oid */ Long](idx + 0),
+        srrelid = row[/* oid */ Long](idx + 1),
+        srsubstate = row[String](idx + 2),
+        srsublsn = row[Option[/* pg_lsn */ Long]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgSubscriptionRelRow] = {
-      JsResult.fromTry(
-        Try(
-          PgSubscriptionRelRow(
-            srsubid = json.\("srsubid").as[/* oid */ Long],
-            srrelid = json.\("srrelid").as[/* oid */ Long],
-            srsubstate = json.\("srsubstate").as[String],
-            srsublsn = json.\("srsublsn").toOption.map(_.as[/* pg_lsn */ Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgSubscriptionRelRow] = OWrites[PgSubscriptionRelRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "srsubid" -> Json.toJson(o.srsubid),
+      "srrelid" -> Json.toJson(o.srrelid),
+      "srsubstate" -> Json.toJson(o.srsubstate),
+      "srsublsn" -> Json.toJson(o.srsublsn)
+    ))
+  )
 }

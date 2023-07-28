@@ -7,23 +7,25 @@ package adventureworks
 package production
 package productdocument
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ProductdocumentRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
-  modifieddate: LocalDateTime,
+  modifieddate: TypoLocalDateTime,
   /** Document identification number. Foreign key to Document.DocumentNode.
       Points to [[document.DocumentRow.documentnode]] */
   documentnode: DocumentId
@@ -32,34 +34,30 @@ case class ProductdocumentRow(
  }
 
 object ProductdocumentRow {
-  def rowParser(idx: Int): RowParser[ProductdocumentRow] =
-    RowParser[ProductdocumentRow] { row =>
-      Success(
+  implicit val reads: Reads[ProductdocumentRow] = Reads[ProductdocumentRow](json => JsResult.fromTry(
+      Try(
         ProductdocumentRow(
-          productid = row[ProductId](idx + 0),
-          modifieddate = row[LocalDateTime](idx + 1),
-          documentnode = row[DocumentId](idx + 2)
+          productid = json.\("productid").as[ProductId],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime],
+          documentnode = json.\("documentnode").as[DocumentId]
         )
       )
-    }
-  implicit val oFormat: OFormat[ProductdocumentRow] = new OFormat[ProductdocumentRow]{
-    override def writes(o: ProductdocumentRow): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "modifieddate" -> o.modifieddate,
-        "documentnode" -> o.documentnode
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ProductdocumentRow] = RowParser[ProductdocumentRow] { row =>
+    Success(
+      ProductdocumentRow(
+        productid = row[ProductId](idx + 0),
+        modifieddate = row[TypoLocalDateTime](idx + 1),
+        documentnode = row[DocumentId](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[ProductdocumentRow] = {
-      JsResult.fromTry(
-        Try(
-          ProductdocumentRow(
-            productid = json.\("productid").as[ProductId],
-            modifieddate = json.\("modifieddate").as[LocalDateTime],
-            documentnode = json.\("documentnode").as[DocumentId]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ProductdocumentRow] = OWrites[ProductdocumentRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "modifieddate" -> Json.toJson(o.modifieddate),
+      "documentnode" -> Json.toJson(o.documentnode)
+    ))
+  )
 }

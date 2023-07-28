@@ -8,12 +8,10 @@ package production
 package productcosthistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productcosthistory` which has not been persisted yet */
 case class ProductcosthistoryRowUnsaved(
@@ -21,15 +19,15 @@ case class ProductcosthistoryRowUnsaved(
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** Product cost start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Product cost end date. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Standard cost of the product. */
   standardcost: BigDecimal,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): ProductcosthistoryRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductcosthistoryRow =
     ProductcosthistoryRow(
       productid = productid,
       startdate = startdate,
@@ -42,23 +40,6 @@ case class ProductcosthistoryRowUnsaved(
     )
 }
 object ProductcosthistoryRowUnsaved {
-  implicit val decoder: Decoder[ProductcosthistoryRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        standardcost <- c.downField("standardcost").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductcosthistoryRowUnsaved(productid, startdate, enddate, standardcost, modifieddate)
-  implicit val encoder: Encoder[ProductcosthistoryRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "standardcost" := row.standardcost,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductcosthistoryRowUnsaved] = Decoder.forProduct5[ProductcosthistoryRowUnsaved, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, Defaulted[TypoLocalDateTime]]("productid", "startdate", "enddate", "standardcost", "modifieddate")(ProductcosthistoryRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductcosthistoryRowUnsaved] = Encoder.forProduct5[ProductcosthistoryRowUnsaved, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, Defaulted[TypoLocalDateTime]]("productid", "startdate", "enddate", "standardcost", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate))
 }

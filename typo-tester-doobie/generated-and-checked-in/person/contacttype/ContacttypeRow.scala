@@ -7,54 +7,36 @@ package adventureworks
 package person
 package contacttype
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class ContacttypeRow(
   /** Primary key for ContactType records. */
   contacttypeid: ContacttypeId,
   /** Contact type description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ContacttypeRow {
-  implicit val decoder: Decoder[ContacttypeRow] =
-    (c: HCursor) =>
-      for {
-        contacttypeid <- c.downField("contacttypeid").as[ContacttypeId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ContacttypeRow(contacttypeid, name, modifieddate)
-  implicit val encoder: Encoder[ContacttypeRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "contacttypeid" := row.contacttypeid,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ContacttypeRow] =
-    new Read[ContacttypeRow](
-      gets = List(
-        (Get[ContacttypeId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ContacttypeRow(
-        contacttypeid = Get[ContacttypeId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[ContacttypeRow] = Decoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(ContacttypeRow.apply)
+  implicit val encoder: Encoder[ContacttypeRow] = Encoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(x => (x.contacttypeid, x.name, x.modifieddate))
+  implicit val read: Read[ContacttypeRow] = new Read[ContacttypeRow](
+    gets = List(
+      (Get[ContacttypeId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ContacttypeRow(
+      contacttypeid = Get[ContacttypeId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

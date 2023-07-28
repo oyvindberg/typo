@@ -8,22 +8,22 @@ package production
 package document
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId): ConnectionIO[Boolean] = {
-    sql"""delete from production."document" where documentnode = $documentnode""".update.run.map(_ > 0)
+    sql"""delete from production."document" where documentnode = ${documentnode}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
           values (${unsaved.title}, ${unsaved.owner}::int4, ${unsaved.folderflag}::"public"."Flag", ${unsaved.filename}, ${unsaved.fileextension}, ${unsaved.revision}::bpchar, ${unsaved.changenumber}::int4, ${unsaved.status}::int2, ${unsaved.documentsummary}, ${unsaved.document}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
-          returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+          returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
        """.query[DocumentRow].unique
   }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
@@ -50,7 +50,7 @@ object DocumentRepoImpl extends DocumentRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
@@ -60,26 +60,26 @@ object DocumentRepoImpl extends DocumentRepo {
     
     val q = if (fs.isEmpty) {
       sql"""insert into production."document" default values
-            returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+            returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production."document"(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+            returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
          """
     }
     q.query[DocumentRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
-    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document"""".query[DocumentRow].stream
+    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode from production."document"""".query[DocumentRow].stream
   }
   override def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]] = {
-    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document" where documentnode = $documentnode""".query[DocumentRow].option
+    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode from production."document" where documentnode = ${documentnode}""".query[DocumentRow].option
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
-    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document" where documentnode = ANY($documentnodes)""".query[DocumentRow].stream
+    sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode from production."document" where documentnode = ANY(${documentnodes})""".query[DocumentRow].stream
   }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     val documentnode = row.documentnode
@@ -96,7 +96,7 @@ object DocumentRepoImpl extends DocumentRepo {
               "document" = ${row.document}::bytea,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where documentnode = $documentnode
+          where documentnode = ${documentnode}
        """
       .update
       .run
@@ -133,7 +133,7 @@ object DocumentRepoImpl extends DocumentRepo {
             "document" = EXCLUDED."document",
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
+          returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
        """.query[DocumentRow].unique
   }
 }

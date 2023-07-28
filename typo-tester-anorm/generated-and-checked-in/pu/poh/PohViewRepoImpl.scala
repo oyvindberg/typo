@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PohViewRepoImpl extends PohViewRepo {
   override def selectAll(implicit c: Connection): List[PohViewRow] = {
-    SQL"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+    SQL"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
           from pu.poh
        """.as(PohViewRow.rowParser(1).*)
   }

@@ -7,31 +7,16 @@ package adventureworks
 package sales
 package salesterritoryhistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** Type for the composite primary key of table `sales.salesterritoryhistory` */
-case class SalesterritoryhistoryId(businessentityid: BusinessentityId, startdate: LocalDateTime, territoryid: SalesterritoryId)
+case class SalesterritoryhistoryId(businessentityid: BusinessentityId, startdate: TypoLocalDateTime, territoryid: SalesterritoryId)
 object SalesterritoryhistoryId {
-  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[SalesterritoryhistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.territoryid))
-  implicit val decoder: Decoder[SalesterritoryhistoryId] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        territoryid <- c.downField("territoryid").as[SalesterritoryId]
-      } yield SalesterritoryhistoryId(businessentityid, startdate, territoryid)
-  implicit val encoder: Encoder[SalesterritoryhistoryId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "startdate" := row.startdate,
-        "territoryid" := row.territoryid
-      )}
+  implicit val decoder: Decoder[SalesterritoryhistoryId] = Decoder.forProduct3[SalesterritoryhistoryId, BusinessentityId, TypoLocalDateTime, SalesterritoryId]("businessentityid", "startdate", "territoryid")(SalesterritoryhistoryId.apply)
+  implicit val encoder: Encoder[SalesterritoryhistoryId] = Encoder.forProduct3[SalesterritoryhistoryId, BusinessentityId, TypoLocalDateTime, SalesterritoryId]("businessentityid", "startdate", "territoryid")(x => (x.businessentityid, x.startdate, x.territoryid))
+  implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[SalesterritoryhistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.territoryid))
 }

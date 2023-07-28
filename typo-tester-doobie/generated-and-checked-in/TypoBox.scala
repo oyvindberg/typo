@@ -6,51 +6,23 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.geometric.PGbox
 
 /** This represents the box datatype in PostgreSQL */
 case class TypoBox(x1: Double, y1: Double, x2: Double, y2: Double)
+
 object TypoBox {
-  implicit val decoder: Decoder[TypoBox] =
-    (c: HCursor) =>
-      for {
-        x1 <- c.downField("x1").as[Double]
-        y1 <- c.downField("y1").as[Double]
-        x2 <- c.downField("x2").as[Double]
-        y2 <- c.downField("y2").as[Double]
-      } yield TypoBox(x1, y1, x2, y2)
-  implicit val encoder: Encoder[TypoBox] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "x1" := row.x1,
-        "y1" := row.y1,
-        "x2" := row.x2,
-        "y2" := row.y2
-      )}
-  implicit val get: Get[TypoBox] =
-    Get.Advanced.other[PGbox](cats.data.NonEmptyList.one("box"))
-      .map(v => TypoBox(v.point(0).x, v.point(0).y, v.point(1).x, v.point(1).y))
-  
-  implicit val put: Put[TypoBox] =
-    Put.Advanced.other[PGbox](NonEmptyList.one("box"))
-      .contramap(v => new PGbox(v.x1, v.y1, v.x2, v.y2))
-  
-  implicit val meta: Meta[TypoBox] = new Meta(get, put)
-  val gets: Get[Array[TypoBox]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_box"))
-      .map(_.map(v => TypoBox(v.asInstanceOf[PGbox].point(0).x, v.asInstanceOf[PGbox].point(0).y, v.asInstanceOf[PGbox].point(1).x, v.asInstanceOf[PGbox].point(1).y)))
-  
-  val puts: Put[Array[TypoBox]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_box"), "box")
-      .contramap(_.map(v => new PGbox(v.x1, v.y1, v.x2, v.y2)))
-  
-  implicit val metas: Meta[Array[TypoBox]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoBox]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_box"))
+    .map(_.map(v => TypoBox(v.asInstanceOf[PGbox].point(0).x, v.asInstanceOf[PGbox].point(0).y, v.asInstanceOf[PGbox].point(1).x, v.asInstanceOf[PGbox].point(1).y)))
+  implicit val arrayPut: Put[Array[TypoBox]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_box"), "box")
+    .contramap(_.map(v => new PGbox(v.x1, v.y1, v.x2, v.y2)))
+  implicit val decoder: Decoder[TypoBox] = Decoder.forProduct4[TypoBox, Double, Double, Double, Double]("x1", "y1", "x2", "y2")(TypoBox.apply)
+  implicit val encoder: Encoder[TypoBox] = Encoder.forProduct4[TypoBox, Double, Double, Double, Double]("x1", "y1", "x2", "y2")(x => (x.x1, x.y1, x.x2, x.y2))
+  implicit val get: Get[TypoBox] = Get.Advanced.other[PGbox](NonEmptyList.one("box"))
+    .map(v => TypoBox(v.point(0).x, v.point(0).y, v.point(1).x, v.point(1).y))
+  implicit val put: Put[TypoBox] = Put.Advanced.other[PGbox](NonEmptyList.one("box")).contramap(v => new PGbox(v.x1, v.y1, v.x2, v.y2))
 }

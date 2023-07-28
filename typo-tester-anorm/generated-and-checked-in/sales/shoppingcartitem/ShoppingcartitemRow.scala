@@ -7,15 +7,17 @@ package adventureworks
 package sales
 package shoppingcartitem
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ShoppingcartitemRow(
@@ -29,48 +31,44 @@ case class ShoppingcartitemRow(
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
   /** Date the time the record was created. */
-  datecreated: LocalDateTime,
-  modifieddate: LocalDateTime
+  datecreated: TypoLocalDateTime,
+  modifieddate: TypoLocalDateTime
 )
 
 object ShoppingcartitemRow {
-  def rowParser(idx: Int): RowParser[ShoppingcartitemRow] =
-    RowParser[ShoppingcartitemRow] { row =>
-      Success(
+  implicit val reads: Reads[ShoppingcartitemRow] = Reads[ShoppingcartitemRow](json => JsResult.fromTry(
+      Try(
         ShoppingcartitemRow(
-          shoppingcartitemid = row[ShoppingcartitemId](idx + 0),
-          shoppingcartid = row[/* max 50 chars */ String](idx + 1),
-          quantity = row[Int](idx + 2),
-          productid = row[ProductId](idx + 3),
-          datecreated = row[LocalDateTime](idx + 4),
-          modifieddate = row[LocalDateTime](idx + 5)
+          shoppingcartitemid = json.\("shoppingcartitemid").as[ShoppingcartitemId],
+          shoppingcartid = json.\("shoppingcartid").as[/* max 50 chars */ String],
+          quantity = json.\("quantity").as[Int],
+          productid = json.\("productid").as[ProductId],
+          datecreated = json.\("datecreated").as[TypoLocalDateTime],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ShoppingcartitemRow] = new OFormat[ShoppingcartitemRow]{
-    override def writes(o: ShoppingcartitemRow): JsObject =
-      Json.obj(
-        "shoppingcartitemid" -> o.shoppingcartitemid,
-        "shoppingcartid" -> o.shoppingcartid,
-        "quantity" -> o.quantity,
-        "productid" -> o.productid,
-        "datecreated" -> o.datecreated,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ShoppingcartitemRow] = RowParser[ShoppingcartitemRow] { row =>
+    Success(
+      ShoppingcartitemRow(
+        shoppingcartitemid = row[ShoppingcartitemId](idx + 0),
+        shoppingcartid = row[/* max 50 chars */ String](idx + 1),
+        quantity = row[Int](idx + 2),
+        productid = row[ProductId](idx + 3),
+        datecreated = row[TypoLocalDateTime](idx + 4),
+        modifieddate = row[TypoLocalDateTime](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[ShoppingcartitemRow] = {
-      JsResult.fromTry(
-        Try(
-          ShoppingcartitemRow(
-            shoppingcartitemid = json.\("shoppingcartitemid").as[ShoppingcartitemId],
-            shoppingcartid = json.\("shoppingcartid").as[/* max 50 chars */ String],
-            quantity = json.\("quantity").as[Int],
-            productid = json.\("productid").as[ProductId],
-            datecreated = json.\("datecreated").as[LocalDateTime],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ShoppingcartitemRow] = OWrites[ShoppingcartitemRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "shoppingcartitemid" -> Json.toJson(o.shoppingcartitemid),
+      "shoppingcartid" -> Json.toJson(o.shoppingcartid),
+      "quantity" -> Json.toJson(o.quantity),
+      "productid" -> Json.toJson(o.productid),
+      "datecreated" -> Json.toJson(o.datecreated),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

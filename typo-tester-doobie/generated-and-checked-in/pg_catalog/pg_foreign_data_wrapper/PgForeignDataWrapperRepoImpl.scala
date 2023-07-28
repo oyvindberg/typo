@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def delete(oid: PgForeignDataWrapperId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_foreign_data_wrapper where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_foreign_data_wrapper where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgForeignDataWrapperRow): ConnectionIO[PgForeignDataWrapperRow] = {
     sql"""insert into pg_catalog.pg_foreign_data_wrapper(oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions)
@@ -25,10 +25,10 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
     sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper".query[PgForeignDataWrapperRow].stream
   }
   override def selectById(oid: PgForeignDataWrapperId): ConnectionIO[Option[PgForeignDataWrapperRow]] = {
-    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = $oid".query[PgForeignDataWrapperRow].option
+    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ${oid}".query[PgForeignDataWrapperRow].option
   }
   override def selectByIds(oids: Array[PgForeignDataWrapperId]): Stream[ConnectionIO, PgForeignDataWrapperRow] = {
-    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ANY($oids)".query[PgForeignDataWrapperRow].stream
+    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ANY(${oids})".query[PgForeignDataWrapperRow].stream
   }
   override def update(row: PgForeignDataWrapperRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -39,7 +39,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
               fdwvalidator = ${row.fdwvalidator}::oid,
               fdwacl = ${row.fdwacl}::_aclitem,
               fdwoptions = ${row.fdwoptions}::_text
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

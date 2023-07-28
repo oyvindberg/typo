@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package soh
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -20,13 +21,14 @@ import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SohViewRow(
@@ -36,11 +38,11 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.revisionnumber]] */
   revisionnumber: Option[Int],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.orderdate]] */
-  orderdate: Option[LocalDateTime],
+  orderdate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.duedate]] */
-  duedate: Option[LocalDateTime],
+  duedate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.shipdate]] */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.status]] */
   status: Option[Int],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.onlineorderflag]] */
@@ -80,107 +82,103 @@ case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SohViewRow {
-  def rowParser(idx: Int): RowParser[SohViewRow] =
-    RowParser[SohViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SohViewRow] = Reads[SohViewRow](json => JsResult.fromTry(
+      Try(
         SohViewRow(
-          id = row[Option[Int]](idx + 0),
-          salesorderid = row[Option[SalesorderheaderId]](idx + 1),
-          revisionnumber = row[Option[Int]](idx + 2),
-          orderdate = row[Option[LocalDateTime]](idx + 3),
-          duedate = row[Option[LocalDateTime]](idx + 4),
-          shipdate = row[Option[LocalDateTime]](idx + 5),
-          status = row[Option[Int]](idx + 6),
-          onlineorderflag = row[Flag](idx + 7),
-          purchaseordernumber = row[Option[OrderNumber]](idx + 8),
-          accountnumber = row[Option[AccountNumber]](idx + 9),
-          customerid = row[Option[CustomerId]](idx + 10),
-          salespersonid = row[Option[BusinessentityId]](idx + 11),
-          territoryid = row[Option[SalesterritoryId]](idx + 12),
-          billtoaddressid = row[Option[AddressId]](idx + 13),
-          shiptoaddressid = row[Option[AddressId]](idx + 14),
-          shipmethodid = row[Option[ShipmethodId]](idx + 15),
-          creditcardid = row[Option[CreditcardId]](idx + 16),
-          creditcardapprovalcode = row[Option[/* max 15 chars */ String]](idx + 17),
-          currencyrateid = row[Option[CurrencyrateId]](idx + 18),
-          subtotal = row[Option[BigDecimal]](idx + 19),
-          taxamt = row[Option[BigDecimal]](idx + 20),
-          freight = row[Option[BigDecimal]](idx + 21),
-          totaldue = row[Option[BigDecimal]](idx + 22),
-          comment = row[Option[/* max 128 chars */ String]](idx + 23),
-          rowguid = row[Option[UUID]](idx + 24),
-          modifieddate = row[Option[LocalDateTime]](idx + 25)
+          id = json.\("id").toOption.map(_.as[Int]),
+          salesorderid = json.\("salesorderid").toOption.map(_.as[SalesorderheaderId]),
+          revisionnumber = json.\("revisionnumber").toOption.map(_.as[Int]),
+          orderdate = json.\("orderdate").toOption.map(_.as[TypoLocalDateTime]),
+          duedate = json.\("duedate").toOption.map(_.as[TypoLocalDateTime]),
+          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
+          status = json.\("status").toOption.map(_.as[Int]),
+          onlineorderflag = json.\("onlineorderflag").as[Flag],
+          purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
+          accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
+          customerid = json.\("customerid").toOption.map(_.as[CustomerId]),
+          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
+          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
+          billtoaddressid = json.\("billtoaddressid").toOption.map(_.as[AddressId]),
+          shiptoaddressid = json.\("shiptoaddressid").toOption.map(_.as[AddressId]),
+          shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
+          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
+          creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
+          currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
+          subtotal = json.\("subtotal").toOption.map(_.as[BigDecimal]),
+          taxamt = json.\("taxamt").toOption.map(_.as[BigDecimal]),
+          freight = json.\("freight").toOption.map(_.as[BigDecimal]),
+          totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
+          comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SohViewRow] = new OFormat[SohViewRow]{
-    override def writes(o: SohViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "salesorderid" -> o.salesorderid,
-        "revisionnumber" -> o.revisionnumber,
-        "orderdate" -> o.orderdate,
-        "duedate" -> o.duedate,
-        "shipdate" -> o.shipdate,
-        "status" -> o.status,
-        "onlineorderflag" -> o.onlineorderflag,
-        "purchaseordernumber" -> o.purchaseordernumber,
-        "accountnumber" -> o.accountnumber,
-        "customerid" -> o.customerid,
-        "salespersonid" -> o.salespersonid,
-        "territoryid" -> o.territoryid,
-        "billtoaddressid" -> o.billtoaddressid,
-        "shiptoaddressid" -> o.shiptoaddressid,
-        "shipmethodid" -> o.shipmethodid,
-        "creditcardid" -> o.creditcardid,
-        "creditcardapprovalcode" -> o.creditcardapprovalcode,
-        "currencyrateid" -> o.currencyrateid,
-        "subtotal" -> o.subtotal,
-        "taxamt" -> o.taxamt,
-        "freight" -> o.freight,
-        "totaldue" -> o.totaldue,
-        "comment" -> o.comment,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SohViewRow] = RowParser[SohViewRow] { row =>
+    Success(
+      SohViewRow(
+        id = row[Option[Int]](idx + 0),
+        salesorderid = row[Option[SalesorderheaderId]](idx + 1),
+        revisionnumber = row[Option[Int]](idx + 2),
+        orderdate = row[Option[TypoLocalDateTime]](idx + 3),
+        duedate = row[Option[TypoLocalDateTime]](idx + 4),
+        shipdate = row[Option[TypoLocalDateTime]](idx + 5),
+        status = row[Option[Int]](idx + 6),
+        onlineorderflag = row[Flag](idx + 7),
+        purchaseordernumber = row[Option[OrderNumber]](idx + 8),
+        accountnumber = row[Option[AccountNumber]](idx + 9),
+        customerid = row[Option[CustomerId]](idx + 10),
+        salespersonid = row[Option[BusinessentityId]](idx + 11),
+        territoryid = row[Option[SalesterritoryId]](idx + 12),
+        billtoaddressid = row[Option[AddressId]](idx + 13),
+        shiptoaddressid = row[Option[AddressId]](idx + 14),
+        shipmethodid = row[Option[ShipmethodId]](idx + 15),
+        creditcardid = row[Option[CreditcardId]](idx + 16),
+        creditcardapprovalcode = row[Option[/* max 15 chars */ String]](idx + 17),
+        currencyrateid = row[Option[CurrencyrateId]](idx + 18),
+        subtotal = row[Option[BigDecimal]](idx + 19),
+        taxamt = row[Option[BigDecimal]](idx + 20),
+        freight = row[Option[BigDecimal]](idx + 21),
+        totaldue = row[Option[BigDecimal]](idx + 22),
+        comment = row[Option[/* max 128 chars */ String]](idx + 23),
+        rowguid = row[Option[UUID]](idx + 24),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 25)
       )
-  
-    override def reads(json: JsValue): JsResult[SohViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SohViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            salesorderid = json.\("salesorderid").toOption.map(_.as[SalesorderheaderId]),
-            revisionnumber = json.\("revisionnumber").toOption.map(_.as[Int]),
-            orderdate = json.\("orderdate").toOption.map(_.as[LocalDateTime]),
-            duedate = json.\("duedate").toOption.map(_.as[LocalDateTime]),
-            shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
-            status = json.\("status").toOption.map(_.as[Int]),
-            onlineorderflag = json.\("onlineorderflag").as[Flag],
-            purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
-            accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
-            customerid = json.\("customerid").toOption.map(_.as[CustomerId]),
-            salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-            billtoaddressid = json.\("billtoaddressid").toOption.map(_.as[AddressId]),
-            shiptoaddressid = json.\("shiptoaddressid").toOption.map(_.as[AddressId]),
-            shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
-            creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-            creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
-            currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
-            subtotal = json.\("subtotal").toOption.map(_.as[BigDecimal]),
-            taxamt = json.\("taxamt").toOption.map(_.as[BigDecimal]),
-            freight = json.\("freight").toOption.map(_.as[BigDecimal]),
-            totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
-            comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SohViewRow] = OWrites[SohViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "salesorderid" -> Json.toJson(o.salesorderid),
+      "revisionnumber" -> Json.toJson(o.revisionnumber),
+      "orderdate" -> Json.toJson(o.orderdate),
+      "duedate" -> Json.toJson(o.duedate),
+      "shipdate" -> Json.toJson(o.shipdate),
+      "status" -> Json.toJson(o.status),
+      "onlineorderflag" -> Json.toJson(o.onlineorderflag),
+      "purchaseordernumber" -> Json.toJson(o.purchaseordernumber),
+      "accountnumber" -> Json.toJson(o.accountnumber),
+      "customerid" -> Json.toJson(o.customerid),
+      "salespersonid" -> Json.toJson(o.salespersonid),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "billtoaddressid" -> Json.toJson(o.billtoaddressid),
+      "shiptoaddressid" -> Json.toJson(o.shiptoaddressid),
+      "shipmethodid" -> Json.toJson(o.shipmethodid),
+      "creditcardid" -> Json.toJson(o.creditcardid),
+      "creditcardapprovalcode" -> Json.toJson(o.creditcardapprovalcode),
+      "currencyrateid" -> Json.toJson(o.currencyrateid),
+      "subtotal" -> Json.toJson(o.subtotal),
+      "taxamt" -> Json.toJson(o.taxamt),
+      "freight" -> Json.toJson(o.freight),
+      "totaldue" -> Json.toJson(o.totaldue),
+      "comment" -> Json.toJson(o.comment),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

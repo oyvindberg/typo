@@ -7,18 +7,19 @@ package adventureworks
 package production
 package unitmeasure
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar */ String) extends AnyVal
 object UnitmeasureId {
+  implicit val arrayGet: Get[Array[UnitmeasureId]] = Get[Array[/* bpchar */ String]].map(_.map(UnitmeasureId.apply))
+  implicit val arrayPut: Put[Array[UnitmeasureId]] = Put[Array[/* bpchar */ String]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[UnitmeasureId] = Decoder[/* bpchar */ String].map(UnitmeasureId.apply)
+  implicit val encoder: Encoder[UnitmeasureId] = Encoder[/* bpchar */ String].contramap(_.value)
+  implicit val get: Get[UnitmeasureId] = Get[/* bpchar */ String].map(UnitmeasureId.apply)
   implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[UnitmeasureId] =
-    Encoder[/* bpchar */ String].contramap(_.value)
-  implicit val decoder: Decoder[UnitmeasureId] =
-    Decoder[/* bpchar */ String].map(UnitmeasureId(_))
-  implicit val meta: Meta[UnitmeasureId] = Meta[/* bpchar */ String].imap(UnitmeasureId.apply)(_.value)
-  implicit val metaArray: Meta[Array[UnitmeasureId]] = Meta[Array[/* bpchar */ String]].imap(_.map(UnitmeasureId.apply))(_.map(_.value))
+  implicit val put: Put[UnitmeasureId] = Put[/* bpchar */ String].contramap(_.value)
 }

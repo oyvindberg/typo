@@ -11,19 +11,20 @@ package marital_status
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `myschema.marital_status` */
 case class MaritalStatusId(value: Long) extends AnyVal
 object MaritalStatusId {
-  implicit val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
-  implicit val format: Format[MaritalStatusId] = implicitly[Format[Long]].bimap(MaritalStatusId.apply, _.value)
-  implicit val toStatement: ToStatement[MaritalStatusId] = implicitly[ToStatement[Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[MaritalStatusId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[MaritalStatusId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
   implicit val column: Column[MaritalStatusId] = implicitly[Column[Long]].map(MaritalStatusId.apply)
+  implicit val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[MaritalStatusId] = new ParameterMetaData[MaritalStatusId] {
     override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Long]].jdbcType
   }
-
+  implicit val reads: Reads[MaritalStatusId] = implicitly[Reads[Long]].map(MaritalStatusId.apply)
+  implicit val toStatement: ToStatement[MaritalStatusId] = implicitly[ToStatement[Long]].contramap(_.value)
+  implicit val writes: Writes[MaritalStatusId] = implicitly[Writes[Long]].contramap(_.value)
 }

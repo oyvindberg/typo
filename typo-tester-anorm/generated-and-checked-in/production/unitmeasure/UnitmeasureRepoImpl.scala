@@ -8,11 +8,11 @@ package production
 package unitmeasure
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning unitmeasurecode, "name", modifieddate
+          returning unitmeasurecode, "name", modifieddate::text
        """
       .executeInsert(UnitmeasureRow.rowParser(1).single)
   
@@ -32,19 +32,19 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.unitmeasure default values
-            returning unitmeasurecode, "name", modifieddate
+            returning unitmeasurecode, "name", modifieddate::text
          """
         .executeInsert(UnitmeasureRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.unitmeasure(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning unitmeasurecode, "name", modifieddate
+                  returning unitmeasurecode, "name", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -55,18 +55,18 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, "name", modifieddate
+    SQL"""select unitmeasurecode, "name", modifieddate::text
           from production.unitmeasure
        """.as(UnitmeasureRow.rowParser(1).*)
   }
   override def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, "name", modifieddate
+    SQL"""select unitmeasurecode, "name", modifieddate::text
           from production.unitmeasure
           where unitmeasurecode = $unitmeasurecode
        """.as(UnitmeasureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
-    SQL"""select unitmeasurecode, "name", modifieddate
+    SQL"""select unitmeasurecode, "name", modifieddate::text
           from production.unitmeasure
           where unitmeasurecode = ANY($unitmeasurecodes)
        """.as(UnitmeasureRow.rowParser(1).*)
@@ -91,7 +91,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning unitmeasurecode, "name", modifieddate
+          returning unitmeasurecode, "name", modifieddate::text
        """
       .executeInsert(UnitmeasureRow.rowParser(1).single)
   

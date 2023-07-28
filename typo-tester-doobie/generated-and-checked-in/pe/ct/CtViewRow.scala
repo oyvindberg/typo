@@ -7,17 +7,15 @@ package adventureworks
 package pe
 package ct
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CtViewRow(
   id: Option[Int],
@@ -26,42 +24,24 @@ case class CtViewRow(
   /** Points to [[person.contacttype.ContacttypeRow.name]] */
   name: Option[Name],
   /** Points to [[person.contacttype.ContacttypeRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CtViewRow {
-  implicit val decoder: Decoder[CtViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        contacttypeid <- c.downField("contacttypeid").as[Option[ContacttypeId]]
-        name <- c.downField("name").as[Option[Name]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield CtViewRow(id, contacttypeid, name, modifieddate)
-  implicit val encoder: Encoder[CtViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "contacttypeid" := row.contacttypeid,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CtViewRow] =
-    new Read[CtViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ContacttypeId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CtViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        contacttypeid = Get[ContacttypeId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[CtViewRow] = Decoder.forProduct4[CtViewRow, Option[Int], Option[ContacttypeId], Option[Name], Option[TypoLocalDateTime]]("id", "contacttypeid", "name", "modifieddate")(CtViewRow.apply)
+  implicit val encoder: Encoder[CtViewRow] = Encoder.forProduct4[CtViewRow, Option[Int], Option[ContacttypeId], Option[Name], Option[TypoLocalDateTime]]("id", "contacttypeid", "name", "modifieddate")(x => (x.id, x.contacttypeid, x.name, x.modifieddate))
+  implicit val read: Read[CtViewRow] = new Read[CtViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ContacttypeId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CtViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      contacttypeid = Get[ContacttypeId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

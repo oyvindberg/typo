@@ -8,13 +8,11 @@ package pg_catalog
 package pg_sequences
 
 import adventureworks.TypoRegtype
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgSequencesViewRow(
@@ -32,66 +30,34 @@ case class PgSequencesViewRow(
 )
 
 object PgSequencesViewRow {
-  implicit val decoder: Decoder[PgSequencesViewRow] =
-    (c: HCursor) =>
-      for {
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        sequencename <- c.downField("sequencename").as[Option[String]]
-        sequenceowner <- c.downField("sequenceowner").as[Option[String]]
-        dataType <- c.downField("data_type").as[Option[TypoRegtype]]
-        startValue <- c.downField("start_value").as[Option[Long]]
-        minValue <- c.downField("min_value").as[Option[Long]]
-        maxValue <- c.downField("max_value").as[Option[Long]]
-        incrementBy <- c.downField("increment_by").as[Option[Long]]
-        cycle <- c.downField("cycle").as[Option[Boolean]]
-        cacheSize <- c.downField("cache_size").as[Option[Long]]
-        lastValue <- c.downField("last_value").as[Option[Long]]
-      } yield PgSequencesViewRow(schemaname, sequencename, sequenceowner, dataType, startValue, minValue, maxValue, incrementBy, cycle, cacheSize, lastValue)
-  implicit val encoder: Encoder[PgSequencesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "schemaname" := row.schemaname,
-        "sequencename" := row.sequencename,
-        "sequenceowner" := row.sequenceowner,
-        "data_type" := row.dataType,
-        "start_value" := row.startValue,
-        "min_value" := row.minValue,
-        "max_value" := row.maxValue,
-        "increment_by" := row.incrementBy,
-        "cycle" := row.cycle,
-        "cache_size" := row.cacheSize,
-        "last_value" := row.lastValue
-      )}
-  implicit val read: Read[PgSequencesViewRow] =
-    new Read[PgSequencesViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[TypoRegtype], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgSequencesViewRow(
-        schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-        sequencename = Get[String].unsafeGetNullable(rs, i + 1),
-        sequenceowner = Get[String].unsafeGetNullable(rs, i + 2),
-        dataType = Get[TypoRegtype].unsafeGetNullable(rs, i + 3),
-        startValue = Get[Long].unsafeGetNullable(rs, i + 4),
-        minValue = Get[Long].unsafeGetNullable(rs, i + 5),
-        maxValue = Get[Long].unsafeGetNullable(rs, i + 6),
-        incrementBy = Get[Long].unsafeGetNullable(rs, i + 7),
-        cycle = Get[Boolean].unsafeGetNullable(rs, i + 8),
-        cacheSize = Get[Long].unsafeGetNullable(rs, i + 9),
-        lastValue = Get[Long].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[PgSequencesViewRow] = Decoder.forProduct11[PgSequencesViewRow, Option[String], Option[String], Option[String], Option[TypoRegtype], Option[Long], Option[Long], Option[Long], Option[Long], Option[Boolean], Option[Long], Option[Long]]("schemaname", "sequencename", "sequenceowner", "data_type", "start_value", "min_value", "max_value", "increment_by", "cycle", "cache_size", "last_value")(PgSequencesViewRow.apply)
+  implicit val encoder: Encoder[PgSequencesViewRow] = Encoder.forProduct11[PgSequencesViewRow, Option[String], Option[String], Option[String], Option[TypoRegtype], Option[Long], Option[Long], Option[Long], Option[Long], Option[Boolean], Option[Long], Option[Long]]("schemaname", "sequencename", "sequenceowner", "data_type", "start_value", "min_value", "max_value", "increment_by", "cycle", "cache_size", "last_value")(x => (x.schemaname, x.sequencename, x.sequenceowner, x.dataType, x.startValue, x.minValue, x.maxValue, x.incrementBy, x.cycle, x.cacheSize, x.lastValue))
+  implicit val read: Read[PgSequencesViewRow] = new Read[PgSequencesViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoRegtype], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgSequencesViewRow(
+      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
+      sequencename = Get[String].unsafeGetNullable(rs, i + 1),
+      sequenceowner = Get[String].unsafeGetNullable(rs, i + 2),
+      dataType = Get[TypoRegtype].unsafeGetNullable(rs, i + 3),
+      startValue = Get[Long].unsafeGetNullable(rs, i + 4),
+      minValue = Get[Long].unsafeGetNullable(rs, i + 5),
+      maxValue = Get[Long].unsafeGetNullable(rs, i + 6),
+      incrementBy = Get[Long].unsafeGetNullable(rs, i + 7),
+      cycle = Get[Boolean].unsafeGetNullable(rs, i + 8),
+      cacheSize = Get[Long].unsafeGetNullable(rs, i + 9),
+      lastValue = Get[Long].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

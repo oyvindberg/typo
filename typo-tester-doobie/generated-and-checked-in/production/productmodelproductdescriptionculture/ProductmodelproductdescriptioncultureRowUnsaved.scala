@@ -8,14 +8,12 @@ package production
 package productmodelproductdescriptionculture
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productmodelproductdescriptionculture` which has not been persisted yet */
 case class ProductmodelproductdescriptioncultureRowUnsaved(
@@ -29,9 +27,9 @@ case class ProductmodelproductdescriptioncultureRowUnsaved(
       Points to [[culture.CultureRow.cultureid]] */
   cultureid: CultureId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): ProductmodelproductdescriptioncultureRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductmodelproductdescriptioncultureRow =
     ProductmodelproductdescriptioncultureRow(
       productmodelid = productmodelid,
       productdescriptionid = productdescriptionid,
@@ -43,21 +41,6 @@ case class ProductmodelproductdescriptioncultureRowUnsaved(
     )
 }
 object ProductmodelproductdescriptioncultureRowUnsaved {
-  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
-        productdescriptionid <- c.downField("productdescriptionid").as[ProductdescriptionId]
-        cultureid <- c.downField("cultureid").as[CultureId]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductmodelproductdescriptioncultureRowUnsaved(productmodelid, productdescriptionid, cultureid, modifieddate)
-  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "productdescriptionid" := row.productdescriptionid,
-        "cultureid" := row.cultureid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRowUnsaved] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRowUnsaved, ProductmodelId, ProductdescriptionId, CultureId, Defaulted[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRowUnsaved] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRowUnsaved, ProductmodelId, ProductdescriptionId, CultureId, Defaulted[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))
 }

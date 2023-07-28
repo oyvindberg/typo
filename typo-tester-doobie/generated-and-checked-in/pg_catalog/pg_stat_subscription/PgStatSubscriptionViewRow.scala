@@ -7,15 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_stat_subscription
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatSubscriptionViewRow(
   subid: Option[/* oid */ Long],
@@ -23,65 +21,37 @@ case class PgStatSubscriptionViewRow(
   pid: Option[Int],
   relid: Option[/* oid */ Long],
   receivedLsn: Option[/* pg_lsn */ Long],
-  lastMsgSendTime: Option[OffsetDateTime],
-  lastMsgReceiptTime: Option[OffsetDateTime],
+  lastMsgSendTime: Option[TypoOffsetDateTime],
+  lastMsgReceiptTime: Option[TypoOffsetDateTime],
   latestEndLsn: Option[/* pg_lsn */ Long],
-  latestEndTime: Option[OffsetDateTime]
+  latestEndTime: Option[TypoOffsetDateTime]
 )
 
 object PgStatSubscriptionViewRow {
-  implicit val decoder: Decoder[PgStatSubscriptionViewRow] =
-    (c: HCursor) =>
-      for {
-        subid <- c.downField("subid").as[Option[/* oid */ Long]]
-        subname <- c.downField("subname").as[Option[String]]
-        pid <- c.downField("pid").as[Option[Int]]
-        relid <- c.downField("relid").as[Option[/* oid */ Long]]
-        receivedLsn <- c.downField("received_lsn").as[Option[/* pg_lsn */ Long]]
-        lastMsgSendTime <- c.downField("last_msg_send_time").as[Option[OffsetDateTime]]
-        lastMsgReceiptTime <- c.downField("last_msg_receipt_time").as[Option[OffsetDateTime]]
-        latestEndLsn <- c.downField("latest_end_lsn").as[Option[/* pg_lsn */ Long]]
-        latestEndTime <- c.downField("latest_end_time").as[Option[OffsetDateTime]]
-      } yield PgStatSubscriptionViewRow(subid, subname, pid, relid, receivedLsn, lastMsgSendTime, lastMsgReceiptTime, latestEndLsn, latestEndTime)
-  implicit val encoder: Encoder[PgStatSubscriptionViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "subid" := row.subid,
-        "subname" := row.subname,
-        "pid" := row.pid,
-        "relid" := row.relid,
-        "received_lsn" := row.receivedLsn,
-        "last_msg_send_time" := row.lastMsgSendTime,
-        "last_msg_receipt_time" := row.lastMsgReceiptTime,
-        "latest_end_lsn" := row.latestEndLsn,
-        "latest_end_time" := row.latestEndTime
-      )}
-  implicit val read: Read[PgStatSubscriptionViewRow] =
-    new Read[PgStatSubscriptionViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatSubscriptionViewRow(
-        subid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        subname = Get[String].unsafeGetNullable(rs, i + 1),
-        pid = Get[Int].unsafeGetNullable(rs, i + 2),
-        relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-        receivedLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 4),
-        lastMsgSendTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 5),
-        lastMsgReceiptTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 6),
-        latestEndLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 7),
-        latestEndTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgStatSubscriptionViewRow] = Decoder.forProduct9[PgStatSubscriptionViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[/* oid */ Long], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime]]("subid", "subname", "pid", "relid", "received_lsn", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time")(PgStatSubscriptionViewRow.apply)
+  implicit val encoder: Encoder[PgStatSubscriptionViewRow] = Encoder.forProduct9[PgStatSubscriptionViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[/* oid */ Long], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime]]("subid", "subname", "pid", "relid", "received_lsn", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time")(x => (x.subid, x.subname, x.pid, x.relid, x.receivedLsn, x.lastMsgSendTime, x.lastMsgReceiptTime, x.latestEndLsn, x.latestEndTime))
+  implicit val read: Read[PgStatSubscriptionViewRow] = new Read[PgStatSubscriptionViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatSubscriptionViewRow(
+      subid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      subname = Get[String].unsafeGetNullable(rs, i + 1),
+      pid = Get[Int].unsafeGetNullable(rs, i + 2),
+      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
+      receivedLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 4),
+      lastMsgSendTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 5),
+      lastMsgReceiptTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 6),
+      latestEndLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 7),
+      latestEndTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

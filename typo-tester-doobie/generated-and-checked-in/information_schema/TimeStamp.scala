@@ -6,21 +6,22 @@
 package adventureworks
 package information_schema
 
-import doobie.Meta
+import adventureworks.TypoOffsetDateTime
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import java.time.OffsetDateTime
 
 /** Domain `information_schema.time_stamp`
   * No constraint
   */
-case class TimeStamp(value: OffsetDateTime) extends AnyVal
+case class TimeStamp(value: TypoOffsetDateTime) extends AnyVal
 object TimeStamp {
-  implicit def ordering(implicit ev: Ordering[OffsetDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
-  implicit val encoder: Encoder[TimeStamp] =
-    Encoder[OffsetDateTime].contramap(_.value)
-  implicit val decoder: Decoder[TimeStamp] =
-    Decoder[OffsetDateTime].map(TimeStamp(_))
-  implicit val meta: Meta[TimeStamp] = Meta[OffsetDateTime].imap(TimeStamp.apply)(_.value)
-//  implicit val metaArray: Meta[Array[TimeStamp]] = Meta[Array[OffsetDateTime]].imap(_.map(TimeStamp.apply))(_.map(_.value))
+  implicit val arrayGet: Get[Array[TimeStamp]] = Get[Array[TypoOffsetDateTime]].map(_.map(TimeStamp.apply))
+  implicit val arrayPut: Put[Array[TimeStamp]] = Put[Array[TypoOffsetDateTime]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[TimeStamp] = Decoder[TypoOffsetDateTime].map(TimeStamp.apply)
+  implicit val encoder: Encoder[TimeStamp] = Encoder[TypoOffsetDateTime].contramap(_.value)
+  implicit val get: Get[TimeStamp] = Get[TypoOffsetDateTime].map(TimeStamp.apply)
+  implicit def ordering(implicit O0: Ordering[TypoOffsetDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
+  implicit val put: Put[TimeStamp] = Put[TypoOffsetDateTime].contramap(_.value)
 }

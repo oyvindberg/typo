@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_tablespace where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_tablespace where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow] = {
     sql"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
@@ -25,10 +25,10 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
     sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace".query[PgTablespaceRow].stream
   }
   override def selectById(oid: PgTablespaceId): ConnectionIO[Option[PgTablespaceRow]] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = $oid".query[PgTablespaceRow].option
+    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ${oid}".query[PgTablespaceRow].option
   }
   override def selectByIds(oids: Array[PgTablespaceId]): Stream[ConnectionIO, PgTablespaceRow] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ANY($oids)".query[PgTablespaceRow].stream
+    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ANY(${oids})".query[PgTablespaceRow].stream
   }
   override def update(row: PgTablespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -37,7 +37,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
               spcowner = ${row.spcowner}::oid,
               spcacl = ${row.spcacl}::_aclitem,
               spcoptions = ${row.spcoptions}::_text
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

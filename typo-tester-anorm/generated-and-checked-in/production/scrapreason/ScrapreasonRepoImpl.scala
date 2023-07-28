@@ -8,11 +8,11 @@ package production
 package scrapreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
           values (${unsaved.scrapreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning scrapreasonid, "name", modifieddate
+          returning scrapreasonid, "name", modifieddate::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
   
@@ -35,19 +35,19 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.scrapreason default values
-            returning scrapreasonid, "name", modifieddate
+            returning scrapreasonid, "name", modifieddate::text
          """
         .executeInsert(ScrapreasonRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.scrapreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning scrapreasonid, "name", modifieddate
+                  returning scrapreasonid, "name", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -58,18 +58,18 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, "name", modifieddate
+    SQL"""select scrapreasonid, "name", modifieddate::text
           from production.scrapreason
        """.as(ScrapreasonRow.rowParser(1).*)
   }
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, "name", modifieddate
+    SQL"""select scrapreasonid, "name", modifieddate::text
           from production.scrapreason
           where scrapreasonid = $scrapreasonid
        """.as(ScrapreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow] = {
-    SQL"""select scrapreasonid, "name", modifieddate
+    SQL"""select scrapreasonid, "name", modifieddate::text
           from production.scrapreason
           where scrapreasonid = ANY($scrapreasonids)
        """.as(ScrapreasonRow.rowParser(1).*)
@@ -94,7 +94,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning scrapreasonid, "name", modifieddate
+          returning scrapreasonid, "name", modifieddate::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
   

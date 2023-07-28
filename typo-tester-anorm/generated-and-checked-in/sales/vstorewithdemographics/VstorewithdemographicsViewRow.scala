@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VstorewithdemographicsViewRow(
@@ -37,61 +39,57 @@ case class VstorewithdemographicsViewRow(
 )
 
 object VstorewithdemographicsViewRow {
-  def rowParser(idx: Int): RowParser[VstorewithdemographicsViewRow] =
-    RowParser[VstorewithdemographicsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VstorewithdemographicsViewRow] = Reads[VstorewithdemographicsViewRow](json => JsResult.fromTry(
+      Try(
         VstorewithdemographicsViewRow(
-          businessentityid = row[Option[BusinessentityId]](idx + 0),
-          name = row[Option[Name]](idx + 1),
-          AnnualSales = row[Option[TypoMoney]](idx + 2),
-          AnnualRevenue = row[Option[TypoMoney]](idx + 3),
-          BankName = row[Option[/* max 50 chars */ String]](idx + 4),
-          BusinessType = row[Option[/* max 5 chars */ String]](idx + 5),
-          YearOpened = row[Option[Int]](idx + 6),
-          Specialty = row[Option[/* max 50 chars */ String]](idx + 7),
-          SquareFeet = row[Option[Int]](idx + 8),
-          Brands = row[Option[/* max 30 chars */ String]](idx + 9),
-          Internet = row[Option[/* max 30 chars */ String]](idx + 10),
-          NumberEmployees = row[Option[Int]](idx + 11)
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          AnnualSales = json.\("AnnualSales").toOption.map(_.as[TypoMoney]),
+          AnnualRevenue = json.\("AnnualRevenue").toOption.map(_.as[TypoMoney]),
+          BankName = json.\("BankName").toOption.map(_.as[/* max 50 chars */ String]),
+          BusinessType = json.\("BusinessType").toOption.map(_.as[/* max 5 chars */ String]),
+          YearOpened = json.\("YearOpened").toOption.map(_.as[Int]),
+          Specialty = json.\("Specialty").toOption.map(_.as[/* max 50 chars */ String]),
+          SquareFeet = json.\("SquareFeet").toOption.map(_.as[Int]),
+          Brands = json.\("Brands").toOption.map(_.as[/* max 30 chars */ String]),
+          Internet = json.\("Internet").toOption.map(_.as[/* max 30 chars */ String]),
+          NumberEmployees = json.\("NumberEmployees").toOption.map(_.as[Int])
         )
       )
-    }
-  implicit val oFormat: OFormat[VstorewithdemographicsViewRow] = new OFormat[VstorewithdemographicsViewRow]{
-    override def writes(o: VstorewithdemographicsViewRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "name" -> o.name,
-        "AnnualSales" -> o.AnnualSales,
-        "AnnualRevenue" -> o.AnnualRevenue,
-        "BankName" -> o.BankName,
-        "BusinessType" -> o.BusinessType,
-        "YearOpened" -> o.YearOpened,
-        "Specialty" -> o.Specialty,
-        "SquareFeet" -> o.SquareFeet,
-        "Brands" -> o.Brands,
-        "Internet" -> o.Internet,
-        "NumberEmployees" -> o.NumberEmployees
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VstorewithdemographicsViewRow] = RowParser[VstorewithdemographicsViewRow] { row =>
+    Success(
+      VstorewithdemographicsViewRow(
+        businessentityid = row[Option[BusinessentityId]](idx + 0),
+        name = row[Option[Name]](idx + 1),
+        AnnualSales = row[Option[TypoMoney]](idx + 2),
+        AnnualRevenue = row[Option[TypoMoney]](idx + 3),
+        BankName = row[Option[/* max 50 chars */ String]](idx + 4),
+        BusinessType = row[Option[/* max 5 chars */ String]](idx + 5),
+        YearOpened = row[Option[Int]](idx + 6),
+        Specialty = row[Option[/* max 50 chars */ String]](idx + 7),
+        SquareFeet = row[Option[Int]](idx + 8),
+        Brands = row[Option[/* max 30 chars */ String]](idx + 9),
+        Internet = row[Option[/* max 30 chars */ String]](idx + 10),
+        NumberEmployees = row[Option[Int]](idx + 11)
       )
-  
-    override def reads(json: JsValue): JsResult[VstorewithdemographicsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VstorewithdemographicsViewRow(
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            AnnualSales = json.\("AnnualSales").toOption.map(_.as[TypoMoney]),
-            AnnualRevenue = json.\("AnnualRevenue").toOption.map(_.as[TypoMoney]),
-            BankName = json.\("BankName").toOption.map(_.as[/* max 50 chars */ String]),
-            BusinessType = json.\("BusinessType").toOption.map(_.as[/* max 5 chars */ String]),
-            YearOpened = json.\("YearOpened").toOption.map(_.as[Int]),
-            Specialty = json.\("Specialty").toOption.map(_.as[/* max 50 chars */ String]),
-            SquareFeet = json.\("SquareFeet").toOption.map(_.as[Int]),
-            Brands = json.\("Brands").toOption.map(_.as[/* max 30 chars */ String]),
-            Internet = json.\("Internet").toOption.map(_.as[/* max 30 chars */ String]),
-            NumberEmployees = json.\("NumberEmployees").toOption.map(_.as[Int])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VstorewithdemographicsViewRow] = OWrites[VstorewithdemographicsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "name" -> Json.toJson(o.name),
+      "AnnualSales" -> Json.toJson(o.AnnualSales),
+      "AnnualRevenue" -> Json.toJson(o.AnnualRevenue),
+      "BankName" -> Json.toJson(o.BankName),
+      "BusinessType" -> Json.toJson(o.BusinessType),
+      "YearOpened" -> Json.toJson(o.YearOpened),
+      "Specialty" -> Json.toJson(o.Specialty),
+      "SquareFeet" -> Json.toJson(o.SquareFeet),
+      "Brands" -> Json.toJson(o.Brands),
+      "Internet" -> Json.toJson(o.Internet),
+      "NumberEmployees" -> Json.toJson(o.NumberEmployees)
+    ))
+  )
 }

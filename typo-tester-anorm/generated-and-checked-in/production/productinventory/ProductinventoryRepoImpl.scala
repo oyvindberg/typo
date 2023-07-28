@@ -8,11 +8,11 @@ package production
 package productinventory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object ProductinventoryRepoImpl extends ProductinventoryRepo {
@@ -22,7 +22,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.locationid}::int2, ${unsaved.shelf}, ${unsaved.bin}::int2, ${unsaved.quantity}::int2, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+          returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
        """
       .executeInsert(ProductinventoryRow.rowParser(1).single)
   
@@ -43,19 +43,19 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productinventory default values
-            returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+            returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
          """
         .executeInsert(ProductinventoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productinventory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+                  returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -66,12 +66,12 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {
-    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
           from production.productinventory
        """.as(ProductinventoryRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductinventoryId)(implicit c: Connection): Option[ProductinventoryRow] = {
-    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+    SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
           from production.productinventory
           where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
        """.as(ProductinventoryRow.rowParser(1).singleOpt)
@@ -105,7 +105,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             quantity = EXCLUDED.quantity,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate
+          returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
        """
       .executeInsert(ProductinventoryRow.rowParser(1).single)
   

@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object WViewRepoImpl extends WViewRepo {
   override def selectAll(implicit c: Connection): List[WViewRow] = {
-    SQL"""select "id", workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+    SQL"""select "id", workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
           from pr.w
        """.as(WViewRow.rowParser(1).*)
   }

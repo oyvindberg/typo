@@ -12,14 +12,16 @@ import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.TimeStamp
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import scala.util.Try
 
 case class RoutinesViewRow(
   specificCatalog: Option[SqlIdentifier],
@@ -107,350 +109,352 @@ case class RoutinesViewRow(
 )
 
 object RoutinesViewRow {
-  implicit val decoder: Decoder[RoutinesViewRow] =
-    (c: HCursor) =>
-      for {
-        specificCatalog <- c.downField("specific_catalog").as[Option[SqlIdentifier]]
-        specificSchema <- c.downField("specific_schema").as[Option[SqlIdentifier]]
-        specificName <- c.downField("specific_name").as[Option[SqlIdentifier]]
-        routineCatalog <- c.downField("routine_catalog").as[Option[SqlIdentifier]]
-        routineSchema <- c.downField("routine_schema").as[Option[SqlIdentifier]]
-        routineName <- c.downField("routine_name").as[Option[SqlIdentifier]]
-        routineType <- c.downField("routine_type").as[Option[CharacterData]]
-        moduleCatalog <- c.downField("module_catalog").as[Option[SqlIdentifier]]
-        moduleSchema <- c.downField("module_schema").as[Option[SqlIdentifier]]
-        moduleName <- c.downField("module_name").as[Option[SqlIdentifier]]
-        udtCatalog <- c.downField("udt_catalog").as[Option[SqlIdentifier]]
-        udtSchema <- c.downField("udt_schema").as[Option[SqlIdentifier]]
-        udtName <- c.downField("udt_name").as[Option[SqlIdentifier]]
-        dataType <- c.downField("data_type").as[Option[CharacterData]]
-        characterMaximumLength <- c.downField("character_maximum_length").as[Option[CardinalNumber]]
-        characterOctetLength <- c.downField("character_octet_length").as[Option[CardinalNumber]]
-        characterSetCatalog <- c.downField("character_set_catalog").as[Option[SqlIdentifier]]
-        characterSetSchema <- c.downField("character_set_schema").as[Option[SqlIdentifier]]
-        characterSetName <- c.downField("character_set_name").as[Option[SqlIdentifier]]
-        collationCatalog <- c.downField("collation_catalog").as[Option[SqlIdentifier]]
-        collationSchema <- c.downField("collation_schema").as[Option[SqlIdentifier]]
-        collationName <- c.downField("collation_name").as[Option[SqlIdentifier]]
-        numericPrecision <- c.downField("numeric_precision").as[Option[CardinalNumber]]
-        numericPrecisionRadix <- c.downField("numeric_precision_radix").as[Option[CardinalNumber]]
-        numericScale <- c.downField("numeric_scale").as[Option[CardinalNumber]]
-        datetimePrecision <- c.downField("datetime_precision").as[Option[CardinalNumber]]
-        intervalType <- c.downField("interval_type").as[Option[CharacterData]]
-        intervalPrecision <- c.downField("interval_precision").as[Option[CardinalNumber]]
-        typeUdtCatalog <- c.downField("type_udt_catalog").as[Option[SqlIdentifier]]
-        typeUdtSchema <- c.downField("type_udt_schema").as[Option[SqlIdentifier]]
-        typeUdtName <- c.downField("type_udt_name").as[Option[SqlIdentifier]]
-        scopeCatalog <- c.downField("scope_catalog").as[Option[SqlIdentifier]]
-        scopeSchema <- c.downField("scope_schema").as[Option[SqlIdentifier]]
-        scopeName <- c.downField("scope_name").as[Option[SqlIdentifier]]
-        maximumCardinality <- c.downField("maximum_cardinality").as[Option[CardinalNumber]]
-        dtdIdentifier <- c.downField("dtd_identifier").as[Option[SqlIdentifier]]
-        routineBody <- c.downField("routine_body").as[Option[CharacterData]]
-        routineDefinition <- c.downField("routine_definition").as[Option[CharacterData]]
-        externalName <- c.downField("external_name").as[Option[CharacterData]]
-        externalLanguage <- c.downField("external_language").as[Option[CharacterData]]
-        parameterStyle <- c.downField("parameter_style").as[Option[CharacterData]]
-        isDeterministic <- c.downField("is_deterministic").as[Option[YesOrNo]]
-        sqlDataAccess <- c.downField("sql_data_access").as[Option[CharacterData]]
-        isNullCall <- c.downField("is_null_call").as[Option[YesOrNo]]
-        sqlPath <- c.downField("sql_path").as[Option[CharacterData]]
-        schemaLevelRoutine <- c.downField("schema_level_routine").as[Option[YesOrNo]]
-        maxDynamicResultSets <- c.downField("max_dynamic_result_sets").as[Option[CardinalNumber]]
-        isUserDefinedCast <- c.downField("is_user_defined_cast").as[Option[YesOrNo]]
-        isImplicitlyInvocable <- c.downField("is_implicitly_invocable").as[Option[YesOrNo]]
-        securityType <- c.downField("security_type").as[Option[CharacterData]]
-        toSqlSpecificCatalog <- c.downField("to_sql_specific_catalog").as[Option[SqlIdentifier]]
-        toSqlSpecificSchema <- c.downField("to_sql_specific_schema").as[Option[SqlIdentifier]]
-        toSqlSpecificName <- c.downField("to_sql_specific_name").as[Option[SqlIdentifier]]
-        asLocator <- c.downField("as_locator").as[Option[YesOrNo]]
-        created <- c.downField("created").as[Option[TimeStamp]]
-        lastAltered <- c.downField("last_altered").as[Option[TimeStamp]]
-        newSavepointLevel <- c.downField("new_savepoint_level").as[Option[YesOrNo]]
-        isUdtDependent <- c.downField("is_udt_dependent").as[Option[YesOrNo]]
-        resultCastFromDataType <- c.downField("result_cast_from_data_type").as[Option[CharacterData]]
-        resultCastAsLocator <- c.downField("result_cast_as_locator").as[Option[YesOrNo]]
-        resultCastCharMaxLength <- c.downField("result_cast_char_max_length").as[Option[CardinalNumber]]
-        resultCastCharOctetLength <- c.downField("result_cast_char_octet_length").as[Option[CardinalNumber]]
-        resultCastCharSetCatalog <- c.downField("result_cast_char_set_catalog").as[Option[SqlIdentifier]]
-        resultCastCharSetSchema <- c.downField("result_cast_char_set_schema").as[Option[SqlIdentifier]]
-        resultCastCharSetName <- c.downField("result_cast_char_set_name").as[Option[SqlIdentifier]]
-        resultCastCollationCatalog <- c.downField("result_cast_collation_catalog").as[Option[SqlIdentifier]]
-        resultCastCollationSchema <- c.downField("result_cast_collation_schema").as[Option[SqlIdentifier]]
-        resultCastCollationName <- c.downField("result_cast_collation_name").as[Option[SqlIdentifier]]
-        resultCastNumericPrecision <- c.downField("result_cast_numeric_precision").as[Option[CardinalNumber]]
-        resultCastNumericPrecisionRadix <- c.downField("result_cast_numeric_precision_radix").as[Option[CardinalNumber]]
-        resultCastNumericScale <- c.downField("result_cast_numeric_scale").as[Option[CardinalNumber]]
-        resultCastDatetimePrecision <- c.downField("result_cast_datetime_precision").as[Option[CardinalNumber]]
-        resultCastIntervalType <- c.downField("result_cast_interval_type").as[Option[CharacterData]]
-        resultCastIntervalPrecision <- c.downField("result_cast_interval_precision").as[Option[CardinalNumber]]
-        resultCastTypeUdtCatalog <- c.downField("result_cast_type_udt_catalog").as[Option[SqlIdentifier]]
-        resultCastTypeUdtSchema <- c.downField("result_cast_type_udt_schema").as[Option[SqlIdentifier]]
-        resultCastTypeUdtName <- c.downField("result_cast_type_udt_name").as[Option[SqlIdentifier]]
-        resultCastScopeCatalog <- c.downField("result_cast_scope_catalog").as[Option[SqlIdentifier]]
-        resultCastScopeSchema <- c.downField("result_cast_scope_schema").as[Option[SqlIdentifier]]
-        resultCastScopeName <- c.downField("result_cast_scope_name").as[Option[SqlIdentifier]]
-        resultCastMaximumCardinality <- c.downField("result_cast_maximum_cardinality").as[Option[CardinalNumber]]
-        resultCastDtdIdentifier <- c.downField("result_cast_dtd_identifier").as[Option[SqlIdentifier]]
-      } yield RoutinesViewRow(specificCatalog, specificSchema, specificName, routineCatalog, routineSchema, routineName, routineType, moduleCatalog, moduleSchema, moduleName, udtCatalog, udtSchema, udtName, dataType, characterMaximumLength, characterOctetLength, characterSetCatalog, characterSetSchema, characterSetName, collationCatalog, collationSchema, collationName, numericPrecision, numericPrecisionRadix, numericScale, datetimePrecision, intervalType, intervalPrecision, typeUdtCatalog, typeUdtSchema, typeUdtName, scopeCatalog, scopeSchema, scopeName, maximumCardinality, dtdIdentifier, routineBody, routineDefinition, externalName, externalLanguage, parameterStyle, isDeterministic, sqlDataAccess, isNullCall, sqlPath, schemaLevelRoutine, maxDynamicResultSets, isUserDefinedCast, isImplicitlyInvocable, securityType, toSqlSpecificCatalog, toSqlSpecificSchema, toSqlSpecificName, asLocator, created, lastAltered, newSavepointLevel, isUdtDependent, resultCastFromDataType, resultCastAsLocator, resultCastCharMaxLength, resultCastCharOctetLength, resultCastCharSetCatalog, resultCastCharSetSchema, resultCastCharSetName, resultCastCollationCatalog, resultCastCollationSchema, resultCastCollationName, resultCastNumericPrecision, resultCastNumericPrecisionRadix, resultCastNumericScale, resultCastDatetimePrecision, resultCastIntervalType, resultCastIntervalPrecision, resultCastTypeUdtCatalog, resultCastTypeUdtSchema, resultCastTypeUdtName, resultCastScopeCatalog, resultCastScopeSchema, resultCastScopeName, resultCastMaximumCardinality, resultCastDtdIdentifier)
-  implicit val encoder: Encoder[RoutinesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "specific_catalog" := row.specificCatalog,
-        "specific_schema" := row.specificSchema,
-        "specific_name" := row.specificName,
-        "routine_catalog" := row.routineCatalog,
-        "routine_schema" := row.routineSchema,
-        "routine_name" := row.routineName,
-        "routine_type" := row.routineType,
-        "module_catalog" := row.moduleCatalog,
-        "module_schema" := row.moduleSchema,
-        "module_name" := row.moduleName,
-        "udt_catalog" := row.udtCatalog,
-        "udt_schema" := row.udtSchema,
-        "udt_name" := row.udtName,
-        "data_type" := row.dataType,
-        "character_maximum_length" := row.characterMaximumLength,
-        "character_octet_length" := row.characterOctetLength,
-        "character_set_catalog" := row.characterSetCatalog,
-        "character_set_schema" := row.characterSetSchema,
-        "character_set_name" := row.characterSetName,
-        "collation_catalog" := row.collationCatalog,
-        "collation_schema" := row.collationSchema,
-        "collation_name" := row.collationName,
-        "numeric_precision" := row.numericPrecision,
-        "numeric_precision_radix" := row.numericPrecisionRadix,
-        "numeric_scale" := row.numericScale,
-        "datetime_precision" := row.datetimePrecision,
-        "interval_type" := row.intervalType,
-        "interval_precision" := row.intervalPrecision,
-        "type_udt_catalog" := row.typeUdtCatalog,
-        "type_udt_schema" := row.typeUdtSchema,
-        "type_udt_name" := row.typeUdtName,
-        "scope_catalog" := row.scopeCatalog,
-        "scope_schema" := row.scopeSchema,
-        "scope_name" := row.scopeName,
-        "maximum_cardinality" := row.maximumCardinality,
-        "dtd_identifier" := row.dtdIdentifier,
-        "routine_body" := row.routineBody,
-        "routine_definition" := row.routineDefinition,
-        "external_name" := row.externalName,
-        "external_language" := row.externalLanguage,
-        "parameter_style" := row.parameterStyle,
-        "is_deterministic" := row.isDeterministic,
-        "sql_data_access" := row.sqlDataAccess,
-        "is_null_call" := row.isNullCall,
-        "sql_path" := row.sqlPath,
-        "schema_level_routine" := row.schemaLevelRoutine,
-        "max_dynamic_result_sets" := row.maxDynamicResultSets,
-        "is_user_defined_cast" := row.isUserDefinedCast,
-        "is_implicitly_invocable" := row.isImplicitlyInvocable,
-        "security_type" := row.securityType,
-        "to_sql_specific_catalog" := row.toSqlSpecificCatalog,
-        "to_sql_specific_schema" := row.toSqlSpecificSchema,
-        "to_sql_specific_name" := row.toSqlSpecificName,
-        "as_locator" := row.asLocator,
-        "created" := row.created,
-        "last_altered" := row.lastAltered,
-        "new_savepoint_level" := row.newSavepointLevel,
-        "is_udt_dependent" := row.isUdtDependent,
-        "result_cast_from_data_type" := row.resultCastFromDataType,
-        "result_cast_as_locator" := row.resultCastAsLocator,
-        "result_cast_char_max_length" := row.resultCastCharMaxLength,
-        "result_cast_char_octet_length" := row.resultCastCharOctetLength,
-        "result_cast_char_set_catalog" := row.resultCastCharSetCatalog,
-        "result_cast_char_set_schema" := row.resultCastCharSetSchema,
-        "result_cast_char_set_name" := row.resultCastCharSetName,
-        "result_cast_collation_catalog" := row.resultCastCollationCatalog,
-        "result_cast_collation_schema" := row.resultCastCollationSchema,
-        "result_cast_collation_name" := row.resultCastCollationName,
-        "result_cast_numeric_precision" := row.resultCastNumericPrecision,
-        "result_cast_numeric_precision_radix" := row.resultCastNumericPrecisionRadix,
-        "result_cast_numeric_scale" := row.resultCastNumericScale,
-        "result_cast_datetime_precision" := row.resultCastDatetimePrecision,
-        "result_cast_interval_type" := row.resultCastIntervalType,
-        "result_cast_interval_precision" := row.resultCastIntervalPrecision,
-        "result_cast_type_udt_catalog" := row.resultCastTypeUdtCatalog,
-        "result_cast_type_udt_schema" := row.resultCastTypeUdtSchema,
-        "result_cast_type_udt_name" := row.resultCastTypeUdtName,
-        "result_cast_scope_catalog" := row.resultCastScopeCatalog,
-        "result_cast_scope_schema" := row.resultCastScopeSchema,
-        "result_cast_scope_name" := row.resultCastScopeName,
-        "result_cast_maximum_cardinality" := row.resultCastMaximumCardinality,
-        "result_cast_dtd_identifier" := row.resultCastDtdIdentifier
-      )}
-  implicit val read: Read[RoutinesViewRow] =
-    new Read[RoutinesViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[TimeStamp], Nullability.Nullable),
-        (Get[TimeStamp], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => RoutinesViewRow(
-        specificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        specificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        specificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        routineCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        routineSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        routineName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        routineType = Get[CharacterData].unsafeGetNullable(rs, i + 6),
-        moduleCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 7),
-        moduleSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 8),
-        moduleName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 9),
-        udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 10),
-        udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 11),
-        udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 12),
-        dataType = Get[CharacterData].unsafeGetNullable(rs, i + 13),
-        characterMaximumLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 14),
-        characterOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 15),
-        characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 16),
-        characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 17),
-        characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 18),
-        collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 19),
-        collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 20),
-        collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 21),
-        numericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 22),
-        numericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 23),
-        numericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 24),
-        datetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 25),
-        intervalType = Get[CharacterData].unsafeGetNullable(rs, i + 26),
-        intervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 27),
-        typeUdtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 28),
-        typeUdtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 29),
-        typeUdtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 30),
-        scopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 31),
-        scopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 32),
-        scopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 33),
-        maximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 34),
-        dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 35),
-        routineBody = Get[CharacterData].unsafeGetNullable(rs, i + 36),
-        routineDefinition = Get[CharacterData].unsafeGetNullable(rs, i + 37),
-        externalName = Get[CharacterData].unsafeGetNullable(rs, i + 38),
-        externalLanguage = Get[CharacterData].unsafeGetNullable(rs, i + 39),
-        parameterStyle = Get[CharacterData].unsafeGetNullable(rs, i + 40),
-        isDeterministic = Get[YesOrNo].unsafeGetNullable(rs, i + 41),
-        sqlDataAccess = Get[CharacterData].unsafeGetNullable(rs, i + 42),
-        isNullCall = Get[YesOrNo].unsafeGetNullable(rs, i + 43),
-        sqlPath = Get[CharacterData].unsafeGetNullable(rs, i + 44),
-        schemaLevelRoutine = Get[YesOrNo].unsafeGetNullable(rs, i + 45),
-        maxDynamicResultSets = Get[CardinalNumber].unsafeGetNullable(rs, i + 46),
-        isUserDefinedCast = Get[YesOrNo].unsafeGetNullable(rs, i + 47),
-        isImplicitlyInvocable = Get[YesOrNo].unsafeGetNullable(rs, i + 48),
-        securityType = Get[CharacterData].unsafeGetNullable(rs, i + 49),
-        toSqlSpecificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 50),
-        toSqlSpecificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 51),
-        toSqlSpecificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 52),
-        asLocator = Get[YesOrNo].unsafeGetNullable(rs, i + 53),
-        created = Get[TimeStamp].unsafeGetNullable(rs, i + 54),
-        lastAltered = Get[TimeStamp].unsafeGetNullable(rs, i + 55),
-        newSavepointLevel = Get[YesOrNo].unsafeGetNullable(rs, i + 56),
-        isUdtDependent = Get[YesOrNo].unsafeGetNullable(rs, i + 57),
-        resultCastFromDataType = Get[CharacterData].unsafeGetNullable(rs, i + 58),
-        resultCastAsLocator = Get[YesOrNo].unsafeGetNullable(rs, i + 59),
-        resultCastCharMaxLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 60),
-        resultCastCharOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 61),
-        resultCastCharSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 62),
-        resultCastCharSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 63),
-        resultCastCharSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 64),
-        resultCastCollationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 65),
-        resultCastCollationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 66),
-        resultCastCollationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 67),
-        resultCastNumericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 68),
-        resultCastNumericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 69),
-        resultCastNumericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 70),
-        resultCastDatetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 71),
-        resultCastIntervalType = Get[CharacterData].unsafeGetNullable(rs, i + 72),
-        resultCastIntervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 73),
-        resultCastTypeUdtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 74),
-        resultCastTypeUdtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 75),
-        resultCastTypeUdtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 76),
-        resultCastScopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 77),
-        resultCastScopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 78),
-        resultCastScopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 79),
-        resultCastMaximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 80),
-        resultCastDtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 81)
+  implicit val decoder: Decoder[RoutinesViewRow] = Decoder.instanceTry[RoutinesViewRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      RoutinesViewRow(
+        specificCatalog = orThrow(c.get("specific_catalog")(Decoder[Option[SqlIdentifier]])),
+        specificSchema = orThrow(c.get("specific_schema")(Decoder[Option[SqlIdentifier]])),
+        specificName = orThrow(c.get("specific_name")(Decoder[Option[SqlIdentifier]])),
+        routineCatalog = orThrow(c.get("routine_catalog")(Decoder[Option[SqlIdentifier]])),
+        routineSchema = orThrow(c.get("routine_schema")(Decoder[Option[SqlIdentifier]])),
+        routineName = orThrow(c.get("routine_name")(Decoder[Option[SqlIdentifier]])),
+        routineType = orThrow(c.get("routine_type")(Decoder[Option[CharacterData]])),
+        moduleCatalog = orThrow(c.get("module_catalog")(Decoder[Option[SqlIdentifier]])),
+        moduleSchema = orThrow(c.get("module_schema")(Decoder[Option[SqlIdentifier]])),
+        moduleName = orThrow(c.get("module_name")(Decoder[Option[SqlIdentifier]])),
+        udtCatalog = orThrow(c.get("udt_catalog")(Decoder[Option[SqlIdentifier]])),
+        udtSchema = orThrow(c.get("udt_schema")(Decoder[Option[SqlIdentifier]])),
+        udtName = orThrow(c.get("udt_name")(Decoder[Option[SqlIdentifier]])),
+        dataType = orThrow(c.get("data_type")(Decoder[Option[CharacterData]])),
+        characterMaximumLength = orThrow(c.get("character_maximum_length")(Decoder[Option[CardinalNumber]])),
+        characterOctetLength = orThrow(c.get("character_octet_length")(Decoder[Option[CardinalNumber]])),
+        characterSetCatalog = orThrow(c.get("character_set_catalog")(Decoder[Option[SqlIdentifier]])),
+        characterSetSchema = orThrow(c.get("character_set_schema")(Decoder[Option[SqlIdentifier]])),
+        characterSetName = orThrow(c.get("character_set_name")(Decoder[Option[SqlIdentifier]])),
+        collationCatalog = orThrow(c.get("collation_catalog")(Decoder[Option[SqlIdentifier]])),
+        collationSchema = orThrow(c.get("collation_schema")(Decoder[Option[SqlIdentifier]])),
+        collationName = orThrow(c.get("collation_name")(Decoder[Option[SqlIdentifier]])),
+        numericPrecision = orThrow(c.get("numeric_precision")(Decoder[Option[CardinalNumber]])),
+        numericPrecisionRadix = orThrow(c.get("numeric_precision_radix")(Decoder[Option[CardinalNumber]])),
+        numericScale = orThrow(c.get("numeric_scale")(Decoder[Option[CardinalNumber]])),
+        datetimePrecision = orThrow(c.get("datetime_precision")(Decoder[Option[CardinalNumber]])),
+        intervalType = orThrow(c.get("interval_type")(Decoder[Option[CharacterData]])),
+        intervalPrecision = orThrow(c.get("interval_precision")(Decoder[Option[CardinalNumber]])),
+        typeUdtCatalog = orThrow(c.get("type_udt_catalog")(Decoder[Option[SqlIdentifier]])),
+        typeUdtSchema = orThrow(c.get("type_udt_schema")(Decoder[Option[SqlIdentifier]])),
+        typeUdtName = orThrow(c.get("type_udt_name")(Decoder[Option[SqlIdentifier]])),
+        scopeCatalog = orThrow(c.get("scope_catalog")(Decoder[Option[SqlIdentifier]])),
+        scopeSchema = orThrow(c.get("scope_schema")(Decoder[Option[SqlIdentifier]])),
+        scopeName = orThrow(c.get("scope_name")(Decoder[Option[SqlIdentifier]])),
+        maximumCardinality = orThrow(c.get("maximum_cardinality")(Decoder[Option[CardinalNumber]])),
+        dtdIdentifier = orThrow(c.get("dtd_identifier")(Decoder[Option[SqlIdentifier]])),
+        routineBody = orThrow(c.get("routine_body")(Decoder[Option[CharacterData]])),
+        routineDefinition = orThrow(c.get("routine_definition")(Decoder[Option[CharacterData]])),
+        externalName = orThrow(c.get("external_name")(Decoder[Option[CharacterData]])),
+        externalLanguage = orThrow(c.get("external_language")(Decoder[Option[CharacterData]])),
+        parameterStyle = orThrow(c.get("parameter_style")(Decoder[Option[CharacterData]])),
+        isDeterministic = orThrow(c.get("is_deterministic")(Decoder[Option[YesOrNo]])),
+        sqlDataAccess = orThrow(c.get("sql_data_access")(Decoder[Option[CharacterData]])),
+        isNullCall = orThrow(c.get("is_null_call")(Decoder[Option[YesOrNo]])),
+        sqlPath = orThrow(c.get("sql_path")(Decoder[Option[CharacterData]])),
+        schemaLevelRoutine = orThrow(c.get("schema_level_routine")(Decoder[Option[YesOrNo]])),
+        maxDynamicResultSets = orThrow(c.get("max_dynamic_result_sets")(Decoder[Option[CardinalNumber]])),
+        isUserDefinedCast = orThrow(c.get("is_user_defined_cast")(Decoder[Option[YesOrNo]])),
+        isImplicitlyInvocable = orThrow(c.get("is_implicitly_invocable")(Decoder[Option[YesOrNo]])),
+        securityType = orThrow(c.get("security_type")(Decoder[Option[CharacterData]])),
+        toSqlSpecificCatalog = orThrow(c.get("to_sql_specific_catalog")(Decoder[Option[SqlIdentifier]])),
+        toSqlSpecificSchema = orThrow(c.get("to_sql_specific_schema")(Decoder[Option[SqlIdentifier]])),
+        toSqlSpecificName = orThrow(c.get("to_sql_specific_name")(Decoder[Option[SqlIdentifier]])),
+        asLocator = orThrow(c.get("as_locator")(Decoder[Option[YesOrNo]])),
+        created = orThrow(c.get("created")(Decoder[Option[TimeStamp]])),
+        lastAltered = orThrow(c.get("last_altered")(Decoder[Option[TimeStamp]])),
+        newSavepointLevel = orThrow(c.get("new_savepoint_level")(Decoder[Option[YesOrNo]])),
+        isUdtDependent = orThrow(c.get("is_udt_dependent")(Decoder[Option[YesOrNo]])),
+        resultCastFromDataType = orThrow(c.get("result_cast_from_data_type")(Decoder[Option[CharacterData]])),
+        resultCastAsLocator = orThrow(c.get("result_cast_as_locator")(Decoder[Option[YesOrNo]])),
+        resultCastCharMaxLength = orThrow(c.get("result_cast_char_max_length")(Decoder[Option[CardinalNumber]])),
+        resultCastCharOctetLength = orThrow(c.get("result_cast_char_octet_length")(Decoder[Option[CardinalNumber]])),
+        resultCastCharSetCatalog = orThrow(c.get("result_cast_char_set_catalog")(Decoder[Option[SqlIdentifier]])),
+        resultCastCharSetSchema = orThrow(c.get("result_cast_char_set_schema")(Decoder[Option[SqlIdentifier]])),
+        resultCastCharSetName = orThrow(c.get("result_cast_char_set_name")(Decoder[Option[SqlIdentifier]])),
+        resultCastCollationCatalog = orThrow(c.get("result_cast_collation_catalog")(Decoder[Option[SqlIdentifier]])),
+        resultCastCollationSchema = orThrow(c.get("result_cast_collation_schema")(Decoder[Option[SqlIdentifier]])),
+        resultCastCollationName = orThrow(c.get("result_cast_collation_name")(Decoder[Option[SqlIdentifier]])),
+        resultCastNumericPrecision = orThrow(c.get("result_cast_numeric_precision")(Decoder[Option[CardinalNumber]])),
+        resultCastNumericPrecisionRadix = orThrow(c.get("result_cast_numeric_precision_radix")(Decoder[Option[CardinalNumber]])),
+        resultCastNumericScale = orThrow(c.get("result_cast_numeric_scale")(Decoder[Option[CardinalNumber]])),
+        resultCastDatetimePrecision = orThrow(c.get("result_cast_datetime_precision")(Decoder[Option[CardinalNumber]])),
+        resultCastIntervalType = orThrow(c.get("result_cast_interval_type")(Decoder[Option[CharacterData]])),
+        resultCastIntervalPrecision = orThrow(c.get("result_cast_interval_precision")(Decoder[Option[CardinalNumber]])),
+        resultCastTypeUdtCatalog = orThrow(c.get("result_cast_type_udt_catalog")(Decoder[Option[SqlIdentifier]])),
+        resultCastTypeUdtSchema = orThrow(c.get("result_cast_type_udt_schema")(Decoder[Option[SqlIdentifier]])),
+        resultCastTypeUdtName = orThrow(c.get("result_cast_type_udt_name")(Decoder[Option[SqlIdentifier]])),
+        resultCastScopeCatalog = orThrow(c.get("result_cast_scope_catalog")(Decoder[Option[SqlIdentifier]])),
+        resultCastScopeSchema = orThrow(c.get("result_cast_scope_schema")(Decoder[Option[SqlIdentifier]])),
+        resultCastScopeName = orThrow(c.get("result_cast_scope_name")(Decoder[Option[SqlIdentifier]])),
+        resultCastMaximumCardinality = orThrow(c.get("result_cast_maximum_cardinality")(Decoder[Option[CardinalNumber]])),
+        resultCastDtdIdentifier = orThrow(c.get("result_cast_dtd_identifier")(Decoder[Option[SqlIdentifier]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[RoutinesViewRow] = Encoder[RoutinesViewRow](row =>
+    Json.obj(
+      "specific_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.specificCatalog),
+      "specific_schema" -> Encoder[Option[SqlIdentifier]].apply(row.specificSchema),
+      "specific_name" -> Encoder[Option[SqlIdentifier]].apply(row.specificName),
+      "routine_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.routineCatalog),
+      "routine_schema" -> Encoder[Option[SqlIdentifier]].apply(row.routineSchema),
+      "routine_name" -> Encoder[Option[SqlIdentifier]].apply(row.routineName),
+      "routine_type" -> Encoder[Option[CharacterData]].apply(row.routineType),
+      "module_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.moduleCatalog),
+      "module_schema" -> Encoder[Option[SqlIdentifier]].apply(row.moduleSchema),
+      "module_name" -> Encoder[Option[SqlIdentifier]].apply(row.moduleName),
+      "udt_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.udtCatalog),
+      "udt_schema" -> Encoder[Option[SqlIdentifier]].apply(row.udtSchema),
+      "udt_name" -> Encoder[Option[SqlIdentifier]].apply(row.udtName),
+      "data_type" -> Encoder[Option[CharacterData]].apply(row.dataType),
+      "character_maximum_length" -> Encoder[Option[CardinalNumber]].apply(row.characterMaximumLength),
+      "character_octet_length" -> Encoder[Option[CardinalNumber]].apply(row.characterOctetLength),
+      "character_set_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetCatalog),
+      "character_set_schema" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetSchema),
+      "character_set_name" -> Encoder[Option[SqlIdentifier]].apply(row.characterSetName),
+      "collation_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.collationCatalog),
+      "collation_schema" -> Encoder[Option[SqlIdentifier]].apply(row.collationSchema),
+      "collation_name" -> Encoder[Option[SqlIdentifier]].apply(row.collationName),
+      "numeric_precision" -> Encoder[Option[CardinalNumber]].apply(row.numericPrecision),
+      "numeric_precision_radix" -> Encoder[Option[CardinalNumber]].apply(row.numericPrecisionRadix),
+      "numeric_scale" -> Encoder[Option[CardinalNumber]].apply(row.numericScale),
+      "datetime_precision" -> Encoder[Option[CardinalNumber]].apply(row.datetimePrecision),
+      "interval_type" -> Encoder[Option[CharacterData]].apply(row.intervalType),
+      "interval_precision" -> Encoder[Option[CardinalNumber]].apply(row.intervalPrecision),
+      "type_udt_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.typeUdtCatalog),
+      "type_udt_schema" -> Encoder[Option[SqlIdentifier]].apply(row.typeUdtSchema),
+      "type_udt_name" -> Encoder[Option[SqlIdentifier]].apply(row.typeUdtName),
+      "scope_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.scopeCatalog),
+      "scope_schema" -> Encoder[Option[SqlIdentifier]].apply(row.scopeSchema),
+      "scope_name" -> Encoder[Option[SqlIdentifier]].apply(row.scopeName),
+      "maximum_cardinality" -> Encoder[Option[CardinalNumber]].apply(row.maximumCardinality),
+      "dtd_identifier" -> Encoder[Option[SqlIdentifier]].apply(row.dtdIdentifier),
+      "routine_body" -> Encoder[Option[CharacterData]].apply(row.routineBody),
+      "routine_definition" -> Encoder[Option[CharacterData]].apply(row.routineDefinition),
+      "external_name" -> Encoder[Option[CharacterData]].apply(row.externalName),
+      "external_language" -> Encoder[Option[CharacterData]].apply(row.externalLanguage),
+      "parameter_style" -> Encoder[Option[CharacterData]].apply(row.parameterStyle),
+      "is_deterministic" -> Encoder[Option[YesOrNo]].apply(row.isDeterministic),
+      "sql_data_access" -> Encoder[Option[CharacterData]].apply(row.sqlDataAccess),
+      "is_null_call" -> Encoder[Option[YesOrNo]].apply(row.isNullCall),
+      "sql_path" -> Encoder[Option[CharacterData]].apply(row.sqlPath),
+      "schema_level_routine" -> Encoder[Option[YesOrNo]].apply(row.schemaLevelRoutine),
+      "max_dynamic_result_sets" -> Encoder[Option[CardinalNumber]].apply(row.maxDynamicResultSets),
+      "is_user_defined_cast" -> Encoder[Option[YesOrNo]].apply(row.isUserDefinedCast),
+      "is_implicitly_invocable" -> Encoder[Option[YesOrNo]].apply(row.isImplicitlyInvocable),
+      "security_type" -> Encoder[Option[CharacterData]].apply(row.securityType),
+      "to_sql_specific_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.toSqlSpecificCatalog),
+      "to_sql_specific_schema" -> Encoder[Option[SqlIdentifier]].apply(row.toSqlSpecificSchema),
+      "to_sql_specific_name" -> Encoder[Option[SqlIdentifier]].apply(row.toSqlSpecificName),
+      "as_locator" -> Encoder[Option[YesOrNo]].apply(row.asLocator),
+      "created" -> Encoder[Option[TimeStamp]].apply(row.created),
+      "last_altered" -> Encoder[Option[TimeStamp]].apply(row.lastAltered),
+      "new_savepoint_level" -> Encoder[Option[YesOrNo]].apply(row.newSavepointLevel),
+      "is_udt_dependent" -> Encoder[Option[YesOrNo]].apply(row.isUdtDependent),
+      "result_cast_from_data_type" -> Encoder[Option[CharacterData]].apply(row.resultCastFromDataType),
+      "result_cast_as_locator" -> Encoder[Option[YesOrNo]].apply(row.resultCastAsLocator),
+      "result_cast_char_max_length" -> Encoder[Option[CardinalNumber]].apply(row.resultCastCharMaxLength),
+      "result_cast_char_octet_length" -> Encoder[Option[CardinalNumber]].apply(row.resultCastCharOctetLength),
+      "result_cast_char_set_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastCharSetCatalog),
+      "result_cast_char_set_schema" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastCharSetSchema),
+      "result_cast_char_set_name" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastCharSetName),
+      "result_cast_collation_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastCollationCatalog),
+      "result_cast_collation_schema" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastCollationSchema),
+      "result_cast_collation_name" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastCollationName),
+      "result_cast_numeric_precision" -> Encoder[Option[CardinalNumber]].apply(row.resultCastNumericPrecision),
+      "result_cast_numeric_precision_radix" -> Encoder[Option[CardinalNumber]].apply(row.resultCastNumericPrecisionRadix),
+      "result_cast_numeric_scale" -> Encoder[Option[CardinalNumber]].apply(row.resultCastNumericScale),
+      "result_cast_datetime_precision" -> Encoder[Option[CardinalNumber]].apply(row.resultCastDatetimePrecision),
+      "result_cast_interval_type" -> Encoder[Option[CharacterData]].apply(row.resultCastIntervalType),
+      "result_cast_interval_precision" -> Encoder[Option[CardinalNumber]].apply(row.resultCastIntervalPrecision),
+      "result_cast_type_udt_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastTypeUdtCatalog),
+      "result_cast_type_udt_schema" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastTypeUdtSchema),
+      "result_cast_type_udt_name" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastTypeUdtName),
+      "result_cast_scope_catalog" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastScopeCatalog),
+      "result_cast_scope_schema" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastScopeSchema),
+      "result_cast_scope_name" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastScopeName),
+      "result_cast_maximum_cardinality" -> Encoder[Option[CardinalNumber]].apply(row.resultCastMaximumCardinality),
+      "result_cast_dtd_identifier" -> Encoder[Option[SqlIdentifier]].apply(row.resultCastDtdIdentifier)
     )
-  
-
+  )
+  implicit val read: Read[RoutinesViewRow] = new Read[RoutinesViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[TimeStamp], Nullability.Nullable),
+      (Get[TimeStamp], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => RoutinesViewRow(
+      specificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      specificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      specificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      routineCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      routineSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      routineName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      routineType = Get[CharacterData].unsafeGetNullable(rs, i + 6),
+      moduleCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 7),
+      moduleSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 8),
+      moduleName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 9),
+      udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 10),
+      udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 11),
+      udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 12),
+      dataType = Get[CharacterData].unsafeGetNullable(rs, i + 13),
+      characterMaximumLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 14),
+      characterOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 15),
+      characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 16),
+      characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 17),
+      characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 18),
+      collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 19),
+      collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 20),
+      collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 21),
+      numericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 22),
+      numericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 23),
+      numericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 24),
+      datetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 25),
+      intervalType = Get[CharacterData].unsafeGetNullable(rs, i + 26),
+      intervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 27),
+      typeUdtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 28),
+      typeUdtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 29),
+      typeUdtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 30),
+      scopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 31),
+      scopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 32),
+      scopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 33),
+      maximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 34),
+      dtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 35),
+      routineBody = Get[CharacterData].unsafeGetNullable(rs, i + 36),
+      routineDefinition = Get[CharacterData].unsafeGetNullable(rs, i + 37),
+      externalName = Get[CharacterData].unsafeGetNullable(rs, i + 38),
+      externalLanguage = Get[CharacterData].unsafeGetNullable(rs, i + 39),
+      parameterStyle = Get[CharacterData].unsafeGetNullable(rs, i + 40),
+      isDeterministic = Get[YesOrNo].unsafeGetNullable(rs, i + 41),
+      sqlDataAccess = Get[CharacterData].unsafeGetNullable(rs, i + 42),
+      isNullCall = Get[YesOrNo].unsafeGetNullable(rs, i + 43),
+      sqlPath = Get[CharacterData].unsafeGetNullable(rs, i + 44),
+      schemaLevelRoutine = Get[YesOrNo].unsafeGetNullable(rs, i + 45),
+      maxDynamicResultSets = Get[CardinalNumber].unsafeGetNullable(rs, i + 46),
+      isUserDefinedCast = Get[YesOrNo].unsafeGetNullable(rs, i + 47),
+      isImplicitlyInvocable = Get[YesOrNo].unsafeGetNullable(rs, i + 48),
+      securityType = Get[CharacterData].unsafeGetNullable(rs, i + 49),
+      toSqlSpecificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 50),
+      toSqlSpecificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 51),
+      toSqlSpecificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 52),
+      asLocator = Get[YesOrNo].unsafeGetNullable(rs, i + 53),
+      created = Get[TimeStamp].unsafeGetNullable(rs, i + 54),
+      lastAltered = Get[TimeStamp].unsafeGetNullable(rs, i + 55),
+      newSavepointLevel = Get[YesOrNo].unsafeGetNullable(rs, i + 56),
+      isUdtDependent = Get[YesOrNo].unsafeGetNullable(rs, i + 57),
+      resultCastFromDataType = Get[CharacterData].unsafeGetNullable(rs, i + 58),
+      resultCastAsLocator = Get[YesOrNo].unsafeGetNullable(rs, i + 59),
+      resultCastCharMaxLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 60),
+      resultCastCharOctetLength = Get[CardinalNumber].unsafeGetNullable(rs, i + 61),
+      resultCastCharSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 62),
+      resultCastCharSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 63),
+      resultCastCharSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 64),
+      resultCastCollationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 65),
+      resultCastCollationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 66),
+      resultCastCollationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 67),
+      resultCastNumericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 68),
+      resultCastNumericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 69),
+      resultCastNumericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 70),
+      resultCastDatetimePrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 71),
+      resultCastIntervalType = Get[CharacterData].unsafeGetNullable(rs, i + 72),
+      resultCastIntervalPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 73),
+      resultCastTypeUdtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 74),
+      resultCastTypeUdtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 75),
+      resultCastTypeUdtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 76),
+      resultCastScopeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 77),
+      resultCastScopeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 78),
+      resultCastScopeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 79),
+      resultCastMaximumCardinality = Get[CardinalNumber].unsafeGetNullable(rs, i + 80),
+      resultCastDtdIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 81)
+    )
+  )
 }

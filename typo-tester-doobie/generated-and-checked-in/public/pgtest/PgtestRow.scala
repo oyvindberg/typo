@@ -16,19 +16,27 @@ import adventureworks.TypoJson
 import adventureworks.TypoJsonb
 import adventureworks.TypoLine
 import adventureworks.TypoLineSegment
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
 import adventureworks.TypoMoney
+import adventureworks.TypoOffsetDateTime
+import adventureworks.TypoOffsetTime
 import adventureworks.TypoPath
 import adventureworks.TypoPoint
 import adventureworks.TypoPolygon
 import adventureworks.TypoXml
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import java.util.UUID
+import scala.util.Try
 
 case class PgtestRow(
   box: TypoBox,
@@ -45,6 +53,12 @@ case class PgtestRow(
   jsonb: TypoJsonb,
   hstore: TypoHStore,
   inet: TypoInet,
+  timestamp: TypoLocalDateTime,
+  timestampz: TypoOffsetDateTime,
+  time: TypoLocalTime,
+  timez: TypoOffsetTime,
+  date: TypoLocalDate,
+  uuid: UUID,
   boxes: Array[TypoBox],
   circlees: Array[TypoCircle],
   linees: Array[TypoLine],
@@ -58,138 +72,194 @@ case class PgtestRow(
   jsones: Array[TypoJson],
   jsonbes: Array[TypoJsonb],
   hstores: Array[TypoHStore],
-  inets: Array[TypoInet]
+  inets: Array[TypoInet],
+  timestamps: Array[TypoLocalDateTime],
+  timestampzs: Array[TypoOffsetDateTime],
+  times: Array[TypoLocalTime],
+  timezs: Array[TypoOffsetTime],
+  dates: Array[TypoLocalDate],
+  uuids: Array[UUID]
 )
 
 object PgtestRow {
-  implicit val decoder: Decoder[PgtestRow] =
-    (c: HCursor) =>
-      for {
-        box <- c.downField("box").as[TypoBox]
-        circle <- c.downField("circle").as[TypoCircle]
-        line <- c.downField("line").as[TypoLine]
-        lseg <- c.downField("lseg").as[TypoLineSegment]
-        path <- c.downField("path").as[TypoPath]
-        point <- c.downField("point").as[TypoPoint]
-        polygon <- c.downField("polygon").as[TypoPolygon]
-        interval <- c.downField("interval").as[TypoInterval]
-        money <- c.downField("money").as[TypoMoney]
-        xml <- c.downField("xml").as[TypoXml]
-        json <- c.downField("json").as[TypoJson]
-        jsonb <- c.downField("jsonb").as[TypoJsonb]
-        hstore <- c.downField("hstore").as[TypoHStore]
-        inet <- c.downField("inet").as[TypoInet]
-        boxes <- c.downField("boxes").as[Array[TypoBox]]
-        circlees <- c.downField("circlees").as[Array[TypoCircle]]
-        linees <- c.downField("linees").as[Array[TypoLine]]
-        lseges <- c.downField("lseges").as[Array[TypoLineSegment]]
-        pathes <- c.downField("pathes").as[Array[TypoPath]]
-        pointes <- c.downField("pointes").as[Array[TypoPoint]]
-        polygones <- c.downField("polygones").as[Array[TypoPolygon]]
-        intervales <- c.downField("intervales").as[Array[TypoInterval]]
-        moneyes <- c.downField("moneyes").as[Array[TypoMoney]]
-        xmles <- c.downField("xmles").as[Array[TypoXml]]
-        jsones <- c.downField("jsones").as[Array[TypoJson]]
-        jsonbes <- c.downField("jsonbes").as[Array[TypoJsonb]]
-        hstores <- c.downField("hstores").as[Array[TypoHStore]]
-        inets <- c.downField("inets").as[Array[TypoInet]]
-      } yield PgtestRow(box, circle, line, lseg, path, point, polygon, interval, money, xml, json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets)
-  implicit val encoder: Encoder[PgtestRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "box" := row.box,
-        "circle" := row.circle,
-        "line" := row.line,
-        "lseg" := row.lseg,
-        "path" := row.path,
-        "point" := row.point,
-        "polygon" := row.polygon,
-        "interval" := row.interval,
-        "money" := row.money,
-        "xml" := row.xml,
-        "json" := row.json,
-        "jsonb" := row.jsonb,
-        "hstore" := row.hstore,
-        "inet" := row.inet,
-        "boxes" := row.boxes,
-        "circlees" := row.circlees,
-        "linees" := row.linees,
-        "lseges" := row.lseges,
-        "pathes" := row.pathes,
-        "pointes" := row.pointes,
-        "polygones" := row.polygones,
-        "intervales" := row.intervales,
-        "moneyes" := row.moneyes,
-        "xmles" := row.xmles,
-        "jsones" := row.jsones,
-        "jsonbes" := row.jsonbes,
-        "hstores" := row.hstores,
-        "inets" := row.inets
-      )}
-  implicit val read: Read[PgtestRow] =
-    new Read[PgtestRow](
-      gets = List(
-        (Get[TypoBox], Nullability.NoNulls),
-        (Get[TypoCircle], Nullability.NoNulls),
-        (Get[TypoLine], Nullability.NoNulls),
-        (Get[TypoLineSegment], Nullability.NoNulls),
-        (Get[TypoPath], Nullability.NoNulls),
-        (Get[TypoPoint], Nullability.NoNulls),
-        (Get[TypoPolygon], Nullability.NoNulls),
-        (Get[TypoInterval], Nullability.NoNulls),
-        (Get[TypoMoney], Nullability.NoNulls),
-        (Get[TypoXml], Nullability.NoNulls),
-        (Get[TypoJson], Nullability.NoNulls),
-        (Get[TypoJsonb], Nullability.NoNulls),
-        (Get[TypoHStore], Nullability.NoNulls),
-        (Get[TypoInet], Nullability.NoNulls),
-        (Get[Array[TypoBox]], Nullability.NoNulls),
-        (Get[Array[TypoCircle]], Nullability.NoNulls),
-        (Get[Array[TypoLine]], Nullability.NoNulls),
-        (Get[Array[TypoLineSegment]], Nullability.NoNulls),
-        (Get[Array[TypoPath]], Nullability.NoNulls),
-        (Get[Array[TypoPoint]], Nullability.NoNulls),
-        (Get[Array[TypoPolygon]], Nullability.NoNulls),
-        (Get[Array[TypoInterval]], Nullability.NoNulls),
-        (Get[Array[TypoMoney]], Nullability.NoNulls),
-        (Get[Array[TypoXml]], Nullability.NoNulls),
-        (Get[Array[TypoJson]], Nullability.NoNulls),
-        (Get[Array[TypoJsonb]], Nullability.NoNulls),
-        (Get[Array[TypoHStore]], Nullability.NoNulls),
-        (Get[Array[TypoInet]], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgtestRow(
-        box = Get[TypoBox].unsafeGetNonNullable(rs, i + 0),
-        circle = Get[TypoCircle].unsafeGetNonNullable(rs, i + 1),
-        line = Get[TypoLine].unsafeGetNonNullable(rs, i + 2),
-        lseg = Get[TypoLineSegment].unsafeGetNonNullable(rs, i + 3),
-        path = Get[TypoPath].unsafeGetNonNullable(rs, i + 4),
-        point = Get[TypoPoint].unsafeGetNonNullable(rs, i + 5),
-        polygon = Get[TypoPolygon].unsafeGetNonNullable(rs, i + 6),
-        interval = Get[TypoInterval].unsafeGetNonNullable(rs, i + 7),
-        money = Get[TypoMoney].unsafeGetNonNullable(rs, i + 8),
-        xml = Get[TypoXml].unsafeGetNonNullable(rs, i + 9),
-        json = Get[TypoJson].unsafeGetNonNullable(rs, i + 10),
-        jsonb = Get[TypoJsonb].unsafeGetNonNullable(rs, i + 11),
-        hstore = Get[TypoHStore].unsafeGetNonNullable(rs, i + 12),
-        inet = Get[TypoInet].unsafeGetNonNullable(rs, i + 13),
-        boxes = Get[Array[TypoBox]].unsafeGetNonNullable(rs, i + 14),
-        circlees = Get[Array[TypoCircle]].unsafeGetNonNullable(rs, i + 15),
-        linees = Get[Array[TypoLine]].unsafeGetNonNullable(rs, i + 16),
-        lseges = Get[Array[TypoLineSegment]].unsafeGetNonNullable(rs, i + 17),
-        pathes = Get[Array[TypoPath]].unsafeGetNonNullable(rs, i + 18),
-        pointes = Get[Array[TypoPoint]].unsafeGetNonNullable(rs, i + 19),
-        polygones = Get[Array[TypoPolygon]].unsafeGetNonNullable(rs, i + 20),
-        intervales = Get[Array[TypoInterval]].unsafeGetNonNullable(rs, i + 21),
-        moneyes = Get[Array[TypoMoney]].unsafeGetNonNullable(rs, i + 22),
-        xmles = Get[Array[TypoXml]].unsafeGetNonNullable(rs, i + 23),
-        jsones = Get[Array[TypoJson]].unsafeGetNonNullable(rs, i + 24),
-        jsonbes = Get[Array[TypoJsonb]].unsafeGetNonNullable(rs, i + 25),
-        hstores = Get[Array[TypoHStore]].unsafeGetNonNullable(rs, i + 26),
-        inets = Get[Array[TypoInet]].unsafeGetNonNullable(rs, i + 27)
+  implicit val decoder: Decoder[PgtestRow] = Decoder.instanceTry[PgtestRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      PgtestRow(
+        box = orThrow(c.get("box")(Decoder[TypoBox])),
+        circle = orThrow(c.get("circle")(Decoder[TypoCircle])),
+        line = orThrow(c.get("line")(Decoder[TypoLine])),
+        lseg = orThrow(c.get("lseg")(Decoder[TypoLineSegment])),
+        path = orThrow(c.get("path")(Decoder[TypoPath])),
+        point = orThrow(c.get("point")(Decoder[TypoPoint])),
+        polygon = orThrow(c.get("polygon")(Decoder[TypoPolygon])),
+        interval = orThrow(c.get("interval")(Decoder[TypoInterval])),
+        money = orThrow(c.get("money")(Decoder[TypoMoney])),
+        xml = orThrow(c.get("xml")(Decoder[TypoXml])),
+        json = orThrow(c.get("json")(Decoder[TypoJson])),
+        jsonb = orThrow(c.get("jsonb")(Decoder[TypoJsonb])),
+        hstore = orThrow(c.get("hstore")(Decoder[TypoHStore])),
+        inet = orThrow(c.get("inet")(Decoder[TypoInet])),
+        timestamp = orThrow(c.get("timestamp")(Decoder[TypoLocalDateTime])),
+        timestampz = orThrow(c.get("timestampz")(Decoder[TypoOffsetDateTime])),
+        time = orThrow(c.get("time")(Decoder[TypoLocalTime])),
+        timez = orThrow(c.get("timez")(Decoder[TypoOffsetTime])),
+        date = orThrow(c.get("date")(Decoder[TypoLocalDate])),
+        uuid = orThrow(c.get("uuid")(Decoder[UUID])),
+        boxes = orThrow(c.get("boxes")(Decoder[Array[TypoBox]])),
+        circlees = orThrow(c.get("circlees")(Decoder[Array[TypoCircle]])),
+        linees = orThrow(c.get("linees")(Decoder[Array[TypoLine]])),
+        lseges = orThrow(c.get("lseges")(Decoder[Array[TypoLineSegment]])),
+        pathes = orThrow(c.get("pathes")(Decoder[Array[TypoPath]])),
+        pointes = orThrow(c.get("pointes")(Decoder[Array[TypoPoint]])),
+        polygones = orThrow(c.get("polygones")(Decoder[Array[TypoPolygon]])),
+        intervales = orThrow(c.get("intervales")(Decoder[Array[TypoInterval]])),
+        moneyes = orThrow(c.get("moneyes")(Decoder[Array[TypoMoney]])),
+        xmles = orThrow(c.get("xmles")(Decoder[Array[TypoXml]])),
+        jsones = orThrow(c.get("jsones")(Decoder[Array[TypoJson]])),
+        jsonbes = orThrow(c.get("jsonbes")(Decoder[Array[TypoJsonb]])),
+        hstores = orThrow(c.get("hstores")(Decoder[Array[TypoHStore]])),
+        inets = orThrow(c.get("inets")(Decoder[Array[TypoInet]])),
+        timestamps = orThrow(c.get("timestamps")(Decoder[Array[TypoLocalDateTime]])),
+        timestampzs = orThrow(c.get("timestampzs")(Decoder[Array[TypoOffsetDateTime]])),
+        times = orThrow(c.get("times")(Decoder[Array[TypoLocalTime]])),
+        timezs = orThrow(c.get("timezs")(Decoder[Array[TypoOffsetTime]])),
+        dates = orThrow(c.get("dates")(Decoder[Array[TypoLocalDate]])),
+        uuids = orThrow(c.get("uuids")(Decoder[Array[UUID]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[PgtestRow] = Encoder[PgtestRow](row =>
+    Json.obj(
+      "box" -> Encoder[TypoBox].apply(row.box),
+      "circle" -> Encoder[TypoCircle].apply(row.circle),
+      "line" -> Encoder[TypoLine].apply(row.line),
+      "lseg" -> Encoder[TypoLineSegment].apply(row.lseg),
+      "path" -> Encoder[TypoPath].apply(row.path),
+      "point" -> Encoder[TypoPoint].apply(row.point),
+      "polygon" -> Encoder[TypoPolygon].apply(row.polygon),
+      "interval" -> Encoder[TypoInterval].apply(row.interval),
+      "money" -> Encoder[TypoMoney].apply(row.money),
+      "xml" -> Encoder[TypoXml].apply(row.xml),
+      "json" -> Encoder[TypoJson].apply(row.json),
+      "jsonb" -> Encoder[TypoJsonb].apply(row.jsonb),
+      "hstore" -> Encoder[TypoHStore].apply(row.hstore),
+      "inet" -> Encoder[TypoInet].apply(row.inet),
+      "timestamp" -> Encoder[TypoLocalDateTime].apply(row.timestamp),
+      "timestampz" -> Encoder[TypoOffsetDateTime].apply(row.timestampz),
+      "time" -> Encoder[TypoLocalTime].apply(row.time),
+      "timez" -> Encoder[TypoOffsetTime].apply(row.timez),
+      "date" -> Encoder[TypoLocalDate].apply(row.date),
+      "uuid" -> Encoder[UUID].apply(row.uuid),
+      "boxes" -> Encoder[Array[TypoBox]].apply(row.boxes),
+      "circlees" -> Encoder[Array[TypoCircle]].apply(row.circlees),
+      "linees" -> Encoder[Array[TypoLine]].apply(row.linees),
+      "lseges" -> Encoder[Array[TypoLineSegment]].apply(row.lseges),
+      "pathes" -> Encoder[Array[TypoPath]].apply(row.pathes),
+      "pointes" -> Encoder[Array[TypoPoint]].apply(row.pointes),
+      "polygones" -> Encoder[Array[TypoPolygon]].apply(row.polygones),
+      "intervales" -> Encoder[Array[TypoInterval]].apply(row.intervales),
+      "moneyes" -> Encoder[Array[TypoMoney]].apply(row.moneyes),
+      "xmles" -> Encoder[Array[TypoXml]].apply(row.xmles),
+      "jsones" -> Encoder[Array[TypoJson]].apply(row.jsones),
+      "jsonbes" -> Encoder[Array[TypoJsonb]].apply(row.jsonbes),
+      "hstores" -> Encoder[Array[TypoHStore]].apply(row.hstores),
+      "inets" -> Encoder[Array[TypoInet]].apply(row.inets),
+      "timestamps" -> Encoder[Array[TypoLocalDateTime]].apply(row.timestamps),
+      "timestampzs" -> Encoder[Array[TypoOffsetDateTime]].apply(row.timestampzs),
+      "times" -> Encoder[Array[TypoLocalTime]].apply(row.times),
+      "timezs" -> Encoder[Array[TypoOffsetTime]].apply(row.timezs),
+      "dates" -> Encoder[Array[TypoLocalDate]].apply(row.dates),
+      "uuids" -> Encoder[Array[UUID]].apply(row.uuids)
     )
-  
-
+  )
+  implicit val read: Read[PgtestRow] = new Read[PgtestRow](
+    gets = List(
+      (Get[TypoBox], Nullability.NoNulls),
+      (Get[TypoCircle], Nullability.NoNulls),
+      (Get[TypoLine], Nullability.NoNulls),
+      (Get[TypoLineSegment], Nullability.NoNulls),
+      (Get[TypoPath], Nullability.NoNulls),
+      (Get[TypoPoint], Nullability.NoNulls),
+      (Get[TypoPolygon], Nullability.NoNulls),
+      (Get[TypoInterval], Nullability.NoNulls),
+      (Get[TypoMoney], Nullability.NoNulls),
+      (Get[TypoXml], Nullability.NoNulls),
+      (Get[TypoJson], Nullability.NoNulls),
+      (Get[TypoJsonb], Nullability.NoNulls),
+      (Get[TypoHStore], Nullability.NoNulls),
+      (Get[TypoInet], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[TypoOffsetDateTime], Nullability.NoNulls),
+      (Get[TypoLocalTime], Nullability.NoNulls),
+      (Get[TypoOffsetTime], Nullability.NoNulls),
+      (Get[TypoLocalDate], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[Array[TypoBox]], Nullability.NoNulls),
+      (Get[Array[TypoCircle]], Nullability.NoNulls),
+      (Get[Array[TypoLine]], Nullability.NoNulls),
+      (Get[Array[TypoLineSegment]], Nullability.NoNulls),
+      (Get[Array[TypoPath]], Nullability.NoNulls),
+      (Get[Array[TypoPoint]], Nullability.NoNulls),
+      (Get[Array[TypoPolygon]], Nullability.NoNulls),
+      (Get[Array[TypoInterval]], Nullability.NoNulls),
+      (Get[Array[TypoMoney]], Nullability.NoNulls),
+      (Get[Array[TypoXml]], Nullability.NoNulls),
+      (Get[Array[TypoJson]], Nullability.NoNulls),
+      (Get[Array[TypoJsonb]], Nullability.NoNulls),
+      (Get[Array[TypoHStore]], Nullability.NoNulls),
+      (Get[Array[TypoInet]], Nullability.NoNulls),
+      (Get[Array[TypoLocalDateTime]], Nullability.NoNulls),
+      (Get[Array[TypoOffsetDateTime]], Nullability.NoNulls),
+      (Get[Array[TypoLocalTime]], Nullability.NoNulls),
+      (Get[Array[TypoOffsetTime]], Nullability.NoNulls),
+      (Get[Array[TypoLocalDate]], Nullability.NoNulls),
+      (Get[Array[UUID]], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgtestRow(
+      box = Get[TypoBox].unsafeGetNonNullable(rs, i + 0),
+      circle = Get[TypoCircle].unsafeGetNonNullable(rs, i + 1),
+      line = Get[TypoLine].unsafeGetNonNullable(rs, i + 2),
+      lseg = Get[TypoLineSegment].unsafeGetNonNullable(rs, i + 3),
+      path = Get[TypoPath].unsafeGetNonNullable(rs, i + 4),
+      point = Get[TypoPoint].unsafeGetNonNullable(rs, i + 5),
+      polygon = Get[TypoPolygon].unsafeGetNonNullable(rs, i + 6),
+      interval = Get[TypoInterval].unsafeGetNonNullable(rs, i + 7),
+      money = Get[TypoMoney].unsafeGetNonNullable(rs, i + 8),
+      xml = Get[TypoXml].unsafeGetNonNullable(rs, i + 9),
+      json = Get[TypoJson].unsafeGetNonNullable(rs, i + 10),
+      jsonb = Get[TypoJsonb].unsafeGetNonNullable(rs, i + 11),
+      hstore = Get[TypoHStore].unsafeGetNonNullable(rs, i + 12),
+      inet = Get[TypoInet].unsafeGetNonNullable(rs, i + 13),
+      timestamp = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 14),
+      timestampz = Get[TypoOffsetDateTime].unsafeGetNonNullable(rs, i + 15),
+      time = Get[TypoLocalTime].unsafeGetNonNullable(rs, i + 16),
+      timez = Get[TypoOffsetTime].unsafeGetNonNullable(rs, i + 17),
+      date = Get[TypoLocalDate].unsafeGetNonNullable(rs, i + 18),
+      uuid = Get[UUID].unsafeGetNonNullable(rs, i + 19),
+      boxes = Get[Array[TypoBox]].unsafeGetNonNullable(rs, i + 20),
+      circlees = Get[Array[TypoCircle]].unsafeGetNonNullable(rs, i + 21),
+      linees = Get[Array[TypoLine]].unsafeGetNonNullable(rs, i + 22),
+      lseges = Get[Array[TypoLineSegment]].unsafeGetNonNullable(rs, i + 23),
+      pathes = Get[Array[TypoPath]].unsafeGetNonNullable(rs, i + 24),
+      pointes = Get[Array[TypoPoint]].unsafeGetNonNullable(rs, i + 25),
+      polygones = Get[Array[TypoPolygon]].unsafeGetNonNullable(rs, i + 26),
+      intervales = Get[Array[TypoInterval]].unsafeGetNonNullable(rs, i + 27),
+      moneyes = Get[Array[TypoMoney]].unsafeGetNonNullable(rs, i + 28),
+      xmles = Get[Array[TypoXml]].unsafeGetNonNullable(rs, i + 29),
+      jsones = Get[Array[TypoJson]].unsafeGetNonNullable(rs, i + 30),
+      jsonbes = Get[Array[TypoJsonb]].unsafeGetNonNullable(rs, i + 31),
+      hstores = Get[Array[TypoHStore]].unsafeGetNonNullable(rs, i + 32),
+      inets = Get[Array[TypoInet]].unsafeGetNonNullable(rs, i + 33),
+      timestamps = Get[Array[TypoLocalDateTime]].unsafeGetNonNullable(rs, i + 34),
+      timestampzs = Get[Array[TypoOffsetDateTime]].unsafeGetNonNullable(rs, i + 35),
+      times = Get[Array[TypoLocalTime]].unsafeGetNonNullable(rs, i + 36),
+      timezs = Get[Array[TypoOffsetTime]].unsafeGetNonNullable(rs, i + 37),
+      dates = Get[Array[TypoLocalDate]].unsafeGetNonNullable(rs, i + 38),
+      uuids = Get[Array[UUID]].unsafeGetNonNullable(rs, i + 39)
+    )
+  )
 }

@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgRangeRepoImpl extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_range where rngtypid = $rngtypid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_range where rngtypid = ${rngtypid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow] = {
     sql"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)
@@ -25,10 +25,10 @@ object PgRangeRepoImpl extends PgRangeRepo {
     sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range".query[PgRangeRow].stream
   }
   override def selectById(rngtypid: PgRangeId): ConnectionIO[Option[PgRangeRow]] = {
-    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = $rngtypid".query[PgRangeRow].option
+    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ${rngtypid}".query[PgRangeRow].option
   }
   override def selectByIds(rngtypids: Array[PgRangeId]): Stream[ConnectionIO, PgRangeRow] = {
-    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ANY($rngtypids)".query[PgRangeRow].stream
+    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ANY(${rngtypids})".query[PgRangeRow].stream
   }
   override def update(row: PgRangeRow): ConnectionIO[Boolean] = {
     val rngtypid = row.rngtypid
@@ -39,7 +39,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
               rngsubopc = ${row.rngsubopc}::oid,
               rngcanonical = ${row.rngcanonical}::regproc,
               rngsubdiff = ${row.rngsubdiff}::regproc
-          where rngtypid = $rngtypid
+          where rngtypid = ${rngtypid}
        """
       .update
       .run

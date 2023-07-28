@@ -6,46 +6,24 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.geometric.PGpoint
 import org.postgresql.geometric.PGpolygon
 
 /** Polygon datatype in PostgreSQL */
 case class TypoPolygon(points: List[TypoPoint])
+
 object TypoPolygon {
-  implicit val decoder: Decoder[TypoPolygon] =
-    (c: HCursor) =>
-      for {
-        points <- c.downField("points").as[List[TypoPoint]]
-      } yield TypoPolygon(points)
-  implicit val encoder: Encoder[TypoPolygon] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "points" := row.points
-      )}
-  implicit val get: Get[TypoPolygon] =
-    Get.Advanced.other[PGpolygon](cats.data.NonEmptyList.one("polygon"))
-      .map(v => TypoPolygon(v.points.map(p => TypoPoint(p.x, p.y)).toList))
-  
-  implicit val put: Put[TypoPolygon] =
-    Put.Advanced.other[PGpolygon](NonEmptyList.one("polygon"))
-      .contramap(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray))
-  
-  implicit val meta: Meta[TypoPolygon] = new Meta(get, put)
-  val gets: Get[Array[TypoPolygon]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_polygon"))
-      .map(_.map(v => TypoPolygon(v.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList)))
-  
-  val puts: Put[Array[TypoPolygon]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_polygon"), "polygon")
-      .contramap(_.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
-  
-  implicit val metas: Meta[Array[TypoPolygon]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoPolygon]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_polygon"))
+    .map(_.map(v => TypoPolygon(v.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList)))
+  implicit val arrayPut: Put[Array[TypoPolygon]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_polygon"), "polygon")
+    .contramap(_.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
+  implicit val decoder: Decoder[TypoPolygon] = Decoder.forProduct1[TypoPolygon, List[TypoPoint]]("points")(TypoPolygon.apply)
+  implicit val encoder: Encoder[TypoPolygon] = Encoder.forProduct1[TypoPolygon, List[TypoPoint]]("points")(x => (x.points))
+  implicit val get: Get[TypoPolygon] = Get.Advanced.other[PGpolygon](NonEmptyList.one("polygon"))
+    .map(v => TypoPolygon(v.points.map(p => TypoPoint(p.x, p.y)).toList))
+  implicit val put: Put[TypoPolygon] = Put.Advanced.other[PGpolygon](NonEmptyList.one("polygon")).contramap(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray))
 }

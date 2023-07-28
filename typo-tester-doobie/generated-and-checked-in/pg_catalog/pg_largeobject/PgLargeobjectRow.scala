@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgLargeobjectRow(
@@ -25,34 +23,18 @@ case class PgLargeobjectRow(
  }
 
 object PgLargeobjectRow {
-  implicit val decoder: Decoder[PgLargeobjectRow] =
-    (c: HCursor) =>
-      for {
-        loid <- c.downField("loid").as[/* oid */ Long]
-        pageno <- c.downField("pageno").as[Int]
-        data <- c.downField("data").as[Array[Byte]]
-      } yield PgLargeobjectRow(loid, pageno, data)
-  implicit val encoder: Encoder[PgLargeobjectRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "loid" := row.loid,
-        "pageno" := row.pageno,
-        "data" := row.data
-      )}
-  implicit val read: Read[PgLargeobjectRow] =
-    new Read[PgLargeobjectRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Array[Byte]], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgLargeobjectRow(
-        loid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        pageno = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        data = Get[Array[Byte]].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PgLargeobjectRow] = Decoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(PgLargeobjectRow.apply)
+  implicit val encoder: Encoder[PgLargeobjectRow] = Encoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(x => (x.loid, x.pageno, x.data))
+  implicit val read: Read[PgLargeobjectRow] = new Read[PgLargeobjectRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Array[Byte]], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgLargeobjectRow(
+      loid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      pageno = Get[Int].unsafeGetNonNullable(rs, i + 1),
+      data = Get[Array[Byte]].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

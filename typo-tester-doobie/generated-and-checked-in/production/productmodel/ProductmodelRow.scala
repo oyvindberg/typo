@@ -7,17 +7,15 @@ package adventureworks
 package production
 package productmodel
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class ProductmodelRow(
@@ -30,50 +28,28 @@ case class ProductmodelRow(
   /** Manufacturing instructions in xml format. */
   instructions: Option[TypoXml],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductmodelRow {
-  implicit val decoder: Decoder[ProductmodelRow] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
-        name <- c.downField("name").as[Name]
-        catalogdescription <- c.downField("catalogdescription").as[Option[TypoXml]]
-        instructions <- c.downField("instructions").as[Option[TypoXml]]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductmodelRow(productmodelid, name, catalogdescription, instructions, rowguid, modifieddate)
-  implicit val encoder: Encoder[ProductmodelRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "name" := row.name,
-        "catalogdescription" := row.catalogdescription,
-        "instructions" := row.instructions,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductmodelRow] =
-    new Read[ProductmodelRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        catalogdescription = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-        instructions = Get[TypoXml].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[ProductmodelRow] = Decoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(ProductmodelRow.apply)
+  implicit val encoder: Encoder[ProductmodelRow] = Encoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))
+  implicit val read: Read[ProductmodelRow] = new Read[ProductmodelRow](
+    gets = List(
+      (Get[ProductmodelId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductmodelRow(
+      productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      catalogdescription = Get[TypoXml].unsafeGetNullable(rs, i + 2),
+      instructions = Get[TypoXml].unsafeGetNullable(rs, i + 3),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

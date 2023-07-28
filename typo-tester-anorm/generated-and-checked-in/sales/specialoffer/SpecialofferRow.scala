@@ -7,15 +7,17 @@ package adventureworks
 package sales
 package specialoffer
 
+import adventureworks.TypoLocalDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpecialofferRow(
@@ -30,70 +32,66 @@ case class SpecialofferRow(
   /** Group the discount applies to such as Reseller or Customer. */
   category: /* max 50 chars */ String,
   /** Discount start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Discount end date. */
-  enddate: LocalDateTime,
+  enddate: TypoLocalDateTime,
   /** Minimum discount percent allowed. */
   minqty: Int,
   /** Maximum discount percent allowed. */
   maxqty: Option[Int],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object SpecialofferRow {
-  def rowParser(idx: Int): RowParser[SpecialofferRow] =
-    RowParser[SpecialofferRow] { row =>
-      Success(
+  implicit val reads: Reads[SpecialofferRow] = Reads[SpecialofferRow](json => JsResult.fromTry(
+      Try(
         SpecialofferRow(
-          specialofferid = row[SpecialofferId](idx + 0),
-          description = row[/* max 255 chars */ String](idx + 1),
-          discountpct = row[BigDecimal](idx + 2),
-          `type` = row[/* max 50 chars */ String](idx + 3),
-          category = row[/* max 50 chars */ String](idx + 4),
-          startdate = row[LocalDateTime](idx + 5),
-          enddate = row[LocalDateTime](idx + 6),
-          minqty = row[Int](idx + 7),
-          maxqty = row[Option[Int]](idx + 8),
-          rowguid = row[UUID](idx + 9),
-          modifieddate = row[LocalDateTime](idx + 10)
+          specialofferid = json.\("specialofferid").as[SpecialofferId],
+          description = json.\("description").as[/* max 255 chars */ String],
+          discountpct = json.\("discountpct").as[BigDecimal],
+          `type` = json.\("type").as[/* max 50 chars */ String],
+          category = json.\("category").as[/* max 50 chars */ String],
+          startdate = json.\("startdate").as[TypoLocalDateTime],
+          enddate = json.\("enddate").as[TypoLocalDateTime],
+          minqty = json.\("minqty").as[Int],
+          maxqty = json.\("maxqty").toOption.map(_.as[Int]),
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[SpecialofferRow] = new OFormat[SpecialofferRow]{
-    override def writes(o: SpecialofferRow): JsObject =
-      Json.obj(
-        "specialofferid" -> o.specialofferid,
-        "description" -> o.description,
-        "discountpct" -> o.discountpct,
-        "type" -> o.`type`,
-        "category" -> o.category,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "minqty" -> o.minqty,
-        "maxqty" -> o.maxqty,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SpecialofferRow] = RowParser[SpecialofferRow] { row =>
+    Success(
+      SpecialofferRow(
+        specialofferid = row[SpecialofferId](idx + 0),
+        description = row[/* max 255 chars */ String](idx + 1),
+        discountpct = row[BigDecimal](idx + 2),
+        `type` = row[/* max 50 chars */ String](idx + 3),
+        category = row[/* max 50 chars */ String](idx + 4),
+        startdate = row[TypoLocalDateTime](idx + 5),
+        enddate = row[TypoLocalDateTime](idx + 6),
+        minqty = row[Int](idx + 7),
+        maxqty = row[Option[Int]](idx + 8),
+        rowguid = row[UUID](idx + 9),
+        modifieddate = row[TypoLocalDateTime](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[SpecialofferRow] = {
-      JsResult.fromTry(
-        Try(
-          SpecialofferRow(
-            specialofferid = json.\("specialofferid").as[SpecialofferId],
-            description = json.\("description").as[/* max 255 chars */ String],
-            discountpct = json.\("discountpct").as[BigDecimal],
-            `type` = json.\("type").as[/* max 50 chars */ String],
-            category = json.\("category").as[/* max 50 chars */ String],
-            startdate = json.\("startdate").as[LocalDateTime],
-            enddate = json.\("enddate").as[LocalDateTime],
-            minqty = json.\("minqty").as[Int],
-            maxqty = json.\("maxqty").toOption.map(_.as[Int]),
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SpecialofferRow] = OWrites[SpecialofferRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "specialofferid" -> Json.toJson(o.specialofferid),
+      "description" -> Json.toJson(o.description),
+      "discountpct" -> Json.toJson(o.discountpct),
+      "type" -> Json.toJson(o.`type`),
+      "category" -> Json.toJson(o.category),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "minqty" -> Json.toJson(o.minqty),
+      "maxqty" -> Json.toJson(o.maxqty),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

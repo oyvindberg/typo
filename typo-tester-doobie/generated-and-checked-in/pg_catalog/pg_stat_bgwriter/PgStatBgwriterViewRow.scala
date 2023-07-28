@@ -7,15 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_stat_bgwriter
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatBgwriterViewRow(
   checkpointsTimed: Option[Long],
@@ -28,70 +26,38 @@ case class PgStatBgwriterViewRow(
   buffersBackend: Option[Long],
   buffersBackendFsync: Option[Long],
   buffersAlloc: Option[Long],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatBgwriterViewRow {
-  implicit val decoder: Decoder[PgStatBgwriterViewRow] =
-    (c: HCursor) =>
-      for {
-        checkpointsTimed <- c.downField("checkpoints_timed").as[Option[Long]]
-        checkpointsReq <- c.downField("checkpoints_req").as[Option[Long]]
-        checkpointWriteTime <- c.downField("checkpoint_write_time").as[Option[Double]]
-        checkpointSyncTime <- c.downField("checkpoint_sync_time").as[Option[Double]]
-        buffersCheckpoint <- c.downField("buffers_checkpoint").as[Option[Long]]
-        buffersClean <- c.downField("buffers_clean").as[Option[Long]]
-        maxwrittenClean <- c.downField("maxwritten_clean").as[Option[Long]]
-        buffersBackend <- c.downField("buffers_backend").as[Option[Long]]
-        buffersBackendFsync <- c.downField("buffers_backend_fsync").as[Option[Long]]
-        buffersAlloc <- c.downField("buffers_alloc").as[Option[Long]]
-        statsReset <- c.downField("stats_reset").as[Option[OffsetDateTime]]
-      } yield PgStatBgwriterViewRow(checkpointsTimed, checkpointsReq, checkpointWriteTime, checkpointSyncTime, buffersCheckpoint, buffersClean, maxwrittenClean, buffersBackend, buffersBackendFsync, buffersAlloc, statsReset)
-  implicit val encoder: Encoder[PgStatBgwriterViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "checkpoints_timed" := row.checkpointsTimed,
-        "checkpoints_req" := row.checkpointsReq,
-        "checkpoint_write_time" := row.checkpointWriteTime,
-        "checkpoint_sync_time" := row.checkpointSyncTime,
-        "buffers_checkpoint" := row.buffersCheckpoint,
-        "buffers_clean" := row.buffersClean,
-        "maxwritten_clean" := row.maxwrittenClean,
-        "buffers_backend" := row.buffersBackend,
-        "buffers_backend_fsync" := row.buffersBackendFsync,
-        "buffers_alloc" := row.buffersAlloc,
-        "stats_reset" := row.statsReset
-      )}
-  implicit val read: Read[PgStatBgwriterViewRow] =
-    new Read[PgStatBgwriterViewRow](
-      gets = List(
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatBgwriterViewRow(
-        checkpointsTimed = Get[Long].unsafeGetNullable(rs, i + 0),
-        checkpointsReq = Get[Long].unsafeGetNullable(rs, i + 1),
-        checkpointWriteTime = Get[Double].unsafeGetNullable(rs, i + 2),
-        checkpointSyncTime = Get[Double].unsafeGetNullable(rs, i + 3),
-        buffersCheckpoint = Get[Long].unsafeGetNullable(rs, i + 4),
-        buffersClean = Get[Long].unsafeGetNullable(rs, i + 5),
-        maxwrittenClean = Get[Long].unsafeGetNullable(rs, i + 6),
-        buffersBackend = Get[Long].unsafeGetNullable(rs, i + 7),
-        buffersBackendFsync = Get[Long].unsafeGetNullable(rs, i + 8),
-        buffersAlloc = Get[Long].unsafeGetNullable(rs, i + 9),
-        statsReset = Get[OffsetDateTime].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[PgStatBgwriterViewRow] = Decoder.forProduct11[PgStatBgwriterViewRow, Option[Long], Option[Long], Option[Double], Option[Double], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(PgStatBgwriterViewRow.apply)
+  implicit val encoder: Encoder[PgStatBgwriterViewRow] = Encoder.forProduct11[PgStatBgwriterViewRow, Option[Long], Option[Long], Option[Double], Option[Double], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("checkpoints_timed", "checkpoints_req", "checkpoint_write_time", "checkpoint_sync_time", "buffers_checkpoint", "buffers_clean", "maxwritten_clean", "buffers_backend", "buffers_backend_fsync", "buffers_alloc", "stats_reset")(x => (x.checkpointsTimed, x.checkpointsReq, x.checkpointWriteTime, x.checkpointSyncTime, x.buffersCheckpoint, x.buffersClean, x.maxwrittenClean, x.buffersBackend, x.buffersBackendFsync, x.buffersAlloc, x.statsReset))
+  implicit val read: Read[PgStatBgwriterViewRow] = new Read[PgStatBgwriterViewRow](
+    gets = List(
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatBgwriterViewRow(
+      checkpointsTimed = Get[Long].unsafeGetNullable(rs, i + 0),
+      checkpointsReq = Get[Long].unsafeGetNullable(rs, i + 1),
+      checkpointWriteTime = Get[Double].unsafeGetNullable(rs, i + 2),
+      checkpointSyncTime = Get[Double].unsafeGetNullable(rs, i + 3),
+      buffersCheckpoint = Get[Long].unsafeGetNullable(rs, i + 4),
+      buffersClean = Get[Long].unsafeGetNullable(rs, i + 5),
+      maxwrittenClean = Get[Long].unsafeGetNullable(rs, i + 6),
+      buffersBackend = Get[Long].unsafeGetNullable(rs, i + 7),
+      buffersBackendFsync = Get[Long].unsafeGetNullable(rs, i + 8),
+      buffersAlloc = Get[Long].unsafeGetNullable(rs, i + 9),
+      statsReset = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

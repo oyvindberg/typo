@@ -8,11 +8,11 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
@@ -22,7 +22,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
   
@@ -48,19 +48,19 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into purchasing.shipmethod default values
-            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
          """
         .executeInsert(ShipmethodRow.rowParser(1).single)
     } else {
       val q = s"""insert into purchasing.shipmethod(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+                  returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -71,18 +71,18 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
           from purchasing.shipmethod
        """.as(ShipmethodRow.rowParser(1).*)
   }
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
-    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
           from purchasing.shipmethod
           where shipmethodid = $shipmethodid
        """.as(ShipmethodRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
-    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+    SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
           from purchasing.shipmethod
           where shipmethodid = ANY($shipmethodids)
        """.as(ShipmethodRow.rowParser(1).*)
@@ -116,7 +116,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             shiprate = EXCLUDED.shiprate,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
   

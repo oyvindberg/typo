@@ -6,55 +6,33 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.util.PGobject
 
 /** pg_node_tree (via PGObject) */
 case class TypoPgNodeTree(value: String)
+
 object TypoPgNodeTree {
-  implicit val decoder: Decoder[TypoPgNodeTree] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[String]
-      } yield TypoPgNodeTree(value)
-  implicit val encoder: Encoder[TypoPgNodeTree] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoPgNodeTree] =
-    Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("pg_node_tree"))
-      .map(v => TypoPgNodeTree(v.getValue))
-  
-  implicit val put: Put[TypoPgNodeTree] =
-    Put.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree"))
-      .contramap(v => {
-                        val obj = new PGobject
-                        obj.setType("pg_node_tree")
-                        obj.setValue(v.value)
-                        obj
-                      })
-  
-  implicit val meta: Meta[TypoPgNodeTree] = new Meta(get, put)
-  val gets: Get[Array[TypoPgNodeTree]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"))
-      .map(_.map(v => TypoPgNodeTree(v.asInstanceOf[String])))
-  
-  val puts: Put[Array[TypoPgNodeTree]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"), "pg_node_tree")
-      .contramap(_.map(v => {
-                              val obj = new PGobject
-                              obj.setType("pg_node_tree")
-                              obj.setValue(v.value)
-                              obj
-                            }))
-  
-  implicit val metas: Meta[Array[TypoPgNodeTree]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoPgNodeTree]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"))
+    .map(_.map(v => TypoPgNodeTree(v.asInstanceOf[String])))
+  implicit val arrayPut: Put[Array[TypoPgNodeTree]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"), "pg_node_tree")
+    .contramap(_.map(v => {
+                            val obj = new PGobject
+                            obj.setType("pg_node_tree")
+                            obj.setValue(v.value)
+                            obj
+                          }))
+  implicit val decoder: Decoder[TypoPgNodeTree] = Decoder.forProduct1[TypoPgNodeTree, String]("value")(TypoPgNodeTree.apply)
+  implicit val encoder: Encoder[TypoPgNodeTree] = Encoder.forProduct1[TypoPgNodeTree, String]("value")(x => (x.value))
+  implicit val get: Get[TypoPgNodeTree] = Get.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree"))
+    .map(v => TypoPgNodeTree(v.getValue))
+  implicit val put: Put[TypoPgNodeTree] = Put.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree")).contramap(v => {
+                                                                                  val obj = new PGobject
+                                                                                  obj.setType("pg_node_tree")
+                                                                                  obj.setValue(v.value)
+                                                                                  obj
+                                                                                })
 }

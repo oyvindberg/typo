@@ -7,38 +7,37 @@ package adventureworks
 package sales
 package salesterritoryhistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `sales.salesterritoryhistory` */
-case class SalesterritoryhistoryId(businessentityid: BusinessentityId, startdate: LocalDateTime, territoryid: SalesterritoryId)
+case class SalesterritoryhistoryId(businessentityid: BusinessentityId, startdate: TypoLocalDateTime, territoryid: SalesterritoryId)
 object SalesterritoryhistoryId {
-  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[SalesterritoryhistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.territoryid))
-  implicit val oFormat: OFormat[SalesterritoryhistoryId] = new OFormat[SalesterritoryhistoryId]{
-    override def writes(o: SalesterritoryhistoryId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "startdate" -> o.startdate,
-        "territoryid" -> o.territoryid
-      )
-  
-    override def reads(json: JsValue): JsResult[SalesterritoryhistoryId] = {
-      JsResult.fromTry(
-        Try(
-          SalesterritoryhistoryId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            startdate = json.\("startdate").as[LocalDateTime],
-            territoryid = json.\("territoryid").as[SalesterritoryId]
-          )
+  implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[SalesterritoryhistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.territoryid))
+  implicit val reads: Reads[SalesterritoryhistoryId] = Reads[SalesterritoryhistoryId](json => JsResult.fromTry(
+      Try(
+        SalesterritoryhistoryId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          startdate = json.\("startdate").as[TypoLocalDateTime],
+          territoryid = json.\("territoryid").as[SalesterritoryId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalesterritoryhistoryId] = OWrites[SalesterritoryhistoryId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "startdate" -> Json.toJson(o.startdate),
+      "territoryid" -> Json.toJson(o.territoryid)
+    ))
+  )
 }

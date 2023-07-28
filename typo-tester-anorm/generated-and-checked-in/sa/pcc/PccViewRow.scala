@@ -7,16 +7,18 @@ package adventureworks
 package sa
 package pcc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PccViewRow(
@@ -26,41 +28,37 @@ case class PccViewRow(
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PccViewRow {
-  def rowParser(idx: Int): RowParser[PccViewRow] =
-    RowParser[PccViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PccViewRow] = Reads[PccViewRow](json => JsResult.fromTry(
+      Try(
         PccViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          creditcardid = row[Option[CreditcardId]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PccViewRow] = new OFormat[PccViewRow]{
-    override def writes(o: PccViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "creditcardid" -> o.creditcardid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PccViewRow] = RowParser[PccViewRow] { row =>
+    Success(
+      PccViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        creditcardid = row[Option[CreditcardId]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PccViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PccViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PccViewRow] = OWrites[PccViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "creditcardid" -> Json.toJson(o.creditcardid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

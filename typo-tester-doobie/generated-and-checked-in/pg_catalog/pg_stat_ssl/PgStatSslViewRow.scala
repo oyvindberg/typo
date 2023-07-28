@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_ssl
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatSslViewRow(
@@ -28,54 +26,28 @@ case class PgStatSslViewRow(
 )
 
 object PgStatSslViewRow {
-  implicit val decoder: Decoder[PgStatSslViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        ssl <- c.downField("ssl").as[Option[Boolean]]
-        version <- c.downField("version").as[Option[String]]
-        cipher <- c.downField("cipher").as[Option[String]]
-        bits <- c.downField("bits").as[Option[Int]]
-        clientDn <- c.downField("client_dn").as[Option[String]]
-        clientSerial <- c.downField("client_serial").as[Option[BigDecimal]]
-        issuerDn <- c.downField("issuer_dn").as[Option[String]]
-      } yield PgStatSslViewRow(pid, ssl, version, cipher, bits, clientDn, clientSerial, issuerDn)
-  implicit val encoder: Encoder[PgStatSslViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "ssl" := row.ssl,
-        "version" := row.version,
-        "cipher" := row.cipher,
-        "bits" := row.bits,
-        "client_dn" := row.clientDn,
-        "client_serial" := row.clientSerial,
-        "issuer_dn" := row.issuerDn
-      )}
-  implicit val read: Read[PgStatSslViewRow] =
-    new Read[PgStatSslViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatSslViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        ssl = Get[Boolean].unsafeGetNullable(rs, i + 1),
-        version = Get[String].unsafeGetNullable(rs, i + 2),
-        cipher = Get[String].unsafeGetNullable(rs, i + 3),
-        bits = Get[Int].unsafeGetNullable(rs, i + 4),
-        clientDn = Get[String].unsafeGetNullable(rs, i + 5),
-        clientSerial = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        issuerDn = Get[String].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgStatSslViewRow] = Decoder.forProduct8[PgStatSslViewRow, Option[Int], Option[Boolean], Option[String], Option[String], Option[Int], Option[String], Option[BigDecimal], Option[String]]("pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn")(PgStatSslViewRow.apply)
+  implicit val encoder: Encoder[PgStatSslViewRow] = Encoder.forProduct8[PgStatSslViewRow, Option[Int], Option[Boolean], Option[String], Option[String], Option[Int], Option[String], Option[BigDecimal], Option[String]]("pid", "ssl", "version", "cipher", "bits", "client_dn", "client_serial", "issuer_dn")(x => (x.pid, x.ssl, x.version, x.cipher, x.bits, x.clientDn, x.clientSerial, x.issuerDn))
+  implicit val read: Read[PgStatSslViewRow] = new Read[PgStatSslViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatSslViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      ssl = Get[Boolean].unsafeGetNullable(rs, i + 1),
+      version = Get[String].unsafeGetNullable(rs, i + 2),
+      cipher = Get[String].unsafeGetNullable(rs, i + 3),
+      bits = Get[Int].unsafeGetNullable(rs, i + 4),
+      clientDn = Get[String].unsafeGetNullable(rs, i + 5),
+      clientSerial = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
+      issuerDn = Get[String].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

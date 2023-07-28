@@ -7,18 +7,19 @@ package adventureworks
 package purchasing
 package purchaseorderheader
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `purchasing.purchaseorderheader` */
 case class PurchaseorderheaderId(value: Int) extends AnyVal
 object PurchaseorderheaderId {
+  implicit val arrayGet: Get[Array[PurchaseorderheaderId]] = Get[Array[Int]].map(_.map(PurchaseorderheaderId.apply))
+  implicit val arrayPut: Put[Array[PurchaseorderheaderId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PurchaseorderheaderId] = Decoder[Int].map(PurchaseorderheaderId.apply)
+  implicit val encoder: Encoder[PurchaseorderheaderId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[PurchaseorderheaderId] = Get[Int].map(PurchaseorderheaderId.apply)
   implicit val ordering: Ordering[PurchaseorderheaderId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PurchaseorderheaderId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[PurchaseorderheaderId] =
-    Decoder[Int].map(PurchaseorderheaderId(_))
-  implicit val meta: Meta[PurchaseorderheaderId] = Meta[Int].imap(PurchaseorderheaderId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PurchaseorderheaderId]] = Meta[Array[Int]].imap(_.map(PurchaseorderheaderId.apply))(_.map(_.value))
+  implicit val put: Put[PurchaseorderheaderId] = Put[Int].contramap(_.value)
 }

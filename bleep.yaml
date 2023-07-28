@@ -12,9 +12,9 @@ projects:
   # main project
   typo:
     dependencies:
-    - com.typesafe.play::play-json:2.10.0-RC9
-    - org.playframework.anorm::anorm:2.7.0
-    - org.postgresql:postgresql:42.6.0
+      - com.typesafe.play::play-json:2.10.0-RC9
+      - org.playframework.anorm::anorm:2.7.0
+      - org.postgresql:postgresql:42.6.0
     extends: template-cross
     platform:
       mainClass: com.foo.App
@@ -27,10 +27,10 @@ projects:
   # scripts generate code into this project, and there are hand-written tests as well
   typo-tester-anorm:
     dependencies:
-    - com.typesafe.play::play-json:2.10.0-RC9
-    - org.playframework.anorm::anorm:2.7.0
-    - org.postgresql:postgresql:42.6.0
-    - org.scalatest::scalatest:3.3.0-SNAP4
+      - com.typesafe.play::play-json:2.10.0-RC9
+      - org.playframework.anorm::anorm:2.7.0
+      - org.postgresql:postgresql:42.6.0
+      - org.scalatest::scalatest:3.3.0-SNAP4
     extends: template-cross
     isTestProject: true
     sourcegen:
@@ -39,10 +39,10 @@ projects:
     sources: ./generated-and-checked-in
   typo-tester-doobie:
     dependencies:
-    - io.circe::circe-core:0.15.0-M1
-    - org.postgresql:postgresql:42.6.0
-    - org.scalatest::scalatest:3.3.0-SNAP4
-    - org.tpolecat::doobie-postgres:1.0.0-RC4
+      - io.circe::circe-core:0.15.0-M1
+      - org.postgresql:postgresql:42.6.0
+      - org.scalatest::scalatest:3.3.0-SNAP4
+      - org.tpolecat::doobie-postgres:1.0.0-RC4
     extends: template-cross
     isTestProject: true
     sourcegen:

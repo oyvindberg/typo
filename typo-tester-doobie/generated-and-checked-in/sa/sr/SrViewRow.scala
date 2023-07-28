@@ -7,17 +7,15 @@ package adventureworks
 package sa
 package sr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class SrViewRow(
   id: Option[Int],
@@ -28,46 +26,26 @@ case class SrViewRow(
   /** Points to [[sales.salesreason.SalesreasonRow.reasontype]] */
   reasontype: Option[Name],
   /** Points to [[sales.salesreason.SalesreasonRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SrViewRow {
-  implicit val decoder: Decoder[SrViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        salesreasonid <- c.downField("salesreasonid").as[Option[SalesreasonId]]
-        name <- c.downField("name").as[Option[Name]]
-        reasontype <- c.downField("reasontype").as[Option[Name]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SrViewRow(id, salesreasonid, name, reasontype, modifieddate)
-  implicit val encoder: Encoder[SrViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "salesreasonid" := row.salesreasonid,
-        "name" := row.name,
-        "reasontype" := row.reasontype,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SrViewRow] =
-    new Read[SrViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[SalesreasonId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SrViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        salesreasonid = Get[SalesreasonId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        reasontype = Get[Name].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[SrViewRow] = Decoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(SrViewRow.apply)
+  implicit val encoder: Encoder[SrViewRow] = Encoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(x => (x.id, x.salesreasonid, x.name, x.reasontype, x.modifieddate))
+  implicit val read: Read[SrViewRow] = new Read[SrViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[SalesreasonId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SrViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      salesreasonid = Get[SalesreasonId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      reasontype = Get[Name].unsafeGetNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

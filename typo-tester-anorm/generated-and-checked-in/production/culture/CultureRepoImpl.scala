@@ -8,11 +8,11 @@ package production
 package culture
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object CultureRepoImpl extends CultureRepo {
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture(cultureid, "name", modifieddate)
           values (${unsaved.cultureid}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning cultureid, "name", modifieddate
+          returning cultureid, "name", modifieddate::text
        """
       .executeInsert(CultureRow.rowParser(1).single)
   
@@ -32,19 +32,19 @@ object CultureRepoImpl extends CultureRepo {
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.culture default values
-            returning cultureid, "name", modifieddate
+            returning cultureid, "name", modifieddate::text
          """
         .executeInsert(CultureRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.culture(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning cultureid, "name", modifieddate
+                  returning cultureid, "name", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -55,18 +55,18 @@ object CultureRepoImpl extends CultureRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, "name", modifieddate
+    SQL"""select cultureid, "name", modifieddate::text
           from production.culture
        """.as(CultureRow.rowParser(1).*)
   }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
-    SQL"""select cultureid, "name", modifieddate
+    SQL"""select cultureid, "name", modifieddate::text
           from production.culture
           where cultureid = $cultureid
        """.as(CultureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
-    SQL"""select cultureid, "name", modifieddate
+    SQL"""select cultureid, "name", modifieddate::text
           from production.culture
           where cultureid = ANY($cultureids)
        """.as(CultureRow.rowParser(1).*)
@@ -91,7 +91,7 @@ object CultureRepoImpl extends CultureRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning cultureid, "name", modifieddate
+          returning cultureid, "name", modifieddate::text
        """
       .executeInsert(CultureRow.rowParser(1).single)
   

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object AtViewRepoImpl extends AtViewRepo {
   override def selectAll: Stream[ConnectionIO, AtViewRow] = {
-    sql"""select "id", addresstypeid, "name", rowguid, modifieddate from pe."at"""".query[AtViewRow].stream
+    sql"""select "id", addresstypeid, "name", rowguid, modifieddate::text from pe."at"""".query[AtViewRow].stream
   }
 }

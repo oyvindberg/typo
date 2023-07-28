@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgReplicationOriginRow(
@@ -22,31 +24,27 @@ case class PgReplicationOriginRow(
 )
 
 object PgReplicationOriginRow {
-  def rowParser(idx: Int): RowParser[PgReplicationOriginRow] =
-    RowParser[PgReplicationOriginRow] { row =>
-      Success(
+  implicit val reads: Reads[PgReplicationOriginRow] = Reads[PgReplicationOriginRow](json => JsResult.fromTry(
+      Try(
         PgReplicationOriginRow(
-          roident = row[PgReplicationOriginId](idx + 0),
-          roname = row[String](idx + 1)
+          roident = json.\("roident").as[PgReplicationOriginId],
+          roname = json.\("roname").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgReplicationOriginRow] = new OFormat[PgReplicationOriginRow]{
-    override def writes(o: PgReplicationOriginRow): JsObject =
-      Json.obj(
-        "roident" -> o.roident,
-        "roname" -> o.roname
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgReplicationOriginRow] = RowParser[PgReplicationOriginRow] { row =>
+    Success(
+      PgReplicationOriginRow(
+        roident = row[PgReplicationOriginId](idx + 0),
+        roname = row[String](idx + 1)
       )
-  
-    override def reads(json: JsValue): JsResult[PgReplicationOriginRow] = {
-      JsResult.fromTry(
-        Try(
-          PgReplicationOriginRow(
-            roident = json.\("roident").as[PgReplicationOriginId],
-            roname = json.\("roname").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgReplicationOriginRow] = OWrites[PgReplicationOriginRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "roident" -> Json.toJson(o.roident),
+      "roname" -> Json.toJson(o.roname)
+    ))
+  )
 }

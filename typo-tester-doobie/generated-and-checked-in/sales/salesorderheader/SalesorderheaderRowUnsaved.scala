@@ -8,6 +8,7 @@ package sales
 package salesorderheader
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -19,18 +20,19 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
+import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderheader` which has not been persisted yet */
 case class SalesorderheaderRowUnsaved(
   /** Date the order is due to the customer. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Date the order was shipped to the customer. */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Customer purchase order number reference. */
   purchaseordernumber: Option[OrderNumber],
   /** Financial accounting number reference. */
@@ -73,7 +75,7 @@ case class SalesorderheaderRowUnsaved(
   revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Dates the sales order was created. */
-  orderdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
   status: Defaulted[Int] = Defaulted.UseDefault,
@@ -92,9 +94,9 @@ case class SalesorderheaderRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => Int, orderdateDefault: => LocalDateTime, statusDefault: => Int, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesorderheaderRow =
+  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => Int, orderdateDefault: => TypoLocalDateTime, statusDefault: => Int, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
     SalesorderheaderRow(
       duedate = duedate,
       shipdate = shipdate,
@@ -154,63 +156,68 @@ case class SalesorderheaderRowUnsaved(
     )
 }
 object SalesorderheaderRowUnsaved {
-  implicit val decoder: Decoder[SalesorderheaderRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        duedate <- c.downField("duedate").as[LocalDateTime]
-        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
-        purchaseordernumber <- c.downField("purchaseordernumber").as[Option[OrderNumber]]
-        accountnumber <- c.downField("accountnumber").as[Option[AccountNumber]]
-        customerid <- c.downField("customerid").as[CustomerId]
-        salespersonid <- c.downField("salespersonid").as[Option[BusinessentityId]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        billtoaddressid <- c.downField("billtoaddressid").as[AddressId]
-        shiptoaddressid <- c.downField("shiptoaddressid").as[AddressId]
-        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
-        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        creditcardapprovalcode <- c.downField("creditcardapprovalcode").as[Option[/* max 15 chars */ String]]
-        currencyrateid <- c.downField("currencyrateid").as[Option[CurrencyrateId]]
-        totaldue <- c.downField("totaldue").as[Option[BigDecimal]]
-        comment <- c.downField("comment").as[Option[/* max 128 chars */ String]]
-        salesorderid <- c.downField("salesorderid").as[Defaulted[SalesorderheaderId]]
-        revisionnumber <- c.downField("revisionnumber").as[Defaulted[Int]]
-        orderdate <- c.downField("orderdate").as[Defaulted[LocalDateTime]]
-        status <- c.downField("status").as[Defaulted[Int]]
-        onlineorderflag <- c.downField("onlineorderflag").as[Defaulted[Flag]]
-        subtotal <- c.downField("subtotal").as[Defaulted[BigDecimal]]
-        taxamt <- c.downField("taxamt").as[Defaulted[BigDecimal]]
-        freight <- c.downField("freight").as[Defaulted[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SalesorderheaderRowUnsaved(duedate, shipdate, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, totaldue, comment, salesorderid, revisionnumber, orderdate, status, onlineorderflag, subtotal, taxamt, freight, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalesorderheaderRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "duedate" := row.duedate,
-        "shipdate" := row.shipdate,
-        "purchaseordernumber" := row.purchaseordernumber,
-        "accountnumber" := row.accountnumber,
-        "customerid" := row.customerid,
-        "salespersonid" := row.salespersonid,
-        "territoryid" := row.territoryid,
-        "billtoaddressid" := row.billtoaddressid,
-        "shiptoaddressid" := row.shiptoaddressid,
-        "shipmethodid" := row.shipmethodid,
-        "creditcardid" := row.creditcardid,
-        "creditcardapprovalcode" := row.creditcardapprovalcode,
-        "currencyrateid" := row.currencyrateid,
-        "totaldue" := row.totaldue,
-        "comment" := row.comment,
-        "salesorderid" := row.salesorderid,
-        "revisionnumber" := row.revisionnumber,
-        "orderdate" := row.orderdate,
-        "status" := row.status,
-        "onlineorderflag" := row.onlineorderflag,
-        "subtotal" := row.subtotal,
-        "taxamt" := row.taxamt,
-        "freight" := row.freight,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SalesorderheaderRowUnsaved] = Decoder.instanceTry[SalesorderheaderRowUnsaved]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      SalesorderheaderRowUnsaved(
+        duedate = orThrow(c.get("duedate")(Decoder[TypoLocalDateTime])),
+        shipdate = orThrow(c.get("shipdate")(Decoder[Option[TypoLocalDateTime]])),
+        purchaseordernumber = orThrow(c.get("purchaseordernumber")(Decoder[Option[OrderNumber]])),
+        accountnumber = orThrow(c.get("accountnumber")(Decoder[Option[AccountNumber]])),
+        customerid = orThrow(c.get("customerid")(Decoder[CustomerId])),
+        salespersonid = orThrow(c.get("salespersonid")(Decoder[Option[BusinessentityId]])),
+        territoryid = orThrow(c.get("territoryid")(Decoder[Option[SalesterritoryId]])),
+        billtoaddressid = orThrow(c.get("billtoaddressid")(Decoder[AddressId])),
+        shiptoaddressid = orThrow(c.get("shiptoaddressid")(Decoder[AddressId])),
+        shipmethodid = orThrow(c.get("shipmethodid")(Decoder[ShipmethodId])),
+        creditcardid = orThrow(c.get("creditcardid")(Decoder[Option[CreditcardId]])),
+        creditcardapprovalcode = orThrow(c.get("creditcardapprovalcode")(Decoder[Option[/* max 15 chars */ String]])),
+        currencyrateid = orThrow(c.get("currencyrateid")(Decoder[Option[CurrencyrateId]])),
+        totaldue = orThrow(c.get("totaldue")(Decoder[Option[BigDecimal]])),
+        comment = orThrow(c.get("comment")(Decoder[Option[/* max 128 chars */ String]])),
+        salesorderid = orThrow(c.get("salesorderid")(Decoder[Defaulted[SalesorderheaderId]])),
+        revisionnumber = orThrow(c.get("revisionnumber")(Decoder[Defaulted[Int]])),
+        orderdate = orThrow(c.get("orderdate")(Decoder[Defaulted[TypoLocalDateTime]])),
+        status = orThrow(c.get("status")(Decoder[Defaulted[Int]])),
+        onlineorderflag = orThrow(c.get("onlineorderflag")(Decoder[Defaulted[Flag]])),
+        subtotal = orThrow(c.get("subtotal")(Decoder[Defaulted[BigDecimal]])),
+        taxamt = orThrow(c.get("taxamt")(Decoder[Defaulted[BigDecimal]])),
+        freight = orThrow(c.get("freight")(Decoder[Defaulted[BigDecimal]])),
+        rowguid = orThrow(c.get("rowguid")(Decoder[Defaulted[UUID]])),
+        modifieddate = orThrow(c.get("modifieddate")(Decoder[Defaulted[TypoLocalDateTime]]))
+      )
+    }
+  )
+  implicit val encoder: Encoder[SalesorderheaderRowUnsaved] = Encoder[SalesorderheaderRowUnsaved](row =>
+    Json.obj(
+      "duedate" -> Encoder[TypoLocalDateTime].apply(row.duedate),
+      "shipdate" -> Encoder[Option[TypoLocalDateTime]].apply(row.shipdate),
+      "purchaseordernumber" -> Encoder[Option[OrderNumber]].apply(row.purchaseordernumber),
+      "accountnumber" -> Encoder[Option[AccountNumber]].apply(row.accountnumber),
+      "customerid" -> Encoder[CustomerId].apply(row.customerid),
+      "salespersonid" -> Encoder[Option[BusinessentityId]].apply(row.salespersonid),
+      "territoryid" -> Encoder[Option[SalesterritoryId]].apply(row.territoryid),
+      "billtoaddressid" -> Encoder[AddressId].apply(row.billtoaddressid),
+      "shiptoaddressid" -> Encoder[AddressId].apply(row.shiptoaddressid),
+      "shipmethodid" -> Encoder[ShipmethodId].apply(row.shipmethodid),
+      "creditcardid" -> Encoder[Option[CreditcardId]].apply(row.creditcardid),
+      "creditcardapprovalcode" -> Encoder[Option[/* max 15 chars */ String]].apply(row.creditcardapprovalcode),
+      "currencyrateid" -> Encoder[Option[CurrencyrateId]].apply(row.currencyrateid),
+      "totaldue" -> Encoder[Option[BigDecimal]].apply(row.totaldue),
+      "comment" -> Encoder[Option[/* max 128 chars */ String]].apply(row.comment),
+      "salesorderid" -> Encoder[Defaulted[SalesorderheaderId]].apply(row.salesorderid),
+      "revisionnumber" -> Encoder[Defaulted[Int]].apply(row.revisionnumber),
+      "orderdate" -> Encoder[Defaulted[TypoLocalDateTime]].apply(row.orderdate),
+      "status" -> Encoder[Defaulted[Int]].apply(row.status),
+      "onlineorderflag" -> Encoder[Defaulted[Flag]].apply(row.onlineorderflag),
+      "subtotal" -> Encoder[Defaulted[BigDecimal]].apply(row.subtotal),
+      "taxamt" -> Encoder[Defaulted[BigDecimal]].apply(row.taxamt),
+      "freight" -> Encoder[Defaulted[BigDecimal]].apply(row.freight),
+      "rowguid" -> Encoder[Defaulted[UUID]].apply(row.rowguid),
+      "modifieddate" -> Encoder[Defaulted[TypoLocalDateTime]].apply(row.modifieddate)
+    )
+  )
 }

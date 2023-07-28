@@ -18,7 +18,7 @@ import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId): ConnectionIO[Boolean] = {
-    sql"""delete from myschema.person where "id" = $id""".update.run.map(_ > 0)
+    sql"""delete from myschema.person where "id" = ${id}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
@@ -68,10 +68,10 @@ object PersonRepoImpl extends PersonRepo {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".query[PersonRow].stream
   }
   override def selectById(id: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = $id""".query[PersonRow].option
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ${id}""".query[PersonRow].option
   }
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ANY($ids)""".query[PersonRow].stream
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ANY(${ids})""".query[PersonRow].stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val id = row.id
@@ -86,7 +86,7 @@ object PersonRepoImpl extends PersonRepo {
               marital_status_id = ${row.maritalStatusId},
               work_email = ${row.workEmail},
               sector = ${row.sector}::myschema.sector
-          where "id" = $id
+          where "id" = ${id}
        """
       .update
       .run

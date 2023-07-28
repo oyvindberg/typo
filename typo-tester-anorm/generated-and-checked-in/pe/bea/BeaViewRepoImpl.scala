@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object BeaViewRepoImpl extends BeaViewRepo {
   override def selectAll(implicit c: Connection): List[BeaViewRow] = {
-    SQL"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate
+    SQL"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
           from pe.bea
        """.as(BeaViewRow.rowParser(1).*)
   }

@@ -7,17 +7,15 @@ package adventureworks
 package pu
 package sm
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SmViewRow(
@@ -33,54 +31,30 @@ case class SmViewRow(
   /** Points to [[purchasing.shipmethod.ShipmethodRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[purchasing.shipmethod.ShipmethodRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SmViewRow {
-  implicit val decoder: Decoder[SmViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        shipmethodid <- c.downField("shipmethodid").as[Option[ShipmethodId]]
-        name <- c.downField("name").as[Option[Name]]
-        shipbase <- c.downField("shipbase").as[Option[BigDecimal]]
-        shiprate <- c.downField("shiprate").as[Option[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SmViewRow(id, shipmethodid, name, shipbase, shiprate, rowguid, modifieddate)
-  implicit val encoder: Encoder[SmViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "shipmethodid" := row.shipmethodid,
-        "name" := row.name,
-        "shipbase" := row.shipbase,
-        "shiprate" := row.shiprate,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SmViewRow] =
-    new Read[SmViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ShipmethodId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SmViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        shipmethodid = Get[ShipmethodId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        shipbase = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-        shiprate = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[SmViewRow] = Decoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(SmViewRow.apply)
+  implicit val encoder: Encoder[SmViewRow] = Encoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.id, x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))
+  implicit val read: Read[SmViewRow] = new Read[SmViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ShipmethodId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SmViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      shipmethodid = Get[ShipmethodId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      shipbase = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
+      shiprate = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

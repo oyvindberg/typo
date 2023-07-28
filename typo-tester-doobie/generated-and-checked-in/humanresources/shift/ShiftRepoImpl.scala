@@ -8,20 +8,20 @@ package humanresources
 package shift
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.shift where shiftid = $shiftid".update.run.map(_ > 0)
+    sql"delete from humanresources.shift where shiftid = ${shiftid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
-          returning shiftid, "name", starttime, endtime, modifieddate
+          returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """.query[ShiftRow].unique
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
@@ -35,32 +35,32 @@ object ShiftRepoImpl extends ShiftRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into humanresources.shift default values
-            returning shiftid, "name", starttime, endtime, modifieddate
+            returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.shift(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning shiftid, "name", starttime, endtime, modifieddate
+            returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
          """
     }
     q.query[ShiftRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
-    sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift""".query[ShiftRow].stream
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift""".query[ShiftRow].stream
   }
   override def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = {
-    sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid""".query[ShiftRow].option
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ${shiftid}""".query[ShiftRow].option
   }
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift where shiftid = ANY($shiftids)""".query[ShiftRow].stream
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ANY(${shiftids})""".query[ShiftRow].stream
   }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
@@ -69,7 +69,7 @@ object ShiftRepoImpl extends ShiftRepo {
               starttime = ${row.starttime}::time,
               endtime = ${row.endtime}::time,
               modifieddate = ${row.modifieddate}::timestamp
-          where shiftid = $shiftid
+          where shiftid = ${shiftid}
        """
       .update
       .run
@@ -90,7 +90,7 @@ object ShiftRepoImpl extends ShiftRepo {
             starttime = EXCLUDED.starttime,
             endtime = EXCLUDED.endtime,
             modifieddate = EXCLUDED.modifieddate
-          returning shiftid, "name", starttime, endtime, modifieddate
+          returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """.query[ShiftRow].unique
   }
 }

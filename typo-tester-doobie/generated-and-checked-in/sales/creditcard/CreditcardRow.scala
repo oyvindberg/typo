@@ -7,15 +7,13 @@ package adventureworks
 package sales
 package creditcard
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CreditcardRow(
   /** Primary key for CreditCard records. */
@@ -28,50 +26,28 @@ case class CreditcardRow(
   expmonth: Int,
   /** Credit card expiration year. */
   expyear: Int,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CreditcardRow {
-  implicit val decoder: Decoder[CreditcardRow] =
-    (c: HCursor) =>
-      for {
-        creditcardid <- c.downField("creditcardid").as[CreditcardId]
-        cardtype <- c.downField("cardtype").as[/* max 50 chars */ String]
-        cardnumber <- c.downField("cardnumber").as[/* max 25 chars */ String]
-        expmonth <- c.downField("expmonth").as[Int]
-        expyear <- c.downField("expyear").as[Int]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield CreditcardRow(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
-  implicit val encoder: Encoder[CreditcardRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "creditcardid" := row.creditcardid,
-        "cardtype" := row.cardtype,
-        "cardnumber" := row.cardnumber,
-        "expmonth" := row.expmonth,
-        "expyear" := row.expyear,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CreditcardRow] =
-    new Read[CreditcardRow](
-      gets = List(
-        (Get[CreditcardId], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[/* max 25 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
-        creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 0),
-        cardtype = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        cardnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        expmonth = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        expyear = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[CreditcardRow] = Decoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CreditcardRow.apply)
+  implicit val encoder: Encoder[CreditcardRow] = Encoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))
+  implicit val read: Read[CreditcardRow] = new Read[CreditcardRow](
+    gets = List(
+      (Get[CreditcardId], Nullability.NoNulls),
+      (Get[/* max 50 chars */ String], Nullability.NoNulls),
+      (Get[/* max 25 chars */ String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
+      creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 0),
+      cardtype = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
+      cardnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
+      expmonth = Get[Int].unsafeGetNonNullable(rs, i + 3),
+      expyear = Get[Int].unsafeGetNonNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

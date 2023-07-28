@@ -11,24 +11,11 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `production.productproductphoto` */
 case class ProductproductphotoId(productid: ProductId, productphotoid: ProductphotoId)
 object ProductproductphotoId {
+  implicit val decoder: Decoder[ProductproductphotoId] = Decoder.forProduct2[ProductproductphotoId, ProductId, ProductphotoId]("productid", "productphotoid")(ProductproductphotoId.apply)
+  implicit val encoder: Encoder[ProductproductphotoId] = Encoder.forProduct2[ProductproductphotoId, ProductId, ProductphotoId]("productid", "productphotoid")(x => (x.productid, x.productphotoid))
   implicit val ordering: Ordering[ProductproductphotoId] = Ordering.by(x => (x.productid, x.productphotoid))
-  implicit val decoder: Decoder[ProductproductphotoId] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        productphotoid <- c.downField("productphotoid").as[ProductphotoId]
-      } yield ProductproductphotoId(productid, productphotoid)
-  implicit val encoder: Encoder[ProductproductphotoId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "productphotoid" := row.productphotoid
-      )}
 }

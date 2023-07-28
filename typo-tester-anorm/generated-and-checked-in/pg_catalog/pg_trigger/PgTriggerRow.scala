@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTriggerRow(
@@ -41,82 +43,78 @@ case class PgTriggerRow(
 )
 
 object PgTriggerRow {
-  def rowParser(idx: Int): RowParser[PgTriggerRow] =
-    RowParser[PgTriggerRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTriggerRow] = Reads[PgTriggerRow](json => JsResult.fromTry(
+      Try(
         PgTriggerRow(
-          oid = row[PgTriggerId](idx + 0),
-          tgrelid = row[/* oid */ Long](idx + 1),
-          tgparentid = row[/* oid */ Long](idx + 2),
-          tgname = row[String](idx + 3),
-          tgfoid = row[/* oid */ Long](idx + 4),
-          tgtype = row[Int](idx + 5),
-          tgenabled = row[String](idx + 6),
-          tgisinternal = row[Boolean](idx + 7),
-          tgconstrrelid = row[/* oid */ Long](idx + 8),
-          tgconstrindid = row[/* oid */ Long](idx + 9),
-          tgconstraint = row[/* oid */ Long](idx + 10),
-          tgdeferrable = row[Boolean](idx + 11),
-          tginitdeferred = row[Boolean](idx + 12),
-          tgnargs = row[Int](idx + 13),
-          tgattr = row[TypoInt2Vector](idx + 14),
-          tgargs = row[Array[Byte]](idx + 15),
-          tgqual = row[Option[TypoPgNodeTree]](idx + 16),
-          tgoldtable = row[Option[String]](idx + 17),
-          tgnewtable = row[Option[String]](idx + 18)
+          oid = json.\("oid").as[PgTriggerId],
+          tgrelid = json.\("tgrelid").as[/* oid */ Long],
+          tgparentid = json.\("tgparentid").as[/* oid */ Long],
+          tgname = json.\("tgname").as[String],
+          tgfoid = json.\("tgfoid").as[/* oid */ Long],
+          tgtype = json.\("tgtype").as[Int],
+          tgenabled = json.\("tgenabled").as[String],
+          tgisinternal = json.\("tgisinternal").as[Boolean],
+          tgconstrrelid = json.\("tgconstrrelid").as[/* oid */ Long],
+          tgconstrindid = json.\("tgconstrindid").as[/* oid */ Long],
+          tgconstraint = json.\("tgconstraint").as[/* oid */ Long],
+          tgdeferrable = json.\("tgdeferrable").as[Boolean],
+          tginitdeferred = json.\("tginitdeferred").as[Boolean],
+          tgnargs = json.\("tgnargs").as[Int],
+          tgattr = json.\("tgattr").as[TypoInt2Vector],
+          tgargs = json.\("tgargs").as[Array[Byte]],
+          tgqual = json.\("tgqual").toOption.map(_.as[TypoPgNodeTree]),
+          tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
+          tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTriggerRow] = new OFormat[PgTriggerRow]{
-    override def writes(o: PgTriggerRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "tgrelid" -> o.tgrelid,
-        "tgparentid" -> o.tgparentid,
-        "tgname" -> o.tgname,
-        "tgfoid" -> o.tgfoid,
-        "tgtype" -> o.tgtype,
-        "tgenabled" -> o.tgenabled,
-        "tgisinternal" -> o.tgisinternal,
-        "tgconstrrelid" -> o.tgconstrrelid,
-        "tgconstrindid" -> o.tgconstrindid,
-        "tgconstraint" -> o.tgconstraint,
-        "tgdeferrable" -> o.tgdeferrable,
-        "tginitdeferred" -> o.tginitdeferred,
-        "tgnargs" -> o.tgnargs,
-        "tgattr" -> o.tgattr,
-        "tgargs" -> o.tgargs,
-        "tgqual" -> o.tgqual,
-        "tgoldtable" -> o.tgoldtable,
-        "tgnewtable" -> o.tgnewtable
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTriggerRow] = RowParser[PgTriggerRow] { row =>
+    Success(
+      PgTriggerRow(
+        oid = row[PgTriggerId](idx + 0),
+        tgrelid = row[/* oid */ Long](idx + 1),
+        tgparentid = row[/* oid */ Long](idx + 2),
+        tgname = row[String](idx + 3),
+        tgfoid = row[/* oid */ Long](idx + 4),
+        tgtype = row[Int](idx + 5),
+        tgenabled = row[String](idx + 6),
+        tgisinternal = row[Boolean](idx + 7),
+        tgconstrrelid = row[/* oid */ Long](idx + 8),
+        tgconstrindid = row[/* oid */ Long](idx + 9),
+        tgconstraint = row[/* oid */ Long](idx + 10),
+        tgdeferrable = row[Boolean](idx + 11),
+        tginitdeferred = row[Boolean](idx + 12),
+        tgnargs = row[Int](idx + 13),
+        tgattr = row[TypoInt2Vector](idx + 14),
+        tgargs = row[Array[Byte]](idx + 15),
+        tgqual = row[Option[TypoPgNodeTree]](idx + 16),
+        tgoldtable = row[Option[String]](idx + 17),
+        tgnewtable = row[Option[String]](idx + 18)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTriggerRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTriggerRow(
-            oid = json.\("oid").as[PgTriggerId],
-            tgrelid = json.\("tgrelid").as[/* oid */ Long],
-            tgparentid = json.\("tgparentid").as[/* oid */ Long],
-            tgname = json.\("tgname").as[String],
-            tgfoid = json.\("tgfoid").as[/* oid */ Long],
-            tgtype = json.\("tgtype").as[Int],
-            tgenabled = json.\("tgenabled").as[String],
-            tgisinternal = json.\("tgisinternal").as[Boolean],
-            tgconstrrelid = json.\("tgconstrrelid").as[/* oid */ Long],
-            tgconstrindid = json.\("tgconstrindid").as[/* oid */ Long],
-            tgconstraint = json.\("tgconstraint").as[/* oid */ Long],
-            tgdeferrable = json.\("tgdeferrable").as[Boolean],
-            tginitdeferred = json.\("tginitdeferred").as[Boolean],
-            tgnargs = json.\("tgnargs").as[Int],
-            tgattr = json.\("tgattr").as[TypoInt2Vector],
-            tgargs = json.\("tgargs").as[Array[Byte]],
-            tgqual = json.\("tgqual").toOption.map(_.as[TypoPgNodeTree]),
-            tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
-            tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTriggerRow] = OWrites[PgTriggerRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "tgrelid" -> Json.toJson(o.tgrelid),
+      "tgparentid" -> Json.toJson(o.tgparentid),
+      "tgname" -> Json.toJson(o.tgname),
+      "tgfoid" -> Json.toJson(o.tgfoid),
+      "tgtype" -> Json.toJson(o.tgtype),
+      "tgenabled" -> Json.toJson(o.tgenabled),
+      "tgisinternal" -> Json.toJson(o.tgisinternal),
+      "tgconstrrelid" -> Json.toJson(o.tgconstrrelid),
+      "tgconstrindid" -> Json.toJson(o.tgconstrindid),
+      "tgconstraint" -> Json.toJson(o.tgconstraint),
+      "tgdeferrable" -> Json.toJson(o.tgdeferrable),
+      "tginitdeferred" -> Json.toJson(o.tginitdeferred),
+      "tgnargs" -> Json.toJson(o.tgnargs),
+      "tgattr" -> Json.toJson(o.tgattr),
+      "tgargs" -> Json.toJson(o.tgargs),
+      "tgqual" -> Json.toJson(o.tgqual),
+      "tgoldtable" -> Json.toJson(o.tgoldtable),
+      "tgnewtable" -> Json.toJson(o.tgnewtable)
+    ))
+  )
 }

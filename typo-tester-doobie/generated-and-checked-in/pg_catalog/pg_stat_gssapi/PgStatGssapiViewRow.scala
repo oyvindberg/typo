@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_gssapi
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatGssapiViewRow(
@@ -24,38 +22,20 @@ case class PgStatGssapiViewRow(
 )
 
 object PgStatGssapiViewRow {
-  implicit val decoder: Decoder[PgStatGssapiViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        gssAuthenticated <- c.downField("gss_authenticated").as[Option[Boolean]]
-        principal <- c.downField("principal").as[Option[String]]
-        encrypted <- c.downField("encrypted").as[Option[Boolean]]
-      } yield PgStatGssapiViewRow(pid, gssAuthenticated, principal, encrypted)
-  implicit val encoder: Encoder[PgStatGssapiViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "gss_authenticated" := row.gssAuthenticated,
-        "principal" := row.principal,
-        "encrypted" := row.encrypted
-      )}
-  implicit val read: Read[PgStatGssapiViewRow] =
-    new Read[PgStatGssapiViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatGssapiViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        gssAuthenticated = Get[Boolean].unsafeGetNullable(rs, i + 1),
-        principal = Get[String].unsafeGetNullable(rs, i + 2),
-        encrypted = Get[Boolean].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgStatGssapiViewRow] = Decoder.forProduct4[PgStatGssapiViewRow, Option[Int], Option[Boolean], Option[String], Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(PgStatGssapiViewRow.apply)
+  implicit val encoder: Encoder[PgStatGssapiViewRow] = Encoder.forProduct4[PgStatGssapiViewRow, Option[Int], Option[Boolean], Option[String], Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(x => (x.pid, x.gssAuthenticated, x.principal, x.encrypted))
+  implicit val read: Read[PgStatGssapiViewRow] = new Read[PgStatGssapiViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatGssapiViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      gssAuthenticated = Get[Boolean].unsafeGetNullable(rs, i + 1),
+      principal = Get[String].unsafeGetNullable(rs, i + 2),
+      encrypted = Get[Boolean].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

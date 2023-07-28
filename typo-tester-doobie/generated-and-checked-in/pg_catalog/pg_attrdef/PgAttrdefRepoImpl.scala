@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def delete(oid: PgAttrdefId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_attrdef where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_attrdef where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAttrdefRow): ConnectionIO[PgAttrdefRow] = {
     sql"""insert into pg_catalog.pg_attrdef(oid, adrelid, adnum, adbin)
@@ -25,10 +25,10 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef".query[PgAttrdefRow].stream
   }
   override def selectById(oid: PgAttrdefId): ConnectionIO[Option[PgAttrdefRow]] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = $oid".query[PgAttrdefRow].option
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ${oid}".query[PgAttrdefRow].option
   }
   override def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY($oids)".query[PgAttrdefRow].stream
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${oids})".query[PgAttrdefRow].stream
   }
   override def update(row: PgAttrdefRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -36,7 +36,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
           set adrelid = ${row.adrelid}::oid,
               adnum = ${row.adnum}::int2,
               adbin = ${row.adbin}::pg_node_tree
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

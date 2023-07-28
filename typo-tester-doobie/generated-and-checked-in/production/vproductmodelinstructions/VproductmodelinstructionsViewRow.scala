@@ -7,18 +7,16 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class VproductmodelinstructionsViewRow(
@@ -37,70 +35,38 @@ case class VproductmodelinstructionsViewRow(
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object VproductmodelinstructionsViewRow {
-  implicit val decoder: Decoder[VproductmodelinstructionsViewRow] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
-        name <- c.downField("name").as[Option[Name]]
-        instructions <- c.downField("instructions").as[Option[TypoXml]]
-        LocationID <- c.downField("LocationID").as[Option[Int]]
-        SetupHours <- c.downField("SetupHours").as[Option[BigDecimal]]
-        MachineHours <- c.downField("MachineHours").as[Option[BigDecimal]]
-        LaborHours <- c.downField("LaborHours").as[Option[BigDecimal]]
-        LotSize <- c.downField("LotSize").as[Option[Int]]
-        Step <- c.downField("Step").as[Option[/* max 1024 chars */ String]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield VproductmodelinstructionsViewRow(productmodelid, name, instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate)
-  implicit val encoder: Encoder[VproductmodelinstructionsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "name" := row.name,
-        "instructions" := row.instructions,
-        "LocationID" := row.LocationID,
-        "SetupHours" := row.SetupHours,
-        "MachineHours" := row.MachineHours,
-        "LaborHours" := row.LaborHours,
-        "LotSize" := row.LotSize,
-        "Step" := row.Step,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[VproductmodelinstructionsViewRow] =
-    new Read[VproductmodelinstructionsViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VproductmodelinstructionsViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        instructions = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-        LocationID = Get[Int].unsafeGetNullable(rs, i + 3),
-        SetupHours = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        MachineHours = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        LaborHours = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        LotSize = Get[Int].unsafeGetNullable(rs, i + 7),
-        Step = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 8),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[VproductmodelinstructionsViewRow] = Decoder.forProduct11[VproductmodelinstructionsViewRow, Option[ProductmodelId], Option[Name], Option[TypoXml], Option[Int], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[Int], Option[/* max 1024 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate")(VproductmodelinstructionsViewRow.apply)
+  implicit val encoder: Encoder[VproductmodelinstructionsViewRow] = Encoder.forProduct11[VproductmodelinstructionsViewRow, Option[ProductmodelId], Option[Name], Option[TypoXml], Option[Int], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[Int], Option[/* max 1024 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.instructions, x.LocationID, x.SetupHours, x.MachineHours, x.LaborHours, x.LotSize, x.Step, x.rowguid, x.modifieddate))
+  implicit val read: Read[VproductmodelinstructionsViewRow] = new Read[VproductmodelinstructionsViewRow](
+    gets = List(
+      (Get[ProductmodelId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 1024 chars */ String], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VproductmodelinstructionsViewRow(
+      productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNullable(rs, i + 1),
+      instructions = Get[TypoXml].unsafeGetNullable(rs, i + 2),
+      LocationID = Get[Int].unsafeGetNullable(rs, i + 3),
+      SetupHours = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+      MachineHours = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
+      LaborHours = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
+      LotSize = Get[Int].unsafeGetNullable(rs, i + 7),
+      Step = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 8),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

@@ -9,26 +9,11 @@ package pg_statistic
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `pg_catalog.pg_statistic` */
 case class PgStatisticId(starelid: /* oid */ Long, staattnum: Int, stainherit: Boolean)
 object PgStatisticId {
+  implicit val decoder: Decoder[PgStatisticId] = Decoder.forProduct3[PgStatisticId, /* oid */ Long, Int, Boolean]("starelid", "staattnum", "stainherit")(PgStatisticId.apply)
+  implicit val encoder: Encoder[PgStatisticId] = Encoder.forProduct3[PgStatisticId, /* oid */ Long, Int, Boolean]("starelid", "staattnum", "stainherit")(x => (x.starelid, x.staattnum, x.stainherit))
   implicit val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
-  implicit val decoder: Decoder[PgStatisticId] =
-    (c: HCursor) =>
-      for {
-        starelid <- c.downField("starelid").as[/* oid */ Long]
-        staattnum <- c.downField("staattnum").as[Int]
-        stainherit <- c.downField("stainherit").as[Boolean]
-      } yield PgStatisticId(starelid, staattnum, stainherit)
-  implicit val encoder: Encoder[PgStatisticId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "starelid" := row.starelid,
-        "staattnum" := row.staattnum,
-        "stainherit" := row.stainherit
-      )}
 }

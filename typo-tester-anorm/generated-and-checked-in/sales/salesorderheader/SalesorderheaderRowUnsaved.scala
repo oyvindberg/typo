@@ -8,6 +8,7 @@ package sales
 package salesorderheader
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
@@ -18,21 +19,22 @@ import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderheader` which has not been persisted yet */
 case class SalesorderheaderRowUnsaved(
   /** Date the order is due to the customer. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Date the order was shipped to the customer. */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Customer purchase order number reference. */
   purchaseordernumber: Option[OrderNumber],
   /** Financial accounting number reference. */
@@ -75,7 +77,7 @@ case class SalesorderheaderRowUnsaved(
   revisionnumber: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Dates the sales order was created. */
-  orderdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  orderdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1
       Order current status. 1 = In process; 2 = Approved; 3 = Backordered; 4 = Rejected; 5 = Shipped; 6 = Cancelled */
   status: Defaulted[Int] = Defaulted.UseDefault,
@@ -94,9 +96,9 @@ case class SalesorderheaderRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => Int, orderdateDefault: => LocalDateTime, statusDefault: => Int, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesorderheaderRow =
+  def toRow(salesorderidDefault: => SalesorderheaderId, revisionnumberDefault: => Int, orderdateDefault: => TypoLocalDateTime, statusDefault: => Int, onlineorderflagDefault: => Flag, subtotalDefault: => BigDecimal, taxamtDefault: => BigDecimal, freightDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderheaderRow =
     SalesorderheaderRow(
       duedate = duedate,
       shipdate = shipdate,
@@ -156,68 +158,65 @@ case class SalesorderheaderRowUnsaved(
     )
 }
 object SalesorderheaderRowUnsaved {
-  implicit val oFormat: OFormat[SalesorderheaderRowUnsaved] = new OFormat[SalesorderheaderRowUnsaved]{
-    override def writes(o: SalesorderheaderRowUnsaved): JsObject =
-      Json.obj(
-        "duedate" -> o.duedate,
-        "shipdate" -> o.shipdate,
-        "purchaseordernumber" -> o.purchaseordernumber,
-        "accountnumber" -> o.accountnumber,
-        "customerid" -> o.customerid,
-        "salespersonid" -> o.salespersonid,
-        "territoryid" -> o.territoryid,
-        "billtoaddressid" -> o.billtoaddressid,
-        "shiptoaddressid" -> o.shiptoaddressid,
-        "shipmethodid" -> o.shipmethodid,
-        "creditcardid" -> o.creditcardid,
-        "creditcardapprovalcode" -> o.creditcardapprovalcode,
-        "currencyrateid" -> o.currencyrateid,
-        "totaldue" -> o.totaldue,
-        "comment" -> o.comment,
-        "salesorderid" -> o.salesorderid,
-        "revisionnumber" -> o.revisionnumber,
-        "orderdate" -> o.orderdate,
-        "status" -> o.status,
-        "onlineorderflag" -> o.onlineorderflag,
-        "subtotal" -> o.subtotal,
-        "taxamt" -> o.taxamt,
-        "freight" -> o.freight,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[SalesorderheaderRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          SalesorderheaderRowUnsaved(
-            duedate = json.\("duedate").as[LocalDateTime],
-            shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
-            purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
-            accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
-            customerid = json.\("customerid").as[CustomerId],
-            salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-            billtoaddressid = json.\("billtoaddressid").as[AddressId],
-            shiptoaddressid = json.\("shiptoaddressid").as[AddressId],
-            shipmethodid = json.\("shipmethodid").as[ShipmethodId],
-            creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-            creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
-            currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
-            totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
-            comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
-            salesorderid = json.\("salesorderid").as[Defaulted[SalesorderheaderId]],
-            revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
-            orderdate = json.\("orderdate").as[Defaulted[LocalDateTime]],
-            status = json.\("status").as[Defaulted[Int]],
-            onlineorderflag = json.\("onlineorderflag").as[Defaulted[Flag]],
-            subtotal = json.\("subtotal").as[Defaulted[BigDecimal]],
-            taxamt = json.\("taxamt").as[Defaulted[BigDecimal]],
-            freight = json.\("freight").as[Defaulted[BigDecimal]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[SalesorderheaderRowUnsaved] = Reads[SalesorderheaderRowUnsaved](json => JsResult.fromTry(
+      Try(
+        SalesorderheaderRowUnsaved(
+          duedate = json.\("duedate").as[TypoLocalDateTime],
+          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
+          purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
+          accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
+          customerid = json.\("customerid").as[CustomerId],
+          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
+          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
+          billtoaddressid = json.\("billtoaddressid").as[AddressId],
+          shiptoaddressid = json.\("shiptoaddressid").as[AddressId],
+          shipmethodid = json.\("shipmethodid").as[ShipmethodId],
+          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
+          creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
+          currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
+          totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
+          comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
+          salesorderid = json.\("salesorderid").as[Defaulted[SalesorderheaderId]],
+          revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
+          orderdate = json.\("orderdate").as[Defaulted[TypoLocalDateTime]],
+          status = json.\("status").as[Defaulted[Int]],
+          onlineorderflag = json.\("onlineorderflag").as[Defaulted[Flag]],
+          subtotal = json.\("subtotal").as[Defaulted[BigDecimal]],
+          taxamt = json.\("taxamt").as[Defaulted[BigDecimal]],
+          freight = json.\("freight").as[Defaulted[BigDecimal]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalesorderheaderRowUnsaved] = OWrites[SalesorderheaderRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "duedate" -> Json.toJson(o.duedate),
+      "shipdate" -> Json.toJson(o.shipdate),
+      "purchaseordernumber" -> Json.toJson(o.purchaseordernumber),
+      "accountnumber" -> Json.toJson(o.accountnumber),
+      "customerid" -> Json.toJson(o.customerid),
+      "salespersonid" -> Json.toJson(o.salespersonid),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "billtoaddressid" -> Json.toJson(o.billtoaddressid),
+      "shiptoaddressid" -> Json.toJson(o.shiptoaddressid),
+      "shipmethodid" -> Json.toJson(o.shipmethodid),
+      "creditcardid" -> Json.toJson(o.creditcardid),
+      "creditcardapprovalcode" -> Json.toJson(o.creditcardapprovalcode),
+      "currencyrateid" -> Json.toJson(o.currencyrateid),
+      "totaldue" -> Json.toJson(o.totaldue),
+      "comment" -> Json.toJson(o.comment),
+      "salesorderid" -> Json.toJson(o.salesorderid),
+      "revisionnumber" -> Json.toJson(o.revisionnumber),
+      "orderdate" -> Json.toJson(o.orderdate),
+      "status" -> Json.toJson(o.status),
+      "onlineorderflag" -> Json.toJson(o.onlineorderflag),
+      "subtotal" -> Json.toJson(o.subtotal),
+      "taxamt" -> Json.toJson(o.taxamt),
+      "freight" -> Json.toJson(o.freight),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

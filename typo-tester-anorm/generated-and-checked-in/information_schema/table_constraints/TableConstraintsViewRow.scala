@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TableConstraintsViewRow(
@@ -33,55 +35,51 @@ case class TableConstraintsViewRow(
 )
 
 object TableConstraintsViewRow {
-  def rowParser(idx: Int): RowParser[TableConstraintsViewRow] =
-    RowParser[TableConstraintsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[TableConstraintsViewRow] = Reads[TableConstraintsViewRow](json => JsResult.fromTry(
+      Try(
         TableConstraintsViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
-          constraintSchema = row[Option[SqlIdentifier]](idx + 1),
-          constraintName = row[Option[SqlIdentifier]](idx + 2),
-          tableCatalog = row[Option[SqlIdentifier]](idx + 3),
-          tableSchema = row[Option[SqlIdentifier]](idx + 4),
-          tableName = row[Option[SqlIdentifier]](idx + 5),
-          constraintType = row[Option[CharacterData]](idx + 6),
-          isDeferrable = row[Option[YesOrNo]](idx + 7),
-          initiallyDeferred = row[Option[YesOrNo]](idx + 8),
-          enforced = row[Option[YesOrNo]](idx + 9)
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
+          constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          constraintType = json.\("constraint_type").toOption.map(_.as[CharacterData]),
+          isDeferrable = json.\("is_deferrable").toOption.map(_.as[YesOrNo]),
+          initiallyDeferred = json.\("initially_deferred").toOption.map(_.as[YesOrNo]),
+          enforced = json.\("enforced").toOption.map(_.as[YesOrNo])
         )
       )
-    }
-  implicit val oFormat: OFormat[TableConstraintsViewRow] = new OFormat[TableConstraintsViewRow]{
-    override def writes(o: TableConstraintsViewRow): JsObject =
-      Json.obj(
-        "constraint_catalog" -> o.constraintCatalog,
-        "constraint_schema" -> o.constraintSchema,
-        "constraint_name" -> o.constraintName,
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "constraint_type" -> o.constraintType,
-        "is_deferrable" -> o.isDeferrable,
-        "initially_deferred" -> o.initiallyDeferred,
-        "enforced" -> o.enforced
+    ),
+  )
+  def rowParser(idx: Int): RowParser[TableConstraintsViewRow] = RowParser[TableConstraintsViewRow] { row =>
+    Success(
+      TableConstraintsViewRow(
+        constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
+        constraintSchema = row[Option[SqlIdentifier]](idx + 1),
+        constraintName = row[Option[SqlIdentifier]](idx + 2),
+        tableCatalog = row[Option[SqlIdentifier]](idx + 3),
+        tableSchema = row[Option[SqlIdentifier]](idx + 4),
+        tableName = row[Option[SqlIdentifier]](idx + 5),
+        constraintType = row[Option[CharacterData]](idx + 6),
+        isDeferrable = row[Option[YesOrNo]](idx + 7),
+        initiallyDeferred = row[Option[YesOrNo]](idx + 8),
+        enforced = row[Option[YesOrNo]](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[TableConstraintsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          TableConstraintsViewRow(
-            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-            constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
-            constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            constraintType = json.\("constraint_type").toOption.map(_.as[CharacterData]),
-            isDeferrable = json.\("is_deferrable").toOption.map(_.as[YesOrNo]),
-            initiallyDeferred = json.\("initially_deferred").toOption.map(_.as[YesOrNo]),
-            enforced = json.\("enforced").toOption.map(_.as[YesOrNo])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[TableConstraintsViewRow] = OWrites[TableConstraintsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "constraint_catalog" -> Json.toJson(o.constraintCatalog),
+      "constraint_schema" -> Json.toJson(o.constraintSchema),
+      "constraint_name" -> Json.toJson(o.constraintName),
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "constraint_type" -> Json.toJson(o.constraintType),
+      "is_deferrable" -> Json.toJson(o.isDeferrable),
+      "initially_deferred" -> Json.toJson(o.initiallyDeferred),
+      "enforced" -> Json.toJson(o.enforced)
+    ))
+  )
 }

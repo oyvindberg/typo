@@ -7,15 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication_slots
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatReplicationSlotsViewRow(
   /** Points to [[pg_replication_slots.PgReplicationSlotsViewRow.slotName]] */
@@ -28,66 +26,36 @@ case class PgStatReplicationSlotsViewRow(
   streamBytes: Option[Long],
   totalTxns: Option[Long],
   totalBytes: Option[Long],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatReplicationSlotsViewRow {
-  implicit val decoder: Decoder[PgStatReplicationSlotsViewRow] =
-    (c: HCursor) =>
-      for {
-        slotName <- c.downField("slot_name").as[Option[String]]
-        spillTxns <- c.downField("spill_txns").as[Option[Long]]
-        spillCount <- c.downField("spill_count").as[Option[Long]]
-        spillBytes <- c.downField("spill_bytes").as[Option[Long]]
-        streamTxns <- c.downField("stream_txns").as[Option[Long]]
-        streamCount <- c.downField("stream_count").as[Option[Long]]
-        streamBytes <- c.downField("stream_bytes").as[Option[Long]]
-        totalTxns <- c.downField("total_txns").as[Option[Long]]
-        totalBytes <- c.downField("total_bytes").as[Option[Long]]
-        statsReset <- c.downField("stats_reset").as[Option[OffsetDateTime]]
-      } yield PgStatReplicationSlotsViewRow(slotName, spillTxns, spillCount, spillBytes, streamTxns, streamCount, streamBytes, totalTxns, totalBytes, statsReset)
-  implicit val encoder: Encoder[PgStatReplicationSlotsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "slot_name" := row.slotName,
-        "spill_txns" := row.spillTxns,
-        "spill_count" := row.spillCount,
-        "spill_bytes" := row.spillBytes,
-        "stream_txns" := row.streamTxns,
-        "stream_count" := row.streamCount,
-        "stream_bytes" := row.streamBytes,
-        "total_txns" := row.totalTxns,
-        "total_bytes" := row.totalBytes,
-        "stats_reset" := row.statsReset
-      )}
-  implicit val read: Read[PgStatReplicationSlotsViewRow] =
-    new Read[PgStatReplicationSlotsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatReplicationSlotsViewRow(
-        slotName = Get[String].unsafeGetNullable(rs, i + 0),
-        spillTxns = Get[Long].unsafeGetNullable(rs, i + 1),
-        spillCount = Get[Long].unsafeGetNullable(rs, i + 2),
-        spillBytes = Get[Long].unsafeGetNullable(rs, i + 3),
-        streamTxns = Get[Long].unsafeGetNullable(rs, i + 4),
-        streamCount = Get[Long].unsafeGetNullable(rs, i + 5),
-        streamBytes = Get[Long].unsafeGetNullable(rs, i + 6),
-        totalTxns = Get[Long].unsafeGetNullable(rs, i + 7),
-        totalBytes = Get[Long].unsafeGetNullable(rs, i + 8),
-        statsReset = Get[OffsetDateTime].unsafeGetNullable(rs, i + 9)
-      )
+  implicit val decoder: Decoder[PgStatReplicationSlotsViewRow] = Decoder.forProduct10[PgStatReplicationSlotsViewRow, Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(PgStatReplicationSlotsViewRow.apply)
+  implicit val encoder: Encoder[PgStatReplicationSlotsViewRow] = Encoder.forProduct10[PgStatReplicationSlotsViewRow, Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("slot_name", "spill_txns", "spill_count", "spill_bytes", "stream_txns", "stream_count", "stream_bytes", "total_txns", "total_bytes", "stats_reset")(x => (x.slotName, x.spillTxns, x.spillCount, x.spillBytes, x.streamTxns, x.streamCount, x.streamBytes, x.totalTxns, x.totalBytes, x.statsReset))
+  implicit val read: Read[PgStatReplicationSlotsViewRow] = new Read[PgStatReplicationSlotsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatReplicationSlotsViewRow(
+      slotName = Get[String].unsafeGetNullable(rs, i + 0),
+      spillTxns = Get[Long].unsafeGetNullable(rs, i + 1),
+      spillCount = Get[Long].unsafeGetNullable(rs, i + 2),
+      spillBytes = Get[Long].unsafeGetNullable(rs, i + 3),
+      streamTxns = Get[Long].unsafeGetNullable(rs, i + 4),
+      streamCount = Get[Long].unsafeGetNullable(rs, i + 5),
+      streamBytes = Get[Long].unsafeGetNullable(rs, i + 6),
+      totalTxns = Get[Long].unsafeGetNullable(rs, i + 7),
+      totalBytes = Get[Long].unsafeGetNullable(rs, i + 8),
+      statsReset = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 9)
     )
-  
-
+  )
 }

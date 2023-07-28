@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_backend_memory_contexts
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgBackendMemoryContextsViewRow(
@@ -29,58 +27,30 @@ case class PgBackendMemoryContextsViewRow(
 )
 
 object PgBackendMemoryContextsViewRow {
-  implicit val decoder: Decoder[PgBackendMemoryContextsViewRow] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Option[String]]
-        ident <- c.downField("ident").as[Option[String]]
-        parent <- c.downField("parent").as[Option[String]]
-        level <- c.downField("level").as[Option[Int]]
-        totalBytes <- c.downField("total_bytes").as[Option[Long]]
-        totalNblocks <- c.downField("total_nblocks").as[Option[Long]]
-        freeBytes <- c.downField("free_bytes").as[Option[Long]]
-        freeChunks <- c.downField("free_chunks").as[Option[Long]]
-        usedBytes <- c.downField("used_bytes").as[Option[Long]]
-      } yield PgBackendMemoryContextsViewRow(name, ident, parent, level, totalBytes, totalNblocks, freeBytes, freeChunks, usedBytes)
-  implicit val encoder: Encoder[PgBackendMemoryContextsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "ident" := row.ident,
-        "parent" := row.parent,
-        "level" := row.level,
-        "total_bytes" := row.totalBytes,
-        "total_nblocks" := row.totalNblocks,
-        "free_bytes" := row.freeBytes,
-        "free_chunks" := row.freeChunks,
-        "used_bytes" := row.usedBytes
-      )}
-  implicit val read: Read[PgBackendMemoryContextsViewRow] =
-    new Read[PgBackendMemoryContextsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgBackendMemoryContextsViewRow(
-        name = Get[String].unsafeGetNullable(rs, i + 0),
-        ident = Get[String].unsafeGetNullable(rs, i + 1),
-        parent = Get[String].unsafeGetNullable(rs, i + 2),
-        level = Get[Int].unsafeGetNullable(rs, i + 3),
-        totalBytes = Get[Long].unsafeGetNullable(rs, i + 4),
-        totalNblocks = Get[Long].unsafeGetNullable(rs, i + 5),
-        freeBytes = Get[Long].unsafeGetNullable(rs, i + 6),
-        freeChunks = Get[Long].unsafeGetNullable(rs, i + 7),
-        usedBytes = Get[Long].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgBackendMemoryContextsViewRow] = Decoder.forProduct9[PgBackendMemoryContextsViewRow, Option[String], Option[String], Option[String], Option[Int], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("name", "ident", "parent", "level", "total_bytes", "total_nblocks", "free_bytes", "free_chunks", "used_bytes")(PgBackendMemoryContextsViewRow.apply)
+  implicit val encoder: Encoder[PgBackendMemoryContextsViewRow] = Encoder.forProduct9[PgBackendMemoryContextsViewRow, Option[String], Option[String], Option[String], Option[Int], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("name", "ident", "parent", "level", "total_bytes", "total_nblocks", "free_bytes", "free_chunks", "used_bytes")(x => (x.name, x.ident, x.parent, x.level, x.totalBytes, x.totalNblocks, x.freeBytes, x.freeChunks, x.usedBytes))
+  implicit val read: Read[PgBackendMemoryContextsViewRow] = new Read[PgBackendMemoryContextsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgBackendMemoryContextsViewRow(
+      name = Get[String].unsafeGetNullable(rs, i + 0),
+      ident = Get[String].unsafeGetNullable(rs, i + 1),
+      parent = Get[String].unsafeGetNullable(rs, i + 2),
+      level = Get[Int].unsafeGetNullable(rs, i + 3),
+      totalBytes = Get[Long].unsafeGetNullable(rs, i + 4),
+      totalNblocks = Get[Long].unsafeGetNullable(rs, i + 5),
+      freeBytes = Get[Long].unsafeGetNullable(rs, i + 6),
+      freeChunks = Get[Long].unsafeGetNullable(rs, i + 7),
+      usedBytes = Get[Long].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

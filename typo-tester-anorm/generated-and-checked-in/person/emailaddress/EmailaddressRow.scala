@@ -7,16 +7,18 @@ package adventureworks
 package person
 package emailaddress
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EmailaddressRow(
@@ -28,46 +30,42 @@ case class EmailaddressRow(
   /** E-mail address for the person. */
   emailaddress: Option[/* max 50 chars */ String],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmailaddressId = EmailaddressId(businessentityid, emailaddressid)
  }
 
 object EmailaddressRow {
-  def rowParser(idx: Int): RowParser[EmailaddressRow] =
-    RowParser[EmailaddressRow] { row =>
-      Success(
+  implicit val reads: Reads[EmailaddressRow] = Reads[EmailaddressRow](json => JsResult.fromTry(
+      Try(
         EmailaddressRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          emailaddressid = row[Int](idx + 1),
-          emailaddress = row[Option[/* max 50 chars */ String]](idx + 2),
-          rowguid = row[UUID](idx + 3),
-          modifieddate = row[LocalDateTime](idx + 4)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          emailaddressid = json.\("emailaddressid").as[Int],
+          emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[EmailaddressRow] = new OFormat[EmailaddressRow]{
-    override def writes(o: EmailaddressRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "emailaddressid" -> o.emailaddressid,
-        "emailaddress" -> o.emailaddress,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[EmailaddressRow] = RowParser[EmailaddressRow] { row =>
+    Success(
+      EmailaddressRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        emailaddressid = row[Int](idx + 1),
+        emailaddress = row[Option[/* max 50 chars */ String]](idx + 2),
+        rowguid = row[UUID](idx + 3),
+        modifieddate = row[TypoLocalDateTime](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[EmailaddressRow] = {
-      JsResult.fromTry(
-        Try(
-          EmailaddressRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            emailaddressid = json.\("emailaddressid").as[Int],
-            emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[EmailaddressRow] = OWrites[EmailaddressRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "emailaddressid" -> Json.toJson(o.emailaddressid),
+      "emailaddress" -> Json.toJson(o.emailaddress),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

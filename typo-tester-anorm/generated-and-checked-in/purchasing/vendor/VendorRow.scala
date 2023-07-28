@@ -7,18 +7,20 @@ package adventureworks
 package purchasing
 package vendor
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VendorRow(
@@ -37,53 +39,49 @@ case class VendorRow(
   activeflag: Flag,
   /** Vendor URL. */
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object VendorRow {
-  def rowParser(idx: Int): RowParser[VendorRow] =
-    RowParser[VendorRow] { row =>
-      Success(
+  implicit val reads: Reads[VendorRow] = Reads[VendorRow](json => JsResult.fromTry(
+      Try(
         VendorRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          accountnumber = row[AccountNumber](idx + 1),
-          name = row[Name](idx + 2),
-          creditrating = row[Int](idx + 3),
-          preferredvendorstatus = row[Flag](idx + 4),
-          activeflag = row[Flag](idx + 5),
-          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]](idx + 6),
-          modifieddate = row[LocalDateTime](idx + 7)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          accountnumber = json.\("accountnumber").as[AccountNumber],
+          name = json.\("name").as[Name],
+          creditrating = json.\("creditrating").as[Int],
+          preferredvendorstatus = json.\("preferredvendorstatus").as[Flag],
+          activeflag = json.\("activeflag").as[Flag],
+          purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[VendorRow] = new OFormat[VendorRow]{
-    override def writes(o: VendorRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "accountnumber" -> o.accountnumber,
-        "name" -> o.name,
-        "creditrating" -> o.creditrating,
-        "preferredvendorstatus" -> o.preferredvendorstatus,
-        "activeflag" -> o.activeflag,
-        "purchasingwebserviceurl" -> o.purchasingwebserviceurl,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VendorRow] = RowParser[VendorRow] { row =>
+    Success(
+      VendorRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        accountnumber = row[AccountNumber](idx + 1),
+        name = row[Name](idx + 2),
+        creditrating = row[Int](idx + 3),
+        preferredvendorstatus = row[Flag](idx + 4),
+        activeflag = row[Flag](idx + 5),
+        purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]](idx + 6),
+        modifieddate = row[TypoLocalDateTime](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[VendorRow] = {
-      JsResult.fromTry(
-        Try(
-          VendorRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            accountnumber = json.\("accountnumber").as[AccountNumber],
-            name = json.\("name").as[Name],
-            creditrating = json.\("creditrating").as[Int],
-            preferredvendorstatus = json.\("preferredvendorstatus").as[Flag],
-            activeflag = json.\("activeflag").as[Flag],
-            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VendorRow] = OWrites[VendorRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "accountnumber" -> Json.toJson(o.accountnumber),
+      "name" -> Json.toJson(o.name),
+      "creditrating" -> Json.toJson(o.creditrating),
+      "preferredvendorstatus" -> Json.toJson(o.preferredvendorstatus),
+      "activeflag" -> Json.toJson(o.activeflag),
+      "purchasingwebserviceurl" -> Json.toJson(o.purchasingwebserviceurl),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

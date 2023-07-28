@@ -8,20 +8,20 @@ package production
 package productphoto
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId): ConnectionIO[Boolean] = {
-    sql"delete from production.productphoto where productphotoid = $productphotoid".update.run.map(_ > 0)
+    sql"delete from production.productphoto where productphotoid = ${productphotoid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
           values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
-          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """.query[ProductphotoRow].unique
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow] = {
@@ -36,32 +36,32 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productphoto default values
-            returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+            returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productphoto(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+            returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
          """
     }
     q.query[ProductphotoRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductphotoRow] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto".query[ProductphotoRow].stream
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto".query[ProductphotoRow].stream
   }
   override def selectById(productphotoid: ProductphotoId): ConnectionIO[Option[ProductphotoRow]] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = $productphotoid".query[ProductphotoRow].option
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ${productphotoid}".query[ProductphotoRow].option
   }
   override def selectByIds(productphotoids: Array[ProductphotoId]): Stream[ConnectionIO, ProductphotoRow] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = ANY($productphotoids)".query[ProductphotoRow].stream
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ANY(${productphotoids})".query[ProductphotoRow].stream
   }
   override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
     val productphotoid = row.productphotoid
@@ -71,7 +71,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
               largephoto = ${row.largephoto}::bytea,
               largephotofilename = ${row.largephotofilename},
               modifieddate = ${row.modifieddate}::timestamp
-          where productphotoid = $productphotoid
+          where productphotoid = ${productphotoid}
        """
       .update
       .run
@@ -94,7 +94,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             largephoto = EXCLUDED.largephoto,
             largephotofilename = EXCLUDED.largephotofilename,
             modifieddate = EXCLUDED.modifieddate
-          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """.query[ProductphotoRow].unique
   }
 }

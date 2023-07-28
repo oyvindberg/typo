@@ -8,13 +8,11 @@ package pg_catalog
 package pg_largeobject_metadata
 
 import adventureworks.TypoAclItem
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgLargeobjectMetadataRow(
@@ -24,34 +22,18 @@ case class PgLargeobjectMetadataRow(
 )
 
 object PgLargeobjectMetadataRow {
-  implicit val decoder: Decoder[PgLargeobjectMetadataRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgLargeobjectMetadataId]
-        lomowner <- c.downField("lomowner").as[/* oid */ Long]
-        lomacl <- c.downField("lomacl").as[Option[Array[TypoAclItem]]]
-      } yield PgLargeobjectMetadataRow(oid, lomowner, lomacl)
-  implicit val encoder: Encoder[PgLargeobjectMetadataRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "lomowner" := row.lomowner,
-        "lomacl" := row.lomacl
-      )}
-  implicit val read: Read[PgLargeobjectMetadataRow] =
-    new Read[PgLargeobjectMetadataRow](
-      gets = List(
-        (Get[PgLargeobjectMetadataId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Array[TypoAclItem]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgLargeobjectMetadataRow(
-        oid = Get[PgLargeobjectMetadataId].unsafeGetNonNullable(rs, i + 0),
-        lomowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        lomacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PgLargeobjectMetadataRow] = Decoder.forProduct3[PgLargeobjectMetadataRow, PgLargeobjectMetadataId, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lomowner", "lomacl")(PgLargeobjectMetadataRow.apply)
+  implicit val encoder: Encoder[PgLargeobjectMetadataRow] = Encoder.forProduct3[PgLargeobjectMetadataRow, PgLargeobjectMetadataId, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lomowner", "lomacl")(x => (x.oid, x.lomowner, x.lomacl))
+  implicit val read: Read[PgLargeobjectMetadataRow] = new Read[PgLargeobjectMetadataRow](
+    gets = List(
+      (Get[PgLargeobjectMetadataId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Array[TypoAclItem]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgLargeobjectMetadataRow(
+      oid = Get[PgLargeobjectMetadataId].unsafeGetNonNullable(rs, i + 0),
+      lomowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      lomacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

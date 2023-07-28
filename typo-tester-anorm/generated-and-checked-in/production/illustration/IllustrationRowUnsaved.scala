@@ -8,13 +8,15 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.illustration` which has not been persisted yet */
@@ -25,9 +27,9 @@ case class IllustrationRowUnsaved(
       Primary key for Illustration records. */
   illustrationid: Defaulted[IllustrationId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(illustrationidDefault: => IllustrationId, modifieddateDefault: => LocalDateTime): IllustrationRow =
+  def toRow(illustrationidDefault: => IllustrationId, modifieddateDefault: => TypoLocalDateTime): IllustrationRow =
     IllustrationRow(
       diagram = diagram,
       illustrationid = illustrationid match {
@@ -41,24 +43,21 @@ case class IllustrationRowUnsaved(
     )
 }
 object IllustrationRowUnsaved {
-  implicit val oFormat: OFormat[IllustrationRowUnsaved] = new OFormat[IllustrationRowUnsaved]{
-    override def writes(o: IllustrationRowUnsaved): JsObject =
-      Json.obj(
-        "diagram" -> o.diagram,
-        "illustrationid" -> o.illustrationid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[IllustrationRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          IllustrationRowUnsaved(
-            diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
-            illustrationid = json.\("illustrationid").as[Defaulted[IllustrationId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[IllustrationRowUnsaved] = Reads[IllustrationRowUnsaved](json => JsResult.fromTry(
+      Try(
+        IllustrationRowUnsaved(
+          diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
+          illustrationid = json.\("illustrationid").as[Defaulted[IllustrationId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[IllustrationRowUnsaved] = OWrites[IllustrationRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "diagram" -> Json.toJson(o.diagram),
+      "illustrationid" -> Json.toJson(o.illustrationid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

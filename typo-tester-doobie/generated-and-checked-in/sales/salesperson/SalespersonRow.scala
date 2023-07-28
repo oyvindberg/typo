@@ -7,17 +7,15 @@ package adventureworks
 package sales
 package salesperson
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SalespersonRow(
@@ -38,62 +36,34 @@ case class SalespersonRow(
   /** Sales total of previous year. */
   saleslastyear: BigDecimal,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object SalespersonRow {
-  implicit val decoder: Decoder[SalespersonRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        salesquota <- c.downField("salesquota").as[Option[BigDecimal]]
-        bonus <- c.downField("bonus").as[BigDecimal]
-        commissionpct <- c.downField("commissionpct").as[BigDecimal]
-        salesytd <- c.downField("salesytd").as[BigDecimal]
-        saleslastyear <- c.downField("saleslastyear").as[BigDecimal]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield SalespersonRow(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalespersonRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "territoryid" := row.territoryid,
-        "salesquota" := row.salesquota,
-        "bonus" := row.bonus,
-        "commissionpct" := row.commissionpct,
-        "salesytd" := row.salesytd,
-        "saleslastyear" := row.saleslastyear,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SalespersonRow] =
-    new Read[SalespersonRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalespersonRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
-        salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 2),
-        bonus = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        commissionpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
-        salesytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
-        saleslastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[SalespersonRow] = Decoder.forProduct9[SalespersonRow, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SalespersonRow.apply)
+  implicit val encoder: Encoder[SalespersonRow] = Encoder.forProduct9[SalespersonRow, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], BigDecimal, BigDecimal, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))
+  implicit val read: Read[SalespersonRow] = new Read[SalespersonRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[SalesterritoryId], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SalespersonRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
+      salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 2),
+      bonus = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+      commissionpct = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
+      salesytd = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
+      saleslastyear = Get[BigDecimal].unsafeGetNonNullable(rs, i + 6),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

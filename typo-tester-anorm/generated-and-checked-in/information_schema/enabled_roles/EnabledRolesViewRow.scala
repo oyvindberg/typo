@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EnabledRolesViewRow(
@@ -22,28 +24,24 @@ case class EnabledRolesViewRow(
 )
 
 object EnabledRolesViewRow {
-  def rowParser(idx: Int): RowParser[EnabledRolesViewRow] =
-    RowParser[EnabledRolesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[EnabledRolesViewRow] = Reads[EnabledRolesViewRow](json => JsResult.fromTry(
+      Try(
         EnabledRolesViewRow(
-          roleName = row[Option[SqlIdentifier]](idx + 0)
+          roleName = json.\("role_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[EnabledRolesViewRow] = new OFormat[EnabledRolesViewRow]{
-    override def writes(o: EnabledRolesViewRow): JsObject =
-      Json.obj(
-        "role_name" -> o.roleName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[EnabledRolesViewRow] = RowParser[EnabledRolesViewRow] { row =>
+    Success(
+      EnabledRolesViewRow(
+        roleName = row[Option[SqlIdentifier]](idx + 0)
       )
-  
-    override def reads(json: JsValue): JsResult[EnabledRolesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          EnabledRolesViewRow(
-            roleName = json.\("role_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[EnabledRolesViewRow] = OWrites[EnabledRolesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "role_name" -> Json.toJson(o.roleName)
+    ))
+  )
 }

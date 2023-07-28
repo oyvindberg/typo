@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_available_extensions
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgAvailableExtensionsViewRow(
@@ -24,38 +22,20 @@ case class PgAvailableExtensionsViewRow(
 )
 
 object PgAvailableExtensionsViewRow {
-  implicit val decoder: Decoder[PgAvailableExtensionsViewRow] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Option[String]]
-        defaultVersion <- c.downField("default_version").as[Option[String]]
-        installedVersion <- c.downField("installed_version").as[Option[String]]
-        comment <- c.downField("comment").as[Option[String]]
-      } yield PgAvailableExtensionsViewRow(name, defaultVersion, installedVersion, comment)
-  implicit val encoder: Encoder[PgAvailableExtensionsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "default_version" := row.defaultVersion,
-        "installed_version" := row.installedVersion,
-        "comment" := row.comment
-      )}
-  implicit val read: Read[PgAvailableExtensionsViewRow] =
-    new Read[PgAvailableExtensionsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAvailableExtensionsViewRow(
-        name = Get[String].unsafeGetNullable(rs, i + 0),
-        defaultVersion = Get[String].unsafeGetNullable(rs, i + 1),
-        installedVersion = Get[String].unsafeGetNullable(rs, i + 2),
-        comment = Get[String].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgAvailableExtensionsViewRow] = Decoder.forProduct4[PgAvailableExtensionsViewRow, Option[String], Option[String], Option[String], Option[String]]("name", "default_version", "installed_version", "comment")(PgAvailableExtensionsViewRow.apply)
+  implicit val encoder: Encoder[PgAvailableExtensionsViewRow] = Encoder.forProduct4[PgAvailableExtensionsViewRow, Option[String], Option[String], Option[String], Option[String]]("name", "default_version", "installed_version", "comment")(x => (x.name, x.defaultVersion, x.installedVersion, x.comment))
+  implicit val read: Read[PgAvailableExtensionsViewRow] = new Read[PgAvailableExtensionsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAvailableExtensionsViewRow(
+      name = Get[String].unsafeGetNullable(rs, i + 0),
+      defaultVersion = Get[String].unsafeGetNullable(rs, i + 1),
+      installedVersion = Get[String].unsafeGetNullable(rs, i + 2),
+      comment = Get[String].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object SpViewRepoImpl extends SpViewRepo {
   override def selectAll: Stream[ConnectionIO, SpViewRow] = {
-    sql"""select "id", businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sa.sp""".query[SpViewRow].stream
+    sql"""select "id", businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sa.sp""".query[SpViewRow].stream
   }
 }

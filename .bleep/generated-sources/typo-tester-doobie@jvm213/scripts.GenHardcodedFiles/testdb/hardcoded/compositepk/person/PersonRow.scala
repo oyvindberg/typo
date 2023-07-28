@@ -8,13 +8,11 @@ package hardcoded
 package compositepk
 package person
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PersonRow(
@@ -26,34 +24,18 @@ case class PersonRow(
  }
 
 object PersonRow {
-  implicit val decoder: Decoder[PersonRow] =
-    (c: HCursor) =>
-      for {
-        one <- c.downField("one").as[Long]
-        two <- c.downField("two").as[Option[String]]
-        name <- c.downField("name").as[Option[String]]
-      } yield PersonRow(one, two, name)
-  implicit val encoder: Encoder[PersonRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "one" := row.one,
-        "two" := row.two,
-        "name" := row.name
-      )}
-  implicit val read: Read[PersonRow] =
-    new Read[PersonRow](
-      gets = List(
-        (Get[Long], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-        one = Get[Long].unsafeGetNonNullable(rs, i + 0),
-        two = Get[String].unsafeGetNullable(rs, i + 1),
-        name = Get[String].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PersonRow] = Decoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(PersonRow.apply)
+  implicit val encoder: Encoder[PersonRow] = Encoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(x => (x.one, x.two, x.name))
+  implicit val read: Read[PersonRow] = new Read[PersonRow](
+    gets = List(
+      (Get[Long], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
+      one = Get[Long].unsafeGetNonNullable(rs, i + 0),
+      two = Get[String].unsafeGetNullable(rs, i + 1),
+      name = Get[String].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

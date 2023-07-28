@@ -3,7 +3,7 @@ package adventureworks.humanresources.employee
 import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
-import adventureworks.{Defaulted, TypoXml, withConnection}
+import adventureworks.{Defaulted, TypoLocalDate, TypoLocalDateTime, TypoXml, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -47,16 +47,16 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
         nationalidnumber = "9912312312",
         loginid = "loginid",
         jobtitle = "jobtitle",
-        birthdate = LocalDate.of(1950, 1, 1),
+        birthdate = TypoLocalDate(LocalDate.of(1950, 1, 1)),
         maritalstatus = "M",
         gender = "F",
-        hiredate = LocalDate.now().minusYears(1),
+        hiredate = TypoLocalDate(LocalDate.now().minusYears(1)),
         salariedflag = Defaulted.Provided(Flag(true)),
         vacationhours = Defaulted.Provided(1),
         sickleavehours = Defaulted.Provided(2),
         currentflag = Defaulted.Provided(Flag(true)),
         rowguid = Defaulted.Provided(UUID.randomUUID()),
-        modifieddate = Defaulted.Provided(java.time.LocalDateTime.now.withNano(0)),
+        modifieddate = Defaulted.Provided(TypoLocalDateTime.now),
         organizationnode = Defaulted.Provided(Some("/"))
       )
 
@@ -82,10 +82,10 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
           nationalidnumber = "9912312312",
           loginid = "loginid",
           jobtitle = "jobtitle",
-          birthdate = LocalDate.of(1950, 1, 1),
+          birthdate = TypoLocalDate(LocalDate.of(1950, 1, 1)),
           maritalstatus = "M",
           gender = "F",
-          hiredate = LocalDate.now().minusYears(1),
+          hiredate = TypoLocalDate(LocalDate.now().minusYears(1)),
           salariedflag = Defaulted.UseDefault,
           vacationhours = Defaulted.UseDefault,
           sickleavehours = Defaulted.UseDefault,

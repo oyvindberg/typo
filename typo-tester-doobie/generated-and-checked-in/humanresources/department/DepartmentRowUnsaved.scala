@@ -8,12 +8,10 @@ package humanresources
 package department
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `humanresources.department` which has not been persisted yet */
 case class DepartmentRowUnsaved(
@@ -25,9 +23,9 @@ case class DepartmentRowUnsaved(
       Primary key for Department records. */
   departmentid: Defaulted[DepartmentId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(departmentidDefault: => DepartmentId, modifieddateDefault: => LocalDateTime): DepartmentRow =
+  def toRow(departmentidDefault: => DepartmentId, modifieddateDefault: => TypoLocalDateTime): DepartmentRow =
     DepartmentRow(
       name = name,
       groupname = groupname,
@@ -42,21 +40,6 @@ case class DepartmentRowUnsaved(
     )
 }
 object DepartmentRowUnsaved {
-  implicit val decoder: Decoder[DepartmentRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        groupname <- c.downField("groupname").as[Name]
-        departmentid <- c.downField("departmentid").as[Defaulted[DepartmentId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield DepartmentRowUnsaved(name, groupname, departmentid, modifieddate)
-  implicit val encoder: Encoder[DepartmentRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "groupname" := row.groupname,
-        "departmentid" := row.departmentid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[DepartmentRowUnsaved] = Decoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(DepartmentRowUnsaved.apply)
+  implicit val encoder: Encoder[DepartmentRowUnsaved] = Encoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(x => (x.name, x.groupname, x.departmentid, x.modifieddate))
 }

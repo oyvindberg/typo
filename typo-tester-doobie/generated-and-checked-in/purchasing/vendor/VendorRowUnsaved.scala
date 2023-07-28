@@ -8,15 +8,13 @@ package purchasing
 package vendor
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `purchasing.vendor` which has not been persisted yet */
 case class VendorRowUnsaved(
@@ -38,9 +36,9 @@ case class VendorRowUnsaved(
       0 = Vendor no longer used. 1 = Vendor is actively used. */
   activeflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(preferredvendorstatusDefault: => Flag, activeflagDefault: => Flag, modifieddateDefault: => LocalDateTime): VendorRow =
+  def toRow(preferredvendorstatusDefault: => Flag, activeflagDefault: => Flag, modifieddateDefault: => TypoLocalDateTime): VendorRow =
     VendorRow(
       businessentityid = businessentityid,
       accountnumber = accountnumber,
@@ -62,29 +60,6 @@ case class VendorRowUnsaved(
     )
 }
 object VendorRowUnsaved {
-  implicit val decoder: Decoder[VendorRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        accountnumber <- c.downField("accountnumber").as[AccountNumber]
-        name <- c.downField("name").as[Name]
-        creditrating <- c.downField("creditrating").as[Int]
-        purchasingwebserviceurl <- c.downField("purchasingwebserviceurl").as[Option[/* max 1024 chars */ String]]
-        preferredvendorstatus <- c.downField("preferredvendorstatus").as[Defaulted[Flag]]
-        activeflag <- c.downField("activeflag").as[Defaulted[Flag]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield VendorRowUnsaved(businessentityid, accountnumber, name, creditrating, purchasingwebserviceurl, preferredvendorstatus, activeflag, modifieddate)
-  implicit val encoder: Encoder[VendorRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "accountnumber" := row.accountnumber,
-        "name" := row.name,
-        "creditrating" := row.creditrating,
-        "purchasingwebserviceurl" := row.purchasingwebserviceurl,
-        "preferredvendorstatus" := row.preferredvendorstatus,
-        "activeflag" := row.activeflag,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[VendorRowUnsaved] = Decoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, Int, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(VendorRowUnsaved.apply)
+  implicit val encoder: Encoder[VendorRowUnsaved] = Encoder.forProduct8[VendorRowUnsaved, BusinessentityId, AccountNumber, Name, Int, Option[/* max 1024 chars */ String], Defaulted[Flag], Defaulted[Flag], Defaulted[TypoLocalDateTime]]("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.purchasingwebserviceurl, x.preferredvendorstatus, x.activeflag, x.modifieddate))
 }

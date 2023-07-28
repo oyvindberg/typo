@@ -8,11 +8,11 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning salesreasonid, "name", reasontype, modifieddate
+          returning salesreasonid, "name", reasontype, modifieddate::text
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
   
@@ -36,19 +36,19 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salesreason default values
-            returning salesreasonid, "name", reasontype, modifieddate
+            returning salesreasonid, "name", reasontype, modifieddate::text
          """
         .executeInsert(SalesreasonRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning salesreasonid, "name", reasontype, modifieddate
+                  returning salesreasonid, "name", reasontype, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -59,18 +59,18 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, "name", reasontype, modifieddate
+    SQL"""select salesreasonid, "name", reasontype, modifieddate::text
           from sales.salesreason
        """.as(SalesreasonRow.rowParser(1).*)
   }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
-    SQL"""select salesreasonid, "name", reasontype, modifieddate
+    SQL"""select salesreasonid, "name", reasontype, modifieddate::text
           from sales.salesreason
           where salesreasonid = $salesreasonid
        """.as(SalesreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
-    SQL"""select salesreasonid, "name", reasontype, modifieddate
+    SQL"""select salesreasonid, "name", reasontype, modifieddate::text
           from sales.salesreason
           where salesreasonid = ANY($salesreasonids)
        """.as(SalesreasonRow.rowParser(1).*)
@@ -98,7 +98,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             "name" = EXCLUDED."name",
             reasontype = EXCLUDED.reasontype,
             modifieddate = EXCLUDED.modifieddate
-          returning salesreasonid, "name", reasontype, modifieddate
+          returning salesreasonid, "name", reasontype, modifieddate::text
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
   

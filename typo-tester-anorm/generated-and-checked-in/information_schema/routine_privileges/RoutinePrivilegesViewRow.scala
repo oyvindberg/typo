@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class RoutinePrivilegesViewRow(
@@ -33,55 +35,51 @@ case class RoutinePrivilegesViewRow(
 )
 
 object RoutinePrivilegesViewRow {
-  def rowParser(idx: Int): RowParser[RoutinePrivilegesViewRow] =
-    RowParser[RoutinePrivilegesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[RoutinePrivilegesViewRow] = Reads[RoutinePrivilegesViewRow](json => JsResult.fromTry(
+      Try(
         RoutinePrivilegesViewRow(
-          grantor = row[Option[SqlIdentifier]](idx + 0),
-          grantee = row[Option[SqlIdentifier]](idx + 1),
-          specificCatalog = row[Option[SqlIdentifier]](idx + 2),
-          specificSchema = row[Option[SqlIdentifier]](idx + 3),
-          specificName = row[Option[SqlIdentifier]](idx + 4),
-          routineCatalog = row[Option[SqlIdentifier]](idx + 5),
-          routineSchema = row[Option[SqlIdentifier]](idx + 6),
-          routineName = row[Option[SqlIdentifier]](idx + 7),
-          privilegeType = row[Option[CharacterData]](idx + 8),
-          isGrantable = row[Option[YesOrNo]](idx + 9)
+          grantor = json.\("grantor").toOption.map(_.as[SqlIdentifier]),
+          grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
+          specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
+          specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
+          routineCatalog = json.\("routine_catalog").toOption.map(_.as[SqlIdentifier]),
+          routineSchema = json.\("routine_schema").toOption.map(_.as[SqlIdentifier]),
+          routineName = json.\("routine_name").toOption.map(_.as[SqlIdentifier]),
+          privilegeType = json.\("privilege_type").toOption.map(_.as[CharacterData]),
+          isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
         )
       )
-    }
-  implicit val oFormat: OFormat[RoutinePrivilegesViewRow] = new OFormat[RoutinePrivilegesViewRow]{
-    override def writes(o: RoutinePrivilegesViewRow): JsObject =
-      Json.obj(
-        "grantor" -> o.grantor,
-        "grantee" -> o.grantee,
-        "specific_catalog" -> o.specificCatalog,
-        "specific_schema" -> o.specificSchema,
-        "specific_name" -> o.specificName,
-        "routine_catalog" -> o.routineCatalog,
-        "routine_schema" -> o.routineSchema,
-        "routine_name" -> o.routineName,
-        "privilege_type" -> o.privilegeType,
-        "is_grantable" -> o.isGrantable
+    ),
+  )
+  def rowParser(idx: Int): RowParser[RoutinePrivilegesViewRow] = RowParser[RoutinePrivilegesViewRow] { row =>
+    Success(
+      RoutinePrivilegesViewRow(
+        grantor = row[Option[SqlIdentifier]](idx + 0),
+        grantee = row[Option[SqlIdentifier]](idx + 1),
+        specificCatalog = row[Option[SqlIdentifier]](idx + 2),
+        specificSchema = row[Option[SqlIdentifier]](idx + 3),
+        specificName = row[Option[SqlIdentifier]](idx + 4),
+        routineCatalog = row[Option[SqlIdentifier]](idx + 5),
+        routineSchema = row[Option[SqlIdentifier]](idx + 6),
+        routineName = row[Option[SqlIdentifier]](idx + 7),
+        privilegeType = row[Option[CharacterData]](idx + 8),
+        isGrantable = row[Option[YesOrNo]](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[RoutinePrivilegesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          RoutinePrivilegesViewRow(
-            grantor = json.\("grantor").toOption.map(_.as[SqlIdentifier]),
-            grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
-            specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
-            specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
-            specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
-            routineCatalog = json.\("routine_catalog").toOption.map(_.as[SqlIdentifier]),
-            routineSchema = json.\("routine_schema").toOption.map(_.as[SqlIdentifier]),
-            routineName = json.\("routine_name").toOption.map(_.as[SqlIdentifier]),
-            privilegeType = json.\("privilege_type").toOption.map(_.as[CharacterData]),
-            isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[RoutinePrivilegesViewRow] = OWrites[RoutinePrivilegesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "grantor" -> Json.toJson(o.grantor),
+      "grantee" -> Json.toJson(o.grantee),
+      "specific_catalog" -> Json.toJson(o.specificCatalog),
+      "specific_schema" -> Json.toJson(o.specificSchema),
+      "specific_name" -> Json.toJson(o.specificName),
+      "routine_catalog" -> Json.toJson(o.routineCatalog),
+      "routine_schema" -> Json.toJson(o.routineSchema),
+      "routine_name" -> Json.toJson(o.routineName),
+      "privilege_type" -> Json.toJson(o.privilegeType),
+      "is_grantable" -> Json.toJson(o.isGrantable)
+    ))
+  )
 }

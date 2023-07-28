@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTimezoneAbbrevsViewRow(
@@ -24,34 +26,30 @@ case class PgTimezoneAbbrevsViewRow(
 )
 
 object PgTimezoneAbbrevsViewRow {
-  def rowParser(idx: Int): RowParser[PgTimezoneAbbrevsViewRow] =
-    RowParser[PgTimezoneAbbrevsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTimezoneAbbrevsViewRow] = Reads[PgTimezoneAbbrevsViewRow](json => JsResult.fromTry(
+      Try(
         PgTimezoneAbbrevsViewRow(
-          abbrev = row[Option[String]](idx + 0),
-          utcOffset = row[Option[TypoInterval]](idx + 1),
-          isDst = row[Option[Boolean]](idx + 2)
+          abbrev = json.\("abbrev").toOption.map(_.as[String]),
+          utcOffset = json.\("utc_offset").toOption.map(_.as[TypoInterval]),
+          isDst = json.\("is_dst").toOption.map(_.as[Boolean])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTimezoneAbbrevsViewRow] = new OFormat[PgTimezoneAbbrevsViewRow]{
-    override def writes(o: PgTimezoneAbbrevsViewRow): JsObject =
-      Json.obj(
-        "abbrev" -> o.abbrev,
-        "utc_offset" -> o.utcOffset,
-        "is_dst" -> o.isDst
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTimezoneAbbrevsViewRow] = RowParser[PgTimezoneAbbrevsViewRow] { row =>
+    Success(
+      PgTimezoneAbbrevsViewRow(
+        abbrev = row[Option[String]](idx + 0),
+        utcOffset = row[Option[TypoInterval]](idx + 1),
+        isDst = row[Option[Boolean]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTimezoneAbbrevsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTimezoneAbbrevsViewRow(
-            abbrev = json.\("abbrev").toOption.map(_.as[String]),
-            utcOffset = json.\("utc_offset").toOption.map(_.as[TypoInterval]),
-            isDst = json.\("is_dst").toOption.map(_.as[Boolean])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTimezoneAbbrevsViewRow] = OWrites[PgTimezoneAbbrevsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "abbrev" -> Json.toJson(o.abbrev),
+      "utc_offset" -> Json.toJson(o.utcOffset),
+      "is_dst" -> Json.toJson(o.isDst)
+    ))
+  )
 }

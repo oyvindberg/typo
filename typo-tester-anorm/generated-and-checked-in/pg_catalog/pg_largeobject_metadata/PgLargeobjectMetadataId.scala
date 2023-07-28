@@ -10,19 +10,20 @@ package pg_largeobject_metadata
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_largeobject_metadata` */
 case class PgLargeobjectMetadataId(value: /* oid */ Long) extends AnyVal
 object PgLargeobjectMetadataId {
-  implicit val ordering: Ordering[PgLargeobjectMetadataId] = Ordering.by(_.value)
-  implicit val format: Format[PgLargeobjectMetadataId] = implicitly[Format[/* oid */ Long]].bimap(PgLargeobjectMetadataId.apply, _.value)
-  implicit val toStatement: ToStatement[PgLargeobjectMetadataId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgLargeobjectMetadataId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgLargeobjectMetadataId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit val column: Column[PgLargeobjectMetadataId] = implicitly[Column[/* oid */ Long]].map(PgLargeobjectMetadataId.apply)
+  implicit val ordering: Ordering[PgLargeobjectMetadataId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgLargeobjectMetadataId] = new ParameterMetaData[PgLargeobjectMetadataId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit val reads: Reads[PgLargeobjectMetadataId] = implicitly[Reads[/* oid */ Long]].map(PgLargeobjectMetadataId.apply)
+  implicit val toStatement: ToStatement[PgLargeobjectMetadataId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgLargeobjectMetadataId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
 }

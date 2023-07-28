@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_foreign_table
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgForeignTableRow(
@@ -23,34 +21,18 @@ case class PgForeignTableRow(
 )
 
 object PgForeignTableRow {
-  implicit val decoder: Decoder[PgForeignTableRow] =
-    (c: HCursor) =>
-      for {
-        ftrelid <- c.downField("ftrelid").as[PgForeignTableId]
-        ftserver <- c.downField("ftserver").as[/* oid */ Long]
-        ftoptions <- c.downField("ftoptions").as[Option[Array[String]]]
-      } yield PgForeignTableRow(ftrelid, ftserver, ftoptions)
-  implicit val encoder: Encoder[PgForeignTableRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "ftrelid" := row.ftrelid,
-        "ftserver" := row.ftserver,
-        "ftoptions" := row.ftoptions
-      )}
-  implicit val read: Read[PgForeignTableRow] =
-    new Read[PgForeignTableRow](
-      gets = List(
-        (Get[PgForeignTableId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Array[String]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgForeignTableRow(
-        ftrelid = Get[PgForeignTableId].unsafeGetNonNullable(rs, i + 0),
-        ftserver = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        ftoptions = Get[Array[String]].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PgForeignTableRow] = Decoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(PgForeignTableRow.apply)
+  implicit val encoder: Encoder[PgForeignTableRow] = Encoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(x => (x.ftrelid, x.ftserver, x.ftoptions))
+  implicit val read: Read[PgForeignTableRow] = new Read[PgForeignTableRow](
+    gets = List(
+      (Get[PgForeignTableId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Array[String]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgForeignTableRow(
+      ftrelid = Get[PgForeignTableId].unsafeGetNonNullable(rs, i + 0),
+      ftserver = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      ftoptions = Get[Array[String]].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_views
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgViewsViewRow(
@@ -24,38 +22,20 @@ case class PgViewsViewRow(
 )
 
 object PgViewsViewRow {
-  implicit val decoder: Decoder[PgViewsViewRow] =
-    (c: HCursor) =>
-      for {
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        viewname <- c.downField("viewname").as[Option[String]]
-        viewowner <- c.downField("viewowner").as[Option[String]]
-        definition <- c.downField("definition").as[Option[String]]
-      } yield PgViewsViewRow(schemaname, viewname, viewowner, definition)
-  implicit val encoder: Encoder[PgViewsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "schemaname" := row.schemaname,
-        "viewname" := row.viewname,
-        "viewowner" := row.viewowner,
-        "definition" := row.definition
-      )}
-  implicit val read: Read[PgViewsViewRow] =
-    new Read[PgViewsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgViewsViewRow(
-        schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-        viewname = Get[String].unsafeGetNullable(rs, i + 1),
-        viewowner = Get[String].unsafeGetNullable(rs, i + 2),
-        definition = Get[String].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgViewsViewRow] = Decoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(PgViewsViewRow.apply)
+  implicit val encoder: Encoder[PgViewsViewRow] = Encoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(x => (x.schemaname, x.viewname, x.viewowner, x.definition))
+  implicit val read: Read[PgViewsViewRow] = new Read[PgViewsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgViewsViewRow(
+      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
+      viewname = Get[String].unsafeGetNullable(rs, i + 1),
+      viewowner = Get[String].unsafeGetNullable(rs, i + 2),
+      definition = Get[String].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

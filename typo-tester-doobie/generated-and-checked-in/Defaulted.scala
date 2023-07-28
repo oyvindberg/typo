@@ -18,14 +18,12 @@ sealed trait Defaulted[+T]
 object Defaulted {
   case class Provided[T](value: T) extends Defaulted[T]
   case object UseDefault extends Defaulted[Nothing]
-  implicit def decoder[T: Decoder]: Decoder[Defaulted[T]] = c =>
-    c.as[String].flatMap {
+  implicit def decoder[T](implicit T: Decoder[T]): Decoder[Defaulted[T]] = c => c.as[String].flatMap {
       case "defaulted" => Right(UseDefault)
       case _           => c.downField("provided").as[T].map(Provided.apply)
     }
-  implicit def encoder[T: Encoder]: Encoder[Defaulted[T]] =
-    Encoder.instance {
-      case Provided(value) => Json.obj("provided" -> Encoder[T].apply(value))
-      case UseDefault      => Json.fromString("defaulted")
-    }
+  implicit def encoder[T](implicit T: Encoder[T]): Encoder[Defaulted[T]] = Encoder.instance {
+    case Provided(value) => Json.obj("provided" -> Encoder[T].apply(value))
+    case UseDefault      => Json.fromString("defaulted")
+  }
 }

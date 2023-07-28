@@ -8,11 +8,11 @@ package sales
 package specialofferproduct
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
@@ -22,7 +22,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
           values (${unsaved.specialofferid}::int4, ${unsaved.productid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning specialofferid, productid, rowguid, modifieddate
+          returning specialofferid, productid, rowguid, modifieddate::text
        """.query[SpecialofferproductRow].unique
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow] = {
@@ -35,29 +35,29 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.specialofferproduct default values
-            returning specialofferid, productid, rowguid, modifieddate
+            returning specialofferid, productid, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.specialofferproduct(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning specialofferid, productid, rowguid, modifieddate
+            returning specialofferid, productid, rowguid, modifieddate::text
          """
     }
     q.query[SpecialofferproductRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
-    sql"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct".query[SpecialofferproductRow].stream
+    sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct".query[SpecialofferproductRow].stream
   }
   override def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]] = {
-    sql"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".query[SpecialofferproductRow].option
+    sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".query[SpecialofferproductRow].option
   }
   override def update(row: SpecialofferproductRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -82,7 +82,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           do update set
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning specialofferid, productid, rowguid, modifieddate
+          returning specialofferid, productid, rowguid, modifieddate::text
        """.query[SpecialofferproductRow].unique
   }
 }

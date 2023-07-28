@@ -8,13 +8,11 @@ package pg_catalog
 package pg_rewrite
 
 import adventureworks.TypoPgNodeTree
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgRewriteRow(
@@ -29,54 +27,28 @@ case class PgRewriteRow(
 )
 
 object PgRewriteRow {
-  implicit val decoder: Decoder[PgRewriteRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgRewriteId]
-        rulename <- c.downField("rulename").as[String]
-        evClass <- c.downField("ev_class").as[/* oid */ Long]
-        evType <- c.downField("ev_type").as[String]
-        evEnabled <- c.downField("ev_enabled").as[String]
-        isInstead <- c.downField("is_instead").as[Boolean]
-        evQual <- c.downField("ev_qual").as[TypoPgNodeTree]
-        evAction <- c.downField("ev_action").as[TypoPgNodeTree]
-      } yield PgRewriteRow(oid, rulename, evClass, evType, evEnabled, isInstead, evQual, evAction)
-  implicit val encoder: Encoder[PgRewriteRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "rulename" := row.rulename,
-        "ev_class" := row.evClass,
-        "ev_type" := row.evType,
-        "ev_enabled" := row.evEnabled,
-        "is_instead" := row.isInstead,
-        "ev_qual" := row.evQual,
-        "ev_action" := row.evAction
-      )}
-  implicit val read: Read[PgRewriteRow] =
-    new Read[PgRewriteRow](
-      gets = List(
-        (Get[PgRewriteId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[TypoPgNodeTree], Nullability.NoNulls),
-        (Get[TypoPgNodeTree], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgRewriteRow(
-        oid = Get[PgRewriteId].unsafeGetNonNullable(rs, i + 0),
-        rulename = Get[String].unsafeGetNonNullable(rs, i + 1),
-        evClass = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        evType = Get[String].unsafeGetNonNullable(rs, i + 3),
-        evEnabled = Get[String].unsafeGetNonNullable(rs, i + 4),
-        isInstead = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-        evQual = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 6),
-        evAction = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgRewriteRow] = Decoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(PgRewriteRow.apply)
+  implicit val encoder: Encoder[PgRewriteRow] = Encoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(x => (x.oid, x.rulename, x.evClass, x.evType, x.evEnabled, x.isInstead, x.evQual, x.evAction))
+  implicit val read: Read[PgRewriteRow] = new Read[PgRewriteRow](
+    gets = List(
+      (Get[PgRewriteId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[TypoPgNodeTree], Nullability.NoNulls),
+      (Get[TypoPgNodeTree], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgRewriteRow(
+      oid = Get[PgRewriteId].unsafeGetNonNullable(rs, i + 0),
+      rulename = Get[String].unsafeGetNonNullable(rs, i + 1),
+      evClass = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      evType = Get[String].unsafeGetNonNullable(rs, i + 3),
+      evEnabled = Get[String].unsafeGetNonNullable(rs, i + 4),
+      isInstead = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
+      evQual = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 6),
+      evAction = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 7)
     )
-  
-
+  )
 }

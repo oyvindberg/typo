@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgStatSlruViewRepoImpl extends PgStatSlruViewRepo {
   override def selectAll(implicit c: Connection): List[PgStatSlruViewRow] = {
-    SQL"""select "name", blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset
+    SQL"""select "name", blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset::text
           from pg_catalog.pg_stat_slru
        """.as(PgStatSlruViewRow.rowParser(1).*)
   }

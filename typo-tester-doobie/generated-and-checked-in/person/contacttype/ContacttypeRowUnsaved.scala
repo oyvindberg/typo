@@ -8,12 +8,10 @@ package person
 package contacttype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `person.contacttype` which has not been persisted yet */
 case class ContacttypeRowUnsaved(
@@ -23,9 +21,9 @@ case class ContacttypeRowUnsaved(
       Primary key for ContactType records. */
   contacttypeid: Defaulted[ContacttypeId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(contacttypeidDefault: => ContacttypeId, modifieddateDefault: => LocalDateTime): ContacttypeRow =
+  def toRow(contacttypeidDefault: => ContacttypeId, modifieddateDefault: => TypoLocalDateTime): ContacttypeRow =
     ContacttypeRow(
       name = name,
       contacttypeid = contacttypeid match {
@@ -39,19 +37,6 @@ case class ContacttypeRowUnsaved(
     )
 }
 object ContacttypeRowUnsaved {
-  implicit val decoder: Decoder[ContacttypeRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        contacttypeid <- c.downField("contacttypeid").as[Defaulted[ContacttypeId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ContacttypeRowUnsaved(name, contacttypeid, modifieddate)
-  implicit val encoder: Encoder[ContacttypeRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "contacttypeid" := row.contacttypeid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ContacttypeRowUnsaved] = Decoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(ContacttypeRowUnsaved.apply)
+  implicit val encoder: Encoder[ContacttypeRowUnsaved] = Encoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(x => (x.name, x.contacttypeid, x.modifieddate))
 }

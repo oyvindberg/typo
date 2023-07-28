@@ -10,19 +10,20 @@ package pg_ts_parser
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_ts_parser` */
 case class PgTsParserId(value: /* oid */ Long) extends AnyVal
 object PgTsParserId {
-  implicit val ordering: Ordering[PgTsParserId] = Ordering.by(_.value)
-  implicit val format: Format[PgTsParserId] = implicitly[Format[/* oid */ Long]].bimap(PgTsParserId.apply, _.value)
-  implicit val toStatement: ToStatement[PgTsParserId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgTsParserId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgTsParserId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit val column: Column[PgTsParserId] = implicitly[Column[/* oid */ Long]].map(PgTsParserId.apply)
+  implicit val ordering: Ordering[PgTsParserId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgTsParserId] = new ParameterMetaData[PgTsParserId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit val reads: Reads[PgTsParserId] = implicitly[Reads[/* oid */ Long]].map(PgTsParserId.apply)
+  implicit val toStatement: ToStatement[PgTsParserId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgTsParserId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
 }

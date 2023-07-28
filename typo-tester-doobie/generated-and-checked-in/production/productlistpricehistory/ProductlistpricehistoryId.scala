@@ -7,28 +7,15 @@ package adventureworks
 package production
 package productlistpricehistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** Type for the composite primary key of table `production.productlistpricehistory` */
-case class ProductlistpricehistoryId(productid: ProductId, startdate: LocalDateTime)
+case class ProductlistpricehistoryId(productid: ProductId, startdate: TypoLocalDateTime)
 object ProductlistpricehistoryId {
-  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[ProductlistpricehistoryId] = Ordering.by(x => (x.productid, x.startdate))
-  implicit val decoder: Decoder[ProductlistpricehistoryId] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-      } yield ProductlistpricehistoryId(productid, startdate)
-  implicit val encoder: Encoder[ProductlistpricehistoryId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "startdate" := row.startdate
-      )}
+  implicit val decoder: Decoder[ProductlistpricehistoryId] = Decoder.forProduct2[ProductlistpricehistoryId, ProductId, TypoLocalDateTime]("productid", "startdate")(ProductlistpricehistoryId.apply)
+  implicit val encoder: Encoder[ProductlistpricehistoryId] = Encoder.forProduct2[ProductlistpricehistoryId, ProductId, TypoLocalDateTime]("productid", "startdate")(x => (x.productid, x.startdate))
+  implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[ProductlistpricehistoryId] = Ordering.by(x => (x.productid, x.startdate))
 }

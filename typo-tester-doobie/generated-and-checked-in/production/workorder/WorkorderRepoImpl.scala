@@ -8,20 +8,20 @@ package production
 package workorder
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId): ConnectionIO[Boolean] = {
-    sql"delete from production.workorder where workorderid = $workorderid".update.run.map(_ > 0)
+    sql"delete from production.workorder where workorderid = ${workorderid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.orderqty}::int4, ${unsaved.scrappedqty}::int2, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.scrapreasonid}::int2, ${unsaved.modifieddate}::timestamp)
-          returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
        """.query[WorkorderRow].unique
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
@@ -39,32 +39,32 @@ object WorkorderRepoImpl extends WorkorderRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.workorder default values
-            returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+            returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.workorder(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+            returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
          """
     }
     q.query[WorkorderRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
-    sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder".query[WorkorderRow].stream
+    sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder".query[WorkorderRow].stream
   }
   override def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]] = {
-    sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid".query[WorkorderRow].option
+    sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder where workorderid = ${workorderid}".query[WorkorderRow].option
   }
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
-    sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = ANY($workorderids)".query[WorkorderRow].stream
+    sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder where workorderid = ANY(${workorderids})".query[WorkorderRow].stream
   }
   override def update(row: WorkorderRow): ConnectionIO[Boolean] = {
     val workorderid = row.workorderid
@@ -77,7 +77,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
               duedate = ${row.duedate}::timestamp,
               scrapreasonid = ${row.scrapreasonid}::int2,
               modifieddate = ${row.modifieddate}::timestamp
-          where workorderid = $workorderid
+          where workorderid = ${workorderid}
        """
       .update
       .run
@@ -106,7 +106,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
             duedate = EXCLUDED.duedate,
             scrapreasonid = EXCLUDED.scrapreasonid,
             modifieddate = EXCLUDED.modifieddate
-          returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
        """.query[WorkorderRow].unique
   }
 }

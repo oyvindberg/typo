@@ -7,16 +7,18 @@ package adventureworks
 package production
 package workorder
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class WorkorderRow(
@@ -30,64 +32,60 @@ case class WorkorderRow(
   /** Quantity that failed inspection. */
   scrappedqty: Int,
   /** Work order start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Work order end date. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Work order due date. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Reason for inspection failure.
       Points to [[scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: Option[ScrapreasonId],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object WorkorderRow {
-  def rowParser(idx: Int): RowParser[WorkorderRow] =
-    RowParser[WorkorderRow] { row =>
-      Success(
+  implicit val reads: Reads[WorkorderRow] = Reads[WorkorderRow](json => JsResult.fromTry(
+      Try(
         WorkorderRow(
-          workorderid = row[WorkorderId](idx + 0),
-          productid = row[ProductId](idx + 1),
-          orderqty = row[Int](idx + 2),
-          scrappedqty = row[Int](idx + 3),
-          startdate = row[LocalDateTime](idx + 4),
-          enddate = row[Option[LocalDateTime]](idx + 5),
-          duedate = row[LocalDateTime](idx + 6),
-          scrapreasonid = row[Option[ScrapreasonId]](idx + 7),
-          modifieddate = row[LocalDateTime](idx + 8)
+          workorderid = json.\("workorderid").as[WorkorderId],
+          productid = json.\("productid").as[ProductId],
+          orderqty = json.\("orderqty").as[Int],
+          scrappedqty = json.\("scrappedqty").as[Int],
+          startdate = json.\("startdate").as[TypoLocalDateTime],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          duedate = json.\("duedate").as[TypoLocalDateTime],
+          scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[WorkorderRow] = new OFormat[WorkorderRow]{
-    override def writes(o: WorkorderRow): JsObject =
-      Json.obj(
-        "workorderid" -> o.workorderid,
-        "productid" -> o.productid,
-        "orderqty" -> o.orderqty,
-        "scrappedqty" -> o.scrappedqty,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "duedate" -> o.duedate,
-        "scrapreasonid" -> o.scrapreasonid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[WorkorderRow] = RowParser[WorkorderRow] { row =>
+    Success(
+      WorkorderRow(
+        workorderid = row[WorkorderId](idx + 0),
+        productid = row[ProductId](idx + 1),
+        orderqty = row[Int](idx + 2),
+        scrappedqty = row[Int](idx + 3),
+        startdate = row[TypoLocalDateTime](idx + 4),
+        enddate = row[Option[TypoLocalDateTime]](idx + 5),
+        duedate = row[TypoLocalDateTime](idx + 6),
+        scrapreasonid = row[Option[ScrapreasonId]](idx + 7),
+        modifieddate = row[TypoLocalDateTime](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[WorkorderRow] = {
-      JsResult.fromTry(
-        Try(
-          WorkorderRow(
-            workorderid = json.\("workorderid").as[WorkorderId],
-            productid = json.\("productid").as[ProductId],
-            orderqty = json.\("orderqty").as[Int],
-            scrappedqty = json.\("scrappedqty").as[Int],
-            startdate = json.\("startdate").as[LocalDateTime],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            duedate = json.\("duedate").as[LocalDateTime],
-            scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[WorkorderRow] = OWrites[WorkorderRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "workorderid" -> Json.toJson(o.workorderid),
+      "productid" -> Json.toJson(o.productid),
+      "orderqty" -> Json.toJson(o.orderqty),
+      "scrappedqty" -> Json.toJson(o.scrappedqty),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "duedate" -> Json.toJson(o.duedate),
+      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -11,19 +11,20 @@ import adventureworks.TypoRegproc
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_aggregate` */
 case class PgAggregateId(value: TypoRegproc) extends AnyVal
 object PgAggregateId {
-  implicit def ordering(implicit O0: Ordering[TypoRegproc]): Ordering[PgAggregateId] = Ordering.by(_.value)
-  implicit val format: Format[PgAggregateId] = implicitly[Format[TypoRegproc]].bimap(PgAggregateId.apply, _.value)
-  implicit val toStatement: ToStatement[PgAggregateId] = implicitly[ToStatement[TypoRegproc]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgAggregateId]] = implicitly[ToStatement[Array[TypoRegproc]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgAggregateId]] = implicitly[ToStatement[Array[TypoRegproc]]].contramap(_.map(_.value))
   implicit val column: Column[PgAggregateId] = implicitly[Column[TypoRegproc]].map(PgAggregateId.apply)
+  implicit def ordering(implicit O0: Ordering[TypoRegproc]): Ordering[PgAggregateId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgAggregateId] = new ParameterMetaData[PgAggregateId] {
     override def sqlType: String = implicitly[ParameterMetaData[TypoRegproc]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[TypoRegproc]].jdbcType
   }
-
+  implicit val reads: Reads[PgAggregateId] = implicitly[Reads[TypoRegproc]].map(PgAggregateId.apply)
+  implicit val toStatement: ToStatement[PgAggregateId] = implicitly[ToStatement[TypoRegproc]].contramap(_.value)
+  implicit val writes: Writes[PgAggregateId] = implicitly[Writes[TypoRegproc]].contramap(_.value)
 }

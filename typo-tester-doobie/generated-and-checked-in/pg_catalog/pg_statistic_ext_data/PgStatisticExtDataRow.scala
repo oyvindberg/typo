@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatisticExtDataRow(
@@ -25,42 +23,22 @@ case class PgStatisticExtDataRow(
 )
 
 object PgStatisticExtDataRow {
-  implicit val decoder: Decoder[PgStatisticExtDataRow] =
-    (c: HCursor) =>
-      for {
-        stxoid <- c.downField("stxoid").as[PgStatisticExtDataId]
-        stxdndistinct <- c.downField("stxdndistinct").as[Option[String]]
-        stxddependencies <- c.downField("stxddependencies").as[Option[String]]
-        stxdmcv <- c.downField("stxdmcv").as[Option[String]]
-        stxdexpr <- c.downField("stxdexpr").as[Option[String]]
-      } yield PgStatisticExtDataRow(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)
-  implicit val encoder: Encoder[PgStatisticExtDataRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "stxoid" := row.stxoid,
-        "stxdndistinct" := row.stxdndistinct,
-        "stxddependencies" := row.stxddependencies,
-        "stxdmcv" := row.stxdmcv,
-        "stxdexpr" := row.stxdexpr
-      )}
-  implicit val read: Read[PgStatisticExtDataRow] =
-    new Read[PgStatisticExtDataRow](
-      gets = List(
-        (Get[PgStatisticExtDataId], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatisticExtDataRow(
-        stxoid = Get[PgStatisticExtDataId].unsafeGetNonNullable(rs, i + 0),
-        stxdndistinct = Get[String].unsafeGetNullable(rs, i + 1),
-        stxddependencies = Get[String].unsafeGetNullable(rs, i + 2),
-        stxdmcv = Get[String].unsafeGetNullable(rs, i + 3),
-        stxdexpr = Get[String].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[PgStatisticExtDataRow] = Decoder.forProduct5[PgStatisticExtDataRow, PgStatisticExtDataId, Option[String], Option[String], Option[String], Option[String]]("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")(PgStatisticExtDataRow.apply)
+  implicit val encoder: Encoder[PgStatisticExtDataRow] = Encoder.forProduct5[PgStatisticExtDataRow, PgStatisticExtDataId, Option[String], Option[String], Option[String], Option[String]]("stxoid", "stxdndistinct", "stxddependencies", "stxdmcv", "stxdexpr")(x => (x.stxoid, x.stxdndistinct, x.stxddependencies, x.stxdmcv, x.stxdexpr))
+  implicit val read: Read[PgStatisticExtDataRow] = new Read[PgStatisticExtDataRow](
+    gets = List(
+      (Get[PgStatisticExtDataId], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatisticExtDataRow(
+      stxoid = Get[PgStatisticExtDataId].unsafeGetNonNullable(rs, i + 0),
+      stxdndistinct = Get[String].unsafeGetNullable(rs, i + 1),
+      stxddependencies = Get[String].unsafeGetNullable(rs, i + 2),
+      stxdmcv = Get[String].unsafeGetNullable(rs, i + 3),
+      stxdexpr = Get[String].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

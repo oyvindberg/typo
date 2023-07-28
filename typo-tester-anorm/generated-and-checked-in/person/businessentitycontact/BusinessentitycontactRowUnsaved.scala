@@ -8,15 +8,17 @@ package person
 package businessentitycontact
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `person.businessentitycontact` which has not been persisted yet */
@@ -33,9 +35,9 @@ case class BusinessentitycontactRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): BusinessentitycontactRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): BusinessentitycontactRow =
     BusinessentitycontactRow(
       businessentityid = businessentityid,
       personid = personid,
@@ -51,28 +53,25 @@ case class BusinessentitycontactRowUnsaved(
     )
 }
 object BusinessentitycontactRowUnsaved {
-  implicit val oFormat: OFormat[BusinessentitycontactRowUnsaved] = new OFormat[BusinessentitycontactRowUnsaved]{
-    override def writes(o: BusinessentitycontactRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "personid" -> o.personid,
-        "contacttypeid" -> o.contacttypeid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[BusinessentitycontactRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          BusinessentitycontactRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            personid = json.\("personid").as[BusinessentityId],
-            contacttypeid = json.\("contacttypeid").as[ContacttypeId],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[BusinessentitycontactRowUnsaved] = Reads[BusinessentitycontactRowUnsaved](json => JsResult.fromTry(
+      Try(
+        BusinessentitycontactRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          personid = json.\("personid").as[BusinessentityId],
+          contacttypeid = json.\("contacttypeid").as[ContacttypeId],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[BusinessentitycontactRowUnsaved] = OWrites[BusinessentitycontactRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "personid" -> Json.toJson(o.personid),
+      "contacttypeid" -> Json.toJson(o.contacttypeid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

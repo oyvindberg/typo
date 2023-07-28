@@ -8,21 +8,21 @@ package person
 package address
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId): ConnectionIO[Boolean] = {
-    sql"delete from person.address where addressid = $addressid".update.run.map(_ > 0)
+    sql"delete from person.address where addressid = ${addressid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into person.address(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)
           values (${unsaved.addressid}::int4, ${unsaved.addressline1}, ${unsaved.addressline2}, ${unsaved.city}, ${unsaved.stateprovinceid}::int4, ${unsaved.postalcode}, ${unsaved.spatiallocation}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+          returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
        """.query[AddressRow].unique
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
@@ -43,32 +43,32 @@ object AddressRepoImpl extends AddressRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.address default values
-            returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+            returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.address(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+            returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
          """
     }
     q.query[AddressRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address".query[AddressRow].stream
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address".query[AddressRow].stream
   }
   override def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid".query[AddressRow].option
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ${addressid}".query[AddressRow].option
   }
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = ANY($addressids)".query[AddressRow].stream
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ANY(${addressids})".query[AddressRow].stream
   }
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     val addressid = row.addressid
@@ -81,7 +81,7 @@ object AddressRepoImpl extends AddressRepo {
               spatiallocation = ${row.spatiallocation}::bytea,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where addressid = $addressid
+          where addressid = ${addressid}
        """
       .update
       .run
@@ -110,7 +110,7 @@ object AddressRepoImpl extends AddressRepo {
             spatiallocation = EXCLUDED.spatiallocation,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
+          returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
        """.query[AddressRow].unique
   }
 }

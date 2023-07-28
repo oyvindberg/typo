@@ -8,11 +8,11 @@ package sales
 package customer
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object CustomerRepoImpl extends CustomerRepo {
@@ -22,7 +22,7 @@ object CustomerRepoImpl extends CustomerRepo {
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
           values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+          returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """
       .executeInsert(CustomerRow.rowParser(1).single)
   
@@ -42,19 +42,19 @@ object CustomerRepoImpl extends CustomerRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.customer default values
-            returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+            returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
          """
         .executeInsert(CustomerRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.customer(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+                  returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -65,18 +65,18 @@ object CustomerRepoImpl extends CustomerRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate
+    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate::text
           from sales.customer
        """.as(CustomerRow.rowParser(1).*)
   }
   override def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate
+    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate::text
           from sales.customer
           where customerid = $customerid
        """.as(CustomerRow.rowParser(1).singleOpt)
   }
   override def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow] = {
-    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate
+    SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate::text
           from sales.customer
           where customerid = ANY($customerids)
        """.as(CustomerRow.rowParser(1).*)
@@ -110,7 +110,7 @@ object CustomerRepoImpl extends CustomerRepo {
             territoryid = EXCLUDED.territoryid,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+          returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """
       .executeInsert(CustomerRow.rowParser(1).single)
   

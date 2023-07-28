@@ -9,13 +9,11 @@ package `_pg_foreign_data_wrappers`
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgForeignDataWrappersViewRow(
@@ -29,50 +27,26 @@ case class PgForeignDataWrappersViewRow(
 )
 
 object PgForeignDataWrappersViewRow {
-  implicit val decoder: Decoder[PgForeignDataWrappersViewRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[Option[/* oid */ Long]]
-        fdwowner <- c.downField("fdwowner").as[Option[/* oid */ Long]]
-        fdwoptions <- c.downField("fdwoptions").as[Option[Array[String]]]
-        foreignDataWrapperCatalog <- c.downField("foreign_data_wrapper_catalog").as[Option[SqlIdentifier]]
-        foreignDataWrapperName <- c.downField("foreign_data_wrapper_name").as[Option[SqlIdentifier]]
-        authorizationIdentifier <- c.downField("authorization_identifier").as[Option[SqlIdentifier]]
-        foreignDataWrapperLanguage <- c.downField("foreign_data_wrapper_language").as[Option[CharacterData]]
-      } yield PgForeignDataWrappersViewRow(oid, fdwowner, fdwoptions, foreignDataWrapperCatalog, foreignDataWrapperName, authorizationIdentifier, foreignDataWrapperLanguage)
-  implicit val encoder: Encoder[PgForeignDataWrappersViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "fdwowner" := row.fdwowner,
-        "fdwoptions" := row.fdwoptions,
-        "foreign_data_wrapper_catalog" := row.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" := row.foreignDataWrapperName,
-        "authorization_identifier" := row.authorizationIdentifier,
-        "foreign_data_wrapper_language" := row.foreignDataWrapperLanguage
-      )}
-  implicit val read: Read[PgForeignDataWrappersViewRow] =
-    new Read[PgForeignDataWrappersViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgForeignDataWrappersViewRow(
-        oid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        fdwowner = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        fdwoptions = Get[Array[String]].unsafeGetNullable(rs, i + 2),
-        foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        foreignDataWrapperLanguage = Get[CharacterData].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgForeignDataWrappersViewRow] = Decoder.forProduct7[PgForeignDataWrappersViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[Array[String]], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("oid", "fdwowner", "fdwoptions", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "foreign_data_wrapper_language")(PgForeignDataWrappersViewRow.apply)
+  implicit val encoder: Encoder[PgForeignDataWrappersViewRow] = Encoder.forProduct7[PgForeignDataWrappersViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[Array[String]], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("oid", "fdwowner", "fdwoptions", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "foreign_data_wrapper_language")(x => (x.oid, x.fdwowner, x.fdwoptions, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.authorizationIdentifier, x.foreignDataWrapperLanguage))
+  implicit val read: Read[PgForeignDataWrappersViewRow] = new Read[PgForeignDataWrappersViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgForeignDataWrappersViewRow(
+      oid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      fdwowner = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      fdwoptions = Get[Array[String]].unsafeGetNullable(rs, i + 2),
+      foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      foreignDataWrapperLanguage = Get[CharacterData].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

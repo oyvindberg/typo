@@ -8,13 +8,11 @@ package information_schema
 package constraint_column_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ConstraintColumnUsageViewRow(
@@ -28,50 +26,26 @@ case class ConstraintColumnUsageViewRow(
 )
 
 object ConstraintColumnUsageViewRow {
-  implicit val decoder: Decoder[ConstraintColumnUsageViewRow] =
-    (c: HCursor) =>
-      for {
-        tableCatalog <- c.downField("table_catalog").as[Option[SqlIdentifier]]
-        tableSchema <- c.downField("table_schema").as[Option[SqlIdentifier]]
-        tableName <- c.downField("table_name").as[Option[SqlIdentifier]]
-        columnName <- c.downField("column_name").as[Option[SqlIdentifier]]
-        constraintCatalog <- c.downField("constraint_catalog").as[Option[SqlIdentifier]]
-        constraintSchema <- c.downField("constraint_schema").as[Option[SqlIdentifier]]
-        constraintName <- c.downField("constraint_name").as[Option[SqlIdentifier]]
-      } yield ConstraintColumnUsageViewRow(tableCatalog, tableSchema, tableName, columnName, constraintCatalog, constraintSchema, constraintName)
-  implicit val encoder: Encoder[ConstraintColumnUsageViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "table_catalog" := row.tableCatalog,
-        "table_schema" := row.tableSchema,
-        "table_name" := row.tableName,
-        "column_name" := row.columnName,
-        "constraint_catalog" := row.constraintCatalog,
-        "constraint_schema" := row.constraintSchema,
-        "constraint_name" := row.constraintName
-      )}
-  implicit val read: Read[ConstraintColumnUsageViewRow] =
-    new Read[ConstraintColumnUsageViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ConstraintColumnUsageViewRow(
-        tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[ConstraintColumnUsageViewRow] = Decoder.forProduct7[ConstraintColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "constraint_catalog", "constraint_schema", "constraint_name")(ConstraintColumnUsageViewRow.apply)
+  implicit val encoder: Encoder[ConstraintColumnUsageViewRow] = Encoder.forProduct7[ConstraintColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "constraint_catalog", "constraint_schema", "constraint_name")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.constraintCatalog, x.constraintSchema, x.constraintName))
+  implicit val read: Read[ConstraintColumnUsageViewRow] = new Read[ConstraintColumnUsageViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ConstraintColumnUsageViewRow(
+      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

@@ -7,17 +7,19 @@ package adventureworks
 package pu
 package poh
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PohViewRow(
@@ -35,9 +37,9 @@ case class PohViewRow(
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.shipmethodid]] */
   shipmethodid: Option[ShipmethodId],
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.orderdate]] */
-  orderdate: Option[LocalDateTime],
+  orderdate: Option[TypoLocalDateTime],
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.shipdate]] */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.subtotal]] */
   subtotal: Option[BigDecimal],
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.taxamt]] */
@@ -45,68 +47,64 @@ case class PohViewRow(
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.freight]] */
   freight: Option[BigDecimal],
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PohViewRow {
-  def rowParser(idx: Int): RowParser[PohViewRow] =
-    RowParser[PohViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PohViewRow] = Reads[PohViewRow](json => JsResult.fromTry(
+      Try(
         PohViewRow(
-          id = row[Option[Int]](idx + 0),
-          purchaseorderid = row[Option[PurchaseorderheaderId]](idx + 1),
-          revisionnumber = row[Option[Int]](idx + 2),
-          status = row[Option[Int]](idx + 3),
-          employeeid = row[Option[BusinessentityId]](idx + 4),
-          vendorid = row[Option[BusinessentityId]](idx + 5),
-          shipmethodid = row[Option[ShipmethodId]](idx + 6),
-          orderdate = row[Option[LocalDateTime]](idx + 7),
-          shipdate = row[Option[LocalDateTime]](idx + 8),
-          subtotal = row[Option[BigDecimal]](idx + 9),
-          taxamt = row[Option[BigDecimal]](idx + 10),
-          freight = row[Option[BigDecimal]](idx + 11),
-          modifieddate = row[Option[LocalDateTime]](idx + 12)
+          id = json.\("id").toOption.map(_.as[Int]),
+          purchaseorderid = json.\("purchaseorderid").toOption.map(_.as[PurchaseorderheaderId]),
+          revisionnumber = json.\("revisionnumber").toOption.map(_.as[Int]),
+          status = json.\("status").toOption.map(_.as[Int]),
+          employeeid = json.\("employeeid").toOption.map(_.as[BusinessentityId]),
+          vendorid = json.\("vendorid").toOption.map(_.as[BusinessentityId]),
+          shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
+          orderdate = json.\("orderdate").toOption.map(_.as[TypoLocalDateTime]),
+          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
+          subtotal = json.\("subtotal").toOption.map(_.as[BigDecimal]),
+          taxamt = json.\("taxamt").toOption.map(_.as[BigDecimal]),
+          freight = json.\("freight").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PohViewRow] = new OFormat[PohViewRow]{
-    override def writes(o: PohViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "purchaseorderid" -> o.purchaseorderid,
-        "revisionnumber" -> o.revisionnumber,
-        "status" -> o.status,
-        "employeeid" -> o.employeeid,
-        "vendorid" -> o.vendorid,
-        "shipmethodid" -> o.shipmethodid,
-        "orderdate" -> o.orderdate,
-        "shipdate" -> o.shipdate,
-        "subtotal" -> o.subtotal,
-        "taxamt" -> o.taxamt,
-        "freight" -> o.freight,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PohViewRow] = RowParser[PohViewRow] { row =>
+    Success(
+      PohViewRow(
+        id = row[Option[Int]](idx + 0),
+        purchaseorderid = row[Option[PurchaseorderheaderId]](idx + 1),
+        revisionnumber = row[Option[Int]](idx + 2),
+        status = row[Option[Int]](idx + 3),
+        employeeid = row[Option[BusinessentityId]](idx + 4),
+        vendorid = row[Option[BusinessentityId]](idx + 5),
+        shipmethodid = row[Option[ShipmethodId]](idx + 6),
+        orderdate = row[Option[TypoLocalDateTime]](idx + 7),
+        shipdate = row[Option[TypoLocalDateTime]](idx + 8),
+        subtotal = row[Option[BigDecimal]](idx + 9),
+        taxamt = row[Option[BigDecimal]](idx + 10),
+        freight = row[Option[BigDecimal]](idx + 11),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 12)
       )
-  
-    override def reads(json: JsValue): JsResult[PohViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PohViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            purchaseorderid = json.\("purchaseorderid").toOption.map(_.as[PurchaseorderheaderId]),
-            revisionnumber = json.\("revisionnumber").toOption.map(_.as[Int]),
-            status = json.\("status").toOption.map(_.as[Int]),
-            employeeid = json.\("employeeid").toOption.map(_.as[BusinessentityId]),
-            vendorid = json.\("vendorid").toOption.map(_.as[BusinessentityId]),
-            shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
-            orderdate = json.\("orderdate").toOption.map(_.as[LocalDateTime]),
-            shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
-            subtotal = json.\("subtotal").toOption.map(_.as[BigDecimal]),
-            taxamt = json.\("taxamt").toOption.map(_.as[BigDecimal]),
-            freight = json.\("freight").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PohViewRow] = OWrites[PohViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
+      "revisionnumber" -> Json.toJson(o.revisionnumber),
+      "status" -> Json.toJson(o.status),
+      "employeeid" -> Json.toJson(o.employeeid),
+      "vendorid" -> Json.toJson(o.vendorid),
+      "shipmethodid" -> Json.toJson(o.shipmethodid),
+      "orderdate" -> Json.toJson(o.orderdate),
+      "shipdate" -> Json.toJson(o.shipdate),
+      "subtotal" -> Json.toJson(o.subtotal),
+      "taxamt" -> Json.toJson(o.taxamt),
+      "freight" -> Json.toJson(o.freight),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

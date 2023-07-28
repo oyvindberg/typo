@@ -8,11 +8,11 @@ package person
 package countryregion
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning countryregioncode, "name", modifieddate
+          returning countryregioncode, "name", modifieddate::text
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
   
@@ -32,19 +32,19 @@ object CountryregionRepoImpl extends CountryregionRepo {
       Some((NamedParameter("name", ParameterValue.from(unsaved.name)), """::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.countryregion default values
-            returning countryregioncode, "name", modifieddate
+            returning countryregioncode, "name", modifieddate::text
          """
         .executeInsert(CountryregionRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.countryregion(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning countryregioncode, "name", modifieddate
+                  returning countryregioncode, "name", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -55,18 +55,18 @@ object CountryregionRepoImpl extends CountryregionRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
-    SQL"""select countryregioncode, "name", modifieddate
+    SQL"""select countryregioncode, "name", modifieddate::text
           from person.countryregion
        """.as(CountryregionRow.rowParser(1).*)
   }
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
-    SQL"""select countryregioncode, "name", modifieddate
+    SQL"""select countryregioncode, "name", modifieddate::text
           from person.countryregion
           where countryregioncode = $countryregioncode
        """.as(CountryregionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
-    SQL"""select countryregioncode, "name", modifieddate
+    SQL"""select countryregioncode, "name", modifieddate::text
           from person.countryregion
           where countryregioncode = ANY($countryregioncodes)
        """.as(CountryregionRow.rowParser(1).*)
@@ -91,7 +91,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning countryregioncode, "name", modifieddate
+          returning countryregioncode, "name", modifieddate::text
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
   

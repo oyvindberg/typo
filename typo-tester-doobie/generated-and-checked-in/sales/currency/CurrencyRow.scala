@@ -7,54 +7,36 @@ package adventureworks
 package sales
 package currency
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CurrencyRow(
   /** The ISO code for the Currency. */
   currencycode: CurrencyId,
   /** Currency name. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CurrencyRow {
-  implicit val decoder: Decoder[CurrencyRow] =
-    (c: HCursor) =>
-      for {
-        currencycode <- c.downField("currencycode").as[CurrencyId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield CurrencyRow(currencycode, name, modifieddate)
-  implicit val encoder: Encoder[CurrencyRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "currencycode" := row.currencycode,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CurrencyRow] =
-    new Read[CurrencyRow](
-      gets = List(
-        (Get[CurrencyId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CurrencyRow(
-        currencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[CurrencyRow] = Decoder.forProduct3[CurrencyRow, CurrencyId, Name, TypoLocalDateTime]("currencycode", "name", "modifieddate")(CurrencyRow.apply)
+  implicit val encoder: Encoder[CurrencyRow] = Encoder.forProduct3[CurrencyRow, CurrencyId, Name, TypoLocalDateTime]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))
+  implicit val read: Read[CurrencyRow] = new Read[CurrencyRow](
+    gets = List(
+      (Get[CurrencyId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CurrencyRow(
+      currencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

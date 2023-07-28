@@ -12,29 +12,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `sales.salesorderdetail` */
 case class SalesorderdetailId(salesorderid: SalesorderheaderId, salesorderdetailid: Int)
 object SalesorderdetailId {
   implicit val ordering: Ordering[SalesorderdetailId] = Ordering.by(x => (x.salesorderid, x.salesorderdetailid))
-  implicit val oFormat: OFormat[SalesorderdetailId] = new OFormat[SalesorderdetailId]{
-    override def writes(o: SalesorderdetailId): JsObject =
-      Json.obj(
-        "salesorderid" -> o.salesorderid,
-        "salesorderdetailid" -> o.salesorderdetailid
-      )
-  
-    override def reads(json: JsValue): JsResult[SalesorderdetailId] = {
-      JsResult.fromTry(
-        Try(
-          SalesorderdetailId(
-            salesorderid = json.\("salesorderid").as[SalesorderheaderId],
-            salesorderdetailid = json.\("salesorderdetailid").as[Int]
-          )
+  implicit val reads: Reads[SalesorderdetailId] = Reads[SalesorderdetailId](json => JsResult.fromTry(
+      Try(
+        SalesorderdetailId(
+          salesorderid = json.\("salesorderid").as[SalesorderheaderId],
+          salesorderdetailid = json.\("salesorderdetailid").as[Int]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalesorderdetailId] = OWrites[SalesorderdetailId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "salesorderid" -> Json.toJson(o.salesorderid),
+      "salesorderdetailid" -> Json.toJson(o.salesorderdetailid)
+    ))
+  )
 }

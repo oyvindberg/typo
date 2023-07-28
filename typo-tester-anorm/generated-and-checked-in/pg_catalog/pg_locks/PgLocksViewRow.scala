@@ -7,15 +7,17 @@ package adventureworks
 package pg_catalog
 package pg_locks
 
+import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgLocksViewRow(
@@ -34,77 +36,73 @@ case class PgLocksViewRow(
   mode: Option[String],
   granted: Option[Boolean],
   fastpath: Option[Boolean],
-  waitstart: Option[OffsetDateTime]
+  waitstart: Option[TypoOffsetDateTime]
 )
 
 object PgLocksViewRow {
-  def rowParser(idx: Int): RowParser[PgLocksViewRow] =
-    RowParser[PgLocksViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgLocksViewRow] = Reads[PgLocksViewRow](json => JsResult.fromTry(
+      Try(
         PgLocksViewRow(
-          locktype = row[Option[String]](idx + 0),
-          database = row[Option[/* oid */ Long]](idx + 1),
-          relation = row[Option[/* oid */ Long]](idx + 2),
-          page = row[Option[Int]](idx + 3),
-          tuple = row[Option[Int]](idx + 4),
-          virtualxid = row[Option[String]](idx + 5),
-          transactionid = row[Option[TypoXid]](idx + 6),
-          classid = row[Option[/* oid */ Long]](idx + 7),
-          objid = row[Option[/* oid */ Long]](idx + 8),
-          objsubid = row[Option[Int]](idx + 9),
-          virtualtransaction = row[Option[String]](idx + 10),
-          pid = row[Option[Int]](idx + 11),
-          mode = row[Option[String]](idx + 12),
-          granted = row[Option[Boolean]](idx + 13),
-          fastpath = row[Option[Boolean]](idx + 14),
-          waitstart = row[Option[OffsetDateTime]](idx + 15)
+          locktype = json.\("locktype").toOption.map(_.as[String]),
+          database = json.\("database").toOption.map(_.as[/* oid */ Long]),
+          relation = json.\("relation").toOption.map(_.as[/* oid */ Long]),
+          page = json.\("page").toOption.map(_.as[Int]),
+          tuple = json.\("tuple").toOption.map(_.as[Int]),
+          virtualxid = json.\("virtualxid").toOption.map(_.as[String]),
+          transactionid = json.\("transactionid").toOption.map(_.as[TypoXid]),
+          classid = json.\("classid").toOption.map(_.as[/* oid */ Long]),
+          objid = json.\("objid").toOption.map(_.as[/* oid */ Long]),
+          objsubid = json.\("objsubid").toOption.map(_.as[Int]),
+          virtualtransaction = json.\("virtualtransaction").toOption.map(_.as[String]),
+          pid = json.\("pid").toOption.map(_.as[Int]),
+          mode = json.\("mode").toOption.map(_.as[String]),
+          granted = json.\("granted").toOption.map(_.as[Boolean]),
+          fastpath = json.\("fastpath").toOption.map(_.as[Boolean]),
+          waitstart = json.\("waitstart").toOption.map(_.as[TypoOffsetDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgLocksViewRow] = new OFormat[PgLocksViewRow]{
-    override def writes(o: PgLocksViewRow): JsObject =
-      Json.obj(
-        "locktype" -> o.locktype,
-        "database" -> o.database,
-        "relation" -> o.relation,
-        "page" -> o.page,
-        "tuple" -> o.tuple,
-        "virtualxid" -> o.virtualxid,
-        "transactionid" -> o.transactionid,
-        "classid" -> o.classid,
-        "objid" -> o.objid,
-        "objsubid" -> o.objsubid,
-        "virtualtransaction" -> o.virtualtransaction,
-        "pid" -> o.pid,
-        "mode" -> o.mode,
-        "granted" -> o.granted,
-        "fastpath" -> o.fastpath,
-        "waitstart" -> o.waitstart
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgLocksViewRow] = RowParser[PgLocksViewRow] { row =>
+    Success(
+      PgLocksViewRow(
+        locktype = row[Option[String]](idx + 0),
+        database = row[Option[/* oid */ Long]](idx + 1),
+        relation = row[Option[/* oid */ Long]](idx + 2),
+        page = row[Option[Int]](idx + 3),
+        tuple = row[Option[Int]](idx + 4),
+        virtualxid = row[Option[String]](idx + 5),
+        transactionid = row[Option[TypoXid]](idx + 6),
+        classid = row[Option[/* oid */ Long]](idx + 7),
+        objid = row[Option[/* oid */ Long]](idx + 8),
+        objsubid = row[Option[Int]](idx + 9),
+        virtualtransaction = row[Option[String]](idx + 10),
+        pid = row[Option[Int]](idx + 11),
+        mode = row[Option[String]](idx + 12),
+        granted = row[Option[Boolean]](idx + 13),
+        fastpath = row[Option[Boolean]](idx + 14),
+        waitstart = row[Option[TypoOffsetDateTime]](idx + 15)
       )
-  
-    override def reads(json: JsValue): JsResult[PgLocksViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgLocksViewRow(
-            locktype = json.\("locktype").toOption.map(_.as[String]),
-            database = json.\("database").toOption.map(_.as[/* oid */ Long]),
-            relation = json.\("relation").toOption.map(_.as[/* oid */ Long]),
-            page = json.\("page").toOption.map(_.as[Int]),
-            tuple = json.\("tuple").toOption.map(_.as[Int]),
-            virtualxid = json.\("virtualxid").toOption.map(_.as[String]),
-            transactionid = json.\("transactionid").toOption.map(_.as[TypoXid]),
-            classid = json.\("classid").toOption.map(_.as[/* oid */ Long]),
-            objid = json.\("objid").toOption.map(_.as[/* oid */ Long]),
-            objsubid = json.\("objsubid").toOption.map(_.as[Int]),
-            virtualtransaction = json.\("virtualtransaction").toOption.map(_.as[String]),
-            pid = json.\("pid").toOption.map(_.as[Int]),
-            mode = json.\("mode").toOption.map(_.as[String]),
-            granted = json.\("granted").toOption.map(_.as[Boolean]),
-            fastpath = json.\("fastpath").toOption.map(_.as[Boolean]),
-            waitstart = json.\("waitstart").toOption.map(_.as[OffsetDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgLocksViewRow] = OWrites[PgLocksViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "locktype" -> Json.toJson(o.locktype),
+      "database" -> Json.toJson(o.database),
+      "relation" -> Json.toJson(o.relation),
+      "page" -> Json.toJson(o.page),
+      "tuple" -> Json.toJson(o.tuple),
+      "virtualxid" -> Json.toJson(o.virtualxid),
+      "transactionid" -> Json.toJson(o.transactionid),
+      "classid" -> Json.toJson(o.classid),
+      "objid" -> Json.toJson(o.objid),
+      "objsubid" -> Json.toJson(o.objsubid),
+      "virtualtransaction" -> Json.toJson(o.virtualtransaction),
+      "pid" -> Json.toJson(o.pid),
+      "mode" -> Json.toJson(o.mode),
+      "granted" -> Json.toJson(o.granted),
+      "fastpath" -> Json.toJson(o.fastpath),
+      "waitstart" -> Json.toJson(o.waitstart)
+    ))
+  )
 }

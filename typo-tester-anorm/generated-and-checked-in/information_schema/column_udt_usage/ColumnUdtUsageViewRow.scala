@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ColumnUdtUsageViewRow(
@@ -28,46 +30,42 @@ case class ColumnUdtUsageViewRow(
 )
 
 object ColumnUdtUsageViewRow {
-  def rowParser(idx: Int): RowParser[ColumnUdtUsageViewRow] =
-    RowParser[ColumnUdtUsageViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ColumnUdtUsageViewRow] = Reads[ColumnUdtUsageViewRow](json => JsResult.fromTry(
+      Try(
         ColumnUdtUsageViewRow(
-          udtCatalog = row[Option[SqlIdentifier]](idx + 0),
-          udtSchema = row[Option[SqlIdentifier]](idx + 1),
-          udtName = row[Option[SqlIdentifier]](idx + 2),
-          tableCatalog = row[Option[SqlIdentifier]](idx + 3),
-          tableSchema = row[Option[SqlIdentifier]](idx + 4),
-          tableName = row[Option[SqlIdentifier]](idx + 5),
-          columnName = row[Option[SqlIdentifier]](idx + 6)
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
+          udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
+          udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[ColumnUdtUsageViewRow] = new OFormat[ColumnUdtUsageViewRow]{
-    override def writes(o: ColumnUdtUsageViewRow): JsObject =
-      Json.obj(
-        "udt_catalog" -> o.udtCatalog,
-        "udt_schema" -> o.udtSchema,
-        "udt_name" -> o.udtName,
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "column_name" -> o.columnName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ColumnUdtUsageViewRow] = RowParser[ColumnUdtUsageViewRow] { row =>
+    Success(
+      ColumnUdtUsageViewRow(
+        udtCatalog = row[Option[SqlIdentifier]](idx + 0),
+        udtSchema = row[Option[SqlIdentifier]](idx + 1),
+        udtName = row[Option[SqlIdentifier]](idx + 2),
+        tableCatalog = row[Option[SqlIdentifier]](idx + 3),
+        tableSchema = row[Option[SqlIdentifier]](idx + 4),
+        tableName = row[Option[SqlIdentifier]](idx + 5),
+        columnName = row[Option[SqlIdentifier]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[ColumnUdtUsageViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ColumnUdtUsageViewRow(
-            udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
-            udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
-            udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ColumnUdtUsageViewRow] = OWrites[ColumnUdtUsageViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "udt_catalog" -> Json.toJson(o.udtCatalog),
+      "udt_schema" -> Json.toJson(o.udtSchema),
+      "udt_name" -> Json.toJson(o.udtName),
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "column_name" -> Json.toJson(o.columnName)
+    ))
+  )
 }

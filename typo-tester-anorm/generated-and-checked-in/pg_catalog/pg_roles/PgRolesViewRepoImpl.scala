@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgRolesViewRepoImpl extends PgRolesViewRepo {
   override def selectAll(implicit c: Connection): List[PgRolesViewRow] = {
-    SQL"""select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil, rolbypassrls, rolconfig, oid
+    SQL"""select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil::text, rolbypassrls, rolconfig, oid
           from pg_catalog.pg_roles
        """.as(PgRolesViewRow.rowParser(1).*)
   }

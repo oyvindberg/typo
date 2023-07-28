@@ -7,18 +7,20 @@ package adventureworks
 package production
 package vproductmodelcatalogdescription
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
+import scala.util.Try
 
 case class VproductmodelcatalogdescriptionViewRow(
   /** Points to [[productmodel.ProductmodelRow.productmodelid]] */
@@ -49,126 +51,128 @@ case class VproductmodelcatalogdescriptionViewRow(
   /** Points to [[productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[productmodel.ProductmodelRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object VproductmodelcatalogdescriptionViewRow {
-  implicit val decoder: Decoder[VproductmodelcatalogdescriptionViewRow] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
-        name <- c.downField("name").as[Option[Name]]
-        Summary <- c.downField("Summary").as[Option[String]]
-        manufacturer <- c.downField("manufacturer").as[Option[String]]
-        copyright <- c.downField("copyright").as[Option[/* max 30 chars */ String]]
-        producturl <- c.downField("producturl").as[Option[/* max 256 chars */ String]]
-        warrantyperiod <- c.downField("warrantyperiod").as[Option[/* max 256 chars */ String]]
-        warrantydescription <- c.downField("warrantydescription").as[Option[/* max 256 chars */ String]]
-        noofyears <- c.downField("noofyears").as[Option[/* max 256 chars */ String]]
-        maintenancedescription <- c.downField("maintenancedescription").as[Option[/* max 256 chars */ String]]
-        wheel <- c.downField("wheel").as[Option[/* max 256 chars */ String]]
-        saddle <- c.downField("saddle").as[Option[/* max 256 chars */ String]]
-        pedal <- c.downField("pedal").as[Option[/* max 256 chars */ String]]
-        bikeframe <- c.downField("bikeframe").as[Option[String]]
-        crankset <- c.downField("crankset").as[Option[/* max 256 chars */ String]]
-        pictureangle <- c.downField("pictureangle").as[Option[/* max 256 chars */ String]]
-        picturesize <- c.downField("picturesize").as[Option[/* max 256 chars */ String]]
-        productphotoid <- c.downField("productphotoid").as[Option[/* max 256 chars */ String]]
-        material <- c.downField("material").as[Option[/* max 256 chars */ String]]
-        color <- c.downField("color").as[Option[/* max 256 chars */ String]]
-        productline <- c.downField("productline").as[Option[/* max 256 chars */ String]]
-        style <- c.downField("style").as[Option[/* max 256 chars */ String]]
-        riderexperience <- c.downField("riderexperience").as[Option[/* max 1024 chars */ String]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield VproductmodelcatalogdescriptionViewRow(productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate)
-  implicit val encoder: Encoder[VproductmodelcatalogdescriptionViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "name" := row.name,
-        "Summary" := row.Summary,
-        "manufacturer" := row.manufacturer,
-        "copyright" := row.copyright,
-        "producturl" := row.producturl,
-        "warrantyperiod" := row.warrantyperiod,
-        "warrantydescription" := row.warrantydescription,
-        "noofyears" := row.noofyears,
-        "maintenancedescription" := row.maintenancedescription,
-        "wheel" := row.wheel,
-        "saddle" := row.saddle,
-        "pedal" := row.pedal,
-        "bikeframe" := row.bikeframe,
-        "crankset" := row.crankset,
-        "pictureangle" := row.pictureangle,
-        "picturesize" := row.picturesize,
-        "productphotoid" := row.productphotoid,
-        "material" := row.material,
-        "color" := row.color,
-        "productline" := row.productline,
-        "style" := row.style,
-        "riderexperience" := row.riderexperience,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[VproductmodelcatalogdescriptionViewRow] =
-    new Read[VproductmodelcatalogdescriptionViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 256 chars */ String], Nullability.Nullable),
-        (Get[/* max 1024 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VproductmodelcatalogdescriptionViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        Summary = Get[String].unsafeGetNullable(rs, i + 2),
-        manufacturer = Get[String].unsafeGetNullable(rs, i + 3),
-        copyright = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 4),
-        producturl = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 5),
-        warrantyperiod = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 6),
-        warrantydescription = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 7),
-        noofyears = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 8),
-        maintenancedescription = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 9),
-        wheel = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 10),
-        saddle = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 11),
-        pedal = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 12),
-        bikeframe = Get[String].unsafeGetNullable(rs, i + 13),
-        crankset = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 14),
-        pictureangle = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 15),
-        picturesize = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 16),
-        productphotoid = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 17),
-        material = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 18),
-        color = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 19),
-        productline = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 20),
-        style = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 21),
-        riderexperience = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 22),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 23),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 24)
+  implicit val decoder: Decoder[VproductmodelcatalogdescriptionViewRow] = Decoder.instanceTry[VproductmodelcatalogdescriptionViewRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      VproductmodelcatalogdescriptionViewRow(
+        productmodelid = orThrow(c.get("productmodelid")(Decoder[Option[ProductmodelId]])),
+        name = orThrow(c.get("name")(Decoder[Option[Name]])),
+        Summary = orThrow(c.get("Summary")(Decoder[Option[String]])),
+        manufacturer = orThrow(c.get("manufacturer")(Decoder[Option[String]])),
+        copyright = orThrow(c.get("copyright")(Decoder[Option[/* max 30 chars */ String]])),
+        producturl = orThrow(c.get("producturl")(Decoder[Option[/* max 256 chars */ String]])),
+        warrantyperiod = orThrow(c.get("warrantyperiod")(Decoder[Option[/* max 256 chars */ String]])),
+        warrantydescription = orThrow(c.get("warrantydescription")(Decoder[Option[/* max 256 chars */ String]])),
+        noofyears = orThrow(c.get("noofyears")(Decoder[Option[/* max 256 chars */ String]])),
+        maintenancedescription = orThrow(c.get("maintenancedescription")(Decoder[Option[/* max 256 chars */ String]])),
+        wheel = orThrow(c.get("wheel")(Decoder[Option[/* max 256 chars */ String]])),
+        saddle = orThrow(c.get("saddle")(Decoder[Option[/* max 256 chars */ String]])),
+        pedal = orThrow(c.get("pedal")(Decoder[Option[/* max 256 chars */ String]])),
+        bikeframe = orThrow(c.get("bikeframe")(Decoder[Option[String]])),
+        crankset = orThrow(c.get("crankset")(Decoder[Option[/* max 256 chars */ String]])),
+        pictureangle = orThrow(c.get("pictureangle")(Decoder[Option[/* max 256 chars */ String]])),
+        picturesize = orThrow(c.get("picturesize")(Decoder[Option[/* max 256 chars */ String]])),
+        productphotoid = orThrow(c.get("productphotoid")(Decoder[Option[/* max 256 chars */ String]])),
+        material = orThrow(c.get("material")(Decoder[Option[/* max 256 chars */ String]])),
+        color = orThrow(c.get("color")(Decoder[Option[/* max 256 chars */ String]])),
+        productline = orThrow(c.get("productline")(Decoder[Option[/* max 256 chars */ String]])),
+        style = orThrow(c.get("style")(Decoder[Option[/* max 256 chars */ String]])),
+        riderexperience = orThrow(c.get("riderexperience")(Decoder[Option[/* max 1024 chars */ String]])),
+        rowguid = orThrow(c.get("rowguid")(Decoder[Option[UUID]])),
+        modifieddate = orThrow(c.get("modifieddate")(Decoder[Option[TypoLocalDateTime]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[VproductmodelcatalogdescriptionViewRow] = Encoder[VproductmodelcatalogdescriptionViewRow](row =>
+    Json.obj(
+      "productmodelid" -> Encoder[Option[ProductmodelId]].apply(row.productmodelid),
+      "name" -> Encoder[Option[Name]].apply(row.name),
+      "Summary" -> Encoder[Option[String]].apply(row.Summary),
+      "manufacturer" -> Encoder[Option[String]].apply(row.manufacturer),
+      "copyright" -> Encoder[Option[/* max 30 chars */ String]].apply(row.copyright),
+      "producturl" -> Encoder[Option[/* max 256 chars */ String]].apply(row.producturl),
+      "warrantyperiod" -> Encoder[Option[/* max 256 chars */ String]].apply(row.warrantyperiod),
+      "warrantydescription" -> Encoder[Option[/* max 256 chars */ String]].apply(row.warrantydescription),
+      "noofyears" -> Encoder[Option[/* max 256 chars */ String]].apply(row.noofyears),
+      "maintenancedescription" -> Encoder[Option[/* max 256 chars */ String]].apply(row.maintenancedescription),
+      "wheel" -> Encoder[Option[/* max 256 chars */ String]].apply(row.wheel),
+      "saddle" -> Encoder[Option[/* max 256 chars */ String]].apply(row.saddle),
+      "pedal" -> Encoder[Option[/* max 256 chars */ String]].apply(row.pedal),
+      "bikeframe" -> Encoder[Option[String]].apply(row.bikeframe),
+      "crankset" -> Encoder[Option[/* max 256 chars */ String]].apply(row.crankset),
+      "pictureangle" -> Encoder[Option[/* max 256 chars */ String]].apply(row.pictureangle),
+      "picturesize" -> Encoder[Option[/* max 256 chars */ String]].apply(row.picturesize),
+      "productphotoid" -> Encoder[Option[/* max 256 chars */ String]].apply(row.productphotoid),
+      "material" -> Encoder[Option[/* max 256 chars */ String]].apply(row.material),
+      "color" -> Encoder[Option[/* max 256 chars */ String]].apply(row.color),
+      "productline" -> Encoder[Option[/* max 256 chars */ String]].apply(row.productline),
+      "style" -> Encoder[Option[/* max 256 chars */ String]].apply(row.style),
+      "riderexperience" -> Encoder[Option[/* max 1024 chars */ String]].apply(row.riderexperience),
+      "rowguid" -> Encoder[Option[UUID]].apply(row.rowguid),
+      "modifieddate" -> Encoder[Option[TypoLocalDateTime]].apply(row.modifieddate)
     )
-  
-
+  )
+  implicit val read: Read[VproductmodelcatalogdescriptionViewRow] = new Read[VproductmodelcatalogdescriptionViewRow](
+    gets = List(
+      (Get[ProductmodelId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 256 chars */ String], Nullability.Nullable),
+      (Get[/* max 1024 chars */ String], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VproductmodelcatalogdescriptionViewRow(
+      productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNullable(rs, i + 1),
+      Summary = Get[String].unsafeGetNullable(rs, i + 2),
+      manufacturer = Get[String].unsafeGetNullable(rs, i + 3),
+      copyright = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 4),
+      producturl = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 5),
+      warrantyperiod = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 6),
+      warrantydescription = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 7),
+      noofyears = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 8),
+      maintenancedescription = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 9),
+      wheel = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 10),
+      saddle = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 11),
+      pedal = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 12),
+      bikeframe = Get[String].unsafeGetNullable(rs, i + 13),
+      crankset = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 14),
+      pictureangle = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 15),
+      picturesize = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 16),
+      productphotoid = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 17),
+      material = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 18),
+      color = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 19),
+      productline = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 20),
+      style = Get[/* max 256 chars */ String].unsafeGetNullable(rs, i + 21),
+      riderexperience = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 22),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 23),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 24)
+    )
+  )
 }

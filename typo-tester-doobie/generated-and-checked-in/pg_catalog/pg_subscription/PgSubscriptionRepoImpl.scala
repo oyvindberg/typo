@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def delete(oid: PgSubscriptionId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_subscription where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_subscription where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgSubscriptionRow): ConnectionIO[PgSubscriptionRow] = {
     sql"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)
@@ -25,10 +25,10 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
     sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription".query[PgSubscriptionRow].stream
   }
   override def selectById(oid: PgSubscriptionId): ConnectionIO[Option[PgSubscriptionRow]] = {
-    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = $oid".query[PgSubscriptionRow].option
+    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ${oid}".query[PgSubscriptionRow].option
   }
   override def selectByIds(oids: Array[PgSubscriptionId]): Stream[ConnectionIO, PgSubscriptionRow] = {
-    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ANY($oids)".query[PgSubscriptionRow].stream
+    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ANY(${oids})".query[PgSubscriptionRow].stream
   }
   override def update(row: PgSubscriptionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -43,7 +43,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
               subslotname = ${row.subslotname}::name,
               subsynccommit = ${row.subsynccommit},
               subpublications = ${row.subpublications}::_text
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

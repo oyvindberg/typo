@@ -7,16 +7,18 @@ package adventureworks
 package purchasing
 package purchaseorderheader
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PurchaseorderheaderRow(
@@ -36,74 +38,70 @@ case class PurchaseorderheaderRow(
       Points to [[shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
   /** Purchase order creation date. */
-  orderdate: LocalDateTime,
+  orderdate: TypoLocalDateTime,
   /** Estimated shipment date from the vendor. */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID. */
   subtotal: BigDecimal,
   /** Tax amount. */
   taxamt: BigDecimal,
   /** Shipping cost. */
   freight: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object PurchaseorderheaderRow {
-  def rowParser(idx: Int): RowParser[PurchaseorderheaderRow] =
-    RowParser[PurchaseorderheaderRow] { row =>
-      Success(
+  implicit val reads: Reads[PurchaseorderheaderRow] = Reads[PurchaseorderheaderRow](json => JsResult.fromTry(
+      Try(
         PurchaseorderheaderRow(
-          purchaseorderid = row[PurchaseorderheaderId](idx + 0),
-          revisionnumber = row[Int](idx + 1),
-          status = row[Int](idx + 2),
-          employeeid = row[BusinessentityId](idx + 3),
-          vendorid = row[BusinessentityId](idx + 4),
-          shipmethodid = row[ShipmethodId](idx + 5),
-          orderdate = row[LocalDateTime](idx + 6),
-          shipdate = row[Option[LocalDateTime]](idx + 7),
-          subtotal = row[BigDecimal](idx + 8),
-          taxamt = row[BigDecimal](idx + 9),
-          freight = row[BigDecimal](idx + 10),
-          modifieddate = row[LocalDateTime](idx + 11)
+          purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
+          revisionnumber = json.\("revisionnumber").as[Int],
+          status = json.\("status").as[Int],
+          employeeid = json.\("employeeid").as[BusinessentityId],
+          vendorid = json.\("vendorid").as[BusinessentityId],
+          shipmethodid = json.\("shipmethodid").as[ShipmethodId],
+          orderdate = json.\("orderdate").as[TypoLocalDateTime],
+          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
+          subtotal = json.\("subtotal").as[BigDecimal],
+          taxamt = json.\("taxamt").as[BigDecimal],
+          freight = json.\("freight").as[BigDecimal],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[PurchaseorderheaderRow] = new OFormat[PurchaseorderheaderRow]{
-    override def writes(o: PurchaseorderheaderRow): JsObject =
-      Json.obj(
-        "purchaseorderid" -> o.purchaseorderid,
-        "revisionnumber" -> o.revisionnumber,
-        "status" -> o.status,
-        "employeeid" -> o.employeeid,
-        "vendorid" -> o.vendorid,
-        "shipmethodid" -> o.shipmethodid,
-        "orderdate" -> o.orderdate,
-        "shipdate" -> o.shipdate,
-        "subtotal" -> o.subtotal,
-        "taxamt" -> o.taxamt,
-        "freight" -> o.freight,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PurchaseorderheaderRow] = RowParser[PurchaseorderheaderRow] { row =>
+    Success(
+      PurchaseorderheaderRow(
+        purchaseorderid = row[PurchaseorderheaderId](idx + 0),
+        revisionnumber = row[Int](idx + 1),
+        status = row[Int](idx + 2),
+        employeeid = row[BusinessentityId](idx + 3),
+        vendorid = row[BusinessentityId](idx + 4),
+        shipmethodid = row[ShipmethodId](idx + 5),
+        orderdate = row[TypoLocalDateTime](idx + 6),
+        shipdate = row[Option[TypoLocalDateTime]](idx + 7),
+        subtotal = row[BigDecimal](idx + 8),
+        taxamt = row[BigDecimal](idx + 9),
+        freight = row[BigDecimal](idx + 10),
+        modifieddate = row[TypoLocalDateTime](idx + 11)
       )
-  
-    override def reads(json: JsValue): JsResult[PurchaseorderheaderRow] = {
-      JsResult.fromTry(
-        Try(
-          PurchaseorderheaderRow(
-            purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
-            revisionnumber = json.\("revisionnumber").as[Int],
-            status = json.\("status").as[Int],
-            employeeid = json.\("employeeid").as[BusinessentityId],
-            vendorid = json.\("vendorid").as[BusinessentityId],
-            shipmethodid = json.\("shipmethodid").as[ShipmethodId],
-            orderdate = json.\("orderdate").as[LocalDateTime],
-            shipdate = json.\("shipdate").toOption.map(_.as[LocalDateTime]),
-            subtotal = json.\("subtotal").as[BigDecimal],
-            taxamt = json.\("taxamt").as[BigDecimal],
-            freight = json.\("freight").as[BigDecimal],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PurchaseorderheaderRow] = OWrites[PurchaseorderheaderRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
+      "revisionnumber" -> Json.toJson(o.revisionnumber),
+      "status" -> Json.toJson(o.status),
+      "employeeid" -> Json.toJson(o.employeeid),
+      "vendorid" -> Json.toJson(o.vendorid),
+      "shipmethodid" -> Json.toJson(o.shipmethodid),
+      "orderdate" -> Json.toJson(o.orderdate),
+      "shipdate" -> Json.toJson(o.shipdate),
+      "subtotal" -> Json.toJson(o.subtotal),
+      "taxamt" -> Json.toJson(o.taxamt),
+      "freight" -> Json.toJson(o.freight),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

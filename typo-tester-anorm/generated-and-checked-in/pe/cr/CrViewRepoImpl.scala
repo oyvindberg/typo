@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object CrViewRepoImpl extends CrViewRepo {
   override def selectAll(implicit c: Connection): List[CrViewRow] = {
-    SQL"""select countryregioncode, "name", modifieddate
+    SQL"""select countryregioncode, "name", modifieddate::text
           from pe.cr
        """.as(CrViewRow.rowParser(1).*)
   }

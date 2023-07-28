@@ -8,12 +8,10 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `humanresources.employeepayhistory` which has not been persisted yet */
 case class EmployeepayhistoryRowUnsaved(
@@ -21,15 +19,15 @@ case class EmployeepayhistoryRowUnsaved(
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Date the change in pay is effective */
-  ratechangedate: LocalDateTime,
+  ratechangedate: TypoLocalDateTime,
   /** Salary hourly rate. */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly */
   payfrequency: Int,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): EmployeepayhistoryRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): EmployeepayhistoryRow =
     EmployeepayhistoryRow(
       businessentityid = businessentityid,
       ratechangedate = ratechangedate,
@@ -42,23 +40,6 @@ case class EmployeepayhistoryRowUnsaved(
     )
 }
 object EmployeepayhistoryRowUnsaved {
-  implicit val decoder: Decoder[EmployeepayhistoryRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        ratechangedate <- c.downField("ratechangedate").as[LocalDateTime]
-        rate <- c.downField("rate").as[BigDecimal]
-        payfrequency <- c.downField("payfrequency").as[Int]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield EmployeepayhistoryRowUnsaved(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
-  implicit val encoder: Encoder[EmployeepayhistoryRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "ratechangedate" := row.ratechangedate,
-        "rate" := row.rate,
-        "payfrequency" := row.payfrequency,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[EmployeepayhistoryRowUnsaved] = Decoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRowUnsaved.apply)
+  implicit val encoder: Encoder[EmployeepayhistoryRowUnsaved] = Encoder.forProduct5[EmployeepayhistoryRowUnsaved, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, Defaulted[TypoLocalDateTime]]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))
 }

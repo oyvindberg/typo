@@ -8,15 +8,17 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesterritoryhistory` which has not been persisted yet */
@@ -28,15 +30,15 @@ case class SalesterritoryhistoryRowUnsaved(
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   /** Primary key. Date the sales representive started work in the territory. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Date the sales representative left work in the territory. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesterritoryhistoryRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesterritoryhistoryRow =
     SalesterritoryhistoryRow(
       businessentityid = businessentityid,
       territoryid = territoryid,
@@ -53,30 +55,27 @@ case class SalesterritoryhistoryRowUnsaved(
     )
 }
 object SalesterritoryhistoryRowUnsaved {
-  implicit val oFormat: OFormat[SalesterritoryhistoryRowUnsaved] = new OFormat[SalesterritoryhistoryRowUnsaved]{
-    override def writes(o: SalesterritoryhistoryRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "territoryid" -> o.territoryid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[SalesterritoryhistoryRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          SalesterritoryhistoryRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            territoryid = json.\("territoryid").as[SalesterritoryId],
-            startdate = json.\("startdate").as[LocalDateTime],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[SalesterritoryhistoryRowUnsaved] = Reads[SalesterritoryhistoryRowUnsaved](json => JsResult.fromTry(
+      Try(
+        SalesterritoryhistoryRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          territoryid = json.\("territoryid").as[SalesterritoryId],
+          startdate = json.\("startdate").as[TypoLocalDateTime],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalesterritoryhistoryRowUnsaved] = OWrites[SalesterritoryhistoryRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

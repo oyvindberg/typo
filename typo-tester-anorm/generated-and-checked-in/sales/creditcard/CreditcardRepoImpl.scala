@@ -8,11 +8,11 @@ package sales
 package creditcard
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: CreditcardId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
           values (${unsaved.creditcardid}::int4, ${unsaved.cardtype}, ${unsaved.cardnumber}, ${unsaved.expmonth}::int2, ${unsaved.expyear}::int2, ${unsaved.modifieddate}::timestamp)
-          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
   
@@ -38,19 +38,19 @@ object CreditcardRepoImpl extends CreditcardRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.creditcard default values
-            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+            returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
          """
         .executeInsert(CreditcardRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.creditcard(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+                  returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -61,18 +61,18 @@ object CreditcardRepoImpl extends CreditcardRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
           from sales.creditcard
        """.as(CreditcardRow.rowParser(1).*)
   }
   override def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
           from sales.creditcard
           where creditcardid = $creditcardid
        """.as(CreditcardRow.rowParser(1).singleOpt)
   }
   override def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow] = {
-    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+    SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
           from sales.creditcard
           where creditcardid = ANY($creditcardids)
        """.as(CreditcardRow.rowParser(1).*)
@@ -106,7 +106,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
             expmonth = EXCLUDED.expmonth,
             expyear = EXCLUDED.expyear,
             modifieddate = EXCLUDED.modifieddate
-          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
+          returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
   

@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.jdbc.PgSQLXML
@@ -20,60 +17,58 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** XML */
 case class TypoXml(value: String)
+
 object TypoXml {
-  implicit val oFormat: OFormat[TypoXml] = new OFormat[TypoXml]{
-    override def writes(o: TypoXml): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoXml] = {
-      JsResult.fromTry(
-        Try(
-          TypoXml(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoXmlDb: ToStatement[TypoXml] with ParameterMetaData[TypoXml] with Column[TypoXml] = new ToStatement[TypoXml] with ParameterMetaData[TypoXml] with Column[TypoXml] {
-    override def sqlType: String = "xml"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoXml): Unit =
-      s.setObject(index, v.value)
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoXml] =
-      v match {
-        case v: PgSQLXML => Right(TypoXml(v.getString))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PgSQLXML from JDBC to produce a TypoXml, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoXmlDbArray: ToStatement[Array[TypoXml]] with ParameterMetaData[Array[TypoXml]] with Column[Array[TypoXml]] = new ToStatement[Array[TypoXml]] with ParameterMetaData[Array[TypoXml]] with Column[Array[TypoXml]] {
-    override def sqlType: String = "_xml"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoXml]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("xml", v.map(v => {
-                                                                          val obj = new PGobject
-                                                                          obj.setType("xml")
-                                                                          obj.setValue(v.value)
-                                                                          obj
-                                                                        })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoXml]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoXml]] = Column.nonNull[Array[TypoXml]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoXml(v.asInstanceOf[PGobject].getValue)))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoXml, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoXml, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoXml]] = new ParameterMetaData[Array[TypoXml]] {
+    override def sqlType: String = "_xml"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoXml]] = ToStatement[Array[TypoXml]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("xml", v.map(v => {
+                                                                                                                   val obj = new PGobject
+                                                                                                                   obj.setType("xml")
+                                                                                                                   obj.setValue(v.value)
+                                                                                                                   obj
+                                                                                                                 }))))
+  implicit val column: Column[TypoXml] = Column.nonNull[TypoXml]((v1: Any, _) =>
+    v1 match {
+      case v: PgSQLXML => Right(TypoXml(v.getString))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgSQLXML, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoXml] = new ParameterMetaData[TypoXml] {
+    override def sqlType: String = "xml"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoXml] = Reads[TypoXml](json => JsResult.fromTry(
+      Try(
+        TypoXml(
+          value = json.\("value").as[String]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoXml] = ToStatement[TypoXml]((s, index, v) => s.setObject(index, v.value))
+  implicit val writes: OWrites[TypoXml] = OWrites[TypoXml](o =>
+    new JsObject(ListMap[String, JsValue](
+      "value" -> Json.toJson(o.value)
+    ))
+  )
 }

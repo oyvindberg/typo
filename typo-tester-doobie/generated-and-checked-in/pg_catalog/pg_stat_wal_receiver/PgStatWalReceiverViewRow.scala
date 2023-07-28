@@ -7,15 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal_receiver
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatWalReceiverViewRow(
   pid: Option[Int],
@@ -25,10 +23,10 @@ case class PgStatWalReceiverViewRow(
   writtenLsn: Option[/* pg_lsn */ Long],
   flushedLsn: Option[/* pg_lsn */ Long],
   receivedTli: Option[Int],
-  lastMsgSendTime: Option[OffsetDateTime],
-  lastMsgReceiptTime: Option[OffsetDateTime],
+  lastMsgSendTime: Option[TypoOffsetDateTime],
+  lastMsgReceiptTime: Option[TypoOffsetDateTime],
   latestEndLsn: Option[/* pg_lsn */ Long],
-  latestEndTime: Option[OffsetDateTime],
+  latestEndTime: Option[TypoOffsetDateTime],
   slotName: Option[String],
   senderHost: Option[String],
   senderPort: Option[Int],
@@ -36,82 +34,42 @@ case class PgStatWalReceiverViewRow(
 )
 
 object PgStatWalReceiverViewRow {
-  implicit val decoder: Decoder[PgStatWalReceiverViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        status <- c.downField("status").as[Option[String]]
-        receiveStartLsn <- c.downField("receive_start_lsn").as[Option[/* pg_lsn */ Long]]
-        receiveStartTli <- c.downField("receive_start_tli").as[Option[Int]]
-        writtenLsn <- c.downField("written_lsn").as[Option[/* pg_lsn */ Long]]
-        flushedLsn <- c.downField("flushed_lsn").as[Option[/* pg_lsn */ Long]]
-        receivedTli <- c.downField("received_tli").as[Option[Int]]
-        lastMsgSendTime <- c.downField("last_msg_send_time").as[Option[OffsetDateTime]]
-        lastMsgReceiptTime <- c.downField("last_msg_receipt_time").as[Option[OffsetDateTime]]
-        latestEndLsn <- c.downField("latest_end_lsn").as[Option[/* pg_lsn */ Long]]
-        latestEndTime <- c.downField("latest_end_time").as[Option[OffsetDateTime]]
-        slotName <- c.downField("slot_name").as[Option[String]]
-        senderHost <- c.downField("sender_host").as[Option[String]]
-        senderPort <- c.downField("sender_port").as[Option[Int]]
-        conninfo <- c.downField("conninfo").as[Option[String]]
-      } yield PgStatWalReceiverViewRow(pid, status, receiveStartLsn, receiveStartTli, writtenLsn, flushedLsn, receivedTli, lastMsgSendTime, lastMsgReceiptTime, latestEndLsn, latestEndTime, slotName, senderHost, senderPort, conninfo)
-  implicit val encoder: Encoder[PgStatWalReceiverViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "status" := row.status,
-        "receive_start_lsn" := row.receiveStartLsn,
-        "receive_start_tli" := row.receiveStartTli,
-        "written_lsn" := row.writtenLsn,
-        "flushed_lsn" := row.flushedLsn,
-        "received_tli" := row.receivedTli,
-        "last_msg_send_time" := row.lastMsgSendTime,
-        "last_msg_receipt_time" := row.lastMsgReceiptTime,
-        "latest_end_lsn" := row.latestEndLsn,
-        "latest_end_time" := row.latestEndTime,
-        "slot_name" := row.slotName,
-        "sender_host" := row.senderHost,
-        "sender_port" := row.senderPort,
-        "conninfo" := row.conninfo
-      )}
-  implicit val read: Read[PgStatWalReceiverViewRow] =
-    new Read[PgStatWalReceiverViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatWalReceiverViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        status = Get[String].unsafeGetNullable(rs, i + 1),
-        receiveStartLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 2),
-        receiveStartTli = Get[Int].unsafeGetNullable(rs, i + 3),
-        writtenLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 4),
-        flushedLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 5),
-        receivedTli = Get[Int].unsafeGetNullable(rs, i + 6),
-        lastMsgSendTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 7),
-        lastMsgReceiptTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 8),
-        latestEndLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 9),
-        latestEndTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 10),
-        slotName = Get[String].unsafeGetNullable(rs, i + 11),
-        senderHost = Get[String].unsafeGetNullable(rs, i + 12),
-        senderPort = Get[Int].unsafeGetNullable(rs, i + 13),
-        conninfo = Get[String].unsafeGetNullable(rs, i + 14)
-      )
+  implicit val decoder: Decoder[PgStatWalReceiverViewRow] = Decoder.forProduct15[PgStatWalReceiverViewRow, Option[Int], Option[String], Option[/* pg_lsn */ Long], Option[Int], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[Int], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[String], Option[String], Option[Int], Option[String]]("pid", "status", "receive_start_lsn", "receive_start_tli", "written_lsn", "flushed_lsn", "received_tli", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time", "slot_name", "sender_host", "sender_port", "conninfo")(PgStatWalReceiverViewRow.apply)
+  implicit val encoder: Encoder[PgStatWalReceiverViewRow] = Encoder.forProduct15[PgStatWalReceiverViewRow, Option[Int], Option[String], Option[/* pg_lsn */ Long], Option[Int], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[Int], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[String], Option[String], Option[Int], Option[String]]("pid", "status", "receive_start_lsn", "receive_start_tli", "written_lsn", "flushed_lsn", "received_tli", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time", "slot_name", "sender_host", "sender_port", "conninfo")(x => (x.pid, x.status, x.receiveStartLsn, x.receiveStartTli, x.writtenLsn, x.flushedLsn, x.receivedTli, x.lastMsgSendTime, x.lastMsgReceiptTime, x.latestEndLsn, x.latestEndTime, x.slotName, x.senderHost, x.senderPort, x.conninfo))
+  implicit val read: Read[PgStatWalReceiverViewRow] = new Read[PgStatWalReceiverViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatWalReceiverViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      status = Get[String].unsafeGetNullable(rs, i + 1),
+      receiveStartLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 2),
+      receiveStartTli = Get[Int].unsafeGetNullable(rs, i + 3),
+      writtenLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 4),
+      flushedLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 5),
+      receivedTli = Get[Int].unsafeGetNullable(rs, i + 6),
+      lastMsgSendTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 7),
+      lastMsgReceiptTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 8),
+      latestEndLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 9),
+      latestEndTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 10),
+      slotName = Get[String].unsafeGetNullable(rs, i + 11),
+      senderHost = Get[String].unsafeGetNullable(rs, i + 12),
+      senderPort = Get[Int].unsafeGetNullable(rs, i + 13),
+      conninfo = Get[String].unsafeGetNullable(rs, i + 14)
     )
-  
-
+  )
 }

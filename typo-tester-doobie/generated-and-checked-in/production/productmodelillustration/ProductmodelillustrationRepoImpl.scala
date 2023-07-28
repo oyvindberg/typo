@@ -8,11 +8,11 @@ package production
 package productmodelillustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId): ConnectionIO[Boolean] = {
@@ -21,7 +21,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.illustrationid}::int4, ${unsaved.modifieddate}::timestamp)
-          returning productmodelid, illustrationid, modifieddate
+          returning productmodelid, illustrationid, modifieddate::text
        """.query[ProductmodelillustrationRow].unique
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
@@ -30,29 +30,29 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
       Some((Fragment.const(s"illustrationid"), fr"${unsaved.illustrationid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productmodelillustration default values
-            returning productmodelid, illustrationid, modifieddate
+            returning productmodelid, illustrationid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productmodelillustration(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productmodelid, illustrationid, modifieddate
+            returning productmodelid, illustrationid, modifieddate::text
          """
     }
     q.query[ProductmodelillustrationRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
-    sql"select productmodelid, illustrationid, modifieddate from production.productmodelillustration".query[ProductmodelillustrationRow].stream
+    sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration".query[ProductmodelillustrationRow].stream
   }
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
-    sql"select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".query[ProductmodelillustrationRow].option
+    sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".query[ProductmodelillustrationRow].option
   }
   override def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -74,7 +74,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           on conflict (productmodelid, illustrationid)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning productmodelid, illustrationid, modifieddate
+          returning productmodelid, illustrationid, modifieddate::text
        """.query[ProductmodelillustrationRow].unique
   }
 }

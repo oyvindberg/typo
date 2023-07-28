@@ -8,11 +8,11 @@ package humanresources
 package department
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
           values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning departmentid, "name", groupname, modifieddate
+          returning departmentid, "name", groupname, modifieddate::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
   
@@ -36,19 +36,19 @@ object DepartmentRepoImpl extends DepartmentRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into humanresources.department default values
-            returning departmentid, "name", groupname, modifieddate
+            returning departmentid, "name", groupname, modifieddate::text
          """
         .executeInsert(DepartmentRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.department(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning departmentid, "name", groupname, modifieddate
+                  returning departmentid, "name", groupname, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -59,18 +59,18 @@ object DepartmentRepoImpl extends DepartmentRepo {
   
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
-    SQL"""select departmentid, "name", groupname, modifieddate
+    SQL"""select departmentid, "name", groupname, modifieddate::text
           from humanresources.department
        """.as(DepartmentRow.rowParser(1).*)
   }
   override def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow] = {
-    SQL"""select departmentid, "name", groupname, modifieddate
+    SQL"""select departmentid, "name", groupname, modifieddate::text
           from humanresources.department
           where departmentid = $departmentid
        """.as(DepartmentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
-    SQL"""select departmentid, "name", groupname, modifieddate
+    SQL"""select departmentid, "name", groupname, modifieddate::text
           from humanresources.department
           where departmentid = ANY($departmentids)
        """.as(DepartmentRow.rowParser(1).*)
@@ -98,7 +98,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
             "name" = EXCLUDED."name",
             groupname = EXCLUDED.groupname,
             modifieddate = EXCLUDED.modifieddate
-          returning departmentid, "name", groupname, modifieddate
+          returning departmentid, "name", groupname, modifieddate::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
   

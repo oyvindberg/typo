@@ -7,16 +7,14 @@ package adventureworks
 package sa
 package cc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.creditcard.CreditcardId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CcViewRow(
   id: Option[Int],
@@ -31,54 +29,30 @@ case class CcViewRow(
   /** Points to [[sales.creditcard.CreditcardRow.expyear]] */
   expyear: Option[Int],
   /** Points to [[sales.creditcard.CreditcardRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CcViewRow {
-  implicit val decoder: Decoder[CcViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        cardtype <- c.downField("cardtype").as[Option[/* max 50 chars */ String]]
-        cardnumber <- c.downField("cardnumber").as[Option[/* max 25 chars */ String]]
-        expmonth <- c.downField("expmonth").as[Option[Int]]
-        expyear <- c.downField("expyear").as[Option[Int]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield CcViewRow(id, creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
-  implicit val encoder: Encoder[CcViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "creditcardid" := row.creditcardid,
-        "cardtype" := row.cardtype,
-        "cardnumber" := row.cardnumber,
-        "expmonth" := row.expmonth,
-        "expyear" := row.expyear,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CcViewRow] =
-    new Read[CcViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[CreditcardId], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[/* max 25 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 1),
-        cardtype = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        cardnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
-        expmonth = Get[Int].unsafeGetNullable(rs, i + 4),
-        expyear = Get[Int].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[CcViewRow] = Decoder.forProduct7[CcViewRow, Option[Int], Option[CreditcardId], Option[/* max 50 chars */ String], Option[/* max 25 chars */ String], Option[Int], Option[Int], Option[TypoLocalDateTime]]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CcViewRow.apply)
+  implicit val encoder: Encoder[CcViewRow] = Encoder.forProduct7[CcViewRow, Option[Int], Option[CreditcardId], Option[/* max 50 chars */ String], Option[/* max 25 chars */ String], Option[Int], Option[Int], Option[TypoLocalDateTime]]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.id, x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))
+  implicit val read: Read[CcViewRow] = new Read[CcViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[CreditcardId], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[/* max 25 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 1),
+      cardtype = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
+      cardnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
+      expmonth = Get[Int].unsafeGetNullable(rs, i + 4),
+      expyear = Get[Int].unsafeGetNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

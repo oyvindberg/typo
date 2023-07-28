@@ -13,22 +13,22 @@ import fs2.Stream
 
 object PgAuthidRepoImpl extends PgAuthidRepo {
   override def delete(oid: PgAuthidId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_authid where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_authid where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAuthidRow): ConnectionIO[PgAuthidRow] = {
     sql"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
           values (${unsaved.oid}::oid, ${unsaved.rolname}::name, ${unsaved.rolsuper}, ${unsaved.rolinherit}, ${unsaved.rolcreaterole}, ${unsaved.rolcreatedb}, ${unsaved.rolcanlogin}, ${unsaved.rolreplication}, ${unsaved.rolbypassrls}, ${unsaved.rolconnlimit}::int4, ${unsaved.rolpassword}, ${unsaved.rolvaliduntil}::timestamptz)
-          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil
+          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """.query[PgAuthidRow].unique
   }
   override def selectAll: Stream[ConnectionIO, PgAuthidRow] = {
-    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid".query[PgAuthidRow].stream
+    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid".query[PgAuthidRow].stream
   }
   override def selectById(oid: PgAuthidId): ConnectionIO[Option[PgAuthidRow]] = {
-    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid where oid = $oid".query[PgAuthidRow].option
+    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ${oid}".query[PgAuthidRow].option
   }
   override def selectByIds(oids: Array[PgAuthidId]): Stream[ConnectionIO, PgAuthidRow] = {
-    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil from pg_catalog.pg_authid where oid = ANY($oids)".query[PgAuthidRow].stream
+    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ANY(${oids})".query[PgAuthidRow].stream
   }
   override def update(row: PgAuthidRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -44,7 +44,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
               rolconnlimit = ${row.rolconnlimit}::int4,
               rolpassword = ${row.rolpassword},
               rolvaliduntil = ${row.rolvaliduntil}::timestamptz
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run
@@ -79,7 +79,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
             rolconnlimit = EXCLUDED.rolconnlimit,
             rolpassword = EXCLUDED.rolpassword,
             rolvaliduntil = EXCLUDED.rolvaliduntil
-          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil
+          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """.query[PgAuthidRow].unique
   }
 }

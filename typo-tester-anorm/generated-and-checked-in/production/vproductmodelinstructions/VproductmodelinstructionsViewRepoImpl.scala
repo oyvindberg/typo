@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
-    SQL"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
+    SQL"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate::text
           from production.vproductmodelinstructions
        """.as(VproductmodelinstructionsViewRow.rowParser(1).*)
   }

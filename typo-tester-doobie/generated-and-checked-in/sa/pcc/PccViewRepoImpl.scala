@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PccViewRepoImpl extends PccViewRepo {
   override def selectAll: Stream[ConnectionIO, PccViewRow] = {
-    sql"""select "id", businessentityid, creditcardid, modifieddate from sa.pcc""".query[PccViewRow].stream
+    sql"""select "id", businessentityid, creditcardid, modifieddate::text from sa.pcc""".query[PccViewRow].stream
   }
 }

@@ -9,13 +9,11 @@ package pg_trigger
 
 import adventureworks.TypoInt2Vector
 import adventureworks.TypoPgNodeTree
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgTriggerRow(
@@ -41,98 +39,50 @@ case class PgTriggerRow(
 )
 
 object PgTriggerRow {
-  implicit val decoder: Decoder[PgTriggerRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgTriggerId]
-        tgrelid <- c.downField("tgrelid").as[/* oid */ Long]
-        tgparentid <- c.downField("tgparentid").as[/* oid */ Long]
-        tgname <- c.downField("tgname").as[String]
-        tgfoid <- c.downField("tgfoid").as[/* oid */ Long]
-        tgtype <- c.downField("tgtype").as[Int]
-        tgenabled <- c.downField("tgenabled").as[String]
-        tgisinternal <- c.downField("tgisinternal").as[Boolean]
-        tgconstrrelid <- c.downField("tgconstrrelid").as[/* oid */ Long]
-        tgconstrindid <- c.downField("tgconstrindid").as[/* oid */ Long]
-        tgconstraint <- c.downField("tgconstraint").as[/* oid */ Long]
-        tgdeferrable <- c.downField("tgdeferrable").as[Boolean]
-        tginitdeferred <- c.downField("tginitdeferred").as[Boolean]
-        tgnargs <- c.downField("tgnargs").as[Int]
-        tgattr <- c.downField("tgattr").as[TypoInt2Vector]
-        tgargs <- c.downField("tgargs").as[Array[Byte]]
-        tgqual <- c.downField("tgqual").as[Option[TypoPgNodeTree]]
-        tgoldtable <- c.downField("tgoldtable").as[Option[String]]
-        tgnewtable <- c.downField("tgnewtable").as[Option[String]]
-      } yield PgTriggerRow(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
-  implicit val encoder: Encoder[PgTriggerRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "tgrelid" := row.tgrelid,
-        "tgparentid" := row.tgparentid,
-        "tgname" := row.tgname,
-        "tgfoid" := row.tgfoid,
-        "tgtype" := row.tgtype,
-        "tgenabled" := row.tgenabled,
-        "tgisinternal" := row.tgisinternal,
-        "tgconstrrelid" := row.tgconstrrelid,
-        "tgconstrindid" := row.tgconstrindid,
-        "tgconstraint" := row.tgconstraint,
-        "tgdeferrable" := row.tgdeferrable,
-        "tginitdeferred" := row.tginitdeferred,
-        "tgnargs" := row.tgnargs,
-        "tgattr" := row.tgattr,
-        "tgargs" := row.tgargs,
-        "tgqual" := row.tgqual,
-        "tgoldtable" := row.tgoldtable,
-        "tgnewtable" := row.tgnewtable
-      )}
-  implicit val read: Read[PgTriggerRow] =
-    new Read[PgTriggerRow](
-      gets = List(
-        (Get[PgTriggerId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[TypoInt2Vector], Nullability.NoNulls),
-        (Get[Array[Byte]], Nullability.NoNulls),
-        (Get[TypoPgNodeTree], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTriggerRow(
-        oid = Get[PgTriggerId].unsafeGetNonNullable(rs, i + 0),
-        tgrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        tgparentid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        tgname = Get[String].unsafeGetNonNullable(rs, i + 3),
-        tgfoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-        tgtype = Get[Int].unsafeGetNonNullable(rs, i + 5),
-        tgenabled = Get[String].unsafeGetNonNullable(rs, i + 6),
-        tgisinternal = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-        tgconstrrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8),
-        tgconstrindid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 9),
-        tgconstraint = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 10),
-        tgdeferrable = Get[Boolean].unsafeGetNonNullable(rs, i + 11),
-        tginitdeferred = Get[Boolean].unsafeGetNonNullable(rs, i + 12),
-        tgnargs = Get[Int].unsafeGetNonNullable(rs, i + 13),
-        tgattr = Get[TypoInt2Vector].unsafeGetNonNullable(rs, i + 14),
-        tgargs = Get[Array[Byte]].unsafeGetNonNullable(rs, i + 15),
-        tgqual = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 16),
-        tgoldtable = Get[String].unsafeGetNullable(rs, i + 17),
-        tgnewtable = Get[String].unsafeGetNullable(rs, i + 18)
-      )
+  implicit val decoder: Decoder[PgTriggerRow] = Decoder.forProduct19[PgTriggerRow, PgTriggerId, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, Int, String, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, Boolean, Int, TypoInt2Vector, Array[Byte], Option[TypoPgNodeTree], Option[String], Option[String]]("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")(PgTriggerRow.apply)
+  implicit val encoder: Encoder[PgTriggerRow] = Encoder.forProduct19[PgTriggerRow, PgTriggerId, /* oid */ Long, /* oid */ Long, String, /* oid */ Long, Int, String, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean, Boolean, Int, TypoInt2Vector, Array[Byte], Option[TypoPgNodeTree], Option[String], Option[String]]("oid", "tgrelid", "tgparentid", "tgname", "tgfoid", "tgtype", "tgenabled", "tgisinternal", "tgconstrrelid", "tgconstrindid", "tgconstraint", "tgdeferrable", "tginitdeferred", "tgnargs", "tgattr", "tgargs", "tgqual", "tgoldtable", "tgnewtable")(x => (x.oid, x.tgrelid, x.tgparentid, x.tgname, x.tgfoid, x.tgtype, x.tgenabled, x.tgisinternal, x.tgconstrrelid, x.tgconstrindid, x.tgconstraint, x.tgdeferrable, x.tginitdeferred, x.tgnargs, x.tgattr, x.tgargs, x.tgqual, x.tgoldtable, x.tgnewtable))
+  implicit val read: Read[PgTriggerRow] = new Read[PgTriggerRow](
+    gets = List(
+      (Get[PgTriggerId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoInt2Vector], Nullability.NoNulls),
+      (Get[Array[Byte]], Nullability.NoNulls),
+      (Get[TypoPgNodeTree], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTriggerRow(
+      oid = Get[PgTriggerId].unsafeGetNonNullable(rs, i + 0),
+      tgrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      tgparentid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      tgname = Get[String].unsafeGetNonNullable(rs, i + 3),
+      tgfoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
+      tgtype = Get[Int].unsafeGetNonNullable(rs, i + 5),
+      tgenabled = Get[String].unsafeGetNonNullable(rs, i + 6),
+      tgisinternal = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
+      tgconstrrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8),
+      tgconstrindid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 9),
+      tgconstraint = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 10),
+      tgdeferrable = Get[Boolean].unsafeGetNonNullable(rs, i + 11),
+      tginitdeferred = Get[Boolean].unsafeGetNonNullable(rs, i + 12),
+      tgnargs = Get[Int].unsafeGetNonNullable(rs, i + 13),
+      tgattr = Get[TypoInt2Vector].unsafeGetNonNullable(rs, i + 14),
+      tgargs = Get[Array[Byte]].unsafeGetNonNullable(rs, i + 15),
+      tgqual = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 16),
+      tgoldtable = Get[String].unsafeGetNullable(rs, i + 17),
+      tgnewtable = Get[String].unsafeGetNullable(rs, i + 18)
     )
-  
-
+  )
 }

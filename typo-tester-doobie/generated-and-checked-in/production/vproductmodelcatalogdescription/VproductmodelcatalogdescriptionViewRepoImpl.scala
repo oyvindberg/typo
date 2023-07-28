@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VproductmodelcatalogdescriptionViewRepoImpl extends VproductmodelcatalogdescriptionViewRepo {
   override def selectAll: Stream[ConnectionIO, VproductmodelcatalogdescriptionViewRow] = {
-    sql"""select productmodelid, "name", Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, "style", riderexperience, rowguid, modifieddate from production.vproductmodelcatalogdescription""".query[VproductmodelcatalogdescriptionViewRow].stream
+    sql"""select productmodelid, "name", Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, "style", riderexperience, rowguid, modifieddate::text from production.vproductmodelcatalogdescription""".query[VproductmodelcatalogdescriptionViewRow].stream
   }
 }

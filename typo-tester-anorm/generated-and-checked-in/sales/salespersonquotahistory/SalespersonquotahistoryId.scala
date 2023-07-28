@@ -7,35 +7,34 @@ package adventureworks
 package sales
 package salespersonquotahistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `sales.salespersonquotahistory` */
-case class SalespersonquotahistoryId(businessentityid: BusinessentityId, quotadate: LocalDateTime)
+case class SalespersonquotahistoryId(businessentityid: BusinessentityId, quotadate: TypoLocalDateTime)
 object SalespersonquotahistoryId {
-  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[SalespersonquotahistoryId] = Ordering.by(x => (x.businessentityid, x.quotadate))
-  implicit val oFormat: OFormat[SalespersonquotahistoryId] = new OFormat[SalespersonquotahistoryId]{
-    override def writes(o: SalespersonquotahistoryId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "quotadate" -> o.quotadate
-      )
-  
-    override def reads(json: JsValue): JsResult[SalespersonquotahistoryId] = {
-      JsResult.fromTry(
-        Try(
-          SalespersonquotahistoryId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            quotadate = json.\("quotadate").as[LocalDateTime]
-          )
+  implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[SalespersonquotahistoryId] = Ordering.by(x => (x.businessentityid, x.quotadate))
+  implicit val reads: Reads[SalespersonquotahistoryId] = Reads[SalespersonquotahistoryId](json => JsResult.fromTry(
+      Try(
+        SalespersonquotahistoryId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          quotadate = json.\("quotadate").as[TypoLocalDateTime]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalespersonquotahistoryId] = OWrites[SalespersonquotahistoryId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "quotadate" -> Json.toJson(o.quotadate)
+    ))
+  )
 }

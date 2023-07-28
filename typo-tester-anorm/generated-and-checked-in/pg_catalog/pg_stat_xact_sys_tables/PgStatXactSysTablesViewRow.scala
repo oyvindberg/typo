@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatXactSysTablesViewRow(
@@ -42,58 +44,54 @@ case class PgStatXactSysTablesViewRow(
 )
 
 object PgStatXactSysTablesViewRow {
-  def rowParser(idx: Int): RowParser[PgStatXactSysTablesViewRow] =
-    RowParser[PgStatXactSysTablesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatXactSysTablesViewRow] = Reads[PgStatXactSysTablesViewRow](json => JsResult.fromTry(
+      Try(
         PgStatXactSysTablesViewRow(
-          relid = row[Option[/* oid */ Long]](idx + 0),
-          schemaname = row[Option[String]](idx + 1),
-          relname = row[Option[String]](idx + 2),
-          seqScan = row[Option[Long]](idx + 3),
-          seqTupRead = row[Option[Long]](idx + 4),
-          idxScan = row[Option[Long]](idx + 5),
-          idxTupFetch = row[Option[Long]](idx + 6),
-          nTupIns = row[Option[Long]](idx + 7),
-          nTupUpd = row[Option[Long]](idx + 8),
-          nTupDel = row[Option[Long]](idx + 9),
-          nTupHotUpd = row[Option[Long]](idx + 10)
+          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          relname = json.\("relname").toOption.map(_.as[String]),
+          seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
+          seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
+          idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+          idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
+          nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
+          nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
+          nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
+          nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatXactSysTablesViewRow] = new OFormat[PgStatXactSysTablesViewRow]{
-    override def writes(o: PgStatXactSysTablesViewRow): JsObject =
-      Json.obj(
-        "relid" -> o.relid,
-        "schemaname" -> o.schemaname,
-        "relname" -> o.relname,
-        "seq_scan" -> o.seqScan,
-        "seq_tup_read" -> o.seqTupRead,
-        "idx_scan" -> o.idxScan,
-        "idx_tup_fetch" -> o.idxTupFetch,
-        "n_tup_ins" -> o.nTupIns,
-        "n_tup_upd" -> o.nTupUpd,
-        "n_tup_del" -> o.nTupDel,
-        "n_tup_hot_upd" -> o.nTupHotUpd
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatXactSysTablesViewRow] = RowParser[PgStatXactSysTablesViewRow] { row =>
+    Success(
+      PgStatXactSysTablesViewRow(
+        relid = row[Option[/* oid */ Long]](idx + 0),
+        schemaname = row[Option[String]](idx + 1),
+        relname = row[Option[String]](idx + 2),
+        seqScan = row[Option[Long]](idx + 3),
+        seqTupRead = row[Option[Long]](idx + 4),
+        idxScan = row[Option[Long]](idx + 5),
+        idxTupFetch = row[Option[Long]](idx + 6),
+        nTupIns = row[Option[Long]](idx + 7),
+        nTupUpd = row[Option[Long]](idx + 8),
+        nTupDel = row[Option[Long]](idx + 9),
+        nTupHotUpd = row[Option[Long]](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatXactSysTablesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatXactSysTablesViewRow(
-            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            relname = json.\("relname").toOption.map(_.as[String]),
-            seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
-            seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
-            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
-            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
-            nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
-            nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
-            nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
-            nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatXactSysTablesViewRow] = OWrites[PgStatXactSysTablesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "relid" -> Json.toJson(o.relid),
+      "schemaname" -> Json.toJson(o.schemaname),
+      "relname" -> Json.toJson(o.relname),
+      "seq_scan" -> Json.toJson(o.seqScan),
+      "seq_tup_read" -> Json.toJson(o.seqTupRead),
+      "idx_scan" -> Json.toJson(o.idxScan),
+      "idx_tup_fetch" -> Json.toJson(o.idxTupFetch),
+      "n_tup_ins" -> Json.toJson(o.nTupIns),
+      "n_tup_upd" -> Json.toJson(o.nTupUpd),
+      "n_tup_del" -> Json.toJson(o.nTupDel),
+      "n_tup_hot_upd" -> Json.toJson(o.nTupHotUpd)
+    ))
+  )
 }

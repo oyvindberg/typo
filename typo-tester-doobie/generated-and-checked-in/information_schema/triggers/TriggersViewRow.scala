@@ -11,13 +11,11 @@ import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.TimeStamp
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class TriggersViewRow(
@@ -41,90 +39,46 @@ case class TriggersViewRow(
 )
 
 object TriggersViewRow {
-  implicit val decoder: Decoder[TriggersViewRow] =
-    (c: HCursor) =>
-      for {
-        triggerCatalog <- c.downField("trigger_catalog").as[Option[SqlIdentifier]]
-        triggerSchema <- c.downField("trigger_schema").as[Option[SqlIdentifier]]
-        triggerName <- c.downField("trigger_name").as[Option[SqlIdentifier]]
-        eventManipulation <- c.downField("event_manipulation").as[Option[CharacterData]]
-        eventObjectCatalog <- c.downField("event_object_catalog").as[Option[SqlIdentifier]]
-        eventObjectSchema <- c.downField("event_object_schema").as[Option[SqlIdentifier]]
-        eventObjectTable <- c.downField("event_object_table").as[Option[SqlIdentifier]]
-        actionOrder <- c.downField("action_order").as[Option[CardinalNumber]]
-        actionCondition <- c.downField("action_condition").as[Option[CharacterData]]
-        actionStatement <- c.downField("action_statement").as[Option[CharacterData]]
-        actionOrientation <- c.downField("action_orientation").as[Option[CharacterData]]
-        actionTiming <- c.downField("action_timing").as[Option[CharacterData]]
-        actionReferenceOldTable <- c.downField("action_reference_old_table").as[Option[SqlIdentifier]]
-        actionReferenceNewTable <- c.downField("action_reference_new_table").as[Option[SqlIdentifier]]
-        actionReferenceOldRow <- c.downField("action_reference_old_row").as[Option[SqlIdentifier]]
-        actionReferenceNewRow <- c.downField("action_reference_new_row").as[Option[SqlIdentifier]]
-        created <- c.downField("created").as[Option[TimeStamp]]
-      } yield TriggersViewRow(triggerCatalog, triggerSchema, triggerName, eventManipulation, eventObjectCatalog, eventObjectSchema, eventObjectTable, actionOrder, actionCondition, actionStatement, actionOrientation, actionTiming, actionReferenceOldTable, actionReferenceNewTable, actionReferenceOldRow, actionReferenceNewRow, created)
-  implicit val encoder: Encoder[TriggersViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "trigger_catalog" := row.triggerCatalog,
-        "trigger_schema" := row.triggerSchema,
-        "trigger_name" := row.triggerName,
-        "event_manipulation" := row.eventManipulation,
-        "event_object_catalog" := row.eventObjectCatalog,
-        "event_object_schema" := row.eventObjectSchema,
-        "event_object_table" := row.eventObjectTable,
-        "action_order" := row.actionOrder,
-        "action_condition" := row.actionCondition,
-        "action_statement" := row.actionStatement,
-        "action_orientation" := row.actionOrientation,
-        "action_timing" := row.actionTiming,
-        "action_reference_old_table" := row.actionReferenceOldTable,
-        "action_reference_new_table" := row.actionReferenceNewTable,
-        "action_reference_old_row" := row.actionReferenceOldRow,
-        "action_reference_new_row" := row.actionReferenceNewRow,
-        "created" := row.created
-      )}
-  implicit val read: Read[TriggersViewRow] =
-    new Read[TriggersViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[TimeStamp], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => TriggersViewRow(
-        triggerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        triggerSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        triggerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        eventManipulation = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-        eventObjectCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        eventObjectSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        eventObjectTable = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
-        actionOrder = Get[CardinalNumber].unsafeGetNullable(rs, i + 7),
-        actionCondition = Get[CharacterData].unsafeGetNullable(rs, i + 8),
-        actionStatement = Get[CharacterData].unsafeGetNullable(rs, i + 9),
-        actionOrientation = Get[CharacterData].unsafeGetNullable(rs, i + 10),
-        actionTiming = Get[CharacterData].unsafeGetNullable(rs, i + 11),
-        actionReferenceOldTable = Get[SqlIdentifier].unsafeGetNullable(rs, i + 12),
-        actionReferenceNewTable = Get[SqlIdentifier].unsafeGetNullable(rs, i + 13),
-        actionReferenceOldRow = Get[SqlIdentifier].unsafeGetNullable(rs, i + 14),
-        actionReferenceNewRow = Get[SqlIdentifier].unsafeGetNullable(rs, i + 15),
-        created = Get[TimeStamp].unsafeGetNullable(rs, i + 16)
-      )
+  implicit val decoder: Decoder[TriggersViewRow] = Decoder.forProduct17[TriggersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[TimeStamp]]("trigger_catalog", "trigger_schema", "trigger_name", "event_manipulation", "event_object_catalog", "event_object_schema", "event_object_table", "action_order", "action_condition", "action_statement", "action_orientation", "action_timing", "action_reference_old_table", "action_reference_new_table", "action_reference_old_row", "action_reference_new_row", "created")(TriggersViewRow.apply)
+  implicit val encoder: Encoder[TriggersViewRow] = Encoder.forProduct17[TriggersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[TimeStamp]]("trigger_catalog", "trigger_schema", "trigger_name", "event_manipulation", "event_object_catalog", "event_object_schema", "event_object_table", "action_order", "action_condition", "action_statement", "action_orientation", "action_timing", "action_reference_old_table", "action_reference_new_table", "action_reference_old_row", "action_reference_new_row", "created")(x => (x.triggerCatalog, x.triggerSchema, x.triggerName, x.eventManipulation, x.eventObjectCatalog, x.eventObjectSchema, x.eventObjectTable, x.actionOrder, x.actionCondition, x.actionStatement, x.actionOrientation, x.actionTiming, x.actionReferenceOldTable, x.actionReferenceNewTable, x.actionReferenceOldRow, x.actionReferenceNewRow, x.created))
+  implicit val read: Read[TriggersViewRow] = new Read[TriggersViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[TimeStamp], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => TriggersViewRow(
+      triggerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      triggerSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      triggerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      eventManipulation = Get[CharacterData].unsafeGetNullable(rs, i + 3),
+      eventObjectCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      eventObjectSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      eventObjectTable = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
+      actionOrder = Get[CardinalNumber].unsafeGetNullable(rs, i + 7),
+      actionCondition = Get[CharacterData].unsafeGetNullable(rs, i + 8),
+      actionStatement = Get[CharacterData].unsafeGetNullable(rs, i + 9),
+      actionOrientation = Get[CharacterData].unsafeGetNullable(rs, i + 10),
+      actionTiming = Get[CharacterData].unsafeGetNullable(rs, i + 11),
+      actionReferenceOldTable = Get[SqlIdentifier].unsafeGetNullable(rs, i + 12),
+      actionReferenceNewTable = Get[SqlIdentifier].unsafeGetNullable(rs, i + 13),
+      actionReferenceOldRow = Get[SqlIdentifier].unsafeGetNullable(rs, i + 14),
+      actionReferenceNewRow = Get[SqlIdentifier].unsafeGetNullable(rs, i + 15),
+      created = Get[TimeStamp].unsafeGetNullable(rs, i + 16)
     )
-  
-
+  )
 }

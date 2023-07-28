@@ -43,7 +43,7 @@ case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, 
       case "polygon"                           => Some(db.Type.PGpolygon)
       case "text"                              => Some(db.Type.Text)
       case "time"                              => Some(db.Type.Time)
-      case "timez"                             => Some(db.Type.Timez)
+      case "timetz"                            => Some(db.Type.TimeTz)
       case "timestamp"                         => Some(db.Type.Timestamp)
       case "timestamptz"                       => Some(db.Type.TimestampTz)
       case "uuid"                              => Some(db.Type.UUID)

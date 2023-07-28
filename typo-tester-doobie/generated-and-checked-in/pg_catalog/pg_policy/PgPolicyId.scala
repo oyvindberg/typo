@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_policy
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_policy` */
 case class PgPolicyId(value: /* oid */ Long) extends AnyVal
 object PgPolicyId {
+  implicit val arrayGet: Get[Array[PgPolicyId]] = Get[Array[/* oid */ Long]].map(_.map(PgPolicyId.apply))
+  implicit val arrayPut: Put[Array[PgPolicyId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgPolicyId] = Decoder[/* oid */ Long].map(PgPolicyId.apply)
+  implicit val encoder: Encoder[PgPolicyId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgPolicyId] = Get[/* oid */ Long].map(PgPolicyId.apply)
   implicit val ordering: Ordering[PgPolicyId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgPolicyId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgPolicyId] =
-    Decoder[/* oid */ Long].map(PgPolicyId(_))
-  implicit val meta: Meta[PgPolicyId] = Meta[/* oid */ Long].imap(PgPolicyId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgPolicyId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgPolicyId.apply))(_.map(_.value))
+  implicit val put: Put[PgPolicyId] = Put[/* oid */ Long].contramap(_.value)
 }

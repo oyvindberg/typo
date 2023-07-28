@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatProgressClusterViewRow(
@@ -32,61 +34,57 @@ case class PgStatProgressClusterViewRow(
 )
 
 object PgStatProgressClusterViewRow {
-  def rowParser(idx: Int): RowParser[PgStatProgressClusterViewRow] =
-    RowParser[PgStatProgressClusterViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatProgressClusterViewRow] = Reads[PgStatProgressClusterViewRow](json => JsResult.fromTry(
+      Try(
         PgStatProgressClusterViewRow(
-          pid = row[Option[Int]](idx + 0),
-          datid = row[Option[/* oid */ Long]](idx + 1),
-          datname = row[Option[String]](idx + 2),
-          relid = row[Option[/* oid */ Long]](idx + 3),
-          command = row[Option[String]](idx + 4),
-          phase = row[Option[String]](idx + 5),
-          clusterIndexRelid = row[Option[/* oid */ Long]](idx + 6),
-          heapTuplesScanned = row[Option[Long]](idx + 7),
-          heapTuplesWritten = row[Option[Long]](idx + 8),
-          heapBlksTotal = row[Option[Long]](idx + 9),
-          heapBlksScanned = row[Option[Long]](idx + 10),
-          indexRebuildCount = row[Option[Long]](idx + 11)
+          pid = json.\("pid").toOption.map(_.as[Int]),
+          datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
+          datname = json.\("datname").toOption.map(_.as[String]),
+          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+          command = json.\("command").toOption.map(_.as[String]),
+          phase = json.\("phase").toOption.map(_.as[String]),
+          clusterIndexRelid = json.\("cluster_index_relid").toOption.map(_.as[/* oid */ Long]),
+          heapTuplesScanned = json.\("heap_tuples_scanned").toOption.map(_.as[Long]),
+          heapTuplesWritten = json.\("heap_tuples_written").toOption.map(_.as[Long]),
+          heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),
+          heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as[Long]),
+          indexRebuildCount = json.\("index_rebuild_count").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatProgressClusterViewRow] = new OFormat[PgStatProgressClusterViewRow]{
-    override def writes(o: PgStatProgressClusterViewRow): JsObject =
-      Json.obj(
-        "pid" -> o.pid,
-        "datid" -> o.datid,
-        "datname" -> o.datname,
-        "relid" -> o.relid,
-        "command" -> o.command,
-        "phase" -> o.phase,
-        "cluster_index_relid" -> o.clusterIndexRelid,
-        "heap_tuples_scanned" -> o.heapTuplesScanned,
-        "heap_tuples_written" -> o.heapTuplesWritten,
-        "heap_blks_total" -> o.heapBlksTotal,
-        "heap_blks_scanned" -> o.heapBlksScanned,
-        "index_rebuild_count" -> o.indexRebuildCount
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatProgressClusterViewRow] = RowParser[PgStatProgressClusterViewRow] { row =>
+    Success(
+      PgStatProgressClusterViewRow(
+        pid = row[Option[Int]](idx + 0),
+        datid = row[Option[/* oid */ Long]](idx + 1),
+        datname = row[Option[String]](idx + 2),
+        relid = row[Option[/* oid */ Long]](idx + 3),
+        command = row[Option[String]](idx + 4),
+        phase = row[Option[String]](idx + 5),
+        clusterIndexRelid = row[Option[/* oid */ Long]](idx + 6),
+        heapTuplesScanned = row[Option[Long]](idx + 7),
+        heapTuplesWritten = row[Option[Long]](idx + 8),
+        heapBlksTotal = row[Option[Long]](idx + 9),
+        heapBlksScanned = row[Option[Long]](idx + 10),
+        indexRebuildCount = row[Option[Long]](idx + 11)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatProgressClusterViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatProgressClusterViewRow(
-            pid = json.\("pid").toOption.map(_.as[Int]),
-            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
-            datname = json.\("datname").toOption.map(_.as[String]),
-            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            command = json.\("command").toOption.map(_.as[String]),
-            phase = json.\("phase").toOption.map(_.as[String]),
-            clusterIndexRelid = json.\("cluster_index_relid").toOption.map(_.as[/* oid */ Long]),
-            heapTuplesScanned = json.\("heap_tuples_scanned").toOption.map(_.as[Long]),
-            heapTuplesWritten = json.\("heap_tuples_written").toOption.map(_.as[Long]),
-            heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),
-            heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as[Long]),
-            indexRebuildCount = json.\("index_rebuild_count").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatProgressClusterViewRow] = OWrites[PgStatProgressClusterViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "pid" -> Json.toJson(o.pid),
+      "datid" -> Json.toJson(o.datid),
+      "datname" -> Json.toJson(o.datname),
+      "relid" -> Json.toJson(o.relid),
+      "command" -> Json.toJson(o.command),
+      "phase" -> Json.toJson(o.phase),
+      "cluster_index_relid" -> Json.toJson(o.clusterIndexRelid),
+      "heap_tuples_scanned" -> Json.toJson(o.heapTuplesScanned),
+      "heap_tuples_written" -> Json.toJson(o.heapTuplesWritten),
+      "heap_blks_total" -> Json.toJson(o.heapBlksTotal),
+      "heap_blks_scanned" -> Json.toJson(o.heapBlksScanned),
+      "index_rebuild_count" -> Json.toJson(o.indexRebuildCount)
+    ))
+  )
 }

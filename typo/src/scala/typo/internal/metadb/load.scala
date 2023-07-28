@@ -22,8 +22,8 @@ object load {
       keyColumnUsage: List[KeyColumnUsageViewRow],
       referentialConstraints: List[ReferentialConstraintsViewRow],
       pgEnums: List[PgEnum.Row],
-      TablesViewRows: List[TablesViewRow],
-      ColumnsViewRows: List[ColumnsViewRow],
+      tablesViewRows: List[TablesViewRow],
+      columnsViewRows: List[ColumnsViewRow],
       viewRows: List[ViewFindAllSqlRow],
       viewColumnDeps: List[ViewColumnDependenciesSqlRow],
       domains: List[DomainsSqlRow],
@@ -32,17 +32,24 @@ object load {
 
   object Input {
     def fromDb(implicit c: Connection): Input = {
+      def timed[T](name: String)(f: => T): T = {
+        val start = System.currentTimeMillis()
+        val result = f
+        val end = System.currentTimeMillis()
+        println(s"fetched $name from PG in ${end - start}ms")
+        result
+      }
       Input(
-        tableConstraints = TableConstraintsViewRepoImpl.selectAll,
-        keyColumnUsage = KeyColumnUsageViewRepoImpl.selectAll,
-        referentialConstraints = ReferentialConstraintsViewRepoImpl.selectAll,
-        pgEnums = PgEnum.all,
-        TablesViewRows = TablesViewRepoImpl.selectAll,
-        ColumnsViewRows = ColumnsViewRepoImpl.selectAll,
-        viewRows = ViewFindAllSqlRepoImpl(),
-        viewColumnDeps = ViewColumnDependenciesSqlRepoImpl(None),
-        domains = DomainsSqlRepoImpl(),
-        comments = CommentsSqlRepoImpl()
+        tableConstraints = timed("tableConstraints")(TableConstraintsViewRepoImpl.selectAll),
+        keyColumnUsage = timed("keyColumnUsage")(KeyColumnUsageViewRepoImpl.selectAll),
+        referentialConstraints = timed("referentialConstraints")(ReferentialConstraintsViewRepoImpl.selectAll),
+        pgEnums = timed("pgEnums")(PgEnum.all),
+        tablesViewRows = timed("tablesViewRows")(TablesViewRepoImpl.selectAll),
+        columnsViewRows = timed("columnsViewRows")(ColumnsViewRepoImpl.selectAll),
+        viewRows = timed("viewRows")(ViewFindAllSqlRepoImpl()),
+        viewColumnDeps = timed("viewColumnDeps")(ViewColumnDependenciesSqlRepoImpl(None)),
+        domains = timed("domains")(DomainsSqlRepoImpl()),
+        comments = timed("comments")(CommentsSqlRepoImpl())
       )
     }
   }
@@ -88,13 +95,13 @@ object load {
       }.toMap
 
     val relations: List[db.Relation] = {
-      input.TablesViewRows.flatMap { table =>
+      input.tablesViewRows.flatMap { table =>
         val relationName = db.RelationName(
           schema = table.tableSchema.map(_.value),
           name = table.tableName.get.value
         )
 
-        val columns = input.ColumnsViewRows
+        val columns = input.columnsViewRows
           .filter(c => c.tableCatalog == table.tableCatalog && c.tableSchema == table.tableSchema && c.tableName == table.tableName)
           .sortBy(_.ordinalPosition)
 

@@ -7,13 +7,15 @@ object CustomTypeFile {
 
     val comments = scaladoc(et.comment)(Nil)
 
+    val instances =
+      options.jsonLibs.flatMap(_.customTypeInstances(et)) ++
+        options.dbLib.toList.flatMap(_.customTypeInstances(et))
+
     val str =
       code"""$comments
             |case class ${et.typoType.name}(${et.params.map(_.code).mkCode(", ")})
-            |object ${et.typoType.name} {
-            |  ${options.jsonLibs.flatMap(_.customTypeInstances(et)).mkCode("\n")}
-            |  ${options.dbLib.toList.flatMap(_.customTypeInstances(et)).mkCode("\n")}
-            |}
+            |
+            |${sc.Obj(et.typoType.value, instances, et.objBody0)}
 """.stripMargin
 
     sc.File(et.typoType, str, secondaryTypes = Nil)

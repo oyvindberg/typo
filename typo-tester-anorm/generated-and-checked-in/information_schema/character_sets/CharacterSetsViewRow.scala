@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CharacterSetsViewRow(
@@ -29,49 +31,45 @@ case class CharacterSetsViewRow(
 )
 
 object CharacterSetsViewRow {
-  def rowParser(idx: Int): RowParser[CharacterSetsViewRow] =
-    RowParser[CharacterSetsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CharacterSetsViewRow] = Reads[CharacterSetsViewRow](json => JsResult.fromTry(
+      Try(
         CharacterSetsViewRow(
-          characterSetCatalog = row[Option[SqlIdentifier]](idx + 0),
-          characterSetSchema = row[Option[SqlIdentifier]](idx + 1),
-          characterSetName = row[Option[SqlIdentifier]](idx + 2),
-          characterRepertoire = row[Option[SqlIdentifier]](idx + 3),
-          formOfUse = row[Option[SqlIdentifier]](idx + 4),
-          defaultCollateCatalog = row[Option[SqlIdentifier]](idx + 5),
-          defaultCollateSchema = row[Option[SqlIdentifier]](idx + 6),
-          defaultCollateName = row[Option[SqlIdentifier]](idx + 7)
+          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
+          characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
+          characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier]),
+          characterRepertoire = json.\("character_repertoire").toOption.map(_.as[SqlIdentifier]),
+          formOfUse = json.\("form_of_use").toOption.map(_.as[SqlIdentifier]),
+          defaultCollateCatalog = json.\("default_collate_catalog").toOption.map(_.as[SqlIdentifier]),
+          defaultCollateSchema = json.\("default_collate_schema").toOption.map(_.as[SqlIdentifier]),
+          defaultCollateName = json.\("default_collate_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[CharacterSetsViewRow] = new OFormat[CharacterSetsViewRow]{
-    override def writes(o: CharacterSetsViewRow): JsObject =
-      Json.obj(
-        "character_set_catalog" -> o.characterSetCatalog,
-        "character_set_schema" -> o.characterSetSchema,
-        "character_set_name" -> o.characterSetName,
-        "character_repertoire" -> o.characterRepertoire,
-        "form_of_use" -> o.formOfUse,
-        "default_collate_catalog" -> o.defaultCollateCatalog,
-        "default_collate_schema" -> o.defaultCollateSchema,
-        "default_collate_name" -> o.defaultCollateName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CharacterSetsViewRow] = RowParser[CharacterSetsViewRow] { row =>
+    Success(
+      CharacterSetsViewRow(
+        characterSetCatalog = row[Option[SqlIdentifier]](idx + 0),
+        characterSetSchema = row[Option[SqlIdentifier]](idx + 1),
+        characterSetName = row[Option[SqlIdentifier]](idx + 2),
+        characterRepertoire = row[Option[SqlIdentifier]](idx + 3),
+        formOfUse = row[Option[SqlIdentifier]](idx + 4),
+        defaultCollateCatalog = row[Option[SqlIdentifier]](idx + 5),
+        defaultCollateSchema = row[Option[SqlIdentifier]](idx + 6),
+        defaultCollateName = row[Option[SqlIdentifier]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[CharacterSetsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CharacterSetsViewRow(
-            characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
-            characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
-            characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier]),
-            characterRepertoire = json.\("character_repertoire").toOption.map(_.as[SqlIdentifier]),
-            formOfUse = json.\("form_of_use").toOption.map(_.as[SqlIdentifier]),
-            defaultCollateCatalog = json.\("default_collate_catalog").toOption.map(_.as[SqlIdentifier]),
-            defaultCollateSchema = json.\("default_collate_schema").toOption.map(_.as[SqlIdentifier]),
-            defaultCollateName = json.\("default_collate_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CharacterSetsViewRow] = OWrites[CharacterSetsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "character_set_catalog" -> Json.toJson(o.characterSetCatalog),
+      "character_set_schema" -> Json.toJson(o.characterSetSchema),
+      "character_set_name" -> Json.toJson(o.characterSetName),
+      "character_repertoire" -> Json.toJson(o.characterRepertoire),
+      "form_of_use" -> Json.toJson(o.formOfUse),
+      "default_collate_catalog" -> Json.toJson(o.defaultCollateCatalog),
+      "default_collate_schema" -> Json.toJson(o.defaultCollateSchema),
+      "default_collate_name" -> Json.toJson(o.defaultCollateName)
+    ))
+  )
 }

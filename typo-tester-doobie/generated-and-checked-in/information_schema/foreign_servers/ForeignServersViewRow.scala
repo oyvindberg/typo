@@ -9,13 +9,11 @@ package foreign_servers
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ForeignServersViewRow(
@@ -36,50 +34,26 @@ case class ForeignServersViewRow(
 )
 
 object ForeignServersViewRow {
-  implicit val decoder: Decoder[ForeignServersViewRow] =
-    (c: HCursor) =>
-      for {
-        foreignServerCatalog <- c.downField("foreign_server_catalog").as[Option[SqlIdentifier]]
-        foreignServerName <- c.downField("foreign_server_name").as[Option[SqlIdentifier]]
-        foreignDataWrapperCatalog <- c.downField("foreign_data_wrapper_catalog").as[Option[SqlIdentifier]]
-        foreignDataWrapperName <- c.downField("foreign_data_wrapper_name").as[Option[SqlIdentifier]]
-        foreignServerType <- c.downField("foreign_server_type").as[Option[CharacterData]]
-        foreignServerVersion <- c.downField("foreign_server_version").as[Option[CharacterData]]
-        authorizationIdentifier <- c.downField("authorization_identifier").as[Option[SqlIdentifier]]
-      } yield ForeignServersViewRow(foreignServerCatalog, foreignServerName, foreignDataWrapperCatalog, foreignDataWrapperName, foreignServerType, foreignServerVersion, authorizationIdentifier)
-  implicit val encoder: Encoder[ForeignServersViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "foreign_server_catalog" := row.foreignServerCatalog,
-        "foreign_server_name" := row.foreignServerName,
-        "foreign_data_wrapper_catalog" := row.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" := row.foreignDataWrapperName,
-        "foreign_server_type" := row.foreignServerType,
-        "foreign_server_version" := row.foreignServerVersion,
-        "authorization_identifier" := row.authorizationIdentifier
-      )}
-  implicit val read: Read[ForeignServersViewRow] =
-    new Read[ForeignServersViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ForeignServersViewRow(
-        foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        foreignServerType = Get[CharacterData].unsafeGetNullable(rs, i + 4),
-        foreignServerVersion = Get[CharacterData].unsafeGetNullable(rs, i + 5),
-        authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[ForeignServersViewRow] = Decoder.forProduct7[ForeignServersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier]]("foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(ForeignServersViewRow.apply)
+  implicit val encoder: Encoder[ForeignServersViewRow] = Encoder.forProduct7[ForeignServersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier]]("foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(x => (x.foreignServerCatalog, x.foreignServerName, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.foreignServerType, x.foreignServerVersion, x.authorizationIdentifier))
+  implicit val read: Read[ForeignServersViewRow] = new Read[ForeignServersViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ForeignServersViewRow(
+      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      foreignServerType = Get[CharacterData].unsafeGetNullable(rs, i + 4),
+      foreignServerVersion = Get[CharacterData].unsafeGetNullable(rs, i + 5),
+      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

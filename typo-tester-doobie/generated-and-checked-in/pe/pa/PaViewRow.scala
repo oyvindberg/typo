@@ -7,16 +7,14 @@ package adventureworks
 package pe
 package pa
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class PaViewRow(
@@ -30,50 +28,28 @@ case class PaViewRow(
   /** Points to [[person.password.PasswordRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.password.PasswordRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PaViewRow {
-  implicit val decoder: Decoder[PaViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        passwordhash <- c.downField("passwordhash").as[Option[/* max 128 chars */ String]]
-        passwordsalt <- c.downField("passwordsalt").as[Option[/* max 10 chars */ String]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PaViewRow(id, businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
-  implicit val encoder: Encoder[PaViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "passwordhash" := row.passwordhash,
-        "passwordsalt" := row.passwordsalt,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PaViewRow] =
-    new Read[PaViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 128 chars */ String], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PaViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        passwordhash = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 2),
-        passwordsalt = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PaViewRow] = Decoder.forProduct6[PaViewRow, Option[Int], Option[BusinessentityId], Option[/* max 128 chars */ String], Option[/* max 10 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PaViewRow.apply)
+  implicit val encoder: Encoder[PaViewRow] = Encoder.forProduct6[PaViewRow, Option[Int], Option[BusinessentityId], Option[/* max 128 chars */ String], Option[/* max 10 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))
+  implicit val read: Read[PaViewRow] = new Read[PaViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[/* max 128 chars */ String], Nullability.Nullable),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PaViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      passwordhash = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 2),
+      passwordsalt = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

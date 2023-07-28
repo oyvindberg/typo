@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgMatviewsViewRow(
@@ -27,46 +29,42 @@ case class PgMatviewsViewRow(
 )
 
 object PgMatviewsViewRow {
-  def rowParser(idx: Int): RowParser[PgMatviewsViewRow] =
-    RowParser[PgMatviewsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgMatviewsViewRow] = Reads[PgMatviewsViewRow](json => JsResult.fromTry(
+      Try(
         PgMatviewsViewRow(
-          schemaname = row[Option[String]](idx + 0),
-          matviewname = row[Option[String]](idx + 1),
-          matviewowner = row[Option[String]](idx + 2),
-          tablespace = row[Option[String]](idx + 3),
-          hasindexes = row[Option[Boolean]](idx + 4),
-          ispopulated = row[Option[Boolean]](idx + 5),
-          definition = row[Option[String]](idx + 6)
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          matviewname = json.\("matviewname").toOption.map(_.as[String]),
+          matviewowner = json.\("matviewowner").toOption.map(_.as[String]),
+          tablespace = json.\("tablespace").toOption.map(_.as[String]),
+          hasindexes = json.\("hasindexes").toOption.map(_.as[Boolean]),
+          ispopulated = json.\("ispopulated").toOption.map(_.as[Boolean]),
+          definition = json.\("definition").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgMatviewsViewRow] = new OFormat[PgMatviewsViewRow]{
-    override def writes(o: PgMatviewsViewRow): JsObject =
-      Json.obj(
-        "schemaname" -> o.schemaname,
-        "matviewname" -> o.matviewname,
-        "matviewowner" -> o.matviewowner,
-        "tablespace" -> o.tablespace,
-        "hasindexes" -> o.hasindexes,
-        "ispopulated" -> o.ispopulated,
-        "definition" -> o.definition
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgMatviewsViewRow] = RowParser[PgMatviewsViewRow] { row =>
+    Success(
+      PgMatviewsViewRow(
+        schemaname = row[Option[String]](idx + 0),
+        matviewname = row[Option[String]](idx + 1),
+        matviewowner = row[Option[String]](idx + 2),
+        tablespace = row[Option[String]](idx + 3),
+        hasindexes = row[Option[Boolean]](idx + 4),
+        ispopulated = row[Option[Boolean]](idx + 5),
+        definition = row[Option[String]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgMatviewsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgMatviewsViewRow(
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            matviewname = json.\("matviewname").toOption.map(_.as[String]),
-            matviewowner = json.\("matviewowner").toOption.map(_.as[String]),
-            tablespace = json.\("tablespace").toOption.map(_.as[String]),
-            hasindexes = json.\("hasindexes").toOption.map(_.as[Boolean]),
-            ispopulated = json.\("ispopulated").toOption.map(_.as[Boolean]),
-            definition = json.\("definition").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgMatviewsViewRow] = OWrites[PgMatviewsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "schemaname" -> Json.toJson(o.schemaname),
+      "matviewname" -> Json.toJson(o.matviewname),
+      "matviewowner" -> Json.toJson(o.matviewowner),
+      "tablespace" -> Json.toJson(o.tablespace),
+      "hasindexes" -> Json.toJson(o.hasindexes),
+      "ispopulated" -> Json.toJson(o.ispopulated),
+      "definition" -> Json.toJson(o.definition)
+    ))
+  )
 }

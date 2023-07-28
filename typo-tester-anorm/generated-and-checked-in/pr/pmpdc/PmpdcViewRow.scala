@@ -7,17 +7,19 @@ package adventureworks
 package pr
 package pmpdc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PmpdcViewRow(
@@ -28,41 +30,37 @@ case class PmpdcViewRow(
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.cultureid]] */
   cultureid: Option[CultureId],
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PmpdcViewRow {
-  def rowParser(idx: Int): RowParser[PmpdcViewRow] =
-    RowParser[PmpdcViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PmpdcViewRow] = Reads[PmpdcViewRow](json => JsResult.fromTry(
+      Try(
         PmpdcViewRow(
-          productmodelid = row[Option[ProductmodelId]](idx + 0),
-          productdescriptionid = row[Option[ProductdescriptionId]](idx + 1),
-          cultureid = row[Option[CultureId]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
+          productdescriptionid = json.\("productdescriptionid").toOption.map(_.as[ProductdescriptionId]),
+          cultureid = json.\("cultureid").toOption.map(_.as[CultureId]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PmpdcViewRow] = new OFormat[PmpdcViewRow]{
-    override def writes(o: PmpdcViewRow): JsObject =
-      Json.obj(
-        "productmodelid" -> o.productmodelid,
-        "productdescriptionid" -> o.productdescriptionid,
-        "cultureid" -> o.cultureid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PmpdcViewRow] = RowParser[PmpdcViewRow] { row =>
+    Success(
+      PmpdcViewRow(
+        productmodelid = row[Option[ProductmodelId]](idx + 0),
+        productdescriptionid = row[Option[ProductdescriptionId]](idx + 1),
+        cultureid = row[Option[CultureId]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PmpdcViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PmpdcViewRow(
-            productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            productdescriptionid = json.\("productdescriptionid").toOption.map(_.as[ProductdescriptionId]),
-            cultureid = json.\("cultureid").toOption.map(_.as[CultureId]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PmpdcViewRow] = OWrites[PmpdcViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
+      "cultureid" -> Json.toJson(o.cultureid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

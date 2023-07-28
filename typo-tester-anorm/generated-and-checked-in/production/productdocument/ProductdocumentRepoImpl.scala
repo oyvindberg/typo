@@ -8,12 +8,12 @@ package production
 package productdocument
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
@@ -22,7 +22,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
     SQL"""insert into production.productdocument(productid, modifieddate, documentnode)
           values (${unsaved.productid}::int4, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
-          returning productid, modifieddate, documentnode
+          returning productid, modifieddate::text, documentnode
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
   
@@ -32,7 +32,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
       Some((NamedParameter("productid", ParameterValue.from(unsaved.productid)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
@@ -42,13 +42,13 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productdocument default values
-            returning productid, modifieddate, documentnode
+            returning productid, modifieddate::text, documentnode
          """
         .executeInsert(ProductdocumentRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productdocument(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productid, modifieddate, documentnode
+                  returning productid, modifieddate::text, documentnode
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -59,12 +59,12 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate, documentnode
+    SQL"""select productid, modifieddate::text, documentnode
           from production.productdocument
        """.as(ProductdocumentRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
-    SQL"""select productid, modifieddate, documentnode
+    SQL"""select productid, modifieddate::text, documentnode
           from production.productdocument
           where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
        """.as(ProductdocumentRow.rowParser(1).singleOpt)
@@ -86,7 +86,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           on conflict (productid, documentnode)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning productid, modifieddate, documentnode
+          returning productid, modifieddate::text, documentnode
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
   

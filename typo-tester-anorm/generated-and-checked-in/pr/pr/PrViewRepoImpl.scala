@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PrViewRepoImpl extends PrViewRepo {
   override def selectAll(implicit c: Connection): List[PrViewRow] = {
-    SQL"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+    SQL"""select "id", productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
           from pr.pr
        """.as(PrViewRow.rowParser(1).*)
   }

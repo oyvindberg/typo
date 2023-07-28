@@ -9,13 +9,11 @@ package key_column_usage
 
 import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class KeyColumnUsageViewRow(
@@ -31,58 +29,30 @@ case class KeyColumnUsageViewRow(
 )
 
 object KeyColumnUsageViewRow {
-  implicit val decoder: Decoder[KeyColumnUsageViewRow] =
-    (c: HCursor) =>
-      for {
-        constraintCatalog <- c.downField("constraint_catalog").as[Option[SqlIdentifier]]
-        constraintSchema <- c.downField("constraint_schema").as[Option[SqlIdentifier]]
-        constraintName <- c.downField("constraint_name").as[Option[SqlIdentifier]]
-        tableCatalog <- c.downField("table_catalog").as[Option[SqlIdentifier]]
-        tableSchema <- c.downField("table_schema").as[Option[SqlIdentifier]]
-        tableName <- c.downField("table_name").as[Option[SqlIdentifier]]
-        columnName <- c.downField("column_name").as[Option[SqlIdentifier]]
-        ordinalPosition <- c.downField("ordinal_position").as[Option[CardinalNumber]]
-        positionInUniqueConstraint <- c.downField("position_in_unique_constraint").as[Option[CardinalNumber]]
-      } yield KeyColumnUsageViewRow(constraintCatalog, constraintSchema, constraintName, tableCatalog, tableSchema, tableName, columnName, ordinalPosition, positionInUniqueConstraint)
-  implicit val encoder: Encoder[KeyColumnUsageViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "constraint_catalog" := row.constraintCatalog,
-        "constraint_schema" := row.constraintSchema,
-        "constraint_name" := row.constraintName,
-        "table_catalog" := row.tableCatalog,
-        "table_schema" := row.tableSchema,
-        "table_name" := row.tableName,
-        "column_name" := row.columnName,
-        "ordinal_position" := row.ordinalPosition,
-        "position_in_unique_constraint" := row.positionInUniqueConstraint
-      )}
-  implicit val read: Read[KeyColumnUsageViewRow] =
-    new Read[KeyColumnUsageViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable),
-        (Get[CardinalNumber], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => KeyColumnUsageViewRow(
-        constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
-        ordinalPosition = Get[CardinalNumber].unsafeGetNullable(rs, i + 7),
-        positionInUniqueConstraint = Get[CardinalNumber].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[KeyColumnUsageViewRow] = Decoder.forProduct9[KeyColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CardinalNumber], Option[CardinalNumber]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "column_name", "ordinal_position", "position_in_unique_constraint")(KeyColumnUsageViewRow.apply)
+  implicit val encoder: Encoder[KeyColumnUsageViewRow] = Encoder.forProduct9[KeyColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CardinalNumber], Option[CardinalNumber]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "column_name", "ordinal_position", "position_in_unique_constraint")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.ordinalPosition, x.positionInUniqueConstraint))
+  implicit val read: Read[KeyColumnUsageViewRow] = new Read[KeyColumnUsageViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable),
+      (Get[CardinalNumber], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => KeyColumnUsageViewRow(
+      constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
+      ordinalPosition = Get[CardinalNumber].unsafeGetNullable(rs, i + 7),
+      positionInUniqueConstraint = Get[CardinalNumber].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTablespaceRow(
@@ -26,40 +28,36 @@ case class PgTablespaceRow(
 )
 
 object PgTablespaceRow {
-  def rowParser(idx: Int): RowParser[PgTablespaceRow] =
-    RowParser[PgTablespaceRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTablespaceRow] = Reads[PgTablespaceRow](json => JsResult.fromTry(
+      Try(
         PgTablespaceRow(
-          oid = row[PgTablespaceId](idx + 0),
-          spcname = row[String](idx + 1),
-          spcowner = row[/* oid */ Long](idx + 2),
-          spcacl = row[Option[Array[TypoAclItem]]](idx + 3),
-          spcoptions = row[Option[Array[String]]](idx + 4)
+          oid = json.\("oid").as[PgTablespaceId],
+          spcname = json.\("spcname").as[String],
+          spcowner = json.\("spcowner").as[/* oid */ Long],
+          spcacl = json.\("spcacl").toOption.map(_.as[Array[TypoAclItem]]),
+          spcoptions = json.\("spcoptions").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTablespaceRow] = new OFormat[PgTablespaceRow]{
-    override def writes(o: PgTablespaceRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "spcname" -> o.spcname,
-        "spcowner" -> o.spcowner,
-        "spcacl" -> o.spcacl,
-        "spcoptions" -> o.spcoptions
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTablespaceRow] = RowParser[PgTablespaceRow] { row =>
+    Success(
+      PgTablespaceRow(
+        oid = row[PgTablespaceId](idx + 0),
+        spcname = row[String](idx + 1),
+        spcowner = row[/* oid */ Long](idx + 2),
+        spcacl = row[Option[Array[TypoAclItem]]](idx + 3),
+        spcoptions = row[Option[Array[String]]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTablespaceRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTablespaceRow(
-            oid = json.\("oid").as[PgTablespaceId],
-            spcname = json.\("spcname").as[String],
-            spcowner = json.\("spcowner").as[/* oid */ Long],
-            spcacl = json.\("spcacl").toOption.map(_.as[Array[TypoAclItem]]),
-            spcoptions = json.\("spcoptions").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTablespaceRow] = OWrites[PgTablespaceRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "spcname" -> Json.toJson(o.spcname),
+      "spcowner" -> Json.toJson(o.spcowner),
+      "spcacl" -> Json.toJson(o.spcacl),
+      "spcoptions" -> Json.toJson(o.spcoptions)
+    ))
+  )
 }

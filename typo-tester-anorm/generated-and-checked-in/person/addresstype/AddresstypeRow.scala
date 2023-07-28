@@ -7,16 +7,18 @@ package adventureworks
 package person
 package addresstype
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class AddresstypeRow(
@@ -25,41 +27,37 @@ case class AddresstypeRow(
   /** Address type description. For example, Billing, Home, or Shipping. */
   name: Name,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object AddresstypeRow {
-  def rowParser(idx: Int): RowParser[AddresstypeRow] =
-    RowParser[AddresstypeRow] { row =>
-      Success(
+  implicit val reads: Reads[AddresstypeRow] = Reads[AddresstypeRow](json => JsResult.fromTry(
+      Try(
         AddresstypeRow(
-          addresstypeid = row[AddresstypeId](idx + 0),
-          name = row[Name](idx + 1),
-          rowguid = row[UUID](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          addresstypeid = json.\("addresstypeid").as[AddresstypeId],
+          name = json.\("name").as[Name],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[AddresstypeRow] = new OFormat[AddresstypeRow]{
-    override def writes(o: AddresstypeRow): JsObject =
-      Json.obj(
-        "addresstypeid" -> o.addresstypeid,
-        "name" -> o.name,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[AddresstypeRow] = RowParser[AddresstypeRow] { row =>
+    Success(
+      AddresstypeRow(
+        addresstypeid = row[AddresstypeId](idx + 0),
+        name = row[Name](idx + 1),
+        rowguid = row[UUID](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[AddresstypeRow] = {
-      JsResult.fromTry(
-        Try(
-          AddresstypeRow(
-            addresstypeid = json.\("addresstypeid").as[AddresstypeId],
-            name = json.\("name").as[Name],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[AddresstypeRow] = OWrites[AddresstypeRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "addresstypeid" -> Json.toJson(o.addresstypeid),
+      "name" -> Json.toJson(o.name),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

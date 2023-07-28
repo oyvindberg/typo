@@ -7,18 +7,19 @@ package adventureworks
 package production
 package document
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.document` */
 case class DocumentId(value: String) extends AnyVal
 object DocumentId {
+  implicit val arrayGet: Get[Array[DocumentId]] = Get[Array[String]].map(_.map(DocumentId.apply))
+  implicit val arrayPut: Put[Array[DocumentId]] = Put[Array[String]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[DocumentId] = Decoder[String].map(DocumentId.apply)
+  implicit val encoder: Encoder[DocumentId] = Encoder[String].contramap(_.value)
+  implicit val get: Get[DocumentId] = Get[String].map(DocumentId.apply)
   implicit val ordering: Ordering[DocumentId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[DocumentId] =
-    Encoder[String].contramap(_.value)
-  implicit val decoder: Decoder[DocumentId] =
-    Decoder[String].map(DocumentId(_))
-  implicit val meta: Meta[DocumentId] = Meta[String].imap(DocumentId.apply)(_.value)
-  implicit val metaArray: Meta[Array[DocumentId]] = Meta[Array[String]].imap(_.map(DocumentId.apply))(_.map(_.value))
+  implicit val put: Put[DocumentId] = Put[String].contramap(_.value)
 }

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgEventTriggerRow(
@@ -27,46 +29,42 @@ case class PgEventTriggerRow(
 )
 
 object PgEventTriggerRow {
-  def rowParser(idx: Int): RowParser[PgEventTriggerRow] =
-    RowParser[PgEventTriggerRow] { row =>
-      Success(
+  implicit val reads: Reads[PgEventTriggerRow] = Reads[PgEventTriggerRow](json => JsResult.fromTry(
+      Try(
         PgEventTriggerRow(
-          oid = row[PgEventTriggerId](idx + 0),
-          evtname = row[String](idx + 1),
-          evtevent = row[String](idx + 2),
-          evtowner = row[/* oid */ Long](idx + 3),
-          evtfoid = row[/* oid */ Long](idx + 4),
-          evtenabled = row[String](idx + 5),
-          evttags = row[Option[Array[String]]](idx + 6)
+          oid = json.\("oid").as[PgEventTriggerId],
+          evtname = json.\("evtname").as[String],
+          evtevent = json.\("evtevent").as[String],
+          evtowner = json.\("evtowner").as[/* oid */ Long],
+          evtfoid = json.\("evtfoid").as[/* oid */ Long],
+          evtenabled = json.\("evtenabled").as[String],
+          evttags = json.\("evttags").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgEventTriggerRow] = new OFormat[PgEventTriggerRow]{
-    override def writes(o: PgEventTriggerRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "evtname" -> o.evtname,
-        "evtevent" -> o.evtevent,
-        "evtowner" -> o.evtowner,
-        "evtfoid" -> o.evtfoid,
-        "evtenabled" -> o.evtenabled,
-        "evttags" -> o.evttags
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgEventTriggerRow] = RowParser[PgEventTriggerRow] { row =>
+    Success(
+      PgEventTriggerRow(
+        oid = row[PgEventTriggerId](idx + 0),
+        evtname = row[String](idx + 1),
+        evtevent = row[String](idx + 2),
+        evtowner = row[/* oid */ Long](idx + 3),
+        evtfoid = row[/* oid */ Long](idx + 4),
+        evtenabled = row[String](idx + 5),
+        evttags = row[Option[Array[String]]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgEventTriggerRow] = {
-      JsResult.fromTry(
-        Try(
-          PgEventTriggerRow(
-            oid = json.\("oid").as[PgEventTriggerId],
-            evtname = json.\("evtname").as[String],
-            evtevent = json.\("evtevent").as[String],
-            evtowner = json.\("evtowner").as[/* oid */ Long],
-            evtfoid = json.\("evtfoid").as[/* oid */ Long],
-            evtenabled = json.\("evtenabled").as[String],
-            evttags = json.\("evttags").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgEventTriggerRow] = OWrites[PgEventTriggerRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "evtname" -> Json.toJson(o.evtname),
+      "evtevent" -> Json.toJson(o.evtevent),
+      "evtowner" -> Json.toJson(o.evtowner),
+      "evtfoid" -> Json.toJson(o.evtfoid),
+      "evtenabled" -> Json.toJson(o.evtenabled),
+      "evttags" -> Json.toJson(o.evttags)
+    ))
+  )
 }

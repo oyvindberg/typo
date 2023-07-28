@@ -10,19 +10,20 @@ package pg_sequence
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_sequence` */
 case class PgSequenceId(value: /* oid */ Long) extends AnyVal
 object PgSequenceId {
-  implicit val ordering: Ordering[PgSequenceId] = Ordering.by(_.value)
-  implicit val format: Format[PgSequenceId] = implicitly[Format[/* oid */ Long]].bimap(PgSequenceId.apply, _.value)
-  implicit val toStatement: ToStatement[PgSequenceId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgSequenceId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgSequenceId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit val column: Column[PgSequenceId] = implicitly[Column[/* oid */ Long]].map(PgSequenceId.apply)
+  implicit val ordering: Ordering[PgSequenceId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgSequenceId] = new ParameterMetaData[PgSequenceId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit val reads: Reads[PgSequenceId] = implicitly[Reads[/* oid */ Long]].map(PgSequenceId.apply)
+  implicit val toStatement: ToStatement[PgSequenceId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgSequenceId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
 }

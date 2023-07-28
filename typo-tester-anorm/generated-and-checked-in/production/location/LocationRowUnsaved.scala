@@ -8,13 +8,15 @@ package production
 package location
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.location` which has not been persisted yet */
@@ -31,9 +33,9 @@ case class LocationRowUnsaved(
       Work capacity (in hours) of the manufacturing location. */
   availability: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(locationidDefault: => LocationId, costrateDefault: => BigDecimal, availabilityDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): LocationRow =
+  def toRow(locationidDefault: => LocationId, costrateDefault: => BigDecimal, availabilityDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): LocationRow =
     LocationRow(
       name = name,
       locationid = locationid match {
@@ -55,28 +57,25 @@ case class LocationRowUnsaved(
     )
 }
 object LocationRowUnsaved {
-  implicit val oFormat: OFormat[LocationRowUnsaved] = new OFormat[LocationRowUnsaved]{
-    override def writes(o: LocationRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "locationid" -> o.locationid,
-        "costrate" -> o.costrate,
-        "availability" -> o.availability,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[LocationRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          LocationRowUnsaved(
-            name = json.\("name").as[Name],
-            locationid = json.\("locationid").as[Defaulted[LocationId]],
-            costrate = json.\("costrate").as[Defaulted[BigDecimal]],
-            availability = json.\("availability").as[Defaulted[BigDecimal]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[LocationRowUnsaved] = Reads[LocationRowUnsaved](json => JsResult.fromTry(
+      Try(
+        LocationRowUnsaved(
+          name = json.\("name").as[Name],
+          locationid = json.\("locationid").as[Defaulted[LocationId]],
+          costrate = json.\("costrate").as[Defaulted[BigDecimal]],
+          availability = json.\("availability").as[Defaulted[BigDecimal]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[LocationRowUnsaved] = OWrites[LocationRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "locationid" -> Json.toJson(o.locationid),
+      "costrate" -> Json.toJson(o.costrate),
+      "availability" -> Json.toJson(o.availability),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

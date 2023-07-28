@@ -8,11 +8,11 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId): ConnectionIO[Boolean] = {
@@ -21,7 +21,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def insert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.ratechangedate}::timestamp, ${unsaved.rate}::numeric, ${unsaved.payfrequency}::int2, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+          returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
        """.query[EmployeepayhistoryRow].unique
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ConnectionIO[EmployeepayhistoryRow] = {
@@ -32,29 +32,29 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       Some((Fragment.const(s"payfrequency"), fr"${unsaved.payfrequency}::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into humanresources.employeepayhistory default values
-            returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+            returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.employeepayhistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+            returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
          """
     }
     q.query[EmployeepayhistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
-    sql"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory".query[EmployeepayhistoryRow].stream
+    sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory".query[EmployeepayhistoryRow].stream
   }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
-    sql"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".query[EmployeepayhistoryRow].option
+    sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".query[EmployeepayhistoryRow].option
   }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -82,7 +82,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             rate = EXCLUDED.rate,
             payfrequency = EXCLUDED.payfrequency,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+          returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
        """.query[EmployeepayhistoryRow].unique
   }
 }

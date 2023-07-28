@@ -6,47 +6,23 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.geometric.PGpoint
 
 /** Point datatype in PostgreSQL */
 case class TypoPoint(x: Double, y: Double)
+
 object TypoPoint {
-  implicit val decoder: Decoder[TypoPoint] =
-    (c: HCursor) =>
-      for {
-        x <- c.downField("x").as[Double]
-        y <- c.downField("y").as[Double]
-      } yield TypoPoint(x, y)
-  implicit val encoder: Encoder[TypoPoint] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "x" := row.x,
-        "y" := row.y
-      )}
-  implicit val get: Get[TypoPoint] =
-    Get.Advanced.other[PGpoint](cats.data.NonEmptyList.one("point"))
-      .map(v => TypoPoint(v.x, v.y))
-  
-  implicit val put: Put[TypoPoint] =
-    Put.Advanced.other[PGpoint](NonEmptyList.one("point"))
-      .contramap(v => new PGpoint(v.x, v.y))
-  
-  implicit val meta: Meta[TypoPoint] = new Meta(get, put)
-  val gets: Get[Array[TypoPoint]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_point"))
-      .map(_.map(v => TypoPoint(v.asInstanceOf[PGpoint].x, v.asInstanceOf[PGpoint].y)))
-  
-  val puts: Put[Array[TypoPoint]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_point"), "point")
-      .contramap(_.map(v => new PGpoint(v.x, v.y)))
-  
-  implicit val metas: Meta[Array[TypoPoint]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoPoint]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_point"))
+    .map(_.map(v => TypoPoint(v.asInstanceOf[PGpoint].x, v.asInstanceOf[PGpoint].y)))
+  implicit val arrayPut: Put[Array[TypoPoint]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_point"), "point")
+    .contramap(_.map(v => new PGpoint(v.x, v.y)))
+  implicit val decoder: Decoder[TypoPoint] = Decoder.forProduct2[TypoPoint, Double, Double]("x", "y")(TypoPoint.apply)
+  implicit val encoder: Encoder[TypoPoint] = Encoder.forProduct2[TypoPoint, Double, Double]("x", "y")(x => (x.x, x.y))
+  implicit val get: Get[TypoPoint] = Get.Advanced.other[PGpoint](NonEmptyList.one("point"))
+    .map(v => TypoPoint(v.x, v.y))
+  implicit val put: Put[TypoPoint] = Put.Advanced.other[PGpoint](NonEmptyList.one("point")).contramap(v => new PGpoint(v.x, v.y))
 }

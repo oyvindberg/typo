@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def delete(oid: PgEventTriggerId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_event_trigger where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_event_trigger where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgEventTriggerRow): ConnectionIO[PgEventTriggerRow] = {
     sql"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)
@@ -25,10 +25,10 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
     sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger".query[PgEventTriggerRow].stream
   }
   override def selectById(oid: PgEventTriggerId): ConnectionIO[Option[PgEventTriggerRow]] = {
-    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = $oid".query[PgEventTriggerRow].option
+    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ${oid}".query[PgEventTriggerRow].option
   }
   override def selectByIds(oids: Array[PgEventTriggerId]): Stream[ConnectionIO, PgEventTriggerRow] = {
-    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ANY($oids)".query[PgEventTriggerRow].stream
+    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ANY(${oids})".query[PgEventTriggerRow].stream
   }
   override def update(row: PgEventTriggerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -39,7 +39,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
               evtfoid = ${row.evtfoid}::oid,
               evtenabled = ${row.evtenabled}::char,
               evttags = ${row.evttags}::_text
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

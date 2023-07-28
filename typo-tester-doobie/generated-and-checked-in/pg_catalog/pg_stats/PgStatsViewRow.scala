@@ -8,13 +8,11 @@ package pg_catalog
 package pg_stats
 
 import adventureworks.TypoAnyArray
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatsViewRow(
@@ -35,78 +33,40 @@ case class PgStatsViewRow(
 )
 
 object PgStatsViewRow {
-  implicit val decoder: Decoder[PgStatsViewRow] =
-    (c: HCursor) =>
-      for {
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        tablename <- c.downField("tablename").as[Option[String]]
-        attname <- c.downField("attname").as[Option[String]]
-        inherited <- c.downField("inherited").as[Option[Boolean]]
-        nullFrac <- c.downField("null_frac").as[Option[Float]]
-        avgWidth <- c.downField("avg_width").as[Option[Int]]
-        nDistinct <- c.downField("n_distinct").as[Option[Float]]
-        mostCommonVals <- c.downField("most_common_vals").as[Option[TypoAnyArray]]
-        mostCommonFreqs <- c.downField("most_common_freqs").as[Option[Array[Float]]]
-        histogramBounds <- c.downField("histogram_bounds").as[Option[TypoAnyArray]]
-        correlation <- c.downField("correlation").as[Option[Float]]
-        mostCommonElems <- c.downField("most_common_elems").as[Option[TypoAnyArray]]
-        mostCommonElemFreqs <- c.downField("most_common_elem_freqs").as[Option[Array[Float]]]
-        elemCountHistogram <- c.downField("elem_count_histogram").as[Option[Array[Float]]]
-      } yield PgStatsViewRow(schemaname, tablename, attname, inherited, nullFrac, avgWidth, nDistinct, mostCommonVals, mostCommonFreqs, histogramBounds, correlation, mostCommonElems, mostCommonElemFreqs, elemCountHistogram)
-  implicit val encoder: Encoder[PgStatsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "schemaname" := row.schemaname,
-        "tablename" := row.tablename,
-        "attname" := row.attname,
-        "inherited" := row.inherited,
-        "null_frac" := row.nullFrac,
-        "avg_width" := row.avgWidth,
-        "n_distinct" := row.nDistinct,
-        "most_common_vals" := row.mostCommonVals,
-        "most_common_freqs" := row.mostCommonFreqs,
-        "histogram_bounds" := row.histogramBounds,
-        "correlation" := row.correlation,
-        "most_common_elems" := row.mostCommonElems,
-        "most_common_elem_freqs" := row.mostCommonElemFreqs,
-        "elem_count_histogram" := row.elemCountHistogram
-      )}
-  implicit val read: Read[PgStatsViewRow] =
-    new Read[PgStatsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Float], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Float], Nullability.Nullable),
-        (Get[TypoAnyArray], Nullability.Nullable),
-        (Get[Array[Float]], Nullability.Nullable),
-        (Get[TypoAnyArray], Nullability.Nullable),
-        (Get[Float], Nullability.Nullable),
-        (Get[TypoAnyArray], Nullability.Nullable),
-        (Get[Array[Float]], Nullability.Nullable),
-        (Get[Array[Float]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatsViewRow(
-        schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-        tablename = Get[String].unsafeGetNullable(rs, i + 1),
-        attname = Get[String].unsafeGetNullable(rs, i + 2),
-        inherited = Get[Boolean].unsafeGetNullable(rs, i + 3),
-        nullFrac = Get[Float].unsafeGetNullable(rs, i + 4),
-        avgWidth = Get[Int].unsafeGetNullable(rs, i + 5),
-        nDistinct = Get[Float].unsafeGetNullable(rs, i + 6),
-        mostCommonVals = Get[TypoAnyArray].unsafeGetNullable(rs, i + 7),
-        mostCommonFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 8),
-        histogramBounds = Get[TypoAnyArray].unsafeGetNullable(rs, i + 9),
-        correlation = Get[Float].unsafeGetNullable(rs, i + 10),
-        mostCommonElems = Get[TypoAnyArray].unsafeGetNullable(rs, i + 11),
-        mostCommonElemFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 12),
-        elemCountHistogram = Get[Array[Float]].unsafeGetNullable(rs, i + 13)
-      )
+  implicit val decoder: Decoder[PgStatsViewRow] = Decoder.forProduct14[PgStatsViewRow, Option[String], Option[String], Option[String], Option[Boolean], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "attname", "inherited", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(PgStatsViewRow.apply)
+  implicit val encoder: Encoder[PgStatsViewRow] = Encoder.forProduct14[PgStatsViewRow, Option[String], Option[String], Option[String], Option[Boolean], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "attname", "inherited", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(x => (x.schemaname, x.tablename, x.attname, x.inherited, x.nullFrac, x.avgWidth, x.nDistinct, x.mostCommonVals, x.mostCommonFreqs, x.histogramBounds, x.correlation, x.mostCommonElems, x.mostCommonElemFreqs, x.elemCountHistogram))
+  implicit val read: Read[PgStatsViewRow] = new Read[PgStatsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Float], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Float], Nullability.Nullable),
+      (Get[TypoAnyArray], Nullability.Nullable),
+      (Get[Array[Float]], Nullability.Nullable),
+      (Get[TypoAnyArray], Nullability.Nullable),
+      (Get[Float], Nullability.Nullable),
+      (Get[TypoAnyArray], Nullability.Nullable),
+      (Get[Array[Float]], Nullability.Nullable),
+      (Get[Array[Float]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatsViewRow(
+      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
+      tablename = Get[String].unsafeGetNullable(rs, i + 1),
+      attname = Get[String].unsafeGetNullable(rs, i + 2),
+      inherited = Get[Boolean].unsafeGetNullable(rs, i + 3),
+      nullFrac = Get[Float].unsafeGetNullable(rs, i + 4),
+      avgWidth = Get[Int].unsafeGetNullable(rs, i + 5),
+      nDistinct = Get[Float].unsafeGetNullable(rs, i + 6),
+      mostCommonVals = Get[TypoAnyArray].unsafeGetNullable(rs, i + 7),
+      mostCommonFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 8),
+      histogramBounds = Get[TypoAnyArray].unsafeGetNullable(rs, i + 9),
+      correlation = Get[Float].unsafeGetNullable(rs, i + 10),
+      mostCommonElems = Get[TypoAnyArray].unsafeGetNullable(rs, i + 11),
+      mostCommonElemFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 12),
+      elemCountHistogram = Get[Array[Float]].unsafeGetNullable(rs, i + 13)
     )
-  
-
+  )
 }

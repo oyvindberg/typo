@@ -7,72 +7,48 @@ package adventureworks
 package hr
 package eph
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class EphViewRow(
   id: Option[Int],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.ratechangedate]] */
-  ratechangedate: Option[LocalDateTime],
+  ratechangedate: Option[TypoLocalDateTime],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.rate]] */
   rate: Option[BigDecimal],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.payfrequency]] */
   payfrequency: Option[Int],
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object EphViewRow {
-  implicit val decoder: Decoder[EphViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        ratechangedate <- c.downField("ratechangedate").as[Option[LocalDateTime]]
-        rate <- c.downField("rate").as[Option[BigDecimal]]
-        payfrequency <- c.downField("payfrequency").as[Option[Int]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield EphViewRow(id, businessentityid, ratechangedate, rate, payfrequency, modifieddate)
-  implicit val encoder: Encoder[EphViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "ratechangedate" := row.ratechangedate,
-        "rate" := row.rate,
-        "payfrequency" := row.payfrequency,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[EphViewRow] =
-    new Read[EphViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EphViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        ratechangedate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
-        rate = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-        payfrequency = Get[Int].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[EphViewRow] = Decoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EphViewRow.apply)
+  implicit val encoder: Encoder[EphViewRow] = Encoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.id, x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))
+  implicit val read: Read[EphViewRow] = new Read[EphViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => EphViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      ratechangedate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
+      rate = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
+      payfrequency = Get[Int].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

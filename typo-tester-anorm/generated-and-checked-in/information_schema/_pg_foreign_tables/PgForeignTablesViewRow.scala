@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgForeignTablesViewRow(
@@ -28,46 +30,42 @@ case class PgForeignTablesViewRow(
 )
 
 object PgForeignTablesViewRow {
-  def rowParser(idx: Int): RowParser[PgForeignTablesViewRow] =
-    RowParser[PgForeignTablesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgForeignTablesViewRow] = Reads[PgForeignTablesViewRow](json => JsResult.fromTry(
+      Try(
         PgForeignTablesViewRow(
-          foreignTableCatalog = row[Option[SqlIdentifier]](idx + 0),
-          foreignTableSchema = row[Option[SqlIdentifier]](idx + 1),
-          foreignTableName = row[Option[SqlIdentifier]](idx + 2),
-          ftoptions = row[Option[Array[String]]](idx + 3),
-          foreignServerCatalog = row[Option[SqlIdentifier]](idx + 4),
-          foreignServerName = row[Option[SqlIdentifier]](idx + 5),
-          authorizationIdentifier = row[Option[SqlIdentifier]](idx + 6)
+          foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as[SqlIdentifier]),
+          foreignTableName = json.\("foreign_table_name").toOption.map(_.as[SqlIdentifier]),
+          ftoptions = json.\("ftoptions").toOption.map(_.as[Array[String]]),
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgForeignTablesViewRow] = new OFormat[PgForeignTablesViewRow]{
-    override def writes(o: PgForeignTablesViewRow): JsObject =
-      Json.obj(
-        "foreign_table_catalog" -> o.foreignTableCatalog,
-        "foreign_table_schema" -> o.foreignTableSchema,
-        "foreign_table_name" -> o.foreignTableName,
-        "ftoptions" -> o.ftoptions,
-        "foreign_server_catalog" -> o.foreignServerCatalog,
-        "foreign_server_name" -> o.foreignServerName,
-        "authorization_identifier" -> o.authorizationIdentifier
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgForeignTablesViewRow] = RowParser[PgForeignTablesViewRow] { row =>
+    Success(
+      PgForeignTablesViewRow(
+        foreignTableCatalog = row[Option[SqlIdentifier]](idx + 0),
+        foreignTableSchema = row[Option[SqlIdentifier]](idx + 1),
+        foreignTableName = row[Option[SqlIdentifier]](idx + 2),
+        ftoptions = row[Option[Array[String]]](idx + 3),
+        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 4),
+        foreignServerName = row[Option[SqlIdentifier]](idx + 5),
+        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgForeignTablesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgForeignTablesViewRow(
-            foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as[SqlIdentifier]),
-            foreignTableName = json.\("foreign_table_name").toOption.map(_.as[SqlIdentifier]),
-            ftoptions = json.\("ftoptions").toOption.map(_.as[Array[String]]),
-            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
-            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgForeignTablesViewRow] = OWrites[PgForeignTablesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "foreign_table_catalog" -> Json.toJson(o.foreignTableCatalog),
+      "foreign_table_schema" -> Json.toJson(o.foreignTableSchema),
+      "foreign_table_name" -> Json.toJson(o.foreignTableName),
+      "ftoptions" -> Json.toJson(o.ftoptions),
+      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
+      "foreign_server_name" -> Json.toJson(o.foreignServerName),
+      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier)
+    ))
+  )
 }

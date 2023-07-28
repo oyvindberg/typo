@@ -7,15 +7,17 @@ package adventureworks
 package sales
 package salesreason
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SalesreasonRow(
@@ -25,41 +27,37 @@ case class SalesreasonRow(
   name: Name,
   /** Category the sales reason belongs to. */
   reasontype: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object SalesreasonRow {
-  def rowParser(idx: Int): RowParser[SalesreasonRow] =
-    RowParser[SalesreasonRow] { row =>
-      Success(
+  implicit val reads: Reads[SalesreasonRow] = Reads[SalesreasonRow](json => JsResult.fromTry(
+      Try(
         SalesreasonRow(
-          salesreasonid = row[SalesreasonId](idx + 0),
-          name = row[Name](idx + 1),
-          reasontype = row[Name](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          salesreasonid = json.\("salesreasonid").as[SalesreasonId],
+          name = json.\("name").as[Name],
+          reasontype = json.\("reasontype").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[SalesreasonRow] = new OFormat[SalesreasonRow]{
-    override def writes(o: SalesreasonRow): JsObject =
-      Json.obj(
-        "salesreasonid" -> o.salesreasonid,
-        "name" -> o.name,
-        "reasontype" -> o.reasontype,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SalesreasonRow] = RowParser[SalesreasonRow] { row =>
+    Success(
+      SalesreasonRow(
+        salesreasonid = row[SalesreasonId](idx + 0),
+        name = row[Name](idx + 1),
+        reasontype = row[Name](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[SalesreasonRow] = {
-      JsResult.fromTry(
-        Try(
-          SalesreasonRow(
-            salesreasonid = json.\("salesreasonid").as[SalesreasonId],
-            name = json.\("name").as[Name],
-            reasontype = json.\("reasontype").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SalesreasonRow] = OWrites[SalesreasonRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "salesreasonid" -> Json.toJson(o.salesreasonid),
+      "name" -> Json.toJson(o.name),
+      "reasontype" -> Json.toJson(o.reasontype),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

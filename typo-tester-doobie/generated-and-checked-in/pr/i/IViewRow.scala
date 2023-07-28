@@ -7,17 +7,15 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class IViewRow(
   id: Option[Int],
@@ -26,42 +24,24 @@ case class IViewRow(
   /** Points to [[production.illustration.IllustrationRow.diagram]] */
   diagram: Option[TypoXml],
   /** Points to [[production.illustration.IllustrationRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object IViewRow {
-  implicit val decoder: Decoder[IViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        illustrationid <- c.downField("illustrationid").as[Option[IllustrationId]]
-        diagram <- c.downField("diagram").as[Option[TypoXml]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield IViewRow(id, illustrationid, diagram, modifieddate)
-  implicit val encoder: Encoder[IViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "illustrationid" := row.illustrationid,
-        "diagram" := row.diagram,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[IViewRow] =
-    new Read[IViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[IllustrationId], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => IViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
-        diagram = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[IViewRow] = Decoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(IViewRow.apply)
+  implicit val encoder: Encoder[IViewRow] = Encoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(x => (x.id, x.illustrationid, x.diagram, x.modifieddate))
+  implicit val read: Read[IViewRow] = new Read[IViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[IllustrationId], Nullability.Nullable),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => IViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
+      diagram = Get[TypoXml].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

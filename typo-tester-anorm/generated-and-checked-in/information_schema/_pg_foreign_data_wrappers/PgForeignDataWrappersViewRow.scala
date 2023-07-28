@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgForeignDataWrappersViewRow(
@@ -29,46 +31,42 @@ case class PgForeignDataWrappersViewRow(
 )
 
 object PgForeignDataWrappersViewRow {
-  def rowParser(idx: Int): RowParser[PgForeignDataWrappersViewRow] =
-    RowParser[PgForeignDataWrappersViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgForeignDataWrappersViewRow] = Reads[PgForeignDataWrappersViewRow](json => JsResult.fromTry(
+      Try(
         PgForeignDataWrappersViewRow(
-          oid = row[Option[/* oid */ Long]](idx + 0),
-          fdwowner = row[Option[/* oid */ Long]](idx + 1),
-          fdwoptions = row[Option[Array[String]]](idx + 2),
-          foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 3),
-          foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 4),
-          authorizationIdentifier = row[Option[SqlIdentifier]](idx + 5),
-          foreignDataWrapperLanguage = row[Option[CharacterData]](idx + 6)
+          oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
+          fdwowner = json.\("fdwowner").toOption.map(_.as[/* oid */ Long]),
+          fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
+          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgForeignDataWrappersViewRow] = new OFormat[PgForeignDataWrappersViewRow]{
-    override def writes(o: PgForeignDataWrappersViewRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "fdwowner" -> o.fdwowner,
-        "fdwoptions" -> o.fdwoptions,
-        "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
-        "authorization_identifier" -> o.authorizationIdentifier,
-        "foreign_data_wrapper_language" -> o.foreignDataWrapperLanguage
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgForeignDataWrappersViewRow] = RowParser[PgForeignDataWrappersViewRow] { row =>
+    Success(
+      PgForeignDataWrappersViewRow(
+        oid = row[Option[/* oid */ Long]](idx + 0),
+        fdwowner = row[Option[/* oid */ Long]](idx + 1),
+        fdwoptions = row[Option[Array[String]]](idx + 2),
+        foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 3),
+        foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 4),
+        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 5),
+        foreignDataWrapperLanguage = row[Option[CharacterData]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgForeignDataWrappersViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgForeignDataWrappersViewRow(
-            oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
-            fdwowner = json.\("fdwowner").toOption.map(_.as[/* oid */ Long]),
-            fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
-            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
-            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
-            foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgForeignDataWrappersViewRow] = OWrites[PgForeignDataWrappersViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "fdwowner" -> Json.toJson(o.fdwowner),
+      "fdwoptions" -> Json.toJson(o.fdwoptions),
+      "foreign_data_wrapper_catalog" -> Json.toJson(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> Json.toJson(o.foreignDataWrapperName),
+      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier),
+      "foreign_data_wrapper_language" -> Json.toJson(o.foreignDataWrapperLanguage)
+    ))
+  )
 }

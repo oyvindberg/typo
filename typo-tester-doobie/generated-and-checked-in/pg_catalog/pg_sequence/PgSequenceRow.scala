@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_sequence
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgSequenceRow(
@@ -28,54 +26,28 @@ case class PgSequenceRow(
 )
 
 object PgSequenceRow {
-  implicit val decoder: Decoder[PgSequenceRow] =
-    (c: HCursor) =>
-      for {
-        seqrelid <- c.downField("seqrelid").as[PgSequenceId]
-        seqtypid <- c.downField("seqtypid").as[/* oid */ Long]
-        seqstart <- c.downField("seqstart").as[Long]
-        seqincrement <- c.downField("seqincrement").as[Long]
-        seqmax <- c.downField("seqmax").as[Long]
-        seqmin <- c.downField("seqmin").as[Long]
-        seqcache <- c.downField("seqcache").as[Long]
-        seqcycle <- c.downField("seqcycle").as[Boolean]
-      } yield PgSequenceRow(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)
-  implicit val encoder: Encoder[PgSequenceRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "seqrelid" := row.seqrelid,
-        "seqtypid" := row.seqtypid,
-        "seqstart" := row.seqstart,
-        "seqincrement" := row.seqincrement,
-        "seqmax" := row.seqmax,
-        "seqmin" := row.seqmin,
-        "seqcache" := row.seqcache,
-        "seqcycle" := row.seqcycle
-      )}
-  implicit val read: Read[PgSequenceRow] =
-    new Read[PgSequenceRow](
-      gets = List(
-        (Get[PgSequenceId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Long], Nullability.NoNulls),
-        (Get[Long], Nullability.NoNulls),
-        (Get[Long], Nullability.NoNulls),
-        (Get[Long], Nullability.NoNulls),
-        (Get[Long], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgSequenceRow(
-        seqrelid = Get[PgSequenceId].unsafeGetNonNullable(rs, i + 0),
-        seqtypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        seqstart = Get[Long].unsafeGetNonNullable(rs, i + 2),
-        seqincrement = Get[Long].unsafeGetNonNullable(rs, i + 3),
-        seqmax = Get[Long].unsafeGetNonNullable(rs, i + 4),
-        seqmin = Get[Long].unsafeGetNonNullable(rs, i + 5),
-        seqcache = Get[Long].unsafeGetNonNullable(rs, i + 6),
-        seqcycle = Get[Boolean].unsafeGetNonNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgSequenceRow] = Decoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(PgSequenceRow.apply)
+  implicit val encoder: Encoder[PgSequenceRow] = Encoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(x => (x.seqrelid, x.seqtypid, x.seqstart, x.seqincrement, x.seqmax, x.seqmin, x.seqcache, x.seqcycle))
+  implicit val read: Read[PgSequenceRow] = new Read[PgSequenceRow](
+    gets = List(
+      (Get[PgSequenceId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Long], Nullability.NoNulls),
+      (Get[Long], Nullability.NoNulls),
+      (Get[Long], Nullability.NoNulls),
+      (Get[Long], Nullability.NoNulls),
+      (Get[Long], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgSequenceRow(
+      seqrelid = Get[PgSequenceId].unsafeGetNonNullable(rs, i + 0),
+      seqtypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      seqstart = Get[Long].unsafeGetNonNullable(rs, i + 2),
+      seqincrement = Get[Long].unsafeGetNonNullable(rs, i + 3),
+      seqmax = Get[Long].unsafeGetNonNullable(rs, i + 4),
+      seqmin = Get[Long].unsafeGetNonNullable(rs, i + 5),
+      seqcache = Get[Long].unsafeGetNonNullable(rs, i + 6),
+      seqcycle = Get[Boolean].unsafeGetNonNullable(rs, i + 7)
     )
-  
-
+  )
 }

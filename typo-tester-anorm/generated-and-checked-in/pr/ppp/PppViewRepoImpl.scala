@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PppViewRepoImpl extends PppViewRepo {
   override def selectAll(implicit c: Connection): List[PppViewRow] = {
-    SQL"""select productid, productphotoid, "primary", modifieddate
+    SQL"""select productid, productphotoid, "primary", modifieddate::text
           from pr.ppp
        """.as(PppViewRow.rowParser(1).*)
   }

@@ -10,13 +10,11 @@ package vsalesperson
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class VsalespersonViewRow(
@@ -62,110 +60,56 @@ case class VsalespersonViewRow(
 )
 
 object VsalespersonViewRow {
-  implicit val decoder: Decoder[VsalespersonViewRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Option[Name]]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
-        jobtitle <- c.downField("jobtitle").as[Option[/* max 50 chars */ String]]
-        phonenumber <- c.downField("phonenumber").as[Option[Phone]]
-        phonenumbertype <- c.downField("phonenumbertype").as[Option[Name]]
-        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
-        emailpromotion <- c.downField("emailpromotion").as[Option[Int]]
-        addressline1 <- c.downField("addressline1").as[Option[/* max 60 chars */ String]]
-        addressline2 <- c.downField("addressline2").as[Option[/* max 60 chars */ String]]
-        city <- c.downField("city").as[Option[/* max 30 chars */ String]]
-        stateprovincename <- c.downField("stateprovincename").as[Option[Name]]
-        postalcode <- c.downField("postalcode").as[Option[/* max 15 chars */ String]]
-        countryregionname <- c.downField("countryregionname").as[Option[Name]]
-        territoryname <- c.downField("territoryname").as[Option[Name]]
-        territorygroup <- c.downField("territorygroup").as[Option[/* max 50 chars */ String]]
-        salesquota <- c.downField("salesquota").as[Option[BigDecimal]]
-        salesytd <- c.downField("salesytd").as[Option[BigDecimal]]
-        saleslastyear <- c.downField("saleslastyear").as[Option[BigDecimal]]
-      } yield VsalespersonViewRow(businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, territoryname, territorygroup, salesquota, salesytd, saleslastyear)
-  implicit val encoder: Encoder[VsalespersonViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "suffix" := row.suffix,
-        "jobtitle" := row.jobtitle,
-        "phonenumber" := row.phonenumber,
-        "phonenumbertype" := row.phonenumbertype,
-        "emailaddress" := row.emailaddress,
-        "emailpromotion" := row.emailpromotion,
-        "addressline1" := row.addressline1,
-        "addressline2" := row.addressline2,
-        "city" := row.city,
-        "stateprovincename" := row.stateprovincename,
-        "postalcode" := row.postalcode,
-        "countryregionname" := row.countryregionname,
-        "territoryname" := row.territoryname,
-        "territorygroup" := row.territorygroup,
-        "salesquota" := row.salesquota,
-        "salesytd" := row.salesytd,
-        "saleslastyear" := row.saleslastyear
-      )}
-  implicit val read: Read[VsalespersonViewRow] =
-    new Read[VsalespersonViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Phone], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VsalespersonViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-        firstname = Get[Name].unsafeGetNullable(rs, i + 2),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-        lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
-        jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
-        phonenumber = Get[Phone].unsafeGetNullable(rs, i + 7),
-        phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 8),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 9),
-        emailpromotion = Get[Int].unsafeGetNullable(rs, i + 10),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 11),
-        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 12),
-        city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 13),
-        stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 15),
-        countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
-        territoryname = Get[Name].unsafeGetNullable(rs, i + 17),
-        territorygroup = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 18),
-        salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 19),
-        salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 20),
-        saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 21)
-      )
+  implicit val decoder: Decoder[VsalespersonViewRow] = Decoder.forProduct22[VsalespersonViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[Name], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear")(VsalespersonViewRow.apply)
+  implicit val encoder: Encoder[VsalespersonViewRow] = Encoder.forProduct22[VsalespersonViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[Name], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname, x.territoryname, x.territorygroup, x.salesquota, x.salesytd, x.saleslastyear))
+  implicit val read: Read[VsalespersonViewRow] = new Read[VsalespersonViewRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Phone], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 60 chars */ String], Nullability.Nullable),
+      (Get[/* max 60 chars */ String], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 15 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VsalespersonViewRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
+      firstname = Get[Name].unsafeGetNullable(rs, i + 2),
+      middlename = Get[Name].unsafeGetNullable(rs, i + 3),
+      lastname = Get[Name].unsafeGetNullable(rs, i + 4),
+      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
+      jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
+      phonenumber = Get[Phone].unsafeGetNullable(rs, i + 7),
+      phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 8),
+      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 9),
+      emailpromotion = Get[Int].unsafeGetNullable(rs, i + 10),
+      addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 11),
+      addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 12),
+      city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 13),
+      stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
+      postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 15),
+      countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
+      territoryname = Get[Name].unsafeGetNullable(rs, i + 17),
+      territorygroup = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 18),
+      salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 19),
+      salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 20),
+      saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 21)
     )
-  
-
+  )
 }

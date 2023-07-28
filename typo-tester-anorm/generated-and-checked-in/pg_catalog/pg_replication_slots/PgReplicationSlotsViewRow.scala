@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgReplicationSlotsViewRow(
@@ -36,70 +38,66 @@ case class PgReplicationSlotsViewRow(
 )
 
 object PgReplicationSlotsViewRow {
-  def rowParser(idx: Int): RowParser[PgReplicationSlotsViewRow] =
-    RowParser[PgReplicationSlotsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgReplicationSlotsViewRow] = Reads[PgReplicationSlotsViewRow](json => JsResult.fromTry(
+      Try(
         PgReplicationSlotsViewRow(
-          slotName = row[Option[String]](idx + 0),
-          plugin = row[Option[String]](idx + 1),
-          slotType = row[Option[String]](idx + 2),
-          datoid = row[Option[/* oid */ Long]](idx + 3),
-          database = row[Option[String]](idx + 4),
-          temporary = row[Option[Boolean]](idx + 5),
-          active = row[Option[Boolean]](idx + 6),
-          activePid = row[Option[Int]](idx + 7),
-          xmin = row[Option[TypoXid]](idx + 8),
-          catalogXmin = row[Option[TypoXid]](idx + 9),
-          restartLsn = row[Option[/* pg_lsn */ Long]](idx + 10),
-          confirmedFlushLsn = row[Option[/* pg_lsn */ Long]](idx + 11),
-          walStatus = row[Option[String]](idx + 12),
-          safeWalSize = row[Option[Long]](idx + 13),
-          twoPhase = row[Option[Boolean]](idx + 14)
+          slotName = json.\("slot_name").toOption.map(_.as[String]),
+          plugin = json.\("plugin").toOption.map(_.as[String]),
+          slotType = json.\("slot_type").toOption.map(_.as[String]),
+          datoid = json.\("datoid").toOption.map(_.as[/* oid */ Long]),
+          database = json.\("database").toOption.map(_.as[String]),
+          temporary = json.\("temporary").toOption.map(_.as[Boolean]),
+          active = json.\("active").toOption.map(_.as[Boolean]),
+          activePid = json.\("active_pid").toOption.map(_.as[Int]),
+          xmin = json.\("xmin").toOption.map(_.as[TypoXid]),
+          catalogXmin = json.\("catalog_xmin").toOption.map(_.as[TypoXid]),
+          restartLsn = json.\("restart_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
+          confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
+          walStatus = json.\("wal_status").toOption.map(_.as[String]),
+          safeWalSize = json.\("safe_wal_size").toOption.map(_.as[Long]),
+          twoPhase = json.\("two_phase").toOption.map(_.as[Boolean])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgReplicationSlotsViewRow] = new OFormat[PgReplicationSlotsViewRow]{
-    override def writes(o: PgReplicationSlotsViewRow): JsObject =
-      Json.obj(
-        "slot_name" -> o.slotName,
-        "plugin" -> o.plugin,
-        "slot_type" -> o.slotType,
-        "datoid" -> o.datoid,
-        "database" -> o.database,
-        "temporary" -> o.temporary,
-        "active" -> o.active,
-        "active_pid" -> o.activePid,
-        "xmin" -> o.xmin,
-        "catalog_xmin" -> o.catalogXmin,
-        "restart_lsn" -> o.restartLsn,
-        "confirmed_flush_lsn" -> o.confirmedFlushLsn,
-        "wal_status" -> o.walStatus,
-        "safe_wal_size" -> o.safeWalSize,
-        "two_phase" -> o.twoPhase
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgReplicationSlotsViewRow] = RowParser[PgReplicationSlotsViewRow] { row =>
+    Success(
+      PgReplicationSlotsViewRow(
+        slotName = row[Option[String]](idx + 0),
+        plugin = row[Option[String]](idx + 1),
+        slotType = row[Option[String]](idx + 2),
+        datoid = row[Option[/* oid */ Long]](idx + 3),
+        database = row[Option[String]](idx + 4),
+        temporary = row[Option[Boolean]](idx + 5),
+        active = row[Option[Boolean]](idx + 6),
+        activePid = row[Option[Int]](idx + 7),
+        xmin = row[Option[TypoXid]](idx + 8),
+        catalogXmin = row[Option[TypoXid]](idx + 9),
+        restartLsn = row[Option[/* pg_lsn */ Long]](idx + 10),
+        confirmedFlushLsn = row[Option[/* pg_lsn */ Long]](idx + 11),
+        walStatus = row[Option[String]](idx + 12),
+        safeWalSize = row[Option[Long]](idx + 13),
+        twoPhase = row[Option[Boolean]](idx + 14)
       )
-  
-    override def reads(json: JsValue): JsResult[PgReplicationSlotsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgReplicationSlotsViewRow(
-            slotName = json.\("slot_name").toOption.map(_.as[String]),
-            plugin = json.\("plugin").toOption.map(_.as[String]),
-            slotType = json.\("slot_type").toOption.map(_.as[String]),
-            datoid = json.\("datoid").toOption.map(_.as[/* oid */ Long]),
-            database = json.\("database").toOption.map(_.as[String]),
-            temporary = json.\("temporary").toOption.map(_.as[Boolean]),
-            active = json.\("active").toOption.map(_.as[Boolean]),
-            activePid = json.\("active_pid").toOption.map(_.as[Int]),
-            xmin = json.\("xmin").toOption.map(_.as[TypoXid]),
-            catalogXmin = json.\("catalog_xmin").toOption.map(_.as[TypoXid]),
-            restartLsn = json.\("restart_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-            confirmedFlushLsn = json.\("confirmed_flush_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-            walStatus = json.\("wal_status").toOption.map(_.as[String]),
-            safeWalSize = json.\("safe_wal_size").toOption.map(_.as[Long]),
-            twoPhase = json.\("two_phase").toOption.map(_.as[Boolean])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgReplicationSlotsViewRow] = OWrites[PgReplicationSlotsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "slot_name" -> Json.toJson(o.slotName),
+      "plugin" -> Json.toJson(o.plugin),
+      "slot_type" -> Json.toJson(o.slotType),
+      "datoid" -> Json.toJson(o.datoid),
+      "database" -> Json.toJson(o.database),
+      "temporary" -> Json.toJson(o.temporary),
+      "active" -> Json.toJson(o.active),
+      "active_pid" -> Json.toJson(o.activePid),
+      "xmin" -> Json.toJson(o.xmin),
+      "catalog_xmin" -> Json.toJson(o.catalogXmin),
+      "restart_lsn" -> Json.toJson(o.restartLsn),
+      "confirmed_flush_lsn" -> Json.toJson(o.confirmedFlushLsn),
+      "wal_status" -> Json.toJson(o.walStatus),
+      "safe_wal_size" -> Json.toJson(o.safeWalSize),
+      "two_phase" -> Json.toJson(o.twoPhase)
+    ))
+  )
 }

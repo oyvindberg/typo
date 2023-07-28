@@ -7,16 +7,18 @@ package adventureworks
 package humanresources
 package vjobcandidate
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VjobcandidateViewRow(
@@ -38,77 +40,73 @@ case class VjobcandidateViewRow(
   EMail: Option[String],
   WebSite: Option[String],
   /** Points to [[jobcandidate.JobcandidateRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object VjobcandidateViewRow {
-  def rowParser(idx: Int): RowParser[VjobcandidateViewRow] =
-    RowParser[VjobcandidateViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VjobcandidateViewRow] = Reads[VjobcandidateViewRow](json => JsResult.fromTry(
+      Try(
         VjobcandidateViewRow(
-          jobcandidateid = row[Option[JobcandidateId]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          `Name.Prefix` = row[Option[/* max 30 chars */ String]](idx + 2),
-          `Name.First` = row[Option[/* max 30 chars */ String]](idx + 3),
-          `Name.Middle` = row[Option[/* max 30 chars */ String]](idx + 4),
-          `Name.Last` = row[Option[/* max 30 chars */ String]](idx + 5),
-          `Name.Suffix` = row[Option[/* max 30 chars */ String]](idx + 6),
-          Skills = row[Option[String]](idx + 7),
-          `Addr.Type` = row[Option[/* max 30 chars */ String]](idx + 8),
-          `Addr.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]](idx + 9),
-          `Addr.Loc.State` = row[Option[/* max 100 chars */ String]](idx + 10),
-          `Addr.Loc.City` = row[Option[/* max 100 chars */ String]](idx + 11),
-          `Addr.PostalCode` = row[Option[/* max 20 chars */ String]](idx + 12),
-          EMail = row[Option[String]](idx + 13),
-          WebSite = row[Option[String]](idx + 14),
-          modifieddate = row[Option[LocalDateTime]](idx + 15)
+          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          `Name.Prefix` = json.\("Name.Prefix").toOption.map(_.as[/* max 30 chars */ String]),
+          `Name.First` = json.\("Name.First").toOption.map(_.as[/* max 30 chars */ String]),
+          `Name.Middle` = json.\("Name.Middle").toOption.map(_.as[/* max 30 chars */ String]),
+          `Name.Last` = json.\("Name.Last").toOption.map(_.as[/* max 30 chars */ String]),
+          `Name.Suffix` = json.\("Name.Suffix").toOption.map(_.as[/* max 30 chars */ String]),
+          Skills = json.\("Skills").toOption.map(_.as[String]),
+          `Addr.Type` = json.\("Addr.Type").toOption.map(_.as[/* max 30 chars */ String]),
+          `Addr.Loc.CountryRegion` = json.\("Addr.Loc.CountryRegion").toOption.map(_.as[/* max 100 chars */ String]),
+          `Addr.Loc.State` = json.\("Addr.Loc.State").toOption.map(_.as[/* max 100 chars */ String]),
+          `Addr.Loc.City` = json.\("Addr.Loc.City").toOption.map(_.as[/* max 100 chars */ String]),
+          `Addr.PostalCode` = json.\("Addr.PostalCode").toOption.map(_.as[/* max 20 chars */ String]),
+          EMail = json.\("EMail").toOption.map(_.as[String]),
+          WebSite = json.\("WebSite").toOption.map(_.as[String]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[VjobcandidateViewRow] = new OFormat[VjobcandidateViewRow]{
-    override def writes(o: VjobcandidateViewRow): JsObject =
-      Json.obj(
-        "jobcandidateid" -> o.jobcandidateid,
-        "businessentityid" -> o.businessentityid,
-        "Name.Prefix" -> o.`Name.Prefix`,
-        "Name.First" -> o.`Name.First`,
-        "Name.Middle" -> o.`Name.Middle`,
-        "Name.Last" -> o.`Name.Last`,
-        "Name.Suffix" -> o.`Name.Suffix`,
-        "Skills" -> o.Skills,
-        "Addr.Type" -> o.`Addr.Type`,
-        "Addr.Loc.CountryRegion" -> o.`Addr.Loc.CountryRegion`,
-        "Addr.Loc.State" -> o.`Addr.Loc.State`,
-        "Addr.Loc.City" -> o.`Addr.Loc.City`,
-        "Addr.PostalCode" -> o.`Addr.PostalCode`,
-        "EMail" -> o.EMail,
-        "WebSite" -> o.WebSite,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VjobcandidateViewRow] = RowParser[VjobcandidateViewRow] { row =>
+    Success(
+      VjobcandidateViewRow(
+        jobcandidateid = row[Option[JobcandidateId]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        `Name.Prefix` = row[Option[/* max 30 chars */ String]](idx + 2),
+        `Name.First` = row[Option[/* max 30 chars */ String]](idx + 3),
+        `Name.Middle` = row[Option[/* max 30 chars */ String]](idx + 4),
+        `Name.Last` = row[Option[/* max 30 chars */ String]](idx + 5),
+        `Name.Suffix` = row[Option[/* max 30 chars */ String]](idx + 6),
+        Skills = row[Option[String]](idx + 7),
+        `Addr.Type` = row[Option[/* max 30 chars */ String]](idx + 8),
+        `Addr.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]](idx + 9),
+        `Addr.Loc.State` = row[Option[/* max 100 chars */ String]](idx + 10),
+        `Addr.Loc.City` = row[Option[/* max 100 chars */ String]](idx + 11),
+        `Addr.PostalCode` = row[Option[/* max 20 chars */ String]](idx + 12),
+        EMail = row[Option[String]](idx + 13),
+        WebSite = row[Option[String]](idx + 14),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 15)
       )
-  
-    override def reads(json: JsValue): JsResult[VjobcandidateViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VjobcandidateViewRow(
-            jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            `Name.Prefix` = json.\("Name.Prefix").toOption.map(_.as[/* max 30 chars */ String]),
-            `Name.First` = json.\("Name.First").toOption.map(_.as[/* max 30 chars */ String]),
-            `Name.Middle` = json.\("Name.Middle").toOption.map(_.as[/* max 30 chars */ String]),
-            `Name.Last` = json.\("Name.Last").toOption.map(_.as[/* max 30 chars */ String]),
-            `Name.Suffix` = json.\("Name.Suffix").toOption.map(_.as[/* max 30 chars */ String]),
-            Skills = json.\("Skills").toOption.map(_.as[String]),
-            `Addr.Type` = json.\("Addr.Type").toOption.map(_.as[/* max 30 chars */ String]),
-            `Addr.Loc.CountryRegion` = json.\("Addr.Loc.CountryRegion").toOption.map(_.as[/* max 100 chars */ String]),
-            `Addr.Loc.State` = json.\("Addr.Loc.State").toOption.map(_.as[/* max 100 chars */ String]),
-            `Addr.Loc.City` = json.\("Addr.Loc.City").toOption.map(_.as[/* max 100 chars */ String]),
-            `Addr.PostalCode` = json.\("Addr.PostalCode").toOption.map(_.as[/* max 20 chars */ String]),
-            EMail = json.\("EMail").toOption.map(_.as[String]),
-            WebSite = json.\("WebSite").toOption.map(_.as[String]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VjobcandidateViewRow] = OWrites[VjobcandidateViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "jobcandidateid" -> Json.toJson(o.jobcandidateid),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "Name.Prefix" -> Json.toJson(o.`Name.Prefix`),
+      "Name.First" -> Json.toJson(o.`Name.First`),
+      "Name.Middle" -> Json.toJson(o.`Name.Middle`),
+      "Name.Last" -> Json.toJson(o.`Name.Last`),
+      "Name.Suffix" -> Json.toJson(o.`Name.Suffix`),
+      "Skills" -> Json.toJson(o.Skills),
+      "Addr.Type" -> Json.toJson(o.`Addr.Type`),
+      "Addr.Loc.CountryRegion" -> Json.toJson(o.`Addr.Loc.CountryRegion`),
+      "Addr.Loc.State" -> Json.toJson(o.`Addr.Loc.State`),
+      "Addr.Loc.City" -> Json.toJson(o.`Addr.Loc.City`),
+      "Addr.PostalCode" -> Json.toJson(o.`Addr.PostalCode`),
+      "EMail" -> Json.toJson(o.EMail),
+      "WebSite" -> Json.toJson(o.WebSite),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

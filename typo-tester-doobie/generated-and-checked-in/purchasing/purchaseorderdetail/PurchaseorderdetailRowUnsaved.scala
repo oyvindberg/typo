@@ -8,13 +8,11 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `purchasing.purchaseorderdetail` which has not been persisted yet */
 case class PurchaseorderdetailRowUnsaved(
@@ -22,7 +20,7 @@ case class PurchaseorderdetailRowUnsaved(
       Points to [[purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,
   /** Date the product is expected to be received. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Quantity ordered. */
   orderqty: Int,
   /** Product identification number. Foreign key to Product.ProductID.
@@ -38,9 +36,9 @@ case class PurchaseorderdetailRowUnsaved(
       Primary key. One line number per purchased product. */
   purchaseorderdetailid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(purchaseorderdetailidDefault: => Int, modifieddateDefault: => LocalDateTime): PurchaseorderdetailRow =
+  def toRow(purchaseorderdetailidDefault: => Int, modifieddateDefault: => TypoLocalDateTime): PurchaseorderdetailRow =
     PurchaseorderdetailRow(
       purchaseorderid = purchaseorderid,
       duedate = duedate,
@@ -60,31 +58,6 @@ case class PurchaseorderdetailRowUnsaved(
     )
 }
 object PurchaseorderdetailRowUnsaved {
-  implicit val decoder: Decoder[PurchaseorderdetailRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        purchaseorderid <- c.downField("purchaseorderid").as[PurchaseorderheaderId]
-        duedate <- c.downField("duedate").as[LocalDateTime]
-        orderqty <- c.downField("orderqty").as[Int]
-        productid <- c.downField("productid").as[ProductId]
-        unitprice <- c.downField("unitprice").as[BigDecimal]
-        receivedqty <- c.downField("receivedqty").as[BigDecimal]
-        rejectedqty <- c.downField("rejectedqty").as[BigDecimal]
-        purchaseorderdetailid <- c.downField("purchaseorderdetailid").as[Defaulted[Int]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield PurchaseorderdetailRowUnsaved(purchaseorderid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, purchaseorderdetailid, modifieddate)
-  implicit val encoder: Encoder[PurchaseorderdetailRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "purchaseorderid" := row.purchaseorderid,
-        "duedate" := row.duedate,
-        "orderqty" := row.orderqty,
-        "productid" := row.productid,
-        "unitprice" := row.unitprice,
-        "receivedqty" := row.receivedqty,
-        "rejectedqty" := row.rejectedqty,
-        "purchaseorderdetailid" := row.purchaseorderdetailid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[PurchaseorderdetailRowUnsaved] = Decoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(PurchaseorderdetailRowUnsaved.apply)
+  implicit val encoder: Encoder[PurchaseorderdetailRowUnsaved] = Encoder.forProduct9[PurchaseorderdetailRowUnsaved, PurchaseorderheaderId, TypoLocalDateTime, Int, ProductId, BigDecimal, BigDecimal, BigDecimal, Defaulted[Int], Defaulted[TypoLocalDateTime]]("purchaseorderid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "purchaseorderdetailid", "modifieddate")(x => (x.purchaseorderid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.purchaseorderdetailid, x.modifieddate))
 }

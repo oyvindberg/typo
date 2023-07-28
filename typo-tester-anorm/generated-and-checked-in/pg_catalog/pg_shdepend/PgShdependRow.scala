@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgShdependRow(
@@ -27,46 +29,42 @@ case class PgShdependRow(
 )
 
 object PgShdependRow {
-  def rowParser(idx: Int): RowParser[PgShdependRow] =
-    RowParser[PgShdependRow] { row =>
-      Success(
+  implicit val reads: Reads[PgShdependRow] = Reads[PgShdependRow](json => JsResult.fromTry(
+      Try(
         PgShdependRow(
-          dbid = row[/* oid */ Long](idx + 0),
-          classid = row[/* oid */ Long](idx + 1),
-          objid = row[/* oid */ Long](idx + 2),
-          objsubid = row[Int](idx + 3),
-          refclassid = row[/* oid */ Long](idx + 4),
-          refobjid = row[/* oid */ Long](idx + 5),
-          deptype = row[String](idx + 6)
+          dbid = json.\("dbid").as[/* oid */ Long],
+          classid = json.\("classid").as[/* oid */ Long],
+          objid = json.\("objid").as[/* oid */ Long],
+          objsubid = json.\("objsubid").as[Int],
+          refclassid = json.\("refclassid").as[/* oid */ Long],
+          refobjid = json.\("refobjid").as[/* oid */ Long],
+          deptype = json.\("deptype").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgShdependRow] = new OFormat[PgShdependRow]{
-    override def writes(o: PgShdependRow): JsObject =
-      Json.obj(
-        "dbid" -> o.dbid,
-        "classid" -> o.classid,
-        "objid" -> o.objid,
-        "objsubid" -> o.objsubid,
-        "refclassid" -> o.refclassid,
-        "refobjid" -> o.refobjid,
-        "deptype" -> o.deptype
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgShdependRow] = RowParser[PgShdependRow] { row =>
+    Success(
+      PgShdependRow(
+        dbid = row[/* oid */ Long](idx + 0),
+        classid = row[/* oid */ Long](idx + 1),
+        objid = row[/* oid */ Long](idx + 2),
+        objsubid = row[Int](idx + 3),
+        refclassid = row[/* oid */ Long](idx + 4),
+        refobjid = row[/* oid */ Long](idx + 5),
+        deptype = row[String](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgShdependRow] = {
-      JsResult.fromTry(
-        Try(
-          PgShdependRow(
-            dbid = json.\("dbid").as[/* oid */ Long],
-            classid = json.\("classid").as[/* oid */ Long],
-            objid = json.\("objid").as[/* oid */ Long],
-            objsubid = json.\("objsubid").as[Int],
-            refclassid = json.\("refclassid").as[/* oid */ Long],
-            refobjid = json.\("refobjid").as[/* oid */ Long],
-            deptype = json.\("deptype").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgShdependRow] = OWrites[PgShdependRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "dbid" -> Json.toJson(o.dbid),
+      "classid" -> Json.toJson(o.classid),
+      "objid" -> Json.toJson(o.objid),
+      "objsubid" -> Json.toJson(o.objsubid),
+      "refclassid" -> Json.toJson(o.refclassid),
+      "refobjid" -> Json.toJson(o.refobjid),
+      "deptype" -> Json.toJson(o.deptype)
+    ))
+  )
 }
