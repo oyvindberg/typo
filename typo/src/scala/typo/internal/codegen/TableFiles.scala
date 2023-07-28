@@ -84,17 +84,7 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
 
     sc.File(unsaved.tpe, str, secondaryTypes = Nil)
   }
-
-  val JoinedRowFile: Option[sc.File] = table.RowJoined.map { rowJoined =>
-    val str =
-      code"""|case class ${rowJoined.name.name}(
-             |  ${rowJoined.params.map(_.param.code).mkCode(",\n")}
-             |)
-             |""".stripMargin
-
-    sc.File(sc.Type.Qualified(rowJoined.name), str, secondaryTypes = Nil)
-  }
-
+  
   def ordering(tpe: sc.Type, constituents: NonEmptyList[sc.Param]) = {
     val ordering = sc.Type.Ordering.of(tpe)
 

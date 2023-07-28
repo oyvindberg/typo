@@ -119,45 +119,7 @@ case class ComputedTable(
 
   val maybeUnsavedRow: Option[ComputedRowUnsaved] =
     ComputedRowUnsaved(source, cols, default, naming)
-
-  val RowJoined: Option[ComputedRowJoined] =
-    if (dbTable.foreignKeys.nonEmpty) {
-      val name = naming.joinedRow(source)
-
-      val maybeParams = dbTable.foreignKeys.flatMap {
-        case fk if fk.otherTable == dbTable.name => None
-        case fk =>
-          eval(fk.otherTable).get match {
-            case Some(nonCircularTable: ComputedTable) =>
-              val tpe = nonCircularTable.names.RowName
-              val fkContainsNullableRow = fk.cols.exists { colName =>
-                dbColsByName(colName).nullability != Nullability.NoNulls
-              }
-              val tpeWithNullability = if (fkContainsNullableRow) sc.Type.Option.of(tpe) else tpe
-
-              val newParam = ComputedRowJoined.Param(
-                name = naming.field(fk.cols),
-                tpe = tpeWithNullability,
-                isOptional = fkContainsNullableRow,
-                table = nonCircularTable
-              )
-
-              Some(newParam)
-            case Some(_) =>
-              System.err.println(s"Unexpected dependency on view ${dbTable.name.value} => ${fk.otherTable.value}")
-              None
-            case None =>
-              System.err.println(s"Unexpected circular dependency ${dbTable.name.value} => ${fk.otherTable.value}")
-              None
-          }
-      }
-      NonEmptyList.fromList(maybeParams).map { params =>
-        val thisParam = ComputedRowJoined.Param(sc.Ident("value"), names.RowName, isOptional = false, table = this)
-        ComputedRowJoined(name, thisParam :: params)
-      }
-
-    } else None
-
+  
   val repoMethods: Option[NonEmptyList[RepoMethod]] = {
 
     val maybeFieldValueOrIdsParam = names.FieldOrIdValueName.map(name =>
