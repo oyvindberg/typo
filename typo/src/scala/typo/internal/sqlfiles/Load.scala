@@ -42,8 +42,8 @@ object Load {
       maybeScript
     }
 
-  /** believe it or not the dependency information we get through prepared statements and for views are not the same. It's too valuable information to leave
-    * out, so let's try to read it from a temporary view.
+  /** believe it or not the dependency information we get through prepared statements and for views are not the same. It's too valuable information to leave out, so let's try to read it from a
+    * temporary view.
     */
   def readDepsFromTemporaryView(
       sqlFile: Path,

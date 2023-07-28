@@ -2,8 +2,8 @@ package typo
 
 /** Simplified model of the scala language.
   *
-  * The generated code is stored in the `Code` data structure. For full flexibility, some parts are stored as text and other parts in trees. Most notably *all
-  * type and term references* which need an import to work should be in a tree.
+  * The generated code is stored in the `Code` data structure. For full flexibility, some parts are stored as text and other parts in trees. Most notably *all type and term references* which need an
+  * import to work should be in a tree.
   *
   * You'll mainly use this module with the `code"..."` interpolator.
   *

@@ -39,8 +39,8 @@ object DecomposedSql {
   case object NotNamedParam extends Param
   case class NamedParam(name: String) extends Param
 
-  /** Parse the query string containing named parameters and result a parse result, which holds the parsed sql (named parameters replaced by standard '?'
-    * parameters and an ordered list of the named parameters.
+  /** Parse the query string containing named parameters and result a parse result, which holds the parsed sql (named parameters replaced by standard '?' parameters and an ordered list of the named
+    * parameters.
     *
     * SQL parsing code borrowed from Adam Crume. Thanks Adam. See <a
     * href="http://www.javaworld.com/article/2077706/core-java/named-parameters-for-preparedstatement.html?page=2">http://www.javaworld.com/article/2077706/core-java/named-parameters-for-preparedstatement.html?page=2</a>
