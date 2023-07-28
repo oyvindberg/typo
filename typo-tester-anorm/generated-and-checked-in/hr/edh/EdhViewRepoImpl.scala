@@ -9,8 +9,13 @@ package edh
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object EdhViewRepoImpl extends EdhViewRepo {
+  override def select: SelectBuilder[EdhViewFields, EdhViewRow] = {
+    SelectBuilderSql("hr.edh", EdhViewFields, EdhViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[EdhViewRow] = {
     SQL"""select "id", businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text
           from hr.edh

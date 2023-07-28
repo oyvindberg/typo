@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_all_indexes
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatAllIndexesViewRepo {
+  def select: SelectBuilder[PgStatAllIndexesViewFields, PgStatAllIndexesViewRow]
   def selectAll(implicit c: Connection): List[PgStatAllIndexesViewRow]
 }

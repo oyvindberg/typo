@@ -10,10 +10,22 @@ package pg_inherits
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgInheritsRepoMock(map: scala.collection.mutable.Map[PgInheritsId, PgInheritsRow] = scala.collection.mutable.Map.empty) extends PgInheritsRepo {
   override def delete(compositeId: PgInheritsId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgInheritsFields, PgInheritsRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgInheritsFields, map)
   }
   override def insert(unsaved: PgInheritsRow): ConnectionIO[PgInheritsRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgInheritsRepoMock(map: scala.collection.mutable.Map[PgInheritsId, PgInher
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgInheritsFields, PgInheritsRow] = {
+    SelectBuilderMock(PgInheritsFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgInheritsRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgInheritsRepoMock(map: scala.collection.mutable.Map[PgInheritsId, PgInher
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgInheritsFields, PgInheritsRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgInheritsFields, map)
   }
   override def upsert(unsaved: PgInheritsRow): ConnectionIO[PgInheritsRow] = {
     delay {

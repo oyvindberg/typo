@@ -8,7 +8,9 @@ package information_schema
 package usage_privileges
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait UsagePrivilegesViewRepo {
+  def select: SelectBuilder[UsagePrivilegesViewFields, UsagePrivilegesViewRow]
   def selectAll(implicit c: Connection): List[UsagePrivilegesViewRow]
 }

@@ -15,10 +15,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalespersonRepoImpl extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesperson where businessentityid = $businessentityid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
+    DeleteBuilder("sales.salesperson", SalespersonFields)
   }
   override def insert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     SQL"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
@@ -77,6 +84,9 @@ object SalespersonRepoImpl extends SalespersonRepo {
     }
     
   }
+  override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
+    SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
           from sales.salesperson
@@ -108,6 +118,9 @@ object SalespersonRepoImpl extends SalespersonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
+    UpdateBuilder("sales.salesperson", SalespersonFields, SalespersonRow.rowParser)
   }
   override def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     SQL"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)

@@ -9,10 +9,17 @@ package pg_replication_origin
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_replication_origin where roident = $roident".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    DeleteBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields)
   }
   override def insert(unsaved: PgReplicationOriginRow)(implicit c: Connection): PgReplicationOriginRow = {
     SQL"""insert into pg_catalog.pg_replication_origin(roident, roname)
@@ -21,6 +28,9 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
        """
       .executeInsert(PgReplicationOriginRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    SelectBuilderSql("pg_catalog.pg_replication_origin", PgReplicationOriginFields, PgReplicationOriginRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgReplicationOriginRow] = {
     SQL"""select roident, roname
@@ -46,6 +56,9 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
           set roname = ${row.roname}
           where roident = $roident
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    UpdateBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields, PgReplicationOriginRow.rowParser)
   }
   override def upsert(unsaved: PgReplicationOriginRow)(implicit c: Connection): PgReplicationOriginRow = {
     SQL"""insert into pg_catalog.pg_replication_origin(roident, roname)

@@ -10,8 +10,13 @@ package pg_stat_progress_basebackup
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatProgressBasebackupViewRepoImpl extends PgStatProgressBasebackupViewRepo {
+  override def select: SelectBuilder[PgStatProgressBasebackupViewFields, PgStatProgressBasebackupViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_progress_basebackup", PgStatProgressBasebackupViewFields, PgStatProgressBasebackupViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatProgressBasebackupViewRow] = {
     sql"select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed from pg_catalog.pg_stat_progress_basebackup".query(PgStatProgressBasebackupViewRow.read).stream
   }

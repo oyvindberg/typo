@@ -10,8 +10,13 @@ package pg_stat_replication_slots
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatReplicationSlotsViewRepoImpl extends PgStatReplicationSlotsViewRepo {
+  override def select: SelectBuilder[PgStatReplicationSlotsViewFields, PgStatReplicationSlotsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_replication_slots", PgStatReplicationSlotsViewFields, PgStatReplicationSlotsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatReplicationSlotsViewRow] = {
     sql"select slot_name, spill_txns, spill_count, spill_bytes, stream_txns, stream_count, stream_bytes, total_txns, total_bytes, stats_reset::text from pg_catalog.pg_stat_replication_slots".query(PgStatReplicationSlotsViewRow.read).stream
   }

@@ -8,13 +8,19 @@ package pg_catalog
 package pg_index
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgIndexRepo {
   def delete(indexrelid: PgIndexId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgIndexFields, PgIndexRow]
   def insert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow
+  def select: SelectBuilder[PgIndexFields, PgIndexRow]
   def selectAll(implicit c: Connection): List[PgIndexRow]
   def selectById(indexrelid: PgIndexId)(implicit c: Connection): Option[PgIndexRow]
   def selectByIds(indexrelids: Array[PgIndexId])(implicit c: Connection): List[PgIndexRow]
   def update(row: PgIndexRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgIndexFields, PgIndexRow]
   def upsert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow
 }

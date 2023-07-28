@@ -10,8 +10,13 @@ package pg_stat_xact_user_functions
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatXactUserFunctionsViewRepoImpl extends PgStatXactUserFunctionsViewRepo {
+  override def select: SelectBuilder[PgStatXactUserFunctionsViewFields, PgStatXactUserFunctionsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_xact_user_functions", PgStatXactUserFunctionsViewFields, PgStatXactUserFunctionsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatXactUserFunctionsViewRow] = {
     sql"select funcid, schemaname, funcname, calls, total_time, self_time from pg_catalog.pg_stat_xact_user_functions".query(PgStatXactUserFunctionsViewRow.read).stream
   }

@@ -9,7 +9,9 @@ package triggered_update_columns
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait TriggeredUpdateColumnsViewRepo {
+  def select: SelectBuilder[TriggeredUpdateColumnsViewFields, TriggeredUpdateColumnsViewRow]
   def selectAll: Stream[ConnectionIO, TriggeredUpdateColumnsViewRow]
 }

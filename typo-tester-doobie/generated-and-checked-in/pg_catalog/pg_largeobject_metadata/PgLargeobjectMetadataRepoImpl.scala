@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def delete(oid: PgLargeobjectMetadataId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_largeobject_metadata where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
+    DeleteBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow): ConnectionIO[PgLargeobjectMetadataRow] = {
     sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgLargeobjectMetadataId.put))}::oid, ${fromWrite(unsaved.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, lomowner, lomacl
        """.query(PgLargeobjectMetadataRow.read).unique
+  }
+  override def select: SelectBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
+    SelectBuilderSql("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields, PgLargeobjectMetadataRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
     sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata".query(PgLargeobjectMetadataRow.read).stream
@@ -43,6 +53,9 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
+    UpdateBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields, PgLargeobjectMetadataRow.read)
   }
   override def upsert(unsaved: PgLargeobjectMetadataRow): ConnectionIO[PgLargeobjectMetadataRow] = {
     sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)

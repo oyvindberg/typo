@@ -10,10 +10,17 @@ package football_club
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.football_club where "id" = $id""".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilder("myschema.football_club", FootballClubFields)
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")
@@ -22,6 +29,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
        """
       .executeInsert(FootballClubRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
+    SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select "id", "name"
@@ -47,6 +57,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
           set "name" = ${row.name}
           where "id" = $id
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilder("myschema.football_club", FootballClubFields, FootballClubRow.rowParser)
   }
   override def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")

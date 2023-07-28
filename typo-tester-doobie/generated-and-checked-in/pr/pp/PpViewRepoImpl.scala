@@ -10,8 +10,13 @@ package pp
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PpViewRepoImpl extends PpViewRepo {
+  override def select: SelectBuilder[PpViewFields, PpViewRow] = {
+    SelectBuilderSql("pr.pp", PpViewFields, PpViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PpViewRow] = {
     sql"""select "id", productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from pr.pp""".query(PpViewRow.read).stream
   }

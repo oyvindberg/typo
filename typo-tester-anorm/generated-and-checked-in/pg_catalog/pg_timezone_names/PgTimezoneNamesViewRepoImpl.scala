@@ -9,8 +9,13 @@ package pg_timezone_names
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgTimezoneNamesViewRepoImpl extends PgTimezoneNamesViewRepo {
+  override def select: SelectBuilder[PgTimezoneNamesViewFields, PgTimezoneNamesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_timezone_names", PgTimezoneNamesViewFields, PgTimezoneNamesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgTimezoneNamesViewRow] = {
     SQL"""select "name", abbrev, utc_offset, is_dst
           from pg_catalog.pg_timezone_names

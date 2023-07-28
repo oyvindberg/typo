@@ -8,11 +8,23 @@ package production
 package illustration
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, IllustrationRow],
                            map: scala.collection.mutable.Map[IllustrationId, IllustrationRow] = scala.collection.mutable.Map.empty) extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
     map.remove(illustrationid).isDefined
+  }
+  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, IllustrationFields, map)
   }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     if (map.contains(unsaved.illustrationid))
@@ -23,6 +35,9 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
+    SelectBuilderMock(IllustrationFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, IllustrationFields, map)
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     map.put(unsaved.illustrationid, unsaved)

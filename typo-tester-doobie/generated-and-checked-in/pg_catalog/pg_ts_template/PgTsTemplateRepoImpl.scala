@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def delete(oid: PgTsTemplateId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_ts_template where oid = ${fromWrite(oid)(Write.fromPut(PgTsTemplateId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields)
   }
   override def insert(unsaved: PgTsTemplateRow): ConnectionIO[PgTsTemplateRow] = {
     sql"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsTemplateId.put))}::oid, ${fromWrite(unsaved.tmplname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tmplnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tmplinit)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.tmpllexize)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
        """.query(PgTsTemplateRow.read).unique
+  }
+  override def select: SelectBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_template", PgTsTemplateFields, PgTsTemplateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTsTemplateRow] = {
     sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template".query(PgTsTemplateRow.read).stream
@@ -45,6 +55,9 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields, PgTsTemplateRow.read)
   }
   override def upsert(unsaved: PgTsTemplateRow): ConnectionIO[PgTsTemplateRow] = {
     sql"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)

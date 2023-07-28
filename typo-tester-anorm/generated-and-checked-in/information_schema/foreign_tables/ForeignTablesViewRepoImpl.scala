@@ -9,8 +9,13 @@ package foreign_tables
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ForeignTablesViewRepoImpl extends ForeignTablesViewRepo {
+  override def select: SelectBuilder[ForeignTablesViewFields, ForeignTablesViewRow] = {
+    SelectBuilderSql("information_schema.foreign_tables", ForeignTablesViewFields, ForeignTablesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ForeignTablesViewRow] = {
     SQL"""select foreign_table_catalog, foreign_table_schema, foreign_table_name, foreign_server_catalog, foreign_server_name
           from information_schema.foreign_tables

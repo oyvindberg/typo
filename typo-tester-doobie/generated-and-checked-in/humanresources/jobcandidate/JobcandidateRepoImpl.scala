@@ -17,10 +17,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
     sql"delete from humanresources.jobcandidate where jobcandidateid = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
+    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields)
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
@@ -56,6 +63,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     q.query(JobcandidateRow.read).unique
     
   }
+  override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
+    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
     sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate".query(JobcandidateRow.read).stream
   }
@@ -75,6 +85,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
+    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.read)
   }
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)

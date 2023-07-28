@@ -9,13 +9,19 @@ package personphone
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PersonphoneRepo {
   def delete(compositeId: PersonphoneId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow]
   def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow]
   def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow]
+  def select: SelectBuilder[PersonphoneFields, PersonphoneRow]
   def selectAll: Stream[ConnectionIO, PersonphoneRow]
   def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]]
   def update(row: PersonphoneRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PersonphoneFields, PersonphoneRow]
   def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow]
 }

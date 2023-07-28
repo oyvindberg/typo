@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
   }
   override def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
@@ -54,6 +61,9 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     }
     
   }
+  override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
     SQL"""select businessentityid, creditcardid, modifieddate::text
           from sales.personcreditcard
@@ -71,6 +81,9 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.rowParser)
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)

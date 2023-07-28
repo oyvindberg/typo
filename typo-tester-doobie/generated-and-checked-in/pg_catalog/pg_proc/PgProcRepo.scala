@@ -9,13 +9,19 @@ package pg_proc
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgProcRepo {
   def delete(oid: PgProcId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgProcFields, PgProcRow]
   def insert(unsaved: PgProcRow): ConnectionIO[PgProcRow]
+  def select: SelectBuilder[PgProcFields, PgProcRow]
   def selectAll: Stream[ConnectionIO, PgProcRow]
   def selectById(oid: PgProcId): ConnectionIO[Option[PgProcRow]]
   def selectByIds(oids: Array[PgProcId]): Stream[ConnectionIO, PgProcRow]
   def update(row: PgProcRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgProcFields, PgProcRow]
   def upsert(unsaved: PgProcRow): ConnectionIO[PgProcRow]
 }

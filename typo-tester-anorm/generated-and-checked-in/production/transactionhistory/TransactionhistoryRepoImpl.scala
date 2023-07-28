@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.transactionhistory where transactionid = $transactionid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    DeleteBuilder("production.transactionhistory", TransactionhistoryFields)
   }
   override def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
     SQL"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
@@ -69,6 +76,9 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     }
     
   }
+  override def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    SelectBuilderSql("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
           from production.transactionhistory
@@ -100,6 +110,9 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where transactionid = $transactionid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    UpdateBuilder("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.rowParser)
   }
   override def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
     SQL"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)

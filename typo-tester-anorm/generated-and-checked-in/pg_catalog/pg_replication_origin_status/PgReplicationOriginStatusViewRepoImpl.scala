@@ -9,8 +9,13 @@ package pg_replication_origin_status
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgReplicationOriginStatusViewRepoImpl extends PgReplicationOriginStatusViewRepo {
+  override def select: SelectBuilder[PgReplicationOriginStatusViewFields, PgReplicationOriginStatusViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_replication_origin_status", PgReplicationOriginStatusViewFields, PgReplicationOriginStatusViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgReplicationOriginStatusViewRow] = {
     SQL"""select local_id, external_id, remote_lsn, local_lsn
           from pg_catalog.pg_replication_origin_status

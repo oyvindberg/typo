@@ -14,6 +14,7 @@ import java.util.HashMap
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** The text representation of an hstore, used for input and output, includes zero or more key => value pairs separated by commas */
 case class TypoHStore(value: Map[String, String])
@@ -43,6 +44,7 @@ object TypoHStore {
                                                                                                                          v.value.foreach { case (k, v) => b.put(k, v)}
                                                                                                                          b
                                                                                                                        }))))
+  implicit val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
   implicit val column: Column[TypoHStore] = Column.nonNull[TypoHStore]((v1: Any, _) =>
     v1 match {
       case v: java.util.Map[?, ?] => Right({

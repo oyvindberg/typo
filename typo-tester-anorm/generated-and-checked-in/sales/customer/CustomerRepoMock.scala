@@ -8,11 +8,23 @@ package sales
 package customer
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
                        map: scala.collection.mutable.Map[CustomerId, CustomerRow] = scala.collection.mutable.Map.empty) extends CustomerRepo {
   override def delete(customerid: CustomerId)(implicit c: Connection): Boolean = {
     map.remove(customerid).isDefined
+  }
+  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CustomerFields, map)
   }
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     if (map.contains(unsaved.customerid))
@@ -23,6 +35,9 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
   }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CustomerFields, CustomerRow] = {
+    SelectBuilderMock(CustomerFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CustomerFields, map)
   }
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     map.put(unsaved.customerid, unsaved)

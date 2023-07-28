@@ -9,7 +9,9 @@ package vvendorwithaddresses
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait VvendorwithaddressesViewRepo {
+  def select: SelectBuilder[VvendorwithaddressesViewFields, VvendorwithaddressesViewRow]
   def selectAll: Stream[ConnectionIO, VvendorwithaddressesViewRow]
 }

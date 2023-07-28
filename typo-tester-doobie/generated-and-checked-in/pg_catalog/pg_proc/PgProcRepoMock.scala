@@ -10,10 +10,22 @@ package pg_proc
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = scala.collection.mutable.Map.empty) extends PgProcRepo {
   override def delete(oid: PgProcId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgProcFields, PgProcRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgProcFields, map)
   }
   override def insert(unsaved: PgProcRow): ConnectionIO[PgProcRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = sc
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgProcFields, PgProcRow] = {
+    SelectBuilderMock(PgProcFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgProcRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgProcRepoMock(map: scala.collection.mutable.Map[PgProcId, PgProcRow] = sc
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgProcFields, PgProcRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgProcFields, map)
   }
   override def upsert(unsaved: PgProcRow): ConnectionIO[PgProcRow] = {
     delay {

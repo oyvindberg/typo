@@ -9,8 +9,13 @@ package pg_group
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgGroupViewRepoImpl extends PgGroupViewRepo {
+  override def select: SelectBuilder[PgGroupViewFields, PgGroupViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_group", PgGroupViewFields, PgGroupViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgGroupViewRow] = {
     SQL"""select groname, grosysid, grolist
           from pg_catalog.pg_group

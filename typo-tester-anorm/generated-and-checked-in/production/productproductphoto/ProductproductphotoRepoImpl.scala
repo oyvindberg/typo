@@ -14,10 +14,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productproductphoto where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    DeleteBuilder("production.productproductphoto", ProductproductphotoFields)
   }
   override def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
@@ -59,6 +66,9 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {
     SQL"""select productid, productphotoid, "primary", modifieddate::text
           from production.productproductphoto
@@ -77,6 +87,9 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    UpdateBuilder("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.rowParser)
   }
   override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)

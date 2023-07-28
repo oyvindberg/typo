@@ -8,8 +8,14 @@ package information_schema
 package sql_sizing
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SqlSizingRepo {
+  def delete: DeleteBuilder[SqlSizingFields, SqlSizingRow]
   def insert(unsaved: SqlSizingRow)(implicit c: Connection): SqlSizingRow
+  def select: SelectBuilder[SqlSizingFields, SqlSizingRow]
   def selectAll(implicit c: Connection): List[SqlSizingRow]
+  def update: UpdateBuilder[SqlSizingFields, SqlSizingRow]
 }

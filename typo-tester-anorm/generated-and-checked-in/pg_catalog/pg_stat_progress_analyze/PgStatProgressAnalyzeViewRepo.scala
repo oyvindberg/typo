@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_progress_analyze
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatProgressAnalyzeViewRepo {
+  def select: SelectBuilder[PgStatProgressAnalyzeViewFields, PgStatProgressAnalyzeViewRow]
   def selectAll(implicit c: Connection): List[PgStatProgressAnalyzeViewRow]
 }

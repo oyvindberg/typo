@@ -9,12 +9,18 @@ package pg_seclabel
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgSeclabelRepo {
   def delete(compositeId: PgSeclabelId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgSeclabelFields, PgSeclabelRow]
   def insert(unsaved: PgSeclabelRow): ConnectionIO[PgSeclabelRow]
+  def select: SelectBuilder[PgSeclabelFields, PgSeclabelRow]
   def selectAll: Stream[ConnectionIO, PgSeclabelRow]
   def selectById(compositeId: PgSeclabelId): ConnectionIO[Option[PgSeclabelRow]]
   def update(row: PgSeclabelRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgSeclabelFields, PgSeclabelRow]
   def upsert(unsaved: PgSeclabelRow): ConnectionIO[PgSeclabelRow]
 }

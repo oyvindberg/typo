@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def delete(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean] = {
     sql"delete from sales.salesterritoryhistory where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND territoryid = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields)
   }
   override def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
@@ -59,6 +66,9 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     q.query(SalesterritoryhistoryRow.read).unique
     
   }
+  override def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    SelectBuilderSql("sales.salesterritoryhistory", SalesterritoryhistoryFields, SalesterritoryhistoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = {
     sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory".query(SalesterritoryhistoryRow.read).stream
   }
@@ -75,6 +85,9 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields, SalesterritoryhistoryRow.read)
   }
   override def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)

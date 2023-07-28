@@ -11,6 +11,7 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `public.Name`
   * No constraint
@@ -19,6 +20,7 @@ case class Name(value: String) extends AnyVal
 object Name {
   implicit val arrayGet: Get[Array[Name]] = adventureworks.StringArrayMeta.get.map(_.map(Name.apply))
   implicit val arrayPut: Put[Array[Name]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[Name, String] = Bijection[Name, String](_.value)(Name.apply)
   implicit val decoder: Decoder[Name] = Decoder.decodeString.map(Name.apply)
   implicit val encoder: Encoder[Name] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[Name] = Meta.StringMeta.get.map(Name.apply)

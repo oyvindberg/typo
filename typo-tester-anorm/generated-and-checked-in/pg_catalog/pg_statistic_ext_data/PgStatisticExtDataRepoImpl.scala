@@ -9,10 +9,17 @@ package pg_statistic_ext_data
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def delete(stxoid: PgStatisticExtDataId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_statistic_ext_data where stxoid = $stxoid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
+    DeleteBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields)
   }
   override def insert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
     SQL"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)
@@ -21,6 +28,9 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
+    SelectBuilderSql("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtDataRow] = {
     SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
@@ -49,6 +59,9 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
               stxdexpr = ${row.stxdexpr}
           where stxoid = $stxoid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
+    UpdateBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.rowParser)
   }
   override def upsert(unsaved: PgStatisticExtDataRow)(implicit c: Connection): PgStatisticExtDataRow = {
     SQL"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)

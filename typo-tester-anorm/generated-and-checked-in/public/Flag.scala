@@ -11,6 +11,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `public.Flag`
   * No constraint
@@ -18,6 +19,7 @@ import play.api.libs.json.Writes
 case class Flag(value: Boolean) extends AnyVal
 object Flag {
   implicit val arrayToStatement: ToStatement[Array[Flag]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[Flag, Boolean] = Bijection[Flag, Boolean](_.value)(Flag.apply)
   implicit val column: Column[Flag] = implicitly[Column[Boolean]].map(Flag.apply)
   implicit val ordering: Ordering[Flag] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[Flag] = new ParameterMetaData[Flag] {

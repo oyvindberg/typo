@@ -9,7 +9,9 @@ package pg_settings
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgSettingsViewRepo {
+  def select: SelectBuilder[PgSettingsViewFields, PgSettingsViewRow]
   def selectAll: Stream[ConnectionIO, PgSettingsViewRow]
 }

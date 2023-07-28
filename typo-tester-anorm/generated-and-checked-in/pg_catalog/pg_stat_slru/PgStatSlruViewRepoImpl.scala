@@ -9,8 +9,13 @@ package pg_stat_slru
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatSlruViewRepoImpl extends PgStatSlruViewRepo {
+  override def select: SelectBuilder[PgStatSlruViewFields, PgStatSlruViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_slru", PgStatSlruViewFields, PgStatSlruViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatSlruViewRow] = {
     SQL"""select "name", blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset::text
           from pg_catalog.pg_stat_slru

@@ -9,14 +9,20 @@ package workorder
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait WorkorderRepo {
   def delete(workorderid: WorkorderId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[WorkorderFields, WorkorderRow]
   def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
   def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow]
+  def select: SelectBuilder[WorkorderFields, WorkorderRow]
   def selectAll: Stream[ConnectionIO, WorkorderRow]
   def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]]
   def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow]
   def update(row: WorkorderRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[WorkorderFields, WorkorderRow]
   def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
 }

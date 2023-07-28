@@ -9,8 +9,13 @@ package information_schema_catalog_name
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object InformationSchemaCatalogNameViewRepoImpl extends InformationSchemaCatalogNameViewRepo {
+  override def select: SelectBuilder[InformationSchemaCatalogNameViewFields, InformationSchemaCatalogNameViewRow] = {
+    SelectBuilderSql("information_schema.information_schema_catalog_name", InformationSchemaCatalogNameViewFields, InformationSchemaCatalogNameViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[InformationSchemaCatalogNameViewRow] = {
     SQL"""select "catalog_name"
           from information_schema.information_schema_catalog_name

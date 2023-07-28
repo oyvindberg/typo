@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    DeleteBuilder("purchasing.purchaseorderdetail", PurchaseorderdetailFields)
   }
   override def insert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
     SQL"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
@@ -63,6 +70,9 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     }
     
   }
+  override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
           from purchasing.purchaseorderdetail
@@ -86,6 +96,9 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    UpdateBuilder("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.rowParser)
   }
   override def upsert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
     SQL"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)

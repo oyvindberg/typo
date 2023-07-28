@@ -8,7 +8,9 @@ package pg_catalog
 package pg_available_extensions
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgAvailableExtensionsViewRepo {
+  def select: SelectBuilder[PgAvailableExtensionsViewFields, PgAvailableExtensionsViewRow]
   def selectAll(implicit c: Connection): List[PgAvailableExtensionsViewRow]
 }

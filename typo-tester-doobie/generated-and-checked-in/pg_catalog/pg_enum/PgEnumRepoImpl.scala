@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgEnumRepoImpl extends PgEnumRepo {
   override def delete(oid: PgEnumId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_enum where oid = ${fromWrite(oid)(Write.fromPut(PgEnumId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgEnumFields, PgEnumRow] = {
+    DeleteBuilder("pg_catalog.pg_enum", PgEnumFields)
   }
   override def insert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow] = {
     sql"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgEnumId.put))}::oid, ${fromWrite(unsaved.enumtypid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.enumsortorder)(Write.fromPut(Meta.FloatMeta.put))}::float4, ${fromWrite(unsaved.enumlabel)(Write.fromPut(Meta.StringMeta.put))}::name)
           returning oid, enumtypid, enumsortorder, enumlabel
        """.query(PgEnumRow.read).unique
+  }
+  override def select: SelectBuilder[PgEnumFields, PgEnumRow] = {
+    SelectBuilderSql("pg_catalog.pg_enum", PgEnumFields, PgEnumRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgEnumRow] = {
     sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum".query(PgEnumRow.read).stream
@@ -43,6 +53,9 @@ object PgEnumRepoImpl extends PgEnumRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgEnumFields, PgEnumRow] = {
+    UpdateBuilder("pg_catalog.pg_enum", PgEnumFields, PgEnumRow.read)
   }
   override def upsert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow] = {
     sql"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)

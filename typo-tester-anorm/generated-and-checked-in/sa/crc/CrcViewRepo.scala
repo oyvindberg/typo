@@ -8,7 +8,9 @@ package sa
 package crc
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait CrcViewRepo {
+  def select: SelectBuilder[CrcViewFields, CrcViewRow]
   def selectAll(implicit c: Connection): List[CrcViewRow]
 }

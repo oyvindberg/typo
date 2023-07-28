@@ -8,10 +8,22 @@ package pg_catalog
 package pg_sequence
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSequenceRow] = scala.collection.mutable.Map.empty) extends PgSequenceRepo {
   override def delete(seqrelid: PgSequenceId)(implicit c: Connection): Boolean = {
     map.remove(seqrelid).isDefined
+  }
+  override def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgSequenceFields, map)
   }
   override def insert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
     if (map.contains(unsaved.seqrelid))
@@ -19,6 +31,9 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
     else
       map.put(unsaved.seqrelid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgSequenceFields, PgSequenceRow] = {
+    SelectBuilderMock(PgSequenceFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgSequenceRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgSequenceFields, PgSequenceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgSequenceFields, map)
   }
   override def upsert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
     map.put(unsaved.seqrelid, unsaved)

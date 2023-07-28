@@ -9,7 +9,9 @@ package pg_prepared_statements
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgPreparedStatementsViewRepo {
+  def select: SelectBuilder[PgPreparedStatementsViewFields, PgPreparedStatementsViewRow]
   def selectAll: Stream[ConnectionIO, PgPreparedStatementsViewRow]
 }

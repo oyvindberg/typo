@@ -8,7 +8,9 @@ package pr
 package um
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait UmViewRepo {
+  def select: SelectBuilder[UmViewFields, UmViewRow]
   def selectAll(implicit c: Connection): List[UmViewRow]
 }

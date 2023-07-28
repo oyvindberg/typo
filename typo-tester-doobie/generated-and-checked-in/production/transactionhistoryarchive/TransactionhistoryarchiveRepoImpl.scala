@@ -16,10 +16,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def delete(transactionid: TransactionhistoryarchiveId): ConnectionIO[Boolean] = {
     sql"delete from production.transactionhistoryarchive where transactionid = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryarchiveId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
+    DeleteBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields)
   }
   override def insert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow] = {
     sql"""insert into production.transactionhistoryarchive(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
@@ -63,6 +70,9 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     q.query(TransactionhistoryarchiveRow.read).unique
     
   }
+  override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
+    SelectBuilderSql("production.transactionhistoryarchive", TransactionhistoryarchiveFields, TransactionhistoryarchiveRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive".query(TransactionhistoryarchiveRow.read).stream
   }
@@ -87,6 +97,9 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
+    UpdateBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields, TransactionhistoryarchiveRow.read)
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow] = {
     sql"""insert into production.transactionhistoryarchive(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)

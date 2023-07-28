@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     SQL"delete from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
+    DeleteBuilder("person.personphone", PersonphoneFields)
   }
   override def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
@@ -55,6 +62,9 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     }
     
   }
+  override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
+    SelectBuilderSql("person.personphone", PersonphoneFields, PersonphoneRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
           from person.personphone
@@ -72,6 +82,9 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
+    UpdateBuilder("person.personphone", PersonphoneFields, PersonphoneRow.rowParser)
   }
   override def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)

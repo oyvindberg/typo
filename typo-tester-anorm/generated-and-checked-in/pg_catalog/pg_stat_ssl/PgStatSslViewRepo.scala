@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_ssl
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatSslViewRepo {
+  def select: SelectBuilder[PgStatSslViewFields, PgStatSslViewRow]
   def selectAll(implicit c: Connection): List[PgStatSslViewRow]
 }

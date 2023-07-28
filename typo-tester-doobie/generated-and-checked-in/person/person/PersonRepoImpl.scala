@@ -21,10 +21,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"delete from person.person where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("person.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
@@ -75,6 +82,9 @@ object PersonRepoImpl extends PersonRepo {
     q.query(PersonRow.read).unique
     
   }
+  override def select: SelectBuilder[PersonFields, PersonRow] = {
+    SelectBuilderSql("person.person", PersonFields, PersonRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person".query(PersonRow.read).stream
   }
@@ -103,6 +113,9 @@ object PersonRepoImpl extends PersonRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("person.person", PersonFields, PersonRow.read)
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)

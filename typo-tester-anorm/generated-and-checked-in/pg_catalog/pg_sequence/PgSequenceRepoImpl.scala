@@ -9,10 +9,17 @@ package pg_sequence
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSequenceRepoImpl extends PgSequenceRepo {
   override def delete(seqrelid: PgSequenceId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_sequence where seqrelid = $seqrelid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow] = {
+    DeleteBuilder("pg_catalog.pg_sequence", PgSequenceFields)
   }
   override def insert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
     SQL"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)
@@ -21,6 +28,9 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
        """
       .executeInsert(PgSequenceRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgSequenceFields, PgSequenceRow] = {
+    SelectBuilderSql("pg_catalog.pg_sequence", PgSequenceFields, PgSequenceRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgSequenceRow] = {
     SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
@@ -52,6 +62,9 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
               seqcycle = ${row.seqcycle}
           where seqrelid = $seqrelid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgSequenceFields, PgSequenceRow] = {
+    UpdateBuilder("pg_catalog.pg_sequence", PgSequenceFields, PgSequenceRow.rowParser)
   }
   override def upsert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow = {
     SQL"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)

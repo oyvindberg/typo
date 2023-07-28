@@ -9,8 +9,13 @@ package pg_tables
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgTablesViewRepoImpl extends PgTablesViewRepo {
+  override def select: SelectBuilder[PgTablesViewFields, PgTablesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_tables", PgTablesViewFields, PgTablesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgTablesViewRow] = {
     SQL"""select schemaname, tablename, tableowner, "tablespace", hasindexes, hasrules, hastriggers, rowsecurity
           from pg_catalog.pg_tables

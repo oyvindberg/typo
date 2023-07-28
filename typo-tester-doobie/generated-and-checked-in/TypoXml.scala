@@ -12,6 +12,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.jdbc.PgSQLXML
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** XML */
 case class TypoXml(value: String)
@@ -26,6 +27,7 @@ object TypoXml {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoXml, String] = Bijection[TypoXml, String](_.value)(TypoXml.apply)
   implicit val decoder: Decoder[TypoXml] = Decoder.decodeString.map(TypoXml.apply)
   implicit val encoder: Encoder[TypoXml] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoXml] = Get.Advanced.other[PgSQLXML](NonEmptyList.one("xml"))

@@ -8,7 +8,9 @@ package information_schema
 package administrable_role_authorizations
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait AdministrableRoleAuthorizationsViewRepo {
+  def select: SelectBuilder[AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow]
   def selectAll(implicit c: Connection): List[AdministrableRoleAuthorizationsViewRow]
 }

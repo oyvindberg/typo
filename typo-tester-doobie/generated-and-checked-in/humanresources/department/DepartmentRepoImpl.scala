@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId): ConnectionIO[Boolean] = {
     sql"delete from humanresources.department where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
+    DeleteBuilder("humanresources.department", DepartmentFields)
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
@@ -55,6 +62,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
     q.query(DepartmentRow.read).unique
     
   }
+  override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
+    SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
     sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department""".query(DepartmentRow.read).stream
   }
@@ -74,6 +84,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
+    UpdateBuilder("humanresources.department", DepartmentFields, DepartmentRow.read)
   }
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)

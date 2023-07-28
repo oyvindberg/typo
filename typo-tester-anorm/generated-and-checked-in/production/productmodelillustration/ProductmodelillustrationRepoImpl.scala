@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields)
   }
   override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
@@ -54,6 +61,9 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
     SQL"""select productmodelid, illustrationid, modifieddate::text
           from production.productmodelillustration
@@ -71,6 +81,9 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)

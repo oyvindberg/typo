@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
     SQL"delete from production.culture where cultureid = $cultureid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
+    DeleteBuilder("production.culture", CultureFields)
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture(cultureid, "name", modifieddate)
@@ -54,6 +61,9 @@ object CultureRepoImpl extends CultureRepo {
     }
     
   }
+  override def select: SelectBuilder[CultureFields, CultureRow] = {
+    SelectBuilderSql("production.culture", CultureFields, CultureRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     SQL"""select cultureid, "name", modifieddate::text
           from production.culture
@@ -79,6 +89,9 @@ object CultureRepoImpl extends CultureRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where cultureid = $cultureid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[CultureFields, CultureRow] = {
+    UpdateBuilder("production.culture", CultureFields, CultureRow.rowParser)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture(cultureid, "name", modifieddate)

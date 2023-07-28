@@ -9,7 +9,9 @@ package data_type_privileges
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait DataTypePrivilegesViewRepo {
+  def select: SelectBuilder[DataTypePrivilegesViewFields, DataTypePrivilegesViewRow]
   def selectAll: Stream[ConnectionIO, DataTypePrivilegesViewRow]
 }

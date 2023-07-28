@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    DeleteBuilder("production.productinventory", ProductinventoryFields)
   }
   override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
@@ -65,6 +72,9 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    SelectBuilderSql("production.productinventory", ProductinventoryFields, ProductinventoryRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {
     SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
           from production.productinventory
@@ -86,6 +96,9 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    UpdateBuilder("production.productinventory", ProductinventoryFields, ProductinventoryRow.rowParser)
   }
   override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)

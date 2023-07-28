@@ -8,11 +8,23 @@ package production
 package productmodelillustration
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductmodelillustrationRepoMock(toRow: Function1[ProductmodelillustrationRowUnsaved, ProductmodelillustrationRow],
                                        map: scala.collection.mutable.Map[ProductmodelillustrationId, ProductmodelillustrationRow] = scala.collection.mutable.Map.empty) extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields, map)
   }
   override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    SelectBuilderMock(ProductmodelillustrationFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields, map)
   }
   override def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     map.put(unsaved.compositeId, unsaved)

@@ -8,14 +8,20 @@ package production
 package productsubcategory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ProductsubcategoryRepo {
   def delete(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
   def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow
   def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow
+  def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
   def selectAll(implicit c: Connection): List[ProductsubcategoryRow]
   def selectById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Option[ProductsubcategoryRow]
   def selectByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow]
   def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
   def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow
 }

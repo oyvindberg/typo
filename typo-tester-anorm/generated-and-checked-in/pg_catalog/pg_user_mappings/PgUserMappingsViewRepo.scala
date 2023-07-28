@@ -8,7 +8,9 @@ package pg_catalog
 package pg_user_mappings
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgUserMappingsViewRepo {
+  def select: SelectBuilder[PgUserMappingsViewFields, PgUserMappingsViewRow]
   def selectAll(implicit c: Connection): List[PgUserMappingsViewRow]
 }

@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_ts_config where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgTsConfigFields, PgTsConfigRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_config", PgTsConfigFields)
   }
   override def insert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow] = {
     sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsConfigId.put))}::oid, ${fromWrite(unsaved.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid)
           returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
        """.query(PgTsConfigRow.read).unique
+  }
+  override def select: SelectBuilder[PgTsConfigFields, PgTsConfigRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTsConfigRow] = {
     sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config".query(PgTsConfigRow.read).stream
@@ -44,6 +54,9 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.read)
   }
   override def upsert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow] = {
     sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)

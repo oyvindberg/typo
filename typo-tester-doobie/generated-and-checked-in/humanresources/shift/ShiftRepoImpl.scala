@@ -17,10 +17,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
     sql"delete from humanresources.shift where shiftid = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilder("humanresources.shift", ShiftFields)
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
@@ -57,6 +64,9 @@ object ShiftRepoImpl extends ShiftRepo {
     q.query(ShiftRow.read).unique
     
   }
+  override def select: SelectBuilder[ShiftFields, ShiftRow] = {
+    SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
     sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift""".query(ShiftRow.read).stream
   }
@@ -77,6 +87,9 @@ object ShiftRepoImpl extends ShiftRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilder("humanresources.shift", ShiftFields, ShiftRow.read)
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)

@@ -9,7 +9,9 @@ package pod
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PodViewRepo {
+  def select: SelectBuilder[PodViewFields, PodViewRow]
   def selectAll: Stream[ConnectionIO, PodViewRow]
 }

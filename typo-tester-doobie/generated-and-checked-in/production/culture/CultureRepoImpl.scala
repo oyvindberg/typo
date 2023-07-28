@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId): ConnectionIO[Boolean] = {
     sql"delete from production.culture where cultureid = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
+    DeleteBuilder("production.culture", CultureFields)
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture(cultureid, "name", modifieddate)
@@ -51,6 +58,9 @@ object CultureRepoImpl extends CultureRepo {
     q.query(CultureRow.read).unique
     
   }
+  override def select: SelectBuilder[CultureFields, CultureRow] = {
+    SelectBuilderSql("production.culture", CultureFields, CultureRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
     sql"""select cultureid, "name", modifieddate::text from production.culture""".query(CultureRow.read).stream
   }
@@ -69,6 +79,9 @@ object CultureRepoImpl extends CultureRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[CultureFields, CultureRow] = {
+    UpdateBuilder("production.culture", CultureFields, CultureRow.read)
   }
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture(cultureid, "name", modifieddate)

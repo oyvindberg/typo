@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
   override def delete(compositeId: PgSubscriptionRelId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_subscription_rel where srrelid = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND srsubid = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    DeleteBuilder("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields)
   }
   override def insert(unsaved: PgSubscriptionRelRow): ConnectionIO[PgSubscriptionRelRow] = {
     sql"""insert into pg_catalog.pg_subscription_rel(srsubid, srrelid, srsubstate, srsublsn)
           values (${fromWrite(unsaved.srsubid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srsubstate)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.srsublsn)(Write.fromPutOption(Meta.LongMeta.put))}::pg_lsn)
           returning srsubid, srrelid, srsubstate, srsublsn
        """.query(PgSubscriptionRelRow.read).unique
+  }
+  override def select: SelectBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    SelectBuilderSql("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields, PgSubscriptionRelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgSubscriptionRelRow] = {
     sql"select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel".query(PgSubscriptionRelRow.read).stream
@@ -39,6 +49,9 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    UpdateBuilder("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields, PgSubscriptionRelRow.read)
   }
   override def upsert(unsaved: PgSubscriptionRelRow): ConnectionIO[PgSubscriptionRelRow] = {
     sql"""insert into pg_catalog.pg_subscription_rel(srsubid, srrelid, srsubstate, srsublsn)

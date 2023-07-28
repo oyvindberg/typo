@@ -9,13 +9,19 @@ package productvendor
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ProductvendorRepo {
   def delete(compositeId: ProductvendorId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow]
   def insert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow]
   def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow]
+  def select: SelectBuilder[ProductvendorFields, ProductvendorRow]
   def selectAll: Stream[ConnectionIO, ProductvendorRow]
   def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]]
   def update(row: ProductvendorRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[ProductvendorFields, ProductvendorRow]
   def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow]
 }

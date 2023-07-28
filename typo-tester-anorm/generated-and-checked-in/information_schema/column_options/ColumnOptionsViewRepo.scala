@@ -8,7 +8,9 @@ package information_schema
 package column_options
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ColumnOptionsViewRepo {
+  def select: SelectBuilder[ColumnOptionsViewFields, ColumnOptionsViewRow]
   def selectAll(implicit c: Connection): List[ColumnOptionsViewRow]
 }

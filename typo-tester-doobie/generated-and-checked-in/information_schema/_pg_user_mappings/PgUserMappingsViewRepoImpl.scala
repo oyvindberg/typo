@@ -10,8 +10,13 @@ package `_pg_user_mappings`
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgUserMappingsViewRepoImpl extends PgUserMappingsViewRepo {
+  override def select: SelectBuilder[PgUserMappingsViewFields, PgUserMappingsViewRow] = {
+    SelectBuilderSql("information_schema._pg_user_mappings", PgUserMappingsViewFields, PgUserMappingsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgUserMappingsViewRow] = {
     sql"select oid, umoptions, umuser, authorization_identifier, foreign_server_catalog, foreign_server_name, srvowner from information_schema._pg_user_mappings".query(PgUserMappingsViewRow.read).stream
   }

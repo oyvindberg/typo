@@ -9,13 +9,19 @@ package pg_opfamily
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgOpfamilyRepo {
   def delete(oid: PgOpfamilyId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgOpfamilyFields, PgOpfamilyRow]
   def insert(unsaved: PgOpfamilyRow): ConnectionIO[PgOpfamilyRow]
+  def select: SelectBuilder[PgOpfamilyFields, PgOpfamilyRow]
   def selectAll: Stream[ConnectionIO, PgOpfamilyRow]
   def selectById(oid: PgOpfamilyId): ConnectionIO[Option[PgOpfamilyRow]]
   def selectByIds(oids: Array[PgOpfamilyId]): Stream[ConnectionIO, PgOpfamilyRow]
   def update(row: PgOpfamilyRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgOpfamilyFields, PgOpfamilyRow]
   def upsert(unsaved: PgOpfamilyRow): ConnectionIO[PgOpfamilyRow]
 }

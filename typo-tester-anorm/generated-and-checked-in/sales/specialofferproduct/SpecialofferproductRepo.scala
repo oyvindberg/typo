@@ -8,13 +8,19 @@ package sales
 package specialofferproduct
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SpecialofferproductRepo {
   def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow
   def insert(unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow
+  def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def selectAll(implicit c: Connection): List[SpecialofferproductRow]
   def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow]
   def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow
 }

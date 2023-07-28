@@ -10,8 +10,13 @@ package pg_stat_slru
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatSlruViewRepoImpl extends PgStatSlruViewRepo {
+  override def select: SelectBuilder[PgStatSlruViewFields, PgStatSlruViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_slru", PgStatSlruViewFields, PgStatSlruViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatSlruViewRow] = {
     sql"""select "name", blks_zeroed, blks_hit, blks_read, blks_written, blks_exists, flushes, truncates, stats_reset::text from pg_catalog.pg_stat_slru""".query(PgStatSlruViewRow.read).stream
   }

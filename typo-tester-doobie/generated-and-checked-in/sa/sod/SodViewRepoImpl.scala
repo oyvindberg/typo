@@ -10,8 +10,13 @@ package sod
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SodViewRepoImpl extends SodViewRepo {
+  override def select: SelectBuilder[SodViewFields, SodViewRow] = {
+    SelectBuilderSql("sa.sod", SodViewFields, SodViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SodViewRow] = {
     sql"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text from sa.sod""".query(SodViewRow.read).stream
   }

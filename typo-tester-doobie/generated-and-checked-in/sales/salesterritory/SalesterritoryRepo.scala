@@ -9,14 +9,20 @@ package salesterritory
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalesterritoryRepo {
   def delete(territoryid: SalesterritoryId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow]
   def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
   def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow]
+  def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow]
   def selectAll: Stream[ConnectionIO, SalesterritoryRow]
   def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]]
   def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow]
   def update(row: SalesterritoryRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow]
   def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
 }

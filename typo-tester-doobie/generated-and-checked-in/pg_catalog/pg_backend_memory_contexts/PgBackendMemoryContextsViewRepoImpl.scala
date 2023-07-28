@@ -10,8 +10,13 @@ package pg_backend_memory_contexts
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgBackendMemoryContextsViewRepoImpl extends PgBackendMemoryContextsViewRepo {
+  override def select: SelectBuilder[PgBackendMemoryContextsViewFields, PgBackendMemoryContextsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_backend_memory_contexts", PgBackendMemoryContextsViewFields, PgBackendMemoryContextsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgBackendMemoryContextsViewRow] = {
     sql"""select "name", ident, parent, "level", total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes from pg_catalog.pg_backend_memory_contexts""".query(PgBackendMemoryContextsViewRow.read).stream
   }

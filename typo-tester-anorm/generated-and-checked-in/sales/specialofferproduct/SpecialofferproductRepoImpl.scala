@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields)
   }
   override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     SQL"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
@@ -59,6 +66,9 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     }
     
   }
+  override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
     SQL"""select specialofferid, productid, rowguid, modifieddate::text
           from sales.specialofferproduct
@@ -77,6 +87,9 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.rowParser)
   }
   override def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     SQL"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)

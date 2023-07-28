@@ -8,7 +8,9 @@ package information_schema
 package foreign_server_options
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ForeignServerOptionsViewRepo {
+  def select: SelectBuilder[ForeignServerOptionsViewFields, ForeignServerOptionsViewRow]
   def selectAll(implicit c: Connection): List[ForeignServerOptionsViewRow]
 }

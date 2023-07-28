@@ -15,6 +15,7 @@ import org.postgresql.geometric.PGpolygon
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Polygon datatype in PostgreSQL */
 case class TypoPolygon(points: List[TypoPoint])
@@ -36,6 +37,7 @@ object TypoPolygon {
     override def jdbcType: Int = Types.ARRAY
   }
   implicit val arrayToStatement: ToStatement[Array[TypoPolygon]] = ToStatement[Array[TypoPolygon]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("polygon", v.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))))
+  implicit val bijection: Bijection[TypoPolygon, List[TypoPoint]] = Bijection[TypoPolygon, List[TypoPoint]](_.points)(TypoPolygon.apply)
   implicit val column: Column[TypoPolygon] = Column.nonNull[TypoPolygon]((v1: Any, _) =>
     v1 match {
       case v: PGpolygon => Right(TypoPolygon(v.points.map(p => TypoPoint(p.x, p.y)).toList))

@@ -8,14 +8,20 @@ package production
 package transactionhistory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait TransactionhistoryRepo {
   def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow
   def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow
+  def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def selectAll(implicit c: Connection): List[TransactionhistoryRow]
   def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow]
   def selectByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): List[TransactionhistoryRow]
   def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow
 }

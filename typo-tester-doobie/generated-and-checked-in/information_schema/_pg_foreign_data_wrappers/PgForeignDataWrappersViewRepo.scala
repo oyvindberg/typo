@@ -9,7 +9,9 @@ package `_pg_foreign_data_wrappers`
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgForeignDataWrappersViewRepo {
+  def select: SelectBuilder[PgForeignDataWrappersViewFields, PgForeignDataWrappersViewRow]
   def selectAll: Stream[ConnectionIO, PgForeignDataWrappersViewRow]
 }

@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** This is `java.time.OffsetDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoOffsetDateTime(value: OffsetDateTime)
@@ -39,10 +40,11 @@ object TypoOffsetDateTime {
     }
   )
   implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoOffsetDateTime]] = new ParameterMetaData[Array[TypoOffsetDateTime]] {
-    override def sqlType: String = "_text"
+    override def sqlType: String = "_timestamptz"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoOffsetDateTime]] = ToStatement[Array[TypoOffsetDateTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("text", v.map(v => v.value.toString))))
+  implicit val arrayToStatement: ToStatement[Array[TypoOffsetDateTime]] = ToStatement[Array[TypoOffsetDateTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("timestamptz", v.map(v => v.value.toString))))
+  implicit val bijection: Bijection[TypoOffsetDateTime, OffsetDateTime] = Bijection[TypoOffsetDateTime, OffsetDateTime](_.value)(TypoOffsetDateTime.apply)
   implicit val column: Column[TypoOffsetDateTime] = Column.nonNull[TypoOffsetDateTime]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoOffsetDateTime(OffsetDateTime.parse(v, parser)))
@@ -51,7 +53,7 @@ object TypoOffsetDateTime {
   )
   implicit def ordering(implicit O0: Ordering[OffsetDateTime]): Ordering[TypoOffsetDateTime] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoOffsetDateTime] = new ParameterMetaData[TypoOffsetDateTime] {
-    override def sqlType: String = "text"
+    override def sqlType: String = "timestamptz"
     override def jdbcType: Int = Types.OTHER
   }
   implicit val reads: Reads[TypoOffsetDateTime] = Reads.DefaultOffsetDateTimeReads.map(TypoOffsetDateTime.apply)

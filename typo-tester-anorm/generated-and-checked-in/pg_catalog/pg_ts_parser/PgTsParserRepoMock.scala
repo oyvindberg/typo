@@ -8,10 +8,22 @@ package pg_catalog
 package pg_ts_parser
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsParserRow] = scala.collection.mutable.Map.empty) extends PgTsParserRepo {
   override def delete(oid: PgTsParserId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgTsParserFields, map)
   }
   override def insert(unsaved: PgTsParserRow)(implicit c: Connection): PgTsParserRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsPar
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgTsParserFields, PgTsParserRow] = {
+    SelectBuilderMock(PgTsParserFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgTsParserRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsPar
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgTsParserFields, PgTsParserRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgTsParserFields, map)
   }
   override def upsert(unsaved: PgTsParserRow)(implicit c: Connection): PgTsParserRow = {
     map.put(unsaved.oid, unsaved)

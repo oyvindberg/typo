@@ -9,13 +9,19 @@ package pg_user_mapping
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgUserMappingRepo {
   def delete(oid: PgUserMappingId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgUserMappingFields, PgUserMappingRow]
   def insert(unsaved: PgUserMappingRow): ConnectionIO[PgUserMappingRow]
+  def select: SelectBuilder[PgUserMappingFields, PgUserMappingRow]
   def selectAll: Stream[ConnectionIO, PgUserMappingRow]
   def selectById(oid: PgUserMappingId): ConnectionIO[Option[PgUserMappingRow]]
   def selectByIds(oids: Array[PgUserMappingId]): Stream[ConnectionIO, PgUserMappingRow]
   def update(row: PgUserMappingRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow]
   def upsert(unsaved: PgUserMappingRow): ConnectionIO[PgUserMappingRow]
 }

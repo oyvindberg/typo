@@ -9,13 +9,19 @@ package productcosthistory
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ProductcosthistoryRepo {
   def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow]
   def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow]
+  def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def selectAll: Stream[ConnectionIO, ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]]
   def update(row: ProductcosthistoryRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow]
 }

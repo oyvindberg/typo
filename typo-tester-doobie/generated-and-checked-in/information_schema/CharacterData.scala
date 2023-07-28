@@ -11,6 +11,7 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `information_schema.character_data`
   * No constraint
@@ -19,6 +20,7 @@ case class CharacterData(value: String) extends AnyVal
 object CharacterData {
   implicit val arrayGet: Get[Array[CharacterData]] = adventureworks.StringArrayMeta.get.map(_.map(CharacterData.apply))
   implicit val arrayPut: Put[Array[CharacterData]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[CharacterData, String] = Bijection[CharacterData, String](_.value)(CharacterData.apply)
   implicit val decoder: Decoder[CharacterData] = Decoder.decodeString.map(CharacterData.apply)
   implicit val encoder: Encoder[CharacterData] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[CharacterData] = Meta.StringMeta.get.map(CharacterData.apply)

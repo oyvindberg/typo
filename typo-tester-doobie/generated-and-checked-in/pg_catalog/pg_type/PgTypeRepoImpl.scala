@@ -16,16 +16,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_type where oid = ${fromWrite(oid)(Write.fromPut(PgTypeId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgTypeFields, PgTypeRow] = {
+    DeleteBuilder("pg_catalog.pg_type", PgTypeFields)
   }
   override def insert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow] = {
     sql"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTypeId.put))}::oid, ${fromWrite(unsaved.typname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.typnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.typowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.typlen)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.typbyval)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.typtype)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.typcategory)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.typispreferred)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.typisdefined)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.typdelim)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.typrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.typsubscript)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typelem)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.typarray)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.typinput)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typoutput)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typreceive)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typsend)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typmodin)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typmodout)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typanalyze)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.typalign)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.typstorage)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.typnotnull)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.typbasetype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.typtypmod)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.typndims)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.typcollation)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.typdefaultbin)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.typdefault)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.typacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
        """.query(PgTypeRow.read).unique
+  }
+  override def select: SelectBuilder[PgTypeFields, PgTypeRow] = {
+    SelectBuilderSql("pg_catalog.pg_type", PgTypeFields, PgTypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTypeRow] = {
     sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type".query(PgTypeRow.read).stream
@@ -74,6 +84,9 @@ object PgTypeRepoImpl extends PgTypeRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgTypeFields, PgTypeRow] = {
+    UpdateBuilder("pg_catalog.pg_type", PgTypeFields, PgTypeRow.read)
   }
   override def upsert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow] = {
     sql"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)

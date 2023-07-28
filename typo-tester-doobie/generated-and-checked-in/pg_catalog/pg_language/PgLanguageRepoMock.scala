@@ -10,10 +10,22 @@ package pg_language
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgLanguageRepoMock(map: scala.collection.mutable.Map[PgLanguageId, PgLanguageRow] = scala.collection.mutable.Map.empty) extends PgLanguageRepo {
   override def delete(oid: PgLanguageId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgLanguageFields, map)
   }
   override def insert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgLanguageRepoMock(map: scala.collection.mutable.Map[PgLanguageId, PgLangu
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgLanguageFields, PgLanguageRow] = {
+    SelectBuilderMock(PgLanguageFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgLanguageRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgLanguageRepoMock(map: scala.collection.mutable.Map[PgLanguageId, PgLangu
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgLanguageFields, PgLanguageRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgLanguageFields, map)
   }
   override def upsert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow] = {
     delay {

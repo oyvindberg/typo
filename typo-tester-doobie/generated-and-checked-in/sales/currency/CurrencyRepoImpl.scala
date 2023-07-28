@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId): ConnectionIO[Boolean] = {
     sql"delete from sales.currency where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
+    DeleteBuilder("sales.currency", CurrencyFields)
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
@@ -51,6 +58,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
     q.query(CurrencyRow.read).unique
     
   }
+  override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
+    SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
     sql"""select currencycode, "name", modifieddate::text from sales.currency""".query(CurrencyRow.read).stream
   }
@@ -69,6 +79,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
+    UpdateBuilder("sales.currency", CurrencyFields, CurrencyRow.read)
   }
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)

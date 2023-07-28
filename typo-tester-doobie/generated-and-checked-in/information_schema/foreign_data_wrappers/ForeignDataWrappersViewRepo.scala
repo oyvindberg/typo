@@ -9,7 +9,9 @@ package foreign_data_wrappers
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ForeignDataWrappersViewRepo {
+  def select: SelectBuilder[ForeignDataWrappersViewFields, ForeignDataWrappersViewRow]
   def selectAll: Stream[ConnectionIO, ForeignDataWrappersViewRow]
 }

@@ -14,6 +14,7 @@ import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** regtype (via PGObject) */
 case class TypoRegtype(value: String)
@@ -40,6 +41,7 @@ object TypoRegtype {
                                                                                                                            obj.setValue(v.value)
                                                                                                                            obj
                                                                                                                          }))))
+  implicit val bijection: Bijection[TypoRegtype, String] = Bijection[TypoRegtype, String](_.value)(TypoRegtype.apply)
   implicit val column: Column[TypoRegtype] = Column.nonNull[TypoRegtype]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoRegtype(v.getValue))

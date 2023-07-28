@@ -9,8 +9,13 @@ package pg_roles
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgRolesViewRepoImpl extends PgRolesViewRepo {
+  override def select: SelectBuilder[PgRolesViewFields, PgRolesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_roles", PgRolesViewFields, PgRolesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgRolesViewRow] = {
     SQL"""select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil::text, rolbypassrls, rolconfig, oid
           from pg_catalog.pg_roles

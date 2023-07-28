@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.addresstype where addresstypeid = $addresstypeid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
+    DeleteBuilder("person.addresstype", AddresstypeFields)
   }
   override def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
@@ -62,6 +69,9 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     }
     
   }
+  override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
+    SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
     SQL"""select addresstypeid, "name", rowguid, modifieddate::text
           from person.addresstype
@@ -88,6 +98,9 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where addresstypeid = $addresstypeid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
+    UpdateBuilder("person.addresstype", AddresstypeFields, AddresstypeRow.rowParser)
   }
   override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)

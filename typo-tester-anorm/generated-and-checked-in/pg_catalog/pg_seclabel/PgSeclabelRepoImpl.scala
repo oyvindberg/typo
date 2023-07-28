@@ -9,10 +9,17 @@ package pg_seclabel
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def delete(compositeId: PgSeclabelId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgSeclabelFields, PgSeclabelRow] = {
+    DeleteBuilder("pg_catalog.pg_seclabel", PgSeclabelFields)
   }
   override def insert(unsaved: PgSeclabelRow)(implicit c: Connection): PgSeclabelRow = {
     SQL"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")
@@ -21,6 +28,9 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
        """
       .executeInsert(PgSeclabelRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgSeclabelFields, PgSeclabelRow] = {
+    SelectBuilderSql("pg_catalog.pg_seclabel", PgSeclabelFields, PgSeclabelRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgSeclabelRow] = {
     SQL"""select objoid, classoid, objsubid, provider, "label"
@@ -39,6 +49,9 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
           set "label" = ${row.label}
           where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgSeclabelFields, PgSeclabelRow] = {
+    UpdateBuilder("pg_catalog.pg_seclabel", PgSeclabelFields, PgSeclabelRow.rowParser)
   }
   override def upsert(unsaved: PgSeclabelRow)(implicit c: Connection): PgSeclabelRow = {
     SQL"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")

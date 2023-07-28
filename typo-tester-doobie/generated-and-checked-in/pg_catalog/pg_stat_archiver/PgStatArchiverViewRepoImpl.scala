@@ -10,8 +10,13 @@ package pg_stat_archiver
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatArchiverViewRepoImpl extends PgStatArchiverViewRepo {
+  override def select: SelectBuilder[PgStatArchiverViewFields, PgStatArchiverViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_archiver", PgStatArchiverViewFields, PgStatArchiverViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatArchiverViewRow] = {
     sql"select archived_count, last_archived_wal, last_archived_time::text, failed_count, last_failed_wal, last_failed_time::text, stats_reset::text from pg_catalog.pg_stat_archiver".query(PgStatArchiverViewRow.read).stream
   }

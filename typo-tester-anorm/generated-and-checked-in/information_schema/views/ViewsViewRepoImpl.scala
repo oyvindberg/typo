@@ -9,8 +9,13 @@ package views
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ViewsViewRepoImpl extends ViewsViewRepo {
+  override def select: SelectBuilder[ViewsViewFields, ViewsViewRow] = {
+    SelectBuilderSql("information_schema.views", ViewsViewFields, ViewsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ViewsViewRow] = {
     SQL"""select table_catalog, table_schema, "table_name", view_definition, check_option, is_updatable, is_insertable_into, is_trigger_updatable, is_trigger_deletable, is_trigger_insertable_into
           from information_schema."views"

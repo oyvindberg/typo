@@ -9,10 +9,17 @@ package pg_ts_dict
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_ts_dict where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTsDictFields, PgTsDictRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_dict", PgTsDictFields)
   }
   override def insert(unsaved: PgTsDictRow)(implicit c: Connection): PgTsDictRow = {
     SQL"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
@@ -21,6 +28,9 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
        """
       .executeInsert(PgTsDictRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTsDictFields, PgTsDictRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_dict", PgTsDictFields, PgTsDictRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsDictRow] = {
     SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
@@ -50,6 +60,9 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
               dictinitoption = ${row.dictinitoption}
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTsDictFields, PgTsDictRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_dict", PgTsDictFields, PgTsDictRow.rowParser)
   }
   override def upsert(unsaved: PgTsDictRow)(implicit c: Connection): PgTsDictRow = {
     SQL"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)

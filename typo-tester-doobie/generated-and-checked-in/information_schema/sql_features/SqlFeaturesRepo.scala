@@ -9,8 +9,14 @@ package sql_features
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SqlFeaturesRepo {
+  def delete: DeleteBuilder[SqlFeaturesFields, SqlFeaturesRow]
   def insert(unsaved: SqlFeaturesRow): ConnectionIO[SqlFeaturesRow]
+  def select: SelectBuilder[SqlFeaturesFields, SqlFeaturesRow]
   def selectAll: Stream[ConnectionIO, SqlFeaturesRow]
+  def update: UpdateBuilder[SqlFeaturesFields, SqlFeaturesRow]
 }

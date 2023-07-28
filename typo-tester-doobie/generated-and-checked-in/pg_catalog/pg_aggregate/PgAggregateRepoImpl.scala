@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAggregateRepoImpl extends PgAggregateRepo {
   override def delete(aggfnoid: PgAggregateId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_aggregate where aggfnoid = ${fromWrite(aggfnoid)(Write.fromPut(PgAggregateId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgAggregateFields, PgAggregateRow] = {
+    DeleteBuilder("pg_catalog.pg_aggregate", PgAggregateFields)
   }
   override def insert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow] = {
     sql"""insert into pg_catalog.pg_aggregate(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)
           values (${fromWrite(unsaved.aggfnoid)(Write.fromPut(PgAggregateId.put))}::regproc, ${fromWrite(unsaved.aggkind)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.aggnumdirectargs)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.aggtransfn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggfinalfn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggcombinefn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggserialfn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggdeserialfn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggmtransfn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggminvtransfn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggmfinalfn)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.aggfinalextra)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.aggmfinalextra)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.aggfinalmodify)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.aggmfinalmodify)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.aggsortop)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.aggtranstype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.aggtransspace)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.aggmtranstype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.aggmtransspace)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.agginitval)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.aggminitval)(Write.fromPutOption(Meta.StringMeta.put))})
           returning aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
        """.query(PgAggregateRow.read).unique
+  }
+  override def select: SelectBuilder[PgAggregateFields, PgAggregateRow] = {
+    SelectBuilderSql("pg_catalog.pg_aggregate", PgAggregateFields, PgAggregateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAggregateRow] = {
     sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate".query(PgAggregateRow.read).stream
@@ -62,6 +72,9 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgAggregateFields, PgAggregateRow] = {
+    UpdateBuilder("pg_catalog.pg_aggregate", PgAggregateFields, PgAggregateRow.read)
   }
   override def upsert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow] = {
     sql"""insert into pg_catalog.pg_aggregate(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)

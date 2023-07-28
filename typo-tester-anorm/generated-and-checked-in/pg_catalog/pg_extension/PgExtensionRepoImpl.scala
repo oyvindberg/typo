@@ -9,10 +9,17 @@ package pg_extension
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgExtensionRepoImpl extends PgExtensionRepo {
   override def delete(oid: PgExtensionId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_extension where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgExtensionFields, PgExtensionRow] = {
+    DeleteBuilder("pg_catalog.pg_extension", PgExtensionFields)
   }
   override def insert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
     SQL"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
@@ -21,6 +28,9 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
        """
       .executeInsert(PgExtensionRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgExtensionFields, PgExtensionRow] = {
+    SelectBuilderSql("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgExtensionRow] = {
     SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
@@ -52,6 +62,9 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
               extcondition = ${row.extcondition}::_text
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgExtensionFields, PgExtensionRow] = {
+    UpdateBuilder("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.rowParser)
   }
   override def upsert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
     SQL"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)

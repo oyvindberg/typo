@@ -19,10 +19,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean] = {
     sql"delete from sales.salestaxrate where salestaxrateid = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    DeleteBuilder("sales.salestaxrate", SalestaxrateFields)
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
@@ -67,6 +74,9 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     q.query(SalestaxrateRow.read).unique
     
   }
+  override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
     sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate""".query(SalestaxrateRow.read).stream
   }
@@ -89,6 +99,9 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    UpdateBuilder("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.read)
   }
   override def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)

@@ -8,7 +8,9 @@ package pg_catalog
 package pg_hba_file_rules
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgHbaFileRulesViewRepo {
+  def select: SelectBuilder[PgHbaFileRulesViewFields, PgHbaFileRulesViewRow]
   def selectAll(implicit c: Connection): List[PgHbaFileRulesViewRow]
 }

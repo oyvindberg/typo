@@ -9,8 +9,13 @@ package pg_available_extension_versions
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgAvailableExtensionVersionsViewRepoImpl extends PgAvailableExtensionVersionsViewRepo {
+  override def select: SelectBuilder[PgAvailableExtensionVersionsViewFields, PgAvailableExtensionVersionsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_available_extension_versions", PgAvailableExtensionVersionsViewFields, PgAvailableExtensionVersionsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgAvailableExtensionVersionsViewRow] = {
     SQL"""select "name", "version", installed, superuser, "trusted", relocatable, "schema", requires, "comment"
           from pg_catalog.pg_available_extension_versions

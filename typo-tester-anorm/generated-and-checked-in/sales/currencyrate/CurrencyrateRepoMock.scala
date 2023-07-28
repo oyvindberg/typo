@@ -8,11 +8,23 @@ package sales
 package currencyrate
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, CurrencyrateRow],
                            map: scala.collection.mutable.Map[CurrencyrateId, CurrencyrateRow] = scala.collection.mutable.Map.empty) extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
     map.remove(currencyrateid).isDefined
+  }
+  override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields, map)
   }
   override def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     if (map.contains(unsaved.currencyrateid))
@@ -23,6 +35,9 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    SelectBuilderMock(CurrencyrateFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields, map)
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     map.put(unsaved.currencyrateid, unsaved)

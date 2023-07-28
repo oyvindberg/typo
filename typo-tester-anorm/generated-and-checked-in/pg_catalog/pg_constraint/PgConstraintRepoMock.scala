@@ -8,10 +8,22 @@ package pg_catalog
 package pg_constraint
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgConstraintRow] = scala.collection.mutable.Map.empty) extends PgConstraintRepo {
   override def delete(oid: PgConstraintId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgConstraintFields, PgConstraintRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgConstraintFields, map)
   }
   override def insert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgConstraintFields, PgConstraintRow] = {
+    SelectBuilderMock(PgConstraintFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgConstraintFields, PgConstraintRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgConstraintFields, map)
   }
   override def upsert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
     map.put(unsaved.oid, unsaved)

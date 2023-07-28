@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAmprocRepoImpl extends PgAmprocRepo {
   override def delete(oid: PgAmprocId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_amproc where oid = ${fromWrite(oid)(Write.fromPut(PgAmprocId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgAmprocFields, PgAmprocRow] = {
+    DeleteBuilder("pg_catalog.pg_amproc", PgAmprocFields)
   }
   override def insert(unsaved: PgAmprocRow): ConnectionIO[PgAmprocRow] = {
     sql"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgAmprocId.put))}::oid, ${fromWrite(unsaved.amprocfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amproclefttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amprocrighttype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.amprocnum)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.amproc)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
        """.query(PgAmprocRow.read).unique
+  }
+  override def select: SelectBuilder[PgAmprocFields, PgAmprocRow] = {
+    SelectBuilderSql("pg_catalog.pg_amproc", PgAmprocFields, PgAmprocRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAmprocRow] = {
     sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc".query(PgAmprocRow.read).stream
@@ -46,6 +56,9 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgAmprocFields, PgAmprocRow] = {
+    UpdateBuilder("pg_catalog.pg_amproc", PgAmprocFields, PgAmprocRow.read)
   }
   override def upsert(unsaved: PgAmprocRow): ConnectionIO[PgAmprocRow] = {
     sql"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)

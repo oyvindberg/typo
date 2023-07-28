@@ -9,10 +9,17 @@ package pg_aggregate
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAggregateRepoImpl extends PgAggregateRepo {
   override def delete(aggfnoid: PgAggregateId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_aggregate where aggfnoid = $aggfnoid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgAggregateFields, PgAggregateRow] = {
+    DeleteBuilder("pg_catalog.pg_aggregate", PgAggregateFields)
   }
   override def insert(unsaved: PgAggregateRow)(implicit c: Connection): PgAggregateRow = {
     SQL"""insert into pg_catalog.pg_aggregate(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)
@@ -21,6 +28,9 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
        """
       .executeInsert(PgAggregateRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgAggregateFields, PgAggregateRow] = {
+    SelectBuilderSql("pg_catalog.pg_aggregate", PgAggregateFields, PgAggregateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAggregateRow] = {
     SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
@@ -66,6 +76,9 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
               aggminitval = ${row.aggminitval}
           where aggfnoid = $aggfnoid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgAggregateFields, PgAggregateRow] = {
+    UpdateBuilder("pg_catalog.pg_aggregate", PgAggregateFields, PgAggregateRow.rowParser)
   }
   override def upsert(unsaved: PgAggregateRow)(implicit c: Connection): PgAggregateRow = {
     SQL"""insert into pg_catalog.pg_aggregate(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)

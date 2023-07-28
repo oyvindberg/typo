@@ -8,13 +8,19 @@ package pg_catalog
 package pg_foreign_data_wrapper
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgForeignDataWrapperRepo {
   def delete(oid: PgForeignDataWrapperId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def insert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow
+  def select: SelectBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def selectAll(implicit c: Connection): List[PgForeignDataWrapperRow]
   def selectById(oid: PgForeignDataWrapperId)(implicit c: Connection): Option[PgForeignDataWrapperRow]
   def selectByIds(oids: Array[PgForeignDataWrapperId])(implicit c: Connection): List[PgForeignDataWrapperRow]
   def update(row: PgForeignDataWrapperRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def upsert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow
 }

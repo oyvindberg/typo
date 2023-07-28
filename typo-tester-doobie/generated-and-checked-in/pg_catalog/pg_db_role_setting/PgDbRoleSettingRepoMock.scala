@@ -10,10 +10,22 @@ package pg_db_role_setting
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgDbRoleSettingRepoMock(map: scala.collection.mutable.Map[PgDbRoleSettingId, PgDbRoleSettingRow] = scala.collection.mutable.Map.empty) extends PgDbRoleSettingRepo {
   override def delete(compositeId: PgDbRoleSettingId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgDbRoleSettingFields, map)
   }
   override def insert(unsaved: PgDbRoleSettingRow): ConnectionIO[PgDbRoleSettingRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgDbRoleSettingRepoMock(map: scala.collection.mutable.Map[PgDbRoleSettingI
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    SelectBuilderMock(PgDbRoleSettingFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgDbRoleSettingRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgDbRoleSettingRepoMock(map: scala.collection.mutable.Map[PgDbRoleSettingI
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgDbRoleSettingFields, map)
   }
   override def upsert(unsaved: PgDbRoleSettingRow): ConnectionIO[PgDbRoleSettingRow] = {
     delay {

@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def delete(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productdescription where productdescriptionid = $productdescriptionid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    DeleteBuilder("production.productdescription", ProductdescriptionFields)
   }
   override def insert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
@@ -62,6 +69,9 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    SelectBuilderSql("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductdescriptionRow] = {
     SQL"""select productdescriptionid, description, rowguid, modifieddate::text
           from production.productdescription
@@ -88,6 +98,9 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productdescriptionid = $productdescriptionid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    UpdateBuilder("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.rowParser)
   }
   override def upsert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)

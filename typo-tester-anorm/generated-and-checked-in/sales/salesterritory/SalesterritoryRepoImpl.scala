@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesterritory where territoryid = $territoryid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    DeleteBuilder("sales.salesterritory", SalesterritoryFields)
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     SQL"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
@@ -80,6 +87,9 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     }
     
   }
+  override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    SelectBuilderSql("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
           from sales.salesterritory
@@ -112,6 +122,9 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where territoryid = $territoryid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    UpdateBuilder("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.rowParser)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     SQL"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)

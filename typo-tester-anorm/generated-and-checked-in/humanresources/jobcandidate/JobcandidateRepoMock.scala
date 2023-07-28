@@ -8,11 +8,23 @@ package humanresources
 package jobcandidate
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, JobcandidateRow],
                            map: scala.collection.mutable.Map[JobcandidateId, JobcandidateRow] = scala.collection.mutable.Map.empty) extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
     map.remove(jobcandidateid).isDefined
+  }
+  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, JobcandidateFields, map)
   }
   override def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     if (map.contains(unsaved.jobcandidateid))
@@ -23,6 +35,9 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
+    SelectBuilderMock(JobcandidateFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, JobcandidateFields, map)
   }
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     map.put(unsaved.jobcandidateid, unsaved)

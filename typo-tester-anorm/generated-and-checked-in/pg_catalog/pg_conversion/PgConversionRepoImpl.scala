@@ -9,10 +9,17 @@ package pg_conversion
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_conversion where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
+    DeleteBuilder("pg_catalog.pg_conversion", PgConversionFields)
   }
   override def insert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
     SQL"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
@@ -21,6 +28,9 @@ object PgConversionRepoImpl extends PgConversionRepo {
        """
       .executeInsert(PgConversionRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgConversionFields, PgConversionRow] = {
+    SelectBuilderSql("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgConversionRow] = {
     SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
@@ -52,6 +62,9 @@ object PgConversionRepoImpl extends PgConversionRepo {
               condefault = ${row.condefault}
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgConversionFields, PgConversionRow] = {
+    UpdateBuilder("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.rowParser)
   }
   override def upsert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
     SQL"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)

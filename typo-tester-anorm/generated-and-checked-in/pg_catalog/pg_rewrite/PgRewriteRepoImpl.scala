@@ -9,10 +9,17 @@ package pg_rewrite
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_rewrite where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow] = {
+    DeleteBuilder("pg_catalog.pg_rewrite", PgRewriteFields)
   }
   override def insert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
     SQL"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
@@ -21,6 +28,9 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
        """
       .executeInsert(PgRewriteRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgRewriteFields, PgRewriteRow] = {
+    SelectBuilderSql("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgRewriteRow] = {
     SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
@@ -52,6 +62,9 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
               ev_action = ${row.evAction}::pg_node_tree
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgRewriteFields, PgRewriteRow] = {
+    UpdateBuilder("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.rowParser)
   }
   override def upsert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
     SQL"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)

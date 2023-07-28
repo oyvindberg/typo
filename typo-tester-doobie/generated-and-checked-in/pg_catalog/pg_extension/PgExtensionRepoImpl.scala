@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgExtensionRepoImpl extends PgExtensionRepo {
   override def delete(oid: PgExtensionId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_extension where oid = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgExtensionFields, PgExtensionRow] = {
+    DeleteBuilder("pg_catalog.pg_extension", PgExtensionFields)
   }
   override def insert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow] = {
     sql"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgExtensionId.put))}::oid, ${fromWrite(unsaved.extname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.extowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.extnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.extrelocatable)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.extversion)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.extconfig)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.extcondition)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
           returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
        """.query(PgExtensionRow.read).unique
+  }
+  override def select: SelectBuilder[PgExtensionFields, PgExtensionRow] = {
+    SelectBuilderSql("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgExtensionRow] = {
     sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension".query(PgExtensionRow.read).stream
@@ -47,6 +57,9 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgExtensionFields, PgExtensionRow] = {
+    UpdateBuilder("pg_catalog.pg_extension", PgExtensionFields, PgExtensionRow.read)
   }
   override def upsert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow] = {
     sql"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)

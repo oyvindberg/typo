@@ -9,13 +9,19 @@ package pg_aggregate
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgAggregateRepo {
   def delete(aggfnoid: PgAggregateId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgAggregateFields, PgAggregateRow]
   def insert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow]
+  def select: SelectBuilder[PgAggregateFields, PgAggregateRow]
   def selectAll: Stream[ConnectionIO, PgAggregateRow]
   def selectById(aggfnoid: PgAggregateId): ConnectionIO[Option[PgAggregateRow]]
   def selectByIds(aggfnoids: Array[PgAggregateId]): Stream[ConnectionIO, PgAggregateRow]
   def update(row: PgAggregateRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgAggregateFields, PgAggregateRow]
   def upsert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow]
 }

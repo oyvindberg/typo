@@ -10,11 +10,23 @@ package shift
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
                     map: scala.collection.mutable.Map[ShiftId, ShiftRow] = scala.collection.mutable.Map.empty) extends ShiftRepo {
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
     delay(map.remove(shiftid).isDefined)
+  }
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields, map)
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {
@@ -27,6 +39,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ShiftFields, ShiftRow] = {
+    SelectBuilderMock(ShiftFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields, map)
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {

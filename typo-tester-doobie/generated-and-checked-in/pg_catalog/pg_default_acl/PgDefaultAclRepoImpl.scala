@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_default_acl where oid = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    DeleteBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields)
   }
   override def insert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow] = {
     sql"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgDefaultAclId.put))}::oid, ${fromWrite(unsaved.defaclrole)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.defaclnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.defaclacl)(Write.fromPut(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
        """.query(PgDefaultAclRow.read).unique
+  }
+  override def select: SelectBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    SelectBuilderSql("pg_catalog.pg_default_acl", PgDefaultAclFields, PgDefaultAclRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgDefaultAclRow] = {
     sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl".query(PgDefaultAclRow.read).stream
@@ -45,6 +55,9 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    UpdateBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields, PgDefaultAclRow.read)
   }
   override def upsert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow] = {
     sql"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)

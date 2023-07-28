@@ -16,10 +16,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: CreditcardId): ConnectionIO[Boolean] = {
     sql"delete from sales.creditcard where creditcardid = ${fromWrite(creditcardid)(Write.fromPut(CreditcardId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
+    DeleteBuilder("sales.creditcard", CreditcardFields)
   }
   override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
@@ -57,6 +64,9 @@ object CreditcardRepoImpl extends CreditcardRepo {
     q.query(CreditcardRow.read).unique
     
   }
+  override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
+    SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
     sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard".query(CreditcardRow.read).stream
   }
@@ -78,6 +88,9 @@ object CreditcardRepoImpl extends CreditcardRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
+    UpdateBuilder("sales.creditcard", CreditcardFields, CreditcardRow.read)
   }
   override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)

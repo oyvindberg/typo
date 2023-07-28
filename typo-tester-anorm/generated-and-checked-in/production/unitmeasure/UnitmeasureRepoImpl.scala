@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
     SQL"delete from production.unitmeasure where unitmeasurecode = $unitmeasurecode".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    DeleteBuilder("production.unitmeasure", UnitmeasureFields)
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
@@ -54,6 +61,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     }
     
   }
+  override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select unitmeasurecode, "name", modifieddate::text
           from production.unitmeasure
@@ -79,6 +89,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where unitmeasurecode = $unitmeasurecode
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    UpdateBuilder("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.rowParser)
   }
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     SQL"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)

@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean] = {
     sql"delete from production.scrapreason where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    DeleteBuilder("production.scrapreason", ScrapreasonFields)
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
@@ -54,6 +61,9 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     q.query(ScrapreasonRow.read).unique
     
   }
+  override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
     sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason""".query(ScrapreasonRow.read).stream
   }
@@ -72,6 +82,9 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    UpdateBuilder("production.scrapreason", ScrapreasonFields, ScrapreasonRow.read)
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)

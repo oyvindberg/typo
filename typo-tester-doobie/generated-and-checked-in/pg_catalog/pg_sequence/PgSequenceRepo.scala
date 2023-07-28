@@ -9,13 +9,19 @@ package pg_sequence
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgSequenceRepo {
   def delete(seqrelid: PgSequenceId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow]
   def insert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow]
+  def select: SelectBuilder[PgSequenceFields, PgSequenceRow]
   def selectAll: Stream[ConnectionIO, PgSequenceRow]
   def selectById(seqrelid: PgSequenceId): ConnectionIO[Option[PgSequenceRow]]
   def selectByIds(seqrelids: Array[PgSequenceId]): Stream[ConnectionIO, PgSequenceRow]
   def update(row: PgSequenceRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgSequenceFields, PgSequenceRow]
   def upsert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow]
 }

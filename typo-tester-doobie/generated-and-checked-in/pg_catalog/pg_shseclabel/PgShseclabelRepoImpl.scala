@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgShseclabelRepoImpl extends PgShseclabelRepo {
   override def delete(compositeId: PgShseclabelId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_shseclabel where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    DeleteBuilder("pg_catalog.pg_shseclabel", PgShseclabelFields)
   }
   override def insert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow] = {
     sql"""insert into pg_catalog.pg_shseclabel(objoid, classoid, provider, "label")
           values (${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.provider)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.label)(Write.fromPut(Meta.StringMeta.put))})
           returning objoid, classoid, provider, "label"
        """.query(PgShseclabelRow.read).unique
+  }
+  override def select: SelectBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    SelectBuilderSql("pg_catalog.pg_shseclabel", PgShseclabelFields, PgShseclabelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgShseclabelRow] = {
     sql"""select objoid, classoid, provider, "label" from pg_catalog.pg_shseclabel""".query(PgShseclabelRow.read).stream
@@ -38,6 +48,9 @@ object PgShseclabelRepoImpl extends PgShseclabelRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    UpdateBuilder("pg_catalog.pg_shseclabel", PgShseclabelFields, PgShseclabelRow.read)
   }
   override def upsert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow] = {
     sql"""insert into pg_catalog.pg_shseclabel(objoid, classoid, provider, "label")

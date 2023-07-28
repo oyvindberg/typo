@@ -9,10 +9,17 @@ package pg_ts_config
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_ts_config where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTsConfigFields, PgTsConfigRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_config", PgTsConfigFields)
   }
   override def insert(unsaved: PgTsConfigRow)(implicit c: Connection): PgTsConfigRow = {
     SQL"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
@@ -21,6 +28,9 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
        """
       .executeInsert(PgTsConfigRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTsConfigFields, PgTsConfigRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsConfigRow] = {
     SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser
@@ -49,6 +59,9 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
               cfgparser = ${row.cfgparser}::oid
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_config", PgTsConfigFields, PgTsConfigRow.rowParser)
   }
   override def upsert(unsaved: PgTsConfigRow)(implicit c: Connection): PgTsConfigRow = {
     SQL"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)

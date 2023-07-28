@@ -9,10 +9,17 @@ package pg_type
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTypeRepoImpl extends PgTypeRepo {
   override def delete(oid: PgTypeId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_type where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTypeFields, PgTypeRow] = {
+    DeleteBuilder("pg_catalog.pg_type", PgTypeFields)
   }
   override def insert(unsaved: PgTypeRow)(implicit c: Connection): PgTypeRow = {
     SQL"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
@@ -21,6 +28,9 @@ object PgTypeRepoImpl extends PgTypeRepo {
        """
       .executeInsert(PgTypeRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTypeFields, PgTypeRow] = {
+    SelectBuilderSql("pg_catalog.pg_type", PgTypeFields, PgTypeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTypeRow] = {
     SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
@@ -76,6 +86,9 @@ object PgTypeRepoImpl extends PgTypeRepo {
               typacl = ${row.typacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTypeFields, PgTypeRow] = {
+    UpdateBuilder("pg_catalog.pg_type", PgTypeFields, PgTypeRow.rowParser)
   }
   override def upsert(unsaved: PgTypeRow)(implicit c: Connection): PgTypeRow = {
     SQL"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)

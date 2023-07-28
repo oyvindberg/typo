@@ -8,8 +8,14 @@ package pg_catalog
 package pg_shdepend
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgShdependRepo {
+  def delete: DeleteBuilder[PgShdependFields, PgShdependRow]
   def insert(unsaved: PgShdependRow)(implicit c: Connection): PgShdependRow
+  def select: SelectBuilder[PgShdependFields, PgShdependRow]
   def selectAll(implicit c: Connection): List[PgShdependRow]
+  def update: UpdateBuilder[PgShdependFields, PgShdependRow]
 }

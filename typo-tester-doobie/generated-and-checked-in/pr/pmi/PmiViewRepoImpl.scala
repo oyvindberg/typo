@@ -10,8 +10,13 @@ package pmi
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PmiViewRepoImpl extends PmiViewRepo {
+  override def select: SelectBuilder[PmiViewFields, PmiViewRow] = {
+    SelectBuilderSql("pr.pmi", PmiViewFields, PmiViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PmiViewRow] = {
     sql"select productmodelid, illustrationid, modifieddate::text from pr.pmi".query(PmiViewRow.read).stream
   }

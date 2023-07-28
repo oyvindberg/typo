@@ -9,12 +9,18 @@ package pg_shseclabel
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgShseclabelRepo {
   def delete(compositeId: PgShseclabelId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgShseclabelFields, PgShseclabelRow]
   def insert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow]
+  def select: SelectBuilder[PgShseclabelFields, PgShseclabelRow]
   def selectAll: Stream[ConnectionIO, PgShseclabelRow]
   def selectById(compositeId: PgShseclabelId): ConnectionIO[Option[PgShseclabelRow]]
   def update(row: PgShseclabelRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgShseclabelFields, PgShseclabelRow]
   def upsert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow]
 }

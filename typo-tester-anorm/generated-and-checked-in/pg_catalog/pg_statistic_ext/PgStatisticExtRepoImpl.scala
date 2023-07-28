@@ -9,10 +9,17 @@ package pg_statistic_ext
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_statistic_ext where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    DeleteBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields)
   }
   override def insert(unsaved: PgStatisticExtRow)(implicit c: Connection): PgStatisticExtRow = {
     SQL"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
@@ -21,6 +28,9 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
        """
       .executeInsert(PgStatisticExtRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    SelectBuilderSql("pg_catalog.pg_statistic_ext", PgStatisticExtFields, PgStatisticExtRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtRow] = {
     SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
@@ -53,6 +63,9 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
               stxexprs = ${row.stxexprs}::pg_node_tree
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    UpdateBuilder("pg_catalog.pg_statistic_ext", PgStatisticExtFields, PgStatisticExtRow.rowParser)
   }
   override def upsert(unsaved: PgStatisticExtRow)(implicit c: Connection): PgStatisticExtRow = {
     SQL"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)

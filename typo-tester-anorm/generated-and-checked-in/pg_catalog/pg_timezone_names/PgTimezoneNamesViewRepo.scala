@@ -8,7 +8,9 @@ package pg_catalog
 package pg_timezone_names
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgTimezoneNamesViewRepo {
+  def select: SelectBuilder[PgTimezoneNamesViewFields, PgTimezoneNamesViewRow]
   def selectAll(implicit c: Connection): List[PgTimezoneNamesViewRow]
 }

@@ -8,7 +8,9 @@ package pu
 package poh
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PohViewRepo {
+  def select: SelectBuilder[PohViewFields, PohViewRow]
   def selectAll(implicit c: Connection): List[PohViewRow]
 }

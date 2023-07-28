@@ -9,10 +9,17 @@ package pg_foreign_table
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgForeignTableRepoImpl extends PgForeignTableRepo {
   override def delete(ftrelid: PgForeignTableId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_foreign_table where ftrelid = $ftrelid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    DeleteBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields)
   }
   override def insert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow = {
     SQL"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)
@@ -21,6 +28,9 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
        """
       .executeInsert(PgForeignTableRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    SelectBuilderSql("pg_catalog.pg_foreign_table", PgForeignTableFields, PgForeignTableRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgForeignTableRow] = {
     SQL"""select ftrelid, ftserver, ftoptions
@@ -47,6 +57,9 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
               ftoptions = ${row.ftoptions}::_text
           where ftrelid = $ftrelid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    UpdateBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields, PgForeignTableRow.rowParser)
   }
   override def upsert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow = {
     SQL"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)

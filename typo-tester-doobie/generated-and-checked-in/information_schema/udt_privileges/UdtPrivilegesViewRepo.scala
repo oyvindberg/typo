@@ -9,7 +9,9 @@ package udt_privileges
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait UdtPrivilegesViewRepo {
+  def select: SelectBuilder[UdtPrivilegesViewFields, UdtPrivilegesViewRow]
   def selectAll: Stream[ConnectionIO, UdtPrivilegesViewRow]
 }

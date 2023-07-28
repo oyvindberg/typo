@@ -9,8 +9,13 @@ package um
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object UmViewRepoImpl extends UmViewRepo {
+  override def select: SelectBuilder[UmViewFields, UmViewRow] = {
+    SelectBuilderSql("pr.um", UmViewFields, UmViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[UmViewRow] = {
     SQL"""select "id", unitmeasurecode, "name", modifieddate::text
           from pr.um

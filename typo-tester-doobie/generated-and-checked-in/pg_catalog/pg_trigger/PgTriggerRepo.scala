@@ -9,13 +9,19 @@ package pg_trigger
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgTriggerRepo {
   def delete(oid: PgTriggerId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgTriggerFields, PgTriggerRow]
   def insert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow]
+  def select: SelectBuilder[PgTriggerFields, PgTriggerRow]
   def selectAll: Stream[ConnectionIO, PgTriggerRow]
   def selectById(oid: PgTriggerId): ConnectionIO[Option[PgTriggerRow]]
   def selectByIds(oids: Array[PgTriggerId]): Stream[ConnectionIO, PgTriggerRow]
   def update(row: PgTriggerRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgTriggerFields, PgTriggerRow]
   def upsert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow]
 }

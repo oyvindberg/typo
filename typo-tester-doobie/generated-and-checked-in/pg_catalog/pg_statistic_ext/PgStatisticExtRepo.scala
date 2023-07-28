@@ -9,13 +9,19 @@ package pg_statistic_ext
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgStatisticExtRepo {
   def delete(oid: PgStatisticExtId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgStatisticExtFields, PgStatisticExtRow]
   def insert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow]
+  def select: SelectBuilder[PgStatisticExtFields, PgStatisticExtRow]
   def selectAll: Stream[ConnectionIO, PgStatisticExtRow]
   def selectById(oid: PgStatisticExtId): ConnectionIO[Option[PgStatisticExtRow]]
   def selectByIds(oids: Array[PgStatisticExtId]): Stream[ConnectionIO, PgStatisticExtRow]
   def update(row: PgStatisticExtRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow]
   def upsert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow]
 }

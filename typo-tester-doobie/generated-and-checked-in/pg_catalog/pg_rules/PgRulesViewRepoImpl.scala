@@ -10,8 +10,13 @@ package pg_rules
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgRulesViewRepoImpl extends PgRulesViewRepo {
+  override def select: SelectBuilder[PgRulesViewFields, PgRulesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_rules", PgRulesViewFields, PgRulesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgRulesViewRow] = {
     sql"select schemaname, tablename, rulename, definition from pg_catalog.pg_rules".query(PgRulesViewRow.read).stream
   }

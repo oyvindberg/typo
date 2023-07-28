@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_activity
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatActivityViewRepo {
+  def select: SelectBuilder[PgStatActivityViewFields, PgStatActivityViewRow]
   def selectAll(implicit c: Connection): List[PgStatActivityViewRow]
 }

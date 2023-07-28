@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: CreditcardId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.creditcard where creditcardid = $creditcardid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
+    DeleteBuilder("sales.creditcard", CreditcardFields)
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
@@ -60,6 +67,9 @@ object CreditcardRepoImpl extends CreditcardRepo {
     }
     
   }
+  override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
+    SelectBuilderSql("sales.creditcard", CreditcardFields, CreditcardRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
           from sales.creditcard
@@ -88,6 +98,9 @@ object CreditcardRepoImpl extends CreditcardRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where creditcardid = $creditcardid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
+    UpdateBuilder("sales.creditcard", CreditcardFields, CreditcardRow.rowParser)
   }
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)

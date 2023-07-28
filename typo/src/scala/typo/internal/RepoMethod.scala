@@ -10,6 +10,12 @@ object RepoMethod {
       rowType: sc.Type
   ) extends RepoMethod
 
+  case class SelectBuilder(
+      relName: db.RelationName,
+      fieldsType: sc.Type,
+      rowType: sc.Type
+  ) extends RepoMethod
+
   case class SelectById(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
@@ -27,7 +33,7 @@ object RepoMethod {
 
   case class SelectByUnique(
       params: NonEmptyList[ComputedColumn],
-      fieldValueType: sc.Type.Qualified,
+      fieldsType: sc.Type.Qualified,
       rowType: sc.Type
   ) extends RepoMethod
 
@@ -36,6 +42,12 @@ object RepoMethod {
       cols: NonEmptyList[ComputedColumn],
       fieldValueType: sc.Type.Qualified,
       fieldValueOrIdsParam: sc.Param,
+      rowType: sc.Type
+  ) extends RepoMethod
+
+  case class UpdateBuilder(
+      relName: db.RelationName,
+      fieldsType: sc.Type,
       rowType: sc.Type
   ) extends RepoMethod
 
@@ -85,9 +97,16 @@ object RepoMethod {
       id: IdComputed
   ) extends RepoMethod
 
+  case class DeleteBuilder(
+      relName: db.RelationName,
+      fieldsType: sc.Type,
+      rowType: sc.Type
+  ) extends RepoMethod
+
   case class SqlFile(sqlFile: ComputedSqlFile) extends RepoMethod
 
   implicit val ordering: Ordering[RepoMethod] = Ordering.by {
+    case _: SelectBuilder       => "Select1"
     case _: SelectAll           => "Select2"
     case _: SelectById          => "Select3"
     case _: SelectAllByIds      => "Select4"
@@ -95,10 +114,12 @@ object RepoMethod {
     case _: SelectByFieldValues => "SelectByFieldValues"
     case _: UpdateFieldValues   => "UpdateFieldValues"
     case _: Update              => "Update1"
+    case _: UpdateBuilder       => "Update2"
     case _: Upsert              => "Upsert"
     case _: Insert              => "Insert1"
     case _: InsertUnsaved       => "Insert2"
     case _: Delete              => "Delete1"
+    case _: DeleteBuilder       => "Delete2"
     case _: SqlFile             => "SqlFile"
   }
 }

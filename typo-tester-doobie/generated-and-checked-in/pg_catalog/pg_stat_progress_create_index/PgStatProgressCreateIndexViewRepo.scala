@@ -9,7 +9,9 @@ package pg_stat_progress_create_index
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatProgressCreateIndexViewRepo {
+  def select: SelectBuilder[PgStatProgressCreateIndexViewFields, PgStatProgressCreateIndexViewRow]
   def selectAll: Stream[ConnectionIO, PgStatProgressCreateIndexViewRow]
 }

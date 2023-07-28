@@ -8,7 +8,9 @@ package information_schema
 package column_udt_usage
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ColumnUdtUsageViewRepo {
+  def select: SelectBuilder[ColumnUdtUsageViewFields, ColumnUdtUsageViewRow]
   def selectAll(implicit c: Connection): List[ColumnUdtUsageViewRow]
 }

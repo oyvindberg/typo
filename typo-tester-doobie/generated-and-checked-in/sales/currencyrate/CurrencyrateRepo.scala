@@ -9,14 +9,20 @@ package currencyrate
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait CurrencyrateRepo {
   def delete(currencyrateid: CurrencyrateId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
   def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
   def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow]
+  def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow]
   def selectAll: Stream[ConnectionIO, CurrencyrateRow]
   def selectById(currencyrateid: CurrencyrateId): ConnectionIO[Option[CurrencyrateRow]]
   def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow]
   def update(row: CurrencyrateRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow]
   def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
 }

@@ -9,14 +9,20 @@ package specialoffer
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SpecialofferRepo {
   def delete(specialofferid: SpecialofferId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow]
   def insert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow]
   def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow]
+  def select: SelectBuilder[SpecialofferFields, SpecialofferRow]
   def selectAll: Stream[ConnectionIO, SpecialofferRow]
   def selectById(specialofferid: SpecialofferId): ConnectionIO[Option[SpecialofferRow]]
   def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow]
   def update(row: SpecialofferRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[SpecialofferFields, SpecialofferRow]
   def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow]
 }

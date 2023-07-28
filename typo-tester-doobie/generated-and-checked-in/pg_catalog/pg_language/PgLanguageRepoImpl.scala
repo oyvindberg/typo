@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgLanguageRepoImpl extends PgLanguageRepo {
   override def delete(oid: PgLanguageId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_language where oid = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow] = {
+    DeleteBuilder("pg_catalog.pg_language", PgLanguageFields)
   }
   override def insert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow] = {
     sql"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgLanguageId.put))}::oid, ${fromWrite(unsaved.lanname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.lanowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lanispl)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.lanpltrusted)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.lanplcallfoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.laninline)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lanvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lanacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
        """.query(PgLanguageRow.read).unique
+  }
+  override def select: SelectBuilder[PgLanguageFields, PgLanguageRow] = {
+    SelectBuilderSql("pg_catalog.pg_language", PgLanguageFields, PgLanguageRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgLanguageRow] = {
     sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language".query(PgLanguageRow.read).stream
@@ -49,6 +59,9 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgLanguageFields, PgLanguageRow] = {
+    UpdateBuilder("pg_catalog.pg_language", PgLanguageFields, PgLanguageRow.read)
   }
   override def upsert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow] = {
     sql"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)

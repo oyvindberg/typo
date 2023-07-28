@@ -9,8 +9,13 @@ package vvendorwithcontacts
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VvendorwithcontactsViewRepoImpl extends VvendorwithcontactsViewRepo {
+  override def select: SelectBuilder[VvendorwithcontactsViewFields, VvendorwithcontactsViewRow] = {
+    SelectBuilderSql("purchasing.vvendorwithcontacts", VvendorwithcontactsViewFields, VvendorwithcontactsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[VvendorwithcontactsViewRow] = {
     SQL"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
           from purchasing.vvendorwithcontacts

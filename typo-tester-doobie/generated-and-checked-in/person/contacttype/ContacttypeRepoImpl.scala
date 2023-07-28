@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
     sql"delete from person.contacttype where contacttypeid = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
+    DeleteBuilder("person.contacttype", ContacttypeFields)
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
@@ -54,6 +61,9 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     q.query(ContacttypeRow.read).unique
     
   }
+  override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
+    SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
     sql"""select contacttypeid, "name", modifieddate::text from person.contacttype""".query(ContacttypeRow.read).stream
   }
@@ -72,6 +82,9 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
+    UpdateBuilder("person.contacttype", ContacttypeFields, ContacttypeRow.read)
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)

@@ -9,8 +9,13 @@ package pg_seclabels
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgSeclabelsViewRepoImpl extends PgSeclabelsViewRepo {
+  override def select: SelectBuilder[PgSeclabelsViewFields, PgSeclabelsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_seclabels", PgSeclabelsViewFields, PgSeclabelsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgSeclabelsViewRow] = {
     SQL"""select objoid, classoid, objsubid, objtype, objnamespace, objname, provider, "label"
           from pg_catalog.pg_seclabels

@@ -9,8 +9,13 @@ package collations
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CollationsViewRepoImpl extends CollationsViewRepo {
+  override def select: SelectBuilder[CollationsViewFields, CollationsViewRow] = {
+    SelectBuilderSql("information_schema.collations", CollationsViewFields, CollationsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CollationsViewRow] = {
     SQL"""select "collation_catalog", "collation_schema", "collation_name", pad_attribute
           from information_schema.collations

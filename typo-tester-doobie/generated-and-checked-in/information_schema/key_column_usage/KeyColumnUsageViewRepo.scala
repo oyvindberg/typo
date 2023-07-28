@@ -9,7 +9,9 @@ package key_column_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait KeyColumnUsageViewRepo {
+  def select: SelectBuilder[KeyColumnUsageViewFields, KeyColumnUsageViewRow]
   def selectAll: Stream[ConnectionIO, KeyColumnUsageViewRow]
 }

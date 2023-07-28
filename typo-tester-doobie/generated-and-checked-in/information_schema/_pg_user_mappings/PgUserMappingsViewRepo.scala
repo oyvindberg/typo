@@ -9,7 +9,9 @@ package `_pg_user_mappings`
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgUserMappingsViewRepo {
+  def select: SelectBuilder[PgUserMappingsViewFields, PgUserMappingsViewRow]
   def selectAll: Stream[ConnectionIO, PgUserMappingsViewRow]
 }

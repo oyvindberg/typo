@@ -8,8 +8,14 @@ package information_schema
 package sql_parts
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SqlPartsRepo {
+  def delete: DeleteBuilder[SqlPartsFields, SqlPartsRow]
   def insert(unsaved: SqlPartsRow)(implicit c: Connection): SqlPartsRow
+  def select: SelectBuilder[SqlPartsFields, SqlPartsRow]
   def selectAll(implicit c: Connection): List[SqlPartsRow]
+  def update: UpdateBuilder[SqlPartsFields, SqlPartsRow]
 }

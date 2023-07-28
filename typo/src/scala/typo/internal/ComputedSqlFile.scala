@@ -9,8 +9,7 @@ case class ComputedSqlFile(
     pkg0: sc.QIdent,
     naming: Naming,
     scalaTypeMapper: TypeMapperScala,
-    eval: Eval[db.RelationName, HasSource],
-    enableFieldValue: Boolean
+    eval: Eval[db.RelationName, HasSource]
 ) {
   val source = Source.SqlFile(sqlFile.relPath)
 
@@ -58,7 +57,7 @@ case class ComputedSqlFile(
     }
   }
 
-  val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue = enableFieldValue)
+  val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue = false, enableDsl = false)
 
   val RowName: sc.Type.Qualified = names.RowName
 

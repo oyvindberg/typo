@@ -10,8 +10,13 @@ package pg_config
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgConfigViewRepoImpl extends PgConfigViewRepo {
+  override def select: SelectBuilder[PgConfigViewFields, PgConfigViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_config", PgConfigViewFields, PgConfigViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgConfigViewRow] = {
     sql"""select "name", setting from pg_catalog.pg_config""".query(PgConfigViewRow.read).stream
   }

@@ -9,8 +9,13 @@ package role_usage_grants
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object RoleUsageGrantsViewRepoImpl extends RoleUsageGrantsViewRepo {
+  override def select: SelectBuilder[RoleUsageGrantsViewFields, RoleUsageGrantsViewRow] = {
+    SelectBuilderSql("information_schema.role_usage_grants", RoleUsageGrantsViewFields, RoleUsageGrantsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[RoleUsageGrantsViewRow] = {
     SQL"""select grantor, grantee, object_catalog, object_schema, object_name, object_type, privilege_type, is_grantable
           from information_schema.role_usage_grants

@@ -17,10 +17,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
     sql"delete from production.transactionhistory where transactionid = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    DeleteBuilder("production.transactionhistory", TransactionhistoryFields)
   }
   override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
@@ -67,6 +74,9 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     q.query(TransactionhistoryRow.read).unique
     
   }
+  override def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    SelectBuilderSql("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory".query(TransactionhistoryRow.read).stream
   }
@@ -91,6 +101,9 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    UpdateBuilder("production.transactionhistory", TransactionhistoryFields, TransactionhistoryRow.read)
   }
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)

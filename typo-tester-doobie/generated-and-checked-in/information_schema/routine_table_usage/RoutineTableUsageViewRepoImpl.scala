@@ -10,8 +10,13 @@ package routine_table_usage
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object RoutineTableUsageViewRepoImpl extends RoutineTableUsageViewRepo {
+  override def select: SelectBuilder[RoutineTableUsageViewFields, RoutineTableUsageViewRow] = {
+    SelectBuilderSql("information_schema.routine_table_usage", RoutineTableUsageViewFields, RoutineTableUsageViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, RoutineTableUsageViewRow] = {
     sql"""select specific_catalog, specific_schema, "specific_name", "routine_catalog", "routine_schema", "routine_name", table_catalog, table_schema, "table_name" from information_schema.routine_table_usage""".query(RoutineTableUsageViewRow.read).stream
   }

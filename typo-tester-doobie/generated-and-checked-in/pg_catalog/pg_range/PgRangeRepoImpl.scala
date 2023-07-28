@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgRangeRepoImpl extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_range where rngtypid = ${fromWrite(rngtypid)(Write.fromPut(PgRangeId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgRangeFields, PgRangeRow] = {
+    DeleteBuilder("pg_catalog.pg_range", PgRangeFields)
   }
   override def insert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow] = {
     sql"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)
           values (${fromWrite(unsaved.rngtypid)(Write.fromPut(PgRangeId.put))}::oid, ${fromWrite(unsaved.rngsubtype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.rngmultitypid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.rngcollation)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.rngsubopc)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.rngcanonical)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.rngsubdiff)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
        """.query(PgRangeRow.read).unique
+  }
+  override def select: SelectBuilder[PgRangeFields, PgRangeRow] = {
+    SelectBuilderSql("pg_catalog.pg_range", PgRangeFields, PgRangeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgRangeRow] = {
     sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range".query(PgRangeRow.read).stream
@@ -47,6 +57,9 @@ object PgRangeRepoImpl extends PgRangeRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgRangeFields, PgRangeRow] = {
+    UpdateBuilder("pg_catalog.pg_range", PgRangeFields, PgRangeRow.read)
   }
   override def upsert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow] = {
     sql"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)

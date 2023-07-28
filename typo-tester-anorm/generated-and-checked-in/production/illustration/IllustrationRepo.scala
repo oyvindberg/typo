@@ -8,14 +8,20 @@ package production
 package illustration
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait IllustrationRepo {
   def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[IllustrationFields, IllustrationRow]
   def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
   def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow
+  def select: SelectBuilder[IllustrationFields, IllustrationRow]
   def selectAll(implicit c: Connection): List[IllustrationRow]
   def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow]
   def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow]
   def update(row: IllustrationRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[IllustrationFields, IllustrationRow]
   def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
 }

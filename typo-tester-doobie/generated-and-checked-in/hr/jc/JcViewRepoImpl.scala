@@ -10,8 +10,13 @@ package jc
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object JcViewRepoImpl extends JcViewRepo {
+  override def select: SelectBuilder[JcViewFields, JcViewRow] = {
+    SelectBuilderSql("hr.jc", JcViewFields, JcViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, JcViewRow] = {
     sql"""select "id", jobcandidateid, businessentityid, resume, modifieddate::text from hr.jc""".query(JcViewRow.read).stream
   }

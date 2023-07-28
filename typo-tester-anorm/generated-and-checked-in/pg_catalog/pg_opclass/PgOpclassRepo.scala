@@ -8,13 +8,19 @@ package pg_catalog
 package pg_opclass
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgOpclassRepo {
   def delete(oid: PgOpclassId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgOpclassFields, PgOpclassRow]
   def insert(unsaved: PgOpclassRow)(implicit c: Connection): PgOpclassRow
+  def select: SelectBuilder[PgOpclassFields, PgOpclassRow]
   def selectAll(implicit c: Connection): List[PgOpclassRow]
   def selectById(oid: PgOpclassId)(implicit c: Connection): Option[PgOpclassRow]
   def selectByIds(oids: Array[PgOpclassId])(implicit c: Connection): List[PgOpclassRow]
   def update(row: PgOpclassRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgOpclassFields, PgOpclassRow]
   def upsert(unsaved: PgOpclassRow)(implicit c: Connection): PgOpclassRow
 }

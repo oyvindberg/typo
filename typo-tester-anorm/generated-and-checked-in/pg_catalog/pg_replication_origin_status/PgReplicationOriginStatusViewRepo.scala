@@ -8,7 +8,9 @@ package pg_catalog
 package pg_replication_origin_status
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgReplicationOriginStatusViewRepo {
+  def select: SelectBuilder[PgReplicationOriginStatusViewFields, PgReplicationOriginStatusViewRow]
   def selectAll(implicit c: Connection): List[PgReplicationOriginStatusViewRow]
 }

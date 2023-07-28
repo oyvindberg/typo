@@ -8,10 +8,22 @@ package pg_catalog
 package pg_enum
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = scala.collection.mutable.Map.empty) extends PgEnumRepo {
   override def delete(oid: PgEnumId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgEnumFields, PgEnumRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgEnumFields, map)
   }
   override def insert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgEnumFields, PgEnumRow] = {
+    SelectBuilderMock(PgEnumFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgEnumRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgEnumFields, PgEnumRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgEnumFields, map)
   }
   override def upsert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
     map.put(unsaved.oid, unsaved)

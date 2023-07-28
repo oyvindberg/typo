@@ -8,11 +8,23 @@ package purchasing
 package purchaseorderdetail
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved, PurchaseorderdetailRow],
                                   map: scala.collection.mutable.Map[PurchaseorderdetailId, PurchaseorderdetailRow] = scala.collection.mutable.Map.empty) extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PurchaseorderdetailFields, map)
   }
   override def insert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    SelectBuilderMock(PurchaseorderdetailFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PurchaseorderdetailFields, map)
   }
   override def upsert(unsaved: PurchaseorderdetailRow)(implicit c: Connection): PurchaseorderdetailRow = {
     map.put(unsaved.compositeId, unsaved)

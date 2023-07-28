@@ -8,7 +8,9 @@ package information_schema
 package domains
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait DomainsViewRepo {
+  def select: SelectBuilder[DomainsViewFields, DomainsViewRow]
   def selectAll(implicit c: Connection): List[DomainsViewRow]
 }

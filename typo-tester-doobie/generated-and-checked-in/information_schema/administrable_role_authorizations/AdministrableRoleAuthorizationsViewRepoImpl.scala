@@ -10,8 +10,13 @@ package administrable_role_authorizations
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object AdministrableRoleAuthorizationsViewRepoImpl extends AdministrableRoleAuthorizationsViewRepo {
+  override def select: SelectBuilder[AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow] = {
+    SelectBuilderSql("information_schema.administrable_role_authorizations", AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, AdministrableRoleAuthorizationsViewRow] = {
     sql"select grantee, role_name, is_grantable from information_schema.administrable_role_authorizations".query(AdministrableRoleAuthorizationsViewRow.read).stream
   }

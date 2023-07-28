@@ -8,7 +8,9 @@ package pg_catalog
 package pg_roles
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgRolesViewRepo {
+  def select: SelectBuilder[PgRolesViewFields, PgRolesViewRow]
   def selectAll(implicit c: Connection): List[PgRolesViewRow]
 }

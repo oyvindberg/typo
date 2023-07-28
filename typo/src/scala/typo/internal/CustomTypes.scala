@@ -28,7 +28,7 @@ class CustomTypes(pkg: sc.QIdent) {
 
   lazy val TypoLocalDate = CustomType(
     comment = "This is `java.time.LocalDate`, but transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
-    sqlType = "text",
+    sqlType = "date",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalDate")),
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.LocalDate, None)
@@ -48,7 +48,7 @@ class CustomTypes(pkg: sc.QIdent) {
   )
   lazy val TypoLocalTime = CustomType(
     comment = "This is `java.time.LocalTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
-    sqlType = "text",
+    sqlType = "time",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalTime")),
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.LocalTime, None)
@@ -70,7 +70,7 @@ class CustomTypes(pkg: sc.QIdent) {
 
   lazy val TypoLocalDateTime = CustomType(
     comment = "This is `java.time.LocalDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
-    sqlType = "text",
+    sqlType = "timestamp",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalDateTime")),
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.LocalDateTime, None)
@@ -94,7 +94,7 @@ class CustomTypes(pkg: sc.QIdent) {
   )
   lazy val TypoOffsetDateTime = CustomType(
     comment = "This is `java.time.OffsetDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
-    sqlType = "text",
+    sqlType = "timestamptz",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoOffsetDateTime")),
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.OffsetDateTime, None)
@@ -119,7 +119,7 @@ class CustomTypes(pkg: sc.QIdent) {
 
   lazy val TypoOffsetTime = CustomType(
     comment = "This is `java.time.OffsetTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
-    sqlType = "text",
+    sqlType = "timetz",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoOffsetTime")),
     params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.OffsetTime, None)

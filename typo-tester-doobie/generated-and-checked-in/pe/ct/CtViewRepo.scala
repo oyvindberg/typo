@@ -9,7 +9,9 @@ package ct
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait CtViewRepo {
+  def select: SelectBuilder[CtViewFields, CtViewRow]
   def selectAll: Stream[ConnectionIO, CtViewRow]
 }

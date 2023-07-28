@@ -10,8 +10,13 @@ package table_constraints
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
+  override def select: SelectBuilder[TableConstraintsViewFields, TableConstraintsViewRow] = {
+    SelectBuilderSql("information_schema.table_constraints", TableConstraintsViewFields, TableConstraintsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, TableConstraintsViewRow] = {
     sql"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced" from information_schema.table_constraints""".query(TableConstraintsViewRow.read).stream
   }

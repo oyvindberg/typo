@@ -9,8 +9,13 @@ package pg_publication_tables
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgPublicationTablesViewRepoImpl extends PgPublicationTablesViewRepo {
+  override def select: SelectBuilder[PgPublicationTablesViewFields, PgPublicationTablesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_publication_tables", PgPublicationTablesViewFields, PgPublicationTablesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgPublicationTablesViewRow] = {
     SQL"""select pubname, schemaname, tablename
           from pg_catalog.pg_publication_tables

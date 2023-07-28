@@ -9,14 +9,20 @@ package password
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PasswordRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PasswordFields, PasswordRow]
   def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow
   def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow
+  def select: SelectBuilder[PasswordFields, PasswordRow]
   def selectAll(implicit c: Connection): List[PasswordRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow]
   def update(row: PasswordRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PasswordFields, PasswordRow]
   def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow
 }

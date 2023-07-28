@@ -9,7 +9,9 @@ package pg_timezone_names
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgTimezoneNamesViewRepo {
+  def select: SelectBuilder[PgTimezoneNamesViewFields, PgTimezoneNamesViewRow]
   def selectAll: Stream[ConnectionIO, PgTimezoneNamesViewRow]
 }

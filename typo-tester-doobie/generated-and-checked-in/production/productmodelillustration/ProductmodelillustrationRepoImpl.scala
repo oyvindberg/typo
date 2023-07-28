@@ -17,10 +17,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId): ConnectionIO[Boolean] = {
     sql"delete from production.productmodelillustration where productmodelid = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND illustrationid = ${fromWrite(compositeId.illustrationid)(Write.fromPut(IllustrationId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields)
   }
   override def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
@@ -52,6 +59,9 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     q.query(ProductmodelillustrationRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
     sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration".query(ProductmodelillustrationRow.read).stream
   }
@@ -66,6 +76,9 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields, ProductmodelillustrationRow.read)
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)

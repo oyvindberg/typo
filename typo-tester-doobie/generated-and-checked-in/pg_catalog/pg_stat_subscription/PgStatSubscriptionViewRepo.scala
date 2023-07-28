@@ -9,7 +9,9 @@ package pg_stat_subscription
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatSubscriptionViewRepo {
+  def select: SelectBuilder[PgStatSubscriptionViewFields, PgStatSubscriptionViewRow]
   def selectAll: Stream[ConnectionIO, PgStatSubscriptionViewRow]
 }

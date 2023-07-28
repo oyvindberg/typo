@@ -10,8 +10,13 @@ package enabled_roles
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object EnabledRolesViewRepoImpl extends EnabledRolesViewRepo {
+  override def select: SelectBuilder[EnabledRolesViewFields, EnabledRolesViewRow] = {
+    SelectBuilderSql("information_schema.enabled_roles", EnabledRolesViewFields, EnabledRolesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, EnabledRolesViewRow] = {
     sql"select role_name from information_schema.enabled_roles".query(EnabledRolesViewRow.read).stream
   }

@@ -8,13 +8,19 @@ package pg_catalog
 package pg_transform
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgTransformRepo {
   def delete(oid: PgTransformId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgTransformFields, PgTransformRow]
   def insert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow
+  def select: SelectBuilder[PgTransformFields, PgTransformRow]
   def selectAll(implicit c: Connection): List[PgTransformRow]
   def selectById(oid: PgTransformId)(implicit c: Connection): Option[PgTransformRow]
   def selectByIds(oids: Array[PgTransformId])(implicit c: Connection): List[PgTransformRow]
   def update(row: PgTransformRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgTransformFields, PgTransformRow]
   def upsert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow
 }

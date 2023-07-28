@@ -19,10 +19,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ConnectionIO[Boolean] = {
     sql"delete from purchasing.productvendor where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
+    DeleteBuilder("purchasing.productvendor", ProductvendorFields)
   }
   override def insert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
@@ -62,6 +69,9 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     q.query(ProductvendorRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
+    SelectBuilderSql("purchasing.productvendor", ProductvendorFields, ProductvendorRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
     sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from purchasing.productvendor".query(ProductvendorRow.read).stream
   }
@@ -84,6 +94,9 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
+    UpdateBuilder("purchasing.productvendor", ProductvendorFields, ProductvendorRow.read)
   }
   override def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)

@@ -8,7 +8,9 @@ package information_schema
 package triggers
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait TriggersViewRepo {
+  def select: SelectBuilder[TriggersViewFields, TriggersViewRow]
   def selectAll(implicit c: Connection): List[TriggersViewRow]
 }

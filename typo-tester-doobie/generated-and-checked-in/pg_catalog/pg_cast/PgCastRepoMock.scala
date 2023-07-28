@@ -10,10 +10,22 @@ package pg_cast
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgCastRepoMock(map: scala.collection.mutable.Map[PgCastId, PgCastRow] = scala.collection.mutable.Map.empty) extends PgCastRepo {
   override def delete(oid: PgCastId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgCastFields, PgCastRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgCastFields, map)
   }
   override def insert(unsaved: PgCastRow): ConnectionIO[PgCastRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgCastRepoMock(map: scala.collection.mutable.Map[PgCastId, PgCastRow] = sc
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgCastFields, PgCastRow] = {
+    SelectBuilderMock(PgCastFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgCastRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgCastRepoMock(map: scala.collection.mutable.Map[PgCastId, PgCastRow] = sc
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgCastFields, PgCastRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgCastFields, map)
   }
   override def upsert(unsaved: PgCastRow): ConnectionIO[PgCastRow] = {
     delay {

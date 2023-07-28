@@ -9,8 +9,13 @@ package pg_stat_progress_copy
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatProgressCopyViewRepoImpl extends PgStatProgressCopyViewRepo {
+  override def select: SelectBuilder[PgStatProgressCopyViewFields, PgStatProgressCopyViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_progress_copy", PgStatProgressCopyViewFields, PgStatProgressCopyViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatProgressCopyViewRow] = {
     SQL"""select pid, datid, datname, relid, command, "type", bytes_processed, bytes_total, tuples_processed, tuples_excluded
           from pg_catalog.pg_stat_progress_copy

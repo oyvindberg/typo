@@ -12,11 +12,13 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `person.countryregion` */
 case class CountryregionId(value: /* max 3 chars */ String) extends AnyVal
 object CountryregionId {
   implicit val arrayToStatement: ToStatement[Array[CountryregionId]] = implicitly[ToStatement[Array[/* max 3 chars */ String]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[CountryregionId, /* max 3 chars */ String] = Bijection[CountryregionId, /* max 3 chars */ String](_.value)(CountryregionId.apply)
   implicit val column: Column[CountryregionId] = implicitly[Column[/* max 3 chars */ String]].map(CountryregionId.apply)
   implicit val ordering: Ordering[CountryregionId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[CountryregionId] = new ParameterMetaData[CountryregionId] {

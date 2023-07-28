@@ -8,7 +8,9 @@ package pr
 package ppp
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PppViewRepo {
+  def select: SelectBuilder[PppViewFields, PppViewRow]
   def selectAll(implicit c: Connection): List[PppViewRow]
 }

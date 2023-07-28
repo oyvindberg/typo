@@ -9,8 +9,14 @@ package sql_parts
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SqlPartsRepo {
+  def delete: DeleteBuilder[SqlPartsFields, SqlPartsRow]
   def insert(unsaved: SqlPartsRow): ConnectionIO[SqlPartsRow]
+  def select: SelectBuilder[SqlPartsFields, SqlPartsRow]
   def selectAll: Stream[ConnectionIO, SqlPartsRow]
+  def update: UpdateBuilder[SqlPartsFields, SqlPartsRow]
 }

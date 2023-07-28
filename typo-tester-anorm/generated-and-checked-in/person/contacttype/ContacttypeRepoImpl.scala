@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.contacttype where contacttypeid = $contacttypeid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
+    DeleteBuilder("person.contacttype", ContacttypeFields)
   }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)
@@ -57,6 +64,9 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     }
     
   }
+  override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
+    SelectBuilderSql("person.contacttype", ContacttypeFields, ContacttypeRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
     SQL"""select contacttypeid, "name", modifieddate::text
           from person.contacttype
@@ -82,6 +92,9 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where contacttypeid = $contacttypeid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
+    UpdateBuilder("person.contacttype", ContacttypeFields, ContacttypeRow.rowParser)
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)

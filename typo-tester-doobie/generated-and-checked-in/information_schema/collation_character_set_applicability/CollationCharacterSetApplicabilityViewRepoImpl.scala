@@ -10,8 +10,13 @@ package collation_character_set_applicability
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CollationCharacterSetApplicabilityViewRepoImpl extends CollationCharacterSetApplicabilityViewRepo {
+  override def select: SelectBuilder[CollationCharacterSetApplicabilityViewFields, CollationCharacterSetApplicabilityViewRow] = {
+    SelectBuilderSql("information_schema.collation_character_set_applicability", CollationCharacterSetApplicabilityViewFields, CollationCharacterSetApplicabilityViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CollationCharacterSetApplicabilityViewRow] = {
     sql"""select "collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name" from information_schema.collation_character_set_applicability""".query(CollationCharacterSetApplicabilityViewRow.read).stream
   }

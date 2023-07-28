@@ -10,8 +10,13 @@ package pg_tables
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgTablesViewRepoImpl extends PgTablesViewRepo {
+  override def select: SelectBuilder[PgTablesViewFields, PgTablesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_tables", PgTablesViewFields, PgTablesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgTablesViewRow] = {
     sql"""select schemaname, tablename, tableowner, "tablespace", hasindexes, hasrules, hastriggers, rowsecurity from pg_catalog.pg_tables""".query(PgTablesViewRow.read).stream
   }

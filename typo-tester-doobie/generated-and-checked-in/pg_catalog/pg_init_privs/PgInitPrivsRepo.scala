@@ -9,12 +9,18 @@ package pg_init_privs
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgInitPrivsRepo {
   def delete(compositeId: PgInitPrivsId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgInitPrivsFields, PgInitPrivsRow]
   def insert(unsaved: PgInitPrivsRow): ConnectionIO[PgInitPrivsRow]
+  def select: SelectBuilder[PgInitPrivsFields, PgInitPrivsRow]
   def selectAll: Stream[ConnectionIO, PgInitPrivsRow]
   def selectById(compositeId: PgInitPrivsId): ConnectionIO[Option[PgInitPrivsRow]]
   def update(row: PgInitPrivsRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgInitPrivsFields, PgInitPrivsRow]
   def upsert(unsaved: PgInitPrivsRow): ConnectionIO[PgInitPrivsRow]
 }

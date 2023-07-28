@@ -9,8 +9,13 @@ package pa
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PaViewRepoImpl extends PaViewRepo {
+  override def select: SelectBuilder[PaViewFields, PaViewRow] = {
+    SelectBuilderSql("pe.pa", PaViewFields, PaViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PaViewRow] = {
     SQL"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
           from pe.pa

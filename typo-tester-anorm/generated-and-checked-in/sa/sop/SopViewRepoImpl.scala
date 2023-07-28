@@ -9,8 +9,13 @@ package sop
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SopViewRepoImpl extends SopViewRepo {
+  override def select: SelectBuilder[SopViewFields, SopViewRow] = {
+    SelectBuilderSql("sa.sop", SopViewFields, SopViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SopViewRow] = {
     SQL"""select "id", specialofferid, productid, rowguid, modifieddate::text
           from sa.sop

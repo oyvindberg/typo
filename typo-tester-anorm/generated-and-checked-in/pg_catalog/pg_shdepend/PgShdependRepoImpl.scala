@@ -9,8 +9,15 @@ package pg_shdepend
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgShdependRepoImpl extends PgShdependRepo {
+  override def delete: DeleteBuilder[PgShdependFields, PgShdependRow] = {
+    DeleteBuilder("pg_catalog.pg_shdepend", PgShdependFields)
+  }
   override def insert(unsaved: PgShdependRow)(implicit c: Connection): PgShdependRow = {
     SQL"""insert into pg_catalog.pg_shdepend(dbid, classid, objid, objsubid, refclassid, refobjid, deptype)
           values (${unsaved.dbid}::oid, ${unsaved.classid}::oid, ${unsaved.objid}::oid, ${unsaved.objsubid}::int4, ${unsaved.refclassid}::oid, ${unsaved.refobjid}::oid, ${unsaved.deptype}::char)
@@ -19,9 +26,15 @@ object PgShdependRepoImpl extends PgShdependRepo {
       .executeInsert(PgShdependRow.rowParser(1).single)
     
   }
+  override def select: SelectBuilder[PgShdependFields, PgShdependRow] = {
+    SelectBuilderSql("pg_catalog.pg_shdepend", PgShdependFields, PgShdependRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgShdependRow] = {
     SQL"""select dbid, classid, objid, objsubid, refclassid, refobjid, deptype
           from pg_catalog.pg_shdepend
        """.as(PgShdependRow.rowParser(1).*)
+  }
+  override def update: UpdateBuilder[PgShdependFields, PgShdependRow] = {
+    UpdateBuilder("pg_catalog.pg_shdepend", PgShdependFields, PgShdependRow.rowParser)
   }
 }

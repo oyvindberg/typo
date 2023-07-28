@@ -9,10 +9,17 @@ package pg_cast
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgCastRepoImpl extends PgCastRepo {
   override def delete(oid: PgCastId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_cast where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgCastFields, PgCastRow] = {
+    DeleteBuilder("pg_catalog.pg_cast", PgCastFields)
   }
   override def insert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow = {
     SQL"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
@@ -21,6 +28,9 @@ object PgCastRepoImpl extends PgCastRepo {
        """
       .executeInsert(PgCastRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgCastFields, PgCastRow] = {
+    SelectBuilderSql("pg_catalog.pg_cast", PgCastFields, PgCastRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgCastRow] = {
     SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod
@@ -50,6 +60,9 @@ object PgCastRepoImpl extends PgCastRepo {
               castmethod = ${row.castmethod}::char
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgCastFields, PgCastRow] = {
+    UpdateBuilder("pg_catalog.pg_cast", PgCastFields, PgCastRow.rowParser)
   }
   override def upsert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow = {
     SQL"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)

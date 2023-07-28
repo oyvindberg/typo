@@ -9,14 +9,20 @@ package scrapreason
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ScrapreasonRepo {
   def delete(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow]
   def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow]
   def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow]
+  def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow]
   def selectAll: Stream[ConnectionIO, ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]]
   def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow]
   def update(row: ScrapreasonRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
   def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow]
 }

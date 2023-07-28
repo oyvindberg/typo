@@ -10,11 +10,23 @@ package purchaseorderdetail
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved, PurchaseorderdetailRow],
                                   map: scala.collection.mutable.Map[PurchaseorderdetailId, PurchaseorderdetailRow] = scala.collection.mutable.Map.empty) extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PurchaseorderdetailFields, map)
   }
   override def insert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     delay {
@@ -27,6 +39,9 @@ class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved): ConnectionIO[PurchaseorderdetailRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    SelectBuilderMock(PurchaseorderdetailFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PurchaseorderdetailFields, map)
   }
   override def upsert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     delay {

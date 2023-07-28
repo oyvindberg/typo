@@ -9,7 +9,9 @@ package pg_statio_sys_indexes
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatioSysIndexesViewRepo {
+  def select: SelectBuilder[PgStatioSysIndexesViewFields, PgStatioSysIndexesViewRow]
   def selectAll: Stream[ConnectionIO, PgStatioSysIndexesViewRow]
 }

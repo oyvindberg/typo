@@ -8,7 +8,9 @@ package information_schema
 package table_privileges
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait TablePrivilegesViewRepo {
+  def select: SelectBuilder[TablePrivilegesViewFields, TablePrivilegesViewRow]
   def selectAll(implicit c: Connection): List[TablePrivilegesViewRow]
 }

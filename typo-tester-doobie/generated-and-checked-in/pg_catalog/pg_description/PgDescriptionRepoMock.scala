@@ -10,10 +10,22 @@ package pg_description
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgDescriptionRepoMock(map: scala.collection.mutable.Map[PgDescriptionId, PgDescriptionRow] = scala.collection.mutable.Map.empty) extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgDescriptionFields, map)
   }
   override def insert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgDescriptionRepoMock(map: scala.collection.mutable.Map[PgDescriptionId, P
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    SelectBuilderMock(PgDescriptionFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgDescriptionRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgDescriptionRepoMock(map: scala.collection.mutable.Map[PgDescriptionId, P
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgDescriptionFields, map)
   }
   override def upsert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
     delay {

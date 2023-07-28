@@ -9,7 +9,9 @@ package pg_locks
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgLocksViewRepo {
+  def select: SelectBuilder[PgLocksViewFields, PgLocksViewRow]
   def selectAll: Stream[ConnectionIO, PgLocksViewRow]
 }

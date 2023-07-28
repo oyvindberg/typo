@@ -12,11 +12,13 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `pg_catalog.pg_partitioned_table` */
 case class PgPartitionedTableId(value: /* oid */ Long) extends AnyVal
 object PgPartitionedTableId {
   implicit val arrayToStatement: ToStatement[Array[PgPartitionedTableId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[PgPartitionedTableId, /* oid */ Long] = Bijection[PgPartitionedTableId, /* oid */ Long](_.value)(PgPartitionedTableId.apply)
   implicit val column: Column[PgPartitionedTableId] = implicitly[Column[/* oid */ Long]].map(PgPartitionedTableId.apply)
   implicit val ordering: Ordering[PgPartitionedTableId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgPartitionedTableId] = new ParameterMetaData[PgPartitionedTableId] {

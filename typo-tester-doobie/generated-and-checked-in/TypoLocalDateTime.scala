@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+import typo.dsl.Bijection
 
 /** This is `java.time.LocalDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalDateTime(value: LocalDateTime)
@@ -24,14 +25,15 @@ object TypoLocalDateTime {
     new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).toFormatter
   def apply(value: LocalDateTime): TypoLocalDateTime = new TypoLocalDateTime(value.truncatedTo(ChronoUnit.MICROS))
   def now = TypoLocalDateTime(LocalDateTime.now)
-  implicit val arrayGet: Get[Array[TypoLocalDateTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_text"))
+  implicit val arrayGet: Get[Array[TypoLocalDateTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_timestamp"))
     .map(_.map(v => TypoLocalDateTime(LocalDateTime.parse(v.asInstanceOf[String], parser))))
-  implicit val arrayPut: Put[Array[TypoLocalDateTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_text"), "text")
+  implicit val arrayPut: Put[Array[TypoLocalDateTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_timestamp"), "timestamp")
     .contramap(_.map(v => v.value.toString))
+  implicit val bijection: Bijection[TypoLocalDateTime, LocalDateTime] = Bijection[TypoLocalDateTime, LocalDateTime](_.value)(TypoLocalDateTime.apply)
   implicit val decoder: Decoder[TypoLocalDateTime] = Decoder.decodeLocalDateTime.map(TypoLocalDateTime.apply)
   implicit val encoder: Encoder[TypoLocalDateTime] = Encoder.encodeLocalDateTime.contramap(_.value)
-  implicit val get: Get[TypoLocalDateTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
+  implicit val get: Get[TypoLocalDateTime] = Get.Advanced.other[String](NonEmptyList.one("timestamp"))
     .map(v => TypoLocalDateTime(LocalDateTime.parse(v, parser)))
   implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[TypoLocalDateTime] = Ordering.by(_.value)
-  implicit val put: Put[TypoLocalDateTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
+  implicit val put: Put[TypoLocalDateTime] = Put.Advanced.other[String](NonEmptyList.one("timestamp")).contramap(v => v.value.toString)
 }

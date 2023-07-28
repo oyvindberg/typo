@@ -9,8 +9,13 @@ package bec
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object BecViewRepoImpl extends BecViewRepo {
+  override def select: SelectBuilder[BecViewFields, BecViewRow] = {
+    SelectBuilderSql("pe.bec", BecViewFields, BecViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[BecViewRow] = {
     SQL"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate::text
           from pe.bec

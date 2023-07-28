@@ -58,6 +58,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     code"${maybeQuoted(x.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
+    case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
+      code"def select: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}"
     case RepoMethod.SelectAll(_, _, rowType) =>
       code"def selectAll: ${fs2Stream.of(ConnectionIO, rowType)}"
     case RepoMethod.SelectById(_, _, id, rowType) =>
@@ -74,6 +76,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"def $ident(${params.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(sc.Type.Option.of(rowType))}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
+    case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
+      code"def update: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
     case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
       code"def updateFieldValues(${id.param}, $varargs): ${ConnectionIO.of(sc.Type.Boolean)}"
     case RepoMethod.Update(_, _, _, param, _) =>
@@ -84,6 +88,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"def insert($unsavedParam): ${ConnectionIO.of(rowType)}"
     case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
       code"def upsert($unsavedParam): ${ConnectionIO.of(rowType)}"
+    case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
+      code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param}): ${ConnectionIO.of(sc.Type.Boolean)}"
     case RepoMethod.SqlFile(sqlScript) =>
@@ -96,6 +102,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
+      case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
+        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.read)"""
+
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName""")
@@ -154,6 +163,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |    )
               |    $sql.update.run.map(_ > 0)
               |}""".stripMargin
+
+      case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
+        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.read)"
 
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
@@ -240,6 +252,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         code"$sql.query($rowType.$readName).unique"
 
+      case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
+        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
         code"$sql.update.run.map(_ > 0)"
@@ -257,6 +271,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code = {
     repoMethod match {
+      case RepoMethod.SelectBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.SelectBuilderMock}($fieldsType, $delayCIO(map.values.toList), ${sc.Type.dsl.SelectParams}.empty)"
       case RepoMethod.SelectAll(_, _, _) =>
         code"$fs2Stream.emits(map.values.toList)"
       case RepoMethod.SelectById(_, _, id, _) =>
@@ -278,6 +294,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |    ${cases.mkCode("\n")}
               |  }.toList
               |}""".stripMargin
+      case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType, map)"
       case RepoMethod.UpdateFieldValues(_, id, varargs, fieldValue, cases0, _) =>
         val cases = cases0.map { col =>
           code"case (acc, $fieldValue.${col.name}(value)) => acc.copy(${col.name} = value)"
@@ -324,6 +342,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
 
+      case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType, map)"
       case RepoMethod.Delete(_, id) =>
         code"$delayCIO(map.remove(${id.paramName}).isDefined)"
       case RepoMethod.SqlFile(_) =>

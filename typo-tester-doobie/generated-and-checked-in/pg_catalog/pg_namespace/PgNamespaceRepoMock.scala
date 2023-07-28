@@ -10,10 +10,22 @@ package pg_namespace
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNamespaceRow] = scala.collection.mutable.Map.empty) extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgNamespaceFields, map)
   }
   override def insert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    SelectBuilderMock(PgNamespaceFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgNamespaceRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgNamespaceFields, map)
   }
   override def upsert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
     delay {

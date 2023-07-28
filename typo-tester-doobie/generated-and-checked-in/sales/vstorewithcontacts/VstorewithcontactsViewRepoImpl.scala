@@ -10,8 +10,13 @@ package vstorewithcontacts
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VstorewithcontactsViewRepoImpl extends VstorewithcontactsViewRepo {
+  override def select: SelectBuilder[VstorewithcontactsViewFields, VstorewithcontactsViewRow] = {
+    SelectBuilderSql("sales.vstorewithcontacts", VstorewithcontactsViewFields, VstorewithcontactsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, VstorewithcontactsViewRow] = {
     sql"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion from sales.vstorewithcontacts""".query(VstorewithcontactsViewRow.read).stream
   }

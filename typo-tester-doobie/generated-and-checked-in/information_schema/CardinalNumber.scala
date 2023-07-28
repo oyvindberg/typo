@@ -11,6 +11,7 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `information_schema.cardinal_number`
   * Constraint: CHECK ((VALUE >= 0))
@@ -19,6 +20,7 @@ case class CardinalNumber(value: Int) extends AnyVal
 object CardinalNumber {
   implicit val arrayGet: Get[Array[CardinalNumber]] = adventureworks.IntegerArrayMeta.get.map(_.map(CardinalNumber.apply))
   implicit val arrayPut: Put[Array[CardinalNumber]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[CardinalNumber, Int] = Bijection[CardinalNumber, Int](_.value)(CardinalNumber.apply)
   implicit val decoder: Decoder[CardinalNumber] = Decoder.decodeInt.map(CardinalNumber.apply)
   implicit val encoder: Encoder[CardinalNumber] = Encoder.encodeInt.contramap(_.value)
   implicit val get: Get[CardinalNumber] = Meta.IntMeta.get.map(CardinalNumber.apply)

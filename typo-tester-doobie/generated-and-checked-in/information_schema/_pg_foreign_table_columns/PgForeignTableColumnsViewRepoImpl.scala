@@ -10,8 +10,13 @@ package `_pg_foreign_table_columns`
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgForeignTableColumnsViewRepoImpl extends PgForeignTableColumnsViewRepo {
+  override def select: SelectBuilder[PgForeignTableColumnsViewFields, PgForeignTableColumnsViewRow] = {
+    SelectBuilderSql("information_schema._pg_foreign_table_columns", PgForeignTableColumnsViewFields, PgForeignTableColumnsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgForeignTableColumnsViewRow] = {
     sql"select nspname, relname, attname, attfdwoptions from information_schema._pg_foreign_table_columns".query(PgForeignTableColumnsViewRow.read).stream
   }

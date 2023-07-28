@@ -9,8 +9,13 @@ package `_pg_foreign_table_columns`
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgForeignTableColumnsViewRepoImpl extends PgForeignTableColumnsViewRepo {
+  override def select: SelectBuilder[PgForeignTableColumnsViewFields, PgForeignTableColumnsViewRow] = {
+    SelectBuilderSql("information_schema._pg_foreign_table_columns", PgForeignTableColumnsViewFields, PgForeignTableColumnsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgForeignTableColumnsViewRow] = {
     SQL"""select nspname, relname, attname, attfdwoptions
           from information_schema._pg_foreign_table_columns

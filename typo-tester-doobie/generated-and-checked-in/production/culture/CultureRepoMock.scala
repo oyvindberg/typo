@@ -10,11 +10,23 @@ package culture
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
                       map: scala.collection.mutable.Map[CultureId, CultureRow] = scala.collection.mutable.Map.empty) extends CultureRepo {
   override def delete(cultureid: CultureId): ConnectionIO[Boolean] = {
     delay(map.remove(cultureid).isDefined)
+  }
+  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CultureFields, map)
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     delay {
@@ -27,6 +39,9 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CultureFields, CultureRow] = {
+    SelectBuilderMock(CultureFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[CultureFields, CultureRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CultureFields, map)
   }
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     delay {

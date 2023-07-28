@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def delete(oid: PgEventTriggerId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_event_trigger where oid = ${fromWrite(oid)(Write.fromPut(PgEventTriggerId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    DeleteBuilder("pg_catalog.pg_event_trigger", PgEventTriggerFields)
   }
   override def insert(unsaved: PgEventTriggerRow): ConnectionIO[PgEventTriggerRow] = {
     sql"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgEventTriggerId.put))}::oid, ${fromWrite(unsaved.evtname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.evtevent)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.evtowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.evtfoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.evtenabled)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.evttags)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
           returning oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
        """.query(PgEventTriggerRow.read).unique
+  }
+  override def select: SelectBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    SelectBuilderSql("pg_catalog.pg_event_trigger", PgEventTriggerFields, PgEventTriggerRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgEventTriggerRow] = {
     sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger".query(PgEventTriggerRow.read).stream
@@ -46,6 +56,9 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    UpdateBuilder("pg_catalog.pg_event_trigger", PgEventTriggerFields, PgEventTriggerRow.read)
   }
   override def upsert(unsaved: PgEventTriggerRow): ConnectionIO[PgEventTriggerRow] = {
     sql"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)

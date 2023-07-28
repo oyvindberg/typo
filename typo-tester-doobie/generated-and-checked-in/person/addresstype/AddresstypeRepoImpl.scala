@@ -17,10 +17,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
     sql"delete from person.addresstype where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
+    DeleteBuilder("person.addresstype", AddresstypeFields)
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
@@ -59,6 +66,9 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     q.query(AddresstypeRow.read).unique
     
   }
+  override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
+    SelectBuilderSql("person.addresstype", AddresstypeFields, AddresstypeRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
     sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype""".query(AddresstypeRow.read).stream
   }
@@ -78,6 +88,9 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
+    UpdateBuilder("person.addresstype", AddresstypeFields, AddresstypeRow.read)
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)

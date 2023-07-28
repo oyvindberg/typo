@@ -12,11 +12,13 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `person.businessentity` */
 case class BusinessentityId(value: Int) extends AnyVal
 object BusinessentityId {
   implicit val arrayToStatement: ToStatement[Array[BusinessentityId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[BusinessentityId, Int] = Bijection[BusinessentityId, Int](_.value)(BusinessentityId.apply)
   implicit val column: Column[BusinessentityId] = implicitly[Column[Int]].map(BusinessentityId.apply)
   implicit val ordering: Ordering[BusinessentityId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[BusinessentityId] = new ParameterMetaData[BusinessentityId] {

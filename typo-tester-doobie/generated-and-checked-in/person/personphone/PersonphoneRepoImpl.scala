@@ -18,10 +18,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
     sql"delete from person.personphone where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND phonenumber = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND phonenumbertypeid = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
+    DeleteBuilder("person.personphone", PersonphoneFields)
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
@@ -54,6 +61,9 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     q.query(PersonphoneRow.read).unique
     
   }
+  override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
+    SelectBuilderSql("person.personphone", PersonphoneFields, PersonphoneRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
     sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone".query(PersonphoneRow.read).stream
   }
@@ -68,6 +78,9 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
+    UpdateBuilder("person.personphone", PersonphoneFields, PersonphoneRow.read)
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)

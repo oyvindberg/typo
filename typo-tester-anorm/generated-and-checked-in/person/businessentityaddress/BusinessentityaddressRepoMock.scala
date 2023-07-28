@@ -8,11 +8,23 @@ package person
 package businessentityaddress
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUnsaved, BusinessentityaddressRow],
                                     map: scala.collection.mutable.Map[BusinessentityaddressId, BusinessentityaddressRow] = scala.collection.mutable.Map.empty) extends BusinessentityaddressRepo {
   override def delete(compositeId: BusinessentityaddressId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields, map)
   }
   override def insert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved)(implicit c: Connection): BusinessentityaddressRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    SelectBuilderMock(BusinessentityaddressFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[BusinessentityaddressRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields, map)
   }
   override def upsert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow = {
     map.put(unsaved.compositeId, unsaved)

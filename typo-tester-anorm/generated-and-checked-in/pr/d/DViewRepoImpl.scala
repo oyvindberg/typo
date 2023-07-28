@@ -9,8 +9,13 @@ package d
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object DViewRepoImpl extends DViewRepo {
+  override def select: SelectBuilder[DViewFields, DViewRow] = {
+    SelectBuilderSql("pr.d", DViewFields, DViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[DViewRow] = {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
           from pr.d

@@ -8,7 +8,9 @@ package pg_catalog
 package pg_cursors
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgCursorsViewRepo {
+  def select: SelectBuilder[PgCursorsViewFields, PgCursorsViewRow]
   def selectAll(implicit c: Connection): List[PgCursorsViewRow]
 }

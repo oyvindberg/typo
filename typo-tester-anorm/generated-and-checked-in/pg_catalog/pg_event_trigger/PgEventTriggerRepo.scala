@@ -8,13 +8,19 @@ package pg_catalog
 package pg_event_trigger
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgEventTriggerRepo {
   def delete(oid: PgEventTriggerId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgEventTriggerFields, PgEventTriggerRow]
   def insert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow
+  def select: SelectBuilder[PgEventTriggerFields, PgEventTriggerRow]
   def selectAll(implicit c: Connection): List[PgEventTriggerRow]
   def selectById(oid: PgEventTriggerId)(implicit c: Connection): Option[PgEventTriggerRow]
   def selectByIds(oids: Array[PgEventTriggerId])(implicit c: Connection): List[PgEventTriggerRow]
   def update(row: PgEventTriggerRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow]
   def upsert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow
 }

@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSequenceRepoImpl extends PgSequenceRepo {
   override def delete(seqrelid: PgSequenceId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_sequence where seqrelid = ${fromWrite(seqrelid)(Write.fromPut(PgSequenceId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow] = {
+    DeleteBuilder("pg_catalog.pg_sequence", PgSequenceFields)
   }
   override def insert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow] = {
     sql"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)
           values (${fromWrite(unsaved.seqrelid)(Write.fromPut(PgSequenceId.put))}::oid, ${fromWrite(unsaved.seqtypid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.seqstart)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.seqincrement)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.seqmax)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.seqmin)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.seqcache)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.seqcycle)(Write.fromPut(Meta.BooleanMeta.put))})
           returning seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
        """.query(PgSequenceRow.read).unique
+  }
+  override def select: SelectBuilder[PgSequenceFields, PgSequenceRow] = {
+    SelectBuilderSql("pg_catalog.pg_sequence", PgSequenceFields, PgSequenceRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgSequenceRow] = {
     sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence".query(PgSequenceRow.read).stream
@@ -47,6 +57,9 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgSequenceFields, PgSequenceRow] = {
+    UpdateBuilder("pg_catalog.pg_sequence", PgSequenceFields, PgSequenceRow.read)
   }
   override def upsert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow] = {
     sql"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)

@@ -9,7 +9,9 @@ package foreign_server_options
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ForeignServerOptionsViewRepo {
+  def select: SelectBuilder[ForeignServerOptionsViewFields, ForeignServerOptionsViewRow]
   def selectAll: Stream[ConnectionIO, ForeignServerOptionsViewRow]
 }

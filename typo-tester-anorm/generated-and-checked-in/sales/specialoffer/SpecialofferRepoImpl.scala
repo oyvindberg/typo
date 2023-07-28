@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.specialoffer where specialofferid = $specialofferid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
+    DeleteBuilder("sales.specialoffer", SpecialofferFields)
   }
   override def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)
@@ -75,6 +82,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     }
     
   }
+  override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
+    SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
           from sales.specialoffer
@@ -108,6 +118,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where specialofferid = $specialofferid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
+    UpdateBuilder("sales.specialoffer", SpecialofferFields, SpecialofferRow.rowParser)
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)

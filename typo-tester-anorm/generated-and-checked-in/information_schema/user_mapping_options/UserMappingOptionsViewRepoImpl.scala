@@ -9,8 +9,13 @@ package user_mapping_options
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object UserMappingOptionsViewRepoImpl extends UserMappingOptionsViewRepo {
+  override def select: SelectBuilder[UserMappingOptionsViewFields, UserMappingOptionsViewRow] = {
+    SelectBuilderSql("information_schema.user_mapping_options", UserMappingOptionsViewFields, UserMappingOptionsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[UserMappingOptionsViewRow] = {
     SQL"""select authorization_identifier, foreign_server_catalog, foreign_server_name, option_name, option_value
           from information_schema.user_mapping_options

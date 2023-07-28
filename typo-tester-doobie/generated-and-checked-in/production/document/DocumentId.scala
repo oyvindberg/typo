@@ -12,12 +12,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `production.document` */
 case class DocumentId(value: String) extends AnyVal
 object DocumentId {
   implicit val arrayGet: Get[Array[DocumentId]] = adventureworks.StringArrayMeta.get.map(_.map(DocumentId.apply))
   implicit val arrayPut: Put[Array[DocumentId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[DocumentId, String] = Bijection[DocumentId, String](_.value)(DocumentId.apply)
   implicit val decoder: Decoder[DocumentId] = Decoder.decodeString.map(DocumentId.apply)
   implicit val encoder: Encoder[DocumentId] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[DocumentId] = Meta.StringMeta.get.map(DocumentId.apply)

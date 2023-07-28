@@ -14,6 +14,7 @@ import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** pg_node_tree (via PGObject) */
 case class TypoPgNodeTree(value: String)
@@ -40,6 +41,7 @@ object TypoPgNodeTree {
                                                                                                                                    obj.setValue(v.value)
                                                                                                                                    obj
                                                                                                                                  }))))
+  implicit val bijection: Bijection[TypoPgNodeTree, String] = Bijection[TypoPgNodeTree, String](_.value)(TypoPgNodeTree.apply)
   implicit val column: Column[TypoPgNodeTree] = Column.nonNull[TypoPgNodeTree]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoPgNodeTree(v.getValue))

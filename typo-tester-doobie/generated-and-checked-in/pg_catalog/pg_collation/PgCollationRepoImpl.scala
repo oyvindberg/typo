@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_collation where oid = ${fromWrite(oid)(Write.fromPut(PgCollationId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgCollationFields, PgCollationRow] = {
+    DeleteBuilder("pg_catalog.pg_collation", PgCollationFields)
   }
   override def insert(unsaved: PgCollationRow): ConnectionIO[PgCollationRow] = {
     sql"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgCollationId.put))}::oid, ${fromWrite(unsaved.collname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.collnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.collowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.collprovider)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.collisdeterministic)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.collencoding)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.collcollate)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.collctype)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.collversion)(Write.fromPutOption(Meta.StringMeta.put))})
           returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
        """.query(PgCollationRow.read).unique
+  }
+  override def select: SelectBuilder[PgCollationFields, PgCollationRow] = {
+    SelectBuilderSql("pg_catalog.pg_collation", PgCollationFields, PgCollationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgCollationRow] = {
     sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation".query(PgCollationRow.read).stream
@@ -49,6 +59,9 @@ object PgCollationRepoImpl extends PgCollationRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgCollationFields, PgCollationRow] = {
+    UpdateBuilder("pg_catalog.pg_collation", PgCollationFields, PgCollationRow.read)
   }
   override def upsert(unsaved: PgCollationRow): ConnectionIO[PgCollationRow] = {
     sql"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)

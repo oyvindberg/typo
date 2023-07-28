@@ -9,7 +9,9 @@ package routine_privileges
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait RoutinePrivilegesViewRepo {
+  def select: SelectBuilder[RoutinePrivilegesViewFields, RoutinePrivilegesViewRow]
   def selectAll: Stream[ConnectionIO, RoutinePrivilegesViewRow]
 }

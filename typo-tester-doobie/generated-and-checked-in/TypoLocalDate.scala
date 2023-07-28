@@ -11,20 +11,22 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import java.time.LocalDate
+import typo.dsl.Bijection
 
 /** This is `java.time.LocalDate`, but transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalDate(value: LocalDate)
 
 object TypoLocalDate {
   def now = TypoLocalDate(LocalDate.now)
-  implicit val arrayGet: Get[Array[TypoLocalDate]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_text"))
+  implicit val arrayGet: Get[Array[TypoLocalDate]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_date"))
     .map(_.map(v => TypoLocalDate(LocalDate.parse(v.asInstanceOf[String]))))
-  implicit val arrayPut: Put[Array[TypoLocalDate]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_text"), "text")
+  implicit val arrayPut: Put[Array[TypoLocalDate]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_date"), "date")
     .contramap(_.map(v => v.value.toString))
+  implicit val bijection: Bijection[TypoLocalDate, LocalDate] = Bijection[TypoLocalDate, LocalDate](_.value)(TypoLocalDate.apply)
   implicit val decoder: Decoder[TypoLocalDate] = Decoder.decodeLocalDate.map(TypoLocalDate.apply)
   implicit val encoder: Encoder[TypoLocalDate] = Encoder.encodeLocalDate.contramap(_.value)
-  implicit val get: Get[TypoLocalDate] = Get.Advanced.other[String](NonEmptyList.one("text"))
+  implicit val get: Get[TypoLocalDate] = Get.Advanced.other[String](NonEmptyList.one("date"))
     .map(v => TypoLocalDate(LocalDate.parse(v)))
   implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[TypoLocalDate] = Ordering.by(_.value)
-  implicit val put: Put[TypoLocalDate] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
+  implicit val put: Put[TypoLocalDate] = Put.Advanced.other[String](NonEmptyList.one("date")).contramap(v => v.value.toString)
 }

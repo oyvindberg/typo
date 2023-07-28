@@ -9,7 +9,9 @@ package vjobcandidateemployment
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait VjobcandidateemploymentViewRepo {
+  def select: SelectBuilder[VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow]
   def selectAll: Stream[ConnectionIO, VjobcandidateemploymentViewRow]
 }

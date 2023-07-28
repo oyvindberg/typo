@@ -10,10 +10,22 @@ package pg_aggregate
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAggregateRow] = scala.collection.mutable.Map.empty) extends PgAggregateRepo {
   override def delete(aggfnoid: PgAggregateId): ConnectionIO[Boolean] = {
     delay(map.remove(aggfnoid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgAggregateFields, PgAggregateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgAggregateFields, map)
   }
   override def insert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAgg
         map.put(unsaved.aggfnoid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgAggregateFields, PgAggregateRow] = {
+    SelectBuilderMock(PgAggregateFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgAggregateRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAgg
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgAggregateFields, PgAggregateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgAggregateFields, map)
   }
   override def upsert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow] = {
     delay {

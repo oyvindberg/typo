@@ -10,8 +10,13 @@ package bec
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object BecViewRepoImpl extends BecViewRepo {
+  override def select: SelectBuilder[BecViewFields, BecViewRow] = {
+    SelectBuilderSql("pe.bec", BecViewFields, BecViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, BecViewRow] = {
     sql"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate::text from pe.bec""".query(BecViewRow.read).stream
   }

@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId): ConnectionIO[Boolean] = {
     sql"delete from production.productmodel where productmodelid = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
+    DeleteBuilder("production.productmodel", ProductmodelFields)
   }
   override def insert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
     sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
@@ -62,6 +69,9 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     q.query(ProductmodelRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
+    SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
     sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel""".query(ProductmodelRow.read).stream
   }
@@ -83,6 +93,9 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
+    UpdateBuilder("production.productmodel", ProductmodelFields, ProductmodelRow.read)
   }
   override def upsert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
     sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)

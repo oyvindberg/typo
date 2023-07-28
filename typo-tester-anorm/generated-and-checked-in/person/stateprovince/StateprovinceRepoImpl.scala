@@ -15,10 +15,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object StateprovinceRepoImpl extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean = {
     SQL"delete from person.stateprovince where stateprovinceid = $stateprovinceid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
+    DeleteBuilder("person.stateprovince", StateprovinceFields)
   }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
@@ -70,6 +77,9 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     }
     
   }
+  override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
+    SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
           from person.stateprovince
@@ -100,6 +110,9 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where stateprovinceid = $stateprovinceid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
+    UpdateBuilder("person.stateprovince", StateprovinceFields, StateprovinceRow.rowParser)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)

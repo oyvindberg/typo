@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId): ConnectionIO[Boolean] = {
     sql"delete from production.workorder where workorderid = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilder("production.workorder", WorkorderFields)
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
@@ -62,6 +69,9 @@ object WorkorderRepoImpl extends WorkorderRepo {
     q.query(WorkorderRow.read).unique
     
   }
+  override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
+    SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
     sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder".query(WorkorderRow.read).stream
   }
@@ -86,6 +96,9 @@ object WorkorderRepoImpl extends WorkorderRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilder("production.workorder", WorkorderFields, WorkorderRow.read)
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)

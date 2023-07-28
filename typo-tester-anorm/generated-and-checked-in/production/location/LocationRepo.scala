@@ -8,14 +8,20 @@ package production
 package location
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait LocationRepo {
   def delete(locationid: LocationId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[LocationFields, LocationRow]
   def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow
   def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow
+  def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll(implicit c: Connection): List[LocationRow]
   def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow]
   def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow]
   def update(row: LocationRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[LocationFields, LocationRow]
   def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow
 }

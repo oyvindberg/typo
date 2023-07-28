@@ -9,7 +9,9 @@ package `_pg_foreign_servers`
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgForeignServersViewRepo {
+  def select: SelectBuilder[PgForeignServersViewFields, PgForeignServersViewRow]
   def selectAll: Stream[ConnectionIO, PgForeignServersViewRow]
 }

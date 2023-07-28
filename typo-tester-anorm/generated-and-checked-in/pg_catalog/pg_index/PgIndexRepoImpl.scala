@@ -9,10 +9,17 @@ package pg_index
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgIndexRepoImpl extends PgIndexRepo {
   override def delete(indexrelid: PgIndexId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_index where indexrelid = $indexrelid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgIndexFields, PgIndexRow] = {
+    DeleteBuilder("pg_catalog.pg_index", PgIndexFields)
   }
   override def insert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
     SQL"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)
@@ -21,6 +28,9 @@ object PgIndexRepoImpl extends PgIndexRepo {
        """
       .executeInsert(PgIndexRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgIndexFields, PgIndexRow] = {
+    SelectBuilderSql("pg_catalog.pg_index", PgIndexFields, PgIndexRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgIndexRow] = {
     SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
@@ -64,6 +74,9 @@ object PgIndexRepoImpl extends PgIndexRepo {
               indpred = ${row.indpred}::pg_node_tree
           where indexrelid = $indexrelid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgIndexFields, PgIndexRow] = {
+    UpdateBuilder("pg_catalog.pg_index", PgIndexFields, PgIndexRow.rowParser)
   }
   override def upsert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
     SQL"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)

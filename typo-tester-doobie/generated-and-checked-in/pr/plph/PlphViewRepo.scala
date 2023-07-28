@@ -9,7 +9,9 @@ package plph
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PlphViewRepo {
+  def select: SelectBuilder[PlphViewFields, PlphViewRow]
   def selectAll: Stream[ConnectionIO, PlphViewRow]
 }

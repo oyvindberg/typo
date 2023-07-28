@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_progress_basebackup
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatProgressBasebackupViewRepo {
+  def select: SelectBuilder[PgStatProgressBasebackupViewFields, PgStatProgressBasebackupViewRow]
   def selectAll(implicit c: Connection): List[PgStatProgressBasebackupViewRow]
 }

@@ -9,7 +9,9 @@ package pg_cursors
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgCursorsViewRepo {
+  def select: SelectBuilder[PgCursorsViewFields, PgCursorsViewRow]
   def selectAll: Stream[ConnectionIO, PgCursorsViewRow]
 }

@@ -9,7 +9,9 @@ package pg_timezone_abbrevs
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgTimezoneAbbrevsViewRepo {
+  def select: SelectBuilder[PgTimezoneAbbrevsViewFields, PgTimezoneAbbrevsViewRow]
   def selectAll: Stream[ConnectionIO, PgTimezoneAbbrevsViewRow]
 }

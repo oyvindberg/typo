@@ -12,11 +12,13 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `production.location` */
 case class LocationId(value: Int) extends AnyVal
 object LocationId {
   implicit val arrayToStatement: ToStatement[Array[LocationId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[LocationId, Int] = Bijection[LocationId, Int](_.value)(LocationId.apply)
   implicit val column: Column[LocationId] = implicitly[Column[Int]].map(LocationId.apply)
   implicit val ordering: Ordering[LocationId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[LocationId] = new ParameterMetaData[LocationId] {

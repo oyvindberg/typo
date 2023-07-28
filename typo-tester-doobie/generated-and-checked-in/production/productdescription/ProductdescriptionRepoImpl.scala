@@ -17,10 +17,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def delete(productdescriptionid: ProductdescriptionId): ConnectionIO[Boolean] = {
     sql"delete from production.productdescription where productdescriptionid = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    DeleteBuilder("production.productdescription", ProductdescriptionFields)
   }
   override def insert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
@@ -59,6 +66,9 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     q.query(ProductdescriptionRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    SelectBuilderSql("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductdescriptionRow] = {
     sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription".query(ProductdescriptionRow.read).stream
   }
@@ -78,6 +88,9 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    UpdateBuilder("production.productdescription", ProductdescriptionFields, ProductdescriptionRow.read)
   }
   override def upsert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)

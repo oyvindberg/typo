@@ -8,7 +8,9 @@ package information_schema
 package tables
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait TablesViewRepo {
+  def select: SelectBuilder[TablesViewFields, TablesViewRow]
   def selectAll(implicit c: Connection): List[TablesViewRow]
 }

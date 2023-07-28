@@ -11,11 +11,23 @@ import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
                      map: scala.collection.mutable.Map[BusinessentityId, VendorRow] = scala.collection.mutable.Map.empty) extends VendorRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     delay(map.remove(businessentityid).isDefined)
+  }
+  override def delete: DeleteBuilder[VendorFields, VendorRow] = {
+    DeleteBuilderMock(DeleteParams.empty, VendorFields, map)
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     delay {
@@ -28,6 +40,9 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
   }
   override def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[VendorFields, VendorRow] = {
+    SelectBuilderMock(VendorFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
     Stream.emits(map.values.toList)
@@ -48,6 +63,9 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[VendorFields, VendorRow] = {
+    UpdateBuilderMock(UpdateParams.empty, VendorFields, map)
   }
   override def upsert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     delay {

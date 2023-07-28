@@ -10,11 +10,23 @@ package address
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
                       map: scala.collection.mutable.Map[AddressId, AddressRow] = scala.collection.mutable.Map.empty) extends AddressRepo {
   override def delete(addressid: AddressId): ConnectionIO[Boolean] = {
     delay(map.remove(addressid).isDefined)
+  }
+  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, AddressFields, map)
   }
   override def insert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     delay {
@@ -27,6 +39,9 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[AddressFields, AddressRow] = {
+    SelectBuilderMock(AddressFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[AddressFields, AddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, AddressFields, map)
   }
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     delay {

@@ -11,6 +11,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `public.NameStyle`
   * No constraint
@@ -18,6 +19,7 @@ import play.api.libs.json.Writes
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
   implicit val arrayToStatement: ToStatement[Array[NameStyle]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)
   implicit val column: Column[NameStyle] = implicitly[Column[Boolean]].map(NameStyle.apply)
   implicit val ordering: Ordering[NameStyle] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[NameStyle] = new ParameterMetaData[NameStyle] {

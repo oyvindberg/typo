@@ -9,8 +9,13 @@ package pg_stat_user_indexes
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatUserIndexesViewRepoImpl extends PgStatUserIndexesViewRepo {
+  override def select: SelectBuilder[PgStatUserIndexesViewFields, PgStatUserIndexesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_user_indexes", PgStatUserIndexesViewFields, PgStatUserIndexesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatUserIndexesViewRow] = {
     SQL"""select relid, indexrelid, schemaname, relname, indexrelname, idx_scan, idx_tup_read, idx_tup_fetch
           from pg_catalog.pg_stat_user_indexes

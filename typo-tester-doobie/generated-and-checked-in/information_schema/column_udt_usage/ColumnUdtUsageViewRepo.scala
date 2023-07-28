@@ -9,7 +9,9 @@ package column_udt_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ColumnUdtUsageViewRepo {
+  def select: SelectBuilder[ColumnUdtUsageViewFields, ColumnUdtUsageViewRow]
   def selectAll: Stream[ConnectionIO, ColumnUdtUsageViewRow]
 }

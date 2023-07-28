@@ -9,7 +9,9 @@ package sohsr
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait SohsrViewRepo {
+  def select: SelectBuilder[SohsrViewFields, SohsrViewRow]
   def selectAll: Stream[ConnectionIO, SohsrViewRow]
 }

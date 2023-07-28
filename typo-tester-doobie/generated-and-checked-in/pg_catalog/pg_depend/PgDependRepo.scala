@@ -9,8 +9,14 @@ package pg_depend
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgDependRepo {
+  def delete: DeleteBuilder[PgDependFields, PgDependRow]
   def insert(unsaved: PgDependRow): ConnectionIO[PgDependRow]
+  def select: SelectBuilder[PgDependFields, PgDependRow]
   def selectAll: Stream[ConnectionIO, PgDependRow]
+  def update: UpdateBuilder[PgDependFields, PgDependRow]
 }

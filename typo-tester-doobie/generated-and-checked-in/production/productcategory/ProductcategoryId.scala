@@ -12,12 +12,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `production.productcategory` */
 case class ProductcategoryId(value: Int) extends AnyVal
 object ProductcategoryId {
   implicit val arrayGet: Get[Array[ProductcategoryId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ProductcategoryId.apply))
   implicit val arrayPut: Put[Array[ProductcategoryId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[ProductcategoryId, Int] = Bijection[ProductcategoryId, Int](_.value)(ProductcategoryId.apply)
   implicit val decoder: Decoder[ProductcategoryId] = Decoder.decodeInt.map(ProductcategoryId.apply)
   implicit val encoder: Encoder[ProductcategoryId] = Encoder.encodeInt.contramap(_.value)
   implicit val get: Get[ProductcategoryId] = Meta.IntMeta.get.map(ProductcategoryId.apply)

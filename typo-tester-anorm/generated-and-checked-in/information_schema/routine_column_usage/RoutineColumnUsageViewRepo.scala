@@ -8,7 +8,9 @@ package information_schema
 package routine_column_usage
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait RoutineColumnUsageViewRepo {
+  def select: SelectBuilder[RoutineColumnUsageViewFields, RoutineColumnUsageViewRow]
   def selectAll(implicit c: Connection): List[RoutineColumnUsageViewRow]
 }

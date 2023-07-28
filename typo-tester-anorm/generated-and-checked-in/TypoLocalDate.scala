@@ -14,6 +14,7 @@ import java.time.LocalDate
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** This is `java.time.LocalDate`, but transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalDate(value: LocalDate)
@@ -32,10 +33,11 @@ object TypoLocalDate {
     }
   )
   implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalDate]] = new ParameterMetaData[Array[TypoLocalDate]] {
-    override def sqlType: String = "_text"
+    override def sqlType: String = "_date"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoLocalDate]] = ToStatement[Array[TypoLocalDate]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("text", v.map(v => v.value.toString))))
+  implicit val arrayToStatement: ToStatement[Array[TypoLocalDate]] = ToStatement[Array[TypoLocalDate]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("date", v.map(v => v.value.toString))))
+  implicit val bijection: Bijection[TypoLocalDate, LocalDate] = Bijection[TypoLocalDate, LocalDate](_.value)(TypoLocalDate.apply)
   implicit val column: Column[TypoLocalDate] = Column.nonNull[TypoLocalDate]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoLocalDate(LocalDate.parse(v)))
@@ -44,7 +46,7 @@ object TypoLocalDate {
   )
   implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[TypoLocalDate] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoLocalDate] = new ParameterMetaData[TypoLocalDate] {
-    override def sqlType: String = "text"
+    override def sqlType: String = "date"
     override def jdbcType: Int = Types.OTHER
   }
   implicit val reads: Reads[TypoLocalDate] = Reads.DefaultLocalDateReads.map(TypoLocalDate.apply)

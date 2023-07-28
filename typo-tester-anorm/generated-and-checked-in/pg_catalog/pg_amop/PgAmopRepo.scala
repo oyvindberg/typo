@@ -8,13 +8,19 @@ package pg_catalog
 package pg_amop
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgAmopRepo {
   def delete(oid: PgAmopId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgAmopFields, PgAmopRow]
   def insert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow
+  def select: SelectBuilder[PgAmopFields, PgAmopRow]
   def selectAll(implicit c: Connection): List[PgAmopRow]
   def selectById(oid: PgAmopId)(implicit c: Connection): Option[PgAmopRow]
   def selectByIds(oids: Array[PgAmopId])(implicit c: Connection): List[PgAmopRow]
   def update(row: PgAmopRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgAmopFields, PgAmopRow]
   def upsert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow
 }

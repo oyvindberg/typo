@@ -9,8 +9,14 @@ package sql_implementation_info
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SqlImplementationInfoRepo {
+  def delete: DeleteBuilder[SqlImplementationInfoFields, SqlImplementationInfoRow]
   def insert(unsaved: SqlImplementationInfoRow): ConnectionIO[SqlImplementationInfoRow]
+  def select: SelectBuilder[SqlImplementationInfoFields, SqlImplementationInfoRow]
   def selectAll: Stream[ConnectionIO, SqlImplementationInfoRow]
+  def update: UpdateBuilder[SqlImplementationInfoFields, SqlImplementationInfoRow]
 }

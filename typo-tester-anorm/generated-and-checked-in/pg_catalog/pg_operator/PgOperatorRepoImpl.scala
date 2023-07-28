@@ -9,10 +9,17 @@ package pg_operator
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgOperatorRepoImpl extends PgOperatorRepo {
   override def delete(oid: PgOperatorId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_operator where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgOperatorFields, PgOperatorRow] = {
+    DeleteBuilder("pg_catalog.pg_operator", PgOperatorFields)
   }
   override def insert(unsaved: PgOperatorRow)(implicit c: Connection): PgOperatorRow = {
     SQL"""insert into pg_catalog.pg_operator(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)
@@ -21,6 +28,9 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
        """
       .executeInsert(PgOperatorRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgOperatorFields, PgOperatorRow] = {
+    SelectBuilderSql("pg_catalog.pg_operator", PgOperatorFields, PgOperatorRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgOperatorRow] = {
     SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
@@ -59,6 +69,9 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
               oprjoin = ${row.oprjoin}::regproc
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgOperatorFields, PgOperatorRow] = {
+    UpdateBuilder("pg_catalog.pg_operator", PgOperatorFields, PgOperatorRow.rowParser)
   }
   override def upsert(unsaved: PgOperatorRow)(implicit c: Connection): PgOperatorRow = {
     SQL"""insert into pg_catalog.pg_operator(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)

@@ -17,10 +17,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
     sql"delete from production.productdocument where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND documentnode = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    DeleteBuilder("production.productdocument", ProductdocumentFields)
   }
   override def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)
@@ -55,6 +62,9 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     q.query(ProductdocumentRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
     sql"select productid, modifieddate::text, documentnode from production.productdocument".query(ProductdocumentRow.read).stream
   }
@@ -69,6 +79,9 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    UpdateBuilder("production.productdocument", ProductdocumentFields, ProductdocumentRow.read)
   }
   override def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)

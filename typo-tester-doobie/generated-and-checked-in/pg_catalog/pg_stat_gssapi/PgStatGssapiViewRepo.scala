@@ -9,7 +9,9 @@ package pg_stat_gssapi
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatGssapiViewRepo {
+  def select: SelectBuilder[PgStatGssapiViewFields, PgStatGssapiViewRow]
   def selectAll: Stream[ConnectionIO, PgStatGssapiViewRow]
 }

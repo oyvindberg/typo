@@ -35,6 +35,7 @@ package object typo {
       generateMockRepos = publicOptions.generateMockRepos,
       header = publicOptions.header,
       enableFieldValue = publicOptions.enableFieldValue,
+      enableDsl = publicOptions.enableDsl,
       debugTypes = publicOptions.debugTypes
     )
     val customTypes = new CustomTypes(options.pkg)
@@ -46,11 +47,11 @@ package object typo {
         case (_, dbTable: db.Table, eval) =>
           ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval)
         case (_, dbView: db.View, eval) =>
-          ComputedView(dbView, naming, scalaTypeMapper, eval, options.enableFieldValue)
+          ComputedView(dbView, naming, scalaTypeMapper, eval, options.enableFieldValue, options.enableDsl)
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.apply, options.enableFieldValue))
+    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.apply))
     computeds.foreach { case (relName, lazyValue) =>
       if (selector.include(relName)) lazyValue.forceGet
     }

@@ -71,6 +71,83 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
       sc.File(fieldValueName, str, secondaryTypes = List(fieldOrIdValueName))
     }
 
+  val FieldsFile: Option[sc.File] =
+    names.StructureName.zip(names.FieldsName).headOption.map { case (structureName, fieldsName) =>
+      val Row = sc.Type.Abstract(sc.Ident("Row"))
+      val members =
+        names.cols
+          .map { col =>
+            val (cls, tpe) =
+              if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
+              else
+                col.tpe match {
+                  case sc.Type.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+                  case _                            => (sc.Type.dsl.Field, col.tpe)
+                }
+            code"val ${col.name}: ${cls.of(tpe, Row)}"
+          }
+          .mkCode("\n")
+
+      val str =
+        code"""trait ${fieldsName.name}[$Row] {
+            |  $members
+            |}
+            |object ${fieldsName.name} extends ${structureName.of(names.RowName)}(None, identity, (_, x) => x)
+            |
+            |""".stripMargin
+
+      sc.File(fieldsName, str, Nil)
+    }
+
+  val StructureFile: Option[sc.File] =
+    names.StructureName.zip(names.FieldsName).headOption.map { case (structureName, fieldsName) =>
+      val Row = sc.Type.Abstract(sc.Ident("Row"))
+      val NewRow = sc.Type.Abstract(sc.Ident("NewRow"))
+      val members =
+        names.cols
+          .map { col =>
+            val (cls, tpe) =
+              if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
+              else
+                col.tpe match {
+                  case sc.Type.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+                  case _                            => (sc.Type.dsl.Field, col.tpe)
+                }
+
+            val readSqlCast = sqlCast.fromPg(col.dbCol) match {
+              case Some(value) => code"${sc.Type.Some}(${sc.StrLit(value)})"
+              case None        => sc.Type.None.code
+            }
+            val writeSqlCast = sqlCast.toPg(col.dbCol) match {
+              case Some(value) => code"${sc.Type.Some}(${sc.StrLit(value)})"
+              case None        => sc.Type.None.code
+            }
+            code"override val ${col.name} = new ${cls.of(tpe, Row)}(prefix, ${sc
+                .StrLit(col.dbName.value)}, $readSqlCast, $writeSqlCast)(x => extract(x).${col.name}, (row, value) => merge(row, extract(row).copy(${col.name} = value)))"
+          }
+          .mkCode("\n")
+
+      val optString = sc.Type.Option.of(sc.Type.String)
+      val generalizedColumn = sc.Type.dsl.FieldLikeNoHkt.of(sc.Type.Wildcard, Row)
+      val columnsList = sc.Type.List.of(generalizedColumn)
+      val str =
+        code"""class ${structureName.name}[$Row](val prefix: $optString, val extract: $Row => ${names.RowName}, val merge: ($Row, ${names.RowName}) => $Row)
+            |  extends ${sc.Type.dsl.StructureRelation.of(fieldsName, names.RowName, Row)}
+            |    with ${fieldsName.of(Row)} { outer =>
+            |
+            |  $members
+            |
+            |  override val columns: $columnsList =
+            |    $columnsList(${names.cols.map(x => x.name.code).mkCode(", ")})
+            |
+            |  override def copy[$NewRow](prefix: $optString, extract: $NewRow => ${names.RowName}, merge: ($NewRow, ${names.RowName}) => $NewRow): ${structureName.of(NewRow)} =
+            |    new ${structureName.name}(prefix, extract, merge)
+            |}
+              |""".stripMargin
+
+      sc.File(structureName, str, Nil)
+    }
+
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val str =
       code"""trait ${names.RepoName.name} {

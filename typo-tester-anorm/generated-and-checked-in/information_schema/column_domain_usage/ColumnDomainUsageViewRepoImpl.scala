@@ -9,8 +9,13 @@ package column_domain_usage
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnDomainUsageViewRepoImpl extends ColumnDomainUsageViewRepo {
+  override def select: SelectBuilder[ColumnDomainUsageViewFields, ColumnDomainUsageViewRow] = {
+    SelectBuilderSql("information_schema.column_domain_usage", ColumnDomainUsageViewFields, ColumnDomainUsageViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ColumnDomainUsageViewRow] = {
     SQL"""select domain_catalog, domain_schema, domain_name, table_catalog, table_schema, "table_name", "column_name"
           from information_schema.column_domain_usage

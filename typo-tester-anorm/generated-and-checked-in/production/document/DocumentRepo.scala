@@ -8,14 +8,20 @@ package production
 package document
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait DocumentRepo {
   def delete(documentnode: DocumentId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[DocumentFields, DocumentRow]
   def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
   def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow
+  def select: SelectBuilder[DocumentFields, DocumentRow]
   def selectAll(implicit c: Connection): List[DocumentRow]
   def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow]
   def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow]
   def update(row: DocumentRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[DocumentFields, DocumentRow]
   def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
 }

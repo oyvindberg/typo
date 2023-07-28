@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_ts_parser where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_parser", PgTsParserFields)
   }
   override def insert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
     sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsParserId.put))}::oid, ${fromWrite(unsaved.prsname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.prsnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prsstart)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prstoken)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prsend)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
        """.query(PgTsParserRow.read).unique
+  }
+  override def select: SelectBuilder[PgTsParserFields, PgTsParserRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_parser", PgTsParserFields, PgTsParserRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTsParserRow] = {
     sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser".query(PgTsParserRow.read).stream
@@ -48,6 +58,9 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgTsParserFields, PgTsParserRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_parser", PgTsParserFields, PgTsParserRow.read)
   }
   override def upsert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
     sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)

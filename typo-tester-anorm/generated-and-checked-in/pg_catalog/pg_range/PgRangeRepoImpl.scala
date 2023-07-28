@@ -9,10 +9,17 @@ package pg_range
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgRangeRepoImpl extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_range where rngtypid = $rngtypid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgRangeFields, PgRangeRow] = {
+    DeleteBuilder("pg_catalog.pg_range", PgRangeFields)
   }
   override def insert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
     SQL"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)
@@ -21,6 +28,9 @@ object PgRangeRepoImpl extends PgRangeRepo {
        """
       .executeInsert(PgRangeRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgRangeFields, PgRangeRow] = {
+    SelectBuilderSql("pg_catalog.pg_range", PgRangeFields, PgRangeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgRangeRow] = {
     SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
@@ -51,6 +61,9 @@ object PgRangeRepoImpl extends PgRangeRepo {
               rngsubdiff = ${row.rngsubdiff}::regproc
           where rngtypid = $rngtypid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgRangeFields, PgRangeRow] = {
+    UpdateBuilder("pg_catalog.pg_range", PgRangeFields, PgRangeRow.rowParser)
   }
   override def upsert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
     SQL"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)

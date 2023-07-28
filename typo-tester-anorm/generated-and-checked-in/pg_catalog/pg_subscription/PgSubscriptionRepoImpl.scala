@@ -9,10 +9,17 @@ package pg_subscription
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def delete(oid: PgSubscriptionId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_subscription where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
+    DeleteBuilder("pg_catalog.pg_subscription", PgSubscriptionFields)
   }
   override def insert(unsaved: PgSubscriptionRow)(implicit c: Connection): PgSubscriptionRow = {
     SQL"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)
@@ -21,6 +28,9 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
        """
       .executeInsert(PgSubscriptionRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
+    SelectBuilderSql("pg_catalog.pg_subscription", PgSubscriptionFields, PgSubscriptionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgSubscriptionRow] = {
     SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
@@ -55,6 +65,9 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
               subpublications = ${row.subpublications}::_text
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
+    UpdateBuilder("pg_catalog.pg_subscription", PgSubscriptionFields, PgSubscriptionRow.rowParser)
   }
   override def upsert(unsaved: PgSubscriptionRow)(implicit c: Connection): PgSubscriptionRow = {
     SQL"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)

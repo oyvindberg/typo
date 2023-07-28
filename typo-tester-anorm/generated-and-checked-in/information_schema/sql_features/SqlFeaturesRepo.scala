@@ -8,8 +8,14 @@ package information_schema
 package sql_features
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SqlFeaturesRepo {
+  def delete: DeleteBuilder[SqlFeaturesFields, SqlFeaturesRow]
   def insert(unsaved: SqlFeaturesRow)(implicit c: Connection): SqlFeaturesRow
+  def select: SelectBuilder[SqlFeaturesFields, SqlFeaturesRow]
   def selectAll(implicit c: Connection): List[SqlFeaturesRow]
+  def update: UpdateBuilder[SqlFeaturesFields, SqlFeaturesRow]
 }

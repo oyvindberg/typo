@@ -8,7 +8,9 @@ package information_schema
 package routine_privileges
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait RoutinePrivilegesViewRepo {
+  def select: SelectBuilder[RoutinePrivilegesViewFields, RoutinePrivilegesViewRow]
   def selectAll(implicit c: Connection): List[RoutinePrivilegesViewRow]
 }

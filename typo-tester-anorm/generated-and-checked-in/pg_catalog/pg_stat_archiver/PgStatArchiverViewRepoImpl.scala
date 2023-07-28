@@ -9,8 +9,13 @@ package pg_stat_archiver
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatArchiverViewRepoImpl extends PgStatArchiverViewRepo {
+  override def select: SelectBuilder[PgStatArchiverViewFields, PgStatArchiverViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_archiver", PgStatArchiverViewFields, PgStatArchiverViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatArchiverViewRow] = {
     SQL"""select archived_count, last_archived_wal, last_archived_time::text, failed_count, last_failed_wal, last_failed_time::text, stats_reset::text
           from pg_catalog.pg_stat_archiver

@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields)
   }
   override def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
@@ -54,6 +61,9 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     }
     
   }
+  override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate::text
           from sales.countryregioncurrency
@@ -71,6 +81,9 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.rowParser)
   }
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)

@@ -9,7 +9,9 @@ package role_table_grants
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait RoleTableGrantsViewRepo {
+  def select: SelectBuilder[RoleTableGrantsViewFields, RoleTableGrantsViewRow]
   def selectAll: Stream[ConnectionIO, RoleTableGrantsViewRow]
 }

@@ -9,13 +9,19 @@ package pg_foreign_table
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgForeignTableRepo {
   def delete(ftrelid: PgForeignTableId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgForeignTableFields, PgForeignTableRow]
   def insert(unsaved: PgForeignTableRow): ConnectionIO[PgForeignTableRow]
+  def select: SelectBuilder[PgForeignTableFields, PgForeignTableRow]
   def selectAll: Stream[ConnectionIO, PgForeignTableRow]
   def selectById(ftrelid: PgForeignTableId): ConnectionIO[Option[PgForeignTableRow]]
   def selectByIds(ftrelids: Array[PgForeignTableId]): Stream[ConnectionIO, PgForeignTableRow]
   def update(row: PgForeignTableRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgForeignTableFields, PgForeignTableRow]
   def upsert(unsaved: PgForeignTableRow): ConnectionIO[PgForeignTableRow]
 }

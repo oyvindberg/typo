@@ -8,7 +8,9 @@ package information_schema
 package enabled_roles
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait EnabledRolesViewRepo {
+  def select: SelectBuilder[EnabledRolesViewFields, EnabledRolesViewRow]
   def selectAll(implicit c: Connection): List[EnabledRolesViewRow]
 }

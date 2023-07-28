@@ -9,7 +9,9 @@ package pg_views
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgViewsViewRepo {
+  def select: SelectBuilder[PgViewsViewFields, PgViewsViewRow]
   def selectAll: Stream[ConnectionIO, PgViewsViewRow]
 }

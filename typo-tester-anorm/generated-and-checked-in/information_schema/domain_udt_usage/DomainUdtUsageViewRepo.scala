@@ -8,7 +8,9 @@ package information_schema
 package domain_udt_usage
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait DomainUdtUsageViewRepo {
+  def select: SelectBuilder[DomainUdtUsageViewFields, DomainUdtUsageViewRow]
   def selectAll(implicit c: Connection): List[DomainUdtUsageViewRow]
 }

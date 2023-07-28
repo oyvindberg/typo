@@ -10,10 +10,22 @@ package pg_user_mapping
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, PgUserMappingRow] = scala.collection.mutable.Map.empty) extends PgUserMappingRepo {
   override def delete(oid: PgUserMappingId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgUserMappingFields, map)
   }
   override def insert(unsaved: PgUserMappingRow): ConnectionIO[PgUserMappingRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, P
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    SelectBuilderMock(PgUserMappingFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgUserMappingRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, P
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgUserMappingFields, map)
   }
   override def upsert(unsaved: PgUserMappingRow): ConnectionIO[PgUserMappingRow] = {
     delay {

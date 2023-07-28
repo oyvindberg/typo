@@ -10,10 +10,22 @@ package pg_event_trigger
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId, PgEventTriggerRow] = scala.collection.mutable.Map.empty) extends PgEventTriggerRepo {
   override def delete(oid: PgEventTriggerId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgEventTriggerFields, map)
   }
   override def insert(unsaved: PgEventTriggerRow): ConnectionIO[PgEventTriggerRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId,
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    SelectBuilderMock(PgEventTriggerFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgEventTriggerRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId,
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgEventTriggerFields, map)
   }
   override def upsert(unsaved: PgEventTriggerRow): ConnectionIO[PgEventTriggerRow] = {
     delay {

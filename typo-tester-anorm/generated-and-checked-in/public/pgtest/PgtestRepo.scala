@@ -8,8 +8,14 @@ package public
 package pgtest
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgtestRepo {
+  def delete: DeleteBuilder[PgtestFields, PgtestRow]
   def insert(unsaved: PgtestRow)(implicit c: Connection): PgtestRow
+  def select: SelectBuilder[PgtestFields, PgtestRow]
   def selectAll(implicit c: Connection): List[PgtestRow]
+  def update: UpdateBuilder[PgtestFields, PgtestRow]
 }

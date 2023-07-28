@@ -8,13 +8,19 @@ package person
 package emailaddress
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait EmailaddressRepo {
   def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
   def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
   def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow
+  def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll(implicit c: Connection): List[EmailaddressRow]
   def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow]
   def update(row: EmailaddressRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
   def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
 }

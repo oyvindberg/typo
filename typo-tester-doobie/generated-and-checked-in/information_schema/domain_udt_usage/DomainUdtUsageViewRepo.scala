@@ -9,7 +9,9 @@ package domain_udt_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait DomainUdtUsageViewRepo {
+  def select: SelectBuilder[DomainUdtUsageViewFields, DomainUdtUsageViewRow]
   def selectAll: Stream[ConnectionIO, DomainUdtUsageViewRow]
 }

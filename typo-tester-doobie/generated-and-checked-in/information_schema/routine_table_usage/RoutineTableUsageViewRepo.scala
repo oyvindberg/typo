@@ -9,7 +9,9 @@ package routine_table_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait RoutineTableUsageViewRepo {
+  def select: SelectBuilder[RoutineTableUsageViewFields, RoutineTableUsageViewRow]
   def selectAll: Stream[ConnectionIO, RoutineTableUsageViewRow]
 }

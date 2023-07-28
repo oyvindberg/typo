@@ -9,10 +9,17 @@ package pg_partitioned_table
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   override def delete(partrelid: PgPartitionedTableId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_partitioned_table where partrelid = $partrelid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    DeleteBuilder("pg_catalog.pg_partitioned_table", PgPartitionedTableFields)
   }
   override def insert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
     SQL"""insert into pg_catalog.pg_partitioned_table(partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs)
@@ -21,6 +28,9 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
        """
       .executeInsert(PgPartitionedTableRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    SelectBuilderSql("pg_catalog.pg_partitioned_table", PgPartitionedTableFields, PgPartitionedTableRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPartitionedTableRow] = {
     SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
@@ -52,6 +62,9 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
               partexprs = ${row.partexprs}::pg_node_tree
           where partrelid = $partrelid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    UpdateBuilder("pg_catalog.pg_partitioned_table", PgPartitionedTableFields, PgPartitionedTableRow.rowParser)
   }
   override def upsert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
     SQL"""insert into pg_catalog.pg_partitioned_table(partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs)

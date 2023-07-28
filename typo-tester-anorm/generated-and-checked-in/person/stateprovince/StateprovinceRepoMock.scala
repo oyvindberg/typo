@@ -8,11 +8,23 @@ package person
 package stateprovince
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, StateprovinceRow],
                             map: scala.collection.mutable.Map[StateprovinceId, StateprovinceRow] = scala.collection.mutable.Map.empty) extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean = {
     map.remove(stateprovinceid).isDefined
+  }
+  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields, map)
   }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     if (map.contains(unsaved.stateprovinceid))
@@ -23,6 +35,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
+    SelectBuilderMock(StateprovinceFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields, map)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     map.put(unsaved.stateprovinceid, unsaved)

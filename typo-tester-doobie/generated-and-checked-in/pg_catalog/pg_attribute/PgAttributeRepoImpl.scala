@@ -15,16 +15,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_attribute where attrelid = ${fromWrite(compositeId.attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attnum = ${fromWrite(compositeId.attnum)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgAttributeFields, PgAttributeRow] = {
+    DeleteBuilder("pg_catalog.pg_attribute", PgAttributeFields)
   }
   override def insert(unsaved: PgAttributeRow): ConnectionIO[PgAttributeRow] = {
     sql"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
           values (${fromWrite(unsaved.attrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.attname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.atttypid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.attstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attlen)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.attnum)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.attndims)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attcacheoff)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.atttypmod)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attbyval)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attalign)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attstorage)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attcompression)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attnotnull)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.atthasdef)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.atthasmissing)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attidentity)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attgenerated)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attisdropped)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attislocal)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attinhcount)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attcollation)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.attacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem, ${fromWrite(unsaved.attoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.attfdwoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.attmissingval)(Write.fromPutOption(TypoAnyArray.put))}::anyarray)
           returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
        """.query(PgAttributeRow.read).unique
+  }
+  override def select: SelectBuilder[PgAttributeFields, PgAttributeRow] = {
+    SelectBuilderSql("pg_catalog.pg_attribute", PgAttributeFields, PgAttributeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAttributeRow] = {
     sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute".query(PgAttributeRow.read).stream
@@ -63,6 +73,9 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgAttributeFields, PgAttributeRow] = {
+    UpdateBuilder("pg_catalog.pg_attribute", PgAttributeFields, PgAttributeRow.read)
   }
   override def upsert(unsaved: PgAttributeRow): ConnectionIO[PgAttributeRow] = {
     sql"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)

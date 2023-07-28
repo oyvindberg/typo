@@ -10,6 +10,7 @@ import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Money and cash types in PostgreSQL */
 case class TypoMoney(value: BigDecimal)
@@ -19,6 +20,7 @@ object TypoMoney {
     .map(_.map(v => TypoMoney(BigDecimal(v.asInstanceOf[java.math.BigDecimal]))))
   implicit val arrayPut: Put[Array[TypoMoney]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_money"), "money")
     .contramap(_.map(v => v.value.bigDecimal))
+  implicit val bijection: Bijection[TypoMoney, BigDecimal] = Bijection[TypoMoney, BigDecimal](_.value)(TypoMoney.apply)
   implicit val decoder: Decoder[TypoMoney] = Decoder.decodeBigDecimal.map(TypoMoney.apply)
   implicit val encoder: Encoder[TypoMoney] = Encoder.encodeBigDecimal.contramap(_.value)
   implicit val get: Get[TypoMoney] = Get.Advanced.other[java.math.BigDecimal](NonEmptyList.one("money"))

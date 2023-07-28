@@ -27,10 +27,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean] = {
     sql"delete from sales.salesorderheader where salesorderid = ${fromWrite(salesorderid)(Write.fromPut(SalesorderheaderId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    DeleteBuilder("sales.salesorderheader", SalesorderheaderFields)
   }
   override def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     sql"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)
@@ -111,6 +118,9 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     q.query(SalesorderheaderRow.read).unique
     
   }
+  override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    SelectBuilderSql("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalesorderheaderRow] = {
     sql"""select salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text from sales.salesorderheader""".query(SalesorderheaderRow.read).stream
   }
@@ -151,6 +161,9 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    UpdateBuilder("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.read)
   }
   override def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     sql"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)

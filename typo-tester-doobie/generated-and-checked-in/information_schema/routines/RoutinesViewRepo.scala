@@ -9,7 +9,9 @@ package routines
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait RoutinesViewRepo {
+  def select: SelectBuilder[RoutinesViewFields, RoutinesViewRow]
   def selectAll: Stream[ConnectionIO, RoutinesViewRow]
 }

@@ -10,8 +10,13 @@ package pg_stat_xact_sys_tables
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatXactSysTablesViewRepoImpl extends PgStatXactSysTablesViewRepo {
+  override def select: SelectBuilder[PgStatXactSysTablesViewFields, PgStatXactSysTablesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_xact_sys_tables", PgStatXactSysTablesViewFields, PgStatXactSysTablesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatXactSysTablesViewRow] = {
     sql"select relid, schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd from pg_catalog.pg_stat_xact_sys_tables".query(PgStatXactSysTablesViewRow.read).stream
   }

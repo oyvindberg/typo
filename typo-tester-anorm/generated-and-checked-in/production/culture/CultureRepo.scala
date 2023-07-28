@@ -8,14 +8,20 @@ package production
 package culture
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait CultureRepo {
   def delete(cultureid: CultureId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[CultureFields, CultureRow]
   def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow
   def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow
+  def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll(implicit c: Connection): List[CultureRow]
   def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow]
   def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow]
   def update(row: CultureRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[CultureFields, CultureRow]
   def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow
 }

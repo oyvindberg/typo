@@ -12,12 +12,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `person.address` */
 case class AddressId(value: Int) extends AnyVal
 object AddressId {
   implicit val arrayGet: Get[Array[AddressId]] = adventureworks.IntegerArrayMeta.get.map(_.map(AddressId.apply))
   implicit val arrayPut: Put[Array[AddressId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[AddressId, Int] = Bijection[AddressId, Int](_.value)(AddressId.apply)
   implicit val decoder: Decoder[AddressId] = Decoder.decodeInt.map(AddressId.apply)
   implicit val encoder: Encoder[AddressId] = Encoder.encodeInt.contramap(_.value)
   implicit val get: Get[AddressId] = Meta.IntMeta.get.map(AddressId.apply)

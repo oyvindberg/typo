@@ -8,13 +8,19 @@ package pg_catalog
 package pg_language
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgLanguageRepo {
   def delete(oid: PgLanguageId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow]
   def insert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow
+  def select: SelectBuilder[PgLanguageFields, PgLanguageRow]
   def selectAll(implicit c: Connection): List[PgLanguageRow]
   def selectById(oid: PgLanguageId)(implicit c: Connection): Option[PgLanguageRow]
   def selectByIds(oids: Array[PgLanguageId])(implicit c: Connection): List[PgLanguageRow]
   def update(row: PgLanguageRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgLanguageFields, PgLanguageRow]
   def upsert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow
 }

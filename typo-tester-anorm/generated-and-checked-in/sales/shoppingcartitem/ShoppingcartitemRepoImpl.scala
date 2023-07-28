@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields)
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     SQL"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
@@ -66,6 +73,9 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     }
     
   }
+  override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
           from sales.shoppingcartitem
@@ -94,6 +104,9 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where shoppingcartitemid = $shoppingcartitemid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.rowParser)
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     SQL"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)

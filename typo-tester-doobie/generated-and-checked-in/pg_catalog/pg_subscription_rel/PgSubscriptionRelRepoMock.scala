@@ -10,10 +10,22 @@ package pg_subscription_rel
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgSubscriptionRelRepoMock(map: scala.collection.mutable.Map[PgSubscriptionRelId, PgSubscriptionRelRow] = scala.collection.mutable.Map.empty) extends PgSubscriptionRelRepo {
   override def delete(compositeId: PgSubscriptionRelId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgSubscriptionRelFields, map)
   }
   override def insert(unsaved: PgSubscriptionRelRow): ConnectionIO[PgSubscriptionRelRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgSubscriptionRelRepoMock(map: scala.collection.mutable.Map[PgSubscription
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    SelectBuilderMock(PgSubscriptionRelFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgSubscriptionRelRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgSubscriptionRelRepoMock(map: scala.collection.mutable.Map[PgSubscription
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgSubscriptionRelFields, map)
   }
   override def upsert(unsaved: PgSubscriptionRelRow): ConnectionIO[PgSubscriptionRelRow] = {
     delay {

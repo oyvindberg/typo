@@ -8,14 +8,20 @@ package purchasing
 package purchaseorderheader
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PurchaseorderheaderRepo {
   def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
   def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow
+  def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def selectAll(implicit c: Connection): List[PurchaseorderheaderRow]
   def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow]
   def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow]
   def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
 }

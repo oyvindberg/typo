@@ -9,8 +9,13 @@ package so
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SoViewRepoImpl extends SoViewRepo {
+  override def select: SelectBuilder[SoViewFields, SoViewRow] = {
+    SelectBuilderSql("sa.so", SoViewFields, SoViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SoViewRow] = {
     SQL"""select "id", specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
           from sa.so

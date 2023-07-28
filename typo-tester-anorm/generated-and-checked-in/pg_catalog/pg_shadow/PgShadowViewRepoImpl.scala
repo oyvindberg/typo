@@ -9,8 +9,13 @@ package pg_shadow
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgShadowViewRepoImpl extends PgShadowViewRepo {
+  override def select: SelectBuilder[PgShadowViewFields, PgShadowViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_shadow", PgShadowViewFields, PgShadowViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgShadowViewRow] = {
     SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig
           from pg_catalog.pg_shadow

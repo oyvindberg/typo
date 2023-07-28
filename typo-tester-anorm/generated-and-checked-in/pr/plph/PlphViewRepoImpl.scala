@@ -9,8 +9,13 @@ package plph
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PlphViewRepoImpl extends PlphViewRepo {
+  override def select: SelectBuilder[PlphViewFields, PlphViewRow] = {
+    SelectBuilderSql("pr.plph", PlphViewFields, PlphViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PlphViewRow] = {
     SQL"""select "id", productid, startdate::text, enddate::text, listprice, modifieddate::text
           from pr.plph

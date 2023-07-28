@@ -10,8 +10,13 @@ package pg_user
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgUserViewRepoImpl extends PgUserViewRepo {
+  override def select: SelectBuilder[PgUserViewFields, PgUserViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_user", PgUserViewFields, PgUserViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgUserViewRow] = {
     sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig from pg_catalog.pg_user".query(PgUserViewRow.read).stream
   }

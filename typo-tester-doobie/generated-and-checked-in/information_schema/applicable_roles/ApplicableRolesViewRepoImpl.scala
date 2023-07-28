@@ -10,8 +10,13 @@ package applicable_roles
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ApplicableRolesViewRepoImpl extends ApplicableRolesViewRepo {
+  override def select: SelectBuilder[ApplicableRolesViewFields, ApplicableRolesViewRow] = {
+    SelectBuilderSql("information_schema.applicable_roles", ApplicableRolesViewFields, ApplicableRolesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ApplicableRolesViewRow] = {
     sql"select grantee, role_name, is_grantable from information_schema.applicable_roles".query(ApplicableRolesViewRow.read).stream
   }

@@ -20,10 +20,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object EmployeeRepoImpl extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"delete from humanresources.employee where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
+    DeleteBuilder("humanresources.employee", EmployeeFields)
   }
   override def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
@@ -85,6 +92,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
     q.query(EmployeeRow.read).unique
     
   }
+  override def select: SelectBuilder[EmployeeFields, EmployeeRow] = {
+    SelectBuilderSql("humanresources.employee", EmployeeFields, EmployeeRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
     sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee".query(EmployeeRow.read).stream
   }
@@ -115,6 +125,9 @@ object EmployeeRepoImpl extends EmployeeRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
+    UpdateBuilder("humanresources.employee", EmployeeFields, EmployeeRow.read)
   }
   override def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)

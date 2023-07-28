@@ -13,12 +13,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `myschema.marital_status` */
 case class MaritalStatusId(value: Long) extends AnyVal
 object MaritalStatusId {
   implicit val arrayGet: Get[Array[MaritalStatusId]] = testdb.hardcoded.LongArrayMeta.get.map(_.map(MaritalStatusId.apply))
   implicit val arrayPut: Put[Array[MaritalStatusId]] = testdb.hardcoded.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[MaritalStatusId, Long] = Bijection[MaritalStatusId, Long](_.value)(MaritalStatusId.apply)
   implicit val decoder: Decoder[MaritalStatusId] = Decoder.decodeLong.map(MaritalStatusId.apply)
   implicit val encoder: Encoder[MaritalStatusId] = Encoder.encodeLong.contramap(_.value)
   implicit val get: Get[MaritalStatusId] = Meta.LongMeta.get.map(MaritalStatusId.apply)

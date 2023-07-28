@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def delete(compositeId: PgSeclabelId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_seclabel where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgSeclabelFields, PgSeclabelRow] = {
+    DeleteBuilder("pg_catalog.pg_seclabel", PgSeclabelFields)
   }
   override def insert(unsaved: PgSeclabelRow): ConnectionIO[PgSeclabelRow] = {
     sql"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")
           values (${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.provider)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.label)(Write.fromPut(Meta.StringMeta.put))})
           returning objoid, classoid, objsubid, provider, "label"
        """.query(PgSeclabelRow.read).unique
+  }
+  override def select: SelectBuilder[PgSeclabelFields, PgSeclabelRow] = {
+    SelectBuilderSql("pg_catalog.pg_seclabel", PgSeclabelFields, PgSeclabelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgSeclabelRow] = {
     sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel""".query(PgSeclabelRow.read).stream
@@ -38,6 +48,9 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgSeclabelFields, PgSeclabelRow] = {
+    UpdateBuilder("pg_catalog.pg_seclabel", PgSeclabelFields, PgSeclabelRow.read)
   }
   override def upsert(unsaved: PgSeclabelRow): ConnectionIO[PgSeclabelRow] = {
     sql"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")

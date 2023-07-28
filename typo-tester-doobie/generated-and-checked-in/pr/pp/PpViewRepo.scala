@@ -9,7 +9,9 @@ package pp
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PpViewRepo {
+  def select: SelectBuilder[PpViewFields, PpViewRow]
   def selectAll: Stream[ConnectionIO, PpViewRow]
 }

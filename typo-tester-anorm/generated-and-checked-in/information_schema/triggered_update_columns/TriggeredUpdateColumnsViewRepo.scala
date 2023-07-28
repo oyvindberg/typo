@@ -8,7 +8,9 @@ package information_schema
 package triggered_update_columns
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait TriggeredUpdateColumnsViewRepo {
+  def select: SelectBuilder[TriggeredUpdateColumnsViewFields, TriggeredUpdateColumnsViewRow]
   def selectAll(implicit c: Connection): List[TriggeredUpdateColumnsViewRow]
 }

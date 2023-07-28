@@ -10,10 +10,22 @@ package pg_range
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] = scala.collection.mutable.Map.empty) extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId): ConnectionIO[Boolean] = {
     delay(map.remove(rngtypid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgRangeFields, PgRangeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgRangeFields, map)
   }
   override def insert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
         map.put(unsaved.rngtypid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgRangeFields, PgRangeRow] = {
+    SelectBuilderMock(PgRangeFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgRangeRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgRangeFields, PgRangeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgRangeFields, map)
   }
   override def upsert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow] = {
     delay {

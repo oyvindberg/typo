@@ -8,12 +8,18 @@ package pg_catalog
 package pg_db_role_setting
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgDbRoleSettingRepo {
   def delete(compositeId: PgDbRoleSettingId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow]
   def insert(unsaved: PgDbRoleSettingRow)(implicit c: Connection): PgDbRoleSettingRow
+  def select: SelectBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow]
   def selectAll(implicit c: Connection): List[PgDbRoleSettingRow]
   def selectById(compositeId: PgDbRoleSettingId)(implicit c: Connection): Option[PgDbRoleSettingRow]
   def update(row: PgDbRoleSettingRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow]
   def upsert(unsaved: PgDbRoleSettingRow)(implicit c: Connection): PgDbRoleSettingRow
 }

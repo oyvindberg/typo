@@ -10,8 +10,13 @@ package c
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CViewRepoImpl extends CViewRepo {
+  override def select: SelectBuilder[CViewFields, CViewRow] = {
+    SelectBuilderSql("pr.c", CViewFields, CViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CViewRow] = {
     sql"""select "id", cultureid, "name", modifieddate::text from pr."c"""".query(CViewRow.read).stream
   }

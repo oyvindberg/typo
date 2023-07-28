@@ -9,10 +9,17 @@ package pg_largeobject_metadata
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def delete(oid: PgLargeobjectMetadataId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_largeobject_metadata where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
+    DeleteBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow = {
     SQL"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
@@ -21,6 +28,9 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
        """
       .executeInsert(PgLargeobjectMetadataRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
+    SelectBuilderSql("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields, PgLargeobjectMetadataRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgLargeobjectMetadataRow] = {
     SQL"""select oid, lomowner, lomacl
@@ -47,6 +57,9 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
               lomacl = ${row.lomacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow] = {
+    UpdateBuilder("pg_catalog.pg_largeobject_metadata", PgLargeobjectMetadataFields, PgLargeobjectMetadataRow.rowParser)
   }
   override def upsert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow = {
     SQL"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)

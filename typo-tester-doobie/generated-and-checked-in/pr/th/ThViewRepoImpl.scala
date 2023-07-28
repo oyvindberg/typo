@@ -10,8 +10,13 @@ package th
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ThViewRepoImpl extends ThViewRepo {
+  override def select: SelectBuilder[ThViewFields, ThViewRow] = {
+    SelectBuilderSql("pr.th", ThViewFields, ThViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ThViewRow] = {
     sql"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from pr.th""".query(ThViewRow.read).stream
   }

@@ -9,10 +9,17 @@ package pg_ts_config_map
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
   override def delete(compositeId: PgTsConfigMapId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg} AND maptokentype = ${compositeId.maptokentype} AND mapseqno = ${compositeId.mapseqno}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_config_map", PgTsConfigMapFields)
   }
   override def insert(unsaved: PgTsConfigMapRow)(implicit c: Connection): PgTsConfigMapRow = {
     SQL"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, mapdict)
@@ -21,6 +28,9 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
        """
       .executeInsert(PgTsConfigMapRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_config_map", PgTsConfigMapFields, PgTsConfigMapRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsConfigMapRow] = {
     SQL"""select mapcfg, maptokentype, mapseqno, mapdict
@@ -39,6 +49,9 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
           set mapdict = ${row.mapdict}::oid
           where mapcfg = ${compositeId.mapcfg} AND maptokentype = ${compositeId.maptokentype} AND mapseqno = ${compositeId.mapseqno}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_config_map", PgTsConfigMapFields, PgTsConfigMapRow.rowParser)
   }
   override def upsert(unsaved: PgTsConfigMapRow)(implicit c: Connection): PgTsConfigMapRow = {
     SQL"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, mapdict)

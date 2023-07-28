@@ -9,7 +9,9 @@ package role_usage_grants
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait RoleUsageGrantsViewRepo {
+  def select: SelectBuilder[RoleUsageGrantsViewFields, RoleUsageGrantsViewRow]
   def selectAll: Stream[ConnectionIO, RoleUsageGrantsViewRow]
 }

@@ -10,8 +10,13 @@ package pg_sequences
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgSequencesViewRepoImpl extends PgSequencesViewRepo {
+  override def select: SelectBuilder[PgSequencesViewFields, PgSequencesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_sequences", PgSequencesViewFields, PgSequencesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgSequencesViewRow] = {
     sql"""select schemaname, sequencename, sequenceowner, data_type, start_value, min_value, max_value, increment_by, "cycle", cache_size, "last_value" from pg_catalog.pg_sequences""".query(PgSequencesViewRow.read).stream
   }

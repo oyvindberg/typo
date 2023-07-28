@@ -9,8 +9,14 @@ package sql_sizing
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SqlSizingRepo {
+  def delete: DeleteBuilder[SqlSizingFields, SqlSizingRow]
   def insert(unsaved: SqlSizingRow): ConnectionIO[SqlSizingRow]
+  def select: SelectBuilder[SqlSizingFields, SqlSizingRow]
   def selectAll: Stream[ConnectionIO, SqlSizingRow]
+  def update: UpdateBuilder[SqlSizingFields, SqlSizingRow]
 }

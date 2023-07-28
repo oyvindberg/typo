@@ -9,10 +9,22 @@ package myschema
 package marital_status
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, MaritalStatusRow] = scala.collection.mutable.Map.empty) extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
     map.remove(id).isDefined
+  }
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields, map)
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     if (map.contains(unsaved.id))
@@ -20,6 +32,9 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     else
       map.put(unsaved.id, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    SelectBuilderMock(MaritalStatusFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     map.values.toList
@@ -29,6 +44,9 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     ids.flatMap(map.get).toList
+  }
+  override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields, map)
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     map.put(unsaved.id, unsaved)

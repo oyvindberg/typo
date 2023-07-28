@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** This is `java.time.LocalDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalDateTime(value: LocalDateTime)
@@ -39,10 +40,11 @@ object TypoLocalDateTime {
     }
   )
   implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalDateTime]] = new ParameterMetaData[Array[TypoLocalDateTime]] {
-    override def sqlType: String = "_text"
+    override def sqlType: String = "_timestamp"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoLocalDateTime]] = ToStatement[Array[TypoLocalDateTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("text", v.map(v => v.value.toString))))
+  implicit val arrayToStatement: ToStatement[Array[TypoLocalDateTime]] = ToStatement[Array[TypoLocalDateTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("timestamp", v.map(v => v.value.toString))))
+  implicit val bijection: Bijection[TypoLocalDateTime, LocalDateTime] = Bijection[TypoLocalDateTime, LocalDateTime](_.value)(TypoLocalDateTime.apply)
   implicit val column: Column[TypoLocalDateTime] = Column.nonNull[TypoLocalDateTime]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoLocalDateTime(LocalDateTime.parse(v, parser)))
@@ -51,7 +53,7 @@ object TypoLocalDateTime {
   )
   implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[TypoLocalDateTime] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoLocalDateTime] = new ParameterMetaData[TypoLocalDateTime] {
-    override def sqlType: String = "text"
+    override def sqlType: String = "timestamp"
     override def jdbcType: Int = Types.OTHER
   }
   implicit val reads: Reads[TypoLocalDateTime] = Reads.DefaultLocalDateTimeReads.map(TypoLocalDateTime.apply)

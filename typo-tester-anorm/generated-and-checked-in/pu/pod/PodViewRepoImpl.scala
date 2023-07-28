@@ -9,8 +9,13 @@ package pod
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PodViewRepoImpl extends PodViewRepo {
+  override def select: SelectBuilder[PodViewFields, PodViewRow] = {
+    SelectBuilderSql("pu.pod", PodViewFields, PodViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PodViewRow] = {
     SQL"""select "id", purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
           from pu.pod

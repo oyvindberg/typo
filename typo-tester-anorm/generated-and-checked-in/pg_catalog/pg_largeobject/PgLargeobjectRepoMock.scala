@@ -8,10 +8,22 @@ package pg_catalog
 package pg_largeobject
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, PgLargeobjectRow] = scala.collection.mutable.Map.empty) extends PgLargeobjectRepo {
   override def delete(compositeId: PgLargeobjectId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgLargeobjectFields, map)
   }
   override def insert(unsaved: PgLargeobjectRow)(implicit c: Connection): PgLargeobjectRow = {
     if (map.contains(unsaved.compositeId))
@@ -19,6 +31,9 @@ class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, P
     else
       map.put(unsaved.compositeId, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    SelectBuilderMock(PgLargeobjectFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgLargeobjectRow] = {
     map.values.toList
@@ -34,6 +49,9 @@ class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, P
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgLargeobjectFields, map)
   }
   override def upsert(unsaved: PgLargeobjectRow)(implicit c: Connection): PgLargeobjectRow = {
     map.put(unsaved.compositeId, unsaved)

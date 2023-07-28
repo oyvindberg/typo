@@ -8,7 +8,9 @@ package pg_catalog
 package pg_rules
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgRulesViewRepo {
+  def select: SelectBuilder[PgRulesViewFields, PgRulesViewRow]
   def selectAll(implicit c: Connection): List[PgRulesViewRow]
 }

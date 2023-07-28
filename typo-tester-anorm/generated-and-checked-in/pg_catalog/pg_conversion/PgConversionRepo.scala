@@ -8,13 +8,19 @@ package pg_catalog
 package pg_conversion
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgConversionRepo {
   def delete(oid: PgConversionId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgConversionFields, PgConversionRow]
   def insert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow
+  def select: SelectBuilder[PgConversionFields, PgConversionRow]
   def selectAll(implicit c: Connection): List[PgConversionRow]
   def selectById(oid: PgConversionId)(implicit c: Connection): Option[PgConversionRow]
   def selectByIds(oids: Array[PgConversionId])(implicit c: Connection): List[PgConversionRow]
   def update(row: PgConversionRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgConversionFields, PgConversionRow]
   def upsert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow
 }

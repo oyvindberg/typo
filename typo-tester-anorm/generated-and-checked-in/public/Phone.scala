@@ -11,6 +11,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `public.Phone`
   * No constraint
@@ -18,6 +19,7 @@ import play.api.libs.json.Writes
 case class Phone(value: String) extends AnyVal
 object Phone {
   implicit val arrayToStatement: ToStatement[Array[Phone]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[Phone, String] = Bijection[Phone, String](_.value)(Phone.apply)
   implicit val column: Column[Phone] = implicitly[Column[String]].map(Phone.apply)
   implicit val ordering: Ordering[Phone] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[Phone] = new ParameterMetaData[Phone] {

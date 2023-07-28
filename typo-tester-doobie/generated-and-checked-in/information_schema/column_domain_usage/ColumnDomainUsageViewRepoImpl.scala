@@ -10,8 +10,13 @@ package column_domain_usage
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnDomainUsageViewRepoImpl extends ColumnDomainUsageViewRepo {
+  override def select: SelectBuilder[ColumnDomainUsageViewFields, ColumnDomainUsageViewRow] = {
+    SelectBuilderSql("information_schema.column_domain_usage", ColumnDomainUsageViewFields, ColumnDomainUsageViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ColumnDomainUsageViewRow] = {
     sql"""select domain_catalog, domain_schema, domain_name, table_catalog, table_schema, "table_name", "column_name" from information_schema.column_domain_usage""".query(ColumnDomainUsageViewRow.read).stream
   }

@@ -12,6 +12,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `information_schema.time_stamp`
   * No constraint
@@ -19,6 +20,7 @@ import play.api.libs.json.Writes
 case class TimeStamp(value: TypoOffsetDateTime) extends AnyVal
 object TimeStamp {
   implicit val arrayToStatement: ToStatement[Array[TimeStamp]] = implicitly[ToStatement[Array[TypoOffsetDateTime]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[TimeStamp, TypoOffsetDateTime] = Bijection[TimeStamp, TypoOffsetDateTime](_.value)(TimeStamp.apply)
   implicit val column: Column[TimeStamp] = implicitly[Column[TypoOffsetDateTime]].map(TimeStamp.apply)
   implicit def ordering(implicit O0: Ordering[TypoOffsetDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TimeStamp] = new ParameterMetaData[TimeStamp] {

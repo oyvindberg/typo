@@ -8,12 +8,18 @@ package pg_catalog
 package pg_statistic
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgStatisticRepo {
   def delete(compositeId: PgStatisticId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgStatisticFields, PgStatisticRow]
   def insert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow
+  def select: SelectBuilder[PgStatisticFields, PgStatisticRow]
   def selectAll(implicit c: Connection): List[PgStatisticRow]
   def selectById(compositeId: PgStatisticId)(implicit c: Connection): Option[PgStatisticRow]
   def update(row: PgStatisticRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgStatisticFields, PgStatisticRow]
   def upsert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow
 }

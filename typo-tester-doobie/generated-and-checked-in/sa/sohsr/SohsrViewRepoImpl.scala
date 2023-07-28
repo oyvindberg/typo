@@ -10,8 +10,13 @@ package sohsr
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SohsrViewRepoImpl extends SohsrViewRepo {
+  override def select: SelectBuilder[SohsrViewFields, SohsrViewRow] = {
+    SelectBuilderSql("sa.sohsr", SohsrViewFields, SohsrViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SohsrViewRow] = {
     sql"select salesorderid, salesreasonid, modifieddate::text from sa.sohsr".query(SohsrViewRow.read).stream
   }

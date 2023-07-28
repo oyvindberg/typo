@@ -10,8 +10,13 @@ package v
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VViewRepoImpl extends VViewRepo {
+  override def select: SelectBuilder[VViewFields, VViewRow] = {
+    SelectBuilderSql("pu.v", VViewFields, VViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, VViewRow] = {
     sql"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from pu.v""".query(VViewRow.read).stream
   }

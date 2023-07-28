@@ -11,10 +11,22 @@ package football_club
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, FootballClubRow] = scala.collection.mutable.Map.empty) extends FootballClubRepo {
   override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
     delay(map.remove(id).isDefined)
+  }
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilderMock(DeleteParams.empty, FootballClubFields, map)
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     delay {
@@ -24,6 +36,9 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
         map.put(unsaved.id, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
+    SelectBuilderMock(FootballClubFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilderMock(UpdateParams.empty, FootballClubFields, map)
   }
   override def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     delay {

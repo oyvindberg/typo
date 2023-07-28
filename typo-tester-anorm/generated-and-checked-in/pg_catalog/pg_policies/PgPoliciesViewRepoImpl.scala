@@ -9,8 +9,13 @@ package pg_policies
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgPoliciesViewRepoImpl extends PgPoliciesViewRepo {
+  override def select: SelectBuilder[PgPoliciesViewFields, PgPoliciesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_policies", PgPoliciesViewFields, PgPoliciesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgPoliciesViewRow] = {
     SQL"""select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check
           from pg_catalog.pg_policies

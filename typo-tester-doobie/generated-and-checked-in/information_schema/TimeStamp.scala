@@ -11,6 +11,7 @@ import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `information_schema.time_stamp`
   * No constraint
@@ -19,6 +20,7 @@ case class TimeStamp(value: TypoOffsetDateTime) extends AnyVal
 object TimeStamp {
   implicit val arrayGet: Get[Array[TimeStamp]] = TypoOffsetDateTime.arrayGet.map(_.map(TimeStamp.apply))
   implicit val arrayPut: Put[Array[TimeStamp]] = TypoOffsetDateTime.arrayPut.contramap(_.map(_.value))
+  implicit val bijection: Bijection[TimeStamp, TypoOffsetDateTime] = Bijection[TimeStamp, TypoOffsetDateTime](_.value)(TimeStamp.apply)
   implicit val decoder: Decoder[TimeStamp] = TypoOffsetDateTime.decoder.map(TimeStamp.apply)
   implicit val encoder: Encoder[TimeStamp] = TypoOffsetDateTime.encoder.contramap(_.value)
   implicit val get: Get[TimeStamp] = TypoOffsetDateTime.get.map(TimeStamp.apply)

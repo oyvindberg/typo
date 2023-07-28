@@ -9,8 +9,13 @@ package column_column_usage
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnColumnUsageViewRepoImpl extends ColumnColumnUsageViewRepo {
+  override def select: SelectBuilder[ColumnColumnUsageViewFields, ColumnColumnUsageViewRow] = {
+    SelectBuilderSql("information_schema.column_column_usage", ColumnColumnUsageViewFields, ColumnColumnUsageViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ColumnColumnUsageViewRow] = {
     SQL"""select table_catalog, table_schema, "table_name", "column_name", dependent_column
           from information_schema.column_column_usage

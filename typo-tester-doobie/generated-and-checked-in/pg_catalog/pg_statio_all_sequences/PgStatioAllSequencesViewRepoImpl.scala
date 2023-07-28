@@ -10,8 +10,13 @@ package pg_statio_all_sequences
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatioAllSequencesViewRepoImpl extends PgStatioAllSequencesViewRepo {
+  override def select: SelectBuilder[PgStatioAllSequencesViewFields, PgStatioAllSequencesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_statio_all_sequences", PgStatioAllSequencesViewFields, PgStatioAllSequencesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatioAllSequencesViewRow] = {
     sql"select relid, schemaname, relname, blks_read, blks_hit from pg_catalog.pg_statio_all_sequences".query(PgStatioAllSequencesViewRow.read).stream
   }

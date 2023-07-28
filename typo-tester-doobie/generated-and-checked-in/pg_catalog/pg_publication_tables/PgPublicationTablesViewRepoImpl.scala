@@ -10,8 +10,13 @@ package pg_publication_tables
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgPublicationTablesViewRepoImpl extends PgPublicationTablesViewRepo {
+  override def select: SelectBuilder[PgPublicationTablesViewFields, PgPublicationTablesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_publication_tables", PgPublicationTablesViewFields, PgPublicationTablesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgPublicationTablesViewRow] = {
     sql"select pubname, schemaname, tablename from pg_catalog.pg_publication_tables".query(PgPublicationTablesViewRow.read).stream
   }

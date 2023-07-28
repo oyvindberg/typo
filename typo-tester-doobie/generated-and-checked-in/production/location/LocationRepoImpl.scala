@@ -17,10 +17,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId): ConnectionIO[Boolean] = {
     sql"""delete from production."location" where locationid = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
+    DeleteBuilder("production.location", LocationFields)
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
@@ -63,6 +70,9 @@ object LocationRepoImpl extends LocationRepo {
     q.query(LocationRow.read).unique
     
   }
+  override def select: SelectBuilder[LocationFields, LocationRow] = {
+    SelectBuilderSql("production.location", LocationFields, LocationRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
     sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location"""".query(LocationRow.read).stream
   }
@@ -83,6 +93,9 @@ object LocationRepoImpl extends LocationRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[LocationFields, LocationRow] = {
+    UpdateBuilder("production.location", LocationFields, LocationRow.read)
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)

@@ -10,11 +10,23 @@ package workorder
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
                         map: scala.collection.mutable.Map[WorkorderId, WorkorderRow] = scala.collection.mutable.Map.empty) extends WorkorderRepo {
   override def delete(workorderid: WorkorderId): ConnectionIO[Boolean] = {
     delay(map.remove(workorderid).isDefined)
+  }
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, WorkorderFields, map)
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     delay {
@@ -27,6 +39,9 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
+    SelectBuilderMock(WorkorderFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, WorkorderFields, map)
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     delay {

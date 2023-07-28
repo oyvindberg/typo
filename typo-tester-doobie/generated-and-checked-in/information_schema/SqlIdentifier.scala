@@ -11,6 +11,7 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `information_schema.sql_identifier`
   * No constraint
@@ -19,6 +20,7 @@ case class SqlIdentifier(value: String) extends AnyVal
 object SqlIdentifier {
   implicit val arrayGet: Get[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.get.map(_.map(SqlIdentifier.apply))
   implicit val arrayPut: Put[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[SqlIdentifier, String] = Bijection[SqlIdentifier, String](_.value)(SqlIdentifier.apply)
   implicit val decoder: Decoder[SqlIdentifier] = Decoder.decodeString.map(SqlIdentifier.apply)
   implicit val encoder: Encoder[SqlIdentifier] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[SqlIdentifier] = Meta.StringMeta.get.map(SqlIdentifier.apply)

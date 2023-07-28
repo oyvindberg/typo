@@ -10,11 +10,23 @@ package countryregion
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, CountryregionRow],
                             map: scala.collection.mutable.Map[CountryregionId, CountryregionRow] = scala.collection.mutable.Map.empty) extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
     delay(map.remove(countryregioncode).isDefined)
+  }
+  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CountryregionFields, map)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {
@@ -27,6 +39,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
+    SelectBuilderMock(CountryregionFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CountryregionFields, map)
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {

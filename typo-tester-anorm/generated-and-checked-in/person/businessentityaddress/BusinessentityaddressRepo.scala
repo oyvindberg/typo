@@ -8,13 +8,19 @@ package person
 package businessentityaddress
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait BusinessentityaddressRepo {
   def delete(compositeId: BusinessentityaddressId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def insert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow
   def insert(unsaved: BusinessentityaddressRowUnsaved)(implicit c: Connection): BusinessentityaddressRow
+  def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def selectAll(implicit c: Connection): List[BusinessentityaddressRow]
   def selectById(compositeId: BusinessentityaddressId)(implicit c: Connection): Option[BusinessentityaddressRow]
   def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def upsert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow
 }

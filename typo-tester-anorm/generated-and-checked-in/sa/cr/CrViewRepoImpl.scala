@@ -9,8 +9,13 @@ package cr
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CrViewRepoImpl extends CrViewRepo {
+  override def select: SelectBuilder[CrViewFields, CrViewRow] = {
+    SelectBuilderSql("sa.cr", CrViewFields, CrViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CrViewRow] = {
     SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
           from sa.cr

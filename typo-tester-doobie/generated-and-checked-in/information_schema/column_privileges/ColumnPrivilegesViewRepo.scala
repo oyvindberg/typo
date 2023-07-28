@@ -9,7 +9,9 @@ package column_privileges
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ColumnPrivilegesViewRepo {
+  def select: SelectBuilder[ColumnPrivilegesViewFields, ColumnPrivilegesViewRow]
   def selectAll: Stream[ConnectionIO, ColumnPrivilegesViewRow]
 }

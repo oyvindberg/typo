@@ -9,13 +9,19 @@ package pg_type
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgTypeRepo {
   def delete(oid: PgTypeId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgTypeFields, PgTypeRow]
   def insert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow]
+  def select: SelectBuilder[PgTypeFields, PgTypeRow]
   def selectAll: Stream[ConnectionIO, PgTypeRow]
   def selectById(oid: PgTypeId): ConnectionIO[Option[PgTypeRow]]
   def selectByIds(oids: Array[PgTypeId]): Stream[ConnectionIO, PgTypeRow]
   def update(row: PgTypeRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgTypeFields, PgTypeRow]
   def upsert(unsaved: PgTypeRow): ConnectionIO[PgTypeRow]
 }

@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
     sql"delete from person.countryregion where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
+    DeleteBuilder("person.countryregion", CountryregionFields)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
@@ -51,6 +58,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
     q.query(CountryregionRow.read).unique
     
   }
+  override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
+    SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
     sql"""select countryregioncode, "name", modifieddate::text from person.countryregion""".query(CountryregionRow.read).stream
   }
@@ -69,6 +79,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
+    UpdateBuilder("person.countryregion", CountryregionFields, CountryregionRow.read)
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)

@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** This is `java.time.OffsetTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoOffsetTime(value: OffsetTime)
@@ -39,10 +40,11 @@ object TypoOffsetTime {
     }
   )
   implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoOffsetTime]] = new ParameterMetaData[Array[TypoOffsetTime]] {
-    override def sqlType: String = "_text"
+    override def sqlType: String = "_timetz"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoOffsetTime]] = ToStatement[Array[TypoOffsetTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("text", v.map(v => v.value.toString))))
+  implicit val arrayToStatement: ToStatement[Array[TypoOffsetTime]] = ToStatement[Array[TypoOffsetTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("timetz", v.map(v => v.value.toString))))
+  implicit val bijection: Bijection[TypoOffsetTime, OffsetTime] = Bijection[TypoOffsetTime, OffsetTime](_.value)(TypoOffsetTime.apply)
   implicit val column: Column[TypoOffsetTime] = Column.nonNull[TypoOffsetTime]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoOffsetTime(OffsetTime.parse(v, parser)))
@@ -51,7 +53,7 @@ object TypoOffsetTime {
   )
   implicit def ordering(implicit O0: Ordering[OffsetTime]): Ordering[TypoOffsetTime] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoOffsetTime] = new ParameterMetaData[TypoOffsetTime] {
-    override def sqlType: String = "text"
+    override def sqlType: String = "timetz"
     override def jdbcType: Int = Types.OTHER
   }
   implicit val reads: Reads[TypoOffsetTime] = adventureworks.OffsetTimeReads.map(TypoOffsetTime.apply)

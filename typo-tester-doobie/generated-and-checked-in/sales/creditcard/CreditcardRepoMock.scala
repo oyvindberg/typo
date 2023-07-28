@@ -10,11 +10,23 @@ package creditcard
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
                          map: scala.collection.mutable.Map[CreditcardId, CreditcardRow] = scala.collection.mutable.Map.empty) extends CreditcardRepo {
   override def delete(creditcardid: CreditcardId): ConnectionIO[Boolean] = {
     delay(map.remove(creditcardid).isDefined)
+  }
+  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CreditcardFields, map)
   }
   override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     delay {
@@ -27,6 +39,9 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
+    SelectBuilderMock(CreditcardFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CreditcardFields, map)
   }
   override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     delay {

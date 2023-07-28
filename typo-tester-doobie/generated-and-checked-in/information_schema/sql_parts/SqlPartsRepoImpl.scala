@@ -14,15 +14,28 @@ import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SqlPartsRepoImpl extends SqlPartsRepo {
+  override def delete: DeleteBuilder[SqlPartsFields, SqlPartsRow] = {
+    DeleteBuilder("information_schema.sql_parts", SqlPartsFields)
+  }
   override def insert(unsaved: SqlPartsRow): ConnectionIO[SqlPartsRow] = {
     sql"""insert into information_schema.sql_parts(feature_id, feature_name, is_supported, is_verified_by, "comments")
           values (${fromWrite(unsaved.featureId)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.featureName)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.isSupported)(Write.fromPutOption(YesOrNo.put))}::information_schema.yes_or_no, ${fromWrite(unsaved.isVerifiedBy)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data)
           returning feature_id, feature_name, is_supported, is_verified_by, "comments"
        """.query(SqlPartsRow.read).unique
   }
+  override def select: SelectBuilder[SqlPartsFields, SqlPartsRow] = {
+    SelectBuilderSql("information_schema.sql_parts", SqlPartsFields, SqlPartsRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SqlPartsRow] = {
     sql"""select feature_id, feature_name, is_supported, is_verified_by, "comments" from information_schema.sql_parts""".query(SqlPartsRow.read).stream
+  }
+  override def update: UpdateBuilder[SqlPartsFields, SqlPartsRow] = {
+    UpdateBuilder("information_schema.sql_parts", SqlPartsFields, SqlPartsRow.read)
   }
 }

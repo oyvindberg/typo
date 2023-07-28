@@ -10,8 +10,13 @@ package vjobcandidate
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VjobcandidateViewRepoImpl extends VjobcandidateViewRepo {
+  override def select: SelectBuilder[VjobcandidateViewFields, VjobcandidateViewRow] = {
+    SelectBuilderSql("humanresources.vjobcandidate", VjobcandidateViewFields, VjobcandidateViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, VjobcandidateViewRow] = {
     sql"""select jobcandidateid, businessentityid, "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", Skills, "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", EMail, WebSite, modifieddate::text from humanresources.vjobcandidate""".query(VjobcandidateViewRow.read).stream
   }

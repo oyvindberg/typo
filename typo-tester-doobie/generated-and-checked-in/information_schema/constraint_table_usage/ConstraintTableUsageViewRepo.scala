@@ -9,7 +9,9 @@ package constraint_table_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ConstraintTableUsageViewRepo {
+  def select: SelectBuilder[ConstraintTableUsageViewFields, ConstraintTableUsageViewRow]
   def selectAll: Stream[ConnectionIO, ConstraintTableUsageViewRow]
 }

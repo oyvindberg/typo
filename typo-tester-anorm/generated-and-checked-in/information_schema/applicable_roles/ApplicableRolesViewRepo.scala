@@ -8,7 +8,9 @@ package information_schema
 package applicable_roles
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ApplicableRolesViewRepo {
+  def select: SelectBuilder[ApplicableRolesViewFields, ApplicableRolesViewRow]
   def selectAll(implicit c: Connection): List[ApplicableRolesViewRow]
 }

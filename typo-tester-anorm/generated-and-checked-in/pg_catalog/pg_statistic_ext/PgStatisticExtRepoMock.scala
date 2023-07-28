@@ -8,10 +8,22 @@ package pg_catalog
 package pg_statistic_ext
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgStatisticExtRepoMock(map: scala.collection.mutable.Map[PgStatisticExtId, PgStatisticExtRow] = scala.collection.mutable.Map.empty) extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgStatisticExtFields, map)
   }
   override def insert(unsaved: PgStatisticExtRow)(implicit c: Connection): PgStatisticExtRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgStatisticExtRepoMock(map: scala.collection.mutable.Map[PgStatisticExtId,
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    SelectBuilderMock(PgStatisticExtFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgStatisticExtRepoMock(map: scala.collection.mutable.Map[PgStatisticExtId,
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgStatisticExtFields, map)
   }
   override def upsert(unsaved: PgStatisticExtRow)(implicit c: Connection): PgStatisticExtRow = {
     map.put(unsaved.oid, unsaved)

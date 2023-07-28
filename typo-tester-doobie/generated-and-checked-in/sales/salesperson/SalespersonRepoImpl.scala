@@ -19,10 +19,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalespersonRepoImpl extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"delete from sales.salesperson where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
+    DeleteBuilder("sales.salesperson", SalespersonFields)
   }
   override def insert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow] = {
     sql"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
@@ -75,6 +82,9 @@ object SalespersonRepoImpl extends SalespersonRepo {
     q.query(SalespersonRow.read).unique
     
   }
+  override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
+    SelectBuilderSql("sales.salesperson", SalespersonFields, SalespersonRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
     sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson".query(SalespersonRow.read).stream
   }
@@ -99,6 +109,9 @@ object SalespersonRepoImpl extends SalespersonRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
+    UpdateBuilder("sales.salesperson", SalespersonFields, SalespersonRow.read)
   }
   override def upsert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow] = {
     sql"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)

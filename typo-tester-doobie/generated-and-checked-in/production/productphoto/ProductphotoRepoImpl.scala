@@ -16,10 +16,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId): ConnectionIO[Boolean] = {
     sql"delete from production.productphoto where productphotoid = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
+    DeleteBuilder("production.productphoto", ProductphotoFields)
   }
   override def insert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
@@ -57,6 +64,9 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     q.query(ProductphotoRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
+    SelectBuilderSql("production.productphoto", ProductphotoFields, ProductphotoRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductphotoRow] = {
     sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto".query(ProductphotoRow.read).stream
   }
@@ -78,6 +88,9 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
+    UpdateBuilder("production.productphoto", ProductphotoFields, ProductphotoRow.read)
   }
   override def upsert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)

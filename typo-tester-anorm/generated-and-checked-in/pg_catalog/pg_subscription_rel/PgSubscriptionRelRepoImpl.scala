@@ -9,10 +9,17 @@ package pg_subscription_rel
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
   override def delete(compositeId: PgSubscriptionRelId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_subscription_rel where srrelid = ${compositeId.srrelid} AND srsubid = ${compositeId.srsubid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    DeleteBuilder("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields)
   }
   override def insert(unsaved: PgSubscriptionRelRow)(implicit c: Connection): PgSubscriptionRelRow = {
     SQL"""insert into pg_catalog.pg_subscription_rel(srsubid, srrelid, srsubstate, srsublsn)
@@ -21,6 +28,9 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
        """
       .executeInsert(PgSubscriptionRelRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    SelectBuilderSql("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields, PgSubscriptionRelRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgSubscriptionRelRow] = {
     SQL"""select srsubid, srrelid, srsubstate, srsublsn
@@ -40,6 +50,9 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
               srsublsn = ${row.srsublsn}::pg_lsn
           where srrelid = ${compositeId.srrelid} AND srsubid = ${compositeId.srsubid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow] = {
+    UpdateBuilder("pg_catalog.pg_subscription_rel", PgSubscriptionRelFields, PgSubscriptionRelRow.rowParser)
   }
   override def upsert(unsaved: PgSubscriptionRelRow)(implicit c: Connection): PgSubscriptionRelRow = {
     SQL"""insert into pg_catalog.pg_subscription_rel(srsubid, srrelid, srsubstate, srsublsn)

@@ -9,14 +9,20 @@ package location
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait LocationRepo {
   def delete(locationid: LocationId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[LocationFields, LocationRow]
   def insert(unsaved: LocationRow): ConnectionIO[LocationRow]
   def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow]
+  def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll: Stream[ConnectionIO, LocationRow]
   def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]]
   def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow]
   def update(row: LocationRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[LocationFields, LocationRow]
   def upsert(unsaved: LocationRow): ConnectionIO[LocationRow]
 }

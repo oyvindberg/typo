@@ -9,10 +9,17 @@ package pg_init_privs
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
   override def delete(compositeId: PgInitPrivsId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_init_privs where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    DeleteBuilder("pg_catalog.pg_init_privs", PgInitPrivsFields)
   }
   override def insert(unsaved: PgInitPrivsRow)(implicit c: Connection): PgInitPrivsRow = {
     SQL"""insert into pg_catalog.pg_init_privs(objoid, classoid, objsubid, privtype, initprivs)
@@ -21,6 +28,9 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
        """
       .executeInsert(PgInitPrivsRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    SelectBuilderSql("pg_catalog.pg_init_privs", PgInitPrivsFields, PgInitPrivsRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgInitPrivsRow] = {
     SQL"""select objoid, classoid, objsubid, privtype, initprivs
@@ -40,6 +50,9 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
               initprivs = ${row.initprivs}::_aclitem
           where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    UpdateBuilder("pg_catalog.pg_init_privs", PgInitPrivsFields, PgInitPrivsRow.rowParser)
   }
   override def upsert(unsaved: PgInitPrivsRow)(implicit c: Connection): PgInitPrivsRow = {
     SQL"""insert into pg_catalog.pg_init_privs(objoid, classoid, objsubid, privtype, initprivs)

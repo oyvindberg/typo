@@ -13,10 +13,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import testdb.hardcoded.Defaulted
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
     SQL"""delete from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("compositepk.person", PersonFields)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into compositepk.person("one", two, "name")
@@ -57,6 +64,9 @@ object PersonRepoImpl extends PersonRepo {
     }
     
   }
+  override def select: SelectBuilder[PersonFields, PersonRow] = {
+    SelectBuilderSql("compositepk.person", PersonFields, PersonRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "one", two, "name"
           from compositepk.person
@@ -74,6 +84,9 @@ object PersonRepoImpl extends PersonRepo {
           set "name" = ${row.name}
           where "one" = ${compositeId.one} AND two = ${compositeId.two}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("compositepk.person", PersonFields, PersonRow.rowParser)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into compositepk.person("one", two, "name")

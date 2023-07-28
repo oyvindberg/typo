@@ -8,7 +8,9 @@ package pg_catalog
 package pg_backend_memory_contexts
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgBackendMemoryContextsViewRepo {
+  def select: SelectBuilder[PgBackendMemoryContextsViewFields, PgBackendMemoryContextsViewRow]
   def selectAll(implicit c: Connection): List[PgBackendMemoryContextsViewRow]
 }

@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productphoto where productphotoid = $productphotoid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
+    DeleteBuilder("production.productphoto", ProductphotoFields)
   }
   override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
@@ -60,6 +67,9 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
+    SelectBuilderSql("production.productphoto", ProductphotoFields, ProductphotoRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
           from production.productphoto
@@ -88,6 +98,9 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productphotoid = $productphotoid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
+    UpdateBuilder("production.productphoto", ProductphotoFields, ProductphotoRow.rowParser)
   }
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)

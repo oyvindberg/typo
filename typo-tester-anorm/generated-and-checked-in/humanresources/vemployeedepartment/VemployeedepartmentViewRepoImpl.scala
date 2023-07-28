@@ -9,8 +9,13 @@ package vemployeedepartment
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
+  override def select: SelectBuilder[VemployeedepartmentViewFields, VemployeedepartmentViewRow] = {
+    SelectBuilderSql("humanresources.vemployeedepartment", VemployeedepartmentViewFields, VemployeedepartmentViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[VemployeedepartmentViewRow] = {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate::text
           from humanresources.vemployeedepartment

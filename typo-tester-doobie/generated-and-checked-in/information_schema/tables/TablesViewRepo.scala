@@ -9,7 +9,9 @@ package tables
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait TablesViewRepo {
+  def select: SelectBuilder[TablesViewFields, TablesViewRow]
   def selectAll: Stream[ConnectionIO, TablesViewRow]
 }

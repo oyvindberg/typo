@@ -8,12 +8,18 @@ package pg_catalog
 package pg_subscription_rel
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgSubscriptionRelRepo {
   def delete(compositeId: PgSubscriptionRelId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow]
   def insert(unsaved: PgSubscriptionRelRow)(implicit c: Connection): PgSubscriptionRelRow
+  def select: SelectBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow]
   def selectAll(implicit c: Connection): List[PgSubscriptionRelRow]
   def selectById(compositeId: PgSubscriptionRelId)(implicit c: Connection): Option[PgSubscriptionRelRow]
   def update(row: PgSubscriptionRelRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgSubscriptionRelFields, PgSubscriptionRelRow]
   def upsert(unsaved: PgSubscriptionRelRow)(implicit c: Connection): PgSubscriptionRelRow
 }

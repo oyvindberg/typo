@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_tablespace where oid = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    DeleteBuilder("pg_catalog.pg_tablespace", PgTablespaceFields)
   }
   override def insert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow] = {
     sql"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTablespaceId.put))}::oid, ${fromWrite(unsaved.spcname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.spcowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.spcacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem, ${fromWrite(unsaved.spcoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
           returning oid, spcname, spcowner, spcacl, spcoptions
        """.query(PgTablespaceRow.read).unique
+  }
+  override def select: SelectBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    SelectBuilderSql("pg_catalog.pg_tablespace", PgTablespaceFields, PgTablespaceRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTablespaceRow] = {
     sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace".query(PgTablespaceRow.read).stream
@@ -45,6 +55,9 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    UpdateBuilder("pg_catalog.pg_tablespace", PgTablespaceFields, PgTablespaceRow.read)
   }
   override def upsert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow] = {
     sql"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)

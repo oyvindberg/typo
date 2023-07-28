@@ -9,13 +9,19 @@ package pg_amproc
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgAmprocRepo {
   def delete(oid: PgAmprocId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgAmprocFields, PgAmprocRow]
   def insert(unsaved: PgAmprocRow): ConnectionIO[PgAmprocRow]
+  def select: SelectBuilder[PgAmprocFields, PgAmprocRow]
   def selectAll: Stream[ConnectionIO, PgAmprocRow]
   def selectById(oid: PgAmprocId): ConnectionIO[Option[PgAmprocRow]]
   def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow]
   def update(row: PgAmprocRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgAmprocFields, PgAmprocRow]
   def upsert(unsaved: PgAmprocRow): ConnectionIO[PgAmprocRow]
 }

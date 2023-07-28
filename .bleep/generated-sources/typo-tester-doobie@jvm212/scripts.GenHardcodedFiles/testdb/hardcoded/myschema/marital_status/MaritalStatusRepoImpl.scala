@@ -13,16 +13,26 @@ import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId): ConnectionIO[Boolean] = {
     sql"""delete from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilder("myschema.marital_status", MaritalStatusFields)
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
           values (${fromWrite(unsaved.id)(Write.fromPut(MaritalStatusId.put))}::int8)
           returning "id"
        """.query(MaritalStatusRow.read).unique
+  }
+  override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    SelectBuilderSql("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.read)
   }
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status""".query(MaritalStatusRow.read).stream
@@ -32,6 +42,9 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   }
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status where "id" = ANY(${fromWrite(ids)(Write.fromPut(MaritalStatusId.arrayPut))})""".query(MaritalStatusRow.read).stream
+  }
+  override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    UpdateBuilder("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.read)
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")

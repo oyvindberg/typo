@@ -8,13 +8,19 @@ package pg_catalog
 package pg_constraint
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgConstraintRepo {
   def delete(oid: PgConstraintId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgConstraintFields, PgConstraintRow]
   def insert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow
+  def select: SelectBuilder[PgConstraintFields, PgConstraintRow]
   def selectAll(implicit c: Connection): List[PgConstraintRow]
   def selectById(oid: PgConstraintId)(implicit c: Connection): Option[PgConstraintRow]
   def selectByIds(oids: Array[PgConstraintId])(implicit c: Connection): List[PgConstraintRow]
   def update(row: PgConstraintRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgConstraintFields, PgConstraintRow]
   def upsert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow
 }

@@ -17,10 +17,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
     sql"delete from production.productcosthistory where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields)
   }
   override def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
@@ -54,6 +61,9 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     q.query(ProductcosthistoryRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
     sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory".query(ProductcosthistoryRow.read).stream
   }
@@ -70,6 +80,9 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields, ProductcosthistoryRow.read)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)

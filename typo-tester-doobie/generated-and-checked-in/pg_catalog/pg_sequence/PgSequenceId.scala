@@ -12,12 +12,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `pg_catalog.pg_sequence` */
 case class PgSequenceId(value: /* oid */ Long) extends AnyVal
 object PgSequenceId {
   implicit val arrayGet: Get[Array[PgSequenceId]] = adventureworks.LongArrayMeta.get.map(_.map(PgSequenceId.apply))
   implicit val arrayPut: Put[Array[PgSequenceId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[PgSequenceId, /* oid */ Long] = Bijection[PgSequenceId, /* oid */ Long](_.value)(PgSequenceId.apply)
   implicit val decoder: Decoder[PgSequenceId] = Decoder.decodeLong.map(PgSequenceId.apply)
   implicit val encoder: Encoder[PgSequenceId] = Encoder.encodeLong.contramap(_.value)
   implicit val get: Get[PgSequenceId] = Meta.LongMeta.get.map(PgSequenceId.apply)

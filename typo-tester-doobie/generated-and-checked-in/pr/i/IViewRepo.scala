@@ -9,7 +9,9 @@ package i
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait IViewRepo {
+  def select: SelectBuilder[IViewFields, IViewRow]
   def selectAll: Stream[ConnectionIO, IViewRow]
 }

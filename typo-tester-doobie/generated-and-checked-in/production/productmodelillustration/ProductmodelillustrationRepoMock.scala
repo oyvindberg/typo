@@ -10,11 +10,23 @@ package productmodelillustration
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductmodelillustrationRepoMock(toRow: Function1[ProductmodelillustrationRowUnsaved, ProductmodelillustrationRow],
                                        map: scala.collection.mutable.Map[ProductmodelillustrationId, ProductmodelillustrationRow] = scala.collection.mutable.Map.empty) extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields, map)
   }
   override def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     delay {
@@ -27,6 +39,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    SelectBuilderMock(ProductmodelillustrationFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields, map)
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     delay {

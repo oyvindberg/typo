@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_publication_rel where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationRelId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    DeleteBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields)
   }
   override def insert(unsaved: PgPublicationRelRow): ConnectionIO[PgPublicationRelRow] = {
     sql"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgPublicationRelId.put))}::oid, ${fromWrite(unsaved.prpubid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prrelid)(Write.fromPut(Meta.LongMeta.put))}::oid)
           returning oid, prpubid, prrelid
        """.query(PgPublicationRelRow.read).unique
+  }
+  override def select: SelectBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    SelectBuilderSql("pg_catalog.pg_publication_rel", PgPublicationRelFields, PgPublicationRelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgPublicationRelRow] = {
     sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel".query(PgPublicationRelRow.read).stream
@@ -42,6 +52,9 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    UpdateBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields, PgPublicationRelRow.read)
   }
   override def upsert(unsaved: PgPublicationRelRow): ConnectionIO[PgPublicationRelRow] = {
     sql"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)

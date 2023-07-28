@@ -9,14 +9,20 @@ package salesorderheader
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalesorderheaderRepo {
   def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow]
   def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow]
+  def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def selectAll: Stream[ConnectionIO, SalesorderheaderRow]
   def selectById(salesorderid: SalesorderheaderId): ConnectionIO[Option[SalesorderheaderRow]]
   def selectByIds(salesorderids: Array[SalesorderheaderId]): Stream[ConnectionIO, SalesorderheaderRow]
   def update(row: SalesorderheaderRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow]
 }

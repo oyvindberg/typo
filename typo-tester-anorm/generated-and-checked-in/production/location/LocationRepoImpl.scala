@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production."location" where locationid = $locationid""".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
+    DeleteBuilder("production.location", LocationFields)
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
@@ -65,6 +72,9 @@ object LocationRepoImpl extends LocationRepo {
     }
     
   }
+  override def select: SelectBuilder[LocationFields, LocationRow] = {
+    SelectBuilderSql("production.location", LocationFields, LocationRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
     SQL"""select locationid, "name", costrate, availability, modifieddate::text
           from production."location"
@@ -92,6 +102,9 @@ object LocationRepoImpl extends LocationRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where locationid = $locationid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[LocationFields, LocationRow] = {
+    UpdateBuilder("production.location", LocationFields, LocationRow.rowParser)
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)

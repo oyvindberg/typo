@@ -8,7 +8,9 @@ package sales
 package vstorewithdemographics
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait VstorewithdemographicsViewRepo {
+  def select: SelectBuilder[VstorewithdemographicsViewFields, VstorewithdemographicsViewRow]
   def selectAll(implicit c: Connection): List[VstorewithdemographicsViewRow]
 }

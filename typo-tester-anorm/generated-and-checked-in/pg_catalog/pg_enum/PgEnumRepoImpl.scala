@@ -9,10 +9,17 @@ package pg_enum
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgEnumRepoImpl extends PgEnumRepo {
   override def delete(oid: PgEnumId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_enum where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgEnumFields, PgEnumRow] = {
+    DeleteBuilder("pg_catalog.pg_enum", PgEnumFields)
   }
   override def insert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
     SQL"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)
@@ -21,6 +28,9 @@ object PgEnumRepoImpl extends PgEnumRepo {
        """
       .executeInsert(PgEnumRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgEnumFields, PgEnumRow] = {
+    SelectBuilderSql("pg_catalog.pg_enum", PgEnumFields, PgEnumRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgEnumRow] = {
     SQL"""select oid, enumtypid, enumsortorder, enumlabel
@@ -48,6 +58,9 @@ object PgEnumRepoImpl extends PgEnumRepo {
               enumlabel = ${row.enumlabel}::name
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgEnumFields, PgEnumRow] = {
+    UpdateBuilder("pg_catalog.pg_enum", PgEnumFields, PgEnumRow.rowParser)
   }
   override def upsert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow = {
     SQL"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)

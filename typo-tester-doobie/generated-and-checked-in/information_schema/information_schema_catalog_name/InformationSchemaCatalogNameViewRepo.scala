@@ -9,7 +9,9 @@ package information_schema_catalog_name
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait InformationSchemaCatalogNameViewRepo {
+  def select: SelectBuilder[InformationSchemaCatalogNameViewFields, InformationSchemaCatalogNameViewRow]
   def selectAll: Stream[ConnectionIO, InformationSchemaCatalogNameViewRow]
 }

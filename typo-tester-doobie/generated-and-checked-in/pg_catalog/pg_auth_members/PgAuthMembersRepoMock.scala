@@ -10,10 +10,22 @@ package pg_auth_members
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, PgAuthMembersRow] = scala.collection.mutable.Map.empty) extends PgAuthMembersRepo {
   override def delete(compositeId: PgAuthMembersId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgAuthMembersFields, map)
   }
   override def insert(unsaved: PgAuthMembersRow): ConnectionIO[PgAuthMembersRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, P
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    SelectBuilderMock(PgAuthMembersFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgAuthMembersRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgAuthMembersRepoMock(map: scala.collection.mutable.Map[PgAuthMembersId, P
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgAuthMembersFields, map)
   }
   override def upsert(unsaved: PgAuthMembersRow): ConnectionIO[PgAuthMembersRow] = {
     delay {

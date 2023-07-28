@@ -15,10 +15,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.store where businessentityid = $businessentityid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[StoreFields, StoreRow] = {
+    DeleteBuilder("sales.store", StoreFields)
   }
   override def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
@@ -62,6 +69,9 @@ object StoreRepoImpl extends StoreRepo {
     }
     
   }
+  override def select: SelectBuilder[StoreFields, StoreRow] = {
+    SelectBuilderSql("sales.store", StoreFields, StoreRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
           from sales.store
@@ -90,6 +100,9 @@ object StoreRepoImpl extends StoreRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[StoreFields, StoreRow] = {
+    UpdateBuilder("sales.store", StoreFields, StoreRow.rowParser)
   }
   override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)

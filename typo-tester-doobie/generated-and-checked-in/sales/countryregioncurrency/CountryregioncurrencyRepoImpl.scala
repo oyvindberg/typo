@@ -17,10 +17,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean] = {
     sql"delete from sales.countryregioncurrency where countryregioncode = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND currencycode = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields)
   }
   override def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
@@ -52,6 +59,9 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     q.query(CountryregioncurrencyRow.read).unique
     
   }
+  override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow] = {
     sql"select countryregioncode, currencycode, modifieddate::text from sales.countryregioncurrency".query(CountryregioncurrencyRow.read).stream
   }
@@ -66,6 +76,9 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields, CountryregioncurrencyRow.read)
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)

@@ -20,10 +20,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"delete from purchasing.vendor where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[VendorFields, VendorRow] = {
+    DeleteBuilder("purchasing.vendor", VendorFields)
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
@@ -66,6 +73,9 @@ object VendorRepoImpl extends VendorRepo {
     q.query(VendorRow.read).unique
     
   }
+  override def select: SelectBuilder[VendorFields, VendorRow] = {
+    SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
     sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor""".query(VendorRow.read).stream
   }
@@ -89,6 +99,9 @@ object VendorRepoImpl extends VendorRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[VendorFields, VendorRow] = {
+    UpdateBuilder("purchasing.vendor", VendorFields, VendorRow.read)
   }
   override def upsert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)

@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_description where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    DeleteBuilder("pg_catalog.pg_description", PgDescriptionFields)
   }
   override def insert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
     sql"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
           values (${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))})
           returning objoid, classoid, objsubid, description
        """.query(PgDescriptionRow.read).unique
+  }
+  override def select: SelectBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    SelectBuilderSql("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgDescriptionRow] = {
     sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description".query(PgDescriptionRow.read).stream
@@ -38,6 +48,9 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    UpdateBuilder("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.read)
   }
   override def upsert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
     sql"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)

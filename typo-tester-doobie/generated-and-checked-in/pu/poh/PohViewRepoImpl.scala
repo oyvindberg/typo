@@ -10,8 +10,13 @@ package poh
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PohViewRepoImpl extends PohViewRepo {
+  override def select: SelectBuilder[PohViewFields, PohViewRow] = {
+    SelectBuilderSql("pu.poh", PohViewFields, PohViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PohViewRow] = {
     sql"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from pu.poh""".query(PohViewRow.read).stream
   }

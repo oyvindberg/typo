@@ -9,10 +9,17 @@ package pg_tablespace
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTablespaceRepoImpl extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_tablespace where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    DeleteBuilder("pg_catalog.pg_tablespace", PgTablespaceFields)
   }
   override def insert(unsaved: PgTablespaceRow)(implicit c: Connection): PgTablespaceRow = {
     SQL"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
@@ -21,6 +28,9 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
        """
       .executeInsert(PgTablespaceRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    SelectBuilderSql("pg_catalog.pg_tablespace", PgTablespaceFields, PgTablespaceRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTablespaceRow] = {
     SQL"""select oid, spcname, spcowner, spcacl, spcoptions
@@ -49,6 +59,9 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
               spcoptions = ${row.spcoptions}::_text
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    UpdateBuilder("pg_catalog.pg_tablespace", PgTablespaceFields, PgTablespaceRow.rowParser)
   }
   override def upsert(unsaved: PgTablespaceRow)(implicit c: Connection): PgTablespaceRow = {
     SQL"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)

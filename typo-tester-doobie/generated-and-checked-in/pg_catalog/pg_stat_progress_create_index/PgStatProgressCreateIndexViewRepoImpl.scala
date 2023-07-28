@@ -10,8 +10,13 @@ package pg_stat_progress_create_index
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatProgressCreateIndexViewRepoImpl extends PgStatProgressCreateIndexViewRepo {
+  override def select: SelectBuilder[PgStatProgressCreateIndexViewFields, PgStatProgressCreateIndexViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_progress_create_index", PgStatProgressCreateIndexViewFields, PgStatProgressCreateIndexViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatProgressCreateIndexViewRow] = {
     sql"select pid, datid, datname, relid, index_relid, command, phase, lockers_total, lockers_done, current_locker_pid, blocks_total, blocks_done, tuples_total, tuples_done, partitions_total, partitions_done from pg_catalog.pg_stat_progress_create_index".query(PgStatProgressCreateIndexViewRow.read).stream
   }

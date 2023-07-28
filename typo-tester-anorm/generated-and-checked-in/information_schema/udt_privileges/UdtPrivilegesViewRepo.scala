@@ -8,7 +8,9 @@ package information_schema
 package udt_privileges
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait UdtPrivilegesViewRepo {
+  def select: SelectBuilder[UdtPrivilegesViewFields, UdtPrivilegesViewRow]
   def selectAll(implicit c: Connection): List[UdtPrivilegesViewRow]
 }

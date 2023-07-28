@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean] = {
     sql"delete from production.unitmeasure where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    DeleteBuilder("production.unitmeasure", UnitmeasureFields)
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
@@ -51,6 +58,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     q.query(UnitmeasureRow.read).unique
     
   }
+  override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    SelectBuilderSql("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
     sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure""".query(UnitmeasureRow.read).stream
   }
@@ -69,6 +79,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    UpdateBuilder("production.unitmeasure", UnitmeasureFields, UnitmeasureRow.read)
   }
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)

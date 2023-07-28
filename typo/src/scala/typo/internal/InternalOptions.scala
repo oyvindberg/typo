@@ -12,5 +12,6 @@ case class InternalOptions(
     generateMockRepos: Selector,
     header: String,
     enableFieldValue: Boolean,
+    enableDsl: Boolean,
     debugTypes: Boolean
 )

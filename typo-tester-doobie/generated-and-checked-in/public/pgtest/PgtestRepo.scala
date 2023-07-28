@@ -9,8 +9,14 @@ package pgtest
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgtestRepo {
+  def delete: DeleteBuilder[PgtestFields, PgtestRow]
   def insert(unsaved: PgtestRow): ConnectionIO[PgtestRow]
+  def select: SelectBuilder[PgtestFields, PgtestRow]
   def selectAll: Stream[ConnectionIO, PgtestRow]
+  def update: UpdateBuilder[PgtestFields, PgtestRow]
 }

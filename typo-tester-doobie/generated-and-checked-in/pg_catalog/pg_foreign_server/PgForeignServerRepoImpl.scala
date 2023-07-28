@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def delete(oid: PgForeignServerId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_foreign_server where oid = ${fromWrite(oid)(Write.fromPut(PgForeignServerId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgForeignServerFields, PgForeignServerRow] = {
+    DeleteBuilder("pg_catalog.pg_foreign_server", PgForeignServerFields)
   }
   override def insert(unsaved: PgForeignServerRow): ConnectionIO[PgForeignServerRow] = {
     sql"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgForeignServerId.put))}::oid, ${fromWrite(unsaved.srvname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.srvowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srvfdw)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srvtype)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.srvversion)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.srvacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem, ${fromWrite(unsaved.srvoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
           returning oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
        """.query(PgForeignServerRow.read).unique
+  }
+  override def select: SelectBuilder[PgForeignServerFields, PgForeignServerRow] = {
+    SelectBuilderSql("pg_catalog.pg_foreign_server", PgForeignServerFields, PgForeignServerRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgForeignServerRow] = {
     sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server".query(PgForeignServerRow.read).stream
@@ -48,6 +58,9 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgForeignServerFields, PgForeignServerRow] = {
+    UpdateBuilder("pg_catalog.pg_foreign_server", PgForeignServerFields, PgForeignServerRow.read)
   }
   override def upsert(unsaved: PgForeignServerRow): ConnectionIO[PgForeignServerRow] = {
     sql"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)

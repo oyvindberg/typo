@@ -10,8 +10,13 @@ package pg_stat_ssl
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatSslViewRepoImpl extends PgStatSslViewRepo {
+  override def select: SelectBuilder[PgStatSslViewFields, PgStatSslViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_ssl", PgStatSslViewFields, PgStatSslViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatSslViewRow] = {
     sql"""select pid, ssl, "version", cipher, bits, client_dn, client_serial, issuer_dn from pg_catalog.pg_stat_ssl""".query(PgStatSslViewRow.read).stream
   }

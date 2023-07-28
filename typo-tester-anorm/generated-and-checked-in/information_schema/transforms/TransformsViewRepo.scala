@@ -8,7 +8,9 @@ package information_schema
 package transforms
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait TransformsViewRepo {
+  def select: SelectBuilder[TransformsViewFields, TransformsViewRow]
   def selectAll(implicit c: Connection): List[TransformsViewRow]
 }

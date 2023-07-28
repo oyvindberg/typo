@@ -9,14 +9,20 @@ package salesperson
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalespersonRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[SalespersonFields, SalespersonRow]
   def insert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow
   def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow
+  def select: SelectBuilder[SalespersonFields, SalespersonRow]
   def selectAll(implicit c: Connection): List[SalespersonRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[SalespersonRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[SalespersonRow]
   def update(row: SalespersonRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[SalespersonFields, SalespersonRow]
   def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow
 }

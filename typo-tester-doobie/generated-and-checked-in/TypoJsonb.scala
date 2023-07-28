@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** jsonb (via PGObject) */
 case class TypoJsonb(value: String)
@@ -25,6 +26,7 @@ object TypoJsonb {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoJsonb, String] = Bijection[TypoJsonb, String](_.value)(TypoJsonb.apply)
   implicit val decoder: Decoder[TypoJsonb] = Decoder.decodeString.map(TypoJsonb.apply)
   implicit val encoder: Encoder[TypoJsonb] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoJsonb] = Get.Advanced.other[PGobject](NonEmptyList.one("jsonb"))

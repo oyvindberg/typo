@@ -9,8 +9,13 @@ package enabled_roles
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object EnabledRolesViewRepoImpl extends EnabledRolesViewRepo {
+  override def select: SelectBuilder[EnabledRolesViewFields, EnabledRolesViewRow] = {
+    SelectBuilderSql("information_schema.enabled_roles", EnabledRolesViewFields, EnabledRolesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[EnabledRolesViewRow] = {
     SQL"""select role_name
           from information_schema.enabled_roles

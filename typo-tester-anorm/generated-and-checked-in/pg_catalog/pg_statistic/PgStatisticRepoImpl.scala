@@ -9,10 +9,17 @@ package pg_statistic
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgStatisticRepoImpl extends PgStatisticRepo {
   override def delete(compositeId: PgStatisticId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_statistic where starelid = ${compositeId.starelid} AND staattnum = ${compositeId.staattnum} AND stainherit = ${compositeId.stainherit}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgStatisticFields, PgStatisticRow] = {
+    DeleteBuilder("pg_catalog.pg_statistic", PgStatisticFields)
   }
   override def insert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow = {
     SQL"""insert into pg_catalog.pg_statistic(starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5)
@@ -21,6 +28,9 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
        """
       .executeInsert(PgStatisticRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgStatisticFields, PgStatisticRow] = {
+    SelectBuilderSql("pg_catalog.pg_statistic", PgStatisticFields, PgStatisticRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgStatisticRow] = {
     SQL"""select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
@@ -66,6 +76,9 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
               stavalues5 = ${row.stavalues5}::anyarray
           where starelid = ${compositeId.starelid} AND staattnum = ${compositeId.staattnum} AND stainherit = ${compositeId.stainherit}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgStatisticFields, PgStatisticRow] = {
+    UpdateBuilder("pg_catalog.pg_statistic", PgStatisticFields, PgStatisticRow.rowParser)
   }
   override def upsert(unsaved: PgStatisticRow)(implicit c: Connection): PgStatisticRow = {
     SQL"""insert into pg_catalog.pg_statistic(starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5)

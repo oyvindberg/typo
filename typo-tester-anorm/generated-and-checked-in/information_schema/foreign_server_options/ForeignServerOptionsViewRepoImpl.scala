@@ -9,8 +9,13 @@ package foreign_server_options
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ForeignServerOptionsViewRepoImpl extends ForeignServerOptionsViewRepo {
+  override def select: SelectBuilder[ForeignServerOptionsViewFields, ForeignServerOptionsViewRow] = {
+    SelectBuilderSql("information_schema.foreign_server_options", ForeignServerOptionsViewFields, ForeignServerOptionsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ForeignServerOptionsViewRow] = {
     SQL"""select foreign_server_catalog, foreign_server_name, option_name, option_value
           from information_schema.foreign_server_options

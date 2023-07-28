@@ -9,7 +9,9 @@ package pg_stat_database_conflicts
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatDatabaseConflictsViewRepo {
+  def select: SelectBuilder[PgStatDatabaseConflictsViewFields, PgStatDatabaseConflictsViewRow]
   def selectAll: Stream[ConnectionIO, PgStatDatabaseConflictsViewRow]
 }

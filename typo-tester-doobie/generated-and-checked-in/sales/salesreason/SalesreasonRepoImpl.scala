@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId): ConnectionIO[Boolean] = {
     sql"delete from sales.salesreason where salesreasonid = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
+    DeleteBuilder("sales.salesreason", SalesreasonFields)
   }
   override def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
@@ -55,6 +62,9 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     q.query(SalesreasonRow.read).unique
     
   }
+  override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
+    SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
     sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason""".query(SalesreasonRow.read).stream
   }
@@ -74,6 +84,9 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
+    UpdateBuilder("sales.salesreason", SalesreasonFields, SalesreasonRow.read)
   }
   override def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)

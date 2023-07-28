@@ -9,14 +9,20 @@ package salesreason
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalesreasonRepo {
   def delete(salesreasonid: SalesreasonId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow]
   def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
   def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow]
+  def select: SelectBuilder[SalesreasonFields, SalesreasonRow]
   def selectAll: Stream[ConnectionIO, SalesreasonRow]
   def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]]
   def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow]
   def update(row: SalesreasonRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[SalesreasonFields, SalesreasonRow]
   def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
 }

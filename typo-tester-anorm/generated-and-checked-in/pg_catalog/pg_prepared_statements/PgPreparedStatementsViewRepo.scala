@@ -8,7 +8,9 @@ package pg_catalog
 package pg_prepared_statements
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgPreparedStatementsViewRepo {
+  def select: SelectBuilder[PgPreparedStatementsViewFields, PgPreparedStatementsViewRow]
   def selectAll(implicit c: Connection): List[PgPreparedStatementsViewRow]
 }

@@ -10,6 +10,7 @@ case class Options(
     generateMockRepos: Selector = Selector.All,
     header: String = Options.header,
     enableFieldValue: Boolean = false,
+    enableDsl: Boolean = true,
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true
 )

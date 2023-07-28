@@ -9,8 +9,13 @@ package domain_constraints
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object DomainConstraintsViewRepoImpl extends DomainConstraintsViewRepo {
+  override def select: SelectBuilder[DomainConstraintsViewFields, DomainConstraintsViewRow] = {
+    SelectBuilderSql("information_schema.domain_constraints", DomainConstraintsViewFields, DomainConstraintsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[DomainConstraintsViewRow] = {
     SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", domain_catalog, domain_schema, domain_name, is_deferrable, initially_deferred
           from information_schema.domain_constraints

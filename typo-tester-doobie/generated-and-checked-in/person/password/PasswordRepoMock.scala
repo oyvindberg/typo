@@ -11,11 +11,23 @@ import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
                        map: scala.collection.mutable.Map[BusinessentityId, PasswordRow] = scala.collection.mutable.Map.empty) extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     delay(map.remove(businessentityid).isDefined)
+  }
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PasswordFields, map)
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     delay {
@@ -28,6 +40,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PasswordFields, PasswordRow] = {
+    SelectBuilderMock(PasswordFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
     Stream.emits(map.values.toList)
@@ -48,6 +63,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PasswordFields, map)
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     delay {

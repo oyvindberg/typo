@@ -9,13 +9,19 @@ package pg_rewrite
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgRewriteRepo {
   def delete(oid: PgRewriteId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow]
   def insert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow]
+  def select: SelectBuilder[PgRewriteFields, PgRewriteRow]
   def selectAll: Stream[ConnectionIO, PgRewriteRow]
   def selectById(oid: PgRewriteId): ConnectionIO[Option[PgRewriteRow]]
   def selectByIds(oids: Array[PgRewriteId]): Stream[ConnectionIO, PgRewriteRow]
   def update(row: PgRewriteRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgRewriteFields, PgRewriteRow]
   def upsert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow]
 }

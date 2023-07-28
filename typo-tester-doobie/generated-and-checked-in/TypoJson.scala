@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** json (via PGObject) */
 case class TypoJson(value: String)
@@ -25,6 +26,7 @@ object TypoJson {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoJson, String] = Bijection[TypoJson, String](_.value)(TypoJson.apply)
   implicit val decoder: Decoder[TypoJson] = Decoder.decodeString.map(TypoJson.apply)
   implicit val encoder: Encoder[TypoJson] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoJson] = Get.Advanced.other[PGobject](NonEmptyList.one("json"))

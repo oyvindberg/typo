@@ -10,10 +10,22 @@ package pg_ts_parser
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsParserRow] = scala.collection.mutable.Map.empty) extends PgTsParserRepo {
   override def delete(oid: PgTsParserId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgTsParserFields, map)
   }
   override def insert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsPar
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgTsParserFields, PgTsParserRow] = {
+    SelectBuilderMock(PgTsParserFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgTsParserRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgTsParserRepoMock(map: scala.collection.mutable.Map[PgTsParserId, PgTsPar
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgTsParserFields, PgTsParserRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgTsParserFields, map)
   }
   override def upsert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
     delay {

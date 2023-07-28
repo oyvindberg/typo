@@ -9,10 +9,17 @@ package pg_shdescription
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
   override def delete(compositeId: PgShdescriptionId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_shdescription where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
+    DeleteBuilder("pg_catalog.pg_shdescription", PgShdescriptionFields)
   }
   override def insert(unsaved: PgShdescriptionRow)(implicit c: Connection): PgShdescriptionRow = {
     SQL"""insert into pg_catalog.pg_shdescription(objoid, classoid, description)
@@ -21,6 +28,9 @@ object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
        """
       .executeInsert(PgShdescriptionRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
+    SelectBuilderSql("pg_catalog.pg_shdescription", PgShdescriptionFields, PgShdescriptionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgShdescriptionRow] = {
     SQL"""select objoid, classoid, description
@@ -39,6 +49,9 @@ object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
           set description = ${row.description}
           where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
+    UpdateBuilder("pg_catalog.pg_shdescription", PgShdescriptionFields, PgShdescriptionRow.rowParser)
   }
   override def upsert(unsaved: PgShdescriptionRow)(implicit c: Connection): PgShdescriptionRow = {
     SQL"""insert into pg_catalog.pg_shdescription(objoid, classoid, description)

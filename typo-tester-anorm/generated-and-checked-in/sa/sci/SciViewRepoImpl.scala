@@ -9,8 +9,13 @@ package sci
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SciViewRepoImpl extends SciViewRepo {
+  override def select: SelectBuilder[SciViewFields, SciViewRow] = {
+    SelectBuilderSql("sa.sci", SciViewFields, SciViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SciViewRow] = {
     SQL"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
           from sa.sci

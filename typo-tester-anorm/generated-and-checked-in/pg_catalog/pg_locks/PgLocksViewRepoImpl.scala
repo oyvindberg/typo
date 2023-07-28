@@ -9,8 +9,13 @@ package pg_locks
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgLocksViewRepoImpl extends PgLocksViewRepo {
+  override def select: SelectBuilder[PgLocksViewFields, PgLocksViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_locks", PgLocksViewFields, PgLocksViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgLocksViewRow] = {
     SQL"""select locktype, "database", relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, "mode", "granted", fastpath, waitstart::text
           from pg_catalog.pg_locks

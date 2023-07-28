@@ -8,13 +8,19 @@ package production
 package workorderrouting
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait WorkorderroutingRepo {
   def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
   def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow
+  def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll(implicit c: Connection): List[WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow]
   def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
 }

@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.currencyrate where currencyrateid = $currencyrateid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    DeleteBuilder("sales.currencyrate", CurrencyrateFields)
   }
   override def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     SQL"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
@@ -61,6 +68,9 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     }
     
   }
+  override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    SelectBuilderSql("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
     SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
           from sales.currencyrate
@@ -90,6 +100,9 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where currencyrateid = $currencyrateid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    UpdateBuilder("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.rowParser)
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     SQL"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)

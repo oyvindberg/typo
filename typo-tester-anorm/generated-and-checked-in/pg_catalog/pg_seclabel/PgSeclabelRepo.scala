@@ -8,12 +8,18 @@ package pg_catalog
 package pg_seclabel
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgSeclabelRepo {
   def delete(compositeId: PgSeclabelId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgSeclabelFields, PgSeclabelRow]
   def insert(unsaved: PgSeclabelRow)(implicit c: Connection): PgSeclabelRow
+  def select: SelectBuilder[PgSeclabelFields, PgSeclabelRow]
   def selectAll(implicit c: Connection): List[PgSeclabelRow]
   def selectById(compositeId: PgSeclabelId)(implicit c: Connection): Option[PgSeclabelRow]
   def update(row: PgSeclabelRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgSeclabelFields, PgSeclabelRow]
   def upsert(unsaved: PgSeclabelRow)(implicit c: Connection): PgSeclabelRow
 }

@@ -9,10 +9,17 @@ package pg_publication_rel
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_publication_rel where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    DeleteBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields)
   }
   override def insert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
     SQL"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
@@ -21,6 +28,9 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
        """
       .executeInsert(PgPublicationRelRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    SelectBuilderSql("pg_catalog.pg_publication_rel", PgPublicationRelFields, PgPublicationRelRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPublicationRelRow] = {
     SQL"""select oid, prpubid, prrelid
@@ -47,6 +57,9 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
               prrelid = ${row.prrelid}::oid
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    UpdateBuilder("pg_catalog.pg_publication_rel", PgPublicationRelFields, PgPublicationRelRow.rowParser)
   }
   override def upsert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
     SQL"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)

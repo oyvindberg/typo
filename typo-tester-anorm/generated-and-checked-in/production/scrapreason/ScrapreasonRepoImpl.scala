@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from production.scrapreason where scrapreasonid = $scrapreasonid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    DeleteBuilder("production.scrapreason", ScrapreasonFields)
   }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
@@ -57,6 +64,9 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     }
     
   }
+  override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    SelectBuilderSql("production.scrapreason", ScrapreasonFields, ScrapreasonRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
     SQL"""select scrapreasonid, "name", modifieddate::text
           from production.scrapreason
@@ -82,6 +92,9 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where scrapreasonid = $scrapreasonid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    UpdateBuilder("production.scrapreason", ScrapreasonFields, ScrapreasonRow.rowParser)
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)

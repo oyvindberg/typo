@@ -10,10 +10,22 @@ package pg_replication_origin
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicationOriginId, PgReplicationOriginRow] = scala.collection.mutable.Map.empty) extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId): ConnectionIO[Boolean] = {
     delay(map.remove(roident).isDefined)
+  }
+  override def delete: DeleteBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgReplicationOriginFields, map)
   }
   override def insert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicatio
         map.put(unsaved.roident, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    SelectBuilderMock(PgReplicationOriginFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgReplicationOriginRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgReplicationOriginRepoMock(map: scala.collection.mutable.Map[PgReplicatio
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgReplicationOriginFields, map)
   }
   override def upsert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     delay {

@@ -12,12 +12,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `production.location` */
 case class LocationId(value: Int) extends AnyVal
 object LocationId {
   implicit val arrayGet: Get[Array[LocationId]] = adventureworks.IntegerArrayMeta.get.map(_.map(LocationId.apply))
   implicit val arrayPut: Put[Array[LocationId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[LocationId, Int] = Bijection[LocationId, Int](_.value)(LocationId.apply)
   implicit val decoder: Decoder[LocationId] = Decoder.decodeInt.map(LocationId.apply)
   implicit val encoder: Encoder[LocationId] = Encoder.encodeInt.contramap(_.value)
   implicit val get: Get[LocationId] = Meta.IntMeta.get.map(LocationId.apply)

@@ -9,8 +9,13 @@ package pg_stats_ext_exprs
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatsExtExprsViewRepoImpl extends PgStatsExtExprsViewRepo {
+  override def select: SelectBuilder[PgStatsExtExprsViewFields, PgStatsExtExprsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stats_ext_exprs", PgStatsExtExprsViewFields, PgStatsExtExprsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatsExtExprsViewRow] = {
     SQL"""select schemaname, tablename, statistics_schemaname, statistics_name, statistics_owner, expr, null_frac, avg_width, n_distinct, most_common_vals, most_common_freqs, histogram_bounds, correlation, most_common_elems, most_common_elem_freqs, elem_count_histogram
           from pg_catalog.pg_stats_ext_exprs

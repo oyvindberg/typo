@@ -9,7 +9,9 @@ package schemata
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait SchemataViewRepo {
+  def select: SelectBuilder[SchemataViewFields, SchemataViewRow]
   def selectAll: Stream[ConnectionIO, SchemataViewRow]
 }

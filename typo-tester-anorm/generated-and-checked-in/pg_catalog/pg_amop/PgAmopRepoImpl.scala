@@ -9,10 +9,17 @@ package pg_amop
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAmopRepoImpl extends PgAmopRepo {
   override def delete(oid: PgAmopId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_amop where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgAmopFields, PgAmopRow] = {
+    DeleteBuilder("pg_catalog.pg_amop", PgAmopFields)
   }
   override def insert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow = {
     SQL"""insert into pg_catalog.pg_amop(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)
@@ -21,6 +28,9 @@ object PgAmopRepoImpl extends PgAmopRepo {
        """
       .executeInsert(PgAmopRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgAmopFields, PgAmopRow] = {
+    SelectBuilderSql("pg_catalog.pg_amop", PgAmopFields, PgAmopRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAmopRow] = {
     SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
@@ -53,6 +63,9 @@ object PgAmopRepoImpl extends PgAmopRepo {
               amopsortfamily = ${row.amopsortfamily}::oid
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgAmopFields, PgAmopRow] = {
+    UpdateBuilder("pg_catalog.pg_amop", PgAmopFields, PgAmopRow.rowParser)
   }
   override def upsert(unsaved: PgAmopRow)(implicit c: Connection): PgAmopRow = {
     SQL"""insert into pg_catalog.pg_amop(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)

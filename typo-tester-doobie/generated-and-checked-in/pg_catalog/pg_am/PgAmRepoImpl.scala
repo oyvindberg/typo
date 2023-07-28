@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAmRepoImpl extends PgAmRepo {
   override def delete(oid: PgAmId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_am where oid = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgAmFields, PgAmRow] = {
+    DeleteBuilder("pg_catalog.pg_am", PgAmFields)
   }
   override def insert(unsaved: PgAmRow): ConnectionIO[PgAmRow] = {
     sql"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgAmId.put))}::oid, ${fromWrite(unsaved.amname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.amhandler)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.amtype)(Write.fromPut(Meta.StringMeta.put))}::char)
           returning oid, amname, amhandler, amtype
        """.query(PgAmRow.read).unique
+  }
+  override def select: SelectBuilder[PgAmFields, PgAmRow] = {
+    SelectBuilderSql("pg_catalog.pg_am", PgAmFields, PgAmRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAmRow] = {
     sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am".query(PgAmRow.read).stream
@@ -44,6 +54,9 @@ object PgAmRepoImpl extends PgAmRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgAmFields, PgAmRow] = {
+    UpdateBuilder("pg_catalog.pg_am", PgAmFields, PgAmRow.read)
   }
   override def upsert(unsaved: PgAmRow): ConnectionIO[PgAmRow] = {
     sql"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)

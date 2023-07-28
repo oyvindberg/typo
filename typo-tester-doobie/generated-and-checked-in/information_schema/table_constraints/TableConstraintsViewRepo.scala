@@ -9,7 +9,9 @@ package table_constraints
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait TableConstraintsViewRepo {
+  def select: SelectBuilder[TableConstraintsViewFields, TableConstraintsViewRow]
   def selectAll: Stream[ConnectionIO, TableConstraintsViewRow]
 }

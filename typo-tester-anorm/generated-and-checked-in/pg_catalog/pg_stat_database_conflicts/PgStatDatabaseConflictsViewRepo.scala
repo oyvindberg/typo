@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_database_conflicts
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatDatabaseConflictsViewRepo {
+  def select: SelectBuilder[PgStatDatabaseConflictsViewFields, PgStatDatabaseConflictsViewRow]
   def selectAll(implicit c: Connection): List[PgStatDatabaseConflictsViewRow]
 }

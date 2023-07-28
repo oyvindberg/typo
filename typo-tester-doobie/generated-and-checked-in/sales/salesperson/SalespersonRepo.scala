@@ -10,14 +10,20 @@ package salesperson
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalespersonRepo {
   def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[SalespersonFields, SalespersonRow]
   def insert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow]
   def insert(unsaved: SalespersonRowUnsaved): ConnectionIO[SalespersonRow]
+  def select: SelectBuilder[SalespersonFields, SalespersonRow]
   def selectAll: Stream[ConnectionIO, SalespersonRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[SalespersonRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, SalespersonRow]
   def update(row: SalespersonRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[SalespersonFields, SalespersonRow]
   def upsert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow]
 }

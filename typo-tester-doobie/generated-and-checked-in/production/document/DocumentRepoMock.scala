@@ -10,11 +10,23 @@ package document
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
                        map: scala.collection.mutable.Map[DocumentId, DocumentRow] = scala.collection.mutable.Map.empty) extends DocumentRepo {
   override def delete(documentnode: DocumentId): ConnectionIO[Boolean] = {
     delay(map.remove(documentnode).isDefined)
+  }
+  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields, map)
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {
@@ -27,6 +39,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[DocumentFields, DocumentRow] = {
+    SelectBuilderMock(DocumentFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields, map)
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {

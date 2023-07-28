@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** regproc (via PGObject) */
 case class TypoRegproc(value: String)
@@ -25,6 +26,7 @@ object TypoRegproc {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoRegproc, String] = Bijection[TypoRegproc, String](_.value)(TypoRegproc.apply)
   implicit val decoder: Decoder[TypoRegproc] = Decoder.decodeString.map(TypoRegproc.apply)
   implicit val encoder: Encoder[TypoRegproc] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoRegproc] = Get.Advanced.other[PGobject](NonEmptyList.one("regproc"))

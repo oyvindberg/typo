@@ -8,14 +8,20 @@ package person
 package addresstype
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait AddresstypeRepo {
   def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow]
   def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow
   def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow
+  def select: SelectBuilder[AddresstypeFields, AddresstypeRow]
   def selectAll(implicit c: Connection): List[AddresstypeRow]
   def selectById(addresstypeid: AddresstypeId)(implicit c: Connection): Option[AddresstypeRow]
   def selectByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): List[AddresstypeRow]
   def update(row: AddresstypeRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
   def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow
 }

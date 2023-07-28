@@ -9,10 +9,17 @@ package pg_constraint
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgConstraintRepoImpl extends PgConstraintRepo {
   override def delete(oid: PgConstraintId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_constraint where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgConstraintFields, PgConstraintRow] = {
+    DeleteBuilder("pg_catalog.pg_constraint", PgConstraintFields)
   }
   override def insert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
     SQL"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)
@@ -21,6 +28,9 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
        """
       .executeInsert(PgConstraintRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgConstraintFields, PgConstraintRow] = {
+    SelectBuilderSql("pg_catalog.pg_constraint", PgConstraintFields, PgConstraintRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
     SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
@@ -69,6 +79,9 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
               conbin = ${row.conbin}::pg_node_tree
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgConstraintFields, PgConstraintRow] = {
+    UpdateBuilder("pg_catalog.pg_constraint", PgConstraintFields, PgConstraintRow.rowParser)
   }
   override def upsert(unsaved: PgConstraintRow)(implicit c: Connection): PgConstraintRow = {
     SQL"""insert into pg_catalog.pg_constraint(oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin)

@@ -10,10 +10,22 @@ package pg_enum
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = scala.collection.mutable.Map.empty) extends PgEnumRepo {
   override def delete(oid: PgEnumId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgEnumFields, PgEnumRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgEnumFields, map)
   }
   override def insert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgEnumFields, PgEnumRow] = {
+    SelectBuilderMock(PgEnumFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgEnumRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgEnumRepoMock(map: scala.collection.mutable.Map[PgEnumId, PgEnumRow] = sc
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgEnumFields, PgEnumRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgEnumFields, map)
   }
   override def upsert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow] = {
     delay {

@@ -9,10 +9,17 @@ package pg_largeobject
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
   override def delete(compositeId: PgLargeobjectId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_largeobject where loid = ${compositeId.loid} AND pageno = ${compositeId.pageno}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    DeleteBuilder("pg_catalog.pg_largeobject", PgLargeobjectFields)
   }
   override def insert(unsaved: PgLargeobjectRow)(implicit c: Connection): PgLargeobjectRow = {
     SQL"""insert into pg_catalog.pg_largeobject(loid, pageno, "data")
@@ -21,6 +28,9 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
        """
       .executeInsert(PgLargeobjectRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    SelectBuilderSql("pg_catalog.pg_largeobject", PgLargeobjectFields, PgLargeobjectRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgLargeobjectRow] = {
     SQL"""select loid, pageno, "data"
@@ -39,6 +49,9 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           set "data" = ${row.data}::bytea
           where loid = ${compositeId.loid} AND pageno = ${compositeId.pageno}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    UpdateBuilder("pg_catalog.pg_largeobject", PgLargeobjectFields, PgLargeobjectRow.rowParser)
   }
   override def upsert(unsaved: PgLargeobjectRow)(implicit c: Connection): PgLargeobjectRow = {
     SQL"""insert into pg_catalog.pg_largeobject(loid, pageno, "data")

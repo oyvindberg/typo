@@ -17,10 +17,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId): ConnectionIO[Boolean] = {
     sql"delete from humanresources.employeepayhistory where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND ratechangedate = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
+    DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields)
   }
   override def insert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
@@ -54,6 +61,9 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     q.query(EmployeepayhistoryRow.read).unique
     
   }
+  override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
+    SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields, EmployeepayhistoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
     sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory".query(EmployeepayhistoryRow.read).stream
   }
@@ -70,6 +80,9 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
+    UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields, EmployeepayhistoryRow.read)
   }
   override def upsert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)

@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_progress_copy
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatProgressCopyViewRepo {
+  def select: SelectBuilder[PgStatProgressCopyViewFields, PgStatProgressCopyViewRow]
   def selectAll(implicit c: Connection): List[PgStatProgressCopyViewRow]
 }

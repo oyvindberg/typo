@@ -9,7 +9,9 @@ package referential_constraints
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ReferentialConstraintsViewRepo {
+  def select: SelectBuilder[ReferentialConstraintsViewFields, ReferentialConstraintsViewRow]
   def selectAll: Stream[ConnectionIO, ReferentialConstraintsViewRow]
 }

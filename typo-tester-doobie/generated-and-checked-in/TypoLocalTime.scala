@@ -12,6 +12,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
+import typo.dsl.Bijection
 
 /** This is `java.time.LocalTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalTime(value: LocalTime)
@@ -19,14 +20,15 @@ case class TypoLocalTime(value: LocalTime)
 object TypoLocalTime {
   def apply(value: LocalTime): TypoLocalTime = new TypoLocalTime(value.truncatedTo(ChronoUnit.MICROS))
   def now = TypoLocalTime(LocalTime.now)
-  implicit val arrayGet: Get[Array[TypoLocalTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_text"))
+  implicit val arrayGet: Get[Array[TypoLocalTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_time"))
     .map(_.map(v => TypoLocalTime(LocalTime.parse(v.asInstanceOf[String]))))
-  implicit val arrayPut: Put[Array[TypoLocalTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_text"), "text")
+  implicit val arrayPut: Put[Array[TypoLocalTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_time"), "time")
     .contramap(_.map(v => v.value.toString))
+  implicit val bijection: Bijection[TypoLocalTime, LocalTime] = Bijection[TypoLocalTime, LocalTime](_.value)(TypoLocalTime.apply)
   implicit val decoder: Decoder[TypoLocalTime] = Decoder.decodeLocalTime.map(TypoLocalTime.apply)
   implicit val encoder: Encoder[TypoLocalTime] = Encoder.encodeLocalTime.contramap(_.value)
-  implicit val get: Get[TypoLocalTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
+  implicit val get: Get[TypoLocalTime] = Get.Advanced.other[String](NonEmptyList.one("time"))
     .map(v => TypoLocalTime(LocalTime.parse(v)))
   implicit def ordering(implicit O0: Ordering[LocalTime]): Ordering[TypoLocalTime] = Ordering.by(_.value)
-  implicit val put: Put[TypoLocalTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
+  implicit val put: Put[TypoLocalTime] = Put.Advanced.other[String](NonEmptyList.one("time")).contramap(v => v.value.toString)
 }

@@ -8,7 +8,9 @@ package information_schema
 package user_defined_types
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait UserDefinedTypesViewRepo {
+  def select: SelectBuilder[UserDefinedTypesViewFields, UserDefinedTypesViewRow]
   def selectAll(implicit c: Connection): List[UserDefinedTypesViewRow]
 }

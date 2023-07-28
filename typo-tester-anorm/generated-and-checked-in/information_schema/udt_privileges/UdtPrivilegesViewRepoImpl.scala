@@ -9,8 +9,13 @@ package udt_privileges
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object UdtPrivilegesViewRepoImpl extends UdtPrivilegesViewRepo {
+  override def select: SelectBuilder[UdtPrivilegesViewFields, UdtPrivilegesViewRow] = {
+    SelectBuilderSql("information_schema.udt_privileges", UdtPrivilegesViewFields, UdtPrivilegesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[UdtPrivilegesViewRow] = {
     SQL"""select grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable
           from information_schema.udt_privileges

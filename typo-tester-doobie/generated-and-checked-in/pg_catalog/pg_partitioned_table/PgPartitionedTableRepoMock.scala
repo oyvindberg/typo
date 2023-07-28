@@ -10,10 +10,22 @@ package pg_partitioned_table
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitionedTableId, PgPartitionedTableRow] = scala.collection.mutable.Map.empty) extends PgPartitionedTableRepo {
   override def delete(partrelid: PgPartitionedTableId): ConnectionIO[Boolean] = {
     delay(map.remove(partrelid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgPartitionedTableFields, map)
   }
   override def insert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
         map.put(unsaved.partrelid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    SelectBuilderMock(PgPartitionedTableFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgPartitionedTableRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgPartitionedTableFields, map)
   }
   override def upsert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow] = {
     delay {

@@ -8,7 +8,9 @@ package sales
 package vsalespersonsalesbyfiscalyears
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait VsalespersonsalesbyfiscalyearsViewRepo {
+  def select: SelectBuilder[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow]
   def selectAll(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsViewRow]
 }

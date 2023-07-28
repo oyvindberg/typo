@@ -10,8 +10,13 @@ package pg_prepared_statements
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgPreparedStatementsViewRepoImpl extends PgPreparedStatementsViewRepo {
+  override def select: SelectBuilder[PgPreparedStatementsViewFields, PgPreparedStatementsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_prepared_statements", PgPreparedStatementsViewFields, PgPreparedStatementsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgPreparedStatementsViewRow] = {
     sql"""select "name", "statement", prepare_time::text, parameter_types, from_sql, generic_plans, custom_plans from pg_catalog.pg_prepared_statements""".query(PgPreparedStatementsViewRow.read).stream
   }

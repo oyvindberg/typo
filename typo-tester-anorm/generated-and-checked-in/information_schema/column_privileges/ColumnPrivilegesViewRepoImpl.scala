@@ -9,8 +9,13 @@ package column_privileges
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnPrivilegesViewRepoImpl extends ColumnPrivilegesViewRepo {
+  override def select: SelectBuilder[ColumnPrivilegesViewFields, ColumnPrivilegesViewRow] = {
+    SelectBuilderSql("information_schema.column_privileges", ColumnPrivilegesViewFields, ColumnPrivilegesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ColumnPrivilegesViewRow] = {
     SQL"""select grantor, grantee, table_catalog, table_schema, "table_name", "column_name", privilege_type, is_grantable
           from information_schema.column_privileges
