@@ -81,7 +81,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
          """
     }
     q.query(PurchaseorderheaderRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
     sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader".query(PurchaseorderheaderRow.read).stream
@@ -106,8 +106,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               taxamt = ${fromWrite(row.taxamt)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               freight = ${fromWrite(row.freight)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where purchaseorderid = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}
-       """
+          where purchaseorderid = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}"""
       .update
       .run
       .map(_ > 0)

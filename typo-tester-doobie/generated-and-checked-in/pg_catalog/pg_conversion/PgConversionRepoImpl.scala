@@ -44,8 +44,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
               contoencoding = ${fromWrite(row.contoencoding)(Write.fromPut(Meta.IntMeta.put))}::int4,
               conproc = ${fromWrite(row.conproc)(Write.fromPut(TypoRegproc.put))}::regproc,
               condefault = ${fromWrite(row.condefault)(Write.fromPut(Meta.BooleanMeta.put))}
-          where oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}"""
       .update
       .run
       .map(_ > 0)

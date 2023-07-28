@@ -56,8 +56,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
               tgqual = ${fromWrite(row.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
               tgoldtable = ${fromWrite(row.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name,
               tgnewtable = ${fromWrite(row.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}"""
       .update
       .run
       .map(_ > 0)

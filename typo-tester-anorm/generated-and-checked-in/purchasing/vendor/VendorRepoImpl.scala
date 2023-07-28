@@ -26,7 +26,7 @@ object VendorRepoImpl extends VendorRepo {
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
        """
       .executeInsert(VendorRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
     val namedParameters = List(
@@ -65,7 +65,7 @@ object VendorRepoImpl extends VendorRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(VendorRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
@@ -83,7 +83,7 @@ object VendorRepoImpl extends VendorRepo {
           from purchasing.vendor
           where businessentityid = ANY($businessentityids)
        """.as(VendorRow.rowParser(1).*)
-  
+    
   }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
@@ -122,6 +122,6 @@ object VendorRepoImpl extends VendorRepo {
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
        """
       .executeInsert(VendorRow.rowParser(1).single)
-  
+    
   }
 }

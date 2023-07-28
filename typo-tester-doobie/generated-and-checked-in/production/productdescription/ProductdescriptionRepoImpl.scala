@@ -57,7 +57,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
          """
     }
     q.query(ProductdescriptionRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductdescriptionRow] = {
     sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription".query(ProductdescriptionRow.read).stream
@@ -74,8 +74,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           set description = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))},
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productdescriptionid = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}
-       """
+          where productdescriptionid = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -24,7 +24,7 @@ object CultureRepoImpl extends CultureRepo {
           returning cultureid, "name", modifieddate::text
        """
       .executeInsert(CultureRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object CultureRepoImpl extends CultureRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(CultureRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     SQL"""select cultureid, "name", modifieddate::text
@@ -70,7 +70,7 @@ object CultureRepoImpl extends CultureRepo {
           from production.culture
           where cultureid = ANY($cultureids)
        """.as(CultureRow.rowParser(1).*)
-  
+    
   }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     val cultureid = row.cultureid
@@ -94,6 +94,6 @@ object CultureRepoImpl extends CultureRepo {
           returning cultureid, "name", modifieddate::text
        """
       .executeInsert(CultureRow.rowParser(1).single)
-  
+    
   }
 }

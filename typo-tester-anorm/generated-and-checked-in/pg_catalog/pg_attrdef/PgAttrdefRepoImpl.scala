@@ -20,7 +20,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
           returning oid, adrelid, adnum, adbin
        """
       .executeInsert(PgAttrdefRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAttrdefRow] = {
     SQL"""select oid, adrelid, adnum, adbin
@@ -38,7 +38,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
           from pg_catalog.pg_attrdef
           where oid = ANY($oids)
        """.as(PgAttrdefRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgAttrdefRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -65,6 +65,6 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
           returning oid, adrelid, adnum, adbin
        """
       .executeInsert(PgAttrdefRow.rowParser(1).single)
-  
+    
   }
 }

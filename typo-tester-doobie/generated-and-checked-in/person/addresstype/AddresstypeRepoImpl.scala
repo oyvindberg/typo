@@ -57,7 +57,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
          """
     }
     q.query(AddresstypeRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
     sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype""".query(AddresstypeRow.read).stream
@@ -74,8 +74,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}
-       """
+          where addresstypeid = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}"""
       .update
       .run
       .map(_ > 0)

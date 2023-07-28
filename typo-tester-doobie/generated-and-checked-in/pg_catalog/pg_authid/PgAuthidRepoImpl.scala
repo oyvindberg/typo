@@ -48,8 +48,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
               rolconnlimit = ${fromWrite(row.rolconnlimit)(Write.fromPut(Meta.IntMeta.put))}::int4,
               rolpassword = ${fromWrite(row.rolpassword)(Write.fromPutOption(Meta.StringMeta.put))},
               rolvaliduntil = ${fromWrite(row.rolvaliduntil)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz
-          where oid = ${fromWrite(oid)(Write.fromPut(PgAuthidId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgAuthidId.put))}"""
       .update
       .run
       .map(_ > 0)

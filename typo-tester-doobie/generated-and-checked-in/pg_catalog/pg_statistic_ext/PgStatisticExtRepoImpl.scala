@@ -46,8 +46,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
               stxkeys = ${fromWrite(row.stxkeys)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
               stxkind = ${fromWrite(row.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char,
               stxexprs = ${fromWrite(row.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}"""
       .update
       .run
       .map(_ > 0)

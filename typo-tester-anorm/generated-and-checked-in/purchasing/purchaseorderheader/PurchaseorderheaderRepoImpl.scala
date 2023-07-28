@@ -24,7 +24,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
        """
       .executeInsert(PurchaseorderheaderRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
     val namedParameters = List(
@@ -82,7 +82,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PurchaseorderheaderRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
@@ -100,7 +100,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           from purchasing.purchaseorderheader
           where purchaseorderid = ANY($purchaseorderids)
        """.as(PurchaseorderheaderRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
     val purchaseorderid = row.purchaseorderid
@@ -151,6 +151,6 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
        """
       .executeInsert(PurchaseorderheaderRow.rowParser(1).single)
-  
+    
   }
 }

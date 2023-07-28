@@ -54,7 +54,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
          """
     }
     q.query(JobcandidateRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
     sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate".query(JobcandidateRow.read).stream
@@ -71,8 +71,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           set businessentityid = ${fromWrite(row.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4,
               resume = ${fromWrite(row.resume)(Write.fromPutOption(TypoXml.put))}::xml,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where jobcandidateid = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}
-       """
+          where jobcandidateid = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}"""
       .update
       .run
       .map(_ > 0)

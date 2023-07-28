@@ -24,7 +24,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           returning salesorderid, salesreasonid, modifieddate::text
        """
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
     SQL"""select salesorderid, salesreasonid, modifieddate::text
@@ -85,6 +85,6 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           returning salesorderid, salesreasonid, modifieddate::text
        """
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
-  
+    
   }
 }

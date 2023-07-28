@@ -25,7 +25,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow = {
     val namedParameters = List(
@@ -61,7 +61,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductsubcategoryRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
     SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
@@ -79,7 +79,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
           from production.productsubcategory
           where productsubcategoryid = ANY($productsubcategoryids)
        """.as(ProductsubcategoryRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
     val productsubcategoryid = row.productsubcategoryid
@@ -109,6 +109,6 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
-  
+    
   }
 }

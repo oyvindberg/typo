@@ -20,7 +20,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
           returning oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
        """
       .executeInsert(PgPolicyRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgPolicyRow] = {
     SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
@@ -38,7 +38,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
           from pg_catalog.pg_policy
           where oid = ANY($oids)
        """.as(PgPolicyRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgPolicyRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -77,6 +77,6 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
           returning oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
        """
       .executeInsert(PgPolicyRow.rowParser(1).single)
-  
+    
   }
 }

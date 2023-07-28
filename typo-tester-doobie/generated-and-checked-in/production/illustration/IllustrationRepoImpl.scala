@@ -52,7 +52,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
          """
     }
     q.query(IllustrationRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
     sql"select illustrationid, diagram, modifieddate::text from production.illustration".query(IllustrationRow.read).stream
@@ -68,8 +68,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     sql"""update production.illustration
           set diagram = ${fromWrite(row.diagram)(Write.fromPutOption(TypoXml.put))}::xml,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where illustrationid = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}
-       """
+          where illustrationid = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}"""
       .update
       .run
       .map(_ > 0)

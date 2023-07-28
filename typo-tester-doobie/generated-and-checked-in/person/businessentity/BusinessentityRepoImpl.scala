@@ -55,7 +55,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
          """
     }
     q.query(BusinessentityRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
     sql"select businessentityid, rowguid, modifieddate::text from person.businessentity".query(BusinessentityRow.read).stream
@@ -71,8 +71,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     sql"""update person.businessentity
           set rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}
-       """
+          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)

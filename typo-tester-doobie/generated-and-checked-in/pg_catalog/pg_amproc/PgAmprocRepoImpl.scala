@@ -42,8 +42,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
               amprocrighttype = ${fromWrite(row.amprocrighttype)(Write.fromPut(Meta.LongMeta.put))}::oid,
               amprocnum = ${fromWrite(row.amprocnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
               amproc = ${fromWrite(row.amproc)(Write.fromPut(TypoRegproc.put))}::regproc
-          where oid = ${fromWrite(oid)(Write.fromPut(PgAmprocId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgAmprocId.put))}"""
       .update
       .run
       .map(_ > 0)

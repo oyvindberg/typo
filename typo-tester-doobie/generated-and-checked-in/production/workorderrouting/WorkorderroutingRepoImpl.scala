@@ -60,7 +60,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
          """
     }
     q.query(WorkorderroutingRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
     sql"select workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text from production.workorderrouting".query(WorkorderroutingRow.read).stream
@@ -80,8 +80,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               plannedcost = ${fromWrite(row.plannedcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               actualcost = ${fromWrite(row.actualcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where workorderid = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND productid = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND operationsequence = ${fromWrite(compositeId.operationsequence)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where workorderid = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND productid = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND operationsequence = ${fromWrite(compositeId.operationsequence)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -20,7 +20,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           returning loid, pageno, "data"
        """
       .executeInsert(PgLargeobjectRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgLargeobjectRow] = {
     SQL"""select loid, pageno, "data"
@@ -53,6 +53,6 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           returning loid, pageno, "data"
        """
       .executeInsert(PgLargeobjectRow.rowParser(1).single)
-  
+    
   }
 }

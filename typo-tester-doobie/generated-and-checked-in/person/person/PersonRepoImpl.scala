@@ -73,7 +73,7 @@ object PersonRepoImpl extends PersonRepo {
          """
     }
     q.query(PersonRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person".query(PersonRow.read).stream
@@ -99,8 +99,7 @@ object PersonRepoImpl extends PersonRepo {
               demographics = ${fromWrite(row.demographics)(Write.fromPutOption(TypoXml.put))}::xml,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}
-       """
+          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)

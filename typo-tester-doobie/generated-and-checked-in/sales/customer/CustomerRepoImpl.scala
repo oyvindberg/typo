@@ -60,7 +60,7 @@ object CustomerRepoImpl extends CustomerRepo {
          """
     }
     q.query(CustomerRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
     sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer".query(CustomerRow.read).stream
@@ -79,8 +79,7 @@ object CustomerRepoImpl extends CustomerRepo {
               territoryid = ${fromWrite(row.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}
-       """
+          where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}"""
       .update
       .run
       .map(_ > 0)

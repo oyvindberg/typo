@@ -20,7 +20,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
           returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
        """
       .executeInsert(PgCollationRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
     SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
@@ -38,7 +38,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
           from pg_catalog.pg_collation
           where oid = ANY($oids)
        """.as(PgCollationRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgCollationRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -83,6 +83,6 @@ object PgCollationRepoImpl extends PgCollationRepo {
           returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
        """
       .executeInsert(PgCollationRow.rowParser(1).single)
-  
+    
   }
 }

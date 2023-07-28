@@ -21,7 +21,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
           returning "id", "name"
        """
       .executeInsert(FootballClubRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select "id", "name"
@@ -39,7 +39,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
           from myschema.football_club
           where "id" = ANY($ids)
        """.as(FootballClubRow.rowParser(1).*)
-  
+    
   }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     val id = row.id
@@ -60,6 +60,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
           returning "id", "name"
        """
       .executeInsert(FootballClubRow.rowParser(1).single)
-  
+    
   }
 }

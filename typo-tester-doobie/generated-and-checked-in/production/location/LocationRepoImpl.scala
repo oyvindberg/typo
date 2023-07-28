@@ -61,7 +61,7 @@ object LocationRepoImpl extends LocationRepo {
          """
     }
     q.query(LocationRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
     sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location"""".query(LocationRow.read).stream
@@ -79,8 +79,7 @@ object LocationRepoImpl extends LocationRepo {
               costrate = ${fromWrite(row.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               availability = ${fromWrite(row.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where locationid = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}
-       """
+          where locationid = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}"""
       .update
       .run
       .map(_ > 0)

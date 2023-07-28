@@ -52,7 +52,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
          """
     }
     q.query(ProductlistpricehistoryRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow] = {
     sql"select productid, startdate::text, enddate::text, listprice, modifieddate::text from production.productlistpricehistory".query(ProductlistpricehistoryRow.read).stream
@@ -66,8 +66,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
           set enddate = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
               listprice = ${fromWrite(row.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}
-       """
+          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}"""
       .update
       .run
       .map(_ > 0)

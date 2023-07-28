@@ -40,8 +40,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           set nspname = ${fromWrite(row.nspname)(Write.fromPut(Meta.StringMeta.put))}::name,
               nspowner = ${fromWrite(row.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
               nspacl = ${fromWrite(row.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -25,7 +25,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
     val namedParameters = List(
@@ -66,7 +66,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalestaxrateRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
@@ -84,7 +84,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           from sales.salestaxrate
           where salestaxrateid = ANY($salestaxrateids)
        """.as(SalestaxrateRow.rowParser(1).*)
-  
+    
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     val salestaxrateid = row.salestaxrateid
@@ -120,6 +120,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
-  
+    
   }
 }

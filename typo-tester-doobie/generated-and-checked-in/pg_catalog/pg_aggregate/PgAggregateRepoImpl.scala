@@ -58,8 +58,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
               aggmtransspace = ${fromWrite(row.aggmtransspace)(Write.fromPut(Meta.IntMeta.put))}::int4,
               agginitval = ${fromWrite(row.agginitval)(Write.fromPutOption(Meta.StringMeta.put))},
               aggminitval = ${fromWrite(row.aggminitval)(Write.fromPutOption(Meta.StringMeta.put))}
-          where aggfnoid = ${fromWrite(aggfnoid)(Write.fromPut(PgAggregateId.put))}
-       """
+          where aggfnoid = ${fromWrite(aggfnoid)(Write.fromPut(PgAggregateId.put))}"""
       .update
       .run
       .map(_ > 0)

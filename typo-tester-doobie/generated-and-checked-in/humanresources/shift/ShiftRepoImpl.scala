@@ -55,7 +55,7 @@ object ShiftRepoImpl extends ShiftRepo {
          """
     }
     q.query(ShiftRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
     sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift""".query(ShiftRow.read).stream
@@ -73,8 +73,7 @@ object ShiftRepoImpl extends ShiftRepo {
               starttime = ${fromWrite(row.starttime)(Write.fromPut(TypoLocalTime.put))}::time,
               endtime = ${fromWrite(row.endtime)(Write.fromPut(TypoLocalTime.put))}::time,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where shiftid = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}
-       """
+          where shiftid = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}"""
       .update
       .run
       .map(_ > 0)

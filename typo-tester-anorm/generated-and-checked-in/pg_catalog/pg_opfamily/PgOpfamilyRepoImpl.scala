@@ -20,7 +20,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
           returning oid, opfmethod, opfname, opfnamespace, opfowner
        """
       .executeInsert(PgOpfamilyRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgOpfamilyRow] = {
     SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner
@@ -38,7 +38,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
           from pg_catalog.pg_opfamily
           where oid = ANY($oids)
        """.as(PgOpfamilyRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgOpfamilyRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
           returning oid, opfmethod, opfname, opfnamespace, opfowner
        """
       .executeInsert(PgOpfamilyRow.rowParser(1).single)
-  
+    
   }
 }

@@ -24,7 +24,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           returning businessentityid, creditcardid, modifieddate::text
        """
       .executeInsert(PersoncreditcardRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PersoncreditcardRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
     SQL"""select businessentityid, creditcardid, modifieddate::text
@@ -85,6 +85,6 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           returning businessentityid, creditcardid, modifieddate::text
        """
       .executeInsert(PersoncreditcardRow.rowParser(1).single)
-  
+    
   }
 }

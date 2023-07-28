@@ -44,8 +44,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
               opcintype = ${fromWrite(row.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid,
               opcdefault = ${fromWrite(row.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))},
               opckeytype = ${fromWrite(row.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}"""
       .update
       .run
       .map(_ > 0)

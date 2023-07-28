@@ -41,8 +41,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
               spcowner = ${fromWrite(row.spcowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
               spcacl = ${fromWrite(row.spcacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
               spcoptions = ${fromWrite(row.spcoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTablespaceId.put))}"""
       .update
       .run
       .map(_ > 0)

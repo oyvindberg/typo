@@ -57,7 +57,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
          """
     }
     q.query(BusinessentityaddressRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityaddressRow] = {
     sql"select businessentityid, addressid, addresstypeid, rowguid, modifieddate::text from person.businessentityaddress".query(BusinessentityaddressRow.read).stream
@@ -70,8 +70,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     sql"""update person.businessentityaddress
           set rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND addressid = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND addresstypeid = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND addressid = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND addresstypeid = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}"""
       .update
       .run
       .map(_ > 0)

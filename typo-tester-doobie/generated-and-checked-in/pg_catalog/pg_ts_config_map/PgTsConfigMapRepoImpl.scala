@@ -34,8 +34,7 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_ts_config_map
           set mapdict = ${fromWrite(row.mapdict)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where mapcfg = ${fromWrite(compositeId.mapcfg)(Write.fromPut(Meta.LongMeta.put))} AND maptokentype = ${fromWrite(compositeId.maptokentype)(Write.fromPut(Meta.IntMeta.put))} AND mapseqno = ${fromWrite(compositeId.mapseqno)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where mapcfg = ${fromWrite(compositeId.mapcfg)(Write.fromPut(Meta.LongMeta.put))} AND maptokentype = ${fromWrite(compositeId.maptokentype)(Write.fromPut(Meta.IntMeta.put))} AND mapseqno = ${fromWrite(compositeId.mapseqno)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

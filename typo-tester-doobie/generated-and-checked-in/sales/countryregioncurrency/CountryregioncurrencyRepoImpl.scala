@@ -50,7 +50,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
          """
     }
     q.query(CountryregioncurrencyRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow] = {
     sql"select countryregioncode, currencycode, modifieddate::text from sales.countryregioncurrency".query(CountryregioncurrencyRow.read).stream
@@ -62,8 +62,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     val compositeId = row.compositeId
     sql"""update sales.countryregioncurrency
           set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where countryregioncode = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND currencycode = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}
-       """
+          where countryregioncode = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND currencycode = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}"""
       .update
       .run
       .map(_ > 0)

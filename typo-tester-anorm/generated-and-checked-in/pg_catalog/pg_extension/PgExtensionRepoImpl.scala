@@ -20,7 +20,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
           returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
        """
       .executeInsert(PgExtensionRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgExtensionRow] = {
     SQL"""select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
@@ -38,7 +38,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
           from pg_catalog.pg_extension
           where oid = ANY($oids)
        """.as(PgExtensionRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgExtensionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -77,6 +77,6 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
           returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
        """
       .executeInsert(PgExtensionRow.rowParser(1).single)
-  
+    
   }
 }

@@ -24,7 +24,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           returning countryregioncode, currencycode, modifieddate::text
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate::text
@@ -85,6 +85,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           returning countryregioncode, currencycode, modifieddate::text
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
-  
+    
   }
 }

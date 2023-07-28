@@ -25,7 +25,7 @@ object CustomerRepoImpl extends CustomerRepo {
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """
       .executeInsert(CustomerRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
     val namedParameters = List(
@@ -62,7 +62,7 @@ object CustomerRepoImpl extends CustomerRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(CustomerRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
     SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate::text
@@ -80,7 +80,7 @@ object CustomerRepoImpl extends CustomerRepo {
           from sales.customer
           where customerid = ANY($customerids)
        """.as(CustomerRow.rowParser(1).*)
-  
+    
   }
   override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
     val customerid = row.customerid
@@ -113,6 +113,6 @@ object CustomerRepoImpl extends CustomerRepo {
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """
       .executeInsert(CustomerRow.rowParser(1).single)
-  
+    
   }
 }

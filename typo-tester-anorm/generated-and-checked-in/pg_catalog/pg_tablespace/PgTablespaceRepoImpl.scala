@@ -20,7 +20,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
           returning oid, spcname, spcowner, spcacl, spcoptions
        """
       .executeInsert(PgTablespaceRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTablespaceRow] = {
     SQL"""select oid, spcname, spcowner, spcacl, spcoptions
@@ -38,7 +38,7 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
           from pg_catalog.pg_tablespace
           where oid = ANY($oids)
        """.as(PgTablespaceRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTablespaceRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
           returning oid, spcname, spcowner, spcacl, spcoptions
        """
       .executeInsert(PgTablespaceRow.rowParser(1).single)
-  
+    
   }
 }

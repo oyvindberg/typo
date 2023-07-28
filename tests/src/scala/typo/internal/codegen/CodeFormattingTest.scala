@@ -14,7 +14,7 @@ class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
                       | b2
                       |a""".stripMargin
 
-    assert(actual === expected)
+    assert(actual.asString === expected)
   }
 
   test("work with mkCode") {
@@ -26,7 +26,7 @@ class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
                       |  import b2
                       |a""".stripMargin
 
-    assert(actual === expected)
+    assert(actual.asString === expected)
   }
 
   test("keep linebreaks") {
@@ -44,7 +44,7 @@ class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
                       |
                       |import c2""".stripMargin
 
-    assert(actual === expected)
+    assert(actual.asString === expected)
   }
 
   test("multiple on same line") {
@@ -53,6 +53,6 @@ class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
     val expected = s"""|ab___
                        |  ___a""".stripMargin
 
-    assert(actual === expected)
+    assert(actual.asString === expected)
   }
 }

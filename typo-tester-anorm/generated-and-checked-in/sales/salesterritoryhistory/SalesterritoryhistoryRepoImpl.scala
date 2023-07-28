@@ -25,7 +25,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
        """
       .executeInsert(SalesterritoryhistoryRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalesterritoryhistoryRowUnsaved)(implicit c: Connection): SalesterritoryhistoryRow = {
     val namedParameters = List(
@@ -59,7 +59,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalesterritoryhistoryRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     SQL"""select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
@@ -99,6 +99,6 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
        """
       .executeInsert(SalesterritoryhistoryRow.rowParser(1).single)
-  
+    
   }
 }

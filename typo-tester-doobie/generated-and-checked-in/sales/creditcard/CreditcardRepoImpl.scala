@@ -55,7 +55,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
          """
     }
     q.query(CreditcardRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
     sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard".query(CreditcardRow.read).stream
@@ -74,8 +74,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
               expmonth = ${fromWrite(row.expmonth)(Write.fromPut(Meta.IntMeta.put))}::int2,
               expyear = ${fromWrite(row.expyear)(Write.fromPut(Meta.IntMeta.put))}::int2,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where creditcardid = ${fromWrite(creditcardid)(Write.fromPut(CreditcardId.put))}
-       """
+          where creditcardid = ${fromWrite(creditcardid)(Write.fromPut(CreditcardId.put))}"""
       .update
       .run
       .map(_ > 0)

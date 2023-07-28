@@ -20,7 +20,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
           returning oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
        """
       .executeInsert(PgOperatorRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgOperatorRow] = {
     SQL"""select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
@@ -38,7 +38,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
           from pg_catalog.pg_operator
           where oid = ANY($oids)
        """.as(PgOperatorRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgOperatorRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -98,6 +98,6 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
           returning oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
        """
       .executeInsert(PgOperatorRow.rowParser(1).single)
-  
+    
   }
 }

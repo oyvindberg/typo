@@ -40,8 +40,7 @@ object PgAmRepoImpl extends PgAmRepo {
           set amname = ${fromWrite(row.amname)(Write.fromPut(Meta.StringMeta.put))}::name,
               amhandler = ${fromWrite(row.amhandler)(Write.fromPut(TypoRegproc.put))}::regproc,
               amtype = ${fromWrite(row.amtype)(Write.fromPut(Meta.StringMeta.put))}::char
-          where oid = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgAmId.put))}"""
       .update
       .run
       .map(_ > 0)

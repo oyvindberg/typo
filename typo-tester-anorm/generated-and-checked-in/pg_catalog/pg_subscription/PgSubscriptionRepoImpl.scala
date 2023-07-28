@@ -20,7 +20,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
           returning oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
        """
       .executeInsert(PgSubscriptionRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgSubscriptionRow] = {
     SQL"""select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
@@ -38,7 +38,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
           from pg_catalog.pg_subscription
           where oid = ANY($oids)
        """.as(PgSubscriptionRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgSubscriptionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -86,6 +86,6 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
           returning oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
        """
       .executeInsert(PgSubscriptionRow.rowParser(1).single)
-  
+    
   }
 }

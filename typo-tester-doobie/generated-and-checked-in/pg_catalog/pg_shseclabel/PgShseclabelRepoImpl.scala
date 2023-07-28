@@ -34,8 +34,7 @@ object PgShseclabelRepoImpl extends PgShseclabelRepo {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_shseclabel
           set "label" = ${fromWrite(row.label)(Write.fromPut(Meta.StringMeta.put))}
-          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}
-       """
+          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}"""
       .update
       .run
       .map(_ > 0)

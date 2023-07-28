@@ -20,7 +20,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
           returning oid, trftype, trflang, trffromsql, trftosql
        """
       .executeInsert(PgTransformRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTransformRow] = {
     SQL"""select oid, trftype, trflang, trffromsql, trftosql
@@ -38,7 +38,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
           from pg_catalog.pg_transform
           where oid = ANY($oids)
        """.as(PgTransformRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTransformRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgTransformRepoImpl extends PgTransformRepo {
           returning oid, trftype, trflang, trffromsql, trftosql
        """
       .executeInsert(PgTransformRow.rowParser(1).single)
-  
+    
   }
 }

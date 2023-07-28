@@ -24,7 +24,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
        """
       .executeInsert(BillofmaterialsRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
     val namedParameters = List(
@@ -67,7 +67,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(BillofmaterialsRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
@@ -85,7 +85,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           from production.billofmaterials
           where billofmaterialsid = ANY($billofmaterialsids)
        """.as(BillofmaterialsRow.rowParser(1).*)
-  
+    
   }
   override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
     val billofmaterialsid = row.billofmaterialsid
@@ -127,6 +127,6 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
        """
       .executeInsert(BillofmaterialsRow.rowParser(1).single)
-  
+    
   }
 }

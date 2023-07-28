@@ -44,8 +44,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
               polroles = ${fromWrite(row.polroles)(Write.fromPut(adventureworks.LongArrayMeta.put))}::_oid,
               polqual = ${fromWrite(row.polqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
               polwithcheck = ${fromWrite(row.polwithcheck)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgPolicyId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgPolicyId.put))}"""
       .update
       .run
       .map(_ > 0)

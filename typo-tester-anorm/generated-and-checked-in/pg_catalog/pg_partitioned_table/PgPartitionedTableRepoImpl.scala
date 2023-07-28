@@ -20,7 +20,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
           returning partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
        """
       .executeInsert(PgPartitionedTableRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgPartitionedTableRow] = {
     SQL"""select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
@@ -38,7 +38,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
           from pg_catalog.pg_partitioned_table
           where partrelid = ANY($partrelids)
        """.as(PgPartitionedTableRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgPartitionedTableRow)(implicit c: Connection): Boolean = {
     val partrelid = row.partrelid
@@ -77,6 +77,6 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
           returning partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
        """
       .executeInsert(PgPartitionedTableRow.rowParser(1).single)
-  
+    
   }
 }

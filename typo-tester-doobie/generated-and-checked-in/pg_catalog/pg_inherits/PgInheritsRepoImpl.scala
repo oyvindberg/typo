@@ -35,8 +35,7 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
     sql"""update pg_catalog.pg_inherits
           set inhparent = ${fromWrite(row.inhparent)(Write.fromPut(Meta.LongMeta.put))}::oid,
               inhdetachpending = ${fromWrite(row.inhdetachpending)(Write.fromPut(Meta.BooleanMeta.put))}
-          where inhrelid = ${fromWrite(compositeId.inhrelid)(Write.fromPut(Meta.LongMeta.put))} AND inhseqno = ${fromWrite(compositeId.inhseqno)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where inhrelid = ${fromWrite(compositeId.inhrelid)(Write.fromPut(Meta.LongMeta.put))} AND inhseqno = ${fromWrite(compositeId.inhseqno)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

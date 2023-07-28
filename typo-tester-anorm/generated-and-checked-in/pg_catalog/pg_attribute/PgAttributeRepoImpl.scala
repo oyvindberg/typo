@@ -20,7 +20,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
        """
       .executeInsert(PgAttributeRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
     SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
@@ -122,6 +122,6 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
           returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
        """
       .executeInsert(PgAttributeRow.rowParser(1).single)
-  
+    
   }
 }

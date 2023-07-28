@@ -74,7 +74,7 @@ object DocumentRepoImpl extends DocumentRepo {
          """
     }
     q.query(DocumentRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
     sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode from production."document"""".query(DocumentRow.read).stream
@@ -100,8 +100,7 @@ object DocumentRepoImpl extends DocumentRepo {
               "document" = ${fromWrite(row.document)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where documentnode = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}
-       """
+          where documentnode = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}"""
       .update
       .run
       .map(_ > 0)

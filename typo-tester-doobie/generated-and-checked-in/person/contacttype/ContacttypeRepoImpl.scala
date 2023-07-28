@@ -52,7 +52,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
          """
     }
     q.query(ContacttypeRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
     sql"""select contacttypeid, "name", modifieddate::text from person.contacttype""".query(ContacttypeRow.read).stream
@@ -68,8 +68,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""update person.contacttype
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where contacttypeid = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}
-       """
+          where contacttypeid = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}"""
       .update
       .run
       .map(_ > 0)

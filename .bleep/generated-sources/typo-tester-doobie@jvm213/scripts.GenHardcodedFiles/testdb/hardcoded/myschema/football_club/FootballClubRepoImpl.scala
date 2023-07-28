@@ -38,8 +38,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     val id = row.id
     sql"""update myschema.football_club
           set "name" = ${fromWrite(row.name)(Write.fromPut(Meta.StringMeta.put))}
-          where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}
-       """
+          where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}"""
       .update
       .run
       .map(_ > 0)

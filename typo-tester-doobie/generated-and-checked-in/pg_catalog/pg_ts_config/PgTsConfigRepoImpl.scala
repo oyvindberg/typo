@@ -40,8 +40,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
               cfgnamespace = ${fromWrite(row.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
               cfgowner = ${fromWrite(row.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
               cfgparser = ${fromWrite(row.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}"""
       .update
       .run
       .map(_ > 0)

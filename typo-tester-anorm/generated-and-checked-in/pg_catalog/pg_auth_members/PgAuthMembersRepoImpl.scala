@@ -20,7 +20,7 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
           returning roleid, "member", grantor, admin_option
        """
       .executeInsert(PgAuthMembersRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAuthMembersRow] = {
     SQL"""select roleid, "member", grantor, admin_option
@@ -56,6 +56,6 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
           returning roleid, "member", grantor, admin_option
        """
       .executeInsert(PgAuthMembersRow.rowParser(1).single)
-  
+    
   }
 }

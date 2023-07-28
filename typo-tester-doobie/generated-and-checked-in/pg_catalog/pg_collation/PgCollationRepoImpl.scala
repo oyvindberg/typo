@@ -45,8 +45,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
               collcollate = ${fromWrite(row.collcollate)(Write.fromPut(Meta.StringMeta.put))}::name,
               collctype = ${fromWrite(row.collctype)(Write.fromPut(Meta.StringMeta.put))}::name,
               collversion = ${fromWrite(row.collversion)(Write.fromPutOption(Meta.StringMeta.put))}
-          where oid = ${fromWrite(oid)(Write.fromPut(PgCollationId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgCollationId.put))}"""
       .update
       .run
       .map(_ > 0)

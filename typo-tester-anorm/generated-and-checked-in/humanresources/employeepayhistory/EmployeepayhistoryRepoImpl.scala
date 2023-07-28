@@ -24,7 +24,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
        """
       .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
     val namedParameters = List(
@@ -54,7 +54,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
     SQL"""select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
@@ -93,6 +93,6 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
        """
       .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
-  
+    
   }
 }

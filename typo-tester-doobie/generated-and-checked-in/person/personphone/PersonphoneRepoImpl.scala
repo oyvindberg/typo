@@ -52,7 +52,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
          """
     }
     q.query(PersonphoneRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
     sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone".query(PersonphoneRow.read).stream
@@ -64,8 +64,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     val compositeId = row.compositeId
     sql"""update person.personphone
           set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND phonenumber = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND phonenumbertypeid = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND phonenumber = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND phonenumbertypeid = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}"""
       .update
       .run
       .map(_ > 0)

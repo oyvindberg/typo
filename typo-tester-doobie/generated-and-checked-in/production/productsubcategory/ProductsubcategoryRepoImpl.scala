@@ -59,7 +59,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
          """
     }
     q.query(ProductsubcategoryRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
     sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory""".query(ProductsubcategoryRow.read).stream
@@ -77,8 +77,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
               "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productsubcategoryid = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}
-       """
+          where productsubcategoryid = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}"""
       .update
       .run
       .map(_ > 0)

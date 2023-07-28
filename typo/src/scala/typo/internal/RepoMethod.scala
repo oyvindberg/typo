@@ -87,4 +87,18 @@ object RepoMethod {
 
   case class SqlFile(sqlFile: ComputedSqlFile) extends RepoMethod
 
+  implicit val ordering: Ordering[RepoMethod] = Ordering.by {
+    case _: SelectAll           => "Select2"
+    case _: SelectById          => "Select3"
+    case _: SelectAllByIds      => "Select4"
+    case x: SelectByUnique      => s"SelectByUnique(${x.params.map(_.name.value).mkString(", ")})"
+    case _: SelectByFieldValues => "SelectByFieldValues"
+    case _: UpdateFieldValues   => "UpdateFieldValues"
+    case _: Update              => "Update1"
+    case _: Upsert              => "Upsert"
+    case _: Insert              => "Insert1"
+    case _: InsertUnsaved       => "Insert2"
+    case _: Delete              => "Delete1"
+    case _: SqlFile             => "SqlFile"
+  }
 }

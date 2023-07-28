@@ -44,8 +44,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
               is_instead = ${fromWrite(row.isInstead)(Write.fromPut(Meta.BooleanMeta.put))},
               ev_qual = ${fromWrite(row.evQual)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree,
               ev_action = ${fromWrite(row.evAction)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}"""
       .update
       .run
       .map(_ > 0)

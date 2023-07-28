@@ -34,8 +34,7 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_largeobject
           set "data" = ${fromWrite(row.data)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea
-          where loid = ${fromWrite(compositeId.loid)(Write.fromPut(Meta.LongMeta.put))} AND pageno = ${fromWrite(compositeId.pageno)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where loid = ${fromWrite(compositeId.loid)(Write.fromPut(Meta.LongMeta.put))} AND pageno = ${fromWrite(compositeId.pageno)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

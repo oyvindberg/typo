@@ -36,8 +36,7 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
     sql"""update pg_catalog.pg_init_privs
           set privtype = ${fromWrite(row.privtype)(Write.fromPut(Meta.StringMeta.put))}::char,
               initprivs = ${fromWrite(row.initprivs)(Write.fromPut(TypoAclItem.arrayPut))}::_aclitem
-          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

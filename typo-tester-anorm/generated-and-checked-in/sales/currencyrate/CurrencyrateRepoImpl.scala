@@ -24,7 +24,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
     val namedParameters = List(
@@ -59,7 +59,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(CurrencyrateRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
     SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
@@ -77,7 +77,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           from sales.currencyrate
           where currencyrateid = ANY($currencyrateids)
        """.as(CurrencyrateRow.rowParser(1).*)
-  
+    
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
     val currencyrateid = row.currencyrateid
@@ -113,6 +113,6 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
-  
+    
   }
 }

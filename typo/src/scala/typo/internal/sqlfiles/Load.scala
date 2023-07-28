@@ -3,7 +3,7 @@ package typo.internal.sqlfiles
 import anorm.*
 import org.postgresql.util.PSQLException
 import typo.generated.custom.view_column_dependencies.ViewColumnDependenciesSqlRepoImpl
-import typo.internal.{TypeMapperDb, minimalJson}
+import typo.internal.{TypeMapperDb, DebugJson}
 import typo.{NonEmptyList, RelPath, db}
 
 import java.nio.file.attribute.BasicFileAttributes
@@ -89,11 +89,11 @@ object Load {
     val columns = jdbcMetadata.columns
 
     val cols = columns.map { col =>
-      val jsonDescription = minimalJson(col)
+      val jsonDescription = DebugJson(col)
       db.Col(
         name = col.name,
         tpe = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)).getOrElse {
-          System.err.println(s"$relativePath Couldn't translate type from column $jsonDescription")
+          System.err.println(s"$relativePath Couldn't translate type from column ${jsonDescription.maybeJson.getOrElse(col.name)}")
           db.Type.Text
         },
         udtName = None,

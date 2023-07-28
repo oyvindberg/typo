@@ -27,7 +27,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
        """
       .executeInsert(EmployeeRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
     val namedParameters = List(
@@ -85,7 +85,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(EmployeeRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
@@ -103,7 +103,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
           from humanresources.employee
           where businessentityid = ANY($businessentityids)
        """.as(EmployeeRow.rowParser(1).*)
-  
+    
   }
   override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
@@ -163,6 +163,6 @@ object EmployeeRepoImpl extends EmployeeRepo {
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
        """
       .executeInsert(EmployeeRow.rowParser(1).single)
-  
+    
   }
 }

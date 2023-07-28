@@ -24,7 +24,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
           returning departmentid, "name", groupname, modifieddate::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
     val namedParameters = List(
@@ -56,7 +56,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(DepartmentRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select departmentid, "name", groupname, modifieddate::text
@@ -74,7 +74,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
           from humanresources.department
           where departmentid = ANY($departmentids)
        """.as(DepartmentRow.rowParser(1).*)
-  
+    
   }
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
     val departmentid = row.departmentid
@@ -101,6 +101,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
           returning departmentid, "name", groupname, modifieddate::text
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
-  
+    
   }
 }

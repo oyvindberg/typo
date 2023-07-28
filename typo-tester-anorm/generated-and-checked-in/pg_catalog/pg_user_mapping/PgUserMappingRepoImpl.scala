@@ -20,7 +20,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
           returning oid, umuser, umserver, umoptions
        """
       .executeInsert(PgUserMappingRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgUserMappingRow] = {
     SQL"""select oid, umuser, umserver, umoptions
@@ -38,7 +38,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
           from pg_catalog.pg_user_mapping
           where oid = ANY($oids)
        """.as(PgUserMappingRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgUserMappingRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -65,6 +65,6 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
           returning oid, umuser, umserver, umoptions
        """
       .executeInsert(PgUserMappingRow.rowParser(1).single)
-  
+    
   }
 }

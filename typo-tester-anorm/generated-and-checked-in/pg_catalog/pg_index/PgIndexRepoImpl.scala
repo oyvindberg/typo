@@ -20,7 +20,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
           returning indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
        """
       .executeInsert(PgIndexRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgIndexRow] = {
     SQL"""select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
@@ -38,7 +38,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
           from pg_catalog.pg_index
           where indexrelid = ANY($indexrelids)
        """.as(PgIndexRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgIndexRow)(implicit c: Connection): Boolean = {
     val indexrelid = row.indexrelid
@@ -113,6 +113,6 @@ object PgIndexRepoImpl extends PgIndexRepo {
           returning indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
        """
       .executeInsert(PgIndexRow.rowParser(1).single)
-  
+    
   }
 }

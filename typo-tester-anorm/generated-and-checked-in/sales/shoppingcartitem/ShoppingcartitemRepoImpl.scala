@@ -24,7 +24,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
     val namedParameters = List(
@@ -64,7 +64,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
@@ -82,7 +82,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           from sales.shoppingcartitem
           where shoppingcartitemid = ANY($shoppingcartitemids)
        """.as(ShoppingcartitemRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
     val shoppingcartitemid = row.shoppingcartitemid
@@ -115,6 +115,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
-  
+    
   }
 }

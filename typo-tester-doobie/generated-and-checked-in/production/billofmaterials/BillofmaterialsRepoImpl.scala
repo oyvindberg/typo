@@ -66,7 +66,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
          """
     }
     q.query(BillofmaterialsRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials".query(BillofmaterialsRow.read).stream
@@ -88,8 +88,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               bomlevel = ${fromWrite(row.bomlevel)(Write.fromPut(Meta.IntMeta.put))}::int2,
               perassemblyqty = ${fromWrite(row.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where billofmaterialsid = ${fromWrite(billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}
-       """
+          where billofmaterialsid = ${fromWrite(billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}"""
       .update
       .run
       .map(_ > 0)

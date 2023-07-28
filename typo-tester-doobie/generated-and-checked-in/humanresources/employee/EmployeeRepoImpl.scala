@@ -83,7 +83,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
          """
     }
     q.query(EmployeeRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
     sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee".query(EmployeeRow.read).stream
@@ -111,8 +111,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
               organizationnode = ${fromWrite(row.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))}
-          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}
-       """
+          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -27,7 +27,7 @@ object PersonRepoImpl extends PersonRepo {
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
        """
       .executeInsert(PersonRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -74,7 +74,7 @@ object PersonRepoImpl extends PersonRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PersonRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
@@ -92,7 +92,7 @@ object PersonRepoImpl extends PersonRepo {
           from person.person
           where businessentityid = ANY($businessentityids)
        """.as(PersonRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
@@ -146,6 +146,6 @@ object PersonRepoImpl extends PersonRepo {
           returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
        """
       .executeInsert(PersonRow.rowParser(1).single)
-  
+    
   }
 }

@@ -43,8 +43,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
               seqmin = ${fromWrite(row.seqmin)(Write.fromPut(Meta.LongMeta.put))}::int8,
               seqcache = ${fromWrite(row.seqcache)(Write.fromPut(Meta.LongMeta.put))}::int8,
               seqcycle = ${fromWrite(row.seqcycle)(Write.fromPut(Meta.BooleanMeta.put))}
-          where seqrelid = ${fromWrite(seqrelid)(Write.fromPut(PgSequenceId.put))}
-       """
+          where seqrelid = ${fromWrite(seqrelid)(Write.fromPut(PgSequenceId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -20,7 +20,7 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
           returning inhrelid, inhparent, inhseqno, inhdetachpending
        """
       .executeInsert(PgInheritsRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgInheritsRow] = {
     SQL"""select inhrelid, inhparent, inhseqno, inhdetachpending
@@ -56,6 +56,6 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
           returning inhrelid, inhparent, inhseqno, inhdetachpending
        """
       .executeInsert(PgInheritsRow.rowParser(1).single)
-  
+    
   }
 }

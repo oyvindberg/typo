@@ -24,7 +24,7 @@ object LocationRepoImpl extends LocationRepo {
           returning locationid, "name", costrate, availability, modifieddate::text
        """
       .executeInsert(LocationRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
@@ -63,7 +63,7 @@ object LocationRepoImpl extends LocationRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(LocationRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
     SQL"""select locationid, "name", costrate, availability, modifieddate::text
@@ -81,7 +81,7 @@ object LocationRepoImpl extends LocationRepo {
           from production."location"
           where locationid = ANY($locationids)
        """.as(LocationRow.rowParser(1).*)
-  
+    
   }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     val locationid = row.locationid
@@ -111,6 +111,6 @@ object LocationRepoImpl extends LocationRepo {
           returning locationid, "name", costrate, availability, modifieddate::text
        """
       .executeInsert(LocationRow.rowParser(1).single)
-  
+    
   }
 }

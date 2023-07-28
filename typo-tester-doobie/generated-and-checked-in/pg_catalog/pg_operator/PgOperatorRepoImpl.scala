@@ -51,8 +51,7 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
               oprcode = ${fromWrite(row.oprcode)(Write.fromPut(TypoRegproc.put))}::regproc,
               oprrest = ${fromWrite(row.oprrest)(Write.fromPut(TypoRegproc.put))}::regproc,
               oprjoin = ${fromWrite(row.oprjoin)(Write.fromPut(TypoRegproc.put))}::regproc
-          where oid = ${fromWrite(oid)(Write.fromPut(PgOperatorId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgOperatorId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -24,7 +24,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
        """
       .executeInsert(ProductvendorRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
     val namedParameters = List(
@@ -60,7 +60,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductvendorRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {
     SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
@@ -117,6 +117,6 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
        """
       .executeInsert(ProductvendorRow.rowParser(1).single)
-  
+    
   }
 }

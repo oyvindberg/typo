@@ -55,7 +55,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
          """
     }
     q.query(ProductphotoRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductphotoRow] = {
     sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto".query(ProductphotoRow.read).stream
@@ -74,8 +74,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
               largephoto = ${fromWrite(row.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
               largephotofilename = ${fromWrite(row.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productphotoid = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}
-       """
+          where productphotoid = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}"""
       .update
       .run
       .map(_ > 0)

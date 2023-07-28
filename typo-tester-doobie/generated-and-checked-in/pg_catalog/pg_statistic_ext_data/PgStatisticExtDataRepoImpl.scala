@@ -40,8 +40,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
               stxddependencies = ${fromWrite(row.stxddependencies)(Write.fromPutOption(Meta.StringMeta.put))},
               stxdmcv = ${fromWrite(row.stxdmcv)(Write.fromPutOption(Meta.StringMeta.put))},
               stxdexpr = ${fromWrite(row.stxdexpr)(Write.fromPutOption(Meta.StringMeta.put))}
-          where stxoid = ${fromWrite(stxoid)(Write.fromPut(PgStatisticExtDataId.put))}
-       """
+          where stxoid = ${fromWrite(stxoid)(Write.fromPut(PgStatisticExtDataId.put))}"""
       .update
       .run
       .map(_ > 0)

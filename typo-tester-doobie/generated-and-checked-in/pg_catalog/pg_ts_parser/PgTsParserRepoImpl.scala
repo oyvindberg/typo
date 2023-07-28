@@ -44,8 +44,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
               prsend = ${fromWrite(row.prsend)(Write.fromPut(TypoRegproc.put))}::regproc,
               prsheadline = ${fromWrite(row.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc,
               prslextype = ${fromWrite(row.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}"""
       .update
       .run
       .map(_ > 0)

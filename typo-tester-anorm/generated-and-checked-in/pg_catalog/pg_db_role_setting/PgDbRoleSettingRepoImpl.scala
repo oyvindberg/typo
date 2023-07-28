@@ -20,7 +20,7 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
           returning setdatabase, setrole, setconfig
        """
       .executeInsert(PgDbRoleSettingRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgDbRoleSettingRow] = {
     SQL"""select setdatabase, setrole, setconfig
@@ -53,6 +53,6 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
           returning setdatabase, setrole, setconfig
        """
       .executeInsert(PgDbRoleSettingRow.rowParser(1).single)
-  
+    
   }
 }

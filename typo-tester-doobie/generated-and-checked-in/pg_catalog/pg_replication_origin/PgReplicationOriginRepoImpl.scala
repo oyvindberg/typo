@@ -37,8 +37,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     val roident = row.roident
     sql"""update pg_catalog.pg_replication_origin
           set roname = ${fromWrite(row.roname)(Write.fromPut(Meta.StringMeta.put))}
-          where roident = ${fromWrite(roident)(Write.fromPut(PgReplicationOriginId.put))}
-       """
+          where roident = ${fromWrite(roident)(Write.fromPut(PgReplicationOriginId.put))}"""
       .update
       .run
       .map(_ > 0)

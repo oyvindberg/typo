@@ -57,7 +57,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
          """
     }
     q.query(SalesterritoryhistoryRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = {
     sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory".query(SalesterritoryhistoryRow.read).stream
@@ -71,8 +71,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           set enddate = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND territoryid = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND territoryid = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -53,7 +53,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
          """
     }
     q.query(SalesreasonRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
     sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason""".query(SalesreasonRow.read).stream
@@ -70,8 +70,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               reasontype = ${fromWrite(row.reasontype)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where salesreasonid = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}
-       """
+          where salesreasonid = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}"""
       .update
       .run
       .map(_ > 0)

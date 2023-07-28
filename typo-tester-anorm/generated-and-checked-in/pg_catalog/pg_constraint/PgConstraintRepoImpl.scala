@@ -20,7 +20,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
           returning oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
        """
       .executeInsert(PgConstraintRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgConstraintRow] = {
     SQL"""select oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
@@ -38,7 +38,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
           from pg_catalog.pg_constraint
           where oid = ANY($oids)
        """.as(PgConstraintRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgConstraintRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -128,6 +128,6 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
           returning oid, conname, connamespace, contype, condeferrable, condeferred, convalidated, conrelid, contypid, conindid, conparentid, confrelid, confupdtype, confdeltype, confmatchtype, conislocal, coninhcount, connoinherit, conkey, confkey, conpfeqop, conppeqop, conffeqop, conexclop, conbin
        """
       .executeInsert(PgConstraintRow.rowParser(1).single)
-  
+    
   }
 }

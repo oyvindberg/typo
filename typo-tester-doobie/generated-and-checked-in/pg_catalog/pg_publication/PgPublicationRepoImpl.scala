@@ -44,8 +44,7 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
               pubdelete = ${fromWrite(row.pubdelete)(Write.fromPut(Meta.BooleanMeta.put))},
               pubtruncate = ${fromWrite(row.pubtruncate)(Write.fromPut(Meta.BooleanMeta.put))},
               pubviaroot = ${fromWrite(row.pubviaroot)(Write.fromPut(Meta.BooleanMeta.put))}
-          where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationId.put))}"""
       .update
       .run
       .map(_ > 0)

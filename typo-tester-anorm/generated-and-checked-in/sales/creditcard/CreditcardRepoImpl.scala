@@ -24,7 +24,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
           returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
     val namedParameters = List(
@@ -58,7 +58,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(CreditcardRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[CreditcardRow] = {
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
@@ -76,7 +76,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
           from sales.creditcard
           where creditcardid = ANY($creditcardids)
        """.as(CreditcardRow.rowParser(1).*)
-  
+    
   }
   override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {
     val creditcardid = row.creditcardid
@@ -109,6 +109,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
           returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
-  
+    
   }
 }

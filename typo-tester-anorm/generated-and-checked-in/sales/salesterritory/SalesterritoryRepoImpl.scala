@@ -25,7 +25,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
        """
       .executeInsert(SalesterritoryRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
     val namedParameters = List(
@@ -78,7 +78,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalesterritoryRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
@@ -96,7 +96,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           from sales.salesterritory
           where territoryid = ANY($territoryids)
        """.as(SalesterritoryRow.rowParser(1).*)
-  
+    
   }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     val territoryid = row.territoryid
@@ -141,6 +141,6 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
        """
       .executeInsert(SalesterritoryRow.rowParser(1).single)
-  
+    
   }
 }

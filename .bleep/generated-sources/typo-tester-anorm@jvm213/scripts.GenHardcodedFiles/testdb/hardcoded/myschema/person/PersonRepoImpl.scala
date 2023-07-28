@@ -26,7 +26,7 @@ object PersonRepoImpl extends PersonRepo {
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
        """
       .executeInsert(PersonRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -68,7 +68,7 @@ object PersonRepoImpl extends PersonRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PersonRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
@@ -86,7 +86,7 @@ object PersonRepoImpl extends PersonRepo {
           from myschema.person
           where "id" = ANY($ids)
        """.as(PersonRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val id = row.id
@@ -134,6 +134,6 @@ object PersonRepoImpl extends PersonRepo {
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
        """
       .executeInsert(PersonRow.rowParser(1).single)
-  
+    
   }
 }

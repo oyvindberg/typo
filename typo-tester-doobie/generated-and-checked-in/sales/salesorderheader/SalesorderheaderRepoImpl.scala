@@ -109,7 +109,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
          """
     }
     q.query(SalesorderheaderRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheaderRow] = {
     sql"""select salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text from sales.salesorderheader""".query(SalesorderheaderRow.read).stream
@@ -147,8 +147,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
               "comment" = ${fromWrite(row.comment)(Write.fromPutOption(Meta.StringMeta.put))},
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where salesorderid = ${fromWrite(salesorderid)(Write.fromPut(SalesorderheaderId.put))}
-       """
+          where salesorderid = ${fromWrite(salesorderid)(Write.fromPut(SalesorderheaderId.put))}"""
       .update
       .run
       .map(_ > 0)

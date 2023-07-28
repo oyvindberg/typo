@@ -26,7 +26,7 @@ object PasswordRepoImpl extends PasswordRepo {
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
        """
       .executeInsert(PasswordRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     val namedParameters = List(
@@ -59,7 +59,7 @@ object PasswordRepoImpl extends PasswordRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PasswordRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
@@ -77,7 +77,7 @@ object PasswordRepoImpl extends PasswordRepo {
           from person."password"
           where businessentityid = ANY($businessentityids)
        """.as(PasswordRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
@@ -107,6 +107,6 @@ object PasswordRepoImpl extends PasswordRepo {
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
        """
       .executeInsert(PasswordRow.rowParser(1).single)
-  
+    
   }
 }

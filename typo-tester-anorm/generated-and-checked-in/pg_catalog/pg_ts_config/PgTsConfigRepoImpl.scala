@@ -20,7 +20,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
           returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
        """
       .executeInsert(PgTsConfigRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTsConfigRow] = {
     SQL"""select oid, cfgname, cfgnamespace, cfgowner, cfgparser
@@ -38,7 +38,7 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
           from pg_catalog.pg_ts_config
           where oid = ANY($oids)
        """.as(PgTsConfigRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTsConfigRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
           returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
        """
       .executeInsert(PgTsConfigRow.rowParser(1).single)
-  
+    
   }
 }

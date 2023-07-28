@@ -49,7 +49,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
          """
     }
     q.query(CountryregionRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
     sql"""select countryregioncode, "name", modifieddate::text from person.countryregion""".query(CountryregionRow.read).stream
@@ -65,8 +65,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""update person.countryregion
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}
-       """
+          where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}"""
       .update
       .run
       .map(_ > 0)

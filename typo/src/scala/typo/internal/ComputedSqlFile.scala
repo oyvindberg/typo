@@ -62,11 +62,8 @@ case class ComputedSqlFile(
 
   val RowName: sc.Type.Qualified = names.RowName
 
-  val repoMethods: NonEmptyList[RepoMethod] = {
-    NonEmptyList(
-      RepoMethod.SqlFile(this)
-    )
-  }
+  val repoMethods: NonEmptyList[RepoMethod] =
+    NonEmptyList(RepoMethod.SqlFile(this))
 }
 
 object ComputedSqlFile {

@@ -35,8 +35,7 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
     sql"""update pg_catalog.pg_subscription_rel
           set srsubstate = ${fromWrite(row.srsubstate)(Write.fromPut(Meta.StringMeta.put))}::char,
               srsublsn = ${fromWrite(row.srsublsn)(Write.fromPutOption(Meta.LongMeta.put))}::pg_lsn
-          where srrelid = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND srsubid = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}
-       """
+          where srrelid = ${fromWrite(compositeId.srrelid)(Write.fromPut(Meta.LongMeta.put))} AND srsubid = ${fromWrite(compositeId.srsubid)(Write.fromPut(Meta.LongMeta.put))}"""
       .update
       .run
       .map(_ > 0)

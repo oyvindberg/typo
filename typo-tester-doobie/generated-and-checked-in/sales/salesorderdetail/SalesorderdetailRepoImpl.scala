@@ -69,7 +69,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
          """
     }
     q.query(SalesorderdetailRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalesorderdetailRow] = {
     sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text from sales.salesorderdetail".query(SalesorderdetailRow.read).stream
@@ -88,8 +88,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               unitpricediscount = ${fromWrite(row.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesorderdetailid = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesorderdetailid = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -53,7 +53,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
          """
     }
     q.query(ProductdocumentRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
     sql"select productid, modifieddate::text, documentnode from production.productdocument".query(ProductdocumentRow.read).stream
@@ -65,8 +65,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     val compositeId = row.compositeId
     sql"""update production.productdocument
           set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND documentnode = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}
-       """
+          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND documentnode = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}"""
       .update
       .run
       .map(_ > 0)

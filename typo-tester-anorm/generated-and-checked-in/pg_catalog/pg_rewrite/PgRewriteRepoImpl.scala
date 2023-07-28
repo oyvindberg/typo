@@ -20,7 +20,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
           returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
        """
       .executeInsert(PgRewriteRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgRewriteRow] = {
     SQL"""select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
@@ -38,7 +38,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
           from pg_catalog.pg_rewrite
           where oid = ANY($oids)
        """.as(PgRewriteRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgRewriteRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -77,6 +77,6 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
           returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
        """
       .executeInsert(PgRewriteRow.rowParser(1).single)
-  
+    
   }
 }

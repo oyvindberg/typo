@@ -25,7 +25,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           returning businessentityid, rowguid, modifieddate::text
        """
       .executeInsert(BusinessentityRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
     val namedParameters = List(
@@ -59,7 +59,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(BusinessentityRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
     SQL"""select businessentityid, rowguid, modifieddate::text
@@ -77,7 +77,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           from person.businessentity
           where businessentityid = ANY($businessentityids)
        """.as(BusinessentityRow.rowParser(1).*)
-  
+    
   }
   override def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
@@ -101,6 +101,6 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           returning businessentityid, rowguid, modifieddate::text
        """
       .executeInsert(BusinessentityRow.rowParser(1).single)
-  
+    
   }
 }

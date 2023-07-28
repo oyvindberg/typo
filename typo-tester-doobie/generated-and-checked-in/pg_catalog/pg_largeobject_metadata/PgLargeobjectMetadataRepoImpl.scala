@@ -39,8 +39,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     sql"""update pg_catalog.pg_largeobject_metadata
           set lomowner = ${fromWrite(row.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
               lomacl = ${fromWrite(row.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}"""
       .update
       .run
       .map(_ > 0)

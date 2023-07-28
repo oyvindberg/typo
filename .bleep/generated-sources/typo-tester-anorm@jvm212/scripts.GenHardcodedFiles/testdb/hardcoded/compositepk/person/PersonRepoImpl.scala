@@ -24,7 +24,7 @@ object PersonRepoImpl extends PersonRepo {
           returning "one", two, "name"
        """
       .executeInsert(PersonRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -55,7 +55,7 @@ object PersonRepoImpl extends PersonRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PersonRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "one", two, "name"
@@ -88,6 +88,6 @@ object PersonRepoImpl extends PersonRepo {
           returning "one", two, "name"
        """
       .executeInsert(PersonRow.rowParser(1).single)
-  
+    
   }
 }

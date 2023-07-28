@@ -60,7 +60,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
          """
     }
     q.query(ProductvendorRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
     sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from purchasing.productvendor".query(ProductvendorRow.read).stream
@@ -80,8 +80,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
               onorderqty = ${fromWrite(row.onorderqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4,
               unitmeasurecode = ${fromWrite(row.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}
-       """
+          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)

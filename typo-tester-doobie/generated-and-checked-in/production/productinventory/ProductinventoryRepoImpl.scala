@@ -62,7 +62,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
          """
     }
     q.query(ProductinventoryRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
     sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text from production.productinventory".query(ProductinventoryRow.read).stream
@@ -78,8 +78,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
               quantity = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int2,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND locationid = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}
-       """
+          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND locationid = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}"""
       .update
       .run
       .map(_ > 0)

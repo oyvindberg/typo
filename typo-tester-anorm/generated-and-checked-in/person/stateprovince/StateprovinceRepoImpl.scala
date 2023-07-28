@@ -26,7 +26,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
     val namedParameters = List(
@@ -68,7 +68,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(StateprovinceRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
@@ -86,7 +86,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           from person.stateprovince
           where stateprovinceid = ANY($stateprovinceids)
        """.as(StateprovinceRow.rowParser(1).*)
-  
+    
   }
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
     val stateprovinceid = row.stateprovinceid
@@ -125,6 +125,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
-  
+    
   }
 }

@@ -20,7 +20,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
           returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
        """
       .executeInsert(PgAmprocRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAmprocRow] = {
     SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
@@ -38,7 +38,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
           from pg_catalog.pg_amproc
           where oid = ANY($oids)
        """.as(PgAmprocRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgAmprocRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
           returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
        """
       .executeInsert(PgAmprocRow.rowParser(1).single)
-  
+    
   }
 }

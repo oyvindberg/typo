@@ -40,8 +40,7 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
               opfname = ${fromWrite(row.opfname)(Write.fromPut(Meta.StringMeta.put))}::name,
               opfnamespace = ${fromWrite(row.opfnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
               opfowner = ${fromWrite(row.opfowner)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where oid = ${fromWrite(oid)(Write.fromPut(PgOpfamilyId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgOpfamilyId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -24,7 +24,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
        """
       .executeInsert(ProductcosthistoryRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow = {
     val namedParameters = List(
@@ -54,7 +54,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductcosthistoryRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
     SQL"""select productid, startdate::text, enddate::text, standardcost, modifieddate::text
@@ -93,6 +93,6 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
        """
       .executeInsert(ProductcosthistoryRow.rowParser(1).single)
-  
+    
   }
 }

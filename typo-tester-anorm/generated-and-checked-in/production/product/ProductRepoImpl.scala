@@ -26,7 +26,7 @@ object ProductRepoImpl extends ProductRepo {
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
        """
       .executeInsert(ProductRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow = {
     val namedParameters = List(
@@ -88,7 +88,7 @@ object ProductRepoImpl extends ProductRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductRow] = {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
@@ -106,7 +106,7 @@ object ProductRepoImpl extends ProductRepo {
           from production.product
           where productid = ANY($productids)
        """.as(ProductRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ProductRow)(implicit c: Connection): Boolean = {
     val productid = row.productid
@@ -196,6 +196,6 @@ object ProductRepoImpl extends ProductRepo {
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
        """
       .executeInsert(ProductRow.rowParser(1).single)
-  
+    
   }
 }

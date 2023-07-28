@@ -55,7 +55,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
          """
     }
     q.query(EmployeedepartmenthistoryRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
     sql"select businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text from humanresources.employeedepartmenthistory".query(EmployeedepartmenthistoryRow.read).stream
@@ -68,8 +68,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""update humanresources.employeedepartmenthistory
           set enddate = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDate.put))}::date,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND departmentid = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND shiftid = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND departmentid = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND shiftid = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}"""
       .update
       .run
       .map(_ > 0)

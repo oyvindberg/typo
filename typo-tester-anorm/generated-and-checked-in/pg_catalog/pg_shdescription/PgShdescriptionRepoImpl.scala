@@ -20,7 +20,7 @@ object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
           returning objoid, classoid, description
        """
       .executeInsert(PgShdescriptionRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgShdescriptionRow] = {
     SQL"""select objoid, classoid, description
@@ -53,6 +53,6 @@ object PgShdescriptionRepoImpl extends PgShdescriptionRepo {
           returning objoid, classoid, description
        """
       .executeInsert(PgShdescriptionRow.rowParser(1).single)
-  
+    
   }
 }

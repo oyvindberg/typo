@@ -20,7 +20,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
           returning oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
        """
       .executeInsert(PgEventTriggerRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgEventTriggerRow] = {
     SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
@@ -38,7 +38,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
           from pg_catalog.pg_event_trigger
           where oid = ANY($oids)
        """.as(PgEventTriggerRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgEventTriggerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -74,6 +74,6 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
           returning oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
        """
       .executeInsert(PgEventTriggerRow.rowParser(1).single)
-  
+    
   }
 }

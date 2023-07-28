@@ -26,7 +26,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
        """
       .executeInsert(SalespersonRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
     val namedParameters = List(
@@ -75,7 +75,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalespersonRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
@@ -93,7 +93,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
           from sales.salesperson
           where businessentityid = ANY($businessentityids)
        """.as(SalespersonRow.rowParser(1).*)
-  
+    
   }
   override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
@@ -135,6 +135,6 @@ object SalespersonRepoImpl extends SalespersonRepo {
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text
        """
       .executeInsert(SalespersonRow.rowParser(1).single)
-  
+    
   }
 }

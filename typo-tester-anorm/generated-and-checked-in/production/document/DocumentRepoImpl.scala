@@ -26,7 +26,7 @@ object DocumentRepoImpl extends DocumentRepo {
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
        """
       .executeInsert(DocumentRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
     val namedParameters = List(
@@ -76,7 +76,7 @@ object DocumentRepoImpl extends DocumentRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(DocumentRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
@@ -94,7 +94,7 @@ object DocumentRepoImpl extends DocumentRepo {
           from production."document"
           where documentnode = ANY($documentnodes)
        """.as(DocumentRow.rowParser(1).*)
-  
+    
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
     val documentnode = row.documentnode
@@ -148,6 +148,6 @@ object DocumentRepoImpl extends DocumentRepo {
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
        """
       .executeInsert(DocumentRow.rowParser(1).single)
-  
+    
   }
 }

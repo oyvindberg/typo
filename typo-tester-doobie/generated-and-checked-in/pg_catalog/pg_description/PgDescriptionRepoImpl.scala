@@ -34,8 +34,7 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_description
           set description = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))}
-          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

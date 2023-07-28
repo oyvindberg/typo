@@ -17,7 +17,7 @@ object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
           returning implementation_info_id, implementation_info_name, integer_value, character_value, "comments"
        """
       .executeInsert(SqlImplementationInfoRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SqlImplementationInfoRow] = {
     SQL"""select implementation_info_id, implementation_info_name, integer_value, character_value, "comments"

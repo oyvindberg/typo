@@ -17,7 +17,7 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
           returning feature_id, feature_name, is_supported, is_verified_by, "comments"
        """
       .executeInsert(SqlPartsRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SqlPartsRow] = {
     SQL"""select feature_id, feature_name, is_supported, is_verified_by, "comments"

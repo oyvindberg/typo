@@ -43,8 +43,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
               extversion = ${fromWrite(row.extversion)(Write.fromPut(Meta.StringMeta.put))},
               extconfig = ${fromWrite(row.extconfig)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
               extcondition = ${fromWrite(row.extcondition)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgExtensionId.put))}"""
       .update
       .run
       .map(_ > 0)

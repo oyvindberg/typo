@@ -25,7 +25,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           returning specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
        """
       .executeInsert(SpecialofferRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
     val namedParameters = List(
@@ -73,7 +73,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SpecialofferRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
@@ -91,7 +91,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           from sales.specialoffer
           where specialofferid = ANY($specialofferids)
        """.as(SpecialofferRow.rowParser(1).*)
-  
+    
   }
   override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
     val specialofferid = row.specialofferid
@@ -139,6 +139,6 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           returning specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
        """
       .executeInsert(SpecialofferRow.rowParser(1).single)
-  
+    
   }
 }

@@ -44,8 +44,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
               srvversion = ${fromWrite(row.srvversion)(Write.fromPutOption(Meta.StringMeta.put))},
               srvacl = ${fromWrite(row.srvacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
               srvoptions = ${fromWrite(row.srvoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgForeignServerId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgForeignServerId.put))}"""
       .update
       .run
       .map(_ > 0)

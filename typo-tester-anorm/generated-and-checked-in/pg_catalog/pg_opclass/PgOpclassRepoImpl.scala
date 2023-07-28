@@ -20,7 +20,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
           returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
        """
       .executeInsert(PgOpclassRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgOpclassRow] = {
     SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
@@ -38,7 +38,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
           from pg_catalog.pg_opclass
           where oid = ANY($oids)
        """.as(PgOpclassRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgOpclassRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -80,6 +80,6 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
           returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
        """
       .executeInsert(PgOpclassRow.rowParser(1).single)
-  
+    
   }
 }

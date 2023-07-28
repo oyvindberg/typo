@@ -20,7 +20,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
           returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
        """
       .executeInsert(PgTsTemplateRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTsTemplateRow] = {
     SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize
@@ -38,7 +38,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
           from pg_catalog.pg_ts_template
           where oid = ANY($oids)
        """.as(PgTsTemplateRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTsTemplateRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
           returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
        """
       .executeInsert(PgTsTemplateRow.rowParser(1).single)
-  
+    
   }
 }

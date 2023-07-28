@@ -20,7 +20,7 @@ object PgCastRepoImpl extends PgCastRepo {
           returning oid, castsource, casttarget, castfunc, castcontext, castmethod
        """
       .executeInsert(PgCastRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgCastRow] = {
     SQL"""select oid, castsource, casttarget, castfunc, castcontext, castmethod
@@ -38,7 +38,7 @@ object PgCastRepoImpl extends PgCastRepo {
           from pg_catalog.pg_cast
           where oid = ANY($oids)
        """.as(PgCastRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgCastRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgCastRepoImpl extends PgCastRepo {
           returning oid, castsource, casttarget, castfunc, castcontext, castmethod
        """
       .executeInsert(PgCastRow.rowParser(1).single)
-  
+    
   }
 }

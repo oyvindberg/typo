@@ -59,8 +59,7 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
               attoptions = ${fromWrite(row.attoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
               attfdwoptions = ${fromWrite(row.attfdwoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
               attmissingval = ${fromWrite(row.attmissingval)(Write.fromPutOption(TypoAnyArray.put))}::anyarray
-          where attrelid = ${fromWrite(compositeId.attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attnum = ${fromWrite(compositeId.attnum)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where attrelid = ${fromWrite(compositeId.attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attnum = ${fromWrite(compositeId.attnum)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -10,7 +10,7 @@ case class Generated(files: List[sc.File]) {
       val path = idents.init
       val name = idents.last
       val relPath = RelPath(path.map(_.value) :+ (name.value + ".scala"))
-      relPath -> content.render
+      relPath -> content.render.asString
     }.toMap
 
   def overwriteFolder(folder: Path, soft: Boolean, adjustPaths: RelPath => RelPath = identity): Map[Path, FileSync.Synced] =

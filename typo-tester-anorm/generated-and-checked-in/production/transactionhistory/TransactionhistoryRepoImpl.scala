@@ -24,7 +24,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
        """
       .executeInsert(TransactionhistoryRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow = {
     val namedParameters = List(
@@ -67,7 +67,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(TransactionhistoryRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
@@ -85,7 +85,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           from production.transactionhistory
           where transactionid = ANY($transactionids)
        """.as(TransactionhistoryRow.rowParser(1).*)
-  
+    
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     val transactionid = row.transactionid
@@ -127,6 +127,6 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
        """
       .executeInsert(TransactionhistoryRow.rowParser(1).single)
-  
+    
   }
 }

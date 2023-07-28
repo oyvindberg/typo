@@ -73,7 +73,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
          """
     }
     q.query(SalespersonRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
     sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sales.salesperson".query(SalespersonRow.read).stream
@@ -95,8 +95,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
               saleslastyear = ${fromWrite(row.saleslastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}
-       """
+          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)

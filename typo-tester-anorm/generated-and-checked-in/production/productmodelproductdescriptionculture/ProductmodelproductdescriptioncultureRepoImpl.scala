@@ -24,7 +24,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           returning productmodelid, productdescriptionid, cultureid, modifieddate::text
        """
       .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     val namedParameters = List(
@@ -53,7 +53,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate::text
@@ -87,6 +87,6 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           returning productmodelid, productdescriptionid, cultureid, modifieddate::text
        """
       .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).single)
-  
+    
   }
 }

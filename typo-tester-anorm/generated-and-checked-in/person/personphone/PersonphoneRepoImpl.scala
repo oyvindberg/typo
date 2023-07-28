@@ -24,7 +24,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """
       .executeInsert(PersonphoneRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
     val namedParameters = List(
@@ -53,7 +53,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PersonphoneRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
@@ -87,6 +87,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """
       .executeInsert(PersonphoneRow.rowParser(1).single)
-  
+    
   }
 }

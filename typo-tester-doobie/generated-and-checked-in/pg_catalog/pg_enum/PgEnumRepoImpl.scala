@@ -39,8 +39,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
           set enumtypid = ${fromWrite(row.enumtypid)(Write.fromPut(Meta.LongMeta.put))}::oid,
               enumsortorder = ${fromWrite(row.enumsortorder)(Write.fromPut(Meta.FloatMeta.put))}::float4,
               enumlabel = ${fromWrite(row.enumlabel)(Write.fromPut(Meta.StringMeta.put))}::name
-          where oid = ${fromWrite(oid)(Write.fromPut(PgEnumId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgEnumId.put))}"""
       .update
       .run
       .map(_ > 0)

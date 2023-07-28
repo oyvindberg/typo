@@ -25,7 +25,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           returning specialofferid, productid, rowguid, modifieddate::text
        """
       .executeInsert(SpecialofferproductRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow = {
     val namedParameters = List(
@@ -57,7 +57,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SpecialofferproductRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
     SQL"""select specialofferid, productid, rowguid, modifieddate::text
@@ -93,6 +93,6 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           returning specialofferid, productid, rowguid, modifieddate::text
        """
       .executeInsert(SpecialofferproductRow.rowParser(1).single)
-  
+    
   }
 }

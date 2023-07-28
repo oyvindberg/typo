@@ -24,7 +24,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
           returning countryregioncode, "name", modifieddate::text
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(CountryregionRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select countryregioncode, "name", modifieddate::text
@@ -70,7 +70,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
           from person.countryregion
           where countryregioncode = ANY($countryregioncodes)
        """.as(CountryregionRow.rowParser(1).*)
-  
+    
   }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
     val countryregioncode = row.countryregioncode
@@ -94,6 +94,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
           returning countryregioncode, "name", modifieddate::text
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
-  
+    
   }
 }

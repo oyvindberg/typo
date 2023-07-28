@@ -16,8 +16,8 @@ case class NonEmptyList[T](head: T, tail: List[T]) {
   def length: Int = tail.length + 1
   def toList: List[T] = head :: tail
   def toArray(implicit CT: ClassTag[T]): Array[T] = toList.toArray
-  def sortedBy[U: Ordering](f: T => U) = {
-    val head :: tail = toList.sortBy(f): @unchecked
+  def sorted(implicit O: Ordering[T]) = {
+    val head :: tail = toList.sorted: @unchecked
     NonEmptyList(head, tail)
   }
   def zipWithIndex: NonEmptyList[(T, Int)] =

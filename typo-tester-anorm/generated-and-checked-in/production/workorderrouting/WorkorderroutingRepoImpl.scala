@@ -24,7 +24,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text
        """
       .executeInsert(WorkorderroutingRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
     val namedParameters = List(
@@ -61,7 +61,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(WorkorderroutingRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text
@@ -119,6 +119,6 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text
        """
       .executeInsert(WorkorderroutingRow.rowParser(1).single)
-  
+    
   }
 }

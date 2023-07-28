@@ -20,7 +20,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
           returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
        """
       .executeInsert(PgTsParserRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTsParserRow] = {
     SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
@@ -38,7 +38,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
           from pg_catalog.pg_ts_parser
           where oid = ANY($oids)
        """.as(PgTsParserRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTsParserRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -77,6 +77,6 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
           returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
        """
       .executeInsert(PgTsParserRow.rowParser(1).single)
-  
+    
   }
 }

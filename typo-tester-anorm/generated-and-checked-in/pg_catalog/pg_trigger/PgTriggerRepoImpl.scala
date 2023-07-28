@@ -20,7 +20,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
           returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
        """
       .executeInsert(PgTriggerRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTriggerRow] = {
     SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
@@ -38,7 +38,7 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
           from pg_catalog.pg_trigger
           where oid = ANY($oids)
        """.as(PgTriggerRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTriggerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -110,6 +110,6 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
           returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
        """
       .executeInsert(PgTriggerRow.rowParser(1).single)
-  
+    
   }
 }

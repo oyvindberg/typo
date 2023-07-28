@@ -39,8 +39,7 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
           set umuser = ${fromWrite(row.umuser)(Write.fromPut(Meta.LongMeta.put))}::oid,
               umserver = ${fromWrite(row.umserver)(Write.fromPut(Meta.LongMeta.put))}::oid,
               umoptions = ${fromWrite(row.umoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgUserMappingId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgUserMappingId.put))}"""
       .update
       .run
       .map(_ > 0)

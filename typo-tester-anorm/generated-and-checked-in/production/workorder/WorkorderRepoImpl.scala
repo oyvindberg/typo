@@ -24,7 +24,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
           returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     val namedParameters = List(
@@ -61,7 +61,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(WorkorderRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
@@ -79,7 +79,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
           from production.workorder
           where workorderid = ANY($workorderids)
        """.as(WorkorderRow.rowParser(1).*)
-  
+    
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     val workorderid = row.workorderid
@@ -121,6 +121,6 @@ object WorkorderRepoImpl extends WorkorderRepo {
           returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
-  
+    
   }
 }
