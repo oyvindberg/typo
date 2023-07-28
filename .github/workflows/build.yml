@@ -7,7 +7,7 @@ on:
     branches: [ 'main' ]
 
 jobs:
-  build:
+  scalafmt:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
@@ -21,6 +21,17 @@ jobs:
       - name: Scalafmt Check
         run: bleep fmt --check
 
+  build-scala212:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bleep-build/bleep-setup-action@0.0.1
+      - uses: coursier/cache-action@v6
+        with:
+          extraFiles: bleep.yaml
+
       - name: Start up Postgres
         run: docker-compose up -d
 
@@ -28,13 +39,55 @@ jobs:
         env:
           CI: true
         run: |
-          bleep compile
-          bleep test
+          bleep compile jvm212
+          bleep test jvm212
+
+  build-scala213:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bleep-build/bleep-setup-action@0.0.1
+      - uses: coursier/cache-action@v6
+        with:
+          extraFiles: bleep.yaml
+
+      - name: Start up Postgres
+        run: docker-compose up -d
+
+      - name: Run tests
+        env:
+          CI: true
+        run: |
+          bleep compile jvm213
+          bleep test jvm213
+
+  build-scala3:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bleep-build/bleep-setup-action@0.0.1
+      - uses: coursier/cache-action@v6
+        with:
+          extraFiles: bleep.yaml
+
+      - name: Start up Postgres
+        run: docker-compose up -d
+
+      - name: Run tests
+        env:
+          CI: true
+        run: |
+          bleep compile jvm3
+          bleep test jvm3
 
   release:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ scalafmt, build-scala212, build-scala213, build-scala3 ]
     if: "startsWith(github.ref, 'refs/tags/v')"
     steps:
       - uses: actions/checkout@v2
