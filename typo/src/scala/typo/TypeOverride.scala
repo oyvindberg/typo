@@ -1,7 +1,7 @@
 package typo
 
-/** Here you can override the type of a column. You specify either a fully qualified type name or something which is in scope, either by default in scala or is
-  * exposed in a super package of the generated code.
+/** Here you can override the type of a column. You specify either a fully qualified type name or something which is in scope, either by default in scala or is exposed in a super package of the
+  * generated code.
   *
   * Note that you cannot override `Array` or `Option`.
   */
