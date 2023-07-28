@@ -8,8 +8,8 @@ package pg_catalog
 package pg_file_settings
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -25,26 +25,26 @@ case class PgFileSettingsViewRow(
 )
 
 object PgFileSettingsViewRow {
-  implicit val decoder: Decoder[PgFileSettingsViewRow] = Decoder.forProduct7[PgFileSettingsViewRow, Option[String], Option[Int], Option[Int], Option[String], Option[String], Option[Boolean], Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(PgFileSettingsViewRow.apply)
-  implicit val encoder: Encoder[PgFileSettingsViewRow] = Encoder.forProduct7[PgFileSettingsViewRow, Option[String], Option[Int], Option[Int], Option[String], Option[String], Option[Boolean], Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(x => (x.sourcefile, x.sourceline, x.seqno, x.name, x.setting, x.applied, x.error))
+  implicit val decoder: Decoder[PgFileSettingsViewRow] = Decoder.forProduct7[PgFileSettingsViewRow, Option[String], Option[Int], Option[Int], Option[String], Option[String], Option[Boolean], Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(PgFileSettingsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgFileSettingsViewRow] = Encoder.forProduct7[PgFileSettingsViewRow, Option[String], Option[Int], Option[Int], Option[String], Option[String], Option[Boolean], Option[String]]("sourcefile", "sourceline", "seqno", "name", "setting", "applied", "error")(x => (x.sourcefile, x.sourceline, x.seqno, x.name, x.setting, x.applied, x.error))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgFileSettingsViewRow] = new Read[PgFileSettingsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[String], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgFileSettingsViewRow(
-      sourcefile = Get[String].unsafeGetNullable(rs, i + 0),
-      sourceline = Get[Int].unsafeGetNullable(rs, i + 1),
-      seqno = Get[Int].unsafeGetNullable(rs, i + 2),
-      name = Get[String].unsafeGetNullable(rs, i + 3),
-      setting = Get[String].unsafeGetNullable(rs, i + 4),
-      applied = Get[Boolean].unsafeGetNullable(rs, i + 5),
-      error = Get[String].unsafeGetNullable(rs, i + 6)
+      sourcefile = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      sourceline = Meta.IntMeta.get.unsafeGetNullable(rs, i + 1),
+      seqno = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
+      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      setting = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      applied = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 5),
+      error = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

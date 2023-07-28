@@ -10,9 +10,9 @@ package pg_statistic
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,18 +23,18 @@ object PgStatisticId {
   implicit val reads: Reads[PgStatisticId] = Reads[PgStatisticId](json => JsResult.fromTry(
       Try(
         PgStatisticId(
-          starelid = json.\("starelid").as[/* oid */ Long],
-          staattnum = json.\("staattnum").as[Int],
-          stainherit = json.\("stainherit").as[Boolean]
+          starelid = json.\("starelid").as(Reads.LongReads),
+          staattnum = json.\("staattnum").as(Reads.IntReads),
+          stainherit = json.\("stainherit").as(Reads.BooleanReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgStatisticId] = OWrites[PgStatisticId](o =>
     new JsObject(ListMap[String, JsValue](
-      "starelid" -> Json.toJson(o.starelid),
-      "staattnum" -> Json.toJson(o.staattnum),
-      "stainherit" -> Json.toJson(o.stainherit)
+      "starelid" -> Writes.LongWrites.writes(o.starelid),
+      "staattnum" -> Writes.IntWrites.writes(o.staattnum),
+      "stainherit" -> Writes.BooleanWrites.writes(o.stainherit)
     ))
   )
 }

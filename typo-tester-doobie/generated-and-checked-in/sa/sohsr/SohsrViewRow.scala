@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,18 +26,18 @@ case class SohsrViewRow(
 )
 
 object SohsrViewRow {
-  implicit val decoder: Decoder[SohsrViewRow] = Decoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(SohsrViewRow.apply)
-  implicit val encoder: Encoder[SohsrViewRow] = Encoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))
+  implicit val decoder: Decoder[SohsrViewRow] = Decoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(SohsrViewRow.apply)(Decoder.decodeOption(SalesorderheaderId.decoder), Decoder.decodeOption(SalesreasonId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[SohsrViewRow] = Encoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(Encoder.encodeOption(SalesorderheaderId.encoder), Encoder.encodeOption(SalesreasonId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[SohsrViewRow] = new Read[SohsrViewRow](
     gets = List(
-      (Get[SalesorderheaderId], Nullability.Nullable),
-      (Get[SalesreasonId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (SalesorderheaderId.get, Nullability.Nullable),
+      (SalesreasonId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SohsrViewRow(
-      salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 0),
-      salesreasonid = Get[SalesreasonId].unsafeGetNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2)
+      salesorderid = SalesorderheaderId.get.unsafeGetNullable(rs, i + 0),
+      salesreasonid = SalesreasonId.get.unsafeGetNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

@@ -10,14 +10,15 @@ package ct
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,10 +36,10 @@ object CtViewRow {
   implicit val reads: Reads[CtViewRow] = Reads[CtViewRow](json => JsResult.fromTry(
       Try(
         CtViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          contacttypeid = json.\("contacttypeid").toOption.map(_.as[ContacttypeId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          contacttypeid = json.\("contacttypeid").toOption.map(_.as(ContacttypeId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -46,19 +47,19 @@ object CtViewRow {
   def rowParser(idx: Int): RowParser[CtViewRow] = RowParser[CtViewRow] { row =>
     Success(
       CtViewRow(
-        id = row[Option[Int]](idx + 0),
-        contacttypeid = row[Option[ContacttypeId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        contacttypeid = row(idx + 1)(Column.columnToOption(ContacttypeId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[CtViewRow] = OWrites[CtViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "contacttypeid" -> Json.toJson(o.contacttypeid),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "contacttypeid" -> Writes.OptionWrites(ContacttypeId.writes).writes(o.contacttypeid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

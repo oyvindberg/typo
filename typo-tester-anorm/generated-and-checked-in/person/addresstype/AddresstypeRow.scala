@@ -9,15 +9,16 @@ package addresstype
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,10 +35,10 @@ object AddresstypeRow {
   implicit val reads: Reads[AddresstypeRow] = Reads[AddresstypeRow](json => JsResult.fromTry(
       Try(
         AddresstypeRow(
-          addresstypeid = json.\("addresstypeid").as[AddresstypeId],
-          name = json.\("name").as[Name],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
+          name = json.\("name").as(Name.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,19 +46,19 @@ object AddresstypeRow {
   def rowParser(idx: Int): RowParser[AddresstypeRow] = RowParser[AddresstypeRow] { row =>
     Success(
       AddresstypeRow(
-        addresstypeid = row[AddresstypeId](idx + 0),
-        name = row[Name](idx + 1),
-        rowguid = row[UUID](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        addresstypeid = row(idx + 0)(AddresstypeId.column),
+        name = row(idx + 1)(Name.column),
+        rowguid = row(idx + 2)(Column.columnToUUID),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[AddresstypeRow] = OWrites[AddresstypeRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "addresstypeid" -> Json.toJson(o.addresstypeid),
-      "name" -> Json.toJson(o.name),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
+      "name" -> Name.writes.writes(o.name),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

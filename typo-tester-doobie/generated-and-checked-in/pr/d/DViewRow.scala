@@ -12,8 +12,8 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -49,38 +49,38 @@ case class DViewRow(
 )
 
 object DViewRow {
-  implicit val decoder: Decoder[DViewRow] = Decoder.forProduct13[DViewRow, Option[/* max 50 chars */ String], Option[BusinessentityId], Flag, Option[/* max 400 chars */ String], Option[/* max 8 chars */ String], Option[/* bpchar */ String], Option[Int], Option[Int], Option[String], Option[Byte], Option[UUID], Option[TypoLocalDateTime], Option[DocumentId]]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DViewRow.apply)
-  implicit val encoder: Encoder[DViewRow] = Encoder.forProduct13[DViewRow, Option[/* max 50 chars */ String], Option[BusinessentityId], Flag, Option[/* max 400 chars */ String], Option[/* max 8 chars */ String], Option[/* bpchar */ String], Option[Int], Option[Int], Option[String], Option[Byte], Option[UUID], Option[TypoLocalDateTime], Option[DocumentId]]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))
+  implicit val decoder: Decoder[DViewRow] = Decoder.forProduct13[DViewRow, Option[/* max 50 chars */ String], Option[BusinessentityId], Flag, Option[/* max 400 chars */ String], Option[/* max 8 chars */ String], Option[/* bpchar */ String], Option[Int], Option[Int], Option[String], Option[Byte], Option[UUID], Option[TypoLocalDateTime], Option[DocumentId]]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(BusinessentityId.decoder), Flag.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeByte), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(DocumentId.decoder))
+  implicit val encoder: Encoder[DViewRow] = Encoder.forProduct13[DViewRow, Option[/* max 50 chars */ String], Option[BusinessentityId], Flag, Option[/* max 400 chars */ String], Option[/* max 8 chars */ String], Option[/* bpchar */ String], Option[Int], Option[Int], Option[String], Option[Byte], Option[UUID], Option[TypoLocalDateTime], Option[DocumentId]]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(BusinessentityId.encoder), Flag.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeByte), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(DocumentId.encoder))
   implicit val read: Read[DViewRow] = new Read[DViewRow](
     gets = List(
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[/* max 400 chars */ String], Nullability.Nullable),
-      (Get[/* max 8 chars */ String], Nullability.Nullable),
-      (Get[/* bpchar */ String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Byte], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[DocumentId], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (Flag.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ByteMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (DocumentId.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-      title = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 0),
-      owner = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-      filename = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 3),
-      fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
-      revision = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 5),
-      changenumber = Get[Int].unsafeGetNullable(rs, i + 6),
-      status = Get[Int].unsafeGetNullable(rs, i + 7),
-      documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
-      document = Get[Byte].unsafeGetNullable(rs, i + 9),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 10),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 11),
-      documentnode = Get[DocumentId].unsafeGetNullable(rs, i + 12)
+      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      owner = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      folderflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
+      filename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      fileextension = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      revision = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      changenumber = Meta.IntMeta.get.unsafeGetNullable(rs, i + 6),
+      status = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
+      documentsummary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      document = Meta.ByteMeta.get.unsafeGetNullable(rs, i + 9),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 10),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 11),
+      documentnode = DocumentId.get.unsafeGetNullable(rs, i + 12)
     )
   )
 }

@@ -14,9 +14,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -67,24 +67,24 @@ object ShipmethodRowUnsaved {
   implicit val reads: Reads[ShipmethodRowUnsaved] = Reads[ShipmethodRowUnsaved](json => JsResult.fromTry(
       Try(
         ShipmethodRowUnsaved(
-          name = json.\("name").as[Name],
-          shipmethodid = json.\("shipmethodid").as[Defaulted[ShipmethodId]],
-          shipbase = json.\("shipbase").as[Defaulted[BigDecimal]],
-          shiprate = json.\("shiprate").as[Defaulted[BigDecimal]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          shipmethodid = json.\("shipmethodid").as(Defaulted.reads(ShipmethodId.reads)),
+          shipbase = json.\("shipbase").as(Defaulted.reads(Reads.bigDecReads)),
+          shiprate = json.\("shiprate").as(Defaulted.reads(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ShipmethodRowUnsaved] = OWrites[ShipmethodRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "shipmethodid" -> Json.toJson(o.shipmethodid),
-      "shipbase" -> Json.toJson(o.shipbase),
-      "shiprate" -> Json.toJson(o.shiprate),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "shipmethodid" -> Defaulted.writes(ShipmethodId.writes).writes(o.shipmethodid),
+      "shipbase" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.shipbase),
+      "shiprate" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.shiprate),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

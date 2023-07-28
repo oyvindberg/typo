@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -51,17 +52,17 @@ object StViewRow {
   implicit val reads: Reads[StViewRow] = Reads[StViewRow](json => JsResult.fromTry(
       Try(
         StViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
-          group = json.\("group").toOption.map(_.as[/* max 50 chars */ String]),
-          salesytd = json.\("salesytd").toOption.map(_.as[BigDecimal]),
-          saleslastyear = json.\("saleslastyear").toOption.map(_.as[BigDecimal]),
-          costytd = json.\("costytd").toOption.map(_.as[BigDecimal]),
-          costlastyear = json.\("costlastyear").toOption.map(_.as[BigDecimal]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          countryregioncode = json.\("countryregioncode").toOption.map(_.as(CountryregionId.reads)),
+          group = json.\("group").toOption.map(_.as(Reads.StringReads)),
+          salesytd = json.\("salesytd").toOption.map(_.as(Reads.bigDecReads)),
+          saleslastyear = json.\("saleslastyear").toOption.map(_.as(Reads.bigDecReads)),
+          costytd = json.\("costytd").toOption.map(_.as(Reads.bigDecReads)),
+          costlastyear = json.\("costlastyear").toOption.map(_.as(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -69,33 +70,33 @@ object StViewRow {
   def rowParser(idx: Int): RowParser[StViewRow] = RowParser[StViewRow] { row =>
     Success(
       StViewRow(
-        id = row[Option[Int]](idx + 0),
-        territoryid = row[Option[SalesterritoryId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        countryregioncode = row[Option[CountryregionId]](idx + 3),
-        group = row[Option[/* max 50 chars */ String]](idx + 4),
-        salesytd = row[Option[BigDecimal]](idx + 5),
-        saleslastyear = row[Option[BigDecimal]](idx + 6),
-        costytd = row[Option[BigDecimal]](idx + 7),
-        costlastyear = row[Option[BigDecimal]](idx + 8),
-        rowguid = row[Option[UUID]](idx + 9),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 10)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        territoryid = row(idx + 1)(Column.columnToOption(SalesterritoryId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        countryregioncode = row(idx + 3)(Column.columnToOption(CountryregionId.column)),
+        group = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        salesytd = row(idx + 5)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        saleslastyear = row(idx + 6)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        costytd = row(idx + 7)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        costlastyear = row(idx + 8)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        rowguid = row(idx + 9)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 10)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[StViewRow] = OWrites[StViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "name" -> Json.toJson(o.name),
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "group" -> Json.toJson(o.group),
-      "salesytd" -> Json.toJson(o.salesytd),
-      "saleslastyear" -> Json.toJson(o.saleslastyear),
-      "costytd" -> Json.toJson(o.costytd),
-      "costlastyear" -> Json.toJson(o.costlastyear),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "countryregioncode" -> Writes.OptionWrites(CountryregionId.writes).writes(o.countryregioncode),
+      "group" -> Writes.OptionWrites(Writes.StringWrites).writes(o.group),
+      "salesytd" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesytd),
+      "saleslastyear" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.saleslastyear),
+      "costytd" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.costytd),
+      "costlastyear" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.costlastyear),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

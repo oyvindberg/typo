@@ -10,14 +10,15 @@ package billofmaterials
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -48,15 +49,15 @@ object BillofmaterialsRow {
   implicit val reads: Reads[BillofmaterialsRow] = Reads[BillofmaterialsRow](json => JsResult.fromTry(
       Try(
         BillofmaterialsRow(
-          billofmaterialsid = json.\("billofmaterialsid").as[BillofmaterialsId],
-          productassemblyid = json.\("productassemblyid").toOption.map(_.as[ProductId]),
-          componentid = json.\("componentid").as[ProductId],
-          startdate = json.\("startdate").as[TypoLocalDateTime],
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
-          unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
-          bomlevel = json.\("bomlevel").as[Int],
-          perassemblyqty = json.\("perassemblyqty").as[BigDecimal],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          billofmaterialsid = json.\("billofmaterialsid").as(BillofmaterialsId.reads),
+          productassemblyid = json.\("productassemblyid").toOption.map(_.as(ProductId.reads)),
+          componentid = json.\("componentid").as(ProductId.reads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          bomlevel = json.\("bomlevel").as(Reads.IntReads),
+          perassemblyqty = json.\("perassemblyqty").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -64,29 +65,29 @@ object BillofmaterialsRow {
   def rowParser(idx: Int): RowParser[BillofmaterialsRow] = RowParser[BillofmaterialsRow] { row =>
     Success(
       BillofmaterialsRow(
-        billofmaterialsid = row[BillofmaterialsId](idx + 0),
-        productassemblyid = row[Option[ProductId]](idx + 1),
-        componentid = row[ProductId](idx + 2),
-        startdate = row[TypoLocalDateTime](idx + 3),
-        enddate = row[Option[TypoLocalDateTime]](idx + 4),
-        unitmeasurecode = row[UnitmeasureId](idx + 5),
-        bomlevel = row[Int](idx + 6),
-        perassemblyqty = row[BigDecimal](idx + 7),
-        modifieddate = row[TypoLocalDateTime](idx + 8)
+        billofmaterialsid = row(idx + 0)(BillofmaterialsId.column),
+        productassemblyid = row(idx + 1)(Column.columnToOption(ProductId.column)),
+        componentid = row(idx + 2)(ProductId.column),
+        startdate = row(idx + 3)(TypoLocalDateTime.column),
+        enddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
+        unitmeasurecode = row(idx + 5)(UnitmeasureId.column),
+        bomlevel = row(idx + 6)(Column.columnToInt),
+        perassemblyqty = row(idx + 7)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[BillofmaterialsRow] = OWrites[BillofmaterialsRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "billofmaterialsid" -> Json.toJson(o.billofmaterialsid),
-      "productassemblyid" -> Json.toJson(o.productassemblyid),
-      "componentid" -> Json.toJson(o.componentid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
-      "bomlevel" -> Json.toJson(o.bomlevel),
-      "perassemblyqty" -> Json.toJson(o.perassemblyqty),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "billofmaterialsid" -> BillofmaterialsId.writes.writes(o.billofmaterialsid),
+      "productassemblyid" -> Writes.OptionWrites(ProductId.writes).writes(o.productassemblyid),
+      "componentid" -> ProductId.writes.writes(o.componentid),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "bomlevel" -> Writes.IntWrites.writes(o.bomlevel),
+      "perassemblyqty" -> Writes.BigDecimalWrites.writes(o.perassemblyqty),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

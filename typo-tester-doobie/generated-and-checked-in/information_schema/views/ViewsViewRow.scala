@@ -11,7 +11,6 @@ import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -31,32 +30,32 @@ case class ViewsViewRow(
 )
 
 object ViewsViewRow {
-  implicit val decoder: Decoder[ViewsViewRow] = Decoder.forProduct10[ViewsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("table_catalog", "table_schema", "table_name", "view_definition", "check_option", "is_updatable", "is_insertable_into", "is_trigger_updatable", "is_trigger_deletable", "is_trigger_insertable_into")(ViewsViewRow.apply)
-  implicit val encoder: Encoder[ViewsViewRow] = Encoder.forProduct10[ViewsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("table_catalog", "table_schema", "table_name", "view_definition", "check_option", "is_updatable", "is_insertable_into", "is_trigger_updatable", "is_trigger_deletable", "is_trigger_insertable_into")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.viewDefinition, x.checkOption, x.isUpdatable, x.isInsertableInto, x.isTriggerUpdatable, x.isTriggerDeletable, x.isTriggerInsertableInto))
+  implicit val decoder: Decoder[ViewsViewRow] = Decoder.forProduct10[ViewsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("table_catalog", "table_schema", "table_name", "view_definition", "check_option", "is_updatable", "is_insertable_into", "is_trigger_updatable", "is_trigger_deletable", "is_trigger_insertable_into")(ViewsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder))
+  implicit val encoder: Encoder[ViewsViewRow] = Encoder.forProduct10[ViewsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("table_catalog", "table_schema", "table_name", "view_definition", "check_option", "is_updatable", "is_insertable_into", "is_trigger_updatable", "is_trigger_deletable", "is_trigger_insertable_into")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.viewDefinition, x.checkOption, x.isUpdatable, x.isInsertableInto, x.isTriggerUpdatable, x.isTriggerDeletable, x.isTriggerInsertableInto))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder))
   implicit val read: Read[ViewsViewRow] = new Read[ViewsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ViewsViewRow(
-      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      viewDefinition = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-      checkOption = Get[CharacterData].unsafeGetNullable(rs, i + 4),
-      isUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 5),
-      isInsertableInto = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
-      isTriggerUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 7),
-      isTriggerDeletable = Get[YesOrNo].unsafeGetNullable(rs, i + 8),
-      isTriggerInsertableInto = Get[YesOrNo].unsafeGetNullable(rs, i + 9)
+      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      viewDefinition = CharacterData.get.unsafeGetNullable(rs, i + 3),
+      checkOption = CharacterData.get.unsafeGetNullable(rs, i + 4),
+      isUpdatable = YesOrNo.get.unsafeGetNullable(rs, i + 5),
+      isInsertableInto = YesOrNo.get.unsafeGetNullable(rs, i + 6),
+      isTriggerUpdatable = YesOrNo.get.unsafeGetNullable(rs, i + 7),
+      isTriggerDeletable = YesOrNo.get.unsafeGetNullable(rs, i + 8),
+      isTriggerInsertableInto = YesOrNo.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

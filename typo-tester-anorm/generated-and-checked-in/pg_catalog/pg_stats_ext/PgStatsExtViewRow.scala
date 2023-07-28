@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,20 +40,20 @@ object PgStatsExtViewRow {
   implicit val reads: Reads[PgStatsExtViewRow] = Reads[PgStatsExtViewRow](json => JsResult.fromTry(
       Try(
         PgStatsExtViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          tablename = json.\("tablename").toOption.map(_.as[String]),
-          statisticsSchemaname = json.\("statistics_schemaname").toOption.map(_.as[String]),
-          statisticsName = json.\("statistics_name").toOption.map(_.as[String]),
-          statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
-          attnames = json.\("attnames").toOption.map(_.as[Array[String]]),
-          exprs = json.\("exprs").toOption.map(_.as[Array[String]]),
-          kinds = json.\("kinds").toOption.map(_.as[Array[String]]),
-          nDistinct = json.\("n_distinct").toOption.map(_.as[String]),
-          dependencies = json.\("dependencies").toOption.map(_.as[String]),
-          mostCommonVals = json.\("most_common_vals").toOption.map(_.as[Array[String]]),
-          mostCommonValNulls = json.\("most_common_val_nulls").toOption.map(_.as[Array[Boolean]]),
-          mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Double]]),
-          mostCommonBaseFreqs = json.\("most_common_base_freqs").toOption.map(_.as[Array[Double]])
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
+          statisticsSchemaname = json.\("statistics_schemaname").toOption.map(_.as(Reads.StringReads)),
+          statisticsName = json.\("statistics_name").toOption.map(_.as(Reads.StringReads)),
+          statisticsOwner = json.\("statistics_owner").toOption.map(_.as(Reads.StringReads)),
+          attnames = json.\("attnames").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          exprs = json.\("exprs").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          kinds = json.\("kinds").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          nDistinct = json.\("n_distinct").toOption.map(_.as(Reads.StringReads)),
+          dependencies = json.\("dependencies").toOption.map(_.as(Reads.StringReads)),
+          mostCommonVals = json.\("most_common_vals").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          mostCommonValNulls = json.\("most_common_val_nulls").toOption.map(_.as(Reads.ArrayReads[Boolean](Reads.BooleanReads, implicitly))),
+          mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as(Reads.ArrayReads[Double](Reads.DoubleReads, implicitly))),
+          mostCommonBaseFreqs = json.\("most_common_base_freqs").toOption.map(_.as(Reads.ArrayReads[Double](Reads.DoubleReads, implicitly)))
         )
       )
     ),
@@ -60,39 +61,39 @@ object PgStatsExtViewRow {
   def rowParser(idx: Int): RowParser[PgStatsExtViewRow] = RowParser[PgStatsExtViewRow] { row =>
     Success(
       PgStatsExtViewRow(
-        schemaname = row[Option[String]](idx + 0),
-        tablename = row[Option[String]](idx + 1),
-        statisticsSchemaname = row[Option[String]](idx + 2),
-        statisticsName = row[Option[String]](idx + 3),
-        statisticsOwner = row[Option[String]](idx + 4),
-        attnames = row[Option[Array[String]]](idx + 5),
-        exprs = row[Option[Array[String]]](idx + 6),
-        kinds = row[Option[Array[String]]](idx + 7),
-        nDistinct = row[Option[String]](idx + 8),
-        dependencies = row[Option[String]](idx + 9),
-        mostCommonVals = row[Option[Array[String]]](idx + 10),
-        mostCommonValNulls = row[Option[Array[Boolean]]](idx + 11),
-        mostCommonFreqs = row[Option[Array[Double]]](idx + 12),
-        mostCommonBaseFreqs = row[Option[Array[Double]]](idx + 13)
+        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        statisticsSchemaname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        statisticsName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        statisticsOwner = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        attnames = row(idx + 5)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        exprs = row(idx + 6)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        kinds = row(idx + 7)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        nDistinct = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        dependencies = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        mostCommonVals = row(idx + 10)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        mostCommonValNulls = row(idx + 11)(Column.columnToOption(Column.columnToArray[Boolean](Column.columnToBoolean, implicitly))),
+        mostCommonFreqs = row(idx + 12)(Column.columnToOption(Column.columnToArray[Double](Column.columnToDouble, implicitly))),
+        mostCommonBaseFreqs = row(idx + 13)(Column.columnToOption(Column.columnToArray[Double](Column.columnToDouble, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgStatsExtViewRow] = OWrites[PgStatsExtViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Json.toJson(o.schemaname),
-      "tablename" -> Json.toJson(o.tablename),
-      "statistics_schemaname" -> Json.toJson(o.statisticsSchemaname),
-      "statistics_name" -> Json.toJson(o.statisticsName),
-      "statistics_owner" -> Json.toJson(o.statisticsOwner),
-      "attnames" -> Json.toJson(o.attnames),
-      "exprs" -> Json.toJson(o.exprs),
-      "kinds" -> Json.toJson(o.kinds),
-      "n_distinct" -> Json.toJson(o.nDistinct),
-      "dependencies" -> Json.toJson(o.dependencies),
-      "most_common_vals" -> Json.toJson(o.mostCommonVals),
-      "most_common_val_nulls" -> Json.toJson(o.mostCommonValNulls),
-      "most_common_freqs" -> Json.toJson(o.mostCommonFreqs),
-      "most_common_base_freqs" -> Json.toJson(o.mostCommonBaseFreqs)
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
+      "statistics_schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statisticsSchemaname),
+      "statistics_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statisticsName),
+      "statistics_owner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statisticsOwner),
+      "attnames" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.attnames),
+      "exprs" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.exprs),
+      "kinds" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.kinds),
+      "n_distinct" -> Writes.OptionWrites(Writes.StringWrites).writes(o.nDistinct),
+      "dependencies" -> Writes.OptionWrites(Writes.StringWrites).writes(o.dependencies),
+      "most_common_vals" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.mostCommonVals),
+      "most_common_val_nulls" -> Writes.OptionWrites(Writes.arrayWrites[Boolean](implicitly, Writes.BooleanWrites)).writes(o.mostCommonValNulls),
+      "most_common_freqs" -> Writes.OptionWrites(Writes.arrayWrites[Double](implicitly, Writes.DoubleWrites)).writes(o.mostCommonFreqs),
+      "most_common_base_freqs" -> Writes.OptionWrites(Writes.arrayWrites[Double](implicitly, Writes.DoubleWrites)).writes(o.mostCommonBaseFreqs)
     ))
   )
 }

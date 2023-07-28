@@ -15,9 +15,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -89,32 +89,32 @@ object SalesterritoryRowUnsaved {
   implicit val reads: Reads[SalesterritoryRowUnsaved] = Reads[SalesterritoryRowUnsaved](json => JsResult.fromTry(
       Try(
         SalesterritoryRowUnsaved(
-          name = json.\("name").as[Name],
-          countryregioncode = json.\("countryregioncode").as[CountryregionId],
-          group = json.\("group").as[/* max 50 chars */ String],
-          territoryid = json.\("territoryid").as[Defaulted[SalesterritoryId]],
-          salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],
-          saleslastyear = json.\("saleslastyear").as[Defaulted[BigDecimal]],
-          costytd = json.\("costytd").as[Defaulted[BigDecimal]],
-          costlastyear = json.\("costlastyear").as[Defaulted[BigDecimal]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          group = json.\("group").as(Reads.StringReads),
+          territoryid = json.\("territoryid").as(Defaulted.reads(SalesterritoryId.reads)),
+          salesytd = json.\("salesytd").as(Defaulted.reads(Reads.bigDecReads)),
+          saleslastyear = json.\("saleslastyear").as(Defaulted.reads(Reads.bigDecReads)),
+          costytd = json.\("costytd").as(Defaulted.reads(Reads.bigDecReads)),
+          costlastyear = json.\("costlastyear").as(Defaulted.reads(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[SalesterritoryRowUnsaved] = OWrites[SalesterritoryRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "group" -> Json.toJson(o.group),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "salesytd" -> Json.toJson(o.salesytd),
-      "saleslastyear" -> Json.toJson(o.saleslastyear),
-      "costytd" -> Json.toJson(o.costytd),
-      "costlastyear" -> Json.toJson(o.costlastyear),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "group" -> Writes.StringWrites.writes(o.group),
+      "territoryid" -> Defaulted.writes(SalesterritoryId.writes).writes(o.territoryid),
+      "salesytd" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.salesytd),
+      "saleslastyear" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.saleslastyear),
+      "costytd" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.costytd),
+      "costlastyear" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.costlastyear),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

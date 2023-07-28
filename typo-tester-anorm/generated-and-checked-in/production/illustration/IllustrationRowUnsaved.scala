@@ -13,9 +13,9 @@ import adventureworks.TypoXml
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -46,18 +46,18 @@ object IllustrationRowUnsaved {
   implicit val reads: Reads[IllustrationRowUnsaved] = Reads[IllustrationRowUnsaved](json => JsResult.fromTry(
       Try(
         IllustrationRowUnsaved(
-          diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
-          illustrationid = json.\("illustrationid").as[Defaulted[IllustrationId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          diagram = json.\("diagram").toOption.map(_.as(TypoXml.reads)),
+          illustrationid = json.\("illustrationid").as(Defaulted.reads(IllustrationId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[IllustrationRowUnsaved] = OWrites[IllustrationRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "diagram" -> Json.toJson(o.diagram),
-      "illustrationid" -> Json.toJson(o.illustrationid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),
+      "illustrationid" -> Defaulted.writes(IllustrationId.writes).writes(o.illustrationid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

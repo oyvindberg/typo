@@ -8,14 +8,15 @@ package pg_catalog
 package pg_foreign_server
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,14 +35,14 @@ object PgForeignServerRow {
   implicit val reads: Reads[PgForeignServerRow] = Reads[PgForeignServerRow](json => JsResult.fromTry(
       Try(
         PgForeignServerRow(
-          oid = json.\("oid").as[PgForeignServerId],
-          srvname = json.\("srvname").as[String],
-          srvowner = json.\("srvowner").as[/* oid */ Long],
-          srvfdw = json.\("srvfdw").as[/* oid */ Long],
-          srvtype = json.\("srvtype").toOption.map(_.as[String]),
-          srvversion = json.\("srvversion").toOption.map(_.as[String]),
-          srvacl = json.\("srvacl").toOption.map(_.as[Array[TypoAclItem]]),
-          srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]])
+          oid = json.\("oid").as(PgForeignServerId.reads),
+          srvname = json.\("srvname").as(Reads.StringReads),
+          srvowner = json.\("srvowner").as(Reads.LongReads),
+          srvfdw = json.\("srvfdw").as(Reads.LongReads),
+          srvtype = json.\("srvtype").toOption.map(_.as(Reads.StringReads)),
+          srvversion = json.\("srvversion").toOption.map(_.as(Reads.StringReads)),
+          srvacl = json.\("srvacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly))),
+          srvoptions = json.\("srvoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -49,27 +50,27 @@ object PgForeignServerRow {
   def rowParser(idx: Int): RowParser[PgForeignServerRow] = RowParser[PgForeignServerRow] { row =>
     Success(
       PgForeignServerRow(
-        oid = row[PgForeignServerId](idx + 0),
-        srvname = row[String](idx + 1),
-        srvowner = row[/* oid */ Long](idx + 2),
-        srvfdw = row[/* oid */ Long](idx + 3),
-        srvtype = row[Option[String]](idx + 4),
-        srvversion = row[Option[String]](idx + 5),
-        srvacl = row[Option[Array[TypoAclItem]]](idx + 6),
-        srvoptions = row[Option[Array[String]]](idx + 7)
+        oid = row(idx + 0)(PgForeignServerId.column),
+        srvname = row(idx + 1)(Column.columnToString),
+        srvowner = row(idx + 2)(Column.columnToLong),
+        srvfdw = row(idx + 3)(Column.columnToLong),
+        srvtype = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        srvversion = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        srvacl = row(idx + 6)(Column.columnToOption(TypoAclItem.arrayColumn)),
+        srvoptions = row(idx + 7)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgForeignServerRow] = OWrites[PgForeignServerRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "srvname" -> Json.toJson(o.srvname),
-      "srvowner" -> Json.toJson(o.srvowner),
-      "srvfdw" -> Json.toJson(o.srvfdw),
-      "srvtype" -> Json.toJson(o.srvtype),
-      "srvversion" -> Json.toJson(o.srvversion),
-      "srvacl" -> Json.toJson(o.srvacl),
-      "srvoptions" -> Json.toJson(o.srvoptions)
+      "oid" -> PgForeignServerId.writes.writes(o.oid),
+      "srvname" -> Writes.StringWrites.writes(o.srvname),
+      "srvowner" -> Writes.LongWrites.writes(o.srvowner),
+      "srvfdw" -> Writes.LongWrites.writes(o.srvfdw),
+      "srvtype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.srvtype),
+      "srvversion" -> Writes.OptionWrites(Writes.StringWrites).writes(o.srvversion),
+      "srvacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.srvacl),
+      "srvoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.srvoptions)
     ))
   )
 }

@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
+import adventureworks.TypoPgNodeTree
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def delete(oid: PgAttrdefId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_attrdef where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_attrdef where oid = ${fromWrite(oid)(Write.fromPut(PgAttrdefId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAttrdefRow): ConnectionIO[PgAttrdefRow] = {
     sql"""insert into pg_catalog.pg_attrdef(oid, adrelid, adnum, adbin)
-          values (${unsaved.oid}::oid, ${unsaved.adrelid}::oid, ${unsaved.adnum}::int2, ${unsaved.adbin}::pg_node_tree)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgAttrdefId.put))}::oid, ${fromWrite(unsaved.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.adnum)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree)
           returning oid, adrelid, adnum, adbin
        """.query(PgAttrdefRow.read).unique
   }
@@ -25,18 +29,18 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef".query(PgAttrdefRow.read).stream
   }
   override def selectById(oid: PgAttrdefId): ConnectionIO[Option[PgAttrdefRow]] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ${oid}".query(PgAttrdefRow.read).option
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ${fromWrite(oid)(Write.fromPut(PgAttrdefId.put))}".query(PgAttrdefRow.read).option
   }
   override def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${oids})".query(PgAttrdefRow.read).stream
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${fromWrite(oids)(Write.fromPut(PgAttrdefId.arrayPut))})".query(PgAttrdefRow.read).stream
   }
   override def update(row: PgAttrdefRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_attrdef
-          set adrelid = ${row.adrelid}::oid,
-              adnum = ${row.adnum}::int2,
-              adbin = ${row.adbin}::pg_node_tree
-          where oid = ${oid}
+          set adrelid = ${fromWrite(row.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              adnum = ${fromWrite(row.adnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              adbin = ${fromWrite(row.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
+          where oid = ${fromWrite(oid)(Write.fromPut(PgAttrdefId.put))}
        """
       .update
       .run
@@ -45,10 +49,10 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
   override def upsert(unsaved: PgAttrdefRow): ConnectionIO[PgAttrdefRow] = {
     sql"""insert into pg_catalog.pg_attrdef(oid, adrelid, adnum, adbin)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.adrelid}::oid,
-            ${unsaved.adnum}::int2,
-            ${unsaved.adbin}::pg_node_tree
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgAttrdefId.put))}::oid,
+            ${fromWrite(unsaved.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.adnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
           )
           on conflict (oid)
           do update set

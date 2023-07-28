@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_extension
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,14 +34,14 @@ object PgExtensionRow {
   implicit val reads: Reads[PgExtensionRow] = Reads[PgExtensionRow](json => JsResult.fromTry(
       Try(
         PgExtensionRow(
-          oid = json.\("oid").as[PgExtensionId],
-          extname = json.\("extname").as[String],
-          extowner = json.\("extowner").as[/* oid */ Long],
-          extnamespace = json.\("extnamespace").as[/* oid */ Long],
-          extrelocatable = json.\("extrelocatable").as[Boolean],
-          extversion = json.\("extversion").as[String],
-          extconfig = json.\("extconfig").toOption.map(_.as[Array[/* oid */ Long]]),
-          extcondition = json.\("extcondition").toOption.map(_.as[Array[String]])
+          oid = json.\("oid").as(PgExtensionId.reads),
+          extname = json.\("extname").as(Reads.StringReads),
+          extowner = json.\("extowner").as(Reads.LongReads),
+          extnamespace = json.\("extnamespace").as(Reads.LongReads),
+          extrelocatable = json.\("extrelocatable").as(Reads.BooleanReads),
+          extversion = json.\("extversion").as(Reads.StringReads),
+          extconfig = json.\("extconfig").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
+          extcondition = json.\("extcondition").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -48,27 +49,27 @@ object PgExtensionRow {
   def rowParser(idx: Int): RowParser[PgExtensionRow] = RowParser[PgExtensionRow] { row =>
     Success(
       PgExtensionRow(
-        oid = row[PgExtensionId](idx + 0),
-        extname = row[String](idx + 1),
-        extowner = row[/* oid */ Long](idx + 2),
-        extnamespace = row[/* oid */ Long](idx + 3),
-        extrelocatable = row[Boolean](idx + 4),
-        extversion = row[String](idx + 5),
-        extconfig = row[Option[Array[/* oid */ Long]]](idx + 6),
-        extcondition = row[Option[Array[String]]](idx + 7)
+        oid = row(idx + 0)(PgExtensionId.column),
+        extname = row(idx + 1)(Column.columnToString),
+        extowner = row(idx + 2)(Column.columnToLong),
+        extnamespace = row(idx + 3)(Column.columnToLong),
+        extrelocatable = row(idx + 4)(Column.columnToBoolean),
+        extversion = row(idx + 5)(Column.columnToString),
+        extconfig = row(idx + 6)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
+        extcondition = row(idx + 7)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgExtensionRow] = OWrites[PgExtensionRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "extname" -> Json.toJson(o.extname),
-      "extowner" -> Json.toJson(o.extowner),
-      "extnamespace" -> Json.toJson(o.extnamespace),
-      "extrelocatable" -> Json.toJson(o.extrelocatable),
-      "extversion" -> Json.toJson(o.extversion),
-      "extconfig" -> Json.toJson(o.extconfig),
-      "extcondition" -> Json.toJson(o.extcondition)
+      "oid" -> PgExtensionId.writes.writes(o.oid),
+      "extname" -> Writes.StringWrites.writes(o.extname),
+      "extowner" -> Writes.LongWrites.writes(o.extowner),
+      "extnamespace" -> Writes.LongWrites.writes(o.extnamespace),
+      "extrelocatable" -> Writes.BooleanWrites.writes(o.extrelocatable),
+      "extversion" -> Writes.StringWrites.writes(o.extversion),
+      "extconfig" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.extconfig),
+      "extcondition" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.extcondition)
     ))
   )
 }

@@ -15,9 +15,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -60,24 +60,24 @@ object ProductmodelRowUnsaved {
   implicit val reads: Reads[ProductmodelRowUnsaved] = Reads[ProductmodelRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductmodelRowUnsaved(
-          name = json.\("name").as[Name],
-          catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
-          instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
-          productmodelid = json.\("productmodelid").as[Defaulted[ProductmodelId]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          catalogdescription = json.\("catalogdescription").toOption.map(_.as(TypoXml.reads)),
+          instructions = json.\("instructions").toOption.map(_.as(TypoXml.reads)),
+          productmodelid = json.\("productmodelid").as(Defaulted.reads(ProductmodelId.reads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductmodelRowUnsaved] = OWrites[ProductmodelRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "catalogdescription" -> Json.toJson(o.catalogdescription),
-      "instructions" -> Json.toJson(o.instructions),
-      "productmodelid" -> Json.toJson(o.productmodelid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "catalogdescription" -> Writes.OptionWrites(TypoXml.writes).writes(o.catalogdescription),
+      "instructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.instructions),
+      "productmodelid" -> Defaulted.writes(ProductmodelId.writes).writes(o.productmodelid),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

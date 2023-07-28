@@ -8,8 +8,8 @@ package pg_catalog
 package pg_subscription_rel
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,20 +24,20 @@ case class PgSubscriptionRelRow(
  }
 
 object PgSubscriptionRelRow {
-  implicit val decoder: Decoder[PgSubscriptionRelRow] = Decoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(PgSubscriptionRelRow.apply)
-  implicit val encoder: Encoder[PgSubscriptionRelRow] = Encoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(x => (x.srsubid, x.srrelid, x.srsubstate, x.srsublsn))
+  implicit val decoder: Decoder[PgSubscriptionRelRow] = Decoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(PgSubscriptionRelRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeLong))
+  implicit val encoder: Encoder[PgSubscriptionRelRow] = Encoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(x => (x.srsubid, x.srrelid, x.srsubstate, x.srsublsn))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeLong))
   implicit val read: Read[PgSubscriptionRelRow] = new Read[PgSubscriptionRelRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgSubscriptionRelRow(
-      srsubid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      srrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      srsubstate = Get[String].unsafeGetNonNullable(rs, i + 2),
-      srsublsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 3)
+      srsubid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      srrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      srsubstate = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      srsublsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

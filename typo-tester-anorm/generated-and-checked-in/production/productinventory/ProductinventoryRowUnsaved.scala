@@ -15,9 +15,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -65,26 +65,26 @@ object ProductinventoryRowUnsaved {
   implicit val reads: Reads[ProductinventoryRowUnsaved] = Reads[ProductinventoryRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductinventoryRowUnsaved(
-          productid = json.\("productid").as[ProductId],
-          locationid = json.\("locationid").as[LocationId],
-          shelf = json.\("shelf").as[/* max 10 chars */ String],
-          bin = json.\("bin").as[Int],
-          quantity = json.\("quantity").as[Defaulted[Int]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          productid = json.\("productid").as(ProductId.reads),
+          locationid = json.\("locationid").as(LocationId.reads),
+          shelf = json.\("shelf").as(Reads.StringReads),
+          bin = json.\("bin").as(Reads.IntReads),
+          quantity = json.\("quantity").as(Defaulted.reads(Reads.IntReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductinventoryRowUnsaved] = OWrites[ProductinventoryRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "locationid" -> Json.toJson(o.locationid),
-      "shelf" -> Json.toJson(o.shelf),
-      "bin" -> Json.toJson(o.bin),
-      "quantity" -> Json.toJson(o.quantity),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "locationid" -> LocationId.writes.writes(o.locationid),
+      "shelf" -> Writes.StringWrites.writes(o.shelf),
+      "bin" -> Writes.IntWrites.writes(o.bin),
+      "quantity" -> Defaulted.writes(Writes.IntWrites).writes(o.quantity),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -7,17 +7,22 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext
 
+import adventureworks.TypoInt2Vector
+import adventureworks.TypoPgNodeTree
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_statistic_ext where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_statistic_ext where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
-          values (${unsaved.oid}::oid, ${unsaved.stxrelid}::oid, ${unsaved.stxname}::name, ${unsaved.stxnamespace}::oid, ${unsaved.stxowner}::oid, ${unsaved.stxstattarget}::int4, ${unsaved.stxkeys}::int2vector, ${unsaved.stxkind}::_char, ${unsaved.stxexprs}::pg_node_tree)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgStatisticExtId.put))}::oid, ${fromWrite(unsaved.stxrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.stxname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.stxnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.stxowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.stxstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.stxkeys)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char, ${fromWrite(unsaved.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree)
           returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
        """.query(PgStatisticExtRow.read).unique
   }
@@ -25,23 +30,23 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext".query(PgStatisticExtRow.read).stream
   }
   override def selectById(oid: PgStatisticExtId): ConnectionIO[Option[PgStatisticExtRow]] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ${oid}".query(PgStatisticExtRow.read).option
+    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}".query(PgStatisticExtRow.read).option
   }
   override def selectByIds(oids: Array[PgStatisticExtId]): Stream[ConnectionIO, PgStatisticExtRow] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY(${oids})".query(PgStatisticExtRow.read).stream
+    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY(${fromWrite(oids)(Write.fromPut(PgStatisticExtId.arrayPut))})".query(PgStatisticExtRow.read).stream
   }
   override def update(row: PgStatisticExtRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_statistic_ext
-          set stxrelid = ${row.stxrelid}::oid,
-              stxname = ${row.stxname}::name,
-              stxnamespace = ${row.stxnamespace}::oid,
-              stxowner = ${row.stxowner}::oid,
-              stxstattarget = ${row.stxstattarget}::int4,
-              stxkeys = ${row.stxkeys}::int2vector,
-              stxkind = ${row.stxkind}::_char,
-              stxexprs = ${row.stxexprs}::pg_node_tree
-          where oid = ${oid}
+          set stxrelid = ${fromWrite(row.stxrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              stxname = ${fromWrite(row.stxname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              stxnamespace = ${fromWrite(row.stxnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              stxowner = ${fromWrite(row.stxowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              stxstattarget = ${fromWrite(row.stxstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              stxkeys = ${fromWrite(row.stxkeys)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
+              stxkind = ${fromWrite(row.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char,
+              stxexprs = ${fromWrite(row.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
+          where oid = ${fromWrite(oid)(Write.fromPut(PgStatisticExtId.put))}
        """
       .update
       .run
@@ -50,15 +55,15 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def upsert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.stxrelid}::oid,
-            ${unsaved.stxname}::name,
-            ${unsaved.stxnamespace}::oid,
-            ${unsaved.stxowner}::oid,
-            ${unsaved.stxstattarget}::int4,
-            ${unsaved.stxkeys}::int2vector,
-            ${unsaved.stxkind}::_char,
-            ${unsaved.stxexprs}::pg_node_tree
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgStatisticExtId.put))}::oid,
+            ${fromWrite(unsaved.stxrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.stxname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.stxnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.stxowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.stxstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.stxkeys)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
+            ${fromWrite(unsaved.stxkind)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_char,
+            ${fromWrite(unsaved.stxexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
           )
           on conflict (oid)
           do update set

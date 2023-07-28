@@ -10,7 +10,6 @@ package sql_sizing
 import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -24,20 +23,20 @@ case class SqlSizingRow(
 )
 
 object SqlSizingRow {
-  implicit val decoder: Decoder[SqlSizingRow] = Decoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(SqlSizingRow.apply)
-  implicit val encoder: Encoder[SqlSizingRow] = Encoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(x => (x.sizingId, x.sizingName, x.supportedValue, x.comments))
+  implicit val decoder: Decoder[SqlSizingRow] = Decoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(SqlSizingRow.apply)(Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[SqlSizingRow] = Encoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(x => (x.sizingId, x.sizingName, x.supportedValue, x.comments))(Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[SqlSizingRow] = new Read[SqlSizingRow](
     gets = List(
-      (Get[CardinalNumber], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CardinalNumber], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (CardinalNumber.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CardinalNumber.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SqlSizingRow(
-      sizingId = Get[CardinalNumber].unsafeGetNullable(rs, i + 0),
-      sizingName = Get[CharacterData].unsafeGetNullable(rs, i + 1),
-      supportedValue = Get[CardinalNumber].unsafeGetNullable(rs, i + 2),
-      comments = Get[CharacterData].unsafeGetNullable(rs, i + 3)
+      sizingId = CardinalNumber.get.unsafeGetNullable(rs, i + 0),
+      sizingName = CharacterData.get.unsafeGetNullable(rs, i + 1),
+      supportedValue = CardinalNumber.get.unsafeGetNullable(rs, i + 2),
+      comments = CharacterData.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

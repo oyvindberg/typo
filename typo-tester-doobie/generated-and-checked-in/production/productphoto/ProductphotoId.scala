@@ -9,17 +9,18 @@ package productphoto
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.productphoto` */
 case class ProductphotoId(value: Int) extends AnyVal
 object ProductphotoId {
-  implicit val arrayGet: Get[Array[ProductphotoId]] = Get[Array[Int]].map(_.map(ProductphotoId.apply))
-  implicit val arrayPut: Put[Array[ProductphotoId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[ProductphotoId] = Decoder[Int].map(ProductphotoId.apply)
-  implicit val encoder: Encoder[ProductphotoId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[ProductphotoId] = Get[Int].map(ProductphotoId.apply)
+  implicit val arrayGet: Get[Array[ProductphotoId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ProductphotoId.apply))
+  implicit val arrayPut: Put[Array[ProductphotoId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[ProductphotoId] = Decoder.decodeInt.map(ProductphotoId.apply)
+  implicit val encoder: Encoder[ProductphotoId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[ProductphotoId] = Meta.IntMeta.get.map(ProductphotoId.apply)
   implicit val ordering: Ordering[ProductphotoId] = Ordering.by(_.value)
-  implicit val put: Put[ProductphotoId] = Put[Int].contramap(_.value)
+  implicit val put: Put[ProductphotoId] = Meta.IntMeta.put.contramap(_.value)
 }

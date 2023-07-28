@@ -10,14 +10,15 @@ package d
 import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -37,11 +38,11 @@ object DViewRow {
   implicit val reads: Reads[DViewRow] = Reads[DViewRow](json => JsResult.fromTry(
       Try(
         DViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          groupname = json.\("groupname").toOption.map(_.as[Name]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          departmentid = json.\("departmentid").toOption.map(_.as(DepartmentId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          groupname = json.\("groupname").toOption.map(_.as(Name.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -49,21 +50,21 @@ object DViewRow {
   def rowParser(idx: Int): RowParser[DViewRow] = RowParser[DViewRow] { row =>
     Success(
       DViewRow(
-        id = row[Option[Int]](idx + 0),
-        departmentid = row[Option[DepartmentId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        groupname = row[Option[Name]](idx + 3),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        departmentid = row(idx + 1)(Column.columnToOption(DepartmentId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        groupname = row(idx + 3)(Column.columnToOption(Name.column)),
+        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[DViewRow] = OWrites[DViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "departmentid" -> Json.toJson(o.departmentid),
-      "name" -> Json.toJson(o.name),
-      "groupname" -> Json.toJson(o.groupname),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "departmentid" -> Writes.OptionWrites(DepartmentId.writes).writes(o.departmentid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "groupname" -> Writes.OptionWrites(Name.writes).writes(o.groupname),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

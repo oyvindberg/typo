@@ -8,14 +8,15 @@ package pg_catalog
 package pg_stat_wal
 
 import adventureworks.TypoOffsetDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,15 +36,15 @@ object PgStatWalViewRow {
   implicit val reads: Reads[PgStatWalViewRow] = Reads[PgStatWalViewRow](json => JsResult.fromTry(
       Try(
         PgStatWalViewRow(
-          walRecords = json.\("wal_records").toOption.map(_.as[Long]),
-          walFpi = json.\("wal_fpi").toOption.map(_.as[Long]),
-          walBytes = json.\("wal_bytes").toOption.map(_.as[BigDecimal]),
-          walBuffersFull = json.\("wal_buffers_full").toOption.map(_.as[Long]),
-          walWrite = json.\("wal_write").toOption.map(_.as[Long]),
-          walSync = json.\("wal_sync").toOption.map(_.as[Long]),
-          walWriteTime = json.\("wal_write_time").toOption.map(_.as[Double]),
-          walSyncTime = json.\("wal_sync_time").toOption.map(_.as[Double]),
-          statsReset = json.\("stats_reset").toOption.map(_.as[TypoOffsetDateTime])
+          walRecords = json.\("wal_records").toOption.map(_.as(Reads.LongReads)),
+          walFpi = json.\("wal_fpi").toOption.map(_.as(Reads.LongReads)),
+          walBytes = json.\("wal_bytes").toOption.map(_.as(Reads.bigDecReads)),
+          walBuffersFull = json.\("wal_buffers_full").toOption.map(_.as(Reads.LongReads)),
+          walWrite = json.\("wal_write").toOption.map(_.as(Reads.LongReads)),
+          walSync = json.\("wal_sync").toOption.map(_.as(Reads.LongReads)),
+          walWriteTime = json.\("wal_write_time").toOption.map(_.as(Reads.DoubleReads)),
+          walSyncTime = json.\("wal_sync_time").toOption.map(_.as(Reads.DoubleReads)),
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -51,29 +52,29 @@ object PgStatWalViewRow {
   def rowParser(idx: Int): RowParser[PgStatWalViewRow] = RowParser[PgStatWalViewRow] { row =>
     Success(
       PgStatWalViewRow(
-        walRecords = row[Option[Long]](idx + 0),
-        walFpi = row[Option[Long]](idx + 1),
-        walBytes = row[Option[BigDecimal]](idx + 2),
-        walBuffersFull = row[Option[Long]](idx + 3),
-        walWrite = row[Option[Long]](idx + 4),
-        walSync = row[Option[Long]](idx + 5),
-        walWriteTime = row[Option[Double]](idx + 6),
-        walSyncTime = row[Option[Double]](idx + 7),
-        statsReset = row[Option[TypoOffsetDateTime]](idx + 8)
+        walRecords = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        walFpi = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        walBytes = row(idx + 2)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        walBuffersFull = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        walWrite = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        walSync = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        walWriteTime = row(idx + 6)(Column.columnToOption(Column.columnToDouble)),
+        walSyncTime = row(idx + 7)(Column.columnToOption(Column.columnToDouble)),
+        statsReset = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PgStatWalViewRow] = OWrites[PgStatWalViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "wal_records" -> Json.toJson(o.walRecords),
-      "wal_fpi" -> Json.toJson(o.walFpi),
-      "wal_bytes" -> Json.toJson(o.walBytes),
-      "wal_buffers_full" -> Json.toJson(o.walBuffersFull),
-      "wal_write" -> Json.toJson(o.walWrite),
-      "wal_sync" -> Json.toJson(o.walSync),
-      "wal_write_time" -> Json.toJson(o.walWriteTime),
-      "wal_sync_time" -> Json.toJson(o.walSyncTime),
-      "stats_reset" -> Json.toJson(o.statsReset)
+      "wal_records" -> Writes.OptionWrites(Writes.LongWrites).writes(o.walRecords),
+      "wal_fpi" -> Writes.OptionWrites(Writes.LongWrites).writes(o.walFpi),
+      "wal_bytes" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.walBytes),
+      "wal_buffers_full" -> Writes.OptionWrites(Writes.LongWrites).writes(o.walBuffersFull),
+      "wal_write" -> Writes.OptionWrites(Writes.LongWrites).writes(o.walWrite),
+      "wal_sync" -> Writes.OptionWrites(Writes.LongWrites).writes(o.walSync),
+      "wal_write_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.walWriteTime),
+      "wal_sync_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.walSyncTime),
+      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
     ))
   )
 }

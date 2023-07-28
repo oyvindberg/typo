@@ -8,14 +8,15 @@ package information_schema
 package user_mappings
 
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,9 +33,9 @@ object UserMappingsViewRow {
   implicit val reads: Reads[UserMappingsViewRow] = Reads[UserMappingsViewRow](json => JsResult.fromTry(
       Try(
         UserMappingsViewRow(
-          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
-          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier])
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -42,17 +43,17 @@ object UserMappingsViewRow {
   def rowParser(idx: Int): RowParser[UserMappingsViewRow] = RowParser[UserMappingsViewRow] { row =>
     Success(
       UserMappingsViewRow(
-        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 0),
-        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 1),
-        foreignServerName = row[Option[SqlIdentifier]](idx + 2)
+        authorizationIdentifier = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerCatalog = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[UserMappingsViewRow] = OWrites[UserMappingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier),
-      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
-      "foreign_server_name" -> Json.toJson(o.foreignServerName)
+      "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier),
+      "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),
+      "foreign_server_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerName)
     ))
   )
 }

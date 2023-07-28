@@ -15,7 +15,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -37,9 +36,9 @@ object ProductdocumentRow {
   implicit val reads: Reads[ProductdocumentRow] = Reads[ProductdocumentRow](json => JsResult.fromTry(
       Try(
         ProductdocumentRow(
-          productid = json.\("productid").as[ProductId],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime],
-          documentnode = json.\("documentnode").as[DocumentId]
+          productid = json.\("productid").as(ProductId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads),
+          documentnode = json.\("documentnode").as(DocumentId.reads)
         )
       )
     ),
@@ -47,17 +46,17 @@ object ProductdocumentRow {
   def rowParser(idx: Int): RowParser[ProductdocumentRow] = RowParser[ProductdocumentRow] { row =>
     Success(
       ProductdocumentRow(
-        productid = row[ProductId](idx + 0),
-        modifieddate = row[TypoLocalDateTime](idx + 1),
-        documentnode = row[DocumentId](idx + 2)
+        productid = row(idx + 0)(ProductId.column),
+        modifieddate = row(idx + 1)(TypoLocalDateTime.column),
+        documentnode = row(idx + 2)(DocumentId.column)
       )
     )
   }
   implicit val writes: OWrites[ProductdocumentRow] = OWrites[ProductdocumentRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "modifieddate" -> Json.toJson(o.modifieddate),
-      "documentnode" -> Json.toJson(o.documentnode)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate),
+      "documentnode" -> DocumentId.writes.writes(o.documentnode)
     ))
   )
 }

@@ -14,9 +14,9 @@ import adventureworks.production.workorder.WorkorderId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -72,36 +72,36 @@ object WorkorderroutingRowUnsaved {
   implicit val reads: Reads[WorkorderroutingRowUnsaved] = Reads[WorkorderroutingRowUnsaved](json => JsResult.fromTry(
       Try(
         WorkorderroutingRowUnsaved(
-          workorderid = json.\("workorderid").as[WorkorderId],
-          productid = json.\("productid").as[Int],
-          operationsequence = json.\("operationsequence").as[Int],
-          locationid = json.\("locationid").as[LocationId],
-          scheduledstartdate = json.\("scheduledstartdate").as[TypoLocalDateTime],
-          scheduledenddate = json.\("scheduledenddate").as[TypoLocalDateTime],
-          actualstartdate = json.\("actualstartdate").toOption.map(_.as[TypoLocalDateTime]),
-          actualenddate = json.\("actualenddate").toOption.map(_.as[TypoLocalDateTime]),
-          actualresourcehrs = json.\("actualresourcehrs").toOption.map(_.as[BigDecimal]),
-          plannedcost = json.\("plannedcost").as[BigDecimal],
-          actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          workorderid = json.\("workorderid").as(WorkorderId.reads),
+          productid = json.\("productid").as(Reads.IntReads),
+          operationsequence = json.\("operationsequence").as(Reads.IntReads),
+          locationid = json.\("locationid").as(LocationId.reads),
+          scheduledstartdate = json.\("scheduledstartdate").as(TypoLocalDateTime.reads),
+          scheduledenddate = json.\("scheduledenddate").as(TypoLocalDateTime.reads),
+          actualstartdate = json.\("actualstartdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          actualenddate = json.\("actualenddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          actualresourcehrs = json.\("actualresourcehrs").toOption.map(_.as(Reads.bigDecReads)),
+          plannedcost = json.\("plannedcost").as(Reads.bigDecReads),
+          actualcost = json.\("actualcost").toOption.map(_.as(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[WorkorderroutingRowUnsaved] = OWrites[WorkorderroutingRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "workorderid" -> Json.toJson(o.workorderid),
-      "productid" -> Json.toJson(o.productid),
-      "operationsequence" -> Json.toJson(o.operationsequence),
-      "locationid" -> Json.toJson(o.locationid),
-      "scheduledstartdate" -> Json.toJson(o.scheduledstartdate),
-      "scheduledenddate" -> Json.toJson(o.scheduledenddate),
-      "actualstartdate" -> Json.toJson(o.actualstartdate),
-      "actualenddate" -> Json.toJson(o.actualenddate),
-      "actualresourcehrs" -> Json.toJson(o.actualresourcehrs),
-      "plannedcost" -> Json.toJson(o.plannedcost),
-      "actualcost" -> Json.toJson(o.actualcost),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "workorderid" -> WorkorderId.writes.writes(o.workorderid),
+      "productid" -> Writes.IntWrites.writes(o.productid),
+      "operationsequence" -> Writes.IntWrites.writes(o.operationsequence),
+      "locationid" -> LocationId.writes.writes(o.locationid),
+      "scheduledstartdate" -> TypoLocalDateTime.writes.writes(o.scheduledstartdate),
+      "scheduledenddate" -> TypoLocalDateTime.writes.writes(o.scheduledenddate),
+      "actualstartdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.actualstartdate),
+      "actualenddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.actualenddate),
+      "actualresourcehrs" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.actualresourcehrs),
+      "plannedcost" -> Writes.BigDecimalWrites.writes(o.plannedcost),
+      "actualcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.actualcost),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

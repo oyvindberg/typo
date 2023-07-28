@@ -8,14 +8,15 @@ package information_schema
 package constraint_table_usage
 
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,12 +33,12 @@ object ConstraintTableUsageViewRow {
   implicit val reads: Reads[ConstraintTableUsageViewRow] = Reads[ConstraintTableUsageViewRow](json => JsResult.fromTry(
       Try(
         ConstraintTableUsageViewRow(
-          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-          constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
-          constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier])
+          tableCatalog = json.\("table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          tableSchema = json.\("table_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          tableName = json.\("table_name").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -45,23 +46,23 @@ object ConstraintTableUsageViewRow {
   def rowParser(idx: Int): RowParser[ConstraintTableUsageViewRow] = RowParser[ConstraintTableUsageViewRow] { row =>
     Success(
       ConstraintTableUsageViewRow(
-        tableCatalog = row[Option[SqlIdentifier]](idx + 0),
-        tableSchema = row[Option[SqlIdentifier]](idx + 1),
-        tableName = row[Option[SqlIdentifier]](idx + 2),
-        constraintCatalog = row[Option[SqlIdentifier]](idx + 3),
-        constraintSchema = row[Option[SqlIdentifier]](idx + 4),
-        constraintName = row[Option[SqlIdentifier]](idx + 5)
+        tableCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        tableSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        tableName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        constraintCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        constraintSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        constraintName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[ConstraintTableUsageViewRow] = OWrites[ConstraintTableUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "table_catalog" -> Json.toJson(o.tableCatalog),
-      "table_schema" -> Json.toJson(o.tableSchema),
-      "table_name" -> Json.toJson(o.tableName),
-      "constraint_catalog" -> Json.toJson(o.constraintCatalog),
-      "constraint_schema" -> Json.toJson(o.constraintSchema),
-      "constraint_name" -> Json.toJson(o.constraintName)
+      "table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableCatalog),
+      "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableName),
+      "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintName)
     ))
   )
 }

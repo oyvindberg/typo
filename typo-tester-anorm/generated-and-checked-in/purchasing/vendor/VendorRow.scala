@@ -12,14 +12,15 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -46,14 +47,14 @@ object VendorRow {
   implicit val reads: Reads[VendorRow] = Reads[VendorRow](json => JsResult.fromTry(
       Try(
         VendorRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          accountnumber = json.\("accountnumber").as[AccountNumber],
-          name = json.\("name").as[Name],
-          creditrating = json.\("creditrating").as[Int],
-          preferredvendorstatus = json.\("preferredvendorstatus").as[Flag],
-          activeflag = json.\("activeflag").as[Flag],
-          purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          accountnumber = json.\("accountnumber").as(AccountNumber.reads),
+          name = json.\("name").as(Name.reads),
+          creditrating = json.\("creditrating").as(Reads.IntReads),
+          preferredvendorstatus = json.\("preferredvendorstatus").as(Flag.reads),
+          activeflag = json.\("activeflag").as(Flag.reads),
+          purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as(Reads.StringReads)),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -61,27 +62,27 @@ object VendorRow {
   def rowParser(idx: Int): RowParser[VendorRow] = RowParser[VendorRow] { row =>
     Success(
       VendorRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        accountnumber = row[AccountNumber](idx + 1),
-        name = row[Name](idx + 2),
-        creditrating = row[Int](idx + 3),
-        preferredvendorstatus = row[Flag](idx + 4),
-        activeflag = row[Flag](idx + 5),
-        purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]](idx + 6),
-        modifieddate = row[TypoLocalDateTime](idx + 7)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        accountnumber = row(idx + 1)(AccountNumber.column),
+        name = row(idx + 2)(Name.column),
+        creditrating = row(idx + 3)(Column.columnToInt),
+        preferredvendorstatus = row(idx + 4)(Flag.column),
+        activeflag = row(idx + 5)(Flag.column),
+        purchasingwebserviceurl = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[VendorRow] = OWrites[VendorRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "accountnumber" -> Json.toJson(o.accountnumber),
-      "name" -> Json.toJson(o.name),
-      "creditrating" -> Json.toJson(o.creditrating),
-      "preferredvendorstatus" -> Json.toJson(o.preferredvendorstatus),
-      "activeflag" -> Json.toJson(o.activeflag),
-      "purchasingwebserviceurl" -> Json.toJson(o.purchasingwebserviceurl),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "accountnumber" -> AccountNumber.writes.writes(o.accountnumber),
+      "name" -> Name.writes.writes(o.name),
+      "creditrating" -> Writes.IntWrites.writes(o.creditrating),
+      "preferredvendorstatus" -> Flag.writes.writes(o.preferredvendorstatus),
+      "activeflag" -> Flag.writes.writes(o.activeflag),
+      "purchasingwebserviceurl" -> Writes.OptionWrites(Writes.StringWrites).writes(o.purchasingwebserviceurl),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

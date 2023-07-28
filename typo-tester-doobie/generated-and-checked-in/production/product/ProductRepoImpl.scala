@@ -9,64 +9,71 @@ package product
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.production.productsubcategory.ProductsubcategoryId
+import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
 
 object ProductRepoImpl extends ProductRepo {
   override def delete(productid: ProductId): ConnectionIO[Boolean] = {
-    sql"delete from production.product where productid = ${productid}".update.run.map(_ > 0)
+    sql"delete from production.product where productid = ${fromWrite(productid)(Write.fromPut(ProductId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
-          values (${unsaved.productid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.productnumber}, ${unsaved.makeflag}::"public"."Flag", ${unsaved.finishedgoodsflag}::"public"."Flag", ${unsaved.color}, ${unsaved.safetystocklevel}::int2, ${unsaved.reorderpoint}::int2, ${unsaved.standardcost}::numeric, ${unsaved.listprice}::numeric, ${unsaved.size}, ${unsaved.sizeunitmeasurecode}::bpchar, ${unsaved.weightunitmeasurecode}::bpchar, ${unsaved.weight}::numeric, ${unsaved.daystomanufacture}::int4, ${unsaved.productline}::bpchar, ${unsaved.`class`}::bpchar, ${unsaved.style}::bpchar, ${unsaved.productsubcategoryid}::int4, ${unsaved.productmodelid}::int4, ${unsaved.sellstartdate}::timestamp, ${unsaved.sellenddate}::timestamp, ${unsaved.discontinueddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.makeflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.finishedgoodsflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4, ${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4, ${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
        """.query(ProductRow.read).unique
   }
   override def insert(unsaved: ProductRowUnsaved): ConnectionIO[ProductRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
-      Some((Fragment.const(s"productnumber"), fr"${unsaved.productnumber}")),
-      Some((Fragment.const(s"color"), fr"${unsaved.color}")),
-      Some((Fragment.const(s"safetystocklevel"), fr"${unsaved.safetystocklevel}::int2")),
-      Some((Fragment.const(s"reorderpoint"), fr"${unsaved.reorderpoint}::int2")),
-      Some((Fragment.const(s"standardcost"), fr"${unsaved.standardcost}::numeric")),
-      Some((Fragment.const(s"listprice"), fr"${unsaved.listprice}::numeric")),
-      Some((Fragment.const(s""""size""""), fr"${unsaved.size}")),
-      Some((Fragment.const(s"sizeunitmeasurecode"), fr"${unsaved.sizeunitmeasurecode}::bpchar")),
-      Some((Fragment.const(s"weightunitmeasurecode"), fr"${unsaved.weightunitmeasurecode}::bpchar")),
-      Some((Fragment.const(s"weight"), fr"${unsaved.weight}::numeric")),
-      Some((Fragment.const(s"daystomanufacture"), fr"${unsaved.daystomanufacture}::int4")),
-      Some((Fragment.const(s"productline"), fr"${unsaved.productline}::bpchar")),
-      Some((Fragment.const(s""""class""""), fr"${unsaved.`class`}::bpchar")),
-      Some((Fragment.const(s""""style""""), fr"${unsaved.style}::bpchar")),
-      Some((Fragment.const(s"productsubcategoryid"), fr"${unsaved.productsubcategoryid}::int4")),
-      Some((Fragment.const(s"productmodelid"), fr"${unsaved.productmodelid}::int4")),
-      Some((Fragment.const(s"sellstartdate"), fr"${unsaved.sellstartdate}::timestamp")),
-      Some((Fragment.const(s"sellenddate"), fr"${unsaved.sellenddate}::timestamp")),
-      Some((Fragment.const(s"discontinueddate"), fr"${unsaved.discontinueddate}::timestamp")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s"productnumber"), fr"${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"color"), fr"${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"safetystocklevel"), fr"${fromWrite(unsaved.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s"reorderpoint"), fr"${fromWrite(unsaved.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s"standardcost"), fr"${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const(s"listprice"), fr"${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const(s""""size""""), fr"${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"sizeunitmeasurecode"), fr"${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar")),
+      Some((Fragment.const(s"weightunitmeasurecode"), fr"${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar")),
+      Some((Fragment.const(s"weight"), fr"${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const(s"daystomanufacture"), fr"${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const(s"productline"), fr"${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const(s""""class""""), fr"${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const(s""""style""""), fr"${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const(s"productsubcategoryid"), fr"${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4")),
+      Some((Fragment.const(s"productmodelid"), fr"${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4")),
+      Some((Fragment.const(s"sellstartdate"), fr"${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const(s"sellenddate"), fr"${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const(s"discontinueddate"), fr"${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
       unsaved.productid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productid"), fr"${value: ProductId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productid"), fr"${fromWrite(value: ProductId)(Write.fromPut(ProductId.put))}::int4"))
       },
       unsaved.makeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"makeflag"), fr"""${value: Flag}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"makeflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
       },
       unsaved.finishedgoodsflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"finishedgoodsflag"), fr"""${value: Flag}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"finishedgoodsflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -88,39 +95,39 @@ object ProductRepoImpl extends ProductRepo {
     sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product""".query(ProductRow.read).stream
   }
   override def selectById(productid: ProductId): ConnectionIO[Option[ProductRow]] = {
-    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product where productid = ${productid}""".query(ProductRow.read).option
+    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product where productid = ${fromWrite(productid)(Write.fromPut(ProductId.put))}""".query(ProductRow.read).option
   }
   override def selectByIds(productids: Array[ProductId]): Stream[ConnectionIO, ProductRow] = {
-    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product where productid = ANY(${productids})""".query(ProductRow.read).stream
+    sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product where productid = ANY(${fromWrite(productids)(Write.fromPut(ProductId.arrayPut))})""".query(ProductRow.read).stream
   }
   override def update(row: ProductRow): ConnectionIO[Boolean] = {
     val productid = row.productid
     sql"""update production.product
-          set "name" = ${row.name}::"public"."Name",
-              productnumber = ${row.productnumber},
-              makeflag = ${row.makeflag}::"public"."Flag",
-              finishedgoodsflag = ${row.finishedgoodsflag}::"public"."Flag",
-              color = ${row.color},
-              safetystocklevel = ${row.safetystocklevel}::int2,
-              reorderpoint = ${row.reorderpoint}::int2,
-              standardcost = ${row.standardcost}::numeric,
-              listprice = ${row.listprice}::numeric,
-              "size" = ${row.size},
-              sizeunitmeasurecode = ${row.sizeunitmeasurecode}::bpchar,
-              weightunitmeasurecode = ${row.weightunitmeasurecode}::bpchar,
-              weight = ${row.weight}::numeric,
-              daystomanufacture = ${row.daystomanufacture}::int4,
-              productline = ${row.productline}::bpchar,
-              "class" = ${row.`class`}::bpchar,
-              "style" = ${row.style}::bpchar,
-              productsubcategoryid = ${row.productsubcategoryid}::int4,
-              productmodelid = ${row.productmodelid}::int4,
-              sellstartdate = ${row.sellstartdate}::timestamp,
-              sellenddate = ${row.sellenddate}::timestamp,
-              discontinueddate = ${row.discontinueddate}::timestamp,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${productid}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              productnumber = ${fromWrite(row.productnumber)(Write.fromPut(Meta.StringMeta.put))},
+              makeflag = ${fromWrite(row.makeflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              finishedgoodsflag = ${fromWrite(row.finishedgoodsflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              color = ${fromWrite(row.color)(Write.fromPutOption(Meta.StringMeta.put))},
+              safetystocklevel = ${fromWrite(row.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              reorderpoint = ${fromWrite(row.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              standardcost = ${fromWrite(row.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              listprice = ${fromWrite(row.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "size" = ${fromWrite(row.size)(Write.fromPutOption(Meta.StringMeta.put))},
+              sizeunitmeasurecode = ${fromWrite(row.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar,
+              weightunitmeasurecode = ${fromWrite(row.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar,
+              weight = ${fromWrite(row.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              daystomanufacture = ${fromWrite(row.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              productline = ${fromWrite(row.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar,
+              "class" = ${fromWrite(row.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar,
+              "style" = ${fromWrite(row.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar,
+              productsubcategoryid = ${fromWrite(row.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4,
+              productmodelid = ${fromWrite(row.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4,
+              sellstartdate = ${fromWrite(row.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+              sellenddate = ${fromWrite(row.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
+              discontinueddate = ${fromWrite(row.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
+              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where productid = ${fromWrite(productid)(Write.fromPut(ProductId.put))}
        """
       .update
       .run
@@ -129,31 +136,31 @@ object ProductRepoImpl extends ProductRepo {
   override def upsert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
           values (
-            ${unsaved.productid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.productnumber},
-            ${unsaved.makeflag}::"public"."Flag",
-            ${unsaved.finishedgoodsflag}::"public"."Flag",
-            ${unsaved.color},
-            ${unsaved.safetystocklevel}::int2,
-            ${unsaved.reorderpoint}::int2,
-            ${unsaved.standardcost}::numeric,
-            ${unsaved.listprice}::numeric,
-            ${unsaved.size},
-            ${unsaved.sizeunitmeasurecode}::bpchar,
-            ${unsaved.weightunitmeasurecode}::bpchar,
-            ${unsaved.weight}::numeric,
-            ${unsaved.daystomanufacture}::int4,
-            ${unsaved.productline}::bpchar,
-            ${unsaved.`class`}::bpchar,
-            ${unsaved.style}::bpchar,
-            ${unsaved.productsubcategoryid}::int4,
-            ${unsaved.productmodelid}::int4,
-            ${unsaved.sellstartdate}::timestamp,
-            ${unsaved.sellenddate}::timestamp,
-            ${unsaved.discontinueddate}::timestamp,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.makeflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.finishedgoodsflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.safetystocklevel)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.reorderpoint)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar,
+            ${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar,
+            ${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4,
+            ${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4,
+            ${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (productid)
           do update set

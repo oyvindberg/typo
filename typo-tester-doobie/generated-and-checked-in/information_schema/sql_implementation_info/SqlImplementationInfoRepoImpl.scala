@@ -7,14 +7,18 @@ package adventureworks
 package information_schema
 package sql_implementation_info
 
+import adventureworks.information_schema.CardinalNumber
+import adventureworks.information_schema.CharacterData
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import fs2.Stream
 
 object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
   override def insert(unsaved: SqlImplementationInfoRow): ConnectionIO[SqlImplementationInfoRow] = {
     sql"""insert into information_schema.sql_implementation_info(implementation_info_id, implementation_info_name, integer_value, character_value, "comments")
-          values (${unsaved.implementationInfoId}::information_schema.character_data, ${unsaved.implementationInfoName}::information_schema.character_data, ${unsaved.integerValue}::information_schema.cardinal_number, ${unsaved.characterValue}::information_schema.character_data, ${unsaved.comments}::information_schema.character_data)
+          values (${fromWrite(unsaved.implementationInfoId)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.implementationInfoName)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.integerValue)(Write.fromPutOption(CardinalNumber.put))}::information_schema.cardinal_number, ${fromWrite(unsaved.characterValue)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data)
           returning implementation_info_id, implementation_info_name, integer_value, character_value, "comments"
        """.query(SqlImplementationInfoRow.read).unique
   }

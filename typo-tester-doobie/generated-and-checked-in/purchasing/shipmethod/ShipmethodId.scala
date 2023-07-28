@@ -9,17 +9,18 @@ package shipmethod
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `purchasing.shipmethod` */
 case class ShipmethodId(value: Int) extends AnyVal
 object ShipmethodId {
-  implicit val arrayGet: Get[Array[ShipmethodId]] = Get[Array[Int]].map(_.map(ShipmethodId.apply))
-  implicit val arrayPut: Put[Array[ShipmethodId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[ShipmethodId] = Decoder[Int].map(ShipmethodId.apply)
-  implicit val encoder: Encoder[ShipmethodId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[ShipmethodId] = Get[Int].map(ShipmethodId.apply)
+  implicit val arrayGet: Get[Array[ShipmethodId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ShipmethodId.apply))
+  implicit val arrayPut: Put[Array[ShipmethodId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[ShipmethodId] = Decoder.decodeInt.map(ShipmethodId.apply)
+  implicit val encoder: Encoder[ShipmethodId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[ShipmethodId] = Meta.IntMeta.get.map(ShipmethodId.apply)
   implicit val ordering: Ordering[ShipmethodId] = Ordering.by(_.value)
-  implicit val put: Put[ShipmethodId] = Put[Int].contramap(_.value)
+  implicit val put: Put[ShipmethodId] = Meta.IntMeta.put.contramap(_.value)
 }

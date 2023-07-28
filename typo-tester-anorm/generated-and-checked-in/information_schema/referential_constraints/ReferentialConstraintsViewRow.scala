@@ -9,14 +9,15 @@ package referential_constraints
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -36,15 +37,15 @@ object ReferentialConstraintsViewRow {
   implicit val reads: Reads[ReferentialConstraintsViewRow] = Reads[ReferentialConstraintsViewRow](json => JsResult.fromTry(
       Try(
         ReferentialConstraintsViewRow(
-          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-          constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
-          constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
-          uniqueConstraintCatalog = json.\("unique_constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-          uniqueConstraintSchema = json.\("unique_constraint_schema").toOption.map(_.as[SqlIdentifier]),
-          uniqueConstraintName = json.\("unique_constraint_name").toOption.map(_.as[SqlIdentifier]),
-          matchOption = json.\("match_option").toOption.map(_.as[CharacterData]),
-          updateRule = json.\("update_rule").toOption.map(_.as[CharacterData]),
-          deleteRule = json.\("delete_rule").toOption.map(_.as[CharacterData])
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(SqlIdentifier.reads)),
+          uniqueConstraintCatalog = json.\("unique_constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          uniqueConstraintSchema = json.\("unique_constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          uniqueConstraintName = json.\("unique_constraint_name").toOption.map(_.as(SqlIdentifier.reads)),
+          matchOption = json.\("match_option").toOption.map(_.as(CharacterData.reads)),
+          updateRule = json.\("update_rule").toOption.map(_.as(CharacterData.reads)),
+          deleteRule = json.\("delete_rule").toOption.map(_.as(CharacterData.reads))
         )
       )
     ),
@@ -52,29 +53,29 @@ object ReferentialConstraintsViewRow {
   def rowParser(idx: Int): RowParser[ReferentialConstraintsViewRow] = RowParser[ReferentialConstraintsViewRow] { row =>
     Success(
       ReferentialConstraintsViewRow(
-        constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
-        constraintSchema = row[Option[SqlIdentifier]](idx + 1),
-        constraintName = row[Option[SqlIdentifier]](idx + 2),
-        uniqueConstraintCatalog = row[Option[SqlIdentifier]](idx + 3),
-        uniqueConstraintSchema = row[Option[SqlIdentifier]](idx + 4),
-        uniqueConstraintName = row[Option[SqlIdentifier]](idx + 5),
-        matchOption = row[Option[CharacterData]](idx + 6),
-        updateRule = row[Option[CharacterData]](idx + 7),
-        deleteRule = row[Option[CharacterData]](idx + 8)
+        constraintCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        constraintName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        uniqueConstraintCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        uniqueConstraintSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        uniqueConstraintName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
+        matchOption = row(idx + 6)(Column.columnToOption(CharacterData.column)),
+        updateRule = row(idx + 7)(Column.columnToOption(CharacterData.column)),
+        deleteRule = row(idx + 8)(Column.columnToOption(CharacterData.column))
       )
     )
   }
   implicit val writes: OWrites[ReferentialConstraintsViewRow] = OWrites[ReferentialConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> Json.toJson(o.constraintCatalog),
-      "constraint_schema" -> Json.toJson(o.constraintSchema),
-      "constraint_name" -> Json.toJson(o.constraintName),
-      "unique_constraint_catalog" -> Json.toJson(o.uniqueConstraintCatalog),
-      "unique_constraint_schema" -> Json.toJson(o.uniqueConstraintSchema),
-      "unique_constraint_name" -> Json.toJson(o.uniqueConstraintName),
-      "match_option" -> Json.toJson(o.matchOption),
-      "update_rule" -> Json.toJson(o.updateRule),
-      "delete_rule" -> Json.toJson(o.deleteRule)
+      "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintName),
+      "unique_constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.uniqueConstraintCatalog),
+      "unique_constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.uniqueConstraintSchema),
+      "unique_constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.uniqueConstraintName),
+      "match_option" -> Writes.OptionWrites(CharacterData.writes).writes(o.matchOption),
+      "update_rule" -> Writes.OptionWrites(CharacterData.writes).writes(o.updateRule),
+      "delete_rule" -> Writes.OptionWrites(CharacterData.writes).writes(o.deleteRule)
     ))
   )
 }

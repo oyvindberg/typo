@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -49,20 +48,20 @@ object SalesreasonRowUnsaved {
   implicit val reads: Reads[SalesreasonRowUnsaved] = Reads[SalesreasonRowUnsaved](json => JsResult.fromTry(
       Try(
         SalesreasonRowUnsaved(
-          name = json.\("name").as[Name],
-          reasontype = json.\("reasontype").as[Name],
-          salesreasonid = json.\("salesreasonid").as[Defaulted[SalesreasonId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          reasontype = json.\("reasontype").as(Name.reads),
+          salesreasonid = json.\("salesreasonid").as(Defaulted.reads(SalesreasonId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[SalesreasonRowUnsaved] = OWrites[SalesreasonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "reasontype" -> Json.toJson(o.reasontype),
-      "salesreasonid" -> Json.toJson(o.salesreasonid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "reasontype" -> Name.writes.writes(o.reasontype),
+      "salesreasonid" -> Defaulted.writes(SalesreasonId.writes).writes(o.salesreasonid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

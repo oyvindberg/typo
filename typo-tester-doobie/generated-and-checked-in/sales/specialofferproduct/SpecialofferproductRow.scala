@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -32,20 +31,20 @@ case class SpecialofferproductRow(
  }
 
 object SpecialofferproductRow {
-  implicit val decoder: Decoder[SpecialofferproductRow] = Decoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRow.apply)
-  implicit val encoder: Encoder[SpecialofferproductRow] = Encoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[SpecialofferproductRow] = Decoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRow.apply)(SpecialofferId.decoder, ProductId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[SpecialofferproductRow] = Encoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))(SpecialofferId.encoder, ProductId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[SpecialofferproductRow] = new Read[SpecialofferproductRow](
     gets = List(
-      (Get[SpecialofferId], Nullability.NoNulls),
-      (Get[ProductId], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (SpecialofferId.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpecialofferproductRow(
-      specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
-      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      specialofferid = SpecialofferId.get.unsafeGetNonNullable(rs, i + 0),
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

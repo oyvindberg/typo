@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-object DbLibAnorm extends DbLib {
+class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   val Column = sc.Type.Qualified("anorm.Column")
   val ToStatement = sc.Type.Qualified("anorm.ToStatement")
   val ToSql = sc.Type.Qualified("anorm.ToSql")
@@ -45,8 +45,37 @@ object DbLibAnorm extends DbLib {
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
     code"${maybeQuoted(x.col.dbName)} = ANY($$${idsParam.name})"
 
-  def columnFor(tpe: sc.Type): sc.Code =
-    sc.Summon(Column.of(tpe)).code
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  def lookupColumnFor(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) Column.of(tpe).code
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal     => code"$Column.columnToScalaBigDecimal"
+        case sc.Type.Boolean        => code"$Column.columnToBoolean"
+        case sc.Type.Byte           => code"$Column.columnToByte"
+        case sc.Type.Double         => code"$Column.columnToDouble"
+        case sc.Type.Float          => code"$Column.columnToFloat"
+        case sc.Type.Int            => code"$Column.columnToInt"
+        case sc.Type.Long           => code"$Column.columnToLong"
+        case sc.Type.String         => code"$Column.columnToString"
+        case sc.Type.UUID           => code"$Column.columnToUUID"
+        case sc.Type.Optional(targ) => code"$Column.columnToOption(${lookupColumnFor(targ)})"
+        // generated type
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"$tpe.$columnName"
+        // customized type mapping
+        case x if missingInstancesByType.contains(Column.of(x)) =>
+          code"${missingInstancesByType(Column.of(x))}"
+        // generated array type
+        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+          code"$targ.$arrayColumnName"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) => code"$Column.columnToByteArray"
+        // fallback array case. implementation looks loco, but I guess it works
+        case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$Column.columnToArray[$targ](${lookupColumnFor(targ)}, implicitly)"
+        case other =>
+          println(other)
+          sc.Summon(Column.of(other)).code
+      }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
     case RepoMethod.SelectAll(_, _, rowType) =>
@@ -472,9 +501,12 @@ object DbLibAnorm extends DbLib {
     arrayInstances
   }
 
+  val missingInstancesByType: Map[sc.Type, sc.QIdent] =
+    missingInstances.collect { case x: sc.Given => (x.tpe, pkg / x.name) }.toMap
+
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.ClassMember] = {
     val rowParser = {
-      val mappedValues = cols.zipWithIndex.map { case (x, num) => code"${x.name} = row[${x.tpe}](idx + $num)" }
+      val mappedValues = cols.zipWithIndex.map { case (x, num) => code"${x.name} = row(idx + $num)(${lookupColumnFor(x.tpe)})" }
       sc.Value(
         Nil,
         rowParserName,

@@ -10,9 +10,9 @@ package pg_ts_config_map
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,18 +23,18 @@ object PgTsConfigMapId {
   implicit val reads: Reads[PgTsConfigMapId] = Reads[PgTsConfigMapId](json => JsResult.fromTry(
       Try(
         PgTsConfigMapId(
-          mapcfg = json.\("mapcfg").as[/* oid */ Long],
-          maptokentype = json.\("maptokentype").as[Int],
-          mapseqno = json.\("mapseqno").as[Int]
+          mapcfg = json.\("mapcfg").as(Reads.LongReads),
+          maptokentype = json.\("maptokentype").as(Reads.IntReads),
+          mapseqno = json.\("mapseqno").as(Reads.IntReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgTsConfigMapId] = OWrites[PgTsConfigMapId](o =>
     new JsObject(ListMap[String, JsValue](
-      "mapcfg" -> Json.toJson(o.mapcfg),
-      "maptokentype" -> Json.toJson(o.maptokentype),
-      "mapseqno" -> Json.toJson(o.mapseqno)
+      "mapcfg" -> Writes.LongWrites.writes(o.mapcfg),
+      "maptokentype" -> Writes.IntWrites.writes(o.maptokentype),
+      "mapseqno" -> Writes.IntWrites.writes(o.mapseqno)
     ))
   )
 }

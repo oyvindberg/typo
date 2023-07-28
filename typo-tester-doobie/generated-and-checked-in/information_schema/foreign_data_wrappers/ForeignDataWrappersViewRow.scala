@@ -10,7 +10,6 @@ package foreign_data_wrappers
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -29,22 +28,22 @@ case class ForeignDataWrappersViewRow(
 )
 
 object ForeignDataWrappersViewRow {
-  implicit val decoder: Decoder[ForeignDataWrappersViewRow] = Decoder.forProduct5[ForeignDataWrappersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(ForeignDataWrappersViewRow.apply)
-  implicit val encoder: Encoder[ForeignDataWrappersViewRow] = Encoder.forProduct5[ForeignDataWrappersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.authorizationIdentifier, x.libraryName, x.foreignDataWrapperLanguage))
+  implicit val decoder: Decoder[ForeignDataWrappersViewRow] = Decoder.forProduct5[ForeignDataWrappersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(ForeignDataWrappersViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[ForeignDataWrappersViewRow] = Encoder.forProduct5[ForeignDataWrappersViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData]]("foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "authorization_identifier", "library_name", "foreign_data_wrapper_language")(x => (x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.authorizationIdentifier, x.libraryName, x.foreignDataWrapperLanguage))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[ForeignDataWrappersViewRow] = new Read[ForeignDataWrappersViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignDataWrappersViewRow(
-      foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      libraryName = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-      foreignDataWrapperLanguage = Get[CharacterData].unsafeGetNullable(rs, i + 4)
+      foreignDataWrapperCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      foreignDataWrapperName = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      authorizationIdentifier = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      libraryName = CharacterData.get.unsafeGetNullable(rs, i + 3),
+      foreignDataWrapperLanguage = CharacterData.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

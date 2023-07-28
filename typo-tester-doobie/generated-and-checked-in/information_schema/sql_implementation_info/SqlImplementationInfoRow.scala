@@ -10,7 +10,6 @@ package sql_implementation_info
 import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,22 +24,22 @@ case class SqlImplementationInfoRow(
 )
 
 object SqlImplementationInfoRow {
-  implicit val decoder: Decoder[SqlImplementationInfoRow] = Decoder.forProduct5[SqlImplementationInfoRow, Option[CharacterData], Option[CharacterData], Option[CardinalNumber], Option[CharacterData], Option[CharacterData]]("implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments")(SqlImplementationInfoRow.apply)
-  implicit val encoder: Encoder[SqlImplementationInfoRow] = Encoder.forProduct5[SqlImplementationInfoRow, Option[CharacterData], Option[CharacterData], Option[CardinalNumber], Option[CharacterData], Option[CharacterData]]("implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments")(x => (x.implementationInfoId, x.implementationInfoName, x.integerValue, x.characterValue, x.comments))
+  implicit val decoder: Decoder[SqlImplementationInfoRow] = Decoder.forProduct5[SqlImplementationInfoRow, Option[CharacterData], Option[CharacterData], Option[CardinalNumber], Option[CharacterData], Option[CharacterData]]("implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments")(SqlImplementationInfoRow.apply)(Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[SqlImplementationInfoRow] = Encoder.forProduct5[SqlImplementationInfoRow, Option[CharacterData], Option[CharacterData], Option[CardinalNumber], Option[CharacterData], Option[CharacterData]]("implementation_info_id", "implementation_info_name", "integer_value", "character_value", "comments")(x => (x.implementationInfoId, x.implementationInfoName, x.integerValue, x.characterValue, x.comments))(Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[SqlImplementationInfoRow] = new Read[SqlImplementationInfoRow](
     gets = List(
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CardinalNumber], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CardinalNumber.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SqlImplementationInfoRow(
-      implementationInfoId = Get[CharacterData].unsafeGetNullable(rs, i + 0),
-      implementationInfoName = Get[CharacterData].unsafeGetNullable(rs, i + 1),
-      integerValue = Get[CardinalNumber].unsafeGetNullable(rs, i + 2),
-      characterValue = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-      comments = Get[CharacterData].unsafeGetNullable(rs, i + 4)
+      implementationInfoId = CharacterData.get.unsafeGetNullable(rs, i + 0),
+      implementationInfoName = CharacterData.get.unsafeGetNullable(rs, i + 1),
+      integerValue = CardinalNumber.get.unsafeGetNullable(rs, i + 2),
+      characterValue = CharacterData.get.unsafeGetNullable(rs, i + 3),
+      comments = CharacterData.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

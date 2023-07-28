@@ -12,7 +12,6 @@ import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -25,16 +24,16 @@ object SalespersonquotahistoryId {
   implicit val reads: Reads[SalespersonquotahistoryId] = Reads[SalespersonquotahistoryId](json => JsResult.fromTry(
       Try(
         SalespersonquotahistoryId(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          quotadate = json.\("quotadate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          quotadate = json.\("quotadate").as(TypoLocalDateTime.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[SalespersonquotahistoryId] = OWrites[SalespersonquotahistoryId](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "quotadate" -> Json.toJson(o.quotadate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "quotadate" -> TypoLocalDateTime.writes.writes(o.quotadate)
     ))
   )
 }

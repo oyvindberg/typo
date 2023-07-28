@@ -23,7 +23,7 @@ object TransactionhistoryId {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[TransactionhistoryId] = implicitly[Reads[Int]].map(TransactionhistoryId.apply)
+  implicit val reads: Reads[TransactionhistoryId] = Reads.IntReads.map(TransactionhistoryId.apply)
   implicit val toStatement: ToStatement[TransactionhistoryId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[TransactionhistoryId] = implicitly[Writes[Int]].contramap(_.value)
+  implicit val writes: Writes[TransactionhistoryId] = Writes.IntWrites.contramap(_.value)
 }

@@ -10,7 +10,6 @@ package applicable_roles
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -23,18 +22,18 @@ case class ApplicableRolesViewRow(
 )
 
 object ApplicableRolesViewRow {
-  implicit val decoder: Decoder[ApplicableRolesViewRow] = Decoder.forProduct3[ApplicableRolesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(ApplicableRolesViewRow.apply)
-  implicit val encoder: Encoder[ApplicableRolesViewRow] = Encoder.forProduct3[ApplicableRolesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))
+  implicit val decoder: Decoder[ApplicableRolesViewRow] = Decoder.forProduct3[ApplicableRolesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(ApplicableRolesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(YesOrNo.decoder))
+  implicit val encoder: Encoder[ApplicableRolesViewRow] = Encoder.forProduct3[ApplicableRolesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(YesOrNo.encoder))
   implicit val read: Read[ApplicableRolesViewRow] = new Read[ApplicableRolesViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ApplicableRolesViewRow(
-      grantee = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      roleName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      isGrantable = Get[YesOrNo].unsafeGetNullable(rs, i + 2)
+      grantee = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      roleName = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      isGrantable = YesOrNo.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

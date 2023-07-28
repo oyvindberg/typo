@@ -15,9 +15,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,8 +54,8 @@ object TypoCircle {
   implicit val reads: Reads[TypoCircle] = Reads[TypoCircle](json => JsResult.fromTry(
       Try(
         TypoCircle(
-          center = json.\("center").as[TypoPoint],
-          radius = json.\("radius").as[Double]
+          center = json.\("center").as(TypoPoint.reads),
+          radius = json.\("radius").as(Reads.DoubleReads)
         )
       )
     ),
@@ -63,8 +63,8 @@ object TypoCircle {
   implicit val toStatement: ToStatement[TypoCircle] = ToStatement[TypoCircle]((s, index, v) => s.setObject(index, new PGcircle(v.center.x, v.center.y, v.radius)))
   implicit val writes: OWrites[TypoCircle] = OWrites[TypoCircle](o =>
     new JsObject(ListMap[String, JsValue](
-      "center" -> Json.toJson(o.center),
-      "radius" -> Json.toJson(o.radius)
+      "center" -> TypoPoint.writes.writes(o.center),
+      "radius" -> Writes.DoubleWrites.writes(o.radius)
     ))
   )
 }

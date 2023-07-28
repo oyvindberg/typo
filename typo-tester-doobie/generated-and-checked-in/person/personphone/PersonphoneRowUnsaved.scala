@@ -40,6 +40,6 @@ case class PersonphoneRowUnsaved(
     )
 }
 object PersonphoneRowUnsaved {
-  implicit val decoder: Decoder[PersonphoneRowUnsaved] = Decoder.forProduct4[PersonphoneRowUnsaved, BusinessentityId, Phone, PhonenumbertypeId, Defaulted[TypoLocalDateTime]]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRowUnsaved.apply)
-  implicit val encoder: Encoder[PersonphoneRowUnsaved] = Encoder.forProduct4[PersonphoneRowUnsaved, BusinessentityId, Phone, PhonenumbertypeId, Defaulted[TypoLocalDateTime]]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))
+  implicit val decoder: Decoder[PersonphoneRowUnsaved] = Decoder.forProduct4[PersonphoneRowUnsaved, BusinessentityId, Phone, PhonenumbertypeId, Defaulted[TypoLocalDateTime]]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRowUnsaved.apply)(BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PersonphoneRowUnsaved] = Encoder.forProduct4[PersonphoneRowUnsaved, BusinessentityId, Phone, PhonenumbertypeId, Defaulted[TypoLocalDateTime]]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }

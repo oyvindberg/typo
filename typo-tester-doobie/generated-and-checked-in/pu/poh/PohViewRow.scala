@@ -12,8 +12,8 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -47,38 +47,38 @@ case class PohViewRow(
 )
 
 object PohViewRow {
-  implicit val decoder: Decoder[PohViewRow] = Decoder.forProduct13[PohViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ShipmethodId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PohViewRow.apply)
-  implicit val encoder: Encoder[PohViewRow] = Encoder.forProduct13[PohViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ShipmethodId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.id, x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))
+  implicit val decoder: Decoder[PohViewRow] = Decoder.forProduct13[PohViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ShipmethodId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PohViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(PurchaseorderheaderId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(ShipmethodId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PohViewRow] = Encoder.forProduct13[PohViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[Int], Option[BusinessentityId], Option[BusinessentityId], Option[ShipmethodId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.id, x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(PurchaseorderheaderId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(ShipmethodId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PohViewRow] = new Read[PohViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[PurchaseorderheaderId], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[ShipmethodId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (PurchaseorderheaderId.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (ShipmethodId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PohViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNullable(rs, i + 1),
-      revisionnumber = Get[Int].unsafeGetNullable(rs, i + 2),
-      status = Get[Int].unsafeGetNullable(rs, i + 3),
-      employeeid = Get[BusinessentityId].unsafeGetNullable(rs, i + 4),
-      vendorid = Get[BusinessentityId].unsafeGetNullable(rs, i + 5),
-      shipmethodid = Get[ShipmethodId].unsafeGetNullable(rs, i + 6),
-      orderdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7),
-      shipdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 8),
-      subtotal = Get[BigDecimal].unsafeGetNullable(rs, i + 9),
-      taxamt = Get[BigDecimal].unsafeGetNullable(rs, i + 10),
-      freight = Get[BigDecimal].unsafeGetNullable(rs, i + 11),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 12)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      purchaseorderid = PurchaseorderheaderId.get.unsafeGetNullable(rs, i + 1),
+      revisionnumber = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
+      status = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
+      employeeid = BusinessentityId.get.unsafeGetNullable(rs, i + 4),
+      vendorid = BusinessentityId.get.unsafeGetNullable(rs, i + 5),
+      shipmethodid = ShipmethodId.get.unsafeGetNullable(rs, i + 6),
+      orderdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
+      shipdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 8),
+      subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 9),
+      taxamt = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 10),
+      freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 11),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 12)
     )
   )
 }

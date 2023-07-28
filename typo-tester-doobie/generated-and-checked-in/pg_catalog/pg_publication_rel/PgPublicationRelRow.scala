@@ -8,8 +8,8 @@ package pg_catalog
 package pg_publication_rel
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -21,18 +21,18 @@ case class PgPublicationRelRow(
 )
 
 object PgPublicationRelRow {
-  implicit val decoder: Decoder[PgPublicationRelRow] = Decoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(PgPublicationRelRow.apply)
-  implicit val encoder: Encoder[PgPublicationRelRow] = Encoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(x => (x.oid, x.prpubid, x.prrelid))
+  implicit val decoder: Decoder[PgPublicationRelRow] = Decoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(PgPublicationRelRow.apply)(PgPublicationRelId.decoder, Decoder.decodeLong, Decoder.decodeLong)
+  implicit val encoder: Encoder[PgPublicationRelRow] = Encoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(x => (x.oid, x.prpubid, x.prrelid))(PgPublicationRelId.encoder, Encoder.encodeLong, Encoder.encodeLong)
   implicit val read: Read[PgPublicationRelRow] = new Read[PgPublicationRelRow](
     gets = List(
-      (Get[PgPublicationRelId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls)
+      (PgPublicationRelId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgPublicationRelRow(
-      oid = Get[PgPublicationRelId].unsafeGetNonNullable(rs, i + 0),
-      prpubid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      prrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2)
+      oid = PgPublicationRelId.get.unsafeGetNonNullable(rs, i + 0),
+      prpubid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      prrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

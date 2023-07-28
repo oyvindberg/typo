@@ -24,7 +24,7 @@ object PgAggregateId {
     override def sqlType: String = implicitly[ParameterMetaData[TypoRegproc]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[TypoRegproc]].jdbcType
   }
-  implicit val reads: Reads[PgAggregateId] = implicitly[Reads[TypoRegproc]].map(PgAggregateId.apply)
+  implicit val reads: Reads[PgAggregateId] = TypoRegproc.reads.map(PgAggregateId.apply)
   implicit val toStatement: ToStatement[PgAggregateId] = implicitly[ToStatement[TypoRegproc]].contramap(_.value)
-  implicit val writes: Writes[PgAggregateId] = implicitly[Writes[TypoRegproc]].contramap(_.value)
+  implicit val writes: Writes[PgAggregateId] = TypoRegproc.writes.contramap(_.value)
 }

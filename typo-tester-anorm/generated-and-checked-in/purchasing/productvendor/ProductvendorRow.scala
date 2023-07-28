@@ -11,14 +11,15 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -55,17 +56,17 @@ object ProductvendorRow {
   implicit val reads: Reads[ProductvendorRow] = Reads[ProductvendorRow](json => JsResult.fromTry(
       Try(
         ProductvendorRow(
-          productid = json.\("productid").as[ProductId],
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          averageleadtime = json.\("averageleadtime").as[Int],
-          standardprice = json.\("standardprice").as[BigDecimal],
-          lastreceiptcost = json.\("lastreceiptcost").toOption.map(_.as[BigDecimal]),
-          lastreceiptdate = json.\("lastreceiptdate").toOption.map(_.as[TypoLocalDateTime]),
-          minorderqty = json.\("minorderqty").as[Int],
-          maxorderqty = json.\("maxorderqty").as[Int],
-          onorderqty = json.\("onorderqty").toOption.map(_.as[Int]),
-          unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productid = json.\("productid").as(ProductId.reads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          averageleadtime = json.\("averageleadtime").as(Reads.IntReads),
+          standardprice = json.\("standardprice").as(Reads.bigDecReads),
+          lastreceiptcost = json.\("lastreceiptcost").toOption.map(_.as(Reads.bigDecReads)),
+          lastreceiptdate = json.\("lastreceiptdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          minorderqty = json.\("minorderqty").as(Reads.IntReads),
+          maxorderqty = json.\("maxorderqty").as(Reads.IntReads),
+          onorderqty = json.\("onorderqty").toOption.map(_.as(Reads.IntReads)),
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -73,33 +74,33 @@ object ProductvendorRow {
   def rowParser(idx: Int): RowParser[ProductvendorRow] = RowParser[ProductvendorRow] { row =>
     Success(
       ProductvendorRow(
-        productid = row[ProductId](idx + 0),
-        businessentityid = row[BusinessentityId](idx + 1),
-        averageleadtime = row[Int](idx + 2),
-        standardprice = row[BigDecimal](idx + 3),
-        lastreceiptcost = row[Option[BigDecimal]](idx + 4),
-        lastreceiptdate = row[Option[TypoLocalDateTime]](idx + 5),
-        minorderqty = row[Int](idx + 6),
-        maxorderqty = row[Int](idx + 7),
-        onorderqty = row[Option[Int]](idx + 8),
-        unitmeasurecode = row[UnitmeasureId](idx + 9),
-        modifieddate = row[TypoLocalDateTime](idx + 10)
+        productid = row(idx + 0)(ProductId.column),
+        businessentityid = row(idx + 1)(BusinessentityId.column),
+        averageleadtime = row(idx + 2)(Column.columnToInt),
+        standardprice = row(idx + 3)(Column.columnToScalaBigDecimal),
+        lastreceiptcost = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        lastreceiptdate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
+        minorderqty = row(idx + 6)(Column.columnToInt),
+        maxorderqty = row(idx + 7)(Column.columnToInt),
+        onorderqty = row(idx + 8)(Column.columnToOption(Column.columnToInt)),
+        unitmeasurecode = row(idx + 9)(UnitmeasureId.column),
+        modifieddate = row(idx + 10)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductvendorRow] = OWrites[ProductvendorRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "averageleadtime" -> Json.toJson(o.averageleadtime),
-      "standardprice" -> Json.toJson(o.standardprice),
-      "lastreceiptcost" -> Json.toJson(o.lastreceiptcost),
-      "lastreceiptdate" -> Json.toJson(o.lastreceiptdate),
-      "minorderqty" -> Json.toJson(o.minorderqty),
-      "maxorderqty" -> Json.toJson(o.maxorderqty),
-      "onorderqty" -> Json.toJson(o.onorderqty),
-      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "averageleadtime" -> Writes.IntWrites.writes(o.averageleadtime),
+      "standardprice" -> Writes.BigDecimalWrites.writes(o.standardprice),
+      "lastreceiptcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.lastreceiptcost),
+      "lastreceiptdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.lastreceiptdate),
+      "minorderqty" -> Writes.IntWrites.writes(o.minorderqty),
+      "maxorderqty" -> Writes.IntWrites.writes(o.maxorderqty),
+      "onorderqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.onorderqty),
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

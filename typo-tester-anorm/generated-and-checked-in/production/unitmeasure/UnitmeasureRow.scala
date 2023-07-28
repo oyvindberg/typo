@@ -14,7 +14,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -32,9 +31,9 @@ object UnitmeasureRow {
   implicit val reads: Reads[UnitmeasureRow] = Reads[UnitmeasureRow](json => JsResult.fromTry(
       Try(
         UnitmeasureRow(
-          unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
-          name = json.\("name").as[Name],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -42,17 +41,17 @@ object UnitmeasureRow {
   def rowParser(idx: Int): RowParser[UnitmeasureRow] = RowParser[UnitmeasureRow] { row =>
     Success(
       UnitmeasureRow(
-        unitmeasurecode = row[UnitmeasureId](idx + 0),
-        name = row[Name](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        unitmeasurecode = row(idx + 0)(UnitmeasureId.column),
+        name = row(idx + 1)(Name.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[UnitmeasureRow] = OWrites[UnitmeasureRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

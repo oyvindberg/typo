@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_event_trigger
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,13 +33,13 @@ object PgEventTriggerRow {
   implicit val reads: Reads[PgEventTriggerRow] = Reads[PgEventTriggerRow](json => JsResult.fromTry(
       Try(
         PgEventTriggerRow(
-          oid = json.\("oid").as[PgEventTriggerId],
-          evtname = json.\("evtname").as[String],
-          evtevent = json.\("evtevent").as[String],
-          evtowner = json.\("evtowner").as[/* oid */ Long],
-          evtfoid = json.\("evtfoid").as[/* oid */ Long],
-          evtenabled = json.\("evtenabled").as[String],
-          evttags = json.\("evttags").toOption.map(_.as[Array[String]])
+          oid = json.\("oid").as(PgEventTriggerId.reads),
+          evtname = json.\("evtname").as(Reads.StringReads),
+          evtevent = json.\("evtevent").as(Reads.StringReads),
+          evtowner = json.\("evtowner").as(Reads.LongReads),
+          evtfoid = json.\("evtfoid").as(Reads.LongReads),
+          evtenabled = json.\("evtenabled").as(Reads.StringReads),
+          evttags = json.\("evttags").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -46,25 +47,25 @@ object PgEventTriggerRow {
   def rowParser(idx: Int): RowParser[PgEventTriggerRow] = RowParser[PgEventTriggerRow] { row =>
     Success(
       PgEventTriggerRow(
-        oid = row[PgEventTriggerId](idx + 0),
-        evtname = row[String](idx + 1),
-        evtevent = row[String](idx + 2),
-        evtowner = row[/* oid */ Long](idx + 3),
-        evtfoid = row[/* oid */ Long](idx + 4),
-        evtenabled = row[String](idx + 5),
-        evttags = row[Option[Array[String]]](idx + 6)
+        oid = row(idx + 0)(PgEventTriggerId.column),
+        evtname = row(idx + 1)(Column.columnToString),
+        evtevent = row(idx + 2)(Column.columnToString),
+        evtowner = row(idx + 3)(Column.columnToLong),
+        evtfoid = row(idx + 4)(Column.columnToLong),
+        evtenabled = row(idx + 5)(Column.columnToString),
+        evttags = row(idx + 6)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgEventTriggerRow] = OWrites[PgEventTriggerRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "evtname" -> Json.toJson(o.evtname),
-      "evtevent" -> Json.toJson(o.evtevent),
-      "evtowner" -> Json.toJson(o.evtowner),
-      "evtfoid" -> Json.toJson(o.evtfoid),
-      "evtenabled" -> Json.toJson(o.evtenabled),
-      "evttags" -> Json.toJson(o.evttags)
+      "oid" -> PgEventTriggerId.writes.writes(o.oid),
+      "evtname" -> Writes.StringWrites.writes(o.evtname),
+      "evtevent" -> Writes.StringWrites.writes(o.evtevent),
+      "evtowner" -> Writes.LongWrites.writes(o.evtowner),
+      "evtfoid" -> Writes.LongWrites.writes(o.evtfoid),
+      "evtenabled" -> Writes.StringWrites.writes(o.evtenabled),
+      "evttags" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.evttags)
     ))
   )
 }

@@ -16,9 +16,9 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -69,28 +69,28 @@ object VendorRowUnsaved {
   implicit val reads: Reads[VendorRowUnsaved] = Reads[VendorRowUnsaved](json => JsResult.fromTry(
       Try(
         VendorRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          accountnumber = json.\("accountnumber").as[AccountNumber],
-          name = json.\("name").as[Name],
-          creditrating = json.\("creditrating").as[Int],
-          purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
-          preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[Flag]],
-          activeflag = json.\("activeflag").as[Defaulted[Flag]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          accountnumber = json.\("accountnumber").as(AccountNumber.reads),
+          name = json.\("name").as(Name.reads),
+          creditrating = json.\("creditrating").as(Reads.IntReads),
+          purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as(Reads.StringReads)),
+          preferredvendorstatus = json.\("preferredvendorstatus").as(Defaulted.reads(Flag.reads)),
+          activeflag = json.\("activeflag").as(Defaulted.reads(Flag.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[VendorRowUnsaved] = OWrites[VendorRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "accountnumber" -> Json.toJson(o.accountnumber),
-      "name" -> Json.toJson(o.name),
-      "creditrating" -> Json.toJson(o.creditrating),
-      "purchasingwebserviceurl" -> Json.toJson(o.purchasingwebserviceurl),
-      "preferredvendorstatus" -> Json.toJson(o.preferredvendorstatus),
-      "activeflag" -> Json.toJson(o.activeflag),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "accountnumber" -> AccountNumber.writes.writes(o.accountnumber),
+      "name" -> Name.writes.writes(o.name),
+      "creditrating" -> Writes.IntWrites.writes(o.creditrating),
+      "purchasingwebserviceurl" -> Writes.OptionWrites(Writes.StringWrites).writes(o.purchasingwebserviceurl),
+      "preferredvendorstatus" -> Defaulted.writes(Flag.writes).writes(o.preferredvendorstatus),
+      "activeflag" -> Defaulted.writes(Flag.writes).writes(o.activeflag),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

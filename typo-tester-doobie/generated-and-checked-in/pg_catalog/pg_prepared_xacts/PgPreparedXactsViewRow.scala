@@ -10,8 +10,8 @@ package pg_prepared_xacts
 import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -25,22 +25,22 @@ case class PgPreparedXactsViewRow(
 )
 
 object PgPreparedXactsViewRow {
-  implicit val decoder: Decoder[PgPreparedXactsViewRow] = Decoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(PgPreparedXactsViewRow.apply)
-  implicit val encoder: Encoder[PgPreparedXactsViewRow] = Encoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(x => (x.transaction, x.gid, x.prepared, x.owner, x.database))
+  implicit val decoder: Decoder[PgPreparedXactsViewRow] = Decoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(PgPreparedXactsViewRow.apply)(Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgPreparedXactsViewRow] = Encoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(x => (x.transaction, x.gid, x.prepared, x.owner, x.database))(Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgPreparedXactsViewRow] = new Read[PgPreparedXactsViewRow](
     gets = List(
-      (Get[TypoXid], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable)
+      (TypoXid.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgPreparedXactsViewRow(
-      transaction = Get[TypoXid].unsafeGetNullable(rs, i + 0),
-      gid = Get[String].unsafeGetNullable(rs, i + 1),
-      prepared = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 2),
-      owner = Get[String].unsafeGetNullable(rs, i + 3),
-      database = Get[String].unsafeGetNullable(rs, i + 4)
+      transaction = TypoXid.get.unsafeGetNullable(rs, i + 0),
+      gid = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      prepared = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 2),
+      owner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      database = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

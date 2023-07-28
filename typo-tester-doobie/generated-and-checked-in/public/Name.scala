@@ -8,6 +8,7 @@ package public
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -16,11 +17,11 @@ import io.circe.Encoder
   */
 case class Name(value: String) extends AnyVal
 object Name {
-  implicit val arrayGet: Get[Array[Name]] = Get[Array[String]].map(_.map(Name.apply))
-  implicit val arrayPut: Put[Array[Name]] = Put[Array[String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[Name] = Decoder[String].map(Name.apply)
-  implicit val encoder: Encoder[Name] = Encoder[String].contramap(_.value)
-  implicit val get: Get[Name] = Get[String].map(Name.apply)
+  implicit val arrayGet: Get[Array[Name]] = adventureworks.StringArrayMeta.get.map(_.map(Name.apply))
+  implicit val arrayPut: Put[Array[Name]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[Name] = Decoder.decodeString.map(Name.apply)
+  implicit val encoder: Encoder[Name] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[Name] = Meta.StringMeta.get.map(Name.apply)
   implicit val ordering: Ordering[Name] = Ordering.by(_.value)
-  implicit val put: Put[Name] = Put[String].contramap(_.value)
+  implicit val put: Put[Name] = Meta.StringMeta.put.contramap(_.value)
 }

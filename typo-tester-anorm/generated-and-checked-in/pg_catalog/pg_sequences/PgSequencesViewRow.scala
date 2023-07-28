@@ -8,14 +8,15 @@ package pg_catalog
 package pg_sequences
 
 import adventureworks.TypoRegtype
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -37,17 +38,17 @@ object PgSequencesViewRow {
   implicit val reads: Reads[PgSequencesViewRow] = Reads[PgSequencesViewRow](json => JsResult.fromTry(
       Try(
         PgSequencesViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          sequencename = json.\("sequencename").toOption.map(_.as[String]),
-          sequenceowner = json.\("sequenceowner").toOption.map(_.as[String]),
-          dataType = json.\("data_type").toOption.map(_.as[TypoRegtype]),
-          startValue = json.\("start_value").toOption.map(_.as[Long]),
-          minValue = json.\("min_value").toOption.map(_.as[Long]),
-          maxValue = json.\("max_value").toOption.map(_.as[Long]),
-          incrementBy = json.\("increment_by").toOption.map(_.as[Long]),
-          cycle = json.\("cycle").toOption.map(_.as[Boolean]),
-          cacheSize = json.\("cache_size").toOption.map(_.as[Long]),
-          lastValue = json.\("last_value").toOption.map(_.as[Long])
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          sequencename = json.\("sequencename").toOption.map(_.as(Reads.StringReads)),
+          sequenceowner = json.\("sequenceowner").toOption.map(_.as(Reads.StringReads)),
+          dataType = json.\("data_type").toOption.map(_.as(TypoRegtype.reads)),
+          startValue = json.\("start_value").toOption.map(_.as(Reads.LongReads)),
+          minValue = json.\("min_value").toOption.map(_.as(Reads.LongReads)),
+          maxValue = json.\("max_value").toOption.map(_.as(Reads.LongReads)),
+          incrementBy = json.\("increment_by").toOption.map(_.as(Reads.LongReads)),
+          cycle = json.\("cycle").toOption.map(_.as(Reads.BooleanReads)),
+          cacheSize = json.\("cache_size").toOption.map(_.as(Reads.LongReads)),
+          lastValue = json.\("last_value").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -55,33 +56,33 @@ object PgSequencesViewRow {
   def rowParser(idx: Int): RowParser[PgSequencesViewRow] = RowParser[PgSequencesViewRow] { row =>
     Success(
       PgSequencesViewRow(
-        schemaname = row[Option[String]](idx + 0),
-        sequencename = row[Option[String]](idx + 1),
-        sequenceowner = row[Option[String]](idx + 2),
-        dataType = row[Option[TypoRegtype]](idx + 3),
-        startValue = row[Option[Long]](idx + 4),
-        minValue = row[Option[Long]](idx + 5),
-        maxValue = row[Option[Long]](idx + 6),
-        incrementBy = row[Option[Long]](idx + 7),
-        cycle = row[Option[Boolean]](idx + 8),
-        cacheSize = row[Option[Long]](idx + 9),
-        lastValue = row[Option[Long]](idx + 10)
+        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        sequencename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        sequenceowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        dataType = row(idx + 3)(Column.columnToOption(TypoRegtype.column)),
+        startValue = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        minValue = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        maxValue = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        incrementBy = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        cycle = row(idx + 8)(Column.columnToOption(Column.columnToBoolean)),
+        cacheSize = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        lastValue = row(idx + 10)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgSequencesViewRow] = OWrites[PgSequencesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Json.toJson(o.schemaname),
-      "sequencename" -> Json.toJson(o.sequencename),
-      "sequenceowner" -> Json.toJson(o.sequenceowner),
-      "data_type" -> Json.toJson(o.dataType),
-      "start_value" -> Json.toJson(o.startValue),
-      "min_value" -> Json.toJson(o.minValue),
-      "max_value" -> Json.toJson(o.maxValue),
-      "increment_by" -> Json.toJson(o.incrementBy),
-      "cycle" -> Json.toJson(o.cycle),
-      "cache_size" -> Json.toJson(o.cacheSize),
-      "last_value" -> Json.toJson(o.lastValue)
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "sequencename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.sequencename),
+      "sequenceowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.sequenceowner),
+      "data_type" -> Writes.OptionWrites(TypoRegtype.writes).writes(o.dataType),
+      "start_value" -> Writes.OptionWrites(Writes.LongWrites).writes(o.startValue),
+      "min_value" -> Writes.OptionWrites(Writes.LongWrites).writes(o.minValue),
+      "max_value" -> Writes.OptionWrites(Writes.LongWrites).writes(o.maxValue),
+      "increment_by" -> Writes.OptionWrites(Writes.LongWrites).writes(o.incrementBy),
+      "cycle" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.cycle),
+      "cache_size" -> Writes.OptionWrites(Writes.LongWrites).writes(o.cacheSize),
+      "last_value" -> Writes.OptionWrites(Writes.LongWrites).writes(o.lastValue)
     ))
   )
 }

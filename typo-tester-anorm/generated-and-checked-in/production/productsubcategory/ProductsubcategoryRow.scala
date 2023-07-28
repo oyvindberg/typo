@@ -10,15 +10,16 @@ package productsubcategory
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -38,11 +39,11 @@ object ProductsubcategoryRow {
   implicit val reads: Reads[ProductsubcategoryRow] = Reads[ProductsubcategoryRow](json => JsResult.fromTry(
       Try(
         ProductsubcategoryRow(
-          productsubcategoryid = json.\("productsubcategoryid").as[ProductsubcategoryId],
-          productcategoryid = json.\("productcategoryid").as[ProductcategoryId],
-          name = json.\("name").as[Name],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productsubcategoryid = json.\("productsubcategoryid").as(ProductsubcategoryId.reads),
+          productcategoryid = json.\("productcategoryid").as(ProductcategoryId.reads),
+          name = json.\("name").as(Name.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -50,21 +51,21 @@ object ProductsubcategoryRow {
   def rowParser(idx: Int): RowParser[ProductsubcategoryRow] = RowParser[ProductsubcategoryRow] { row =>
     Success(
       ProductsubcategoryRow(
-        productsubcategoryid = row[ProductsubcategoryId](idx + 0),
-        productcategoryid = row[ProductcategoryId](idx + 1),
-        name = row[Name](idx + 2),
-        rowguid = row[UUID](idx + 3),
-        modifieddate = row[TypoLocalDateTime](idx + 4)
+        productsubcategoryid = row(idx + 0)(ProductsubcategoryId.column),
+        productcategoryid = row(idx + 1)(ProductcategoryId.column),
+        name = row(idx + 2)(Name.column),
+        rowguid = row(idx + 3)(Column.columnToUUID),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductsubcategoryRow] = OWrites[ProductsubcategoryRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productsubcategoryid" -> Json.toJson(o.productsubcategoryid),
-      "productcategoryid" -> Json.toJson(o.productcategoryid),
-      "name" -> Json.toJson(o.name),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productsubcategoryid" -> ProductsubcategoryId.writes.writes(o.productsubcategoryid),
+      "productcategoryid" -> ProductcategoryId.writes.writes(o.productcategoryid),
+      "name" -> Name.writes.writes(o.name),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

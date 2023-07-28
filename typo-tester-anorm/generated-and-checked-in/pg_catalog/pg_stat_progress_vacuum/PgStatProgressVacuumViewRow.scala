@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_vacuum
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -36,17 +37,17 @@ object PgStatProgressVacuumViewRow {
   implicit val reads: Reads[PgStatProgressVacuumViewRow] = Reads[PgStatProgressVacuumViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressVacuumViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
-          datname = json.\("datname").toOption.map(_.as[String]),
-          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-          phase = json.\("phase").toOption.map(_.as[String]),
-          heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as[Long]),
-          heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as[Long]),
-          heapBlksVacuumed = json.\("heap_blks_vacuumed").toOption.map(_.as[Long]),
-          indexVacuumCount = json.\("index_vacuum_count").toOption.map(_.as[Long]),
-          maxDeadTuples = json.\("max_dead_tuples").toOption.map(_.as[Long]),
-          numDeadTuples = json.\("num_dead_tuples").toOption.map(_.as[Long])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
+          datname = json.\("datname").toOption.map(_.as(Reads.StringReads)),
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          phase = json.\("phase").toOption.map(_.as(Reads.StringReads)),
+          heapBlksTotal = json.\("heap_blks_total").toOption.map(_.as(Reads.LongReads)),
+          heapBlksScanned = json.\("heap_blks_scanned").toOption.map(_.as(Reads.LongReads)),
+          heapBlksVacuumed = json.\("heap_blks_vacuumed").toOption.map(_.as(Reads.LongReads)),
+          indexVacuumCount = json.\("index_vacuum_count").toOption.map(_.as(Reads.LongReads)),
+          maxDeadTuples = json.\("max_dead_tuples").toOption.map(_.as(Reads.LongReads)),
+          numDeadTuples = json.\("num_dead_tuples").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -54,33 +55,33 @@ object PgStatProgressVacuumViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressVacuumViewRow] = RowParser[PgStatProgressVacuumViewRow] { row =>
     Success(
       PgStatProgressVacuumViewRow(
-        pid = row[Option[Int]](idx + 0),
-        datid = row[Option[/* oid */ Long]](idx + 1),
-        datname = row[Option[String]](idx + 2),
-        relid = row[Option[/* oid */ Long]](idx + 3),
-        phase = row[Option[String]](idx + 4),
-        heapBlksTotal = row[Option[Long]](idx + 5),
-        heapBlksScanned = row[Option[Long]](idx + 6),
-        heapBlksVacuumed = row[Option[Long]](idx + 7),
-        indexVacuumCount = row[Option[Long]](idx + 8),
-        maxDeadTuples = row[Option[Long]](idx + 9),
-        numDeadTuples = row[Option[Long]](idx + 10)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        datid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        datname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        phase = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        heapBlksTotal = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        heapBlksScanned = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        heapBlksVacuumed = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        indexVacuumCount = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        maxDeadTuples = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        numDeadTuples = row(idx + 10)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgStatProgressVacuumViewRow] = OWrites[PgStatProgressVacuumViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "datid" -> Json.toJson(o.datid),
-      "datname" -> Json.toJson(o.datname),
-      "relid" -> Json.toJson(o.relid),
-      "phase" -> Json.toJson(o.phase),
-      "heap_blks_total" -> Json.toJson(o.heapBlksTotal),
-      "heap_blks_scanned" -> Json.toJson(o.heapBlksScanned),
-      "heap_blks_vacuumed" -> Json.toJson(o.heapBlksVacuumed),
-      "index_vacuum_count" -> Json.toJson(o.indexVacuumCount),
-      "max_dead_tuples" -> Json.toJson(o.maxDeadTuples),
-      "num_dead_tuples" -> Json.toJson(o.numDeadTuples)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
+      "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "phase" -> Writes.OptionWrites(Writes.StringWrites).writes(o.phase),
+      "heap_blks_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapBlksTotal),
+      "heap_blks_scanned" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapBlksScanned),
+      "heap_blks_vacuumed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.heapBlksVacuumed),
+      "index_vacuum_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexVacuumCount),
+      "max_dead_tuples" -> Writes.OptionWrites(Writes.LongWrites).writes(o.maxDeadTuples),
+      "num_dead_tuples" -> Writes.OptionWrites(Writes.LongWrites).writes(o.numDeadTuples)
     ))
   )
 }

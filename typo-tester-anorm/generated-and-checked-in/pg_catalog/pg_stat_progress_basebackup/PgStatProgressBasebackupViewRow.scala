@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_basebackup
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,12 +32,12 @@ object PgStatProgressBasebackupViewRow {
   implicit val reads: Reads[PgStatProgressBasebackupViewRow] = Reads[PgStatProgressBasebackupViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressBasebackupViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          phase = json.\("phase").toOption.map(_.as[String]),
-          backupTotal = json.\("backup_total").toOption.map(_.as[Long]),
-          backupStreamed = json.\("backup_streamed").toOption.map(_.as[Long]),
-          tablespacesTotal = json.\("tablespaces_total").toOption.map(_.as[Long]),
-          tablespacesStreamed = json.\("tablespaces_streamed").toOption.map(_.as[Long])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          phase = json.\("phase").toOption.map(_.as(Reads.StringReads)),
+          backupTotal = json.\("backup_total").toOption.map(_.as(Reads.LongReads)),
+          backupStreamed = json.\("backup_streamed").toOption.map(_.as(Reads.LongReads)),
+          tablespacesTotal = json.\("tablespaces_total").toOption.map(_.as(Reads.LongReads)),
+          tablespacesStreamed = json.\("tablespaces_streamed").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -44,23 +45,23 @@ object PgStatProgressBasebackupViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressBasebackupViewRow] = RowParser[PgStatProgressBasebackupViewRow] { row =>
     Success(
       PgStatProgressBasebackupViewRow(
-        pid = row[Option[Int]](idx + 0),
-        phase = row[Option[String]](idx + 1),
-        backupTotal = row[Option[Long]](idx + 2),
-        backupStreamed = row[Option[Long]](idx + 3),
-        tablespacesTotal = row[Option[Long]](idx + 4),
-        tablespacesStreamed = row[Option[Long]](idx + 5)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        phase = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        backupTotal = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        backupStreamed = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        tablespacesTotal = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        tablespacesStreamed = row(idx + 5)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgStatProgressBasebackupViewRow] = OWrites[PgStatProgressBasebackupViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "phase" -> Json.toJson(o.phase),
-      "backup_total" -> Json.toJson(o.backupTotal),
-      "backup_streamed" -> Json.toJson(o.backupStreamed),
-      "tablespaces_total" -> Json.toJson(o.tablespacesTotal),
-      "tablespaces_streamed" -> Json.toJson(o.tablespacesStreamed)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "phase" -> Writes.OptionWrites(Writes.StringWrites).writes(o.phase),
+      "backup_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.backupTotal),
+      "backup_streamed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.backupStreamed),
+      "tablespaces_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tablespacesTotal),
+      "tablespaces_streamed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tablespacesStreamed)
     ))
   )
 }

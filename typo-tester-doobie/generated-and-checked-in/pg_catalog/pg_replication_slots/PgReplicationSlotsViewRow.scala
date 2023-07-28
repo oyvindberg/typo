@@ -9,8 +9,8 @@ package pg_replication_slots
 
 import adventureworks.TypoXid
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -34,42 +34,42 @@ case class PgReplicationSlotsViewRow(
 )
 
 object PgReplicationSlotsViewRow {
-  implicit val decoder: Decoder[PgReplicationSlotsViewRow] = Decoder.forProduct15[PgReplicationSlotsViewRow, Option[String], Option[String], Option[String], Option[/* oid */ Long], Option[String], Option[Boolean], Option[Boolean], Option[Int], Option[TypoXid], Option[TypoXid], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[String], Option[Long], Option[Boolean]]("slot_name", "plugin", "slot_type", "datoid", "database", "temporary", "active", "active_pid", "xmin", "catalog_xmin", "restart_lsn", "confirmed_flush_lsn", "wal_status", "safe_wal_size", "two_phase")(PgReplicationSlotsViewRow.apply)
-  implicit val encoder: Encoder[PgReplicationSlotsViewRow] = Encoder.forProduct15[PgReplicationSlotsViewRow, Option[String], Option[String], Option[String], Option[/* oid */ Long], Option[String], Option[Boolean], Option[Boolean], Option[Int], Option[TypoXid], Option[TypoXid], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[String], Option[Long], Option[Boolean]]("slot_name", "plugin", "slot_type", "datoid", "database", "temporary", "active", "active_pid", "xmin", "catalog_xmin", "restart_lsn", "confirmed_flush_lsn", "wal_status", "safe_wal_size", "two_phase")(x => (x.slotName, x.plugin, x.slotType, x.datoid, x.database, x.temporary, x.active, x.activePid, x.xmin, x.catalogXmin, x.restartLsn, x.confirmedFlushLsn, x.walStatus, x.safeWalSize, x.twoPhase))
+  implicit val decoder: Decoder[PgReplicationSlotsViewRow] = Decoder.forProduct15[PgReplicationSlotsViewRow, Option[String], Option[String], Option[String], Option[/* oid */ Long], Option[String], Option[Boolean], Option[Boolean], Option[Int], Option[TypoXid], Option[TypoXid], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[String], Option[Long], Option[Boolean]]("slot_name", "plugin", "slot_type", "datoid", "database", "temporary", "active", "active_pid", "xmin", "catalog_xmin", "restart_lsn", "confirmed_flush_lsn", "wal_status", "safe_wal_size", "two_phase")(PgReplicationSlotsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeBoolean))
+  implicit val encoder: Encoder[PgReplicationSlotsViewRow] = Encoder.forProduct15[PgReplicationSlotsViewRow, Option[String], Option[String], Option[String], Option[/* oid */ Long], Option[String], Option[Boolean], Option[Boolean], Option[Int], Option[TypoXid], Option[TypoXid], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[String], Option[Long], Option[Boolean]]("slot_name", "plugin", "slot_type", "datoid", "database", "temporary", "active", "active_pid", "xmin", "catalog_xmin", "restart_lsn", "confirmed_flush_lsn", "wal_status", "safe_wal_size", "two_phase")(x => (x.slotName, x.plugin, x.slotType, x.datoid, x.database, x.temporary, x.active, x.activePid, x.xmin, x.catalogXmin, x.restartLsn, x.confirmedFlushLsn, x.walStatus, x.safeWalSize, x.twoPhase))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeBoolean))
   implicit val read: Read[PgReplicationSlotsViewRow] = new Read[PgReplicationSlotsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[TypoXid], Nullability.Nullable),
-      (Get[TypoXid], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoXid.get, Nullability.Nullable),
+      (TypoXid.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgReplicationSlotsViewRow(
-      slotName = Get[String].unsafeGetNullable(rs, i + 0),
-      plugin = Get[String].unsafeGetNullable(rs, i + 1),
-      slotType = Get[String].unsafeGetNullable(rs, i + 2),
-      datoid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-      database = Get[String].unsafeGetNullable(rs, i + 4),
-      temporary = Get[Boolean].unsafeGetNullable(rs, i + 5),
-      active = Get[Boolean].unsafeGetNullable(rs, i + 6),
-      activePid = Get[Int].unsafeGetNullable(rs, i + 7),
-      xmin = Get[TypoXid].unsafeGetNullable(rs, i + 8),
-      catalogXmin = Get[TypoXid].unsafeGetNullable(rs, i + 9),
-      restartLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 10),
-      confirmedFlushLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 11),
-      walStatus = Get[String].unsafeGetNullable(rs, i + 12),
-      safeWalSize = Get[Long].unsafeGetNullable(rs, i + 13),
-      twoPhase = Get[Boolean].unsafeGetNullable(rs, i + 14)
+      slotName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      plugin = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      slotType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      datoid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      database = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      temporary = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 5),
+      active = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 6),
+      activePid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
+      xmin = TypoXid.get.unsafeGetNullable(rs, i + 8),
+      catalogXmin = TypoXid.get.unsafeGetNullable(rs, i + 9),
+      restartLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10),
+      confirmedFlushLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 11),
+      walStatus = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
+      safeWalSize = Meta.LongMeta.get.unsafeGetNullable(rs, i + 13),
+      twoPhase = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 14)
     )
   )
 }

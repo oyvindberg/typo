@@ -10,15 +10,16 @@ package bec
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -40,12 +41,12 @@ object BecViewRow {
   implicit val reads: Reads[BecViewRow] = Reads[BecViewRow](json => JsResult.fromTry(
       Try(
         BecViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          personid = json.\("personid").toOption.map(_.as[BusinessentityId]),
-          contacttypeid = json.\("contacttypeid").toOption.map(_.as[ContacttypeId]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          personid = json.\("personid").toOption.map(_.as(BusinessentityId.reads)),
+          contacttypeid = json.\("contacttypeid").toOption.map(_.as(ContacttypeId.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -53,23 +54,23 @@ object BecViewRow {
   def rowParser(idx: Int): RowParser[BecViewRow] = RowParser[BecViewRow] { row =>
     Success(
       BecViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        personid = row[Option[BusinessentityId]](idx + 2),
-        contacttypeid = row[Option[ContacttypeId]](idx + 3),
-        rowguid = row[Option[UUID]](idx + 4),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        personid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
+        contacttypeid = row(idx + 3)(Column.columnToOption(ContacttypeId.column)),
+        rowguid = row(idx + 4)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[BecViewRow] = OWrites[BecViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "personid" -> Json.toJson(o.personid),
-      "contacttypeid" -> Json.toJson(o.contacttypeid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "personid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.personid),
+      "contacttypeid" -> Writes.OptionWrites(ContacttypeId.writes).writes(o.contacttypeid),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

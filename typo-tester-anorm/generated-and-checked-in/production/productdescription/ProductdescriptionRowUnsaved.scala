@@ -13,9 +13,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -52,20 +52,20 @@ object ProductdescriptionRowUnsaved {
   implicit val reads: Reads[ProductdescriptionRowUnsaved] = Reads[ProductdescriptionRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductdescriptionRowUnsaved(
-          description = json.\("description").as[/* max 400 chars */ String],
-          productdescriptionid = json.\("productdescriptionid").as[Defaulted[ProductdescriptionId]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          description = json.\("description").as(Reads.StringReads),
+          productdescriptionid = json.\("productdescriptionid").as(Defaulted.reads(ProductdescriptionId.reads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductdescriptionRowUnsaved] = OWrites[ProductdescriptionRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "description" -> Json.toJson(o.description),
-      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "description" -> Writes.StringWrites.writes(o.description),
+      "productdescriptionid" -> Defaulted.writes(ProductdescriptionId.writes).writes(o.productdescriptionid),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -8,6 +8,7 @@ package public
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -16,11 +17,11 @@ import io.circe.Encoder
   */
 case class OrderNumber(value: String) extends AnyVal
 object OrderNumber {
-  implicit val arrayGet: Get[Array[OrderNumber]] = Get[Array[String]].map(_.map(OrderNumber.apply))
-  implicit val arrayPut: Put[Array[OrderNumber]] = Put[Array[String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[OrderNumber] = Decoder[String].map(OrderNumber.apply)
-  implicit val encoder: Encoder[OrderNumber] = Encoder[String].contramap(_.value)
-  implicit val get: Get[OrderNumber] = Get[String].map(OrderNumber.apply)
+  implicit val arrayGet: Get[Array[OrderNumber]] = adventureworks.StringArrayMeta.get.map(_.map(OrderNumber.apply))
+  implicit val arrayPut: Put[Array[OrderNumber]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[OrderNumber] = Decoder.decodeString.map(OrderNumber.apply)
+  implicit val encoder: Encoder[OrderNumber] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[OrderNumber] = Meta.StringMeta.get.map(OrderNumber.apply)
   implicit val ordering: Ordering[OrderNumber] = Ordering.by(_.value)
-  implicit val put: Put[OrderNumber] = Put[String].contramap(_.value)
+  implicit val put: Put[OrderNumber] = Meta.StringMeta.put.contramap(_.value)
 }

@@ -15,9 +15,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,10 +54,10 @@ object TypoBox {
   implicit val reads: Reads[TypoBox] = Reads[TypoBox](json => JsResult.fromTry(
       Try(
         TypoBox(
-          x1 = json.\("x1").as[Double],
-          y1 = json.\("y1").as[Double],
-          x2 = json.\("x2").as[Double],
-          y2 = json.\("y2").as[Double]
+          x1 = json.\("x1").as(Reads.DoubleReads),
+          y1 = json.\("y1").as(Reads.DoubleReads),
+          x2 = json.\("x2").as(Reads.DoubleReads),
+          y2 = json.\("y2").as(Reads.DoubleReads)
         )
       )
     ),
@@ -65,10 +65,10 @@ object TypoBox {
   implicit val toStatement: ToStatement[TypoBox] = ToStatement[TypoBox]((s, index, v) => s.setObject(index, new PGbox(v.x1, v.y1, v.x2, v.y2)))
   implicit val writes: OWrites[TypoBox] = OWrites[TypoBox](o =>
     new JsObject(ListMap[String, JsValue](
-      "x1" -> Json.toJson(o.x1),
-      "y1" -> Json.toJson(o.y1),
-      "x2" -> Json.toJson(o.x2),
-      "y2" -> Json.toJson(o.y2)
+      "x1" -> Writes.DoubleWrites.writes(o.x1),
+      "y1" -> Writes.DoubleWrites.writes(o.y1),
+      "x2" -> Writes.DoubleWrites.writes(o.x2),
+      "y2" -> Writes.DoubleWrites.writes(o.y2)
     ))
   )
 }

@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_hba_file_rules
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,15 +35,15 @@ object PgHbaFileRulesViewRow {
   implicit val reads: Reads[PgHbaFileRulesViewRow] = Reads[PgHbaFileRulesViewRow](json => JsResult.fromTry(
       Try(
         PgHbaFileRulesViewRow(
-          lineNumber = json.\("line_number").toOption.map(_.as[Int]),
-          `type` = json.\("type").toOption.map(_.as[String]),
-          database = json.\("database").toOption.map(_.as[Array[String]]),
-          userName = json.\("user_name").toOption.map(_.as[Array[String]]),
-          address = json.\("address").toOption.map(_.as[String]),
-          netmask = json.\("netmask").toOption.map(_.as[String]),
-          authMethod = json.\("auth_method").toOption.map(_.as[String]),
-          options = json.\("options").toOption.map(_.as[Array[String]]),
-          error = json.\("error").toOption.map(_.as[String])
+          lineNumber = json.\("line_number").toOption.map(_.as(Reads.IntReads)),
+          `type` = json.\("type").toOption.map(_.as(Reads.StringReads)),
+          database = json.\("database").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          userName = json.\("user_name").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          address = json.\("address").toOption.map(_.as(Reads.StringReads)),
+          netmask = json.\("netmask").toOption.map(_.as(Reads.StringReads)),
+          authMethod = json.\("auth_method").toOption.map(_.as(Reads.StringReads)),
+          options = json.\("options").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          error = json.\("error").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -50,29 +51,29 @@ object PgHbaFileRulesViewRow {
   def rowParser(idx: Int): RowParser[PgHbaFileRulesViewRow] = RowParser[PgHbaFileRulesViewRow] { row =>
     Success(
       PgHbaFileRulesViewRow(
-        lineNumber = row[Option[Int]](idx + 0),
-        `type` = row[Option[String]](idx + 1),
-        database = row[Option[Array[String]]](idx + 2),
-        userName = row[Option[Array[String]]](idx + 3),
-        address = row[Option[String]](idx + 4),
-        netmask = row[Option[String]](idx + 5),
-        authMethod = row[Option[String]](idx + 6),
-        options = row[Option[Array[String]]](idx + 7),
-        error = row[Option[String]](idx + 8)
+        lineNumber = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        `type` = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        database = row(idx + 2)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        userName = row(idx + 3)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        address = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        netmask = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        authMethod = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        options = row(idx + 7)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        error = row(idx + 8)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgHbaFileRulesViewRow] = OWrites[PgHbaFileRulesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "line_number" -> Json.toJson(o.lineNumber),
-      "type" -> Json.toJson(o.`type`),
-      "database" -> Json.toJson(o.database),
-      "user_name" -> Json.toJson(o.userName),
-      "address" -> Json.toJson(o.address),
-      "netmask" -> Json.toJson(o.netmask),
-      "auth_method" -> Json.toJson(o.authMethod),
-      "options" -> Json.toJson(o.options),
-      "error" -> Json.toJson(o.error)
+      "line_number" -> Writes.OptionWrites(Writes.IntWrites).writes(o.lineNumber),
+      "type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`type`),
+      "database" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.database),
+      "user_name" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.userName),
+      "address" -> Writes.OptionWrites(Writes.StringWrites).writes(o.address),
+      "netmask" -> Writes.OptionWrites(Writes.StringWrites).writes(o.netmask),
+      "auth_method" -> Writes.OptionWrites(Writes.StringWrites).writes(o.authMethod),
+      "options" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.options),
+      "error" -> Writes.OptionWrites(Writes.StringWrites).writes(o.error)
     ))
   )
 }

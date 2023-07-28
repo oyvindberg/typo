@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_copy
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,16 +36,16 @@ object PgStatProgressCopyViewRow {
   implicit val reads: Reads[PgStatProgressCopyViewRow] = Reads[PgStatProgressCopyViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressCopyViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
-          datname = json.\("datname").toOption.map(_.as[String]),
-          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-          command = json.\("command").toOption.map(_.as[String]),
-          `type` = json.\("type").toOption.map(_.as[String]),
-          bytesProcessed = json.\("bytes_processed").toOption.map(_.as[Long]),
-          bytesTotal = json.\("bytes_total").toOption.map(_.as[Long]),
-          tuplesProcessed = json.\("tuples_processed").toOption.map(_.as[Long]),
-          tuplesExcluded = json.\("tuples_excluded").toOption.map(_.as[Long])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
+          datname = json.\("datname").toOption.map(_.as(Reads.StringReads)),
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          command = json.\("command").toOption.map(_.as(Reads.StringReads)),
+          `type` = json.\("type").toOption.map(_.as(Reads.StringReads)),
+          bytesProcessed = json.\("bytes_processed").toOption.map(_.as(Reads.LongReads)),
+          bytesTotal = json.\("bytes_total").toOption.map(_.as(Reads.LongReads)),
+          tuplesProcessed = json.\("tuples_processed").toOption.map(_.as(Reads.LongReads)),
+          tuplesExcluded = json.\("tuples_excluded").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -52,31 +53,31 @@ object PgStatProgressCopyViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressCopyViewRow] = RowParser[PgStatProgressCopyViewRow] { row =>
     Success(
       PgStatProgressCopyViewRow(
-        pid = row[Option[Int]](idx + 0),
-        datid = row[Option[/* oid */ Long]](idx + 1),
-        datname = row[Option[String]](idx + 2),
-        relid = row[Option[/* oid */ Long]](idx + 3),
-        command = row[Option[String]](idx + 4),
-        `type` = row[Option[String]](idx + 5),
-        bytesProcessed = row[Option[Long]](idx + 6),
-        bytesTotal = row[Option[Long]](idx + 7),
-        tuplesProcessed = row[Option[Long]](idx + 8),
-        tuplesExcluded = row[Option[Long]](idx + 9)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        datid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        datname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        command = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        `type` = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        bytesProcessed = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        bytesTotal = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        tuplesProcessed = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        tuplesExcluded = row(idx + 9)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgStatProgressCopyViewRow] = OWrites[PgStatProgressCopyViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "datid" -> Json.toJson(o.datid),
-      "datname" -> Json.toJson(o.datname),
-      "relid" -> Json.toJson(o.relid),
-      "command" -> Json.toJson(o.command),
-      "type" -> Json.toJson(o.`type`),
-      "bytes_processed" -> Json.toJson(o.bytesProcessed),
-      "bytes_total" -> Json.toJson(o.bytesTotal),
-      "tuples_processed" -> Json.toJson(o.tuplesProcessed),
-      "tuples_excluded" -> Json.toJson(o.tuplesExcluded)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
+      "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "command" -> Writes.OptionWrites(Writes.StringWrites).writes(o.command),
+      "type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`type`),
+      "bytes_processed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.bytesProcessed),
+      "bytes_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.bytesTotal),
+      "tuples_processed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tuplesProcessed),
+      "tuples_excluded" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tuplesExcluded)
     ))
   )
 }

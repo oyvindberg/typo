@@ -8,14 +8,15 @@ package pg_catalog
 package pg_stat_wal_receiver
 
 import adventureworks.TypoOffsetDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -41,21 +42,21 @@ object PgStatWalReceiverViewRow {
   implicit val reads: Reads[PgStatWalReceiverViewRow] = Reads[PgStatWalReceiverViewRow](json => JsResult.fromTry(
       Try(
         PgStatWalReceiverViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          status = json.\("status").toOption.map(_.as[String]),
-          receiveStartLsn = json.\("receive_start_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          receiveStartTli = json.\("receive_start_tli").toOption.map(_.as[Int]),
-          writtenLsn = json.\("written_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          flushedLsn = json.\("flushed_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          receivedTli = json.\("received_tli").toOption.map(_.as[Int]),
-          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[TypoOffsetDateTime]),
-          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[TypoOffsetDateTime]),
-          latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          latestEndTime = json.\("latest_end_time").toOption.map(_.as[TypoOffsetDateTime]),
-          slotName = json.\("slot_name").toOption.map(_.as[String]),
-          senderHost = json.\("sender_host").toOption.map(_.as[String]),
-          senderPort = json.\("sender_port").toOption.map(_.as[Int]),
-          conninfo = json.\("conninfo").toOption.map(_.as[String])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          status = json.\("status").toOption.map(_.as(Reads.StringReads)),
+          receiveStartLsn = json.\("receive_start_lsn").toOption.map(_.as(Reads.LongReads)),
+          receiveStartTli = json.\("receive_start_tli").toOption.map(_.as(Reads.IntReads)),
+          writtenLsn = json.\("written_lsn").toOption.map(_.as(Reads.LongReads)),
+          flushedLsn = json.\("flushed_lsn").toOption.map(_.as(Reads.LongReads)),
+          receivedTli = json.\("received_tli").toOption.map(_.as(Reads.IntReads)),
+          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as(Reads.LongReads)),
+          latestEndTime = json.\("latest_end_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          slotName = json.\("slot_name").toOption.map(_.as(Reads.StringReads)),
+          senderHost = json.\("sender_host").toOption.map(_.as(Reads.StringReads)),
+          senderPort = json.\("sender_port").toOption.map(_.as(Reads.IntReads)),
+          conninfo = json.\("conninfo").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -63,41 +64,41 @@ object PgStatWalReceiverViewRow {
   def rowParser(idx: Int): RowParser[PgStatWalReceiverViewRow] = RowParser[PgStatWalReceiverViewRow] { row =>
     Success(
       PgStatWalReceiverViewRow(
-        pid = row[Option[Int]](idx + 0),
-        status = row[Option[String]](idx + 1),
-        receiveStartLsn = row[Option[/* pg_lsn */ Long]](idx + 2),
-        receiveStartTli = row[Option[Int]](idx + 3),
-        writtenLsn = row[Option[/* pg_lsn */ Long]](idx + 4),
-        flushedLsn = row[Option[/* pg_lsn */ Long]](idx + 5),
-        receivedTli = row[Option[Int]](idx + 6),
-        lastMsgSendTime = row[Option[TypoOffsetDateTime]](idx + 7),
-        lastMsgReceiptTime = row[Option[TypoOffsetDateTime]](idx + 8),
-        latestEndLsn = row[Option[/* pg_lsn */ Long]](idx + 9),
-        latestEndTime = row[Option[TypoOffsetDateTime]](idx + 10),
-        slotName = row[Option[String]](idx + 11),
-        senderHost = row[Option[String]](idx + 12),
-        senderPort = row[Option[Int]](idx + 13),
-        conninfo = row[Option[String]](idx + 14)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        status = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        receiveStartLsn = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        receiveStartTli = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
+        writtenLsn = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        flushedLsn = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        receivedTli = row(idx + 6)(Column.columnToOption(Column.columnToInt)),
+        lastMsgSendTime = row(idx + 7)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastMsgReceiptTime = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column)),
+        latestEndLsn = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        latestEndTime = row(idx + 10)(Column.columnToOption(TypoOffsetDateTime.column)),
+        slotName = row(idx + 11)(Column.columnToOption(Column.columnToString)),
+        senderHost = row(idx + 12)(Column.columnToOption(Column.columnToString)),
+        senderPort = row(idx + 13)(Column.columnToOption(Column.columnToInt)),
+        conninfo = row(idx + 14)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgStatWalReceiverViewRow] = OWrites[PgStatWalReceiverViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "status" -> Json.toJson(o.status),
-      "receive_start_lsn" -> Json.toJson(o.receiveStartLsn),
-      "receive_start_tli" -> Json.toJson(o.receiveStartTli),
-      "written_lsn" -> Json.toJson(o.writtenLsn),
-      "flushed_lsn" -> Json.toJson(o.flushedLsn),
-      "received_tli" -> Json.toJson(o.receivedTli),
-      "last_msg_send_time" -> Json.toJson(o.lastMsgSendTime),
-      "last_msg_receipt_time" -> Json.toJson(o.lastMsgReceiptTime),
-      "latest_end_lsn" -> Json.toJson(o.latestEndLsn),
-      "latest_end_time" -> Json.toJson(o.latestEndTime),
-      "slot_name" -> Json.toJson(o.slotName),
-      "sender_host" -> Json.toJson(o.senderHost),
-      "sender_port" -> Json.toJson(o.senderPort),
-      "conninfo" -> Json.toJson(o.conninfo)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "status" -> Writes.OptionWrites(Writes.StringWrites).writes(o.status),
+      "receive_start_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.receiveStartLsn),
+      "receive_start_tli" -> Writes.OptionWrites(Writes.IntWrites).writes(o.receiveStartTli),
+      "written_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.writtenLsn),
+      "flushed_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.flushedLsn),
+      "received_tli" -> Writes.OptionWrites(Writes.IntWrites).writes(o.receivedTli),
+      "last_msg_send_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgSendTime),
+      "last_msg_receipt_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgReceiptTime),
+      "latest_end_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.latestEndLsn),
+      "latest_end_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.latestEndTime),
+      "slot_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.slotName),
+      "sender_host" -> Writes.OptionWrites(Writes.StringWrites).writes(o.senderHost),
+      "sender_port" -> Writes.OptionWrites(Writes.IntWrites).writes(o.senderPort),
+      "conninfo" -> Writes.OptionWrites(Writes.StringWrites).writes(o.conninfo)
     ))
   )
 }

@@ -8,8 +8,8 @@ package pg_catalog
 package pg_ts_dict
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,24 +24,24 @@ case class PgTsDictRow(
 )
 
 object PgTsDictRow {
-  implicit val decoder: Decoder[PgTsDictRow] = Decoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(PgTsDictRow.apply)
-  implicit val encoder: Encoder[PgTsDictRow] = Encoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(x => (x.oid, x.dictname, x.dictnamespace, x.dictowner, x.dicttemplate, x.dictinitoption))
+  implicit val decoder: Decoder[PgTsDictRow] = Decoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(PgTsDictRow.apply)(PgTsDictId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgTsDictRow] = Encoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(x => (x.oid, x.dictname, x.dictnamespace, x.dictowner, x.dicttemplate, x.dictinitoption))(PgTsDictId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgTsDictRow] = new Read[PgTsDictRow](
     gets = List(
-      (Get[PgTsDictId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.Nullable)
+      (PgTsDictId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTsDictRow(
-      oid = Get[PgTsDictId].unsafeGetNonNullable(rs, i + 0),
-      dictname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      dictnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      dictowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      dicttemplate = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-      dictinitoption = Get[String].unsafeGetNullable(rs, i + 5)
+      oid = PgTsDictId.get.unsafeGetNonNullable(rs, i + 0),
+      dictname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      dictnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      dictowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      dicttemplate = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      dictinitoption = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

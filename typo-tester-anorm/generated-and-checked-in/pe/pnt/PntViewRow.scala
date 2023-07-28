@@ -10,14 +10,15 @@ package pnt
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,10 +36,10 @@ object PntViewRow {
   implicit val reads: Reads[PntViewRow] = Reads[PntViewRow](json => JsResult.fromTry(
       Try(
         PntViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as[PhonenumbertypeId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as(PhonenumbertypeId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -46,19 +47,19 @@ object PntViewRow {
   def rowParser(idx: Int): RowParser[PntViewRow] = RowParser[PntViewRow] { row =>
     Success(
       PntViewRow(
-        id = row[Option[Int]](idx + 0),
-        phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        phonenumbertypeid = row(idx + 1)(Column.columnToOption(PhonenumbertypeId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PntViewRow] = OWrites[PntViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "phonenumbertypeid" -> Writes.OptionWrites(PhonenumbertypeId.writes).writes(o.phonenumbertypeid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

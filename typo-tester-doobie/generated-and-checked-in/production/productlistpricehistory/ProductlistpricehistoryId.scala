@@ -15,7 +15,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `production.productlistpricehistory` */
 case class ProductlistpricehistoryId(productid: ProductId, startdate: TypoLocalDateTime)
 object ProductlistpricehistoryId {
-  implicit val decoder: Decoder[ProductlistpricehistoryId] = Decoder.forProduct2[ProductlistpricehistoryId, ProductId, TypoLocalDateTime]("productid", "startdate")(ProductlistpricehistoryId.apply)
-  implicit val encoder: Encoder[ProductlistpricehistoryId] = Encoder.forProduct2[ProductlistpricehistoryId, ProductId, TypoLocalDateTime]("productid", "startdate")(x => (x.productid, x.startdate))
+  implicit val decoder: Decoder[ProductlistpricehistoryId] = Decoder.forProduct2[ProductlistpricehistoryId, ProductId, TypoLocalDateTime]("productid", "startdate")(ProductlistpricehistoryId.apply)(ProductId.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ProductlistpricehistoryId] = Encoder.forProduct2[ProductlistpricehistoryId, ProductId, TypoLocalDateTime]("productid", "startdate")(x => (x.productid, x.startdate))(ProductId.encoder, TypoLocalDateTime.encoder)
   implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[ProductlistpricehistoryId] = Ordering.by(x => (x.productid, x.startdate))
 }

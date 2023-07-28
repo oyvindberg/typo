@@ -10,14 +10,15 @@ package domains
 import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -55,33 +56,33 @@ object DomainsViewRow {
   implicit val reads: Reads[DomainsViewRow] = Reads[DomainsViewRow](json => JsResult.fromTry(
       Try(
         DomainsViewRow(
-          domainCatalog = json.\("domain_catalog").toOption.map(_.as[SqlIdentifier]),
-          domainSchema = json.\("domain_schema").toOption.map(_.as[SqlIdentifier]),
-          domainName = json.\("domain_name").toOption.map(_.as[SqlIdentifier]),
-          dataType = json.\("data_type").toOption.map(_.as[CharacterData]),
-          characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as[CardinalNumber]),
-          characterOctetLength = json.\("character_octet_length").toOption.map(_.as[CardinalNumber]),
-          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
-          characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
-          characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier]),
-          collationCatalog = json.\("collation_catalog").toOption.map(_.as[SqlIdentifier]),
-          collationSchema = json.\("collation_schema").toOption.map(_.as[SqlIdentifier]),
-          collationName = json.\("collation_name").toOption.map(_.as[SqlIdentifier]),
-          numericPrecision = json.\("numeric_precision").toOption.map(_.as[CardinalNumber]),
-          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as[CardinalNumber]),
-          numericScale = json.\("numeric_scale").toOption.map(_.as[CardinalNumber]),
-          datetimePrecision = json.\("datetime_precision").toOption.map(_.as[CardinalNumber]),
-          intervalType = json.\("interval_type").toOption.map(_.as[CharacterData]),
-          intervalPrecision = json.\("interval_precision").toOption.map(_.as[CardinalNumber]),
-          domainDefault = json.\("domain_default").toOption.map(_.as[CharacterData]),
-          udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
-          udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
-          udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
-          scopeCatalog = json.\("scope_catalog").toOption.map(_.as[SqlIdentifier]),
-          scopeSchema = json.\("scope_schema").toOption.map(_.as[SqlIdentifier]),
-          scopeName = json.\("scope_name").toOption.map(_.as[SqlIdentifier]),
-          maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as[CardinalNumber]),
-          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as[SqlIdentifier])
+          domainCatalog = json.\("domain_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          domainSchema = json.\("domain_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          domainName = json.\("domain_name").toOption.map(_.as(SqlIdentifier.reads)),
+          dataType = json.\("data_type").toOption.map(_.as(CharacterData.reads)),
+          characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as(CardinalNumber.reads)),
+          characterOctetLength = json.\("character_octet_length").toOption.map(_.as(CardinalNumber.reads)),
+          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          characterSetSchema = json.\("character_set_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          characterSetName = json.\("character_set_name").toOption.map(_.as(SqlIdentifier.reads)),
+          collationCatalog = json.\("collation_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          collationSchema = json.\("collation_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          collationName = json.\("collation_name").toOption.map(_.as(SqlIdentifier.reads)),
+          numericPrecision = json.\("numeric_precision").toOption.map(_.as(CardinalNumber.reads)),
+          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as(CardinalNumber.reads)),
+          numericScale = json.\("numeric_scale").toOption.map(_.as(CardinalNumber.reads)),
+          datetimePrecision = json.\("datetime_precision").toOption.map(_.as(CardinalNumber.reads)),
+          intervalType = json.\("interval_type").toOption.map(_.as(CharacterData.reads)),
+          intervalPrecision = json.\("interval_precision").toOption.map(_.as(CardinalNumber.reads)),
+          domainDefault = json.\("domain_default").toOption.map(_.as(CharacterData.reads)),
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          udtSchema = json.\("udt_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          udtName = json.\("udt_name").toOption.map(_.as(SqlIdentifier.reads)),
+          scopeCatalog = json.\("scope_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          scopeSchema = json.\("scope_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          scopeName = json.\("scope_name").toOption.map(_.as(SqlIdentifier.reads)),
+          maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as(CardinalNumber.reads)),
+          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -89,65 +90,65 @@ object DomainsViewRow {
   def rowParser(idx: Int): RowParser[DomainsViewRow] = RowParser[DomainsViewRow] { row =>
     Success(
       DomainsViewRow(
-        domainCatalog = row[Option[SqlIdentifier]](idx + 0),
-        domainSchema = row[Option[SqlIdentifier]](idx + 1),
-        domainName = row[Option[SqlIdentifier]](idx + 2),
-        dataType = row[Option[CharacterData]](idx + 3),
-        characterMaximumLength = row[Option[CardinalNumber]](idx + 4),
-        characterOctetLength = row[Option[CardinalNumber]](idx + 5),
-        characterSetCatalog = row[Option[SqlIdentifier]](idx + 6),
-        characterSetSchema = row[Option[SqlIdentifier]](idx + 7),
-        characterSetName = row[Option[SqlIdentifier]](idx + 8),
-        collationCatalog = row[Option[SqlIdentifier]](idx + 9),
-        collationSchema = row[Option[SqlIdentifier]](idx + 10),
-        collationName = row[Option[SqlIdentifier]](idx + 11),
-        numericPrecision = row[Option[CardinalNumber]](idx + 12),
-        numericPrecisionRadix = row[Option[CardinalNumber]](idx + 13),
-        numericScale = row[Option[CardinalNumber]](idx + 14),
-        datetimePrecision = row[Option[CardinalNumber]](idx + 15),
-        intervalType = row[Option[CharacterData]](idx + 16),
-        intervalPrecision = row[Option[CardinalNumber]](idx + 17),
-        domainDefault = row[Option[CharacterData]](idx + 18),
-        udtCatalog = row[Option[SqlIdentifier]](idx + 19),
-        udtSchema = row[Option[SqlIdentifier]](idx + 20),
-        udtName = row[Option[SqlIdentifier]](idx + 21),
-        scopeCatalog = row[Option[SqlIdentifier]](idx + 22),
-        scopeSchema = row[Option[SqlIdentifier]](idx + 23),
-        scopeName = row[Option[SqlIdentifier]](idx + 24),
-        maximumCardinality = row[Option[CardinalNumber]](idx + 25),
-        dtdIdentifier = row[Option[SqlIdentifier]](idx + 26)
+        domainCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        domainSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        domainName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        dataType = row(idx + 3)(Column.columnToOption(CharacterData.column)),
+        characterMaximumLength = row(idx + 4)(Column.columnToOption(CardinalNumber.column)),
+        characterOctetLength = row(idx + 5)(Column.columnToOption(CardinalNumber.column)),
+        characterSetCatalog = row(idx + 6)(Column.columnToOption(SqlIdentifier.column)),
+        characterSetSchema = row(idx + 7)(Column.columnToOption(SqlIdentifier.column)),
+        characterSetName = row(idx + 8)(Column.columnToOption(SqlIdentifier.column)),
+        collationCatalog = row(idx + 9)(Column.columnToOption(SqlIdentifier.column)),
+        collationSchema = row(idx + 10)(Column.columnToOption(SqlIdentifier.column)),
+        collationName = row(idx + 11)(Column.columnToOption(SqlIdentifier.column)),
+        numericPrecision = row(idx + 12)(Column.columnToOption(CardinalNumber.column)),
+        numericPrecisionRadix = row(idx + 13)(Column.columnToOption(CardinalNumber.column)),
+        numericScale = row(idx + 14)(Column.columnToOption(CardinalNumber.column)),
+        datetimePrecision = row(idx + 15)(Column.columnToOption(CardinalNumber.column)),
+        intervalType = row(idx + 16)(Column.columnToOption(CharacterData.column)),
+        intervalPrecision = row(idx + 17)(Column.columnToOption(CardinalNumber.column)),
+        domainDefault = row(idx + 18)(Column.columnToOption(CharacterData.column)),
+        udtCatalog = row(idx + 19)(Column.columnToOption(SqlIdentifier.column)),
+        udtSchema = row(idx + 20)(Column.columnToOption(SqlIdentifier.column)),
+        udtName = row(idx + 21)(Column.columnToOption(SqlIdentifier.column)),
+        scopeCatalog = row(idx + 22)(Column.columnToOption(SqlIdentifier.column)),
+        scopeSchema = row(idx + 23)(Column.columnToOption(SqlIdentifier.column)),
+        scopeName = row(idx + 24)(Column.columnToOption(SqlIdentifier.column)),
+        maximumCardinality = row(idx + 25)(Column.columnToOption(CardinalNumber.column)),
+        dtdIdentifier = row(idx + 26)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[DomainsViewRow] = OWrites[DomainsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "domain_catalog" -> Json.toJson(o.domainCatalog),
-      "domain_schema" -> Json.toJson(o.domainSchema),
-      "domain_name" -> Json.toJson(o.domainName),
-      "data_type" -> Json.toJson(o.dataType),
-      "character_maximum_length" -> Json.toJson(o.characterMaximumLength),
-      "character_octet_length" -> Json.toJson(o.characterOctetLength),
-      "character_set_catalog" -> Json.toJson(o.characterSetCatalog),
-      "character_set_schema" -> Json.toJson(o.characterSetSchema),
-      "character_set_name" -> Json.toJson(o.characterSetName),
-      "collation_catalog" -> Json.toJson(o.collationCatalog),
-      "collation_schema" -> Json.toJson(o.collationSchema),
-      "collation_name" -> Json.toJson(o.collationName),
-      "numeric_precision" -> Json.toJson(o.numericPrecision),
-      "numeric_precision_radix" -> Json.toJson(o.numericPrecisionRadix),
-      "numeric_scale" -> Json.toJson(o.numericScale),
-      "datetime_precision" -> Json.toJson(o.datetimePrecision),
-      "interval_type" -> Json.toJson(o.intervalType),
-      "interval_precision" -> Json.toJson(o.intervalPrecision),
-      "domain_default" -> Json.toJson(o.domainDefault),
-      "udt_catalog" -> Json.toJson(o.udtCatalog),
-      "udt_schema" -> Json.toJson(o.udtSchema),
-      "udt_name" -> Json.toJson(o.udtName),
-      "scope_catalog" -> Json.toJson(o.scopeCatalog),
-      "scope_schema" -> Json.toJson(o.scopeSchema),
-      "scope_name" -> Json.toJson(o.scopeName),
-      "maximum_cardinality" -> Json.toJson(o.maximumCardinality),
-      "dtd_identifier" -> Json.toJson(o.dtdIdentifier)
+      "domain_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainCatalog),
+      "domain_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainSchema),
+      "domain_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainName),
+      "data_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.dataType),
+      "character_maximum_length" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.characterMaximumLength),
+      "character_octet_length" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.characterOctetLength),
+      "character_set_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetCatalog),
+      "character_set_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetSchema),
+      "character_set_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetName),
+      "collation_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationCatalog),
+      "collation_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationSchema),
+      "collation_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationName),
+      "numeric_precision" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericPrecision),
+      "numeric_precision_radix" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericPrecisionRadix),
+      "numeric_scale" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.numericScale),
+      "datetime_precision" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.datetimePrecision),
+      "interval_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.intervalType),
+      "interval_precision" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.intervalPrecision),
+      "domain_default" -> Writes.OptionWrites(CharacterData.writes).writes(o.domainDefault),
+      "udt_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtCatalog),
+      "udt_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtSchema),
+      "udt_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtName),
+      "scope_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.scopeCatalog),
+      "scope_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.scopeSchema),
+      "scope_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.scopeName),
+      "maximum_cardinality" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.maximumCardinality),
+      "dtd_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.dtdIdentifier)
     ))
   )
 }

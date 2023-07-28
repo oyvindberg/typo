@@ -8,16 +8,19 @@ package pg_catalog
 package pg_description
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_description where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_description where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
     sql"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
-          values (${unsaved.objoid}::oid, ${unsaved.classoid}::oid, ${unsaved.objsubid}::int4, ${unsaved.description})
+          values (${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))})
           returning objoid, classoid, objsubid, description
        """.query(PgDescriptionRow.read).unique
   }
@@ -25,13 +28,13 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
     sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description".query(PgDescriptionRow.read).stream
   }
   override def selectById(compositeId: PgDescriptionId): ConnectionIO[Option[PgDescriptionRow]] = {
-    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".query(PgDescriptionRow.read).option
+    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}".query(PgDescriptionRow.read).option
   }
   override def update(row: PgDescriptionRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_description
-          set description = ${row.description}
-          where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}
+          set description = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))}
+          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))}
        """
       .update
       .run
@@ -40,10 +43,10 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def upsert(unsaved: PgDescriptionRow): ConnectionIO[PgDescriptionRow] = {
     sql"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
           values (
-            ${unsaved.objoid}::oid,
-            ${unsaved.classoid}::oid,
-            ${unsaved.objsubid}::int4,
-            ${unsaved.description}
+            ${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}
           )
           on conflict (objoid, classoid, objsubid)
           do update set

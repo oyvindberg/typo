@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_shseclabel
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,10 +32,10 @@ object PgShseclabelRow {
   implicit val reads: Reads[PgShseclabelRow] = Reads[PgShseclabelRow](json => JsResult.fromTry(
       Try(
         PgShseclabelRow(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long],
-          provider = json.\("provider").as[String],
-          label = json.\("label").as[String]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads),
+          provider = json.\("provider").as(Reads.StringReads),
+          label = json.\("label").as(Reads.StringReads)
         )
       )
     ),
@@ -42,19 +43,19 @@ object PgShseclabelRow {
   def rowParser(idx: Int): RowParser[PgShseclabelRow] = RowParser[PgShseclabelRow] { row =>
     Success(
       PgShseclabelRow(
-        objoid = row[/* oid */ Long](idx + 0),
-        classoid = row[/* oid */ Long](idx + 1),
-        provider = row[String](idx + 2),
-        label = row[String](idx + 3)
+        objoid = row(idx + 0)(Column.columnToLong),
+        classoid = row(idx + 1)(Column.columnToLong),
+        provider = row(idx + 2)(Column.columnToString),
+        label = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgShseclabelRow] = OWrites[PgShseclabelRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "provider" -> Json.toJson(o.provider),
-      "label" -> Json.toJson(o.label)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid),
+      "provider" -> Writes.StringWrites.writes(o.provider),
+      "label" -> Writes.StringWrites.writes(o.label)
     ))
   )
 }

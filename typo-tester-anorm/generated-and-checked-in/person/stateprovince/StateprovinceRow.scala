@@ -12,15 +12,16 @@ import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -47,14 +48,14 @@ object StateprovinceRow {
   implicit val reads: Reads[StateprovinceRow] = Reads[StateprovinceRow](json => JsResult.fromTry(
       Try(
         StateprovinceRow(
-          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-          stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
-          countryregioncode = json.\("countryregioncode").as[CountryregionId],
-          isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Flag],
-          name = json.\("name").as[Name],
-          territoryid = json.\("territoryid").as[SalesterritoryId],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+          stateprovincecode = json.\("stateprovincecode").as(Reads.StringReads),
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          isonlystateprovinceflag = json.\("isonlystateprovinceflag").as(Flag.reads),
+          name = json.\("name").as(Name.reads),
+          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -62,27 +63,27 @@ object StateprovinceRow {
   def rowParser(idx: Int): RowParser[StateprovinceRow] = RowParser[StateprovinceRow] { row =>
     Success(
       StateprovinceRow(
-        stateprovinceid = row[StateprovinceId](idx + 0),
-        stateprovincecode = row[/* bpchar */ String](idx + 1),
-        countryregioncode = row[CountryregionId](idx + 2),
-        isonlystateprovinceflag = row[Flag](idx + 3),
-        name = row[Name](idx + 4),
-        territoryid = row[SalesterritoryId](idx + 5),
-        rowguid = row[UUID](idx + 6),
-        modifieddate = row[TypoLocalDateTime](idx + 7)
+        stateprovinceid = row(idx + 0)(StateprovinceId.column),
+        stateprovincecode = row(idx + 1)(Column.columnToString),
+        countryregioncode = row(idx + 2)(CountryregionId.column),
+        isonlystateprovinceflag = row(idx + 3)(Flag.column),
+        name = row(idx + 4)(Name.column),
+        territoryid = row(idx + 5)(SalesterritoryId.column),
+        rowguid = row(idx + 6)(Column.columnToUUID),
+        modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[StateprovinceRow] = OWrites[StateprovinceRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "stateprovincecode" -> Json.toJson(o.stateprovincecode),
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "isonlystateprovinceflag" -> Json.toJson(o.isonlystateprovinceflag),
-      "name" -> Json.toJson(o.name),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+      "stateprovincecode" -> Writes.StringWrites.writes(o.stateprovincecode),
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "isonlystateprovinceflag" -> Flag.writes.writes(o.isonlystateprovinceflag),
+      "name" -> Name.writes.writes(o.name),
+      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

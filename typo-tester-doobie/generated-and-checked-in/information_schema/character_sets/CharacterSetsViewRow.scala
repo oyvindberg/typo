@@ -9,7 +9,6 @@ package character_sets
 
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,28 +26,28 @@ case class CharacterSetsViewRow(
 )
 
 object CharacterSetsViewRow {
-  implicit val decoder: Decoder[CharacterSetsViewRow] = Decoder.forProduct8[CharacterSetsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(CharacterSetsViewRow.apply)
-  implicit val encoder: Encoder[CharacterSetsViewRow] = Encoder.forProduct8[CharacterSetsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(x => (x.characterSetCatalog, x.characterSetSchema, x.characterSetName, x.characterRepertoire, x.formOfUse, x.defaultCollateCatalog, x.defaultCollateSchema, x.defaultCollateName))
+  implicit val decoder: Decoder[CharacterSetsViewRow] = Decoder.forProduct8[CharacterSetsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(CharacterSetsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit val encoder: Encoder[CharacterSetsViewRow] = Encoder.forProduct8[CharacterSetsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("character_set_catalog", "character_set_schema", "character_set_name", "character_repertoire", "form_of_use", "default_collate_catalog", "default_collate_schema", "default_collate_name")(x => (x.characterSetCatalog, x.characterSetSchema, x.characterSetName, x.characterRepertoire, x.formOfUse, x.defaultCollateCatalog, x.defaultCollateSchema, x.defaultCollateName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
   implicit val read: Read[CharacterSetsViewRow] = new Read[CharacterSetsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CharacterSetsViewRow(
-      characterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      characterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      characterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      characterRepertoire = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      formOfUse = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      defaultCollateCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-      defaultCollateSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
-      defaultCollateName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 7)
+      characterSetCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      characterSetSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      characterSetName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      characterRepertoire = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      formOfUse = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      defaultCollateCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
+      defaultCollateSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 6),
+      defaultCollateName = SqlIdentifier.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

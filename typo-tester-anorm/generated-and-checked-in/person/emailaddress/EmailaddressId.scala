@@ -11,9 +11,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -24,16 +24,16 @@ object EmailaddressId {
   implicit val reads: Reads[EmailaddressId] = Reads[EmailaddressId](json => JsResult.fromTry(
       Try(
         EmailaddressId(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          emailaddressid = json.\("emailaddressid").as[Int]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          emailaddressid = json.\("emailaddressid").as(Reads.IntReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[EmailaddressId] = OWrites[EmailaddressId](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "emailaddressid" -> Json.toJson(o.emailaddressid)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "emailaddressid" -> Writes.IntWrites.writes(o.emailaddressid)
     ))
   )
 }

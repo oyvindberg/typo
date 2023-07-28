@@ -15,9 +15,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -55,7 +55,7 @@ object TypoLocalDate {
   implicit val reads: Reads[TypoLocalDate] = Reads[TypoLocalDate](json => JsResult.fromTry(
       Try(
         TypoLocalDate(
-          value = json.\("value").as[LocalDate]
+          value = json.\("value").as(Reads.DefaultLocalDateReads)
         )
       )
     ),
@@ -63,7 +63,7 @@ object TypoLocalDate {
   implicit val toStatement: ToStatement[TypoLocalDate] = ToStatement[TypoLocalDate]((s, index, v) => s.setObject(index, v.value.toString))
   implicit val writes: OWrites[TypoLocalDate] = OWrites[TypoLocalDate](o =>
     new JsObject(ListMap[String, JsValue](
-      "value" -> Json.toJson(o.value)
+      "value" -> Writes.DefaultLocalDateWrites.writes(o.value)
     ))
   )
 }

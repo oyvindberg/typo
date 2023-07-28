@@ -9,28 +9,31 @@ package unitmeasure
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean] = {
-    sql"delete from production.unitmeasure where unitmeasurecode = ${unitmeasurecode}".update.run.map(_ > 0)
+    sql"delete from production.unitmeasure where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
-          values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning unitmeasurecode, "name", modifieddate::text
        """.query(UnitmeasureRow.read).unique
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
-      Some((Fragment.const(s"unitmeasurecode"), fr"${unsaved.unitmeasurecode}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"unitmeasurecode"), fr"${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -52,17 +55,17 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure""".query(UnitmeasureRow.read).stream
   }
   override def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]] = {
-    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ${unitmeasurecode}""".query(UnitmeasureRow.read).option
+    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}""".query(UnitmeasureRow.read).option
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
-    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ANY(${unitmeasurecodes})""".query(UnitmeasureRow.read).stream
+    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ANY(${fromWrite(unitmeasurecodes)(Write.fromPut(UnitmeasureId.arrayPut))})""".query(UnitmeasureRow.read).stream
   }
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     val unitmeasurecode = row.unitmeasurecode
     sql"""update production.unitmeasure
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where unitmeasurecode = ${unitmeasurecode}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}
        """
       .update
       .run
@@ -71,9 +74,9 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (
-            ${unsaved.unitmeasurecode}::bpchar,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (unitmeasurecode)
           do update set

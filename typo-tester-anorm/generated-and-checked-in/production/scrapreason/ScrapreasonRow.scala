@@ -14,7 +14,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -32,9 +31,9 @@ object ScrapreasonRow {
   implicit val reads: Reads[ScrapreasonRow] = Reads[ScrapreasonRow](json => JsResult.fromTry(
       Try(
         ScrapreasonRow(
-          scrapreasonid = json.\("scrapreasonid").as[ScrapreasonId],
-          name = json.\("name").as[Name],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          scrapreasonid = json.\("scrapreasonid").as(ScrapreasonId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -42,17 +41,17 @@ object ScrapreasonRow {
   def rowParser(idx: Int): RowParser[ScrapreasonRow] = RowParser[ScrapreasonRow] { row =>
     Success(
       ScrapreasonRow(
-        scrapreasonid = row[ScrapreasonId](idx + 0),
-        name = row[Name](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        scrapreasonid = row(idx + 0)(ScrapreasonId.column),
+        name = row(idx + 1)(Name.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ScrapreasonRow] = OWrites[ScrapreasonRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "scrapreasonid" -> ScrapreasonId.writes.writes(o.scrapreasonid),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

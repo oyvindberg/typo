@@ -13,8 +13,8 @@ import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -39,28 +39,28 @@ case class VendorRow(
 )
 
 object VendorRow {
-  implicit val decoder: Decoder[VendorRow] = Decoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VendorRow.apply)
-  implicit val encoder: Encoder[VendorRow] = Encoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))
+  implicit val decoder: Decoder[VendorRow] = Decoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VendorRow.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, Decoder.decodeInt, Flag.decoder, Flag.decoder, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[VendorRow] = Encoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, Int, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))(BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, Encoder.encodeInt, Flag.encoder, Flag.encoder, Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
   implicit val read: Read[VendorRow] = new Read[VendorRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[AccountNumber], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[/* max 1024 chars */ String], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (AccountNumber.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VendorRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      accountnumber = Get[AccountNumber].unsafeGetNonNullable(rs, i + 1),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 2),
-      creditrating = Get[Int].unsafeGetNonNullable(rs, i + 3),
-      preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 4),
-      activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-      purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 6),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 7)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      accountnumber = AccountNumber.get.unsafeGetNonNullable(rs, i + 1),
+      name = Name.get.unsafeGetNonNullable(rs, i + 2),
+      creditrating = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      preferredvendorstatus = Flag.get.unsafeGetNonNullable(rs, i + 4),
+      activeflag = Flag.get.unsafeGetNonNullable(rs, i + 5),
+      purchasingwebserviceurl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

@@ -8,8 +8,8 @@ package pg_catalog
 package pg_largeobject
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -23,18 +23,18 @@ case class PgLargeobjectRow(
  }
 
 object PgLargeobjectRow {
-  implicit val decoder: Decoder[PgLargeobjectRow] = Decoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(PgLargeobjectRow.apply)
-  implicit val encoder: Encoder[PgLargeobjectRow] = Encoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(x => (x.loid, x.pageno, x.data))
+  implicit val decoder: Decoder[PgLargeobjectRow] = Decoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(PgLargeobjectRow.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly))
+  implicit val encoder: Encoder[PgLargeobjectRow] = Encoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(x => (x.loid, x.pageno, x.data))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly))
   implicit val read: Read[PgLargeobjectRow] = new Read[PgLargeobjectRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Array[Byte]], Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.ByteArrayMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgLargeobjectRow(
-      loid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      pageno = Get[Int].unsafeGetNonNullable(rs, i + 1),
-      data = Get[Array[Byte]].unsafeGetNonNullable(rs, i + 2)
+      loid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      pageno = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
+      data = Meta.ByteArrayMeta.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

@@ -8,14 +8,15 @@ package sales
 package creditcard
 
 import adventureworks.TypoLocalDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -37,12 +38,12 @@ object CreditcardRow {
   implicit val reads: Reads[CreditcardRow] = Reads[CreditcardRow](json => JsResult.fromTry(
       Try(
         CreditcardRow(
-          creditcardid = json.\("creditcardid").as[CreditcardId],
-          cardtype = json.\("cardtype").as[/* max 50 chars */ String],
-          cardnumber = json.\("cardnumber").as[/* max 25 chars */ String],
-          expmonth = json.\("expmonth").as[Int],
-          expyear = json.\("expyear").as[Int],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          creditcardid = json.\("creditcardid").as(CreditcardId.reads),
+          cardtype = json.\("cardtype").as(Reads.StringReads),
+          cardnumber = json.\("cardnumber").as(Reads.StringReads),
+          expmonth = json.\("expmonth").as(Reads.IntReads),
+          expyear = json.\("expyear").as(Reads.IntReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -50,23 +51,23 @@ object CreditcardRow {
   def rowParser(idx: Int): RowParser[CreditcardRow] = RowParser[CreditcardRow] { row =>
     Success(
       CreditcardRow(
-        creditcardid = row[CreditcardId](idx + 0),
-        cardtype = row[/* max 50 chars */ String](idx + 1),
-        cardnumber = row[/* max 25 chars */ String](idx + 2),
-        expmonth = row[Int](idx + 3),
-        expyear = row[Int](idx + 4),
-        modifieddate = row[TypoLocalDateTime](idx + 5)
+        creditcardid = row(idx + 0)(CreditcardId.column),
+        cardtype = row(idx + 1)(Column.columnToString),
+        cardnumber = row(idx + 2)(Column.columnToString),
+        expmonth = row(idx + 3)(Column.columnToInt),
+        expyear = row(idx + 4)(Column.columnToInt),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[CreditcardRow] = OWrites[CreditcardRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "cardtype" -> Json.toJson(o.cardtype),
-      "cardnumber" -> Json.toJson(o.cardnumber),
-      "expmonth" -> Json.toJson(o.expmonth),
-      "expyear" -> Json.toJson(o.expyear),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "creditcardid" -> CreditcardId.writes.writes(o.creditcardid),
+      "cardtype" -> Writes.StringWrites.writes(o.cardtype),
+      "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
+      "expmonth" -> Writes.IntWrites.writes(o.expmonth),
+      "expyear" -> Writes.IntWrites.writes(o.expyear),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

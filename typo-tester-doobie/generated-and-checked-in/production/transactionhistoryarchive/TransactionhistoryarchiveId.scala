@@ -9,17 +9,18 @@ package transactionhistoryarchive
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.transactionhistoryarchive` */
 case class TransactionhistoryarchiveId(value: Int) extends AnyVal
 object TransactionhistoryarchiveId {
-  implicit val arrayGet: Get[Array[TransactionhistoryarchiveId]] = Get[Array[Int]].map(_.map(TransactionhistoryarchiveId.apply))
-  implicit val arrayPut: Put[Array[TransactionhistoryarchiveId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[TransactionhistoryarchiveId] = Decoder[Int].map(TransactionhistoryarchiveId.apply)
-  implicit val encoder: Encoder[TransactionhistoryarchiveId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[TransactionhistoryarchiveId] = Get[Int].map(TransactionhistoryarchiveId.apply)
+  implicit val arrayGet: Get[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.get.map(_.map(TransactionhistoryarchiveId.apply))
+  implicit val arrayPut: Put[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[TransactionhistoryarchiveId] = Decoder.decodeInt.map(TransactionhistoryarchiveId.apply)
+  implicit val encoder: Encoder[TransactionhistoryarchiveId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[TransactionhistoryarchiveId] = Meta.IntMeta.get.map(TransactionhistoryarchiveId.apply)
   implicit val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
-  implicit val put: Put[TransactionhistoryarchiveId] = Put[Int].contramap(_.value)
+  implicit val put: Put[TransactionhistoryarchiveId] = Meta.IntMeta.put.contramap(_.value)
 }

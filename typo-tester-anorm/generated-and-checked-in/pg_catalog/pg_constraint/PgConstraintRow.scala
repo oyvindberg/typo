@@ -8,14 +8,15 @@ package pg_catalog
 package pg_constraint
 
 import adventureworks.TypoPgNodeTree
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -51,31 +52,31 @@ object PgConstraintRow {
   implicit val reads: Reads[PgConstraintRow] = Reads[PgConstraintRow](json => JsResult.fromTry(
       Try(
         PgConstraintRow(
-          oid = json.\("oid").as[PgConstraintId],
-          conname = json.\("conname").as[String],
-          connamespace = json.\("connamespace").as[/* oid */ Long],
-          contype = json.\("contype").as[String],
-          condeferrable = json.\("condeferrable").as[Boolean],
-          condeferred = json.\("condeferred").as[Boolean],
-          convalidated = json.\("convalidated").as[Boolean],
-          conrelid = json.\("conrelid").as[/* oid */ Long],
-          contypid = json.\("contypid").as[/* oid */ Long],
-          conindid = json.\("conindid").as[/* oid */ Long],
-          conparentid = json.\("conparentid").as[/* oid */ Long],
-          confrelid = json.\("confrelid").as[/* oid */ Long],
-          confupdtype = json.\("confupdtype").as[String],
-          confdeltype = json.\("confdeltype").as[String],
-          confmatchtype = json.\("confmatchtype").as[String],
-          conislocal = json.\("conislocal").as[Boolean],
-          coninhcount = json.\("coninhcount").as[Int],
-          connoinherit = json.\("connoinherit").as[Boolean],
-          conkey = json.\("conkey").toOption.map(_.as[Array[Int]]),
-          confkey = json.\("confkey").toOption.map(_.as[Array[Int]]),
-          conpfeqop = json.\("conpfeqop").toOption.map(_.as[Array[/* oid */ Long]]),
-          conppeqop = json.\("conppeqop").toOption.map(_.as[Array[/* oid */ Long]]),
-          conffeqop = json.\("conffeqop").toOption.map(_.as[Array[/* oid */ Long]]),
-          conexclop = json.\("conexclop").toOption.map(_.as[Array[/* oid */ Long]]),
-          conbin = json.\("conbin").toOption.map(_.as[TypoPgNodeTree])
+          oid = json.\("oid").as(PgConstraintId.reads),
+          conname = json.\("conname").as(Reads.StringReads),
+          connamespace = json.\("connamespace").as(Reads.LongReads),
+          contype = json.\("contype").as(Reads.StringReads),
+          condeferrable = json.\("condeferrable").as(Reads.BooleanReads),
+          condeferred = json.\("condeferred").as(Reads.BooleanReads),
+          convalidated = json.\("convalidated").as(Reads.BooleanReads),
+          conrelid = json.\("conrelid").as(Reads.LongReads),
+          contypid = json.\("contypid").as(Reads.LongReads),
+          conindid = json.\("conindid").as(Reads.LongReads),
+          conparentid = json.\("conparentid").as(Reads.LongReads),
+          confrelid = json.\("confrelid").as(Reads.LongReads),
+          confupdtype = json.\("confupdtype").as(Reads.StringReads),
+          confdeltype = json.\("confdeltype").as(Reads.StringReads),
+          confmatchtype = json.\("confmatchtype").as(Reads.StringReads),
+          conislocal = json.\("conislocal").as(Reads.BooleanReads),
+          coninhcount = json.\("coninhcount").as(Reads.IntReads),
+          connoinherit = json.\("connoinherit").as(Reads.BooleanReads),
+          conkey = json.\("conkey").toOption.map(_.as(Reads.ArrayReads[Int](Reads.IntReads, implicitly))),
+          confkey = json.\("confkey").toOption.map(_.as(Reads.ArrayReads[Int](Reads.IntReads, implicitly))),
+          conpfeqop = json.\("conpfeqop").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
+          conppeqop = json.\("conppeqop").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
+          conffeqop = json.\("conffeqop").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
+          conexclop = json.\("conexclop").toOption.map(_.as(Reads.ArrayReads[Long](Reads.LongReads, implicitly))),
+          conbin = json.\("conbin").toOption.map(_.as(TypoPgNodeTree.reads))
         )
       )
     ),
@@ -83,61 +84,61 @@ object PgConstraintRow {
   def rowParser(idx: Int): RowParser[PgConstraintRow] = RowParser[PgConstraintRow] { row =>
     Success(
       PgConstraintRow(
-        oid = row[PgConstraintId](idx + 0),
-        conname = row[String](idx + 1),
-        connamespace = row[/* oid */ Long](idx + 2),
-        contype = row[String](idx + 3),
-        condeferrable = row[Boolean](idx + 4),
-        condeferred = row[Boolean](idx + 5),
-        convalidated = row[Boolean](idx + 6),
-        conrelid = row[/* oid */ Long](idx + 7),
-        contypid = row[/* oid */ Long](idx + 8),
-        conindid = row[/* oid */ Long](idx + 9),
-        conparentid = row[/* oid */ Long](idx + 10),
-        confrelid = row[/* oid */ Long](idx + 11),
-        confupdtype = row[String](idx + 12),
-        confdeltype = row[String](idx + 13),
-        confmatchtype = row[String](idx + 14),
-        conislocal = row[Boolean](idx + 15),
-        coninhcount = row[Int](idx + 16),
-        connoinherit = row[Boolean](idx + 17),
-        conkey = row[Option[Array[Int]]](idx + 18),
-        confkey = row[Option[Array[Int]]](idx + 19),
-        conpfeqop = row[Option[Array[/* oid */ Long]]](idx + 20),
-        conppeqop = row[Option[Array[/* oid */ Long]]](idx + 21),
-        conffeqop = row[Option[Array[/* oid */ Long]]](idx + 22),
-        conexclop = row[Option[Array[/* oid */ Long]]](idx + 23),
-        conbin = row[Option[TypoPgNodeTree]](idx + 24)
+        oid = row(idx + 0)(PgConstraintId.column),
+        conname = row(idx + 1)(Column.columnToString),
+        connamespace = row(idx + 2)(Column.columnToLong),
+        contype = row(idx + 3)(Column.columnToString),
+        condeferrable = row(idx + 4)(Column.columnToBoolean),
+        condeferred = row(idx + 5)(Column.columnToBoolean),
+        convalidated = row(idx + 6)(Column.columnToBoolean),
+        conrelid = row(idx + 7)(Column.columnToLong),
+        contypid = row(idx + 8)(Column.columnToLong),
+        conindid = row(idx + 9)(Column.columnToLong),
+        conparentid = row(idx + 10)(Column.columnToLong),
+        confrelid = row(idx + 11)(Column.columnToLong),
+        confupdtype = row(idx + 12)(Column.columnToString),
+        confdeltype = row(idx + 13)(Column.columnToString),
+        confmatchtype = row(idx + 14)(Column.columnToString),
+        conislocal = row(idx + 15)(Column.columnToBoolean),
+        coninhcount = row(idx + 16)(Column.columnToInt),
+        connoinherit = row(idx + 17)(Column.columnToBoolean),
+        conkey = row(idx + 18)(Column.columnToOption(Column.columnToArray[Int](Column.columnToInt, implicitly))),
+        confkey = row(idx + 19)(Column.columnToOption(Column.columnToArray[Int](Column.columnToInt, implicitly))),
+        conpfeqop = row(idx + 20)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
+        conppeqop = row(idx + 21)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
+        conffeqop = row(idx + 22)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
+        conexclop = row(idx + 23)(Column.columnToOption(Column.columnToArray[Long](Column.columnToLong, implicitly))),
+        conbin = row(idx + 24)(Column.columnToOption(TypoPgNodeTree.column))
       )
     )
   }
   implicit val writes: OWrites[PgConstraintRow] = OWrites[PgConstraintRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "conname" -> Json.toJson(o.conname),
-      "connamespace" -> Json.toJson(o.connamespace),
-      "contype" -> Json.toJson(o.contype),
-      "condeferrable" -> Json.toJson(o.condeferrable),
-      "condeferred" -> Json.toJson(o.condeferred),
-      "convalidated" -> Json.toJson(o.convalidated),
-      "conrelid" -> Json.toJson(o.conrelid),
-      "contypid" -> Json.toJson(o.contypid),
-      "conindid" -> Json.toJson(o.conindid),
-      "conparentid" -> Json.toJson(o.conparentid),
-      "confrelid" -> Json.toJson(o.confrelid),
-      "confupdtype" -> Json.toJson(o.confupdtype),
-      "confdeltype" -> Json.toJson(o.confdeltype),
-      "confmatchtype" -> Json.toJson(o.confmatchtype),
-      "conislocal" -> Json.toJson(o.conislocal),
-      "coninhcount" -> Json.toJson(o.coninhcount),
-      "connoinherit" -> Json.toJson(o.connoinherit),
-      "conkey" -> Json.toJson(o.conkey),
-      "confkey" -> Json.toJson(o.confkey),
-      "conpfeqop" -> Json.toJson(o.conpfeqop),
-      "conppeqop" -> Json.toJson(o.conppeqop),
-      "conffeqop" -> Json.toJson(o.conffeqop),
-      "conexclop" -> Json.toJson(o.conexclop),
-      "conbin" -> Json.toJson(o.conbin)
+      "oid" -> PgConstraintId.writes.writes(o.oid),
+      "conname" -> Writes.StringWrites.writes(o.conname),
+      "connamespace" -> Writes.LongWrites.writes(o.connamespace),
+      "contype" -> Writes.StringWrites.writes(o.contype),
+      "condeferrable" -> Writes.BooleanWrites.writes(o.condeferrable),
+      "condeferred" -> Writes.BooleanWrites.writes(o.condeferred),
+      "convalidated" -> Writes.BooleanWrites.writes(o.convalidated),
+      "conrelid" -> Writes.LongWrites.writes(o.conrelid),
+      "contypid" -> Writes.LongWrites.writes(o.contypid),
+      "conindid" -> Writes.LongWrites.writes(o.conindid),
+      "conparentid" -> Writes.LongWrites.writes(o.conparentid),
+      "confrelid" -> Writes.LongWrites.writes(o.confrelid),
+      "confupdtype" -> Writes.StringWrites.writes(o.confupdtype),
+      "confdeltype" -> Writes.StringWrites.writes(o.confdeltype),
+      "confmatchtype" -> Writes.StringWrites.writes(o.confmatchtype),
+      "conislocal" -> Writes.BooleanWrites.writes(o.conislocal),
+      "coninhcount" -> Writes.IntWrites.writes(o.coninhcount),
+      "connoinherit" -> Writes.BooleanWrites.writes(o.connoinherit),
+      "conkey" -> Writes.OptionWrites(Writes.arrayWrites[Int](implicitly, Writes.IntWrites)).writes(o.conkey),
+      "confkey" -> Writes.OptionWrites(Writes.arrayWrites[Int](implicitly, Writes.IntWrites)).writes(o.confkey),
+      "conpfeqop" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.conpfeqop),
+      "conppeqop" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.conppeqop),
+      "conffeqop" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.conffeqop),
+      "conexclop" -> Writes.OptionWrites(Writes.arrayWrites[Long](implicitly, Writes.LongWrites)).writes(o.conexclop),
+      "conbin" -> Writes.OptionWrites(TypoPgNodeTree.writes).writes(o.conbin)
     ))
   )
 }

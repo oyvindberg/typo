@@ -10,7 +10,6 @@ package collations
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -24,20 +23,20 @@ case class CollationsViewRow(
 )
 
 object CollationsViewRow {
-  implicit val decoder: Decoder[CollationsViewRow] = Decoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(CollationsViewRow.apply)
-  implicit val encoder: Encoder[CollationsViewRow] = Encoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.padAttribute))
+  implicit val decoder: Decoder[CollationsViewRow] = Decoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(CollationsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[CollationsViewRow] = Encoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.padAttribute))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[CollationsViewRow] = new Read[CollationsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CollationsViewRow(
-      collationCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      collationSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      collationName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      padAttribute = Get[CharacterData].unsafeGetNullable(rs, i + 3)
+      collationCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      collationSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      collationName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      padAttribute = CharacterData.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

@@ -9,7 +9,6 @@ package constraint_table_usage
 
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,24 +24,24 @@ case class ConstraintTableUsageViewRow(
 )
 
 object ConstraintTableUsageViewRow {
-  implicit val decoder: Decoder[ConstraintTableUsageViewRow] = Decoder.forProduct6[ConstraintTableUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "constraint_catalog", "constraint_schema", "constraint_name")(ConstraintTableUsageViewRow.apply)
-  implicit val encoder: Encoder[ConstraintTableUsageViewRow] = Encoder.forProduct6[ConstraintTableUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "constraint_catalog", "constraint_schema", "constraint_name")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.constraintCatalog, x.constraintSchema, x.constraintName))
+  implicit val decoder: Decoder[ConstraintTableUsageViewRow] = Decoder.forProduct6[ConstraintTableUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "constraint_catalog", "constraint_schema", "constraint_name")(ConstraintTableUsageViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit val encoder: Encoder[ConstraintTableUsageViewRow] = Encoder.forProduct6[ConstraintTableUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "constraint_catalog", "constraint_schema", "constraint_name")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.constraintCatalog, x.constraintSchema, x.constraintName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
   implicit val read: Read[ConstraintTableUsageViewRow] = new Read[ConstraintTableUsageViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ConstraintTableUsageViewRow(
-      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5)
+      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      constraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      constraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      constraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

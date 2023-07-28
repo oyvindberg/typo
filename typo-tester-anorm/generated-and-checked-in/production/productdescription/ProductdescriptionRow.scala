@@ -8,15 +8,16 @@ package production
 package productdescription
 
 import adventureworks.TypoLocalDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,10 +34,10 @@ object ProductdescriptionRow {
   implicit val reads: Reads[ProductdescriptionRow] = Reads[ProductdescriptionRow](json => JsResult.fromTry(
       Try(
         ProductdescriptionRow(
-          productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
-          description = json.\("description").as[/* max 400 chars */ String],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
+          description = json.\("description").as(Reads.StringReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -44,19 +45,19 @@ object ProductdescriptionRow {
   def rowParser(idx: Int): RowParser[ProductdescriptionRow] = RowParser[ProductdescriptionRow] { row =>
     Success(
       ProductdescriptionRow(
-        productdescriptionid = row[ProductdescriptionId](idx + 0),
-        description = row[/* max 400 chars */ String](idx + 1),
-        rowguid = row[UUID](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        productdescriptionid = row(idx + 0)(ProductdescriptionId.column),
+        description = row(idx + 1)(Column.columnToString),
+        rowguid = row(idx + 2)(Column.columnToUUID),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductdescriptionRow] = OWrites[ProductdescriptionRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
-      "description" -> Json.toJson(o.description),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
+      "description" -> Writes.StringWrites.writes(o.description),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

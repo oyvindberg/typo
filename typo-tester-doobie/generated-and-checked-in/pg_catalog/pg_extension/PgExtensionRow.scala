@@ -8,8 +8,8 @@ package pg_catalog
 package pg_extension
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -26,28 +26,28 @@ case class PgExtensionRow(
 )
 
 object PgExtensionRow {
-  implicit val decoder: Decoder[PgExtensionRow] = Decoder.forProduct8[PgExtensionRow, PgExtensionId, String, /* oid */ Long, /* oid */ Long, Boolean, String, Option[Array[/* oid */ Long]], Option[Array[String]]]("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")(PgExtensionRow.apply)
-  implicit val encoder: Encoder[PgExtensionRow] = Encoder.forProduct8[PgExtensionRow, PgExtensionId, String, /* oid */ Long, /* oid */ Long, Boolean, String, Option[Array[/* oid */ Long]], Option[Array[String]]]("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")(x => (x.oid, x.extname, x.extowner, x.extnamespace, x.extrelocatable, x.extversion, x.extconfig, x.extcondition))
+  implicit val decoder: Decoder[PgExtensionRow] = Decoder.forProduct8[PgExtensionRow, PgExtensionId, String, /* oid */ Long, /* oid */ Long, Boolean, String, Option[Array[/* oid */ Long]], Option[Array[String]]]("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")(PgExtensionRow.apply)(PgExtensionId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgExtensionRow] = Encoder.forProduct8[PgExtensionRow, PgExtensionId, String, /* oid */ Long, /* oid */ Long, Boolean, String, Option[Array[/* oid */ Long]], Option[Array[String]]]("oid", "extname", "extowner", "extnamespace", "extrelocatable", "extversion", "extconfig", "extcondition")(x => (x.oid, x.extname, x.extowner, x.extnamespace, x.extrelocatable, x.extversion, x.extconfig, x.extcondition))(PgExtensionId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgExtensionRow] = new Read[PgExtensionRow](
     gets = List(
-      (Get[PgExtensionId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[Array[/* oid */ Long]], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable)
+      (PgExtensionId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (adventureworks.LongArrayMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgExtensionRow(
-      oid = Get[PgExtensionId].unsafeGetNonNullable(rs, i + 0),
-      extname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      extowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      extnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      extrelocatable = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-      extversion = Get[String].unsafeGetNonNullable(rs, i + 5),
-      extconfig = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 6),
-      extcondition = Get[Array[String]].unsafeGetNullable(rs, i + 7)
+      oid = PgExtensionId.get.unsafeGetNonNullable(rs, i + 0),
+      extname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      extowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      extnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      extrelocatable = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
+      extversion = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      extconfig = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 6),
+      extcondition = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

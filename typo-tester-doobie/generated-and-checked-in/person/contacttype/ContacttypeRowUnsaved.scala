@@ -37,6 +37,6 @@ case class ContacttypeRowUnsaved(
     )
 }
 object ContacttypeRowUnsaved {
-  implicit val decoder: Decoder[ContacttypeRowUnsaved] = Decoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(ContacttypeRowUnsaved.apply)
-  implicit val encoder: Encoder[ContacttypeRowUnsaved] = Encoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(x => (x.name, x.contacttypeid, x.modifieddate))
+  implicit val decoder: Decoder[ContacttypeRowUnsaved] = Decoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(ContacttypeRowUnsaved.apply)(Name.decoder, Defaulted.decoder(ContacttypeId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[ContacttypeRowUnsaved] = Encoder.forProduct3[ContacttypeRowUnsaved, Name, Defaulted[ContacttypeId], Defaulted[TypoLocalDateTime]]("name", "contacttypeid", "modifieddate")(x => (x.name, x.contacttypeid, x.modifieddate))(Name.encoder, Defaulted.encoder(ContacttypeId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

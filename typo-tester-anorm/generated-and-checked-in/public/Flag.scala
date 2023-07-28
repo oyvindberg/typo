@@ -24,7 +24,7 @@ object Flag {
     override def sqlType: String = implicitly[ParameterMetaData[Boolean]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Boolean]].jdbcType
   }
-  implicit val reads: Reads[Flag] = implicitly[Reads[Boolean]].map(Flag.apply)
+  implicit val reads: Reads[Flag] = Reads.BooleanReads.map(Flag.apply)
   implicit val toStatement: ToStatement[Flag] = implicitly[ToStatement[Boolean]].contramap(_.value)
-  implicit val writes: Writes[Flag] = implicitly[Writes[Boolean]].contramap(_.value)
+  implicit val writes: Writes[Flag] = Writes.BooleanWrites.contramap(_.value)
 }

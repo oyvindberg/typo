@@ -12,8 +12,8 @@ import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -44,34 +44,34 @@ case class StViewRow(
 )
 
 object StViewRow {
-  implicit val decoder: Decoder[StViewRow] = Decoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(StViewRow.apply)
-  implicit val encoder: Encoder[StViewRow] = Encoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.id, x.territoryid, x.name, x.countryregioncode, x.group, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[StViewRow] = Decoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(StViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[StViewRow] = Encoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.id, x.territoryid, x.name, x.countryregioncode, x.group, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[StViewRow] = new Read[StViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[SalesterritoryId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[CountryregionId], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (SalesterritoryId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (CountryregionId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => StViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
-      name = Get[Name].unsafeGetNullable(rs, i + 2),
-      countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 3),
-      group = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-      salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-      saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-      costytd = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-      costlastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 10)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 1),
+      name = Name.get.unsafeGetNullable(rs, i + 2),
+      countryregioncode = CountryregionId.get.unsafeGetNullable(rs, i + 3),
+      group = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      salesytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
+      saleslastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6),
+      costytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 7),
+      costlastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 8),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 9),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

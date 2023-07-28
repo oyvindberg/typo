@@ -8,14 +8,15 @@ package information_schema
 package check_constraint_routine_usage
 
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,12 +33,12 @@ object CheckConstraintRoutineUsageViewRow {
   implicit val reads: Reads[CheckConstraintRoutineUsageViewRow] = Reads[CheckConstraintRoutineUsageViewRow](json => JsResult.fromTry(
       Try(
         CheckConstraintRoutineUsageViewRow(
-          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-          constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
-          constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
-          specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
-          specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
-          specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier])
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(SqlIdentifier.reads)),
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          specificSchema = json.\("specific_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          specificName = json.\("specific_name").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -45,23 +46,23 @@ object CheckConstraintRoutineUsageViewRow {
   def rowParser(idx: Int): RowParser[CheckConstraintRoutineUsageViewRow] = RowParser[CheckConstraintRoutineUsageViewRow] { row =>
     Success(
       CheckConstraintRoutineUsageViewRow(
-        constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
-        constraintSchema = row[Option[SqlIdentifier]](idx + 1),
-        constraintName = row[Option[SqlIdentifier]](idx + 2),
-        specificCatalog = row[Option[SqlIdentifier]](idx + 3),
-        specificSchema = row[Option[SqlIdentifier]](idx + 4),
-        specificName = row[Option[SqlIdentifier]](idx + 5)
+        constraintCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        constraintName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        specificCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        specificSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        specificName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[CheckConstraintRoutineUsageViewRow] = OWrites[CheckConstraintRoutineUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> Json.toJson(o.constraintCatalog),
-      "constraint_schema" -> Json.toJson(o.constraintSchema),
-      "constraint_name" -> Json.toJson(o.constraintName),
-      "specific_catalog" -> Json.toJson(o.specificCatalog),
-      "specific_schema" -> Json.toJson(o.specificSchema),
-      "specific_name" -> Json.toJson(o.specificName)
+      "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintName),
+      "specific_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificCatalog),
+      "specific_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificSchema),
+      "specific_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificName)
     ))
   )
 }

@@ -8,8 +8,8 @@ package pg_catalog
 package pg_cast
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,24 +24,24 @@ case class PgCastRow(
 )
 
 object PgCastRow {
-  implicit val decoder: Decoder[PgCastRow] = Decoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(PgCastRow.apply)
-  implicit val encoder: Encoder[PgCastRow] = Encoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(x => (x.oid, x.castsource, x.casttarget, x.castfunc, x.castcontext, x.castmethod))
+  implicit val decoder: Decoder[PgCastRow] = Decoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(PgCastRow.apply)(PgCastId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString)
+  implicit val encoder: Encoder[PgCastRow] = Encoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(x => (x.oid, x.castsource, x.casttarget, x.castfunc, x.castcontext, x.castmethod))(PgCastId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString)
   implicit val read: Read[PgCastRow] = new Read[PgCastRow](
     gets = List(
-      (Get[PgCastId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls)
+      (PgCastId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgCastRow(
-      oid = Get[PgCastId].unsafeGetNonNullable(rs, i + 0),
-      castsource = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      casttarget = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      castfunc = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      castcontext = Get[String].unsafeGetNonNullable(rs, i + 4),
-      castmethod = Get[String].unsafeGetNonNullable(rs, i + 5)
+      oid = PgCastId.get.unsafeGetNonNullable(rs, i + 0),
+      castsource = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      casttarget = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      castfunc = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      castcontext = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      castmethod = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

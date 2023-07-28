@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -56,19 +57,19 @@ object DViewRow {
   implicit val reads: Reads[DViewRow] = Reads[DViewRow](json => JsResult.fromTry(
       Try(
         DViewRow(
-          title = json.\("title").toOption.map(_.as[/* max 50 chars */ String]),
-          owner = json.\("owner").toOption.map(_.as[BusinessentityId]),
-          folderflag = json.\("folderflag").as[Flag],
-          filename = json.\("filename").toOption.map(_.as[/* max 400 chars */ String]),
-          fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
-          revision = json.\("revision").toOption.map(_.as[/* bpchar */ String]),
-          changenumber = json.\("changenumber").toOption.map(_.as[Int]),
-          status = json.\("status").toOption.map(_.as[Int]),
-          documentsummary = json.\("documentsummary").toOption.map(_.as[String]),
-          document = json.\("document").toOption.map(_.as[Byte]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime]),
-          documentnode = json.\("documentnode").toOption.map(_.as[DocumentId])
+          title = json.\("title").toOption.map(_.as(Reads.StringReads)),
+          owner = json.\("owner").toOption.map(_.as(BusinessentityId.reads)),
+          folderflag = json.\("folderflag").as(Flag.reads),
+          filename = json.\("filename").toOption.map(_.as(Reads.StringReads)),
+          fileextension = json.\("fileextension").toOption.map(_.as(Reads.StringReads)),
+          revision = json.\("revision").toOption.map(_.as(Reads.StringReads)),
+          changenumber = json.\("changenumber").toOption.map(_.as(Reads.IntReads)),
+          status = json.\("status").toOption.map(_.as(Reads.IntReads)),
+          documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
+          document = json.\("document").toOption.map(_.as(Reads.ByteReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          documentnode = json.\("documentnode").toOption.map(_.as(DocumentId.reads))
         )
       )
     ),
@@ -76,37 +77,37 @@ object DViewRow {
   def rowParser(idx: Int): RowParser[DViewRow] = RowParser[DViewRow] { row =>
     Success(
       DViewRow(
-        title = row[Option[/* max 50 chars */ String]](idx + 0),
-        owner = row[Option[BusinessentityId]](idx + 1),
-        folderflag = row[Flag](idx + 2),
-        filename = row[Option[/* max 400 chars */ String]](idx + 3),
-        fileextension = row[Option[/* max 8 chars */ String]](idx + 4),
-        revision = row[Option[/* bpchar */ String]](idx + 5),
-        changenumber = row[Option[Int]](idx + 6),
-        status = row[Option[Int]](idx + 7),
-        documentsummary = row[Option[String]](idx + 8),
-        document = row[Option[Byte]](idx + 9),
-        rowguid = row[Option[UUID]](idx + 10),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 11),
-        documentnode = row[Option[DocumentId]](idx + 12)
+        title = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        owner = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        folderflag = row(idx + 2)(Flag.column),
+        filename = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        fileextension = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        revision = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        changenumber = row(idx + 6)(Column.columnToOption(Column.columnToInt)),
+        status = row(idx + 7)(Column.columnToOption(Column.columnToInt)),
+        documentsummary = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        document = row(idx + 9)(Column.columnToOption(Column.columnToByte)),
+        rowguid = row(idx + 10)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 11)(Column.columnToOption(TypoLocalDateTime.column)),
+        documentnode = row(idx + 12)(Column.columnToOption(DocumentId.column))
       )
     )
   }
   implicit val writes: OWrites[DViewRow] = OWrites[DViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "title" -> Json.toJson(o.title),
-      "owner" -> Json.toJson(o.owner),
-      "folderflag" -> Json.toJson(o.folderflag),
-      "filename" -> Json.toJson(o.filename),
-      "fileextension" -> Json.toJson(o.fileextension),
-      "revision" -> Json.toJson(o.revision),
-      "changenumber" -> Json.toJson(o.changenumber),
-      "status" -> Json.toJson(o.status),
-      "documentsummary" -> Json.toJson(o.documentsummary),
-      "document" -> Json.toJson(o.document),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate),
-      "documentnode" -> Json.toJson(o.documentnode)
+      "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
+      "owner" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.owner),
+      "folderflag" -> Flag.writes.writes(o.folderflag),
+      "filename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.filename),
+      "fileextension" -> Writes.OptionWrites(Writes.StringWrites).writes(o.fileextension),
+      "revision" -> Writes.OptionWrites(Writes.StringWrites).writes(o.revision),
+      "changenumber" -> Writes.OptionWrites(Writes.IntWrites).writes(o.changenumber),
+      "status" -> Writes.OptionWrites(Writes.IntWrites).writes(o.status),
+      "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
+      "document" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.document),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate),
+      "documentnode" -> Writes.OptionWrites(DocumentId.writes).writes(o.documentnode)
     ))
   )
 }

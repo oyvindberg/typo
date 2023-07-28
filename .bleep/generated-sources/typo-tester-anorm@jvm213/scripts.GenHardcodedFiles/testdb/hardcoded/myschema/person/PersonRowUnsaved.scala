@@ -11,9 +11,9 @@ package person
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 import testdb.hardcoded.Defaulted
@@ -68,34 +68,34 @@ object PersonRowUnsaved {
   implicit val reads: Reads[PersonRowUnsaved] = Reads[PersonRowUnsaved](json => JsResult.fromTry(
       Try(
         PersonRowUnsaved(
-          favouriteFootballClubId = json.\("favourite_football_club_id").as[FootballClubId],
-          name = json.\("name").as[/* max 100 chars */ String],
-          nickName = json.\("nick_name").toOption.map(_.as[/* max 30 chars */ String]),
-          blogUrl = json.\("blog_url").toOption.map(_.as[/* max 100 chars */ String]),
-          email = json.\("email").as[/* max 254 chars */ String],
-          phone = json.\("phone").as[/* max 8 chars */ String],
-          likesPizza = json.\("likes_pizza").as[Boolean],
-          workEmail = json.\("work_email").toOption.map(_.as[/* max 254 chars */ String]),
-          id = json.\("id").as[Defaulted[PersonId]],
-          maritalStatusId = json.\("marital_status_id").as[Defaulted[MaritalStatusId]],
-          sector = json.\("sector").as[Defaulted[Sector]]
+          favouriteFootballClubId = json.\("favourite_football_club_id").as(FootballClubId.reads),
+          name = json.\("name").as(Reads.StringReads),
+          nickName = json.\("nick_name").toOption.map(_.as(Reads.StringReads)),
+          blogUrl = json.\("blog_url").toOption.map(_.as(Reads.StringReads)),
+          email = json.\("email").as(Reads.StringReads),
+          phone = json.\("phone").as(Reads.StringReads),
+          likesPizza = json.\("likes_pizza").as(Reads.BooleanReads),
+          workEmail = json.\("work_email").toOption.map(_.as(Reads.StringReads)),
+          id = json.\("id").as(Defaulted.reads(PersonId.reads)),
+          maritalStatusId = json.\("marital_status_id").as(Defaulted.reads(MaritalStatusId.reads)),
+          sector = json.\("sector").as(Defaulted.reads(Sector.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[PersonRowUnsaved] = OWrites[PersonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "favourite_football_club_id" -> Json.toJson(o.favouriteFootballClubId),
-      "name" -> Json.toJson(o.name),
-      "nick_name" -> Json.toJson(o.nickName),
-      "blog_url" -> Json.toJson(o.blogUrl),
-      "email" -> Json.toJson(o.email),
-      "phone" -> Json.toJson(o.phone),
-      "likes_pizza" -> Json.toJson(o.likesPizza),
-      "work_email" -> Json.toJson(o.workEmail),
-      "id" -> Json.toJson(o.id),
-      "marital_status_id" -> Json.toJson(o.maritalStatusId),
-      "sector" -> Json.toJson(o.sector)
+      "favourite_football_club_id" -> FootballClubId.writes.writes(o.favouriteFootballClubId),
+      "name" -> Writes.StringWrites.writes(o.name),
+      "nick_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.nickName),
+      "blog_url" -> Writes.OptionWrites(Writes.StringWrites).writes(o.blogUrl),
+      "email" -> Writes.StringWrites.writes(o.email),
+      "phone" -> Writes.StringWrites.writes(o.phone),
+      "likes_pizza" -> Writes.BooleanWrites.writes(o.likesPizza),
+      "work_email" -> Writes.OptionWrites(Writes.StringWrites).writes(o.workEmail),
+      "id" -> Defaulted.writes(PersonId.writes).writes(o.id),
+      "marital_status_id" -> Defaulted.writes(MaritalStatusId.writes).writes(o.maritalStatusId),
+      "sector" -> Defaulted.writes(Sector.writes).writes(o.sector)
     ))
   )
 }

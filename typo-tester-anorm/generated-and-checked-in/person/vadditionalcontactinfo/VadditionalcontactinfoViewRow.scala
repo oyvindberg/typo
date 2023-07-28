@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -53,23 +54,23 @@ object VadditionalcontactinfoViewRow {
   implicit val reads: Reads[VadditionalcontactinfoViewRow] = Reads[VadditionalcontactinfoViewRow](json => JsResult.fromTry(
       Try(
         VadditionalcontactinfoViewRow(
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          firstname = json.\("firstname").toOption.map(_.as[Name]),
-          middlename = json.\("middlename").toOption.map(_.as[Name]),
-          lastname = json.\("lastname").toOption.map(_.as[Name]),
-          telephonenumber = json.\("telephonenumber").toOption.map(_.as[TypoXml]),
-          telephonespecialinstructions = json.\("telephonespecialinstructions").toOption.map(_.as[String]),
-          street = json.\("street").toOption.map(_.as[TypoXml]),
-          city = json.\("city").toOption.map(_.as[TypoXml]),
-          stateprovince = json.\("stateprovince").toOption.map(_.as[TypoXml]),
-          postalcode = json.\("postalcode").toOption.map(_.as[TypoXml]),
-          countryregion = json.\("countryregion").toOption.map(_.as[TypoXml]),
-          homeaddressspecialinstructions = json.\("homeaddressspecialinstructions").toOption.map(_.as[TypoXml]),
-          emailaddress = json.\("emailaddress").toOption.map(_.as[TypoXml]),
-          emailspecialinstructions = json.\("emailspecialinstructions").toOption.map(_.as[String]),
-          emailtelephonenumber = json.\("emailtelephonenumber").toOption.map(_.as[TypoXml]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          firstname = json.\("firstname").toOption.map(_.as(Name.reads)),
+          middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
+          lastname = json.\("lastname").toOption.map(_.as(Name.reads)),
+          telephonenumber = json.\("telephonenumber").toOption.map(_.as(TypoXml.reads)),
+          telephonespecialinstructions = json.\("telephonespecialinstructions").toOption.map(_.as(Reads.StringReads)),
+          street = json.\("street").toOption.map(_.as(TypoXml.reads)),
+          city = json.\("city").toOption.map(_.as(TypoXml.reads)),
+          stateprovince = json.\("stateprovince").toOption.map(_.as(TypoXml.reads)),
+          postalcode = json.\("postalcode").toOption.map(_.as(TypoXml.reads)),
+          countryregion = json.\("countryregion").toOption.map(_.as(TypoXml.reads)),
+          homeaddressspecialinstructions = json.\("homeaddressspecialinstructions").toOption.map(_.as(TypoXml.reads)),
+          emailaddress = json.\("emailaddress").toOption.map(_.as(TypoXml.reads)),
+          emailspecialinstructions = json.\("emailspecialinstructions").toOption.map(_.as(Reads.StringReads)),
+          emailtelephonenumber = json.\("emailtelephonenumber").toOption.map(_.as(TypoXml.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -77,45 +78,45 @@ object VadditionalcontactinfoViewRow {
   def rowParser(idx: Int): RowParser[VadditionalcontactinfoViewRow] = RowParser[VadditionalcontactinfoViewRow] { row =>
     Success(
       VadditionalcontactinfoViewRow(
-        businessentityid = row[Option[BusinessentityId]](idx + 0),
-        firstname = row[Option[Name]](idx + 1),
-        middlename = row[Option[Name]](idx + 2),
-        lastname = row[Option[Name]](idx + 3),
-        telephonenumber = row[Option[TypoXml]](idx + 4),
-        telephonespecialinstructions = row[Option[String]](idx + 5),
-        street = row[Option[TypoXml]](idx + 6),
-        city = row[Option[TypoXml]](idx + 7),
-        stateprovince = row[Option[TypoXml]](idx + 8),
-        postalcode = row[Option[TypoXml]](idx + 9),
-        countryregion = row[Option[TypoXml]](idx + 10),
-        homeaddressspecialinstructions = row[Option[TypoXml]](idx + 11),
-        emailaddress = row[Option[TypoXml]](idx + 12),
-        emailspecialinstructions = row[Option[String]](idx + 13),
-        emailtelephonenumber = row[Option[TypoXml]](idx + 14),
-        rowguid = row[Option[UUID]](idx + 15),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 16)
+        businessentityid = row(idx + 0)(Column.columnToOption(BusinessentityId.column)),
+        firstname = row(idx + 1)(Column.columnToOption(Name.column)),
+        middlename = row(idx + 2)(Column.columnToOption(Name.column)),
+        lastname = row(idx + 3)(Column.columnToOption(Name.column)),
+        telephonenumber = row(idx + 4)(Column.columnToOption(TypoXml.column)),
+        telephonespecialinstructions = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        street = row(idx + 6)(Column.columnToOption(TypoXml.column)),
+        city = row(idx + 7)(Column.columnToOption(TypoXml.column)),
+        stateprovince = row(idx + 8)(Column.columnToOption(TypoXml.column)),
+        postalcode = row(idx + 9)(Column.columnToOption(TypoXml.column)),
+        countryregion = row(idx + 10)(Column.columnToOption(TypoXml.column)),
+        homeaddressspecialinstructions = row(idx + 11)(Column.columnToOption(TypoXml.column)),
+        emailaddress = row(idx + 12)(Column.columnToOption(TypoXml.column)),
+        emailspecialinstructions = row(idx + 13)(Column.columnToOption(Column.columnToString)),
+        emailtelephonenumber = row(idx + 14)(Column.columnToOption(TypoXml.column)),
+        rowguid = row(idx + 15)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 16)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[VadditionalcontactinfoViewRow] = OWrites[VadditionalcontactinfoViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "firstname" -> Json.toJson(o.firstname),
-      "middlename" -> Json.toJson(o.middlename),
-      "lastname" -> Json.toJson(o.lastname),
-      "telephonenumber" -> Json.toJson(o.telephonenumber),
-      "telephonespecialinstructions" -> Json.toJson(o.telephonespecialinstructions),
-      "street" -> Json.toJson(o.street),
-      "city" -> Json.toJson(o.city),
-      "stateprovince" -> Json.toJson(o.stateprovince),
-      "postalcode" -> Json.toJson(o.postalcode),
-      "countryregion" -> Json.toJson(o.countryregion),
-      "homeaddressspecialinstructions" -> Json.toJson(o.homeaddressspecialinstructions),
-      "emailaddress" -> Json.toJson(o.emailaddress),
-      "emailspecialinstructions" -> Json.toJson(o.emailspecialinstructions),
-      "emailtelephonenumber" -> Json.toJson(o.emailtelephonenumber),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "firstname" -> Writes.OptionWrites(Name.writes).writes(o.firstname),
+      "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
+      "lastname" -> Writes.OptionWrites(Name.writes).writes(o.lastname),
+      "telephonenumber" -> Writes.OptionWrites(TypoXml.writes).writes(o.telephonenumber),
+      "telephonespecialinstructions" -> Writes.OptionWrites(Writes.StringWrites).writes(o.telephonespecialinstructions),
+      "street" -> Writes.OptionWrites(TypoXml.writes).writes(o.street),
+      "city" -> Writes.OptionWrites(TypoXml.writes).writes(o.city),
+      "stateprovince" -> Writes.OptionWrites(TypoXml.writes).writes(o.stateprovince),
+      "postalcode" -> Writes.OptionWrites(TypoXml.writes).writes(o.postalcode),
+      "countryregion" -> Writes.OptionWrites(TypoXml.writes).writes(o.countryregion),
+      "homeaddressspecialinstructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.homeaddressspecialinstructions),
+      "emailaddress" -> Writes.OptionWrites(TypoXml.writes).writes(o.emailaddress),
+      "emailspecialinstructions" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailspecialinstructions),
+      "emailtelephonenumber" -> Writes.OptionWrites(TypoXml.writes).writes(o.emailtelephonenumber),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

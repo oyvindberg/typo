@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-object DbLibDoobie extends DbLib {
+class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   val SqlInterpolator = sc.Type.Qualified("doobie.syntax.string.toSqlInterpolator")
   def SQL(content: sc.Code) =
@@ -22,6 +22,7 @@ object DbLibDoobie extends DbLib {
   val delayCIO = sc.Type.Qualified("doobie.free.connection.delay")
   val fs2Stream = sc.Type.Qualified("fs2.Stream")
   val NonEmptyList = sc.Type.Qualified("cats.data.NonEmptyList")
+  val fromWrite = sc.Type.Qualified("doobie.syntax.SqlInterpolator.SingleFragment.fromWrite")
 
   val arrayGetName: sc.Ident = sc.Ident("arrayGet")
   val arrayPutName: sc.Ident = sc.Ident("arrayPut")
@@ -35,19 +36,26 @@ object DbLibDoobie extends DbLib {
       .map(c => maybeQuoted(c.dbName) ++ (if (isRead) sqlCast.fromPgCode(c) else sc.Code.Empty))
       .mkCode(", ")
 
-  def runtimeInterpolateValue(name: sc.Code): sc.Code =
-    code"$${$name}"
+  def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type): sc.Code =
+    if (inlineImplicits)
+      tpe match {
+        case sc.Type.Optional(underlying) =>
+          code"$${$fromWrite($name)($Write.fromPutOption(${lookupPutFor(underlying)}))}"
+        case other =>
+          code"$${$fromWrite($name)($Write.fromPut(${lookupPutFor(other)}))}"
+      }
+    else code"$${$name}"
 
   def matchId(id: IdComputed): sc.Code =
     id match {
       case id: IdComputed.Unary =>
-        code"${maybeQuoted(id.col.dbName)} = ${runtimeInterpolateValue(id.paramName)}"
+        code"${maybeQuoted(id.col.dbName)} = ${runtimeInterpolateValue(id.paramName, id.tpe)}"
       case composite: IdComputed.Composite =>
-        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}")}").mkCode(" AND ")}"
+        code"${composite.cols.map(cc => code"${maybeQuoted(cc.dbName)} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
 
   def matchAnyId(x: IdComputed.Unary, idsParam: sc.Param): sc.Code =
-    code"${maybeQuoted(x.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name)})"
+    code"${maybeQuoted(x.col.dbName)} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
     case RepoMethod.SelectAll(_, _, rowType) =>
@@ -110,7 +118,7 @@ object DbLibDoobie extends DbLib {
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases: NonEmptyList[sc.Code] =
           cols.map { col =>
-            val fr = frInterpolate(code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(sc.Ident("value"))}")
+            val fr = frInterpolate(code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(sc.Ident("value"), col.tpe)}")
             code"case $fieldValue.${col.name}(value) => $fr"
           }
 
@@ -150,7 +158,7 @@ object DbLibDoobie extends DbLib {
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
           code"""update $relName
-                |set ${colsNotId.map { col => code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(code"${param.name}.${col.name}")}${sqlCast.toPgCode(col)}" }.mkCode(",\n")}
+                |set ${colsNotId.map { col => code"${maybeQuoted(col.dbName)} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}" }.mkCode(",\n")}
                 |where ${matchId(id)}""".stripMargin
         )
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
@@ -161,11 +169,11 @@ object DbLibDoobie extends DbLib {
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
-          val set = frInterpolate(code"${runtimeInterpolateValue(code"${unsavedParam.name}.${col.name}")}${sqlCast.toPgCode(col)}")
+          val set = frInterpolate(code"${runtimeInterpolateValue(code"${unsavedParam.name}.${col.name}", col.tpe)}${sqlCast.toPgCode(col)}")
           code"""Some(($Fragment.const(${sc.s(maybeQuoted(col.dbName))}), $set))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, _), origType) =>
-          val setValue = frInterpolate(code"${runtimeInterpolateValue(code"value: $origType")}${sqlCast.toPgCode(col)}")
+          val setValue = frInterpolate(code"${runtimeInterpolateValue(code"value: $origType", origType)}${sqlCast.toPgCode(col)}")
           code"""|${unsavedParam.name}.$ident match {
                  |  case ${default.Defaulted}.${default.UseDefault} => None
                  |  case ${default.Defaulted}.${default.Provided}(value) => Some(($Fragment.const(${sc.s(maybeQuoted(col.dbName))}), $setValue))
@@ -198,7 +206,7 @@ object DbLibDoobie extends DbLib {
                |"""
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
-          code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}")}${sqlCast.toPgCode(c)}"
+          code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${sqlCast.toPgCode(c)}"
         }
 
         val pickExcludedCols = cols.toList
@@ -221,7 +229,7 @@ object DbLibDoobie extends DbLib {
 
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
-          code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}")}${sqlCast.toPgCode(c)}"
+          code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${sqlCast.toPgCode(c)}"
         }
         val sql = SQL {
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
@@ -331,14 +339,14 @@ object DbLibDoobie extends DbLib {
         name = putName,
         implicitParams = Nil,
         tpe = Put.of(wrapperType),
-        body = code"""${putFor(underlying)}.contramap(_.value)"""
+        body = code"""${lookupPutFor(underlying)}.contramap(_.value)"""
       ),
       sc.Given(
         tparams = Nil,
         name = arrayPutName,
         implicitParams = Nil,
         tpe = Put.of(sc.Type.Array.of(wrapperType)),
-        body = code"""${putFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
+        body = code"""${lookupPutFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"""
       ),
       sc.Given(
         tparams = Nil,
@@ -371,28 +379,28 @@ object DbLibDoobie extends DbLib {
         name = putName,
         implicitParams = Nil,
         tpe = Put.of(wrapperType),
-        body = code"${putFor(underlying)}.contramap(_.value)"
+        body = code"${lookupPutFor(underlying)}.contramap(_.value)"
       ),
       sc.Given(
         tparams = Nil,
         name = getName,
         implicitParams = Nil,
         tpe = Get.of(wrapperType),
-        body = code"${getFor(underlying)}.map($wrapperType.apply)"
+        body = code"${lookupGetFor(underlying)}.map($wrapperType.apply)"
       ),
       sc.Given(
         tparams = Nil,
         name = arrayPutName,
         implicitParams = Nil,
         tpe = Put.of(sc.Type.Array.of(wrapperType)),
-        body = code"${putFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
+        body = code"${lookupPutFor(sc.Type.Array.of(underlying))}.contramap(_.map(_.value))"
       ),
       sc.Given(
         tparams = Nil,
         name = arrayGetName,
         implicitParams = Nil,
         tpe = Get.of(sc.Type.Array.of(wrapperType)),
-        body = code"${getFor(sc.Type.Array.of(underlying))}.map(_.map($wrapperType.apply))"
+        body = code"${lookupGetFor(sc.Type.Array.of(underlying))}.map(_.map($wrapperType.apply))"
       )
     )
 
@@ -413,26 +421,75 @@ object DbLibDoobie extends DbLib {
     )
   }
 
-  def getFor(tpe: sc.Type): sc.Code =
-    Get.of(tpe).code
+  val missingInstancesByType: Map[sc.Type, sc.QIdent] =
+    missingInstances.collect { case x: sc.Given => (x.tpe, pkg / x.name) }.toMap
 
-  def putFor(tpe: sc.Type): sc.Code =
-    Put.of(tpe).code
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  def lookupGetFor(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) Get.of(tpe).code
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal => code"$Meta.ScalaBigDecimalMeta.get"
+        case sc.Type.Boolean    => code"$Meta.BooleanMeta.get"
+        case sc.Type.Byte       => code"$Meta.ByteMeta.get"
+        case sc.Type.Double     => code"$Meta.DoubleMeta.get"
+        case sc.Type.Float      => code"$Meta.FloatMeta.get"
+        case sc.Type.Int        => code"$Meta.IntMeta.get"
+        case sc.Type.Long       => code"$Meta.LongMeta.get"
+        case sc.Type.String     => code"$Meta.StringMeta.get"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) =>
+          code"$Meta.ByteArrayMeta.get"
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"$tpe.$getName"
+        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+          code"$targ.$arrayGetName"
+        case x if missingInstancesByType.contains(Meta.of(x)) =>
+          code"${missingInstancesByType(Meta.of(x))}.get"
+        case other =>
+          println(other)
+          code"${Get.of(other)}"
+      }
+
+  /** Resolve known implicits at generation-time instead of at compile-time */
+  def lookupPutFor(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) Put.of(tpe).code
+    else
+      sc.Type.base(tpe) match {
+        case sc.Type.BigDecimal => code"$Meta.ScalaBigDecimalMeta.put"
+        case sc.Type.Boolean    => code"$Meta.BooleanMeta.put"
+        case sc.Type.Byte       => code"$Meta.ByteMeta.put"
+        case sc.Type.Double     => code"$Meta.DoubleMeta.put"
+        case sc.Type.Float      => code"$Meta.FloatMeta.put"
+        case sc.Type.Int        => code"$Meta.IntMeta.put"
+        case sc.Type.Long       => code"$Meta.LongMeta.put"
+        case sc.Type.String     => code"$Meta.StringMeta.put"
+        case sc.Type.TApply(sc.Type.Array, List(sc.Type.Byte)) =>
+          code"$Meta.ByteArrayMeta.put"
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
+          code"$tpe.$putName"
+        case sc.Type.TApply(sc.Type.Array, List(targ: sc.Type.Qualified)) if targ.value.idents.startsWith(pkg.idents) =>
+          code"$targ.$arrayPutName"
+        case x if missingInstancesByType.contains(Meta.of(x)) =>
+          code"${missingInstancesByType(Meta.of(x))}.put"
+        case other =>
+          println(other)
+          code"${Put.of(other)}"
+      }
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Given] = {
     val getCols = cols.map { c =>
       c.tpe match {
-        case sc.Type.Optional(underlying) => code"(${getFor(underlying)}, $Nullability.Nullable)"
-        case other                        => code"(${getFor(other)}, $Nullability.NoNulls)"
+        case sc.Type.Optional(underlying) => code"(${lookupGetFor(underlying)}, $Nullability.Nullable)"
+        case other                        => code"(${lookupGetFor(other)}, $Nullability.NoNulls)"
       }
     }
 
     val namedParams = cols.zipWithIndex.map { case (c, idx) =>
       c.tpe match {
         case sc.Type.Optional(underlying) =>
-          code"${c.name} = ${getFor(underlying)}.unsafeGetNullable(rs, i + $idx)"
+          code"${c.name} = ${lookupGetFor(underlying)}.unsafeGetNullable(rs, i + $idx)"
         case other =>
-          code"${c.name} = ${getFor(other)}.unsafeGetNonNullable(rs, i + $idx)"
+          code"${c.name} = ${lookupGetFor(other)}.unsafeGetNonNullable(rs, i + $idx)"
       }
     }
 

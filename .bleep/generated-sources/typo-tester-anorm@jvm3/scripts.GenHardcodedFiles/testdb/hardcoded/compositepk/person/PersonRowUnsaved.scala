@@ -11,9 +11,9 @@ package person
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 import testdb.hardcoded.Defaulted
@@ -43,18 +43,18 @@ object PersonRowUnsaved {
   implicit val reads: Reads[PersonRowUnsaved] = Reads[PersonRowUnsaved](json => JsResult.fromTry(
       Try(
         PersonRowUnsaved(
-          name = json.\("name").toOption.map(_.as[String]),
-          one = json.\("one").as[Defaulted[Long]],
-          two = json.\("two").as[Defaulted[Option[String]]]
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          one = json.\("one").as(Defaulted.reads(Reads.LongReads)),
+          two = json.\("two").as(Defaulted.readsOpt(Reads.StringReads))
         )
       )
     ),
   )
   implicit val writes: OWrites[PersonRowUnsaved] = OWrites[PersonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "one" -> Json.toJson(o.one),
-      "two" -> Json.toJson(o.two)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "one" -> Defaulted.writes(Writes.LongWrites).writes(o.one),
+      "two" -> Defaulted.writes(Writes.OptionWrites(Writes.StringWrites)).writes(o.two)
     ))
   )
 }

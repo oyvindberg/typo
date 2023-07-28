@@ -8,8 +8,8 @@ package pg_catalog
 package pg_ts_config
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -23,22 +23,22 @@ case class PgTsConfigRow(
 )
 
 object PgTsConfigRow {
-  implicit val decoder: Decoder[PgTsConfigRow] = Decoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(PgTsConfigRow.apply)
-  implicit val encoder: Encoder[PgTsConfigRow] = Encoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(x => (x.oid, x.cfgname, x.cfgnamespace, x.cfgowner, x.cfgparser))
+  implicit val decoder: Decoder[PgTsConfigRow] = Decoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(PgTsConfigRow.apply)(PgTsConfigId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit val encoder: Encoder[PgTsConfigRow] = Encoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(x => (x.oid, x.cfgname, x.cfgnamespace, x.cfgowner, x.cfgparser))(PgTsConfigId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit val read: Read[PgTsConfigRow] = new Read[PgTsConfigRow](
     gets = List(
-      (Get[PgTsConfigId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls)
+      (PgTsConfigId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTsConfigRow(
-      oid = Get[PgTsConfigId].unsafeGetNonNullable(rs, i + 0),
-      cfgname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      cfgnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      cfgowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      cfgparser = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4)
+      oid = PgTsConfigId.get.unsafeGetNonNullable(rs, i + 0),
+      cfgname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      cfgnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      cfgowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      cfgparser = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

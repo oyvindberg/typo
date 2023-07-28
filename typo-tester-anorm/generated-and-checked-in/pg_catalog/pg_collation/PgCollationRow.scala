@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_collation
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,16 +36,16 @@ object PgCollationRow {
   implicit val reads: Reads[PgCollationRow] = Reads[PgCollationRow](json => JsResult.fromTry(
       Try(
         PgCollationRow(
-          oid = json.\("oid").as[PgCollationId],
-          collname = json.\("collname").as[String],
-          collnamespace = json.\("collnamespace").as[/* oid */ Long],
-          collowner = json.\("collowner").as[/* oid */ Long],
-          collprovider = json.\("collprovider").as[String],
-          collisdeterministic = json.\("collisdeterministic").as[Boolean],
-          collencoding = json.\("collencoding").as[Int],
-          collcollate = json.\("collcollate").as[String],
-          collctype = json.\("collctype").as[String],
-          collversion = json.\("collversion").toOption.map(_.as[String])
+          oid = json.\("oid").as(PgCollationId.reads),
+          collname = json.\("collname").as(Reads.StringReads),
+          collnamespace = json.\("collnamespace").as(Reads.LongReads),
+          collowner = json.\("collowner").as(Reads.LongReads),
+          collprovider = json.\("collprovider").as(Reads.StringReads),
+          collisdeterministic = json.\("collisdeterministic").as(Reads.BooleanReads),
+          collencoding = json.\("collencoding").as(Reads.IntReads),
+          collcollate = json.\("collcollate").as(Reads.StringReads),
+          collctype = json.\("collctype").as(Reads.StringReads),
+          collversion = json.\("collversion").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -52,31 +53,31 @@ object PgCollationRow {
   def rowParser(idx: Int): RowParser[PgCollationRow] = RowParser[PgCollationRow] { row =>
     Success(
       PgCollationRow(
-        oid = row[PgCollationId](idx + 0),
-        collname = row[String](idx + 1),
-        collnamespace = row[/* oid */ Long](idx + 2),
-        collowner = row[/* oid */ Long](idx + 3),
-        collprovider = row[String](idx + 4),
-        collisdeterministic = row[Boolean](idx + 5),
-        collencoding = row[Int](idx + 6),
-        collcollate = row[String](idx + 7),
-        collctype = row[String](idx + 8),
-        collversion = row[Option[String]](idx + 9)
+        oid = row(idx + 0)(PgCollationId.column),
+        collname = row(idx + 1)(Column.columnToString),
+        collnamespace = row(idx + 2)(Column.columnToLong),
+        collowner = row(idx + 3)(Column.columnToLong),
+        collprovider = row(idx + 4)(Column.columnToString),
+        collisdeterministic = row(idx + 5)(Column.columnToBoolean),
+        collencoding = row(idx + 6)(Column.columnToInt),
+        collcollate = row(idx + 7)(Column.columnToString),
+        collctype = row(idx + 8)(Column.columnToString),
+        collversion = row(idx + 9)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgCollationRow] = OWrites[PgCollationRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "collname" -> Json.toJson(o.collname),
-      "collnamespace" -> Json.toJson(o.collnamespace),
-      "collowner" -> Json.toJson(o.collowner),
-      "collprovider" -> Json.toJson(o.collprovider),
-      "collisdeterministic" -> Json.toJson(o.collisdeterministic),
-      "collencoding" -> Json.toJson(o.collencoding),
-      "collcollate" -> Json.toJson(o.collcollate),
-      "collctype" -> Json.toJson(o.collctype),
-      "collversion" -> Json.toJson(o.collversion)
+      "oid" -> PgCollationId.writes.writes(o.oid),
+      "collname" -> Writes.StringWrites.writes(o.collname),
+      "collnamespace" -> Writes.LongWrites.writes(o.collnamespace),
+      "collowner" -> Writes.LongWrites.writes(o.collowner),
+      "collprovider" -> Writes.StringWrites.writes(o.collprovider),
+      "collisdeterministic" -> Writes.BooleanWrites.writes(o.collisdeterministic),
+      "collencoding" -> Writes.IntWrites.writes(o.collencoding),
+      "collcollate" -> Writes.StringWrites.writes(o.collcollate),
+      "collctype" -> Writes.StringWrites.writes(o.collctype),
+      "collversion" -> Writes.OptionWrites(Writes.StringWrites).writes(o.collversion)
     ))
   )
 }

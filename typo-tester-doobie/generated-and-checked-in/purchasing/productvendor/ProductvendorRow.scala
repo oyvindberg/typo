@@ -12,8 +12,8 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -48,34 +48,34 @@ case class ProductvendorRow(
  }
 
 object ProductvendorRow {
-  implicit val decoder: Decoder[ProductvendorRow] = Decoder.forProduct11[ProductvendorRow, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, TypoLocalDateTime]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(ProductvendorRow.apply)
-  implicit val encoder: Encoder[ProductvendorRow] = Encoder.forProduct11[ProductvendorRow, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, TypoLocalDateTime]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(x => (x.productid, x.businessentityid, x.averageleadtime, x.standardprice, x.lastreceiptcost, x.lastreceiptdate, x.minorderqty, x.maxorderqty, x.onorderqty, x.unitmeasurecode, x.modifieddate))
+  implicit val decoder: Decoder[ProductvendorRow] = Decoder.forProduct11[ProductvendorRow, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, TypoLocalDateTime]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(ProductvendorRow.apply)(ProductId.decoder, BusinessentityId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeInt), UnitmeasureId.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ProductvendorRow] = Encoder.forProduct11[ProductvendorRow, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, TypoLocalDateTime]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(x => (x.productid, x.businessentityid, x.averageleadtime, x.standardprice, x.lastreceiptcost, x.lastreceiptdate, x.minorderqty, x.maxorderqty, x.onorderqty, x.unitmeasurecode, x.modifieddate))(ProductId.encoder, BusinessentityId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeInt), UnitmeasureId.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[ProductvendorRow] = new Read[ProductvendorRow](
     gets = List(
-      (Get[ProductId], Nullability.NoNulls),
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[BigDecimal], Nullability.NoNulls),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Int], Nullability.Nullable),
-      (Get[UnitmeasureId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ProductId.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (UnitmeasureId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductvendorRow(
-      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
-      averageleadtime = Get[Int].unsafeGetNonNullable(rs, i + 2),
-      standardprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-      lastreceiptcost = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-      lastreceiptdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5),
-      minorderqty = Get[Int].unsafeGetNonNullable(rs, i + 6),
-      maxorderqty = Get[Int].unsafeGetNonNullable(rs, i + 7),
-      onorderqty = Get[Int].unsafeGetNullable(rs, i + 8),
-      unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 9),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 10)
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      averageleadtime = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      standardprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      lastreceiptcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+      lastreceiptdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
+      minorderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
+      maxorderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
+      onorderqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 8),
+      unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 9),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
     )
   )
 }

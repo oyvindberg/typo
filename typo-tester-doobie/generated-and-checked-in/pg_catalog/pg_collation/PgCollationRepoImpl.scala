@@ -8,16 +8,19 @@ package pg_catalog
 package pg_collation
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_collation where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_collation where oid = ${fromWrite(oid)(Write.fromPut(PgCollationId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgCollationRow): ConnectionIO[PgCollationRow] = {
     sql"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
-          values (${unsaved.oid}::oid, ${unsaved.collname}::name, ${unsaved.collnamespace}::oid, ${unsaved.collowner}::oid, ${unsaved.collprovider}::char, ${unsaved.collisdeterministic}, ${unsaved.collencoding}::int4, ${unsaved.collcollate}::name, ${unsaved.collctype}::name, ${unsaved.collversion})
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgCollationId.put))}::oid, ${fromWrite(unsaved.collname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.collnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.collowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.collprovider)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.collisdeterministic)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.collencoding)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.collcollate)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.collctype)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.collversion)(Write.fromPutOption(Meta.StringMeta.put))})
           returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
        """.query(PgCollationRow.read).unique
   }
@@ -25,24 +28,24 @@ object PgCollationRepoImpl extends PgCollationRepo {
     sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation".query(PgCollationRow.read).stream
   }
   override def selectById(oid: PgCollationId): ConnectionIO[Option[PgCollationRow]] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ${oid}".query(PgCollationRow.read).option
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ${fromWrite(oid)(Write.fromPut(PgCollationId.put))}".query(PgCollationRow.read).option
   }
   override def selectByIds(oids: Array[PgCollationId]): Stream[ConnectionIO, PgCollationRow] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY(${oids})".query(PgCollationRow.read).stream
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY(${fromWrite(oids)(Write.fromPut(PgCollationId.arrayPut))})".query(PgCollationRow.read).stream
   }
   override def update(row: PgCollationRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_collation
-          set collname = ${row.collname}::name,
-              collnamespace = ${row.collnamespace}::oid,
-              collowner = ${row.collowner}::oid,
-              collprovider = ${row.collprovider}::char,
-              collisdeterministic = ${row.collisdeterministic},
-              collencoding = ${row.collencoding}::int4,
-              collcollate = ${row.collcollate}::name,
-              collctype = ${row.collctype}::name,
-              collversion = ${row.collversion}
-          where oid = ${oid}
+          set collname = ${fromWrite(row.collname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              collnamespace = ${fromWrite(row.collnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              collowner = ${fromWrite(row.collowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              collprovider = ${fromWrite(row.collprovider)(Write.fromPut(Meta.StringMeta.put))}::char,
+              collisdeterministic = ${fromWrite(row.collisdeterministic)(Write.fromPut(Meta.BooleanMeta.put))},
+              collencoding = ${fromWrite(row.collencoding)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              collcollate = ${fromWrite(row.collcollate)(Write.fromPut(Meta.StringMeta.put))}::name,
+              collctype = ${fromWrite(row.collctype)(Write.fromPut(Meta.StringMeta.put))}::name,
+              collversion = ${fromWrite(row.collversion)(Write.fromPutOption(Meta.StringMeta.put))}
+          where oid = ${fromWrite(oid)(Write.fromPut(PgCollationId.put))}
        """
       .update
       .run
@@ -51,16 +54,16 @@ object PgCollationRepoImpl extends PgCollationRepo {
   override def upsert(unsaved: PgCollationRow): ConnectionIO[PgCollationRow] = {
     sql"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.collname}::name,
-            ${unsaved.collnamespace}::oid,
-            ${unsaved.collowner}::oid,
-            ${unsaved.collprovider}::char,
-            ${unsaved.collisdeterministic},
-            ${unsaved.collencoding}::int4,
-            ${unsaved.collcollate}::name,
-            ${unsaved.collctype}::name,
-            ${unsaved.collversion}
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgCollationId.put))}::oid,
+            ${fromWrite(unsaved.collname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.collnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.collowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.collprovider)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.collisdeterministic)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.collencoding)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.collcollate)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.collctype)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.collversion)(Write.fromPutOption(Meta.StringMeta.put))}
           )
           on conflict (oid)
           do update set

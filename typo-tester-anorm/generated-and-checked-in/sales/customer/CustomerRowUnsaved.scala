@@ -15,9 +15,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -63,24 +63,24 @@ object CustomerRowUnsaved {
   implicit val reads: Reads[CustomerRowUnsaved] = Reads[CustomerRowUnsaved](json => JsResult.fromTry(
       Try(
         CustomerRowUnsaved(
-          personid = json.\("personid").toOption.map(_.as[BusinessentityId]),
-          storeid = json.\("storeid").toOption.map(_.as[BusinessentityId]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          customerid = json.\("customerid").as[Defaulted[CustomerId]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          personid = json.\("personid").toOption.map(_.as(BusinessentityId.reads)),
+          storeid = json.\("storeid").toOption.map(_.as(BusinessentityId.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          customerid = json.\("customerid").as(Defaulted.reads(CustomerId.reads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[CustomerRowUnsaved] = OWrites[CustomerRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "personid" -> Json.toJson(o.personid),
-      "storeid" -> Json.toJson(o.storeid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "customerid" -> Json.toJson(o.customerid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "personid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.personid),
+      "storeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.storeid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "customerid" -> Defaulted.writes(CustomerId.writes).writes(o.customerid),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

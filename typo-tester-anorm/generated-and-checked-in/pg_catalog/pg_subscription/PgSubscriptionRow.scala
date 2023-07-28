@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_subscription
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -36,17 +37,17 @@ object PgSubscriptionRow {
   implicit val reads: Reads[PgSubscriptionRow] = Reads[PgSubscriptionRow](json => JsResult.fromTry(
       Try(
         PgSubscriptionRow(
-          oid = json.\("oid").as[PgSubscriptionId],
-          subdbid = json.\("subdbid").as[/* oid */ Long],
-          subname = json.\("subname").as[String],
-          subowner = json.\("subowner").as[/* oid */ Long],
-          subenabled = json.\("subenabled").as[Boolean],
-          subbinary = json.\("subbinary").as[Boolean],
-          substream = json.\("substream").as[Boolean],
-          subconninfo = json.\("subconninfo").as[String],
-          subslotname = json.\("subslotname").toOption.map(_.as[String]),
-          subsynccommit = json.\("subsynccommit").as[String],
-          subpublications = json.\("subpublications").as[Array[String]]
+          oid = json.\("oid").as(PgSubscriptionId.reads),
+          subdbid = json.\("subdbid").as(Reads.LongReads),
+          subname = json.\("subname").as(Reads.StringReads),
+          subowner = json.\("subowner").as(Reads.LongReads),
+          subenabled = json.\("subenabled").as(Reads.BooleanReads),
+          subbinary = json.\("subbinary").as(Reads.BooleanReads),
+          substream = json.\("substream").as(Reads.BooleanReads),
+          subconninfo = json.\("subconninfo").as(Reads.StringReads),
+          subslotname = json.\("subslotname").toOption.map(_.as(Reads.StringReads)),
+          subsynccommit = json.\("subsynccommit").as(Reads.StringReads),
+          subpublications = json.\("subpublications").as(Reads.ArrayReads[String](Reads.StringReads, implicitly))
         )
       )
     ),
@@ -54,33 +55,33 @@ object PgSubscriptionRow {
   def rowParser(idx: Int): RowParser[PgSubscriptionRow] = RowParser[PgSubscriptionRow] { row =>
     Success(
       PgSubscriptionRow(
-        oid = row[PgSubscriptionId](idx + 0),
-        subdbid = row[/* oid */ Long](idx + 1),
-        subname = row[String](idx + 2),
-        subowner = row[/* oid */ Long](idx + 3),
-        subenabled = row[Boolean](idx + 4),
-        subbinary = row[Boolean](idx + 5),
-        substream = row[Boolean](idx + 6),
-        subconninfo = row[String](idx + 7),
-        subslotname = row[Option[String]](idx + 8),
-        subsynccommit = row[String](idx + 9),
-        subpublications = row[Array[String]](idx + 10)
+        oid = row(idx + 0)(PgSubscriptionId.column),
+        subdbid = row(idx + 1)(Column.columnToLong),
+        subname = row(idx + 2)(Column.columnToString),
+        subowner = row(idx + 3)(Column.columnToLong),
+        subenabled = row(idx + 4)(Column.columnToBoolean),
+        subbinary = row(idx + 5)(Column.columnToBoolean),
+        substream = row(idx + 6)(Column.columnToBoolean),
+        subconninfo = row(idx + 7)(Column.columnToString),
+        subslotname = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        subsynccommit = row(idx + 9)(Column.columnToString),
+        subpublications = row(idx + 10)(Column.columnToArray[String](Column.columnToString, implicitly))
       )
     )
   }
   implicit val writes: OWrites[PgSubscriptionRow] = OWrites[PgSubscriptionRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "subdbid" -> Json.toJson(o.subdbid),
-      "subname" -> Json.toJson(o.subname),
-      "subowner" -> Json.toJson(o.subowner),
-      "subenabled" -> Json.toJson(o.subenabled),
-      "subbinary" -> Json.toJson(o.subbinary),
-      "substream" -> Json.toJson(o.substream),
-      "subconninfo" -> Json.toJson(o.subconninfo),
-      "subslotname" -> Json.toJson(o.subslotname),
-      "subsynccommit" -> Json.toJson(o.subsynccommit),
-      "subpublications" -> Json.toJson(o.subpublications)
+      "oid" -> PgSubscriptionId.writes.writes(o.oid),
+      "subdbid" -> Writes.LongWrites.writes(o.subdbid),
+      "subname" -> Writes.StringWrites.writes(o.subname),
+      "subowner" -> Writes.LongWrites.writes(o.subowner),
+      "subenabled" -> Writes.BooleanWrites.writes(o.subenabled),
+      "subbinary" -> Writes.BooleanWrites.writes(o.subbinary),
+      "substream" -> Writes.BooleanWrites.writes(o.substream),
+      "subconninfo" -> Writes.StringWrites.writes(o.subconninfo),
+      "subslotname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.subslotname),
+      "subsynccommit" -> Writes.StringWrites.writes(o.subsynccommit),
+      "subpublications" -> Writes.arrayWrites[String](implicitly, Writes.StringWrites).writes(o.subpublications)
     ))
   )
 }

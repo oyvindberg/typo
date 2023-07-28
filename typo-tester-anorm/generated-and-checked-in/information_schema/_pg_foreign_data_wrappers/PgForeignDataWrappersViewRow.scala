@@ -9,14 +9,15 @@ package `_pg_foreign_data_wrappers`
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,13 +35,13 @@ object PgForeignDataWrappersViewRow {
   implicit val reads: Reads[PgForeignDataWrappersViewRow] = Reads[PgForeignDataWrappersViewRow](json => JsResult.fromTry(
       Try(
         PgForeignDataWrappersViewRow(
-          oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
-          fdwowner = json.\("fdwowner").toOption.map(_.as[/* oid */ Long]),
-          fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]]),
-          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
-          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
-          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as[CharacterData])
+          oid = json.\("oid").toOption.map(_.as(Reads.LongReads)),
+          fdwowner = json.\("fdwowner").toOption.map(_.as(Reads.LongReads)),
+          fdwoptions = json.\("fdwoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as(SqlIdentifier.reads)),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as(CharacterData.reads))
         )
       )
     ),
@@ -48,25 +49,25 @@ object PgForeignDataWrappersViewRow {
   def rowParser(idx: Int): RowParser[PgForeignDataWrappersViewRow] = RowParser[PgForeignDataWrappersViewRow] { row =>
     Success(
       PgForeignDataWrappersViewRow(
-        oid = row[Option[/* oid */ Long]](idx + 0),
-        fdwowner = row[Option[/* oid */ Long]](idx + 1),
-        fdwoptions = row[Option[Array[String]]](idx + 2),
-        foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 3),
-        foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 4),
-        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 5),
-        foreignDataWrapperLanguage = row[Option[CharacterData]](idx + 6)
+        oid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        fdwowner = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        fdwoptions = row(idx + 2)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        foreignDataWrapperCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        foreignDataWrapperName = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        authorizationIdentifier = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
+        foreignDataWrapperLanguage = row(idx + 6)(Column.columnToOption(CharacterData.column))
       )
     )
   }
   implicit val writes: OWrites[PgForeignDataWrappersViewRow] = OWrites[PgForeignDataWrappersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "fdwowner" -> Json.toJson(o.fdwowner),
-      "fdwoptions" -> Json.toJson(o.fdwoptions),
-      "foreign_data_wrapper_catalog" -> Json.toJson(o.foreignDataWrapperCatalog),
-      "foreign_data_wrapper_name" -> Json.toJson(o.foreignDataWrapperName),
-      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier),
-      "foreign_data_wrapper_language" -> Json.toJson(o.foreignDataWrapperLanguage)
+      "oid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.oid),
+      "fdwowner" -> Writes.OptionWrites(Writes.LongWrites).writes(o.fdwowner),
+      "fdwoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.fdwoptions),
+      "foreign_data_wrapper_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperName),
+      "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier),
+      "foreign_data_wrapper_language" -> Writes.OptionWrites(CharacterData.writes).writes(o.foreignDataWrapperLanguage)
     ))
   )
 }

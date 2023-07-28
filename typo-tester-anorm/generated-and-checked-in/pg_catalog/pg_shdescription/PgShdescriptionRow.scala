@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_shdescription
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,9 +31,9 @@ object PgShdescriptionRow {
   implicit val reads: Reads[PgShdescriptionRow] = Reads[PgShdescriptionRow](json => JsResult.fromTry(
       Try(
         PgShdescriptionRow(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long],
-          description = json.\("description").as[String]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads),
+          description = json.\("description").as(Reads.StringReads)
         )
       )
     ),
@@ -40,17 +41,17 @@ object PgShdescriptionRow {
   def rowParser(idx: Int): RowParser[PgShdescriptionRow] = RowParser[PgShdescriptionRow] { row =>
     Success(
       PgShdescriptionRow(
-        objoid = row[/* oid */ Long](idx + 0),
-        classoid = row[/* oid */ Long](idx + 1),
-        description = row[String](idx + 2)
+        objoid = row(idx + 0)(Column.columnToLong),
+        classoid = row(idx + 1)(Column.columnToLong),
+        description = row(idx + 2)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgShdescriptionRow] = OWrites[PgShdescriptionRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "description" -> Json.toJson(o.description)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid),
+      "description" -> Writes.StringWrites.writes(o.description)
     ))
   )
 }

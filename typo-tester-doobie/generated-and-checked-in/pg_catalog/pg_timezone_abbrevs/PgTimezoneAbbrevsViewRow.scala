@@ -9,8 +9,8 @@ package pg_timezone_abbrevs
 
 import adventureworks.TypoInterval
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -22,18 +22,18 @@ case class PgTimezoneAbbrevsViewRow(
 )
 
 object PgTimezoneAbbrevsViewRow {
-  implicit val decoder: Decoder[PgTimezoneAbbrevsViewRow] = Decoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(PgTimezoneAbbrevsViewRow.apply)
-  implicit val encoder: Encoder[PgTimezoneAbbrevsViewRow] = Encoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(x => (x.abbrev, x.utcOffset, x.isDst))
+  implicit val decoder: Decoder[PgTimezoneAbbrevsViewRow] = Decoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(PgTimezoneAbbrevsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(Decoder.decodeBoolean))
+  implicit val encoder: Encoder[PgTimezoneAbbrevsViewRow] = Encoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(x => (x.abbrev, x.utcOffset, x.isDst))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(Encoder.encodeBoolean))
   implicit val read: Read[PgTimezoneAbbrevsViewRow] = new Read[PgTimezoneAbbrevsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[TypoInterval], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoInterval.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTimezoneAbbrevsViewRow(
-      abbrev = Get[String].unsafeGetNullable(rs, i + 0),
-      utcOffset = Get[TypoInterval].unsafeGetNullable(rs, i + 1),
-      isDst = Get[Boolean].unsafeGetNullable(rs, i + 2)
+      abbrev = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      utcOffset = TypoInterval.get.unsafeGetNullable(rs, i + 1),
+      isDst = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

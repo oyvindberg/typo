@@ -8,14 +8,15 @@ package hardcoded
 package compositepk
 package person
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,9 +32,9 @@ object PersonRow {
   implicit val reads: Reads[PersonRow] = Reads[PersonRow](json => JsResult.fromTry(
       Try(
         PersonRow(
-          one = json.\("one").as[Long],
-          two = json.\("two").toOption.map(_.as[String]),
-          name = json.\("name").toOption.map(_.as[String])
+          one = json.\("one").as(Reads.LongReads),
+          two = json.\("two").toOption.map(_.as(Reads.StringReads)),
+          name = json.\("name").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -41,17 +42,17 @@ object PersonRow {
   def rowParser(idx: Int): RowParser[PersonRow] = RowParser[PersonRow] { row =>
     Success(
       PersonRow(
-        one = row[Long](idx + 0),
-        two = row[Option[String]](idx + 1),
-        name = row[Option[String]](idx + 2)
+        one = row(idx + 0)(Column.columnToLong),
+        two = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        name = row(idx + 2)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PersonRow] = OWrites[PersonRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "one" -> Json.toJson(o.one),
-      "two" -> Json.toJson(o.two),
-      "name" -> Json.toJson(o.name)
+      "one" -> Writes.LongWrites.writes(o.one),
+      "two" -> Writes.OptionWrites(Writes.StringWrites).writes(o.two),
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name)
     ))
   )
 }

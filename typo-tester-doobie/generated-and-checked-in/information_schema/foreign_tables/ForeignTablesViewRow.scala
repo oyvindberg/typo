@@ -9,7 +9,6 @@ package foreign_tables
 
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -29,22 +28,22 @@ case class ForeignTablesViewRow(
 )
 
 object ForeignTablesViewRow {
-  implicit val decoder: Decoder[ForeignTablesViewRow] = Decoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(ForeignTablesViewRow.apply)
-  implicit val encoder: Encoder[ForeignTablesViewRow] = Encoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(x => (x.foreignTableCatalog, x.foreignTableSchema, x.foreignTableName, x.foreignServerCatalog, x.foreignServerName))
+  implicit val decoder: Decoder[ForeignTablesViewRow] = Decoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(ForeignTablesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit val encoder: Encoder[ForeignTablesViewRow] = Encoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(x => (x.foreignTableCatalog, x.foreignTableSchema, x.foreignTableName, x.foreignServerCatalog, x.foreignServerName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
   implicit val read: Read[ForeignTablesViewRow] = new Read[ForeignTablesViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ForeignTablesViewRow(
-      foreignTableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      foreignTableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      foreignTableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
+      foreignTableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      foreignTableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      foreignTableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      foreignServerCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      foreignServerName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

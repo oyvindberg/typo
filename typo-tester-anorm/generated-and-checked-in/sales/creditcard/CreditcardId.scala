@@ -23,7 +23,7 @@ object CreditcardId {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[CreditcardId] = implicitly[Reads[Int]].map(CreditcardId.apply)
+  implicit val reads: Reads[CreditcardId] = Reads.IntReads.map(CreditcardId.apply)
   implicit val toStatement: ToStatement[CreditcardId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[CreditcardId] = implicitly[Writes[Int]].contramap(_.value)
+  implicit val writes: Writes[CreditcardId] = Writes.IntWrites.contramap(_.value)
 }

@@ -8,62 +8,66 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDate
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
 
 object EmployeeRepoImpl extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.employee where businessentityid = ${businessentityid}".update.run.map(_ > 0)
+    sql"delete from humanresources.employee where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
-          values (${unsaved.businessentityid}::int4, ${unsaved.nationalidnumber}, ${unsaved.loginid}, ${unsaved.jobtitle}, ${unsaved.birthdate}::date, ${unsaved.maritalstatus}::bpchar, ${unsaved.gender}::bpchar, ${unsaved.hiredate}::date, ${unsaved.salariedflag}::"public"."Flag", ${unsaved.vacationhours}::int2, ${unsaved.sickleavehours}::int2, ${unsaved.currentflag}::"public"."Flag", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.organizationnode})
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.loginid)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.jobtitle)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.birthdate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.salariedflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.vacationhours)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.sickleavehours)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.currentflag)(Write.fromPut(Flag.put))}::"public"."Flag", ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))})
           returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
        """.query(EmployeeRow.read).unique
   }
   override def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"nationalidnumber"), fr"${unsaved.nationalidnumber}")),
-      Some((Fragment.const(s"loginid"), fr"${unsaved.loginid}")),
-      Some((Fragment.const(s"jobtitle"), fr"${unsaved.jobtitle}")),
-      Some((Fragment.const(s"birthdate"), fr"${unsaved.birthdate}::date")),
-      Some((Fragment.const(s"maritalstatus"), fr"${unsaved.maritalstatus}::bpchar")),
-      Some((Fragment.const(s"gender"), fr"${unsaved.gender}::bpchar")),
-      Some((Fragment.const(s"hiredate"), fr"${unsaved.hiredate}::date")),
+      Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s"nationalidnumber"), fr"${fromWrite(unsaved.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"loginid"), fr"${fromWrite(unsaved.loginid)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"jobtitle"), fr"${fromWrite(unsaved.jobtitle)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"birthdate"), fr"${fromWrite(unsaved.birthdate)(Write.fromPut(TypoLocalDate.put))}::date")),
+      Some((Fragment.const(s"maritalstatus"), fr"${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const(s"gender"), fr"${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const(s"hiredate"), fr"${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date")),
       unsaved.salariedflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salariedflag"), fr"""${value: Flag}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salariedflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
       },
       unsaved.vacationhours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"vacationhours"), fr"${value: Int}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"vacationhours"), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int2"))
       },
       unsaved.sickleavehours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"sickleavehours"), fr"${value: Int}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"sickleavehours"), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int2"))
       },
       unsaved.currentflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"currentflag"), fr"""${value: Flag}::"public"."Flag""""))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"currentflag"), fr"""${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::"public"."Flag""""))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.organizationnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"organizationnode"), fr"${value: Option[String]}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"organizationnode"), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
       }
     ).flatten
     
@@ -85,29 +89,29 @@ object EmployeeRepoImpl extends EmployeeRepo {
     sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee".query(EmployeeRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]] = {
-    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ${businessentityid}".query(EmployeeRow.read).option
+    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".query(EmployeeRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, EmployeeRow] = {
-    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ANY(${businessentityids})".query(EmployeeRow.read).stream
+    sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from humanresources.employee where businessentityid = ANY(${fromWrite(businessentityids)(Write.fromPut(BusinessentityId.arrayPut))})".query(EmployeeRow.read).stream
   }
   override def update(row: EmployeeRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update humanresources.employee
-          set nationalidnumber = ${row.nationalidnumber},
-              loginid = ${row.loginid},
-              jobtitle = ${row.jobtitle},
-              birthdate = ${row.birthdate}::date,
-              maritalstatus = ${row.maritalstatus}::bpchar,
-              gender = ${row.gender}::bpchar,
-              hiredate = ${row.hiredate}::date,
-              salariedflag = ${row.salariedflag}::"public"."Flag",
-              vacationhours = ${row.vacationhours}::int2,
-              sickleavehours = ${row.sickleavehours}::int2,
-              currentflag = ${row.currentflag}::"public"."Flag",
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp,
-              organizationnode = ${row.organizationnode}
-          where businessentityid = ${businessentityid}
+          set nationalidnumber = ${fromWrite(row.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))},
+              loginid = ${fromWrite(row.loginid)(Write.fromPut(Meta.StringMeta.put))},
+              jobtitle = ${fromWrite(row.jobtitle)(Write.fromPut(Meta.StringMeta.put))},
+              birthdate = ${fromWrite(row.birthdate)(Write.fromPut(TypoLocalDate.put))}::date,
+              maritalstatus = ${fromWrite(row.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
+              gender = ${fromWrite(row.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
+              hiredate = ${fromWrite(row.hiredate)(Write.fromPut(TypoLocalDate.put))}::date,
+              salariedflag = ${fromWrite(row.salariedflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              vacationhours = ${fromWrite(row.vacationhours)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              sickleavehours = ${fromWrite(row.sickleavehours)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              currentflag = ${fromWrite(row.currentflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+              organizationnode = ${fromWrite(row.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))}
+          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}
        """
       .update
       .run
@@ -116,21 +120,21 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.nationalidnumber},
-            ${unsaved.loginid},
-            ${unsaved.jobtitle},
-            ${unsaved.birthdate}::date,
-            ${unsaved.maritalstatus}::bpchar,
-            ${unsaved.gender}::bpchar,
-            ${unsaved.hiredate}::date,
-            ${unsaved.salariedflag}::"public"."Flag",
-            ${unsaved.vacationhours}::int2,
-            ${unsaved.sickleavehours}::int2,
-            ${unsaved.currentflag}::"public"."Flag",
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp,
-            ${unsaved.organizationnode}
+            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.loginid)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.jobtitle)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.birthdate)(Write.fromPut(TypoLocalDate.put))}::date,
+            ${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date,
+            ${fromWrite(unsaved.salariedflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.vacationhours)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.sickleavehours)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.currentflag)(Write.fromPut(Flag.put))}::"public"."Flag",
+            ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.organizationnode)(Write.fromPutOption(Meta.StringMeta.put))}
           )
           on conflict (businessentityid)
           do update set

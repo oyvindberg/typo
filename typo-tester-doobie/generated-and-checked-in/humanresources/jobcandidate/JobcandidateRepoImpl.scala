@@ -9,32 +9,36 @@ package jobcandidate
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
+import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.jobcandidate where jobcandidateid = ${jobcandidateid}".update.run.map(_ > 0)
+    sql"delete from humanresources.jobcandidate where jobcandidateid = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
-          values (${unsaved.jobcandidateid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.resume}::xml, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.jobcandidateid)(Write.fromPut(JobcandidateId.put))}::int4, ${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning jobcandidateid, businessentityid, resume, modifieddate::text
        """.query(JobcandidateRow.read).unique
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"resume"), fr"${unsaved.resume}::xml")),
+      Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s"resume"), fr"${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml")),
       unsaved.jobcandidateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"jobcandidateid"), fr"${value: JobcandidateId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"jobcandidateid"), fr"${fromWrite(value: JobcandidateId)(Write.fromPut(JobcandidateId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -56,18 +60,18 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate".query(JobcandidateRow.read).stream
   }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ${jobcandidateid}".query(JobcandidateRow.read).option
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}".query(JobcandidateRow.read).option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ANY(${jobcandidateids})".query(JobcandidateRow.read).stream
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ANY(${fromWrite(jobcandidateids)(Write.fromPut(JobcandidateId.arrayPut))})".query(JobcandidateRow.read).stream
   }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid
     sql"""update humanresources.jobcandidate
-          set businessentityid = ${row.businessentityid}::int4,
-              resume = ${row.resume}::xml,
-              modifieddate = ${row.modifieddate}::timestamp
-          where jobcandidateid = ${jobcandidateid}
+          set businessentityid = ${fromWrite(row.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+              resume = ${fromWrite(row.resume)(Write.fromPutOption(TypoXml.put))}::xml,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where jobcandidateid = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}
        """
       .update
       .run
@@ -76,10 +80,10 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
           values (
-            ${unsaved.jobcandidateid}::int4,
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.resume}::xml,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.jobcandidateid)(Write.fromPut(JobcandidateId.put))}::int4,
+            ${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (jobcandidateid)
           do update set

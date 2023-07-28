@@ -9,14 +9,15 @@ package pch
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -38,12 +39,12 @@ object PchViewRow {
   implicit val reads: Reads[PchViewRow] = Reads[PchViewRow](json => JsResult.fromTry(
       Try(
         PchViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          productid = json.\("productid").toOption.map(_.as[ProductId]),
-          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDateTime]),
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
-          standardcost = json.\("standardcost").toOption.map(_.as[BigDecimal]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
+          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          standardcost = json.\("standardcost").toOption.map(_.as(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -51,23 +52,23 @@ object PchViewRow {
   def rowParser(idx: Int): RowParser[PchViewRow] = RowParser[PchViewRow] { row =>
     Success(
       PchViewRow(
-        id = row[Option[Int]](idx + 0),
-        productid = row[Option[ProductId]](idx + 1),
-        startdate = row[Option[TypoLocalDateTime]](idx + 2),
-        enddate = row[Option[TypoLocalDateTime]](idx + 3),
-        standardcost = row[Option[BigDecimal]](idx + 4),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        productid = row(idx + 1)(Column.columnToOption(ProductId.column)),
+        startdate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
+        enddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column)),
+        standardcost = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PchViewRow] = OWrites[PchViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "productid" -> Json.toJson(o.productid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "standardcost" -> Json.toJson(o.standardcost),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
+      "startdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+      "standardcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.standardcost),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -10,8 +10,8 @@ package vsalespersonsalesbyfiscalyearsdata
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,24 +28,24 @@ case class VsalespersonsalesbyfiscalyearsdataViewRow(
 )
 
 object VsalespersonsalesbyfiscalyearsdataViewRow {
-  implicit val decoder: Decoder[VsalespersonsalesbyfiscalyearsdataViewRow] = Decoder.forProduct6[VsalespersonsalesbyfiscalyearsdataViewRow, Option[BusinessentityId], Option[String], Option[/* max 50 chars */ String], Option[Name], Option[BigDecimal], Option[BigDecimal]]("salespersonid", "fullname", "jobtitle", "salesterritory", "salestotal", "fiscalyear")(VsalespersonsalesbyfiscalyearsdataViewRow.apply)
-  implicit val encoder: Encoder[VsalespersonsalesbyfiscalyearsdataViewRow] = Encoder.forProduct6[VsalespersonsalesbyfiscalyearsdataViewRow, Option[BusinessentityId], Option[String], Option[/* max 50 chars */ String], Option[Name], Option[BigDecimal], Option[BigDecimal]]("salespersonid", "fullname", "jobtitle", "salesterritory", "salestotal", "fiscalyear")(x => (x.salespersonid, x.fullname, x.jobtitle, x.salesterritory, x.salestotal, x.fiscalyear))
+  implicit val decoder: Decoder[VsalespersonsalesbyfiscalyearsdataViewRow] = Decoder.forProduct6[VsalespersonsalesbyfiscalyearsdataViewRow, Option[BusinessentityId], Option[String], Option[/* max 50 chars */ String], Option[Name], Option[BigDecimal], Option[BigDecimal]]("salespersonid", "fullname", "jobtitle", "salesterritory", "salestotal", "fiscalyear")(VsalespersonsalesbyfiscalyearsdataViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal))
+  implicit val encoder: Encoder[VsalespersonsalesbyfiscalyearsdataViewRow] = Encoder.forProduct6[VsalespersonsalesbyfiscalyearsdataViewRow, Option[BusinessentityId], Option[String], Option[/* max 50 chars */ String], Option[Name], Option[BigDecimal], Option[BigDecimal]]("salespersonid", "fullname", "jobtitle", "salesterritory", "salestotal", "fiscalyear")(x => (x.salespersonid, x.fullname, x.jobtitle, x.salesterritory, x.salestotal, x.fiscalyear))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal))
   implicit val read: Read[VsalespersonsalesbyfiscalyearsdataViewRow] = new Read[VsalespersonsalesbyfiscalyearsdataViewRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable)
+      (BusinessentityId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VsalespersonsalesbyfiscalyearsdataViewRow(
-      salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-      fullname = Get[String].unsafeGetNullable(rs, i + 1),
-      jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-      salesterritory = Get[Name].unsafeGetNullable(rs, i + 3),
-      salestotal = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-      fiscalyear = Get[BigDecimal].unsafeGetNullable(rs, i + 5)
+      salespersonid = BusinessentityId.get.unsafeGetNullable(rs, i + 0),
+      fullname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      jobtitle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      salesterritory = Name.get.unsafeGetNullable(rs, i + 3),
+      salestotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+      fiscalyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

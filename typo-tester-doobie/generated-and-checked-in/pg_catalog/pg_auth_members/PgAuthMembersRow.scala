@@ -8,8 +8,8 @@ package pg_catalog
 package pg_auth_members
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,20 +24,20 @@ case class PgAuthMembersRow(
  }
 
 object PgAuthMembersRow {
-  implicit val decoder: Decoder[PgAuthMembersRow] = Decoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(PgAuthMembersRow.apply)
-  implicit val encoder: Encoder[PgAuthMembersRow] = Encoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(x => (x.roleid, x.member, x.grantor, x.adminOption))
+  implicit val decoder: Decoder[PgAuthMembersRow] = Decoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(PgAuthMembersRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean)
+  implicit val encoder: Encoder[PgAuthMembersRow] = Encoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(x => (x.roleid, x.member, x.grantor, x.adminOption))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean)
   implicit val read: Read[PgAuthMembersRow] = new Read[PgAuthMembersRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgAuthMembersRow(
-      roleid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      member = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      grantor = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      adminOption = Get[Boolean].unsafeGetNonNullable(rs, i + 3)
+      roleid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      member = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      grantor = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      adminOption = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

@@ -16,7 +16,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -40,10 +39,10 @@ object ProductproductphotoRow {
   implicit val reads: Reads[ProductproductphotoRow] = Reads[ProductproductphotoRow](json => JsResult.fromTry(
       Try(
         ProductproductphotoRow(
-          productid = json.\("productid").as[ProductId],
-          productphotoid = json.\("productphotoid").as[ProductphotoId],
-          primary = json.\("primary").as[Flag],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productid = json.\("productid").as(ProductId.reads),
+          productphotoid = json.\("productphotoid").as(ProductphotoId.reads),
+          primary = json.\("primary").as(Flag.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,19 +50,19 @@ object ProductproductphotoRow {
   def rowParser(idx: Int): RowParser[ProductproductphotoRow] = RowParser[ProductproductphotoRow] { row =>
     Success(
       ProductproductphotoRow(
-        productid = row[ProductId](idx + 0),
-        productphotoid = row[ProductphotoId](idx + 1),
-        primary = row[Flag](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        productid = row(idx + 0)(ProductId.column),
+        productphotoid = row(idx + 1)(ProductphotoId.column),
+        primary = row(idx + 2)(Flag.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductproductphotoRow] = OWrites[ProductproductphotoRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "productphotoid" -> Json.toJson(o.productphotoid),
-      "primary" -> Json.toJson(o.primary),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "productphotoid" -> ProductphotoId.writes.writes(o.productphotoid),
+      "primary" -> Flag.writes.writes(o.primary),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -35,24 +34,24 @@ case class CustomerRow(
 )
 
 object CustomerRow {
-  implicit val decoder: Decoder[CustomerRow] = Decoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CustomerRow.apply)
-  implicit val encoder: Encoder[CustomerRow] = Encoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[CustomerRow] = Decoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CustomerRow.apply)(CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[CustomerRow] = Encoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[CustomerRow] = new Read[CustomerRow](
     gets = List(
-      (Get[CustomerId], Nullability.NoNulls),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[SalesterritoryId], Nullability.Nullable),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (CustomerId.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (SalesterritoryId.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CustomerRow(
-      customerid = Get[CustomerId].unsafeGetNonNullable(rs, i + 0),
-      personid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      storeid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 3),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      customerid = CustomerId.get.unsafeGetNonNullable(rs, i + 0),
+      personid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      storeid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
+      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

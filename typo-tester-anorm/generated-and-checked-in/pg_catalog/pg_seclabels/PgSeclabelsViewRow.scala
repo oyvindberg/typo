@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_seclabels
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,14 +34,14 @@ object PgSeclabelsViewRow {
   implicit val reads: Reads[PgSeclabelsViewRow] = Reads[PgSeclabelsViewRow](json => JsResult.fromTry(
       Try(
         PgSeclabelsViewRow(
-          objoid = json.\("objoid").toOption.map(_.as[/* oid */ Long]),
-          classoid = json.\("classoid").toOption.map(_.as[/* oid */ Long]),
-          objsubid = json.\("objsubid").toOption.map(_.as[Int]),
-          objtype = json.\("objtype").toOption.map(_.as[String]),
-          objnamespace = json.\("objnamespace").toOption.map(_.as[/* oid */ Long]),
-          objname = json.\("objname").toOption.map(_.as[String]),
-          provider = json.\("provider").toOption.map(_.as[String]),
-          label = json.\("label").toOption.map(_.as[String])
+          objoid = json.\("objoid").toOption.map(_.as(Reads.LongReads)),
+          classoid = json.\("classoid").toOption.map(_.as(Reads.LongReads)),
+          objsubid = json.\("objsubid").toOption.map(_.as(Reads.IntReads)),
+          objtype = json.\("objtype").toOption.map(_.as(Reads.StringReads)),
+          objnamespace = json.\("objnamespace").toOption.map(_.as(Reads.LongReads)),
+          objname = json.\("objname").toOption.map(_.as(Reads.StringReads)),
+          provider = json.\("provider").toOption.map(_.as(Reads.StringReads)),
+          label = json.\("label").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -48,27 +49,27 @@ object PgSeclabelsViewRow {
   def rowParser(idx: Int): RowParser[PgSeclabelsViewRow] = RowParser[PgSeclabelsViewRow] { row =>
     Success(
       PgSeclabelsViewRow(
-        objoid = row[Option[/* oid */ Long]](idx + 0),
-        classoid = row[Option[/* oid */ Long]](idx + 1),
-        objsubid = row[Option[Int]](idx + 2),
-        objtype = row[Option[String]](idx + 3),
-        objnamespace = row[Option[/* oid */ Long]](idx + 4),
-        objname = row[Option[String]](idx + 5),
-        provider = row[Option[String]](idx + 6),
-        label = row[Option[String]](idx + 7)
+        objoid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        classoid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        objsubid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
+        objtype = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        objnamespace = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        objname = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        provider = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        label = row(idx + 7)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgSeclabelsViewRow] = OWrites[PgSeclabelsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "objsubid" -> Json.toJson(o.objsubid),
-      "objtype" -> Json.toJson(o.objtype),
-      "objnamespace" -> Json.toJson(o.objnamespace),
-      "objname" -> Json.toJson(o.objname),
-      "provider" -> Json.toJson(o.provider),
-      "label" -> Json.toJson(o.label)
+      "objoid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.objoid),
+      "classoid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.classoid),
+      "objsubid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.objsubid),
+      "objtype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.objtype),
+      "objnamespace" -> Writes.OptionWrites(Writes.LongWrites).writes(o.objnamespace),
+      "objname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.objname),
+      "provider" -> Writes.OptionWrites(Writes.StringWrites).writes(o.provider),
+      "label" -> Writes.OptionWrites(Writes.StringWrites).writes(o.label)
     ))
   )
 }

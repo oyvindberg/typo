@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_auth_members
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,10 +32,10 @@ object PgAuthMembersRow {
   implicit val reads: Reads[PgAuthMembersRow] = Reads[PgAuthMembersRow](json => JsResult.fromTry(
       Try(
         PgAuthMembersRow(
-          roleid = json.\("roleid").as[/* oid */ Long],
-          member = json.\("member").as[/* oid */ Long],
-          grantor = json.\("grantor").as[/* oid */ Long],
-          adminOption = json.\("admin_option").as[Boolean]
+          roleid = json.\("roleid").as(Reads.LongReads),
+          member = json.\("member").as(Reads.LongReads),
+          grantor = json.\("grantor").as(Reads.LongReads),
+          adminOption = json.\("admin_option").as(Reads.BooleanReads)
         )
       )
     ),
@@ -42,19 +43,19 @@ object PgAuthMembersRow {
   def rowParser(idx: Int): RowParser[PgAuthMembersRow] = RowParser[PgAuthMembersRow] { row =>
     Success(
       PgAuthMembersRow(
-        roleid = row[/* oid */ Long](idx + 0),
-        member = row[/* oid */ Long](idx + 1),
-        grantor = row[/* oid */ Long](idx + 2),
-        adminOption = row[Boolean](idx + 3)
+        roleid = row(idx + 0)(Column.columnToLong),
+        member = row(idx + 1)(Column.columnToLong),
+        grantor = row(idx + 2)(Column.columnToLong),
+        adminOption = row(idx + 3)(Column.columnToBoolean)
       )
     )
   }
   implicit val writes: OWrites[PgAuthMembersRow] = OWrites[PgAuthMembersRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "roleid" -> Json.toJson(o.roleid),
-      "member" -> Json.toJson(o.member),
-      "grantor" -> Json.toJson(o.grantor),
-      "admin_option" -> Json.toJson(o.adminOption)
+      "roleid" -> Writes.LongWrites.writes(o.roleid),
+      "member" -> Writes.LongWrites.writes(o.member),
+      "grantor" -> Writes.LongWrites.writes(o.grantor),
+      "admin_option" -> Writes.BooleanWrites.writes(o.adminOption)
     ))
   )
 }

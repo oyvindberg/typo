@@ -9,8 +9,8 @@ package pg_authid
 
 import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -31,36 +31,36 @@ case class PgAuthidRow(
 )
 
 object PgAuthidRow {
-  implicit val decoder: Decoder[PgAuthidRow] = Decoder.forProduct12[PgAuthidRow, PgAuthidId, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, Option[String], Option[TypoOffsetDateTime]]("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")(PgAuthidRow.apply)
-  implicit val encoder: Encoder[PgAuthidRow] = Encoder.forProduct12[PgAuthidRow, PgAuthidId, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, Option[String], Option[TypoOffsetDateTime]]("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")(x => (x.oid, x.rolname, x.rolsuper, x.rolinherit, x.rolcreaterole, x.rolcreatedb, x.rolcanlogin, x.rolreplication, x.rolbypassrls, x.rolconnlimit, x.rolpassword, x.rolvaliduntil))
+  implicit val decoder: Decoder[PgAuthidRow] = Decoder.forProduct12[PgAuthidRow, PgAuthidId, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, Option[String], Option[TypoOffsetDateTime]]("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")(PgAuthidRow.apply)(PgAuthidId.decoder, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder))
+  implicit val encoder: Encoder[PgAuthidRow] = Encoder.forProduct12[PgAuthidRow, PgAuthidId, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, Option[String], Option[TypoOffsetDateTime]]("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")(x => (x.oid, x.rolname, x.rolsuper, x.rolinherit, x.rolcreaterole, x.rolcreatedb, x.rolcanlogin, x.rolreplication, x.rolbypassrls, x.rolconnlimit, x.rolpassword, x.rolvaliduntil))(PgAuthidId.encoder, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder))
   implicit val read: Read[PgAuthidRow] = new Read[PgAuthidRow](
     gets = List(
-      (Get[PgAuthidId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable)
+      (PgAuthidId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgAuthidRow(
-      oid = Get[PgAuthidId].unsafeGetNonNullable(rs, i + 0),
-      rolname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      rolsuper = Get[Boolean].unsafeGetNonNullable(rs, i + 2),
-      rolinherit = Get[Boolean].unsafeGetNonNullable(rs, i + 3),
-      rolcreaterole = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-      rolcreatedb = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-      rolcanlogin = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
-      rolreplication = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-      rolbypassrls = Get[Boolean].unsafeGetNonNullable(rs, i + 8),
-      rolconnlimit = Get[Int].unsafeGetNonNullable(rs, i + 9),
-      rolpassword = Get[String].unsafeGetNullable(rs, i + 10),
-      rolvaliduntil = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 11)
+      oid = PgAuthidId.get.unsafeGetNonNullable(rs, i + 0),
+      rolname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      rolsuper = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 2),
+      rolinherit = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 3),
+      rolcreaterole = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
+      rolcreatedb = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 5),
+      rolcanlogin = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 6),
+      rolreplication = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 7),
+      rolbypassrls = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 8),
+      rolconnlimit = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 9),
+      rolpassword = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
+      rolvaliduntil = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 11)
     )
   )
 }

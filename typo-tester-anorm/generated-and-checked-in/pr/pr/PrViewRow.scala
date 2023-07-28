@@ -11,14 +11,15 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -46,15 +47,15 @@ object PrViewRow {
   implicit val reads: Reads[PrViewRow] = Reads[PrViewRow](json => JsResult.fromTry(
       Try(
         PrViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          productreviewid = json.\("productreviewid").toOption.map(_.as[ProductreviewId]),
-          productid = json.\("productid").toOption.map(_.as[ProductId]),
-          reviewername = json.\("reviewername").toOption.map(_.as[Name]),
-          reviewdate = json.\("reviewdate").toOption.map(_.as[TypoLocalDateTime]),
-          emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
-          rating = json.\("rating").toOption.map(_.as[Int]),
-          comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          productreviewid = json.\("productreviewid").toOption.map(_.as(ProductreviewId.reads)),
+          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
+          reviewername = json.\("reviewername").toOption.map(_.as(Name.reads)),
+          reviewdate = json.\("reviewdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
+          rating = json.\("rating").toOption.map(_.as(Reads.IntReads)),
+          comments = json.\("comments").toOption.map(_.as(Reads.StringReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -62,29 +63,29 @@ object PrViewRow {
   def rowParser(idx: Int): RowParser[PrViewRow] = RowParser[PrViewRow] { row =>
     Success(
       PrViewRow(
-        id = row[Option[Int]](idx + 0),
-        productreviewid = row[Option[ProductreviewId]](idx + 1),
-        productid = row[Option[ProductId]](idx + 2),
-        reviewername = row[Option[Name]](idx + 3),
-        reviewdate = row[Option[TypoLocalDateTime]](idx + 4),
-        emailaddress = row[Option[/* max 50 chars */ String]](idx + 5),
-        rating = row[Option[Int]](idx + 6),
-        comments = row[Option[/* max 3850 chars */ String]](idx + 7),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 8)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        productreviewid = row(idx + 1)(Column.columnToOption(ProductreviewId.column)),
+        productid = row(idx + 2)(Column.columnToOption(ProductId.column)),
+        reviewername = row(idx + 3)(Column.columnToOption(Name.column)),
+        reviewdate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
+        emailaddress = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        rating = row(idx + 6)(Column.columnToOption(Column.columnToInt)),
+        comments = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        modifieddate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PrViewRow] = OWrites[PrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "productreviewid" -> Json.toJson(o.productreviewid),
-      "productid" -> Json.toJson(o.productid),
-      "reviewername" -> Json.toJson(o.reviewername),
-      "reviewdate" -> Json.toJson(o.reviewdate),
-      "emailaddress" -> Json.toJson(o.emailaddress),
-      "rating" -> Json.toJson(o.rating),
-      "comments" -> Json.toJson(o.comments),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "productreviewid" -> Writes.OptionWrites(ProductreviewId.writes).writes(o.productreviewid),
+      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
+      "reviewername" -> Writes.OptionWrites(Name.writes).writes(o.reviewername),
+      "reviewdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.reviewdate),
+      "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
+      "rating" -> Writes.OptionWrites(Writes.IntWrites).writes(o.rating),
+      "comments" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comments),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

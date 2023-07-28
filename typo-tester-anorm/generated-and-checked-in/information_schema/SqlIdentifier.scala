@@ -24,7 +24,7 @@ object SqlIdentifier {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[SqlIdentifier] = implicitly[Reads[String]].map(SqlIdentifier.apply)
+  implicit val reads: Reads[SqlIdentifier] = Reads.StringReads.map(SqlIdentifier.apply)
   implicit val toStatement: ToStatement[SqlIdentifier] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[SqlIdentifier] = implicitly[Writes[String]].contramap(_.value)
+  implicit val writes: Writes[SqlIdentifier] = Writes.StringWrites.contramap(_.value)
 }

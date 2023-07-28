@@ -10,7 +10,6 @@ package illustration
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,18 +24,18 @@ case class IllustrationRow(
 )
 
 object IllustrationRow {
-  implicit val decoder: Decoder[IllustrationRow] = Decoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(IllustrationRow.apply)
-  implicit val encoder: Encoder[IllustrationRow] = Encoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(x => (x.illustrationid, x.diagram, x.modifieddate))
+  implicit val decoder: Decoder[IllustrationRow] = Decoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(IllustrationRow.apply)(IllustrationId.decoder, Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[IllustrationRow] = Encoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(x => (x.illustrationid, x.diagram, x.modifieddate))(IllustrationId.encoder, Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
   implicit val read: Read[IllustrationRow] = new Read[IllustrationRow](
     gets = List(
-      (Get[IllustrationId], Nullability.NoNulls),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (IllustrationId.get, Nullability.NoNulls),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => IllustrationRow(
-      illustrationid = Get[IllustrationId].unsafeGetNonNullable(rs, i + 0),
-      diagram = Get[TypoXml].unsafeGetNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 0),
+      diagram = TypoXml.get.unsafeGetNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

@@ -10,9 +10,9 @@ package pg_attribute
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,16 +23,16 @@ object PgAttributeId {
   implicit val reads: Reads[PgAttributeId] = Reads[PgAttributeId](json => JsResult.fromTry(
       Try(
         PgAttributeId(
-          attrelid = json.\("attrelid").as[/* oid */ Long],
-          attnum = json.\("attnum").as[Int]
+          attrelid = json.\("attrelid").as(Reads.LongReads),
+          attnum = json.\("attnum").as(Reads.IntReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgAttributeId] = OWrites[PgAttributeId](o =>
     new JsObject(ListMap[String, JsValue](
-      "attrelid" -> Json.toJson(o.attrelid),
-      "attnum" -> Json.toJson(o.attnum)
+      "attrelid" -> Writes.LongWrites.writes(o.attrelid),
+      "attnum" -> Writes.IntWrites.writes(o.attnum)
     ))
   )
 }

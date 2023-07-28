@@ -9,8 +9,8 @@ package myschema
 package person
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -35,34 +35,34 @@ case class PersonRow(
 )
 
 object PersonRow {
-  implicit val decoder: Decoder[PersonRow] = Decoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(PersonRow.apply)
-  implicit val encoder: Encoder[PersonRow] = Encoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(x => (x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.sector))
+  implicit val decoder: Decoder[PersonRow] = Decoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(PersonRow.apply)(PersonId.decoder, FootballClubId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, MaritalStatusId.decoder, Decoder.decodeOption(Decoder.decodeString), Sector.decoder)
+  implicit val encoder: Encoder[PersonRow] = Encoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(x => (x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.sector))(PersonId.encoder, FootballClubId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, MaritalStatusId.encoder, Encoder.encodeOption(Encoder.encodeString), Sector.encoder)
   implicit val read: Read[PersonRow] = new Read[PersonRow](
     gets = List(
-      (Get[PersonId], Nullability.NoNulls),
-      (Get[FootballClubId], Nullability.NoNulls),
-      (Get[/* max 100 chars */ String], Nullability.NoNulls),
-      (Get[/* max 30 chars */ String], Nullability.Nullable),
-      (Get[/* max 100 chars */ String], Nullability.Nullable),
-      (Get[/* max 254 chars */ String], Nullability.NoNulls),
-      (Get[/* max 8 chars */ String], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[MaritalStatusId], Nullability.NoNulls),
-      (Get[/* max 254 chars */ String], Nullability.Nullable),
-      (Get[Sector], Nullability.NoNulls)
+      (PersonId.get, Nullability.NoNulls),
+      (FootballClubId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (MaritalStatusId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Sector.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-      id = Get[PersonId].unsafeGetNonNullable(rs, i + 0),
-      favouriteFootballClubId = Get[FootballClubId].unsafeGetNonNullable(rs, i + 1),
-      name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 2),
-      nickName = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 3),
-      blogUrl = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
-      email = Get[/* max 254 chars */ String].unsafeGetNonNullable(rs, i + 5),
-      phone = Get[/* max 8 chars */ String].unsafeGetNonNullable(rs, i + 6),
-      likesPizza = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-      maritalStatusId = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 8),
-      workEmail = Get[/* max 254 chars */ String].unsafeGetNullable(rs, i + 9),
-      sector = Get[Sector].unsafeGetNonNullable(rs, i + 10)
+      id = PersonId.get.unsafeGetNonNullable(rs, i + 0),
+      favouriteFootballClubId = FootballClubId.get.unsafeGetNonNullable(rs, i + 1),
+      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      nickName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      blogUrl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      email = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      phone = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+      likesPizza = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 7),
+      maritalStatusId = MaritalStatusId.get.unsafeGetNonNullable(rs, i + 8),
+      workEmail = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      sector = Sector.get.unsafeGetNonNullable(rs, i + 10)
     )
   )
 }

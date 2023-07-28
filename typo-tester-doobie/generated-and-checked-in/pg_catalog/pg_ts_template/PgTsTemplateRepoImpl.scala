@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_ts_template
 
+import adventureworks.TypoRegproc
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def delete(oid: PgTsTemplateId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_template where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_template where oid = ${fromWrite(oid)(Write.fromPut(PgTsTemplateId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsTemplateRow): ConnectionIO[PgTsTemplateRow] = {
     sql"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
-          values (${unsaved.oid}::oid, ${unsaved.tmplname}::name, ${unsaved.tmplnamespace}::oid, ${unsaved.tmplinit}::regproc, ${unsaved.tmpllexize}::regproc)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsTemplateId.put))}::oid, ${fromWrite(unsaved.tmplname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tmplnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tmplinit)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.tmpllexize)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
        """.query(PgTsTemplateRow.read).unique
   }
@@ -25,19 +29,19 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template".query(PgTsTemplateRow.read).stream
   }
   override def selectById(oid: PgTsTemplateId): ConnectionIO[Option[PgTsTemplateRow]] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ${oid}".query(PgTsTemplateRow.read).option
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ${fromWrite(oid)(Write.fromPut(PgTsTemplateId.put))}".query(PgTsTemplateRow.read).option
   }
   override def selectByIds(oids: Array[PgTsTemplateId]): Stream[ConnectionIO, PgTsTemplateRow] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${oids})".query(PgTsTemplateRow.read).stream
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTsTemplateId.arrayPut))})".query(PgTsTemplateRow.read).stream
   }
   override def update(row: PgTsTemplateRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_template
-          set tmplname = ${row.tmplname}::name,
-              tmplnamespace = ${row.tmplnamespace}::oid,
-              tmplinit = ${row.tmplinit}::regproc,
-              tmpllexize = ${row.tmpllexize}::regproc
-          where oid = ${oid}
+          set tmplname = ${fromWrite(row.tmplname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              tmplnamespace = ${fromWrite(row.tmplnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              tmplinit = ${fromWrite(row.tmplinit)(Write.fromPut(TypoRegproc.put))}::regproc,
+              tmpllexize = ${fromWrite(row.tmpllexize)(Write.fromPut(TypoRegproc.put))}::regproc
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsTemplateId.put))}
        """
       .update
       .run
@@ -46,11 +50,11 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def upsert(unsaved: PgTsTemplateRow): ConnectionIO[PgTsTemplateRow] = {
     sql"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.tmplname}::name,
-            ${unsaved.tmplnamespace}::oid,
-            ${unsaved.tmplinit}::regproc,
-            ${unsaved.tmpllexize}::regproc
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgTsTemplateId.put))}::oid,
+            ${fromWrite(unsaved.tmplname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.tmplnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.tmplinit)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.tmpllexize)(Write.fromPut(TypoRegproc.put))}::regproc
           )
           on conflict (oid)
           do update set

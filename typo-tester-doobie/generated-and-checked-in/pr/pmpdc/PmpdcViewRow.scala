@@ -12,7 +12,6 @@ import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,20 +29,20 @@ case class PmpdcViewRow(
 )
 
 object PmpdcViewRow {
-  implicit val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)
-  implicit val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))
+  implicit val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(ProductdescriptionId.decoder), Decoder.decodeOption(CultureId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(ProductdescriptionId.encoder), Encoder.encodeOption(CultureId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PmpdcViewRow] = new Read[PmpdcViewRow](
     gets = List(
-      (Get[ProductmodelId], Nullability.Nullable),
-      (Get[ProductdescriptionId], Nullability.Nullable),
-      (Get[CultureId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (ProductmodelId.get, Nullability.Nullable),
+      (ProductdescriptionId.get, Nullability.Nullable),
+      (CultureId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PmpdcViewRow(
-      productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-      productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
-      cultureid = Get[CultureId].unsafeGetNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
+      productmodelid = ProductmodelId.get.unsafeGetNullable(rs, i + 0),
+      productdescriptionid = ProductdescriptionId.get.unsafeGetNullable(rs, i + 1),
+      cultureid = CultureId.get.unsafeGetNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

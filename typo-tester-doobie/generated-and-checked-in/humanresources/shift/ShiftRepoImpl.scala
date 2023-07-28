@@ -9,33 +9,37 @@ package shift
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.shift where shiftid = ${shiftid}".update.run.map(_ > 0)
+    sql"delete from humanresources.shift where shiftid = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
-          values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """.query(ShiftRow.read).unique
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
-      Some((Fragment.const(s"starttime"), fr"${unsaved.starttime}::time")),
-      Some((Fragment.const(s"endtime"), fr"${unsaved.endtime}::time")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s"starttime"), fr"${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time")),
+      Some((Fragment.const(s"endtime"), fr"${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time")),
       unsaved.shiftid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"shiftid"), fr"${value: ShiftId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"shiftid"), fr"${fromWrite(value: ShiftId)(Write.fromPut(ShiftId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -57,19 +61,19 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift""".query(ShiftRow.read).stream
   }
   override def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = {
-    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ${shiftid}""".query(ShiftRow.read).option
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".query(ShiftRow.read).option
   }
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ANY(${shiftids})""".query(ShiftRow.read).stream
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ANY(${fromWrite(shiftids)(Write.fromPut(ShiftId.arrayPut))})""".query(ShiftRow.read).stream
   }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
     sql"""update humanresources.shift
-          set "name" = ${row.name}::"public"."Name",
-              starttime = ${row.starttime}::time,
-              endtime = ${row.endtime}::time,
-              modifieddate = ${row.modifieddate}::timestamp
-          where shiftid = ${shiftid}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              starttime = ${fromWrite(row.starttime)(Write.fromPut(TypoLocalTime.put))}::time,
+              endtime = ${fromWrite(row.endtime)(Write.fromPut(TypoLocalTime.put))}::time,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where shiftid = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}
        """
       .update
       .run
@@ -78,11 +82,11 @@ object ShiftRepoImpl extends ShiftRepo {
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (
-            ${unsaved.shiftid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.starttime}::time,
-            ${unsaved.endtime}::time,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time,
+            ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (shiftid)
           do update set

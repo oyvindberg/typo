@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -35,26 +35,26 @@ case class SalestaxrateRow(
 )
 
 object SalestaxrateRow {
-  implicit val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)
-  implicit val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)(SalestaxrateId.decoder, StateprovinceId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(SalestaxrateId.encoder, StateprovinceId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[SalestaxrateRow] = new Read[SalestaxrateRow](
     gets = List(
-      (Get[SalestaxrateId], Nullability.NoNulls),
-      (Get[StateprovinceId], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[BigDecimal], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (SalestaxrateId.get, Nullability.NoNulls),
+      (StateprovinceId.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SalestaxrateRow(
-      salestaxrateid = Get[SalestaxrateId].unsafeGetNonNullable(rs, i + 0),
-      stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 1),
-      taxtype = Get[Int].unsafeGetNonNullable(rs, i + 2),
-      taxrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 4),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 6)
+      salestaxrateid = SalestaxrateId.get.unsafeGetNonNullable(rs, i + 0),
+      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 1),
+      taxtype = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      taxrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      name = Name.get.unsafeGetNonNullable(rs, i + 4),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

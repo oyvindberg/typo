@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stat_gssapi
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,10 +30,10 @@ object PgStatGssapiViewRow {
   implicit val reads: Reads[PgStatGssapiViewRow] = Reads[PgStatGssapiViewRow](json => JsResult.fromTry(
       Try(
         PgStatGssapiViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          gssAuthenticated = json.\("gss_authenticated").toOption.map(_.as[Boolean]),
-          principal = json.\("principal").toOption.map(_.as[String]),
-          encrypted = json.\("encrypted").toOption.map(_.as[Boolean])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          gssAuthenticated = json.\("gss_authenticated").toOption.map(_.as(Reads.BooleanReads)),
+          principal = json.\("principal").toOption.map(_.as(Reads.StringReads)),
+          encrypted = json.\("encrypted").toOption.map(_.as(Reads.BooleanReads))
         )
       )
     ),
@@ -40,19 +41,19 @@ object PgStatGssapiViewRow {
   def rowParser(idx: Int): RowParser[PgStatGssapiViewRow] = RowParser[PgStatGssapiViewRow] { row =>
     Success(
       PgStatGssapiViewRow(
-        pid = row[Option[Int]](idx + 0),
-        gssAuthenticated = row[Option[Boolean]](idx + 1),
-        principal = row[Option[String]](idx + 2),
-        encrypted = row[Option[Boolean]](idx + 3)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        gssAuthenticated = row(idx + 1)(Column.columnToOption(Column.columnToBoolean)),
+        principal = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        encrypted = row(idx + 3)(Column.columnToOption(Column.columnToBoolean))
       )
     )
   }
   implicit val writes: OWrites[PgStatGssapiViewRow] = OWrites[PgStatGssapiViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "gss_authenticated" -> Json.toJson(o.gssAuthenticated),
-      "principal" -> Json.toJson(o.principal),
-      "encrypted" -> Json.toJson(o.encrypted)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "gss_authenticated" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.gssAuthenticated),
+      "principal" -> Writes.OptionWrites(Writes.StringWrites).writes(o.principal),
+      "encrypted" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.encrypted)
     ))
   )
 }

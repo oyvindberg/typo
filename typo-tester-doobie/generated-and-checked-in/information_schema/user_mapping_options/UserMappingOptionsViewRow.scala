@@ -10,7 +10,6 @@ package user_mapping_options
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -28,22 +27,22 @@ case class UserMappingOptionsViewRow(
 )
 
 object UserMappingOptionsViewRow {
-  implicit val decoder: Decoder[UserMappingOptionsViewRow] = Decoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(UserMappingOptionsViewRow.apply)
-  implicit val encoder: Encoder[UserMappingOptionsViewRow] = Encoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.optionName, x.optionValue))
+  implicit val decoder: Decoder[UserMappingOptionsViewRow] = Decoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(UserMappingOptionsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[UserMappingOptionsViewRow] = Encoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.optionName, x.optionValue))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[UserMappingOptionsViewRow] = new Read[UserMappingOptionsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UserMappingOptionsViewRow(
-      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 4)
+      authorizationIdentifier = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      foreignServerCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      foreignServerName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      optionName = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      optionValue = CharacterData.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

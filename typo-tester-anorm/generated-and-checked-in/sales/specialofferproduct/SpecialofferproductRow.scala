@@ -10,15 +10,16 @@ package specialofferproduct
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,10 +40,10 @@ object SpecialofferproductRow {
   implicit val reads: Reads[SpecialofferproductRow] = Reads[SpecialofferproductRow](json => JsResult.fromTry(
       Try(
         SpecialofferproductRow(
-          specialofferid = json.\("specialofferid").as[SpecialofferId],
-          productid = json.\("productid").as[ProductId],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
+          productid = json.\("productid").as(ProductId.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -50,19 +51,19 @@ object SpecialofferproductRow {
   def rowParser(idx: Int): RowParser[SpecialofferproductRow] = RowParser[SpecialofferproductRow] { row =>
     Success(
       SpecialofferproductRow(
-        specialofferid = row[SpecialofferId](idx + 0),
-        productid = row[ProductId](idx + 1),
-        rowguid = row[UUID](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        specialofferid = row(idx + 0)(SpecialofferId.column),
+        productid = row(idx + 1)(ProductId.column),
+        rowguid = row(idx + 2)(Column.columnToUUID),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[SpecialofferproductRow] = OWrites[SpecialofferproductRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "specialofferid" -> Json.toJson(o.specialofferid),
-      "productid" -> Json.toJson(o.productid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

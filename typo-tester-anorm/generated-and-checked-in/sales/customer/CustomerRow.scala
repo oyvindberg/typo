@@ -10,15 +10,16 @@ package customer
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,12 +43,12 @@ object CustomerRow {
   implicit val reads: Reads[CustomerRow] = Reads[CustomerRow](json => JsResult.fromTry(
       Try(
         CustomerRow(
-          customerid = json.\("customerid").as[CustomerId],
-          personid = json.\("personid").toOption.map(_.as[BusinessentityId]),
-          storeid = json.\("storeid").toOption.map(_.as[BusinessentityId]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          customerid = json.\("customerid").as(CustomerId.reads),
+          personid = json.\("personid").toOption.map(_.as(BusinessentityId.reads)),
+          storeid = json.\("storeid").toOption.map(_.as(BusinessentityId.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -55,23 +56,23 @@ object CustomerRow {
   def rowParser(idx: Int): RowParser[CustomerRow] = RowParser[CustomerRow] { row =>
     Success(
       CustomerRow(
-        customerid = row[CustomerId](idx + 0),
-        personid = row[Option[BusinessentityId]](idx + 1),
-        storeid = row[Option[BusinessentityId]](idx + 2),
-        territoryid = row[Option[SalesterritoryId]](idx + 3),
-        rowguid = row[UUID](idx + 4),
-        modifieddate = row[TypoLocalDateTime](idx + 5)
+        customerid = row(idx + 0)(CustomerId.column),
+        personid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        storeid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
+        territoryid = row(idx + 3)(Column.columnToOption(SalesterritoryId.column)),
+        rowguid = row(idx + 4)(Column.columnToUUID),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[CustomerRow] = OWrites[CustomerRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "customerid" -> Json.toJson(o.customerid),
-      "personid" -> Json.toJson(o.personid),
-      "storeid" -> Json.toJson(o.storeid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "customerid" -> CustomerId.writes.writes(o.customerid),
+      "personid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.personid),
+      "storeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.storeid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

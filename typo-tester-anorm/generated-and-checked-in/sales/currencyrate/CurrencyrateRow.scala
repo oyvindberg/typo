@@ -9,14 +9,15 @@ package currencyrate
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,13 +43,13 @@ object CurrencyrateRow {
   implicit val reads: Reads[CurrencyrateRow] = Reads[CurrencyrateRow](json => JsResult.fromTry(
       Try(
         CurrencyrateRow(
-          currencyrateid = json.\("currencyrateid").as[CurrencyrateId],
-          currencyratedate = json.\("currencyratedate").as[TypoLocalDateTime],
-          fromcurrencycode = json.\("fromcurrencycode").as[CurrencyId],
-          tocurrencycode = json.\("tocurrencycode").as[CurrencyId],
-          averagerate = json.\("averagerate").as[BigDecimal],
-          endofdayrate = json.\("endofdayrate").as[BigDecimal],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          currencyrateid = json.\("currencyrateid").as(CurrencyrateId.reads),
+          currencyratedate = json.\("currencyratedate").as(TypoLocalDateTime.reads),
+          fromcurrencycode = json.\("fromcurrencycode").as(CurrencyId.reads),
+          tocurrencycode = json.\("tocurrencycode").as(CurrencyId.reads),
+          averagerate = json.\("averagerate").as(Reads.bigDecReads),
+          endofdayrate = json.\("endofdayrate").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -56,25 +57,25 @@ object CurrencyrateRow {
   def rowParser(idx: Int): RowParser[CurrencyrateRow] = RowParser[CurrencyrateRow] { row =>
     Success(
       CurrencyrateRow(
-        currencyrateid = row[CurrencyrateId](idx + 0),
-        currencyratedate = row[TypoLocalDateTime](idx + 1),
-        fromcurrencycode = row[CurrencyId](idx + 2),
-        tocurrencycode = row[CurrencyId](idx + 3),
-        averagerate = row[BigDecimal](idx + 4),
-        endofdayrate = row[BigDecimal](idx + 5),
-        modifieddate = row[TypoLocalDateTime](idx + 6)
+        currencyrateid = row(idx + 0)(CurrencyrateId.column),
+        currencyratedate = row(idx + 1)(TypoLocalDateTime.column),
+        fromcurrencycode = row(idx + 2)(CurrencyId.column),
+        tocurrencycode = row(idx + 3)(CurrencyId.column),
+        averagerate = row(idx + 4)(Column.columnToScalaBigDecimal),
+        endofdayrate = row(idx + 5)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[CurrencyrateRow] = OWrites[CurrencyrateRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "currencyrateid" -> Json.toJson(o.currencyrateid),
-      "currencyratedate" -> Json.toJson(o.currencyratedate),
-      "fromcurrencycode" -> Json.toJson(o.fromcurrencycode),
-      "tocurrencycode" -> Json.toJson(o.tocurrencycode),
-      "averagerate" -> Json.toJson(o.averagerate),
-      "endofdayrate" -> Json.toJson(o.endofdayrate),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "currencyrateid" -> CurrencyrateId.writes.writes(o.currencyrateid),
+      "currencyratedate" -> TypoLocalDateTime.writes.writes(o.currencyratedate),
+      "fromcurrencycode" -> CurrencyId.writes.writes(o.fromcurrencycode),
+      "tocurrencycode" -> CurrencyId.writes.writes(o.tocurrencycode),
+      "averagerate" -> Writes.BigDecimalWrites.writes(o.averagerate),
+      "endofdayrate" -> Writes.BigDecimalWrites.writes(o.endofdayrate),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

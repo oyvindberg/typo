@@ -13,7 +13,6 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -26,18 +25,18 @@ object SalesterritoryhistoryId {
   implicit val reads: Reads[SalesterritoryhistoryId] = Reads[SalesterritoryhistoryId](json => JsResult.fromTry(
       Try(
         SalesterritoryhistoryId(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          startdate = json.\("startdate").as[TypoLocalDateTime],
-          territoryid = json.\("territoryid").as[SalesterritoryId]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          territoryid = json.\("territoryid").as(SalesterritoryId.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[SalesterritoryhistoryId] = OWrites[SalesterritoryhistoryId](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "startdate" -> Json.toJson(o.startdate),
-      "territoryid" -> Json.toJson(o.territoryid)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid)
     ))
   )
 }

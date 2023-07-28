@@ -15,7 +15,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -37,11 +36,11 @@ object ShiftRow {
   implicit val reads: Reads[ShiftRow] = Reads[ShiftRow](json => JsResult.fromTry(
       Try(
         ShiftRow(
-          shiftid = json.\("shiftid").as[ShiftId],
-          name = json.\("name").as[Name],
-          starttime = json.\("starttime").as[TypoLocalTime],
-          endtime = json.\("endtime").as[TypoLocalTime],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          shiftid = json.\("shiftid").as(ShiftId.reads),
+          name = json.\("name").as(Name.reads),
+          starttime = json.\("starttime").as(TypoLocalTime.reads),
+          endtime = json.\("endtime").as(TypoLocalTime.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -49,21 +48,21 @@ object ShiftRow {
   def rowParser(idx: Int): RowParser[ShiftRow] = RowParser[ShiftRow] { row =>
     Success(
       ShiftRow(
-        shiftid = row[ShiftId](idx + 0),
-        name = row[Name](idx + 1),
-        starttime = row[TypoLocalTime](idx + 2),
-        endtime = row[TypoLocalTime](idx + 3),
-        modifieddate = row[TypoLocalDateTime](idx + 4)
+        shiftid = row(idx + 0)(ShiftId.column),
+        name = row(idx + 1)(Name.column),
+        starttime = row(idx + 2)(TypoLocalTime.column),
+        endtime = row(idx + 3)(TypoLocalTime.column),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ShiftRow] = OWrites[ShiftRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "shiftid" -> Json.toJson(o.shiftid),
-      "name" -> Json.toJson(o.name),
-      "starttime" -> Json.toJson(o.starttime),
-      "endtime" -> Json.toJson(o.endtime),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "shiftid" -> ShiftId.writes.writes(o.shiftid),
+      "name" -> Name.writes.writes(o.name),
+      "starttime" -> TypoLocalTime.writes.writes(o.starttime),
+      "endtime" -> TypoLocalTime.writes.writes(o.endtime),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

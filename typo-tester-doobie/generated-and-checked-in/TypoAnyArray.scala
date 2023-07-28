@@ -25,8 +25,8 @@ object TypoAnyArray {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoAnyArray] = Decoder.forProduct1[TypoAnyArray, String]("value")(TypoAnyArray.apply)
-  implicit val encoder: Encoder[TypoAnyArray] = Encoder.forProduct1[TypoAnyArray, String]("value")(x => (x.value))
+  implicit val decoder: Decoder[TypoAnyArray] = Decoder.forProduct1[TypoAnyArray, String]("value")(TypoAnyArray.apply)(Decoder.decodeString)
+  implicit val encoder: Encoder[TypoAnyArray] = Encoder.forProduct1[TypoAnyArray, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoAnyArray] = Get.Advanced.other[PGobject](NonEmptyList.one("anyarray"))
     .map(v => TypoAnyArray(v.getValue))
   implicit val put: Put[TypoAnyArray] = Put.Advanced.other[PGobject](NonEmptyList.one("anyarray")).contramap(v => {

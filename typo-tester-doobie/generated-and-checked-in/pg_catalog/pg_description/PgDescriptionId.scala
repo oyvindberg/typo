@@ -13,7 +13,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `pg_catalog.pg_description` */
 case class PgDescriptionId(objoid: /* oid */ Long, classoid: /* oid */ Long, objsubid: Int)
 object PgDescriptionId {
-  implicit val decoder: Decoder[PgDescriptionId] = Decoder.forProduct3[PgDescriptionId, /* oid */ Long, /* oid */ Long, Int]("objoid", "classoid", "objsubid")(PgDescriptionId.apply)
-  implicit val encoder: Encoder[PgDescriptionId] = Encoder.forProduct3[PgDescriptionId, /* oid */ Long, /* oid */ Long, Int]("objoid", "classoid", "objsubid")(x => (x.objoid, x.classoid, x.objsubid))
+  implicit val decoder: Decoder[PgDescriptionId] = Decoder.forProduct3[PgDescriptionId, /* oid */ Long, /* oid */ Long, Int]("objoid", "classoid", "objsubid")(PgDescriptionId.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt)
+  implicit val encoder: Encoder[PgDescriptionId] = Encoder.forProduct3[PgDescriptionId, /* oid */ Long, /* oid */ Long, Int]("objoid", "classoid", "objsubid")(x => (x.objoid, x.classoid, x.objsubid))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt)
   implicit val ordering: Ordering[PgDescriptionId] = Ordering.by(x => (x.objoid, x.classoid, x.objsubid))
 }

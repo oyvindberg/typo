@@ -10,14 +10,15 @@ package cr
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,9 +35,9 @@ object CrViewRow {
   implicit val reads: Reads[CrViewRow] = Reads[CrViewRow](json => JsResult.fromTry(
       Try(
         CrViewRow(
-          countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          countryregioncode = json.\("countryregioncode").toOption.map(_.as(CountryregionId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -44,17 +45,17 @@ object CrViewRow {
   def rowParser(idx: Int): RowParser[CrViewRow] = RowParser[CrViewRow] { row =>
     Success(
       CrViewRow(
-        countryregioncode = row[Option[CountryregionId]](idx + 0),
-        name = row[Option[Name]](idx + 1),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 2)
+        countryregioncode = row(idx + 0)(Column.columnToOption(CountryregionId.column)),
+        name = row(idx + 1)(Column.columnToOption(Name.column)),
+        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[CrViewRow] = OWrites[CrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "countryregioncode" -> Writes.OptionWrites(CountryregionId.writes).writes(o.countryregioncode),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

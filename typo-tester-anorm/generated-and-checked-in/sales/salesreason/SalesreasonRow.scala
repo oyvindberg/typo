@@ -14,7 +14,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -34,10 +33,10 @@ object SalesreasonRow {
   implicit val reads: Reads[SalesreasonRow] = Reads[SalesreasonRow](json => JsResult.fromTry(
       Try(
         SalesreasonRow(
-          salesreasonid = json.\("salesreasonid").as[SalesreasonId],
-          name = json.\("name").as[Name],
-          reasontype = json.\("reasontype").as[Name],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
+          name = json.\("name").as(Name.reads),
+          reasontype = json.\("reasontype").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,19 +44,19 @@ object SalesreasonRow {
   def rowParser(idx: Int): RowParser[SalesreasonRow] = RowParser[SalesreasonRow] { row =>
     Success(
       SalesreasonRow(
-        salesreasonid = row[SalesreasonId](idx + 0),
-        name = row[Name](idx + 1),
-        reasontype = row[Name](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        salesreasonid = row(idx + 0)(SalesreasonId.column),
+        name = row(idx + 1)(Name.column),
+        reasontype = row(idx + 2)(Name.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[SalesreasonRow] = OWrites[SalesreasonRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "salesreasonid" -> Json.toJson(o.salesreasonid),
-      "name" -> Json.toJson(o.name),
-      "reasontype" -> Json.toJson(o.reasontype),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
+      "name" -> Name.writes.writes(o.name),
+      "reasontype" -> Name.writes.writes(o.reasontype),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

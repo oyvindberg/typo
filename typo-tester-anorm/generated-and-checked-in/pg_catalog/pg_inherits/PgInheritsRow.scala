@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_inherits
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,10 +32,10 @@ object PgInheritsRow {
   implicit val reads: Reads[PgInheritsRow] = Reads[PgInheritsRow](json => JsResult.fromTry(
       Try(
         PgInheritsRow(
-          inhrelid = json.\("inhrelid").as[/* oid */ Long],
-          inhparent = json.\("inhparent").as[/* oid */ Long],
-          inhseqno = json.\("inhseqno").as[Int],
-          inhdetachpending = json.\("inhdetachpending").as[Boolean]
+          inhrelid = json.\("inhrelid").as(Reads.LongReads),
+          inhparent = json.\("inhparent").as(Reads.LongReads),
+          inhseqno = json.\("inhseqno").as(Reads.IntReads),
+          inhdetachpending = json.\("inhdetachpending").as(Reads.BooleanReads)
         )
       )
     ),
@@ -42,19 +43,19 @@ object PgInheritsRow {
   def rowParser(idx: Int): RowParser[PgInheritsRow] = RowParser[PgInheritsRow] { row =>
     Success(
       PgInheritsRow(
-        inhrelid = row[/* oid */ Long](idx + 0),
-        inhparent = row[/* oid */ Long](idx + 1),
-        inhseqno = row[Int](idx + 2),
-        inhdetachpending = row[Boolean](idx + 3)
+        inhrelid = row(idx + 0)(Column.columnToLong),
+        inhparent = row(idx + 1)(Column.columnToLong),
+        inhseqno = row(idx + 2)(Column.columnToInt),
+        inhdetachpending = row(idx + 3)(Column.columnToBoolean)
       )
     )
   }
   implicit val writes: OWrites[PgInheritsRow] = OWrites[PgInheritsRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "inhrelid" -> Json.toJson(o.inhrelid),
-      "inhparent" -> Json.toJson(o.inhparent),
-      "inhseqno" -> Json.toJson(o.inhseqno),
-      "inhdetachpending" -> Json.toJson(o.inhdetachpending)
+      "inhrelid" -> Writes.LongWrites.writes(o.inhrelid),
+      "inhparent" -> Writes.LongWrites.writes(o.inhparent),
+      "inhseqno" -> Writes.IntWrites.writes(o.inhseqno),
+      "inhdetachpending" -> Writes.BooleanWrites.writes(o.inhdetachpending)
     ))
   )
 }

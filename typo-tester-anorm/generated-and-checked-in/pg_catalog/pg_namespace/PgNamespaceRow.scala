@@ -8,14 +8,15 @@ package pg_catalog
 package pg_namespace
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,10 +31,10 @@ object PgNamespaceRow {
   implicit val reads: Reads[PgNamespaceRow] = Reads[PgNamespaceRow](json => JsResult.fromTry(
       Try(
         PgNamespaceRow(
-          oid = json.\("oid").as[PgNamespaceId],
-          nspname = json.\("nspname").as[String],
-          nspowner = json.\("nspowner").as[/* oid */ Long],
-          nspacl = json.\("nspacl").toOption.map(_.as[Array[TypoAclItem]])
+          oid = json.\("oid").as(PgNamespaceId.reads),
+          nspname = json.\("nspname").as(Reads.StringReads),
+          nspowner = json.\("nspowner").as(Reads.LongReads),
+          nspacl = json.\("nspacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly)))
         )
       )
     ),
@@ -41,19 +42,19 @@ object PgNamespaceRow {
   def rowParser(idx: Int): RowParser[PgNamespaceRow] = RowParser[PgNamespaceRow] { row =>
     Success(
       PgNamespaceRow(
-        oid = row[PgNamespaceId](idx + 0),
-        nspname = row[String](idx + 1),
-        nspowner = row[/* oid */ Long](idx + 2),
-        nspacl = row[Option[Array[TypoAclItem]]](idx + 3)
+        oid = row(idx + 0)(PgNamespaceId.column),
+        nspname = row(idx + 1)(Column.columnToString),
+        nspowner = row(idx + 2)(Column.columnToLong),
+        nspacl = row(idx + 3)(Column.columnToOption(TypoAclItem.arrayColumn))
       )
     )
   }
   implicit val writes: OWrites[PgNamespaceRow] = OWrites[PgNamespaceRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "nspname" -> Json.toJson(o.nspname),
-      "nspowner" -> Json.toJson(o.nspowner),
-      "nspacl" -> Json.toJson(o.nspacl)
+      "oid" -> PgNamespaceId.writes.writes(o.oid),
+      "nspname" -> Writes.StringWrites.writes(o.nspname),
+      "nspowner" -> Writes.LongWrites.writes(o.nspowner),
+      "nspacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.nspacl)
     ))
   )
 }

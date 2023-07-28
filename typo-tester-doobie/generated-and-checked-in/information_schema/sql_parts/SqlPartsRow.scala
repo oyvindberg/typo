@@ -10,7 +10,6 @@ package sql_parts
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,22 +24,22 @@ case class SqlPartsRow(
 )
 
 object SqlPartsRow {
-  implicit val decoder: Decoder[SqlPartsRow] = Decoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(SqlPartsRow.apply)
-  implicit val encoder: Encoder[SqlPartsRow] = Encoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(x => (x.featureId, x.featureName, x.isSupported, x.isVerifiedBy, x.comments))
+  implicit val decoder: Decoder[SqlPartsRow] = Decoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(SqlPartsRow.apply)(Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[SqlPartsRow] = Encoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(x => (x.featureId, x.featureName, x.isSupported, x.isVerifiedBy, x.comments))(Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[SqlPartsRow] = new Read[SqlPartsRow](
     gets = List(
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SqlPartsRow(
-      featureId = Get[CharacterData].unsafeGetNullable(rs, i + 0),
-      featureName = Get[CharacterData].unsafeGetNullable(rs, i + 1),
-      isSupported = Get[YesOrNo].unsafeGetNullable(rs, i + 2),
-      isVerifiedBy = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-      comments = Get[CharacterData].unsafeGetNullable(rs, i + 4)
+      featureId = CharacterData.get.unsafeGetNullable(rs, i + 0),
+      featureName = CharacterData.get.unsafeGetNullable(rs, i + 1),
+      isSupported = YesOrNo.get.unsafeGetNullable(rs, i + 2),
+      isVerifiedBy = CharacterData.get.unsafeGetNullable(rs, i + 3),
+      comments = CharacterData.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

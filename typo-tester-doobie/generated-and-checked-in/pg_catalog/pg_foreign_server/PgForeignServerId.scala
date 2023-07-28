@@ -9,17 +9,18 @@ package pg_foreign_server
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_foreign_server` */
 case class PgForeignServerId(value: /* oid */ Long) extends AnyVal
 object PgForeignServerId {
-  implicit val arrayGet: Get[Array[PgForeignServerId]] = Get[Array[/* oid */ Long]].map(_.map(PgForeignServerId.apply))
-  implicit val arrayPut: Put[Array[PgForeignServerId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[PgForeignServerId] = Decoder[/* oid */ Long].map(PgForeignServerId.apply)
-  implicit val encoder: Encoder[PgForeignServerId] = Encoder[/* oid */ Long].contramap(_.value)
-  implicit val get: Get[PgForeignServerId] = Get[/* oid */ Long].map(PgForeignServerId.apply)
+  implicit val arrayGet: Get[Array[PgForeignServerId]] = adventureworks.LongArrayMeta.get.map(_.map(PgForeignServerId.apply))
+  implicit val arrayPut: Put[Array[PgForeignServerId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgForeignServerId] = Decoder.decodeLong.map(PgForeignServerId.apply)
+  implicit val encoder: Encoder[PgForeignServerId] = Encoder.encodeLong.contramap(_.value)
+  implicit val get: Get[PgForeignServerId] = Meta.LongMeta.get.map(PgForeignServerId.apply)
   implicit val ordering: Ordering[PgForeignServerId] = Ordering.by(_.value)
-  implicit val put: Put[PgForeignServerId] = Put[/* oid */ Long].contramap(_.value)
+  implicit val put: Put[PgForeignServerId] = Meta.LongMeta.put.contramap(_.value)
 }

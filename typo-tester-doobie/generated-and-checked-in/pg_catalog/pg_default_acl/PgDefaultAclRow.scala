@@ -9,8 +9,8 @@ package pg_default_acl
 
 import adventureworks.TypoAclItem
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,22 +24,22 @@ case class PgDefaultAclRow(
 )
 
 object PgDefaultAclRow {
-  implicit val decoder: Decoder[PgDefaultAclRow] = Decoder.forProduct5[PgDefaultAclRow, PgDefaultAclId, /* oid */ Long, /* oid */ Long, String, Array[TypoAclItem]]("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")(PgDefaultAclRow.apply)
-  implicit val encoder: Encoder[PgDefaultAclRow] = Encoder.forProduct5[PgDefaultAclRow, PgDefaultAclId, /* oid */ Long, /* oid */ Long, String, Array[TypoAclItem]]("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")(x => (x.oid, x.defaclrole, x.defaclnamespace, x.defaclobjtype, x.defaclacl))
+  implicit val decoder: Decoder[PgDefaultAclRow] = Decoder.forProduct5[PgDefaultAclRow, PgDefaultAclId, /* oid */ Long, /* oid */ Long, String, Array[TypoAclItem]]("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")(PgDefaultAclRow.apply)(PgDefaultAclId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly))
+  implicit val encoder: Encoder[PgDefaultAclRow] = Encoder.forProduct5[PgDefaultAclRow, PgDefaultAclId, /* oid */ Long, /* oid */ Long, String, Array[TypoAclItem]]("oid", "defaclrole", "defaclnamespace", "defaclobjtype", "defaclacl")(x => (x.oid, x.defaclrole, x.defaclnamespace, x.defaclobjtype, x.defaclacl))(PgDefaultAclId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly))
   implicit val read: Read[PgDefaultAclRow] = new Read[PgDefaultAclRow](
     gets = List(
-      (Get[PgDefaultAclId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[Array[TypoAclItem]], Nullability.NoNulls)
+      (PgDefaultAclId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (TypoAclItem.arrayGet, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgDefaultAclRow(
-      oid = Get[PgDefaultAclId].unsafeGetNonNullable(rs, i + 0),
-      defaclrole = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      defaclnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      defaclobjtype = Get[String].unsafeGetNonNullable(rs, i + 3),
-      defaclacl = Get[Array[TypoAclItem]].unsafeGetNonNullable(rs, i + 4)
+      oid = PgDefaultAclId.get.unsafeGetNonNullable(rs, i + 0),
+      defaclrole = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      defaclnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      defaclobjtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      defaclacl = TypoAclItem.arrayGet.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

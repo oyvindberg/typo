@@ -23,7 +23,7 @@ object CountryregionId {
     override def sqlType: String = implicitly[ParameterMetaData[/* max 3 chars */ String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* max 3 chars */ String]].jdbcType
   }
-  implicit val reads: Reads[CountryregionId] = implicitly[Reads[/* max 3 chars */ String]].map(CountryregionId.apply)
+  implicit val reads: Reads[CountryregionId] = Reads.StringReads.map(CountryregionId.apply)
   implicit val toStatement: ToStatement[CountryregionId] = implicitly[ToStatement[/* max 3 chars */ String]].contramap(_.value)
-  implicit val writes: Writes[CountryregionId] = implicitly[Writes[/* max 3 chars */ String]].contramap(_.value)
+  implicit val writes: Writes[CountryregionId] = Writes.StringWrites.contramap(_.value)
 }

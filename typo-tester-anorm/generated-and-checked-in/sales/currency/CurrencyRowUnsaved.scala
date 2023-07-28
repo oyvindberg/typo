@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -42,18 +41,18 @@ object CurrencyRowUnsaved {
   implicit val reads: Reads[CurrencyRowUnsaved] = Reads[CurrencyRowUnsaved](json => JsResult.fromTry(
       Try(
         CurrencyRowUnsaved(
-          currencycode = json.\("currencycode").as[CurrencyId],
-          name = json.\("name").as[Name],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          currencycode = json.\("currencycode").as(CurrencyId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[CurrencyRowUnsaved] = OWrites[CurrencyRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "currencycode" -> Json.toJson(o.currencycode),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "currencycode" -> CurrencyId.writes.writes(o.currencycode),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -12,8 +12,8 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -39,30 +39,30 @@ case class PrViewRow(
 )
 
 object PrViewRow {
-  implicit val decoder: Decoder[PrViewRow] = Decoder.forProduct9[PrViewRow, Option[Int], Option[ProductreviewId], Option[ProductId], Option[Name], Option[TypoLocalDateTime], Option[/* max 50 chars */ String], Option[Int], Option[/* max 3850 chars */ String], Option[TypoLocalDateTime]]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(PrViewRow.apply)
-  implicit val encoder: Encoder[PrViewRow] = Encoder.forProduct9[PrViewRow, Option[Int], Option[ProductreviewId], Option[ProductId], Option[Name], Option[TypoLocalDateTime], Option[/* max 50 chars */ String], Option[Int], Option[/* max 3850 chars */ String], Option[TypoLocalDateTime]]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(x => (x.id, x.productreviewid, x.productid, x.reviewername, x.reviewdate, x.emailaddress, x.rating, x.comments, x.modifieddate))
+  implicit val decoder: Decoder[PrViewRow] = Decoder.forProduct9[PrViewRow, Option[Int], Option[ProductreviewId], Option[ProductId], Option[Name], Option[TypoLocalDateTime], Option[/* max 50 chars */ String], Option[Int], Option[/* max 3850 chars */ String], Option[TypoLocalDateTime]]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(PrViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductreviewId.decoder), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PrViewRow] = Encoder.forProduct9[PrViewRow, Option[Int], Option[ProductreviewId], Option[ProductId], Option[Name], Option[TypoLocalDateTime], Option[/* max 50 chars */ String], Option[Int], Option[/* max 3850 chars */ String], Option[TypoLocalDateTime]]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(x => (x.id, x.productreviewid, x.productid, x.reviewername, x.reviewdate, x.emailaddress, x.rating, x.comments, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductreviewId.encoder), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PrViewRow] = new Read[PrViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[ProductreviewId], Nullability.Nullable),
-      (Get[ProductId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[/* max 3850 chars */ String], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (ProductreviewId.get, Nullability.Nullable),
+      (ProductId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PrViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      productreviewid = Get[ProductreviewId].unsafeGetNullable(rs, i + 1),
-      productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-      reviewername = Get[Name].unsafeGetNullable(rs, i + 3),
-      reviewdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4),
-      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
-      rating = Get[Int].unsafeGetNullable(rs, i + 6),
-      comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 7),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 8)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      productreviewid = ProductreviewId.get.unsafeGetNullable(rs, i + 1),
+      productid = ProductId.get.unsafeGetNullable(rs, i + 2),
+      reviewername = Name.get.unsafeGetNullable(rs, i + 3),
+      reviewdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
+      emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      rating = Meta.IntMeta.get.unsafeGetNullable(rs, i + 6),
+      comments = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

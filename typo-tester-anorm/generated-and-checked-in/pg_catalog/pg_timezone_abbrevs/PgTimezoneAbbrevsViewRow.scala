@@ -8,14 +8,15 @@ package pg_catalog
 package pg_timezone_abbrevs
 
 import adventureworks.TypoInterval
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,9 +30,9 @@ object PgTimezoneAbbrevsViewRow {
   implicit val reads: Reads[PgTimezoneAbbrevsViewRow] = Reads[PgTimezoneAbbrevsViewRow](json => JsResult.fromTry(
       Try(
         PgTimezoneAbbrevsViewRow(
-          abbrev = json.\("abbrev").toOption.map(_.as[String]),
-          utcOffset = json.\("utc_offset").toOption.map(_.as[TypoInterval]),
-          isDst = json.\("is_dst").toOption.map(_.as[Boolean])
+          abbrev = json.\("abbrev").toOption.map(_.as(Reads.StringReads)),
+          utcOffset = json.\("utc_offset").toOption.map(_.as(TypoInterval.reads)),
+          isDst = json.\("is_dst").toOption.map(_.as(Reads.BooleanReads))
         )
       )
     ),
@@ -39,17 +40,17 @@ object PgTimezoneAbbrevsViewRow {
   def rowParser(idx: Int): RowParser[PgTimezoneAbbrevsViewRow] = RowParser[PgTimezoneAbbrevsViewRow] { row =>
     Success(
       PgTimezoneAbbrevsViewRow(
-        abbrev = row[Option[String]](idx + 0),
-        utcOffset = row[Option[TypoInterval]](idx + 1),
-        isDst = row[Option[Boolean]](idx + 2)
+        abbrev = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        utcOffset = row(idx + 1)(Column.columnToOption(TypoInterval.column)),
+        isDst = row(idx + 2)(Column.columnToOption(Column.columnToBoolean))
       )
     )
   }
   implicit val writes: OWrites[PgTimezoneAbbrevsViewRow] = OWrites[PgTimezoneAbbrevsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "abbrev" -> Json.toJson(o.abbrev),
-      "utc_offset" -> Json.toJson(o.utcOffset),
-      "is_dst" -> Json.toJson(o.isDst)
+      "abbrev" -> Writes.OptionWrites(Writes.StringWrites).writes(o.abbrev),
+      "utc_offset" -> Writes.OptionWrites(TypoInterval.writes).writes(o.utcOffset),
+      "is_dst" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isDst)
     ))
   )
 }

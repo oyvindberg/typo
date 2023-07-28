@@ -8,6 +8,7 @@ package information_schema
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -16,11 +17,11 @@ import io.circe.Encoder
   */
 case class SqlIdentifier(value: String) extends AnyVal
 object SqlIdentifier {
-  implicit val arrayGet: Get[Array[SqlIdentifier]] = Get[Array[String]].map(_.map(SqlIdentifier.apply))
-  implicit val arrayPut: Put[Array[SqlIdentifier]] = Put[Array[String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[SqlIdentifier] = Decoder[String].map(SqlIdentifier.apply)
-  implicit val encoder: Encoder[SqlIdentifier] = Encoder[String].contramap(_.value)
-  implicit val get: Get[SqlIdentifier] = Get[String].map(SqlIdentifier.apply)
+  implicit val arrayGet: Get[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.get.map(_.map(SqlIdentifier.apply))
+  implicit val arrayPut: Put[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[SqlIdentifier] = Decoder.decodeString.map(SqlIdentifier.apply)
+  implicit val encoder: Encoder[SqlIdentifier] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[SqlIdentifier] = Meta.StringMeta.get.map(SqlIdentifier.apply)
   implicit val ordering: Ordering[SqlIdentifier] = Ordering.by(_.value)
-  implicit val put: Put[SqlIdentifier] = Put[String].contramap(_.value)
+  implicit val put: Put[SqlIdentifier] = Meta.StringMeta.put.contramap(_.value)
 }

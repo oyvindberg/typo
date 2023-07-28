@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,20 +28,20 @@ case class CuViewRow(
 )
 
 object CuViewRow {
-  implicit val decoder: Decoder[CuViewRow] = Decoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(CuViewRow.apply)
-  implicit val encoder: Encoder[CuViewRow] = Encoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(x => (x.id, x.currencycode, x.name, x.modifieddate))
+  implicit val decoder: Decoder[CuViewRow] = Decoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(CuViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[CuViewRow] = Encoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(x => (x.id, x.currencycode, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[CuViewRow] = new Read[CuViewRow](
     gets = List(
-      (Get[/* bpchar */ String], Nullability.Nullable),
-      (Get[CurrencyId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (CurrencyId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CuViewRow(
-      id = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 0),
-      currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
-      name = Get[Name].unsafeGetNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
+      id = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      currencycode = CurrencyId.get.unsafeGetNullable(rs, i + 1),
+      name = Name.get.unsafeGetNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

@@ -8,16 +8,19 @@ package pg_catalog
 package pg_replication_origin
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_replication_origin where roident = ${roident}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_replication_origin where roident = ${fromWrite(roident)(Write.fromPut(PgReplicationOriginId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     sql"""insert into pg_catalog.pg_replication_origin(roident, roname)
-          values (${unsaved.roident}::oid, ${unsaved.roname})
+          values (${fromWrite(unsaved.roident)(Write.fromPut(PgReplicationOriginId.put))}::oid, ${fromWrite(unsaved.roname)(Write.fromPut(Meta.StringMeta.put))})
           returning roident, roname
        """.query(PgReplicationOriginRow.read).unique
   }
@@ -25,16 +28,16 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     sql"select roident, roname from pg_catalog.pg_replication_origin".query(PgReplicationOriginRow.read).stream
   }
   override def selectById(roident: PgReplicationOriginId): ConnectionIO[Option[PgReplicationOriginRow]] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ${roident}".query(PgReplicationOriginRow.read).option
+    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ${fromWrite(roident)(Write.fromPut(PgReplicationOriginId.put))}".query(PgReplicationOriginRow.read).option
   }
   override def selectByIds(roidents: Array[PgReplicationOriginId]): Stream[ConnectionIO, PgReplicationOriginRow] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY(${roidents})".query(PgReplicationOriginRow.read).stream
+    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY(${fromWrite(roidents)(Write.fromPut(PgReplicationOriginId.arrayPut))})".query(PgReplicationOriginRow.read).stream
   }
   override def update(row: PgReplicationOriginRow): ConnectionIO[Boolean] = {
     val roident = row.roident
     sql"""update pg_catalog.pg_replication_origin
-          set roname = ${row.roname}
-          where roident = ${roident}
+          set roname = ${fromWrite(row.roname)(Write.fromPut(Meta.StringMeta.put))}
+          where roident = ${fromWrite(roident)(Write.fromPut(PgReplicationOriginId.put))}
        """
       .update
       .run
@@ -43,8 +46,8 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def upsert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     sql"""insert into pg_catalog.pg_replication_origin(roident, roname)
           values (
-            ${unsaved.roident}::oid,
-            ${unsaved.roname}
+            ${fromWrite(unsaved.roident)(Write.fromPut(PgReplicationOriginId.put))}::oid,
+            ${fromWrite(unsaved.roname)(Write.fromPut(Meta.StringMeta.put))}
           )
           on conflict (roident)
           do update set

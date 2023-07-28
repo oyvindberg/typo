@@ -9,7 +9,6 @@ package myschema
 package marital_status
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -20,14 +19,14 @@ case class MaritalStatusRow(
 )
 
 object MaritalStatusRow {
-  implicit val decoder: Decoder[MaritalStatusRow] = Decoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(MaritalStatusRow.apply)
-  implicit val encoder: Encoder[MaritalStatusRow] = Encoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(x => (x.id))
+  implicit val decoder: Decoder[MaritalStatusRow] = Decoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(MaritalStatusRow.apply)(MaritalStatusId.decoder)
+  implicit val encoder: Encoder[MaritalStatusRow] = Encoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(x => (x.id))(MaritalStatusId.encoder)
   implicit val read: Read[MaritalStatusRow] = new Read[MaritalStatusRow](
     gets = List(
-      (Get[MaritalStatusId], Nullability.NoNulls)
+      (MaritalStatusId.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => MaritalStatusRow(
-      id = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 0)
+      id = MaritalStatusId.get.unsafeGetNonNullable(rs, i + 0)
     )
   )
 }

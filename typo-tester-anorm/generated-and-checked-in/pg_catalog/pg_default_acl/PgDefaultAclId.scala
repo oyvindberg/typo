@@ -23,7 +23,7 @@ object PgDefaultAclId {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgDefaultAclId] = implicitly[Reads[/* oid */ Long]].map(PgDefaultAclId.apply)
+  implicit val reads: Reads[PgDefaultAclId] = Reads.LongReads.map(PgDefaultAclId.apply)
   implicit val toStatement: ToStatement[PgDefaultAclId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgDefaultAclId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgDefaultAclId] = Writes.LongWrites.contramap(_.value)
 }

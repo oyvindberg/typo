@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_create_index
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -41,22 +42,22 @@ object PgStatProgressCreateIndexViewRow {
   implicit val reads: Reads[PgStatProgressCreateIndexViewRow] = Reads[PgStatProgressCreateIndexViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressCreateIndexViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
-          datname = json.\("datname").toOption.map(_.as[String]),
-          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-          indexRelid = json.\("index_relid").toOption.map(_.as[/* oid */ Long]),
-          command = json.\("command").toOption.map(_.as[String]),
-          phase = json.\("phase").toOption.map(_.as[String]),
-          lockersTotal = json.\("lockers_total").toOption.map(_.as[Long]),
-          lockersDone = json.\("lockers_done").toOption.map(_.as[Long]),
-          currentLockerPid = json.\("current_locker_pid").toOption.map(_.as[Long]),
-          blocksTotal = json.\("blocks_total").toOption.map(_.as[Long]),
-          blocksDone = json.\("blocks_done").toOption.map(_.as[Long]),
-          tuplesTotal = json.\("tuples_total").toOption.map(_.as[Long]),
-          tuplesDone = json.\("tuples_done").toOption.map(_.as[Long]),
-          partitionsTotal = json.\("partitions_total").toOption.map(_.as[Long]),
-          partitionsDone = json.\("partitions_done").toOption.map(_.as[Long])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
+          datname = json.\("datname").toOption.map(_.as(Reads.StringReads)),
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          indexRelid = json.\("index_relid").toOption.map(_.as(Reads.LongReads)),
+          command = json.\("command").toOption.map(_.as(Reads.StringReads)),
+          phase = json.\("phase").toOption.map(_.as(Reads.StringReads)),
+          lockersTotal = json.\("lockers_total").toOption.map(_.as(Reads.LongReads)),
+          lockersDone = json.\("lockers_done").toOption.map(_.as(Reads.LongReads)),
+          currentLockerPid = json.\("current_locker_pid").toOption.map(_.as(Reads.LongReads)),
+          blocksTotal = json.\("blocks_total").toOption.map(_.as(Reads.LongReads)),
+          blocksDone = json.\("blocks_done").toOption.map(_.as(Reads.LongReads)),
+          tuplesTotal = json.\("tuples_total").toOption.map(_.as(Reads.LongReads)),
+          tuplesDone = json.\("tuples_done").toOption.map(_.as(Reads.LongReads)),
+          partitionsTotal = json.\("partitions_total").toOption.map(_.as(Reads.LongReads)),
+          partitionsDone = json.\("partitions_done").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -64,43 +65,43 @@ object PgStatProgressCreateIndexViewRow {
   def rowParser(idx: Int): RowParser[PgStatProgressCreateIndexViewRow] = RowParser[PgStatProgressCreateIndexViewRow] { row =>
     Success(
       PgStatProgressCreateIndexViewRow(
-        pid = row[Option[Int]](idx + 0),
-        datid = row[Option[/* oid */ Long]](idx + 1),
-        datname = row[Option[String]](idx + 2),
-        relid = row[Option[/* oid */ Long]](idx + 3),
-        indexRelid = row[Option[/* oid */ Long]](idx + 4),
-        command = row[Option[String]](idx + 5),
-        phase = row[Option[String]](idx + 6),
-        lockersTotal = row[Option[Long]](idx + 7),
-        lockersDone = row[Option[Long]](idx + 8),
-        currentLockerPid = row[Option[Long]](idx + 9),
-        blocksTotal = row[Option[Long]](idx + 10),
-        blocksDone = row[Option[Long]](idx + 11),
-        tuplesTotal = row[Option[Long]](idx + 12),
-        tuplesDone = row[Option[Long]](idx + 13),
-        partitionsTotal = row[Option[Long]](idx + 14),
-        partitionsDone = row[Option[Long]](idx + 15)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        datid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        datname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        indexRelid = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        command = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        phase = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        lockersTotal = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        lockersDone = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        currentLockerPid = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        blocksTotal = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
+        blocksDone = row(idx + 11)(Column.columnToOption(Column.columnToLong)),
+        tuplesTotal = row(idx + 12)(Column.columnToOption(Column.columnToLong)),
+        tuplesDone = row(idx + 13)(Column.columnToOption(Column.columnToLong)),
+        partitionsTotal = row(idx + 14)(Column.columnToOption(Column.columnToLong)),
+        partitionsDone = row(idx + 15)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgStatProgressCreateIndexViewRow] = OWrites[PgStatProgressCreateIndexViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "datid" -> Json.toJson(o.datid),
-      "datname" -> Json.toJson(o.datname),
-      "relid" -> Json.toJson(o.relid),
-      "index_relid" -> Json.toJson(o.indexRelid),
-      "command" -> Json.toJson(o.command),
-      "phase" -> Json.toJson(o.phase),
-      "lockers_total" -> Json.toJson(o.lockersTotal),
-      "lockers_done" -> Json.toJson(o.lockersDone),
-      "current_locker_pid" -> Json.toJson(o.currentLockerPid),
-      "blocks_total" -> Json.toJson(o.blocksTotal),
-      "blocks_done" -> Json.toJson(o.blocksDone),
-      "tuples_total" -> Json.toJson(o.tuplesTotal),
-      "tuples_done" -> Json.toJson(o.tuplesDone),
-      "partitions_total" -> Json.toJson(o.partitionsTotal),
-      "partitions_done" -> Json.toJson(o.partitionsDone)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
+      "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "index_relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexRelid),
+      "command" -> Writes.OptionWrites(Writes.StringWrites).writes(o.command),
+      "phase" -> Writes.OptionWrites(Writes.StringWrites).writes(o.phase),
+      "lockers_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.lockersTotal),
+      "lockers_done" -> Writes.OptionWrites(Writes.LongWrites).writes(o.lockersDone),
+      "current_locker_pid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.currentLockerPid),
+      "blocks_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blocksTotal),
+      "blocks_done" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blocksDone),
+      "tuples_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tuplesTotal),
+      "tuples_done" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tuplesDone),
+      "partitions_total" -> Writes.OptionWrites(Writes.LongWrites).writes(o.partitionsTotal),
+      "partitions_done" -> Writes.OptionWrites(Writes.LongWrites).writes(o.partitionsDone)
     ))
   )
 }

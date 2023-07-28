@@ -9,15 +9,16 @@ package salespersonquotahistory
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,11 +40,11 @@ object SalespersonquotahistoryRow {
   implicit val reads: Reads[SalespersonquotahistoryRow] = Reads[SalespersonquotahistoryRow](json => JsResult.fromTry(
       Try(
         SalespersonquotahistoryRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          quotadate = json.\("quotadate").as[TypoLocalDateTime],
-          salesquota = json.\("salesquota").as[BigDecimal],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          quotadate = json.\("quotadate").as(TypoLocalDateTime.reads),
+          salesquota = json.\("salesquota").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,21 +52,21 @@ object SalespersonquotahistoryRow {
   def rowParser(idx: Int): RowParser[SalespersonquotahistoryRow] = RowParser[SalespersonquotahistoryRow] { row =>
     Success(
       SalespersonquotahistoryRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        quotadate = row[TypoLocalDateTime](idx + 1),
-        salesquota = row[BigDecimal](idx + 2),
-        rowguid = row[UUID](idx + 3),
-        modifieddate = row[TypoLocalDateTime](idx + 4)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        quotadate = row(idx + 1)(TypoLocalDateTime.column),
+        salesquota = row(idx + 2)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 3)(Column.columnToUUID),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[SalespersonquotahistoryRow] = OWrites[SalespersonquotahistoryRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "quotadate" -> Json.toJson(o.quotadate),
-      "salesquota" -> Json.toJson(o.salesquota),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "quotadate" -> TypoLocalDateTime.writes.writes(o.quotadate),
+      "salesquota" -> Writes.BigDecimalWrites.writes(o.salesquota),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

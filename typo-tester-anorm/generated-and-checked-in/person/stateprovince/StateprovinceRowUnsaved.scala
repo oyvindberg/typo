@@ -17,9 +17,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -74,28 +74,28 @@ object StateprovinceRowUnsaved {
   implicit val reads: Reads[StateprovinceRowUnsaved] = Reads[StateprovinceRowUnsaved](json => JsResult.fromTry(
       Try(
         StateprovinceRowUnsaved(
-          stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
-          countryregioncode = json.\("countryregioncode").as[CountryregionId],
-          name = json.\("name").as[Name],
-          territoryid = json.\("territoryid").as[SalesterritoryId],
-          stateprovinceid = json.\("stateprovinceid").as[Defaulted[StateprovinceId]],
-          isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Defaulted[Flag]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          stateprovincecode = json.\("stateprovincecode").as(Reads.StringReads),
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          name = json.\("name").as(Name.reads),
+          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+          stateprovinceid = json.\("stateprovinceid").as(Defaulted.reads(StateprovinceId.reads)),
+          isonlystateprovinceflag = json.\("isonlystateprovinceflag").as(Defaulted.reads(Flag.reads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[StateprovinceRowUnsaved] = OWrites[StateprovinceRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "stateprovincecode" -> Json.toJson(o.stateprovincecode),
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "name" -> Json.toJson(o.name),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "isonlystateprovinceflag" -> Json.toJson(o.isonlystateprovinceflag),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "stateprovincecode" -> Writes.StringWrites.writes(o.stateprovincecode),
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "name" -> Name.writes.writes(o.name),
+      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+      "stateprovinceid" -> Defaulted.writes(StateprovinceId.writes).writes(o.stateprovinceid),
+      "isonlystateprovinceflag" -> Defaulted.writes(Flag.writes).writes(o.isonlystateprovinceflag),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

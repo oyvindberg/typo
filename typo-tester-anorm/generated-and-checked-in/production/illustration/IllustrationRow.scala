@@ -9,14 +9,15 @@ package illustration
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,9 +33,9 @@ object IllustrationRow {
   implicit val reads: Reads[IllustrationRow] = Reads[IllustrationRow](json => JsResult.fromTry(
       Try(
         IllustrationRow(
-          illustrationid = json.\("illustrationid").as[IllustrationId],
-          diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          illustrationid = json.\("illustrationid").as(IllustrationId.reads),
+          diagram = json.\("diagram").toOption.map(_.as(TypoXml.reads)),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -42,17 +43,17 @@ object IllustrationRow {
   def rowParser(idx: Int): RowParser[IllustrationRow] = RowParser[IllustrationRow] { row =>
     Success(
       IllustrationRow(
-        illustrationid = row[IllustrationId](idx + 0),
-        diagram = row[Option[TypoXml]](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        illustrationid = row(idx + 0)(IllustrationId.column),
+        diagram = row(idx + 1)(Column.columnToOption(TypoXml.column)),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[IllustrationRow] = OWrites[IllustrationRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "illustrationid" -> Json.toJson(o.illustrationid),
-      "diagram" -> Json.toJson(o.diagram),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
+      "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

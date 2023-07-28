@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_ts_parser
 
+import adventureworks.TypoRegproc
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_parser where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_parser where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
     sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
-          values (${unsaved.oid}::oid, ${unsaved.prsname}::name, ${unsaved.prsnamespace}::oid, ${unsaved.prsstart}::regproc, ${unsaved.prstoken}::regproc, ${unsaved.prsend}::regproc, ${unsaved.prsheadline}::regproc, ${unsaved.prslextype}::regproc)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsParserId.put))}::oid, ${fromWrite(unsaved.prsname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.prsnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prsstart)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prstoken)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prsend)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
        """.query(PgTsParserRow.read).unique
   }
@@ -25,22 +29,22 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser".query(PgTsParserRow.read).stream
   }
   override def selectById(oid: PgTsParserId): ConnectionIO[Option[PgTsParserRow]] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ${oid}".query(PgTsParserRow.read).option
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}".query(PgTsParserRow.read).option
   }
   override def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${oids})".query(PgTsParserRow.read).stream
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTsParserId.arrayPut))})".query(PgTsParserRow.read).stream
   }
   override def update(row: PgTsParserRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_parser
-          set prsname = ${row.prsname}::name,
-              prsnamespace = ${row.prsnamespace}::oid,
-              prsstart = ${row.prsstart}::regproc,
-              prstoken = ${row.prstoken}::regproc,
-              prsend = ${row.prsend}::regproc,
-              prsheadline = ${row.prsheadline}::regproc,
-              prslextype = ${row.prslextype}::regproc
-          where oid = ${oid}
+          set prsname = ${fromWrite(row.prsname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              prsnamespace = ${fromWrite(row.prsnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              prsstart = ${fromWrite(row.prsstart)(Write.fromPut(TypoRegproc.put))}::regproc,
+              prstoken = ${fromWrite(row.prstoken)(Write.fromPut(TypoRegproc.put))}::regproc,
+              prsend = ${fromWrite(row.prsend)(Write.fromPut(TypoRegproc.put))}::regproc,
+              prsheadline = ${fromWrite(row.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc,
+              prslextype = ${fromWrite(row.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsParserId.put))}
        """
       .update
       .run
@@ -49,14 +53,14 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
   override def upsert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
     sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.prsname}::name,
-            ${unsaved.prsnamespace}::oid,
-            ${unsaved.prsstart}::regproc,
-            ${unsaved.prstoken}::regproc,
-            ${unsaved.prsend}::regproc,
-            ${unsaved.prsheadline}::regproc,
-            ${unsaved.prslextype}::regproc
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgTsParserId.put))}::oid,
+            ${fromWrite(unsaved.prsname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.prsnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.prsstart)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.prstoken)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.prsend)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.prsheadline)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.prslextype)(Write.fromPut(TypoRegproc.put))}::regproc
           )
           on conflict (oid)
           do update set

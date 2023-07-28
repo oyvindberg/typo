@@ -9,14 +9,15 @@ package vvendorwithaddresses
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,15 +43,15 @@ object VvendorwithaddressesViewRow {
   implicit val reads: Reads[VvendorwithaddressesViewRow] = Reads[VvendorwithaddressesViewRow](json => JsResult.fromTry(
       Try(
         VvendorwithaddressesViewRow(
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          addresstype = json.\("addresstype").toOption.map(_.as[Name]),
-          addressline1 = json.\("addressline1").toOption.map(_.as[/* max 60 chars */ String]),
-          addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
-          city = json.\("city").toOption.map(_.as[/* max 30 chars */ String]),
-          stateprovincename = json.\("stateprovincename").toOption.map(_.as[Name]),
-          postalcode = json.\("postalcode").toOption.map(_.as[/* max 15 chars */ String]),
-          countryregionname = json.\("countryregionname").toOption.map(_.as[Name])
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          addresstype = json.\("addresstype").toOption.map(_.as(Name.reads)),
+          addressline1 = json.\("addressline1").toOption.map(_.as(Reads.StringReads)),
+          addressline2 = json.\("addressline2").toOption.map(_.as(Reads.StringReads)),
+          city = json.\("city").toOption.map(_.as(Reads.StringReads)),
+          stateprovincename = json.\("stateprovincename").toOption.map(_.as(Name.reads)),
+          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads)),
+          countryregionname = json.\("countryregionname").toOption.map(_.as(Name.reads))
         )
       )
     ),
@@ -58,29 +59,29 @@ object VvendorwithaddressesViewRow {
   def rowParser(idx: Int): RowParser[VvendorwithaddressesViewRow] = RowParser[VvendorwithaddressesViewRow] { row =>
     Success(
       VvendorwithaddressesViewRow(
-        businessentityid = row[Option[BusinessentityId]](idx + 0),
-        name = row[Option[Name]](idx + 1),
-        addresstype = row[Option[Name]](idx + 2),
-        addressline1 = row[Option[/* max 60 chars */ String]](idx + 3),
-        addressline2 = row[Option[/* max 60 chars */ String]](idx + 4),
-        city = row[Option[/* max 30 chars */ String]](idx + 5),
-        stateprovincename = row[Option[Name]](idx + 6),
-        postalcode = row[Option[/* max 15 chars */ String]](idx + 7),
-        countryregionname = row[Option[Name]](idx + 8)
+        businessentityid = row(idx + 0)(Column.columnToOption(BusinessentityId.column)),
+        name = row(idx + 1)(Column.columnToOption(Name.column)),
+        addresstype = row(idx + 2)(Column.columnToOption(Name.column)),
+        addressline1 = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        addressline2 = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        city = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        stateprovincename = row(idx + 6)(Column.columnToOption(Name.column)),
+        postalcode = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        countryregionname = row(idx + 8)(Column.columnToOption(Name.column))
       )
     )
   }
   implicit val writes: OWrites[VvendorwithaddressesViewRow] = OWrites[VvendorwithaddressesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "name" -> Json.toJson(o.name),
-      "addresstype" -> Json.toJson(o.addresstype),
-      "addressline1" -> Json.toJson(o.addressline1),
-      "addressline2" -> Json.toJson(o.addressline2),
-      "city" -> Json.toJson(o.city),
-      "stateprovincename" -> Json.toJson(o.stateprovincename),
-      "postalcode" -> Json.toJson(o.postalcode),
-      "countryregionname" -> Json.toJson(o.countryregionname)
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "addresstype" -> Writes.OptionWrites(Name.writes).writes(o.addresstype),
+      "addressline1" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline1),
+      "addressline2" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline2),
+      "city" -> Writes.OptionWrites(Writes.StringWrites).writes(o.city),
+      "stateprovincename" -> Writes.OptionWrites(Name.writes).writes(o.stateprovincename),
+      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode),
+      "countryregionname" -> Writes.OptionWrites(Name.writes).writes(o.countryregionname)
     ))
   )
 }

@@ -13,9 +13,9 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -60,22 +60,22 @@ object LocationRowUnsaved {
   implicit val reads: Reads[LocationRowUnsaved] = Reads[LocationRowUnsaved](json => JsResult.fromTry(
       Try(
         LocationRowUnsaved(
-          name = json.\("name").as[Name],
-          locationid = json.\("locationid").as[Defaulted[LocationId]],
-          costrate = json.\("costrate").as[Defaulted[BigDecimal]],
-          availability = json.\("availability").as[Defaulted[BigDecimal]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          locationid = json.\("locationid").as(Defaulted.reads(LocationId.reads)),
+          costrate = json.\("costrate").as(Defaulted.reads(Reads.bigDecReads)),
+          availability = json.\("availability").as(Defaulted.reads(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[LocationRowUnsaved] = OWrites[LocationRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "locationid" -> Json.toJson(o.locationid),
-      "costrate" -> Json.toJson(o.costrate),
-      "availability" -> Json.toJson(o.availability),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "locationid" -> Defaulted.writes(LocationId.writes).writes(o.locationid),
+      "costrate" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.costrate),
+      "availability" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.availability),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

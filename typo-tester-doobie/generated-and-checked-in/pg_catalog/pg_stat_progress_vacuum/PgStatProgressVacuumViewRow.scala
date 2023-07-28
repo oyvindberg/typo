@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stat_progress_vacuum
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -29,34 +29,34 @@ case class PgStatProgressVacuumViewRow(
 )
 
 object PgStatProgressVacuumViewRow {
-  implicit val decoder: Decoder[PgStatProgressVacuumViewRow] = Decoder.forProduct11[PgStatProgressVacuumViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples")(PgStatProgressVacuumViewRow.apply)
-  implicit val encoder: Encoder[PgStatProgressVacuumViewRow] = Encoder.forProduct11[PgStatProgressVacuumViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples")(x => (x.pid, x.datid, x.datname, x.relid, x.phase, x.heapBlksTotal, x.heapBlksScanned, x.heapBlksVacuumed, x.indexVacuumCount, x.maxDeadTuples, x.numDeadTuples))
+  implicit val decoder: Decoder[PgStatProgressVacuumViewRow] = Decoder.forProduct11[PgStatProgressVacuumViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples")(PgStatProgressVacuumViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit val encoder: Encoder[PgStatProgressVacuumViewRow] = Encoder.forProduct11[PgStatProgressVacuumViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples")(x => (x.pid, x.datid, x.datname, x.relid, x.phase, x.heapBlksTotal, x.heapBlksScanned, x.heapBlksVacuumed, x.indexVacuumCount, x.maxDeadTuples, x.numDeadTuples))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit val read: Read[PgStatProgressVacuumViewRow] = new Read[PgStatProgressVacuumViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressVacuumViewRow(
-      pid = Get[Int].unsafeGetNullable(rs, i + 0),
-      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      datname = Get[String].unsafeGetNullable(rs, i + 2),
-      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-      phase = Get[String].unsafeGetNullable(rs, i + 4),
-      heapBlksTotal = Get[Long].unsafeGetNullable(rs, i + 5),
-      heapBlksScanned = Get[Long].unsafeGetNullable(rs, i + 6),
-      heapBlksVacuumed = Get[Long].unsafeGetNullable(rs, i + 7),
-      indexVacuumCount = Get[Long].unsafeGetNullable(rs, i + 8),
-      maxDeadTuples = Get[Long].unsafeGetNullable(rs, i + 9),
-      numDeadTuples = Get[Long].unsafeGetNullable(rs, i + 10)
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      phase = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      heapBlksTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
+      heapBlksScanned = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      heapBlksVacuumed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      indexVacuumCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
+      maxDeadTuples = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
+      numDeadTuples = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

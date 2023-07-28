@@ -24,7 +24,7 @@ object YesOrNo {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[YesOrNo] = implicitly[Reads[String]].map(YesOrNo.apply)
+  implicit val reads: Reads[YesOrNo] = Reads.StringReads.map(YesOrNo.apply)
   implicit val toStatement: ToStatement[YesOrNo] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[YesOrNo] = implicitly[Writes[String]].contramap(_.value)
+  implicit val writes: Writes[YesOrNo] = Writes.StringWrites.contramap(_.value)
 }

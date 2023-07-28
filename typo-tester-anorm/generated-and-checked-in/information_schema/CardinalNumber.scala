@@ -24,7 +24,7 @@ object CardinalNumber {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[CardinalNumber] = implicitly[Reads[Int]].map(CardinalNumber.apply)
+  implicit val reads: Reads[CardinalNumber] = Reads.IntReads.map(CardinalNumber.apply)
   implicit val toStatement: ToStatement[CardinalNumber] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[CardinalNumber] = implicitly[Writes[Int]].contramap(_.value)
+  implicit val writes: Writes[CardinalNumber] = Writes.IntWrites.contramap(_.value)
 }

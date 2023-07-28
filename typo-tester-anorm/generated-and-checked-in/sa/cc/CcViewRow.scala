@@ -9,14 +9,15 @@ package cc
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.sales.creditcard.CreditcardId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -40,13 +41,13 @@ object CcViewRow {
   implicit val reads: Reads[CcViewRow] = Reads[CcViewRow](json => JsResult.fromTry(
       Try(
         CcViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-          cardtype = json.\("cardtype").toOption.map(_.as[/* max 50 chars */ String]),
-          cardnumber = json.\("cardnumber").toOption.map(_.as[/* max 25 chars */ String]),
-          expmonth = json.\("expmonth").toOption.map(_.as[Int]),
-          expyear = json.\("expyear").toOption.map(_.as[Int]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          cardtype = json.\("cardtype").toOption.map(_.as(Reads.StringReads)),
+          cardnumber = json.\("cardnumber").toOption.map(_.as(Reads.StringReads)),
+          expmonth = json.\("expmonth").toOption.map(_.as(Reads.IntReads)),
+          expyear = json.\("expyear").toOption.map(_.as(Reads.IntReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -54,25 +55,25 @@ object CcViewRow {
   def rowParser(idx: Int): RowParser[CcViewRow] = RowParser[CcViewRow] { row =>
     Success(
       CcViewRow(
-        id = row[Option[Int]](idx + 0),
-        creditcardid = row[Option[CreditcardId]](idx + 1),
-        cardtype = row[Option[/* max 50 chars */ String]](idx + 2),
-        cardnumber = row[Option[/* max 25 chars */ String]](idx + 3),
-        expmonth = row[Option[Int]](idx + 4),
-        expyear = row[Option[Int]](idx + 5),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        creditcardid = row(idx + 1)(Column.columnToOption(CreditcardId.column)),
+        cardtype = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        cardnumber = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        expmonth = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
+        expyear = row(idx + 5)(Column.columnToOption(Column.columnToInt)),
+        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[CcViewRow] = OWrites[CcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "cardtype" -> Json.toJson(o.cardtype),
-      "cardnumber" -> Json.toJson(o.cardnumber),
-      "expmonth" -> Json.toJson(o.expmonth),
-      "expyear" -> Json.toJson(o.expyear),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "cardtype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cardtype),
+      "cardnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cardnumber),
+      "expmonth" -> Writes.OptionWrites(Writes.IntWrites).writes(o.expmonth),
+      "expyear" -> Writes.OptionWrites(Writes.IntWrites).writes(o.expyear),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

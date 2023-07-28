@@ -15,9 +15,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -83,30 +83,30 @@ object SalespersonRowUnsaved {
   implicit val reads: Reads[SalespersonRowUnsaved] = Reads[SalespersonRowUnsaved](json => JsResult.fromTry(
       Try(
         SalespersonRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
-          bonus = json.\("bonus").as[Defaulted[BigDecimal]],
-          commissionpct = json.\("commissionpct").as[Defaulted[BigDecimal]],
-          salesytd = json.\("salesytd").as[Defaulted[BigDecimal]],
-          saleslastyear = json.\("saleslastyear").as[Defaulted[BigDecimal]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          salesquota = json.\("salesquota").toOption.map(_.as(Reads.bigDecReads)),
+          bonus = json.\("bonus").as(Defaulted.reads(Reads.bigDecReads)),
+          commissionpct = json.\("commissionpct").as(Defaulted.reads(Reads.bigDecReads)),
+          salesytd = json.\("salesytd").as(Defaulted.reads(Reads.bigDecReads)),
+          saleslastyear = json.\("saleslastyear").as(Defaulted.reads(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[SalespersonRowUnsaved] = OWrites[SalespersonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "salesquota" -> Json.toJson(o.salesquota),
-      "bonus" -> Json.toJson(o.bonus),
-      "commissionpct" -> Json.toJson(o.commissionpct),
-      "salesytd" -> Json.toJson(o.salesytd),
-      "saleslastyear" -> Json.toJson(o.saleslastyear),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "salesquota" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesquota),
+      "bonus" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.bonus),
+      "commissionpct" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.commissionpct),
+      "salesytd" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.salesytd),
+      "saleslastyear" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.saleslastyear),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

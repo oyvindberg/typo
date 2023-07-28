@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_user_mapping
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,10 +30,10 @@ object PgUserMappingRow {
   implicit val reads: Reads[PgUserMappingRow] = Reads[PgUserMappingRow](json => JsResult.fromTry(
       Try(
         PgUserMappingRow(
-          oid = json.\("oid").as[PgUserMappingId],
-          umuser = json.\("umuser").as[/* oid */ Long],
-          umserver = json.\("umserver").as[/* oid */ Long],
-          umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
+          oid = json.\("oid").as(PgUserMappingId.reads),
+          umuser = json.\("umuser").as(Reads.LongReads),
+          umserver = json.\("umserver").as(Reads.LongReads),
+          umoptions = json.\("umoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -40,19 +41,19 @@ object PgUserMappingRow {
   def rowParser(idx: Int): RowParser[PgUserMappingRow] = RowParser[PgUserMappingRow] { row =>
     Success(
       PgUserMappingRow(
-        oid = row[PgUserMappingId](idx + 0),
-        umuser = row[/* oid */ Long](idx + 1),
-        umserver = row[/* oid */ Long](idx + 2),
-        umoptions = row[Option[Array[String]]](idx + 3)
+        oid = row(idx + 0)(PgUserMappingId.column),
+        umuser = row(idx + 1)(Column.columnToLong),
+        umserver = row(idx + 2)(Column.columnToLong),
+        umoptions = row(idx + 3)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgUserMappingRow] = OWrites[PgUserMappingRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "umuser" -> Json.toJson(o.umuser),
-      "umserver" -> Json.toJson(o.umserver),
-      "umoptions" -> Json.toJson(o.umoptions)
+      "oid" -> PgUserMappingId.writes.writes(o.oid),
+      "umuser" -> Writes.LongWrites.writes(o.umuser),
+      "umserver" -> Writes.LongWrites.writes(o.umserver),
+      "umoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.umoptions)
     ))
   )
 }

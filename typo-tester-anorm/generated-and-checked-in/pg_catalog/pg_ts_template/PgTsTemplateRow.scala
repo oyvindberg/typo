@@ -8,14 +8,15 @@ package pg_catalog
 package pg_ts_template
 
 import adventureworks.TypoRegproc
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,11 +32,11 @@ object PgTsTemplateRow {
   implicit val reads: Reads[PgTsTemplateRow] = Reads[PgTsTemplateRow](json => JsResult.fromTry(
       Try(
         PgTsTemplateRow(
-          oid = json.\("oid").as[PgTsTemplateId],
-          tmplname = json.\("tmplname").as[String],
-          tmplnamespace = json.\("tmplnamespace").as[/* oid */ Long],
-          tmplinit = json.\("tmplinit").as[TypoRegproc],
-          tmpllexize = json.\("tmpllexize").as[TypoRegproc]
+          oid = json.\("oid").as(PgTsTemplateId.reads),
+          tmplname = json.\("tmplname").as(Reads.StringReads),
+          tmplnamespace = json.\("tmplnamespace").as(Reads.LongReads),
+          tmplinit = json.\("tmplinit").as(TypoRegproc.reads),
+          tmpllexize = json.\("tmpllexize").as(TypoRegproc.reads)
         )
       )
     ),
@@ -43,21 +44,21 @@ object PgTsTemplateRow {
   def rowParser(idx: Int): RowParser[PgTsTemplateRow] = RowParser[PgTsTemplateRow] { row =>
     Success(
       PgTsTemplateRow(
-        oid = row[PgTsTemplateId](idx + 0),
-        tmplname = row[String](idx + 1),
-        tmplnamespace = row[/* oid */ Long](idx + 2),
-        tmplinit = row[TypoRegproc](idx + 3),
-        tmpllexize = row[TypoRegproc](idx + 4)
+        oid = row(idx + 0)(PgTsTemplateId.column),
+        tmplname = row(idx + 1)(Column.columnToString),
+        tmplnamespace = row(idx + 2)(Column.columnToLong),
+        tmplinit = row(idx + 3)(TypoRegproc.column),
+        tmpllexize = row(idx + 4)(TypoRegproc.column)
       )
     )
   }
   implicit val writes: OWrites[PgTsTemplateRow] = OWrites[PgTsTemplateRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "tmplname" -> Json.toJson(o.tmplname),
-      "tmplnamespace" -> Json.toJson(o.tmplnamespace),
-      "tmplinit" -> Json.toJson(o.tmplinit),
-      "tmpllexize" -> Json.toJson(o.tmpllexize)
+      "oid" -> PgTsTemplateId.writes.writes(o.oid),
+      "tmplname" -> Writes.StringWrites.writes(o.tmplname),
+      "tmplnamespace" -> Writes.LongWrites.writes(o.tmplnamespace),
+      "tmplinit" -> TypoRegproc.writes.writes(o.tmplinit),
+      "tmpllexize" -> TypoRegproc.writes.writes(o.tmpllexize)
     ))
   )
 }

@@ -10,8 +10,8 @@ package transactionhistory
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -38,30 +38,30 @@ case class TransactionhistoryRow(
 )
 
 object TransactionhistoryRow {
-  implicit val decoder: Decoder[TransactionhistoryRow] = Decoder.forProduct9[TransactionhistoryRow, TransactionhistoryId, ProductId, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(TransactionhistoryRow.apply)
-  implicit val encoder: Encoder[TransactionhistoryRow] = Encoder.forProduct9[TransactionhistoryRow, TransactionhistoryId, ProductId, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))
+  implicit val decoder: Decoder[TransactionhistoryRow] = Decoder.forProduct9[TransactionhistoryRow, TransactionhistoryId, ProductId, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(TransactionhistoryRow.apply)(TransactionhistoryId.decoder, ProductId.decoder, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[TransactionhistoryRow] = Encoder.forProduct9[TransactionhistoryRow, TransactionhistoryId, ProductId, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(TransactionhistoryId.encoder, ProductId.encoder, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit val read: Read[TransactionhistoryRow] = new Read[TransactionhistoryRow](
     gets = List(
-      (Get[TransactionhistoryId], Nullability.NoNulls),
-      (Get[ProductId], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls),
-      (Get[/* bpchar */ String], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[BigDecimal], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (TransactionhistoryId.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TransactionhistoryRow(
-      transactionid = Get[TransactionhistoryId].unsafeGetNonNullable(rs, i + 0),
-      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
-      referenceorderid = Get[Int].unsafeGetNonNullable(rs, i + 2),
-      referenceorderlineid = Get[Int].unsafeGetNonNullable(rs, i + 3),
-      transactiondate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4),
-      transactiontype = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-      quantity = Get[Int].unsafeGetNonNullable(rs, i + 6),
-      actualcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 8)
+      transactionid = TransactionhistoryId.get.unsafeGetNonNullable(rs, i + 0),
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
+      referenceorderid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      referenceorderlineid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      transactiondate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
+      transactiontype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
+      actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

@@ -9,28 +9,31 @@ package countryregion
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
-    sql"delete from person.countryregion where countryregioncode = ${countryregioncode}".update.run.map(_ > 0)
+    sql"delete from person.countryregion where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
-          values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning countryregioncode, "name", modifieddate::text
        """.query(CountryregionRow.read).unique
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
-      Some((Fragment.const(s"countryregioncode"), fr"${unsaved.countryregioncode}")),
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"countryregioncode"), fr"${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -52,17 +55,17 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""select countryregioncode, "name", modifieddate::text from person.countryregion""".query(CountryregionRow.read).stream
   }
   override def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]] = {
-    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ${countryregioncode}""".query(CountryregionRow.read).option
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".query(CountryregionRow.read).option
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ANY(${countryregioncodes})""".query(CountryregionRow.read).stream
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ANY(${fromWrite(countryregioncodes)(Write.fromPut(CountryregionId.arrayPut))})""".query(CountryregionRow.read).stream
   }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
     sql"""update person.countryregion
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where countryregioncode = ${countryregioncode}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where countryregioncode = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}
        """
       .update
       .run
@@ -71,9 +74,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (
-            ${unsaved.countryregioncode},
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))},
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (countryregioncode)
           do update set

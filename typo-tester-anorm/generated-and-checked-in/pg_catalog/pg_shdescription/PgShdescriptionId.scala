@@ -10,9 +10,9 @@ package pg_shdescription
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,16 +23,16 @@ object PgShdescriptionId {
   implicit val reads: Reads[PgShdescriptionId] = Reads[PgShdescriptionId](json => JsResult.fromTry(
       Try(
         PgShdescriptionId(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgShdescriptionId] = OWrites[PgShdescriptionId](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid)
     ))
   )
 }

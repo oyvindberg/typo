@@ -10,8 +10,8 @@ package address
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -38,30 +38,30 @@ case class AddressRow(
 )
 
 object AddressRow {
-  implicit val decoder: Decoder[AddressRow] = Decoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], UUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AddressRow.apply)
-  implicit val encoder: Encoder[AddressRow] = Encoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], UUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[AddressRow] = Decoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], UUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AddressRow.apply)(AddressId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, StateprovinceId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[AddressRow] = Encoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], UUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))(AddressId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, StateprovinceId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[AddressRow] = new Read[AddressRow](
     gets = List(
-      (Get[AddressId], Nullability.NoNulls),
-      (Get[/* max 60 chars */ String], Nullability.NoNulls),
-      (Get[/* max 60 chars */ String], Nullability.Nullable),
-      (Get[/* max 30 chars */ String], Nullability.NoNulls),
-      (Get[StateprovinceId], Nullability.NoNulls),
-      (Get[/* max 15 chars */ String], Nullability.NoNulls),
-      (Get[Array[Byte]], Nullability.Nullable),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (AddressId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (StateprovinceId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.ByteArrayMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => AddressRow(
-      addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 0),
-      addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 1),
-      addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 2),
-      city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 3),
-      stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 4),
-      postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 5),
-      spatiallocation = Get[Array[Byte]].unsafeGetNullable(rs, i + 6),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 8)
+      addressid = AddressId.get.unsafeGetNonNullable(rs, i + 0),
+      addressline1 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      city = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 4),
+      postalcode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      spatiallocation = Meta.ByteArrayMeta.get.unsafeGetNullable(rs, i + 6),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 7),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

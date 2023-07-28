@@ -9,15 +9,16 @@ package spqh
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,12 +40,12 @@ object SpqhViewRow {
   implicit val reads: Reads[SpqhViewRow] = Reads[SpqhViewRow](json => JsResult.fromTry(
       Try(
         SpqhViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          quotadate = json.\("quotadate").toOption.map(_.as[TypoLocalDateTime]),
-          salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          quotadate = json.\("quotadate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          salesquota = json.\("salesquota").toOption.map(_.as(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -52,23 +53,23 @@ object SpqhViewRow {
   def rowParser(idx: Int): RowParser[SpqhViewRow] = RowParser[SpqhViewRow] { row =>
     Success(
       SpqhViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        quotadate = row[Option[TypoLocalDateTime]](idx + 2),
-        salesquota = row[Option[BigDecimal]](idx + 3),
-        rowguid = row[Option[UUID]](idx + 4),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        quotadate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
+        salesquota = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        rowguid = row(idx + 4)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SpqhViewRow] = OWrites[SpqhViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "quotadate" -> Json.toJson(o.quotadate),
-      "salesquota" -> Json.toJson(o.salesquota),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "quotadate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.quotadate),
+      "salesquota" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesquota),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

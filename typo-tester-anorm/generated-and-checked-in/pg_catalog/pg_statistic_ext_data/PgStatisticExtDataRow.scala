@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext_data
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,11 +31,11 @@ object PgStatisticExtDataRow {
   implicit val reads: Reads[PgStatisticExtDataRow] = Reads[PgStatisticExtDataRow](json => JsResult.fromTry(
       Try(
         PgStatisticExtDataRow(
-          stxoid = json.\("stxoid").as[PgStatisticExtDataId],
-          stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
-          stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
-          stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),
-          stxdexpr = json.\("stxdexpr").toOption.map(_.as[String])
+          stxoid = json.\("stxoid").as(PgStatisticExtDataId.reads),
+          stxdndistinct = json.\("stxdndistinct").toOption.map(_.as(Reads.StringReads)),
+          stxddependencies = json.\("stxddependencies").toOption.map(_.as(Reads.StringReads)),
+          stxdmcv = json.\("stxdmcv").toOption.map(_.as(Reads.StringReads)),
+          stxdexpr = json.\("stxdexpr").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -42,21 +43,21 @@ object PgStatisticExtDataRow {
   def rowParser(idx: Int): RowParser[PgStatisticExtDataRow] = RowParser[PgStatisticExtDataRow] { row =>
     Success(
       PgStatisticExtDataRow(
-        stxoid = row[PgStatisticExtDataId](idx + 0),
-        stxdndistinct = row[Option[String]](idx + 1),
-        stxddependencies = row[Option[String]](idx + 2),
-        stxdmcv = row[Option[String]](idx + 3),
-        stxdexpr = row[Option[String]](idx + 4)
+        stxoid = row(idx + 0)(PgStatisticExtDataId.column),
+        stxdndistinct = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        stxddependencies = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        stxdmcv = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        stxdexpr = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgStatisticExtDataRow] = OWrites[PgStatisticExtDataRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "stxoid" -> Json.toJson(o.stxoid),
-      "stxdndistinct" -> Json.toJson(o.stxdndistinct),
-      "stxddependencies" -> Json.toJson(o.stxddependencies),
-      "stxdmcv" -> Json.toJson(o.stxdmcv),
-      "stxdexpr" -> Json.toJson(o.stxdexpr)
+      "stxoid" -> PgStatisticExtDataId.writes.writes(o.stxoid),
+      "stxdndistinct" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxdndistinct),
+      "stxddependencies" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxddependencies),
+      "stxdmcv" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxdmcv),
+      "stxdexpr" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stxdexpr)
     ))
   )
 }

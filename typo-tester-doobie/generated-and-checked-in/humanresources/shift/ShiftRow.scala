@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.TypoLocalTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,22 +29,22 @@ case class ShiftRow(
 )
 
 object ShiftRow {
-  implicit val decoder: Decoder[ShiftRow] = Decoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(ShiftRow.apply)
-  implicit val encoder: Encoder[ShiftRow] = Encoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))
+  implicit val decoder: Decoder[ShiftRow] = Decoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(ShiftRow.apply)(ShiftId.decoder, Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ShiftRow] = Encoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(ShiftId.encoder, Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[ShiftRow] = new Read[ShiftRow](
     gets = List(
-      (Get[ShiftId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[TypoLocalTime], Nullability.NoNulls),
-      (Get[TypoLocalTime], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ShiftId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalTime.get, Nullability.NoNulls),
+      (TypoLocalTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ShiftRow(
-      shiftid = Get[ShiftId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      starttime = Get[TypoLocalTime].unsafeGetNonNullable(rs, i + 2),
-      endtime = Get[TypoLocalTime].unsafeGetNonNullable(rs, i + 3),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      starttime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 2),
+      endtime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

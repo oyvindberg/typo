@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -43,13 +44,13 @@ object CViewRow {
   implicit val reads: Reads[CViewRow] = Reads[CViewRow](json => JsResult.fromTry(
       Try(
         CViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          customerid = json.\("customerid").toOption.map(_.as[CustomerId]),
-          personid = json.\("personid").toOption.map(_.as[BusinessentityId]),
-          storeid = json.\("storeid").toOption.map(_.as[BusinessentityId]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          customerid = json.\("customerid").toOption.map(_.as(CustomerId.reads)),
+          personid = json.\("personid").toOption.map(_.as(BusinessentityId.reads)),
+          storeid = json.\("storeid").toOption.map(_.as(BusinessentityId.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -57,25 +58,25 @@ object CViewRow {
   def rowParser(idx: Int): RowParser[CViewRow] = RowParser[CViewRow] { row =>
     Success(
       CViewRow(
-        id = row[Option[Int]](idx + 0),
-        customerid = row[Option[CustomerId]](idx + 1),
-        personid = row[Option[BusinessentityId]](idx + 2),
-        storeid = row[Option[BusinessentityId]](idx + 3),
-        territoryid = row[Option[SalesterritoryId]](idx + 4),
-        rowguid = row[Option[UUID]](idx + 5),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        customerid = row(idx + 1)(Column.columnToOption(CustomerId.column)),
+        personid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
+        storeid = row(idx + 3)(Column.columnToOption(BusinessentityId.column)),
+        territoryid = row(idx + 4)(Column.columnToOption(SalesterritoryId.column)),
+        rowguid = row(idx + 5)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[CViewRow] = OWrites[CViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "customerid" -> Json.toJson(o.customerid),
-      "personid" -> Json.toJson(o.personid),
-      "storeid" -> Json.toJson(o.storeid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "customerid" -> Writes.OptionWrites(CustomerId.writes).writes(o.customerid),
+      "personid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.personid),
+      "storeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.storeid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

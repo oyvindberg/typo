@@ -8,16 +8,19 @@ package pg_catalog
 package pg_seclabel
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def delete(compositeId: PgSeclabelId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_seclabel where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgSeclabelRow): ConnectionIO[PgSeclabelRow] = {
     sql"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")
-          values (${unsaved.objoid}::oid, ${unsaved.classoid}::oid, ${unsaved.objsubid}::int4, ${unsaved.provider}, ${unsaved.label})
+          values (${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.provider)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.label)(Write.fromPut(Meta.StringMeta.put))})
           returning objoid, classoid, objsubid, provider, "label"
        """.query(PgSeclabelRow.read).unique
   }
@@ -25,13 +28,13 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
     sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel""".query(PgSeclabelRow.read).stream
   }
   override def selectById(compositeId: PgSeclabelId): ConnectionIO[Option[PgSeclabelRow]] = {
-    sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}""".query(PgSeclabelRow.read).option
+    sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}""".query(PgSeclabelRow.read).option
   }
   override def update(row: PgSeclabelRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_seclabel
-          set "label" = ${row.label}
-          where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}
+          set "label" = ${fromWrite(row.label)(Write.fromPut(Meta.StringMeta.put))}
+          where objoid = ${fromWrite(compositeId.objoid)(Write.fromPut(Meta.LongMeta.put))} AND classoid = ${fromWrite(compositeId.classoid)(Write.fromPut(Meta.LongMeta.put))} AND objsubid = ${fromWrite(compositeId.objsubid)(Write.fromPut(Meta.IntMeta.put))} AND provider = ${fromWrite(compositeId.provider)(Write.fromPut(Meta.StringMeta.put))}
        """
       .update
       .run
@@ -40,11 +43,11 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
   override def upsert(unsaved: PgSeclabelRow): ConnectionIO[PgSeclabelRow] = {
     sql"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")
           values (
-            ${unsaved.objoid}::oid,
-            ${unsaved.classoid}::oid,
-            ${unsaved.objsubid}::int4,
-            ${unsaved.provider},
-            ${unsaved.label}
+            ${fromWrite(unsaved.objoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.classoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.provider)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.label)(Write.fromPut(Meta.StringMeta.put))}
           )
           on conflict (objoid, classoid, objsubid, provider)
           do update set

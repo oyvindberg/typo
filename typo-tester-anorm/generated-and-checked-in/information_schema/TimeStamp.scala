@@ -25,7 +25,7 @@ object TimeStamp {
     override def sqlType: String = implicitly[ParameterMetaData[TypoOffsetDateTime]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[TypoOffsetDateTime]].jdbcType
   }
-  implicit val reads: Reads[TimeStamp] = implicitly[Reads[TypoOffsetDateTime]].map(TimeStamp.apply)
+  implicit val reads: Reads[TimeStamp] = TypoOffsetDateTime.reads.map(TimeStamp.apply)
   implicit val toStatement: ToStatement[TimeStamp] = implicitly[ToStatement[TypoOffsetDateTime]].contramap(_.value)
-  implicit val writes: Writes[TimeStamp] = implicitly[Writes[TypoOffsetDateTime]].contramap(_.value)
+  implicit val writes: Writes[TimeStamp] = TypoOffsetDateTime.writes.contramap(_.value)
 }

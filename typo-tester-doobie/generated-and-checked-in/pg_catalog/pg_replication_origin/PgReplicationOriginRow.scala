@@ -8,8 +8,8 @@ package pg_catalog
 package pg_replication_origin
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -20,16 +20,16 @@ case class PgReplicationOriginRow(
 )
 
 object PgReplicationOriginRow {
-  implicit val decoder: Decoder[PgReplicationOriginRow] = Decoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(PgReplicationOriginRow.apply)
-  implicit val encoder: Encoder[PgReplicationOriginRow] = Encoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(x => (x.roident, x.roname))
+  implicit val decoder: Decoder[PgReplicationOriginRow] = Decoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(PgReplicationOriginRow.apply)(PgReplicationOriginId.decoder, Decoder.decodeString)
+  implicit val encoder: Encoder[PgReplicationOriginRow] = Encoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(x => (x.roident, x.roname))(PgReplicationOriginId.encoder, Encoder.encodeString)
   implicit val read: Read[PgReplicationOriginRow] = new Read[PgReplicationOriginRow](
     gets = List(
-      (Get[PgReplicationOriginId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls)
+      (PgReplicationOriginId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgReplicationOriginRow(
-      roident = Get[PgReplicationOriginId].unsafeGetNonNullable(rs, i + 0),
-      roname = Get[String].unsafeGetNonNullable(rs, i + 1)
+      roident = PgReplicationOriginId.get.unsafeGetNonNullable(rs, i + 0),
+      roname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1)
     )
   )
 }

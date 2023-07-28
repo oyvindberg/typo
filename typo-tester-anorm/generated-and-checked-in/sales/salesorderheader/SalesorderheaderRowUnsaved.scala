@@ -23,9 +23,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -161,62 +161,62 @@ object SalesorderheaderRowUnsaved {
   implicit val reads: Reads[SalesorderheaderRowUnsaved] = Reads[SalesorderheaderRowUnsaved](json => JsResult.fromTry(
       Try(
         SalesorderheaderRowUnsaved(
-          duedate = json.\("duedate").as[TypoLocalDateTime],
-          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
-          purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
-          accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
-          customerid = json.\("customerid").as[CustomerId],
-          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          billtoaddressid = json.\("billtoaddressid").as[AddressId],
-          shiptoaddressid = json.\("shiptoaddressid").as[AddressId],
-          shipmethodid = json.\("shipmethodid").as[ShipmethodId],
-          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-          creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
-          currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
-          totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
-          comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
-          salesorderid = json.\("salesorderid").as[Defaulted[SalesorderheaderId]],
-          revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
-          orderdate = json.\("orderdate").as[Defaulted[TypoLocalDateTime]],
-          status = json.\("status").as[Defaulted[Int]],
-          onlineorderflag = json.\("onlineorderflag").as[Defaulted[Flag]],
-          subtotal = json.\("subtotal").as[Defaulted[BigDecimal]],
-          taxamt = json.\("taxamt").as[Defaulted[BigDecimal]],
-          freight = json.\("freight").as[Defaulted[BigDecimal]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          duedate = json.\("duedate").as(TypoLocalDateTime.reads),
+          shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as(OrderNumber.reads)),
+          accountnumber = json.\("accountnumber").toOption.map(_.as(AccountNumber.reads)),
+          customerid = json.\("customerid").as(CustomerId.reads),
+          salespersonid = json.\("salespersonid").toOption.map(_.as(BusinessentityId.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          billtoaddressid = json.\("billtoaddressid").as(AddressId.reads),
+          shiptoaddressid = json.\("shiptoaddressid").as(AddressId.reads),
+          shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as(Reads.StringReads)),
+          currencyrateid = json.\("currencyrateid").toOption.map(_.as(CurrencyrateId.reads)),
+          totaldue = json.\("totaldue").toOption.map(_.as(Reads.bigDecReads)),
+          comment = json.\("comment").toOption.map(_.as(Reads.StringReads)),
+          salesorderid = json.\("salesorderid").as(Defaulted.reads(SalesorderheaderId.reads)),
+          revisionnumber = json.\("revisionnumber").as(Defaulted.reads(Reads.IntReads)),
+          orderdate = json.\("orderdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
+          status = json.\("status").as(Defaulted.reads(Reads.IntReads)),
+          onlineorderflag = json.\("onlineorderflag").as(Defaulted.reads(Flag.reads)),
+          subtotal = json.\("subtotal").as(Defaulted.reads(Reads.bigDecReads)),
+          taxamt = json.\("taxamt").as(Defaulted.reads(Reads.bigDecReads)),
+          freight = json.\("freight").as(Defaulted.reads(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[SalesorderheaderRowUnsaved] = OWrites[SalesorderheaderRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "duedate" -> Json.toJson(o.duedate),
-      "shipdate" -> Json.toJson(o.shipdate),
-      "purchaseordernumber" -> Json.toJson(o.purchaseordernumber),
-      "accountnumber" -> Json.toJson(o.accountnumber),
-      "customerid" -> Json.toJson(o.customerid),
-      "salespersonid" -> Json.toJson(o.salespersonid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "billtoaddressid" -> Json.toJson(o.billtoaddressid),
-      "shiptoaddressid" -> Json.toJson(o.shiptoaddressid),
-      "shipmethodid" -> Json.toJson(o.shipmethodid),
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "creditcardapprovalcode" -> Json.toJson(o.creditcardapprovalcode),
-      "currencyrateid" -> Json.toJson(o.currencyrateid),
-      "totaldue" -> Json.toJson(o.totaldue),
-      "comment" -> Json.toJson(o.comment),
-      "salesorderid" -> Json.toJson(o.salesorderid),
-      "revisionnumber" -> Json.toJson(o.revisionnumber),
-      "orderdate" -> Json.toJson(o.orderdate),
-      "status" -> Json.toJson(o.status),
-      "onlineorderflag" -> Json.toJson(o.onlineorderflag),
-      "subtotal" -> Json.toJson(o.subtotal),
-      "taxamt" -> Json.toJson(o.taxamt),
-      "freight" -> Json.toJson(o.freight),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
+      "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
+      "purchaseordernumber" -> Writes.OptionWrites(OrderNumber.writes).writes(o.purchaseordernumber),
+      "accountnumber" -> Writes.OptionWrites(AccountNumber.writes).writes(o.accountnumber),
+      "customerid" -> CustomerId.writes.writes(o.customerid),
+      "salespersonid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.salespersonid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "billtoaddressid" -> AddressId.writes.writes(o.billtoaddressid),
+      "shiptoaddressid" -> AddressId.writes.writes(o.shiptoaddressid),
+      "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
+      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "creditcardapprovalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.creditcardapprovalcode),
+      "currencyrateid" -> Writes.OptionWrites(CurrencyrateId.writes).writes(o.currencyrateid),
+      "totaldue" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.totaldue),
+      "comment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comment),
+      "salesorderid" -> Defaulted.writes(SalesorderheaderId.writes).writes(o.salesorderid),
+      "revisionnumber" -> Defaulted.writes(Writes.IntWrites).writes(o.revisionnumber),
+      "orderdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.orderdate),
+      "status" -> Defaulted.writes(Writes.IntWrites).writes(o.status),
+      "onlineorderflag" -> Defaulted.writes(Flag.writes).writes(o.onlineorderflag),
+      "subtotal" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.subtotal),
+      "taxamt" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.taxamt),
+      "freight" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.freight),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

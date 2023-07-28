@@ -11,14 +11,15 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -38,11 +39,11 @@ object PpViewRow {
   implicit val reads: Reads[PpViewRow] = Reads[PpViewRow](json => JsResult.fromTry(
       Try(
         PpViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          phonenumber = json.\("phonenumber").toOption.map(_.as[Phone]),
-          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as[PhonenumbertypeId]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          phonenumber = json.\("phonenumber").toOption.map(_.as(Phone.reads)),
+          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as(PhonenumbertypeId.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -50,21 +51,21 @@ object PpViewRow {
   def rowParser(idx: Int): RowParser[PpViewRow] = RowParser[PpViewRow] { row =>
     Success(
       PpViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        phonenumber = row[Option[Phone]](idx + 2),
-        phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 3),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        phonenumber = row(idx + 2)(Column.columnToOption(Phone.column)),
+        phonenumbertypeid = row(idx + 3)(Column.columnToOption(PhonenumbertypeId.column)),
+        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PpViewRow] = OWrites[PpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "phonenumber" -> Json.toJson(o.phonenumber),
-      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "phonenumber" -> Writes.OptionWrites(Phone.writes).writes(o.phonenumber),
+      "phonenumbertypeid" -> Writes.OptionWrites(PhonenumbertypeId.writes).writes(o.phonenumbertypeid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

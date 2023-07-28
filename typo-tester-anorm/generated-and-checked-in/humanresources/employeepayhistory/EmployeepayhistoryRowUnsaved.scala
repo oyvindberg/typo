@@ -13,9 +13,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -49,22 +49,22 @@ object EmployeepayhistoryRowUnsaved {
   implicit val reads: Reads[EmployeepayhistoryRowUnsaved] = Reads[EmployeepayhistoryRowUnsaved](json => JsResult.fromTry(
       Try(
         EmployeepayhistoryRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          ratechangedate = json.\("ratechangedate").as[TypoLocalDateTime],
-          rate = json.\("rate").as[BigDecimal],
-          payfrequency = json.\("payfrequency").as[Int],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          ratechangedate = json.\("ratechangedate").as(TypoLocalDateTime.reads),
+          rate = json.\("rate").as(Reads.bigDecReads),
+          payfrequency = json.\("payfrequency").as(Reads.IntReads),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[EmployeepayhistoryRowUnsaved] = OWrites[EmployeepayhistoryRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "ratechangedate" -> Json.toJson(o.ratechangedate),
-      "rate" -> Json.toJson(o.rate),
-      "payfrequency" -> Json.toJson(o.payfrequency),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate),
+      "rate" -> Writes.BigDecimalWrites.writes(o.rate),
+      "payfrequency" -> Writes.IntWrites.writes(o.payfrequency),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -8,16 +8,19 @@ package pg_catalog
 package pg_auth_members
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def delete(compositeId: PgAuthMembersId): ConnectionIO[Boolean] = {
-    sql"""delete from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}""".update.run.map(_ > 0)
+    sql"""delete from pg_catalog.pg_auth_members where roleid = ${fromWrite(compositeId.roleid)(Write.fromPut(Meta.LongMeta.put))} AND "member" = ${fromWrite(compositeId.member)(Write.fromPut(Meta.LongMeta.put))}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAuthMembersRow): ConnectionIO[PgAuthMembersRow] = {
     sql"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
-          values (${unsaved.roleid}::oid, ${unsaved.member}::oid, ${unsaved.grantor}::oid, ${unsaved.adminOption})
+          values (${fromWrite(unsaved.roleid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.member)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.grantor)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.adminOption)(Write.fromPut(Meta.BooleanMeta.put))})
           returning roleid, "member", grantor, admin_option
        """.query(PgAuthMembersRow.read).unique
   }
@@ -25,14 +28,14 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
     sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members""".query(PgAuthMembersRow.read).stream
   }
   override def selectById(compositeId: PgAuthMembersId): ConnectionIO[Option[PgAuthMembersRow]] = {
-    sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}""".query(PgAuthMembersRow.read).option
+    sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members where roleid = ${fromWrite(compositeId.roleid)(Write.fromPut(Meta.LongMeta.put))} AND "member" = ${fromWrite(compositeId.member)(Write.fromPut(Meta.LongMeta.put))}""".query(PgAuthMembersRow.read).option
   }
   override def update(row: PgAuthMembersRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_auth_members
-          set grantor = ${row.grantor}::oid,
-              admin_option = ${row.adminOption}
-          where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}
+          set grantor = ${fromWrite(row.grantor)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              admin_option = ${fromWrite(row.adminOption)(Write.fromPut(Meta.BooleanMeta.put))}
+          where roleid = ${fromWrite(compositeId.roleid)(Write.fromPut(Meta.LongMeta.put))} AND "member" = ${fromWrite(compositeId.member)(Write.fromPut(Meta.LongMeta.put))}
        """
       .update
       .run
@@ -41,10 +44,10 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def upsert(unsaved: PgAuthMembersRow): ConnectionIO[PgAuthMembersRow] = {
     sql"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
           values (
-            ${unsaved.roleid}::oid,
-            ${unsaved.member}::oid,
-            ${unsaved.grantor}::oid,
-            ${unsaved.adminOption}
+            ${fromWrite(unsaved.roleid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.member)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.grantor)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.adminOption)(Write.fromPut(Meta.BooleanMeta.put))}
           )
           on conflict (roleid, "member")
           do update set

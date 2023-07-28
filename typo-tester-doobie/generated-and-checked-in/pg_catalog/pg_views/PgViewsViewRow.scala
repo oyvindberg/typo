@@ -8,8 +8,8 @@ package pg_catalog
 package pg_views
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -22,20 +22,20 @@ case class PgViewsViewRow(
 )
 
 object PgViewsViewRow {
-  implicit val decoder: Decoder[PgViewsViewRow] = Decoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(PgViewsViewRow.apply)
-  implicit val encoder: Encoder[PgViewsViewRow] = Encoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(x => (x.schemaname, x.viewname, x.viewowner, x.definition))
+  implicit val decoder: Decoder[PgViewsViewRow] = Decoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(PgViewsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgViewsViewRow] = Encoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(x => (x.schemaname, x.viewname, x.viewowner, x.definition))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgViewsViewRow] = new Read[PgViewsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgViewsViewRow(
-      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-      viewname = Get[String].unsafeGetNullable(rs, i + 1),
-      viewowner = Get[String].unsafeGetNullable(rs, i + 2),
-      definition = Get[String].unsafeGetNullable(rs, i + 3)
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      viewname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      viewowner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      definition = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

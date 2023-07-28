@@ -10,9 +10,9 @@ package pg_largeobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,16 +23,16 @@ object PgLargeobjectId {
   implicit val reads: Reads[PgLargeobjectId] = Reads[PgLargeobjectId](json => JsResult.fromTry(
       Try(
         PgLargeobjectId(
-          loid = json.\("loid").as[/* oid */ Long],
-          pageno = json.\("pageno").as[Int]
+          loid = json.\("loid").as(Reads.LongReads),
+          pageno = json.\("pageno").as(Reads.IntReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgLargeobjectId] = OWrites[PgLargeobjectId](o =>
     new JsObject(ListMap[String, JsValue](
-      "loid" -> Json.toJson(o.loid),
-      "pageno" -> Json.toJson(o.pageno)
+      "loid" -> Writes.LongWrites.writes(o.loid),
+      "pageno" -> Writes.IntWrites.writes(o.pageno)
     ))
   )
 }

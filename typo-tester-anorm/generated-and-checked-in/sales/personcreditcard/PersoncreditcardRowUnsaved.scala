@@ -14,7 +14,6 @@ import adventureworks.sales.creditcard.CreditcardId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -45,18 +44,18 @@ object PersoncreditcardRowUnsaved {
   implicit val reads: Reads[PersoncreditcardRowUnsaved] = Reads[PersoncreditcardRowUnsaved](json => JsResult.fromTry(
       Try(
         PersoncreditcardRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          creditcardid = json.\("creditcardid").as[CreditcardId],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          creditcardid = json.\("creditcardid").as(CreditcardId.reads),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[PersoncreditcardRowUnsaved] = OWrites[PersoncreditcardRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "creditcardid" -> CreditcardId.writes.writes(o.creditcardid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

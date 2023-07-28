@@ -24,7 +24,7 @@ object NameStyle {
     override def sqlType: String = implicitly[ParameterMetaData[Boolean]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Boolean]].jdbcType
   }
-  implicit val reads: Reads[NameStyle] = implicitly[Reads[Boolean]].map(NameStyle.apply)
+  implicit val reads: Reads[NameStyle] = Reads.BooleanReads.map(NameStyle.apply)
   implicit val toStatement: ToStatement[NameStyle] = implicitly[ToStatement[Boolean]].contramap(_.value)
-  implicit val writes: Writes[NameStyle] = implicitly[Writes[Boolean]].contramap(_.value)
+  implicit val writes: Writes[NameStyle] = Writes.BooleanWrites.contramap(_.value)
 }

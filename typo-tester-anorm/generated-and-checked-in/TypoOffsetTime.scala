@@ -19,7 +19,6 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -62,7 +61,7 @@ object TypoOffsetTime {
   implicit val reads: Reads[TypoOffsetTime] = Reads[TypoOffsetTime](json => JsResult.fromTry(
       Try(
         TypoOffsetTime(
-          value = json.\("value").as[OffsetTime]
+          value = json.\("value").as(adventureworks.OffsetTimeReads)
         )
       )
     ),
@@ -70,7 +69,7 @@ object TypoOffsetTime {
   implicit val toStatement: ToStatement[TypoOffsetTime] = ToStatement[TypoOffsetTime]((s, index, v) => s.setObject(index, v.value.toString))
   implicit val writes: OWrites[TypoOffsetTime] = OWrites[TypoOffsetTime](o =>
     new JsObject(ListMap[String, JsValue](
-      "value" -> Json.toJson(o.value)
+      "value" -> adventureworks.OffsetTimeWrites.writes(o.value)
     ))
   )
 }

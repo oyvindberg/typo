@@ -8,8 +8,8 @@ package pg_catalog
 package pg_foreign_table
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -21,18 +21,18 @@ case class PgForeignTableRow(
 )
 
 object PgForeignTableRow {
-  implicit val decoder: Decoder[PgForeignTableRow] = Decoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(PgForeignTableRow.apply)
-  implicit val encoder: Encoder[PgForeignTableRow] = Encoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(x => (x.ftrelid, x.ftserver, x.ftoptions))
+  implicit val decoder: Decoder[PgForeignTableRow] = Decoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(PgForeignTableRow.apply)(PgForeignTableId.decoder, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgForeignTableRow] = Encoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(x => (x.ftrelid, x.ftserver, x.ftoptions))(PgForeignTableId.encoder, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgForeignTableRow] = new Read[PgForeignTableRow](
     gets = List(
-      (Get[PgForeignTableId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Array[String]], Nullability.Nullable)
+      (PgForeignTableId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgForeignTableRow(
-      ftrelid = Get[PgForeignTableId].unsafeGetNonNullable(rs, i + 0),
-      ftserver = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      ftoptions = Get[Array[String]].unsafeGetNullable(rs, i + 2)
+      ftrelid = PgForeignTableId.get.unsafeGetNonNullable(rs, i + 0),
+      ftserver = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      ftoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

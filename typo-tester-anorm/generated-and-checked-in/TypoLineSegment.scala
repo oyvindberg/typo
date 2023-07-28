@@ -16,7 +16,6 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -55,8 +54,8 @@ object TypoLineSegment {
   implicit val reads: Reads[TypoLineSegment] = Reads[TypoLineSegment](json => JsResult.fromTry(
       Try(
         TypoLineSegment(
-          p1 = json.\("p1").as[TypoPoint],
-          p2 = json.\("p2").as[TypoPoint]
+          p1 = json.\("p1").as(TypoPoint.reads),
+          p2 = json.\("p2").as(TypoPoint.reads)
         )
       )
     ),
@@ -64,8 +63,8 @@ object TypoLineSegment {
   implicit val toStatement: ToStatement[TypoLineSegment] = ToStatement[TypoLineSegment]((s, index, v) => s.setObject(index, new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
   implicit val writes: OWrites[TypoLineSegment] = OWrites[TypoLineSegment](o =>
     new JsObject(ListMap[String, JsValue](
-      "p1" -> Json.toJson(o.p1),
-      "p2" -> Json.toJson(o.p2)
+      "p1" -> TypoPoint.writes.writes(o.p1),
+      "p2" -> TypoPoint.writes.writes(o.p2)
     ))
   )
 }

@@ -10,14 +10,15 @@ package pdoc
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,10 +36,10 @@ object PdocViewRow {
   implicit val reads: Reads[PdocViewRow] = Reads[PdocViewRow](json => JsResult.fromTry(
       Try(
         PdocViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          productid = json.\("productid").toOption.map(_.as[ProductId]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime]),
-          documentnode = json.\("documentnode").toOption.map(_.as[DocumentId])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          documentnode = json.\("documentnode").toOption.map(_.as(DocumentId.reads))
         )
       )
     ),
@@ -46,19 +47,19 @@ object PdocViewRow {
   def rowParser(idx: Int): RowParser[PdocViewRow] = RowParser[PdocViewRow] { row =>
     Success(
       PdocViewRow(
-        id = row[Option[Int]](idx + 0),
-        productid = row[Option[ProductId]](idx + 1),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 2),
-        documentnode = row[Option[DocumentId]](idx + 3)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        productid = row(idx + 1)(Column.columnToOption(ProductId.column)),
+        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
+        documentnode = row(idx + 3)(Column.columnToOption(DocumentId.column))
       )
     )
   }
   implicit val writes: OWrites[PdocViewRow] = OWrites[PdocViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "productid" -> Json.toJson(o.productid),
-      "modifieddate" -> Json.toJson(o.modifieddate),
-      "documentnode" -> Json.toJson(o.documentnode)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate),
+      "documentnode" -> Writes.OptionWrites(DocumentId.writes).writes(o.documentnode)
     ))
   )
 }

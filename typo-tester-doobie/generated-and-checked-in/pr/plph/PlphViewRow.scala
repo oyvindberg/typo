@@ -10,8 +10,8 @@ package plph
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -31,24 +31,24 @@ case class PlphViewRow(
 )
 
 object PlphViewRow {
-  implicit val decoder: Decoder[PlphViewRow] = Decoder.forProduct6[PlphViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "productid", "startdate", "enddate", "listprice", "modifieddate")(PlphViewRow.apply)
-  implicit val encoder: Encoder[PlphViewRow] = Encoder.forProduct6[PlphViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "productid", "startdate", "enddate", "listprice", "modifieddate")(x => (x.id, x.productid, x.startdate, x.enddate, x.listprice, x.modifieddate))
+  implicit val decoder: Decoder[PlphViewRow] = Decoder.forProduct6[PlphViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "productid", "startdate", "enddate", "listprice", "modifieddate")(PlphViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PlphViewRow] = Encoder.forProduct6[PlphViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "productid", "startdate", "enddate", "listprice", "modifieddate")(x => (x.id, x.productid, x.startdate, x.enddate, x.listprice, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PlphViewRow] = new Read[PlphViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[ProductId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (ProductId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PlphViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-      startdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
-      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3),
-      listprice = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      productid = ProductId.get.unsafeGetNullable(rs, i + 1),
+      startdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
+      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3),
+      listprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

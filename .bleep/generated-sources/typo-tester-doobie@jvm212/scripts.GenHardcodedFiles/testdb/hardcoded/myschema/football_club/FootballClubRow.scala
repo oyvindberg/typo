@@ -9,8 +9,8 @@ package myschema
 package football_club
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -21,16 +21,16 @@ case class FootballClubRow(
 )
 
 object FootballClubRow {
-  implicit val decoder: Decoder[FootballClubRow] = Decoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(FootballClubRow.apply)
-  implicit val encoder: Encoder[FootballClubRow] = Encoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(x => (x.id, x.name))
+  implicit val decoder: Decoder[FootballClubRow] = Decoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(FootballClubRow.apply)(FootballClubId.decoder, Decoder.decodeString)
+  implicit val encoder: Encoder[FootballClubRow] = Encoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(x => (x.id, x.name))(FootballClubId.encoder, Encoder.encodeString)
   implicit val read: Read[FootballClubRow] = new Read[FootballClubRow](
     gets = List(
-      (Get[FootballClubId], Nullability.NoNulls),
-      (Get[/* max 100 chars */ String], Nullability.NoNulls)
+      (FootballClubId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => FootballClubRow(
-      id = Get[FootballClubId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 1)
+      id = FootballClubId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1)
     )
   )
 }

@@ -13,7 +13,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `pg_catalog.pg_inherits` */
 case class PgInheritsId(inhrelid: /* oid */ Long, inhseqno: Int)
 object PgInheritsId {
-  implicit val decoder: Decoder[PgInheritsId] = Decoder.forProduct2[PgInheritsId, /* oid */ Long, Int]("inhrelid", "inhseqno")(PgInheritsId.apply)
-  implicit val encoder: Encoder[PgInheritsId] = Encoder.forProduct2[PgInheritsId, /* oid */ Long, Int]("inhrelid", "inhseqno")(x => (x.inhrelid, x.inhseqno))
+  implicit val decoder: Decoder[PgInheritsId] = Decoder.forProduct2[PgInheritsId, /* oid */ Long, Int]("inhrelid", "inhseqno")(PgInheritsId.apply)(Decoder.decodeLong, Decoder.decodeInt)
+  implicit val encoder: Encoder[PgInheritsId] = Encoder.forProduct2[PgInheritsId, /* oid */ Long, Int]("inhrelid", "inhseqno")(x => (x.inhrelid, x.inhseqno))(Encoder.encodeLong, Encoder.encodeInt)
   implicit val ordering: Ordering[PgInheritsId] = Ordering.by(x => (x.inhrelid, x.inhseqno))
 }

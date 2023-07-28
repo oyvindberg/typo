@@ -9,28 +9,32 @@ package salesorderheadersalesreason
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.salesreason.SalesreasonId
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".update.run.map(_ > 0)
+    sql"delete from sales.salesorderheadersalesreason where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesreasonid = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
-          values (${unsaved.salesorderid}::int4, ${unsaved.salesreasonid}::int4, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning salesorderid, salesreasonid, modifieddate::text
        """.query(SalesorderheadersalesreasonRow.read).unique
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
     val fs = List(
-      Some((Fragment.const(s"salesorderid"), fr"${unsaved.salesorderid}::int4")),
-      Some((Fragment.const(s"salesreasonid"), fr"${unsaved.salesreasonid}::int4")),
+      Some((Fragment.const(s"salesorderid"), fr"${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4")),
+      Some((Fragment.const(s"salesreasonid"), fr"${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -52,13 +56,13 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason".query(SalesorderheadersalesreasonRow.read).stream
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
-    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".query(SalesorderheadersalesreasonRow.read).option
+    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesreasonid = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}".query(SalesorderheadersalesreasonRow.read).option
   }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderheadersalesreason
-          set modifieddate = ${row.modifieddate}::timestamp
-          where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
+          set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesreasonid = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}
        """
       .update
       .run
@@ -67,9 +71,9 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def upsert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
           values (
-            ${unsaved.salesorderid}::int4,
-            ${unsaved.salesreasonid}::int4,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4,
+            ${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (salesorderid, salesreasonid)
           do update set

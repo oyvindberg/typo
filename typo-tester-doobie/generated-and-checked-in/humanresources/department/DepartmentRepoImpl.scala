@@ -9,32 +9,35 @@ package department
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.department where departmentid = ${departmentid}".update.run.map(_ > 0)
+    sql"delete from humanresources.department where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
-          values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning departmentid, "name", groupname, modifieddate::text
        """.query(DepartmentRow.read).unique
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
-      Some((Fragment.const(s"groupname"), fr"""${unsaved.groupname}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s"groupname"), fr"""${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::"public"."Name"""")),
       unsaved.departmentid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"departmentid"), fr"${value: DepartmentId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"departmentid"), fr"${fromWrite(value: DepartmentId)(Write.fromPut(DepartmentId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -56,18 +59,18 @@ object DepartmentRepoImpl extends DepartmentRepo {
     sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department""".query(DepartmentRow.read).stream
   }
   override def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]] = {
-    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ${departmentid}""".query(DepartmentRow.read).option
+    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".query(DepartmentRow.read).option
   }
   override def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow] = {
-    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ANY(${departmentids})""".query(DepartmentRow.read).stream
+    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ANY(${fromWrite(departmentids)(Write.fromPut(DepartmentId.arrayPut))})""".query(DepartmentRow.read).stream
   }
   override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
     val departmentid = row.departmentid
     sql"""update humanresources.department
-          set "name" = ${row.name}::"public"."Name",
-              groupname = ${row.groupname}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where departmentid = ${departmentid}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              groupname = ${fromWrite(row.groupname)(Write.fromPut(Name.put))}::"public"."Name",
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}
        """
       .update
       .run
@@ -76,10 +79,10 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
           values (
-            ${unsaved.departmentid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.groupname}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (departmentid)
           do update set

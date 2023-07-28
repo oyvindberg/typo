@@ -8,14 +8,15 @@ package pg_catalog
 package pg_stat_subscription
 
 import adventureworks.TypoOffsetDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,15 +36,15 @@ object PgStatSubscriptionViewRow {
   implicit val reads: Reads[PgStatSubscriptionViewRow] = Reads[PgStatSubscriptionViewRow](json => JsResult.fromTry(
       Try(
         PgStatSubscriptionViewRow(
-          subid = json.\("subid").toOption.map(_.as[/* oid */ Long]),
-          subname = json.\("subname").toOption.map(_.as[String]),
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-          receivedLsn = json.\("received_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as[TypoOffsetDateTime]),
-          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as[TypoOffsetDateTime]),
-          latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          latestEndTime = json.\("latest_end_time").toOption.map(_.as[TypoOffsetDateTime])
+          subid = json.\("subid").toOption.map(_.as(Reads.LongReads)),
+          subname = json.\("subname").toOption.map(_.as(Reads.StringReads)),
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          receivedLsn = json.\("received_lsn").toOption.map(_.as(Reads.LongReads)),
+          lastMsgSendTime = json.\("last_msg_send_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          lastMsgReceiptTime = json.\("last_msg_receipt_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          latestEndLsn = json.\("latest_end_lsn").toOption.map(_.as(Reads.LongReads)),
+          latestEndTime = json.\("latest_end_time").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -51,29 +52,29 @@ object PgStatSubscriptionViewRow {
   def rowParser(idx: Int): RowParser[PgStatSubscriptionViewRow] = RowParser[PgStatSubscriptionViewRow] { row =>
     Success(
       PgStatSubscriptionViewRow(
-        subid = row[Option[/* oid */ Long]](idx + 0),
-        subname = row[Option[String]](idx + 1),
-        pid = row[Option[Int]](idx + 2),
-        relid = row[Option[/* oid */ Long]](idx + 3),
-        receivedLsn = row[Option[/* pg_lsn */ Long]](idx + 4),
-        lastMsgSendTime = row[Option[TypoOffsetDateTime]](idx + 5),
-        lastMsgReceiptTime = row[Option[TypoOffsetDateTime]](idx + 6),
-        latestEndLsn = row[Option[/* pg_lsn */ Long]](idx + 7),
-        latestEndTime = row[Option[TypoOffsetDateTime]](idx + 8)
+        subid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        subname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        pid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
+        relid = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        receivedLsn = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        lastMsgSendTime = row(idx + 5)(Column.columnToOption(TypoOffsetDateTime.column)),
+        lastMsgReceiptTime = row(idx + 6)(Column.columnToOption(TypoOffsetDateTime.column)),
+        latestEndLsn = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        latestEndTime = row(idx + 8)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PgStatSubscriptionViewRow] = OWrites[PgStatSubscriptionViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "subid" -> Json.toJson(o.subid),
-      "subname" -> Json.toJson(o.subname),
-      "pid" -> Json.toJson(o.pid),
-      "relid" -> Json.toJson(o.relid),
-      "received_lsn" -> Json.toJson(o.receivedLsn),
-      "last_msg_send_time" -> Json.toJson(o.lastMsgSendTime),
-      "last_msg_receipt_time" -> Json.toJson(o.lastMsgReceiptTime),
-      "latest_end_lsn" -> Json.toJson(o.latestEndLsn),
-      "latest_end_time" -> Json.toJson(o.latestEndTime)
+      "subid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.subid),
+      "subname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.subname),
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "received_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.receivedLsn),
+      "last_msg_send_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgSendTime),
+      "last_msg_receipt_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.lastMsgReceiptTime),
+      "latest_end_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.latestEndLsn),
+      "latest_end_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.latestEndTime)
     ))
   )
 }

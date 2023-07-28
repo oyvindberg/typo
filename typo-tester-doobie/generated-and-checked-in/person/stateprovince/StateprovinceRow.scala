@@ -13,8 +13,8 @@ import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -40,28 +40,28 @@ case class StateprovinceRow(
 )
 
 object StateprovinceRow {
-  implicit val decoder: Decoder[StateprovinceRow] = Decoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(StateprovinceRow.apply)
-  implicit val encoder: Encoder[StateprovinceRow] = Encoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[StateprovinceRow] = Decoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(StateprovinceRow.apply)(StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[StateprovinceRow] = Encoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[StateprovinceRow] = new Read[StateprovinceRow](
     gets = List(
-      (Get[StateprovinceId], Nullability.NoNulls),
-      (Get[/* bpchar */ String], Nullability.NoNulls),
-      (Get[CountryregionId], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[SalesterritoryId], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (StateprovinceId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (CountryregionId.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (SalesterritoryId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => StateprovinceRow(
-      stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 0),
-      stateprovincecode = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 1),
-      countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 2),
-      isonlystateprovinceflag = Get[Flag].unsafeGetNonNullable(rs, i + 3),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 4),
-      territoryid = Get[SalesterritoryId].unsafeGetNonNullable(rs, i + 5),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 6),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 7)
+      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 0),
+      stateprovincecode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 2),
+      isonlystateprovinceflag = Flag.get.unsafeGetNonNullable(rs, i + 3),
+      name = Name.get.unsafeGetNonNullable(rs, i + 4),
+      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 5),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 6),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

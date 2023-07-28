@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -43,13 +44,13 @@ object PmViewRow {
   implicit val reads: Reads[PmViewRow] = Reads[PmViewRow](json => JsResult.fromTry(
       Try(
         PmViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
-          instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          productmodelid = json.\("productmodelid").toOption.map(_.as(ProductmodelId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          catalogdescription = json.\("catalogdescription").toOption.map(_.as(TypoXml.reads)),
+          instructions = json.\("instructions").toOption.map(_.as(TypoXml.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -57,25 +58,25 @@ object PmViewRow {
   def rowParser(idx: Int): RowParser[PmViewRow] = RowParser[PmViewRow] { row =>
     Success(
       PmViewRow(
-        id = row[Option[Int]](idx + 0),
-        productmodelid = row[Option[ProductmodelId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        catalogdescription = row[Option[TypoXml]](idx + 3),
-        instructions = row[Option[TypoXml]](idx + 4),
-        rowguid = row[Option[UUID]](idx + 5),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        productmodelid = row(idx + 1)(Column.columnToOption(ProductmodelId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        catalogdescription = row(idx + 3)(Column.columnToOption(TypoXml.column)),
+        instructions = row(idx + 4)(Column.columnToOption(TypoXml.column)),
+        rowguid = row(idx + 5)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PmViewRow] = OWrites[PmViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "productmodelid" -> Json.toJson(o.productmodelid),
-      "name" -> Json.toJson(o.name),
-      "catalogdescription" -> Json.toJson(o.catalogdescription),
-      "instructions" -> Json.toJson(o.instructions),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "productmodelid" -> Writes.OptionWrites(ProductmodelId.writes).writes(o.productmodelid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "catalogdescription" -> Writes.OptionWrites(TypoXml.writes).writes(o.catalogdescription),
+      "instructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.instructions),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

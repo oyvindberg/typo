@@ -10,7 +10,6 @@ package culture
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,18 +24,18 @@ case class CultureRow(
 )
 
 object CultureRow {
-  implicit val decoder: Decoder[CultureRow] = Decoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(CultureRow.apply)
-  implicit val encoder: Encoder[CultureRow] = Encoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))
+  implicit val decoder: Decoder[CultureRow] = Decoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(CultureRow.apply)(CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[CultureRow] = Encoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[CultureRow] = new Read[CultureRow](
     gets = List(
-      (Get[CultureId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (CultureId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CultureRow(
-      cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

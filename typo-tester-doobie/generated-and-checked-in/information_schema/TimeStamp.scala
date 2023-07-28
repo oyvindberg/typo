@@ -17,11 +17,11 @@ import io.circe.Encoder
   */
 case class TimeStamp(value: TypoOffsetDateTime) extends AnyVal
 object TimeStamp {
-  implicit val arrayGet: Get[Array[TimeStamp]] = Get[Array[TypoOffsetDateTime]].map(_.map(TimeStamp.apply))
-  implicit val arrayPut: Put[Array[TimeStamp]] = Put[Array[TypoOffsetDateTime]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[TimeStamp] = Decoder[TypoOffsetDateTime].map(TimeStamp.apply)
-  implicit val encoder: Encoder[TimeStamp] = Encoder[TypoOffsetDateTime].contramap(_.value)
-  implicit val get: Get[TimeStamp] = Get[TypoOffsetDateTime].map(TimeStamp.apply)
+  implicit val arrayGet: Get[Array[TimeStamp]] = TypoOffsetDateTime.arrayGet.map(_.map(TimeStamp.apply))
+  implicit val arrayPut: Put[Array[TimeStamp]] = TypoOffsetDateTime.arrayPut.contramap(_.map(_.value))
+  implicit val decoder: Decoder[TimeStamp] = TypoOffsetDateTime.decoder.map(TimeStamp.apply)
+  implicit val encoder: Encoder[TimeStamp] = TypoOffsetDateTime.encoder.contramap(_.value)
+  implicit val get: Get[TimeStamp] = TypoOffsetDateTime.get.map(TimeStamp.apply)
   implicit def ordering(implicit O0: Ordering[TypoOffsetDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
-  implicit val put: Put[TimeStamp] = Put[TypoOffsetDateTime].contramap(_.value)
+  implicit val put: Put[TimeStamp] = TypoOffsetDateTime.put.contramap(_.value)
 }

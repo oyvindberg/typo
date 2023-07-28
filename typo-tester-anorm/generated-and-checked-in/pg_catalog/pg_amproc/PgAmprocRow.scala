@@ -8,14 +8,15 @@ package pg_catalog
 package pg_amproc
 
 import adventureworks.TypoRegproc
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,12 +33,12 @@ object PgAmprocRow {
   implicit val reads: Reads[PgAmprocRow] = Reads[PgAmprocRow](json => JsResult.fromTry(
       Try(
         PgAmprocRow(
-          oid = json.\("oid").as[PgAmprocId],
-          amprocfamily = json.\("amprocfamily").as[/* oid */ Long],
-          amproclefttype = json.\("amproclefttype").as[/* oid */ Long],
-          amprocrighttype = json.\("amprocrighttype").as[/* oid */ Long],
-          amprocnum = json.\("amprocnum").as[Int],
-          amproc = json.\("amproc").as[TypoRegproc]
+          oid = json.\("oid").as(PgAmprocId.reads),
+          amprocfamily = json.\("amprocfamily").as(Reads.LongReads),
+          amproclefttype = json.\("amproclefttype").as(Reads.LongReads),
+          amprocrighttype = json.\("amprocrighttype").as(Reads.LongReads),
+          amprocnum = json.\("amprocnum").as(Reads.IntReads),
+          amproc = json.\("amproc").as(TypoRegproc.reads)
         )
       )
     ),
@@ -45,23 +46,23 @@ object PgAmprocRow {
   def rowParser(idx: Int): RowParser[PgAmprocRow] = RowParser[PgAmprocRow] { row =>
     Success(
       PgAmprocRow(
-        oid = row[PgAmprocId](idx + 0),
-        amprocfamily = row[/* oid */ Long](idx + 1),
-        amproclefttype = row[/* oid */ Long](idx + 2),
-        amprocrighttype = row[/* oid */ Long](idx + 3),
-        amprocnum = row[Int](idx + 4),
-        amproc = row[TypoRegproc](idx + 5)
+        oid = row(idx + 0)(PgAmprocId.column),
+        amprocfamily = row(idx + 1)(Column.columnToLong),
+        amproclefttype = row(idx + 2)(Column.columnToLong),
+        amprocrighttype = row(idx + 3)(Column.columnToLong),
+        amprocnum = row(idx + 4)(Column.columnToInt),
+        amproc = row(idx + 5)(TypoRegproc.column)
       )
     )
   }
   implicit val writes: OWrites[PgAmprocRow] = OWrites[PgAmprocRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "amprocfamily" -> Json.toJson(o.amprocfamily),
-      "amproclefttype" -> Json.toJson(o.amproclefttype),
-      "amprocrighttype" -> Json.toJson(o.amprocrighttype),
-      "amprocnum" -> Json.toJson(o.amprocnum),
-      "amproc" -> Json.toJson(o.amproc)
+      "oid" -> PgAmprocId.writes.writes(o.oid),
+      "amprocfamily" -> Writes.LongWrites.writes(o.amprocfamily),
+      "amproclefttype" -> Writes.LongWrites.writes(o.amproclefttype),
+      "amprocrighttype" -> Writes.LongWrites.writes(o.amprocrighttype),
+      "amprocnum" -> Writes.IntWrites.writes(o.amprocnum),
+      "amproc" -> TypoRegproc.writes.writes(o.amproc)
     ))
   )
 }

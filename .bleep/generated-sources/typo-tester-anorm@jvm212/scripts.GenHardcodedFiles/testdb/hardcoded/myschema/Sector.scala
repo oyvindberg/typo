@@ -39,7 +39,7 @@ object Sector {
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
   implicit val reads: Reads[Sector] = Reads[Sector]((value: JsValue) =>
-    value.validate(implicitly[Reads[String]]).flatMap { str =>
+    value.validate(Reads.StringReads).flatMap { str =>
       ByName.get(str) match {
         case Some(value) => JsSuccess(value)
         case None => JsError(s"'$str' does not match any of the following legal values: $Names")
@@ -47,5 +47,5 @@ object Sector {
     }
   )
   implicit val toStatement: ToStatement[Sector] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[Sector] = Writes[Sector](value => implicitly[Writes[String]].writes(value.value))
+  implicit val writes: Writes[Sector] = Writes[Sector](value => Writes.StringWrites.writes(value.value))
 }

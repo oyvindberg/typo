@@ -12,14 +12,15 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -43,13 +44,13 @@ object EdhViewRow {
   implicit val reads: Reads[EdhViewRow] = Reads[EdhViewRow](json => JsResult.fromTry(
       Try(
         EdhViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
-          shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
-          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDate]),
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          departmentid = json.\("departmentid").toOption.map(_.as(DepartmentId.reads)),
+          shiftid = json.\("shiftid").toOption.map(_.as(ShiftId.reads)),
+          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDate.reads)),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDate.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -57,25 +58,25 @@ object EdhViewRow {
   def rowParser(idx: Int): RowParser[EdhViewRow] = RowParser[EdhViewRow] { row =>
     Success(
       EdhViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        departmentid = row[Option[DepartmentId]](idx + 2),
-        shiftid = row[Option[ShiftId]](idx + 3),
-        startdate = row[Option[TypoLocalDate]](idx + 4),
-        enddate = row[Option[TypoLocalDate]](idx + 5),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        departmentid = row(idx + 2)(Column.columnToOption(DepartmentId.column)),
+        shiftid = row(idx + 3)(Column.columnToOption(ShiftId.column)),
+        startdate = row(idx + 4)(Column.columnToOption(TypoLocalDate.column)),
+        enddate = row(idx + 5)(Column.columnToOption(TypoLocalDate.column)),
+        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[EdhViewRow] = OWrites[EdhViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "departmentid" -> Json.toJson(o.departmentid),
-      "shiftid" -> Json.toJson(o.shiftid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "departmentid" -> Writes.OptionWrites(DepartmentId.writes).writes(o.departmentid),
+      "shiftid" -> Writes.OptionWrites(ShiftId.writes).writes(o.shiftid),
+      "startdate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.enddate),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

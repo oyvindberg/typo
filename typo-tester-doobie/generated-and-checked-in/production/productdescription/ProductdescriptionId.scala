@@ -9,17 +9,18 @@ package productdescription
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.productdescription` */
 case class ProductdescriptionId(value: Int) extends AnyVal
 object ProductdescriptionId {
-  implicit val arrayGet: Get[Array[ProductdescriptionId]] = Get[Array[Int]].map(_.map(ProductdescriptionId.apply))
-  implicit val arrayPut: Put[Array[ProductdescriptionId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[ProductdescriptionId] = Decoder[Int].map(ProductdescriptionId.apply)
-  implicit val encoder: Encoder[ProductdescriptionId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[ProductdescriptionId] = Get[Int].map(ProductdescriptionId.apply)
+  implicit val arrayGet: Get[Array[ProductdescriptionId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ProductdescriptionId.apply))
+  implicit val arrayPut: Put[Array[ProductdescriptionId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[ProductdescriptionId] = Decoder.decodeInt.map(ProductdescriptionId.apply)
+  implicit val encoder: Encoder[ProductdescriptionId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[ProductdescriptionId] = Meta.IntMeta.get.map(ProductdescriptionId.apply)
   implicit val ordering: Ordering[ProductdescriptionId] = Ordering.by(_.value)
-  implicit val put: Put[ProductdescriptionId] = Put[Int].contramap(_.value)
+  implicit val put: Put[ProductdescriptionId] = Meta.IntMeta.put.contramap(_.value)
 }

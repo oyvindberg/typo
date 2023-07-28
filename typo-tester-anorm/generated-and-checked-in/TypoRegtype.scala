@@ -15,9 +15,9 @@ import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -59,7 +59,7 @@ object TypoRegtype {
   implicit val reads: Reads[TypoRegtype] = Reads[TypoRegtype](json => JsResult.fromTry(
       Try(
         TypoRegtype(
-          value = json.\("value").as[String]
+          value = json.\("value").as(Reads.StringReads)
         )
       )
     ),
@@ -72,7 +72,7 @@ object TypoRegtype {
                                                                }))
   implicit val writes: OWrites[TypoRegtype] = OWrites[TypoRegtype](o =>
     new JsObject(ListMap[String, JsValue](
-      "value" -> Json.toJson(o.value)
+      "value" -> Writes.StringWrites.writes(o.value)
     ))
   )
 }

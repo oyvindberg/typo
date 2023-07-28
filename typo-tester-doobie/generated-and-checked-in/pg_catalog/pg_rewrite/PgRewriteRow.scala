@@ -9,8 +9,8 @@ package pg_rewrite
 
 import adventureworks.TypoPgNodeTree
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -27,28 +27,28 @@ case class PgRewriteRow(
 )
 
 object PgRewriteRow {
-  implicit val decoder: Decoder[PgRewriteRow] = Decoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(PgRewriteRow.apply)
-  implicit val encoder: Encoder[PgRewriteRow] = Encoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(x => (x.oid, x.rulename, x.evClass, x.evType, x.evEnabled, x.isInstead, x.evQual, x.evAction))
+  implicit val decoder: Decoder[PgRewriteRow] = Decoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(PgRewriteRow.apply)(PgRewriteId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, TypoPgNodeTree.decoder, TypoPgNodeTree.decoder)
+  implicit val encoder: Encoder[PgRewriteRow] = Encoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(x => (x.oid, x.rulename, x.evClass, x.evType, x.evEnabled, x.isInstead, x.evQual, x.evAction))(PgRewriteId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, TypoPgNodeTree.encoder, TypoPgNodeTree.encoder)
   implicit val read: Read[PgRewriteRow] = new Read[PgRewriteRow](
     gets = List(
-      (Get[PgRewriteId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[TypoPgNodeTree], Nullability.NoNulls),
-      (Get[TypoPgNodeTree], Nullability.NoNulls)
+      (PgRewriteId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (TypoPgNodeTree.get, Nullability.NoNulls),
+      (TypoPgNodeTree.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgRewriteRow(
-      oid = Get[PgRewriteId].unsafeGetNonNullable(rs, i + 0),
-      rulename = Get[String].unsafeGetNonNullable(rs, i + 1),
-      evClass = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      evType = Get[String].unsafeGetNonNullable(rs, i + 3),
-      evEnabled = Get[String].unsafeGetNonNullable(rs, i + 4),
-      isInstead = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-      evQual = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 6),
-      evAction = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 7)
+      oid = PgRewriteId.get.unsafeGetNonNullable(rs, i + 0),
+      rulename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      evClass = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      evType = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      evEnabled = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      isInstead = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 5),
+      evQual = TypoPgNodeTree.get.unsafeGetNonNullable(rs, i + 6),
+      evAction = TypoPgNodeTree.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

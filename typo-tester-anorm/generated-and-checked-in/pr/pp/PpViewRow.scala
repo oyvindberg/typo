@@ -9,14 +9,15 @@ package pp
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -40,13 +41,13 @@ object PpViewRow {
   implicit val reads: Reads[PpViewRow] = Reads[PpViewRow](json => JsResult.fromTry(
       Try(
         PpViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          productphotoid = json.\("productphotoid").toOption.map(_.as[ProductphotoId]),
-          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Byte]),
-          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-          largephoto = json.\("largephoto").toOption.map(_.as[Byte]),
-          largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          productphotoid = json.\("productphotoid").toOption.map(_.as(ProductphotoId.reads)),
+          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as(Reads.ByteReads)),
+          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as(Reads.StringReads)),
+          largephoto = json.\("largephoto").toOption.map(_.as(Reads.ByteReads)),
+          largephotofilename = json.\("largephotofilename").toOption.map(_.as(Reads.StringReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -54,25 +55,25 @@ object PpViewRow {
   def rowParser(idx: Int): RowParser[PpViewRow] = RowParser[PpViewRow] { row =>
     Success(
       PpViewRow(
-        id = row[Option[Int]](idx + 0),
-        productphotoid = row[Option[ProductphotoId]](idx + 1),
-        thumbnailphoto = row[Option[Byte]](idx + 2),
-        thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 3),
-        largephoto = row[Option[Byte]](idx + 4),
-        largephotofilename = row[Option[/* max 50 chars */ String]](idx + 5),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        productphotoid = row(idx + 1)(Column.columnToOption(ProductphotoId.column)),
+        thumbnailphoto = row(idx + 2)(Column.columnToOption(Column.columnToByte)),
+        thumbnailphotofilename = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        largephoto = row(idx + 4)(Column.columnToOption(Column.columnToByte)),
+        largephotofilename = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PpViewRow] = OWrites[PpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "productphotoid" -> Json.toJson(o.productphotoid),
-      "thumbnailphoto" -> Json.toJson(o.thumbnailphoto),
-      "thumbnailphotofilename" -> Json.toJson(o.thumbnailphotofilename),
-      "largephoto" -> Json.toJson(o.largephoto),
-      "largephotofilename" -> Json.toJson(o.largephotofilename),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "productphotoid" -> Writes.OptionWrites(ProductphotoId.writes).writes(o.productphotoid),
+      "thumbnailphoto" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.thumbnailphoto),
+      "thumbnailphotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.thumbnailphotofilename),
+      "largephoto" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.largephoto),
+      "largephotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.largephotofilename),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

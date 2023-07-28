@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stat_progress_copy
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,32 +28,32 @@ case class PgStatProgressCopyViewRow(
 )
 
 object PgStatProgressCopyViewRow {
-  implicit val decoder: Decoder[PgStatProgressCopyViewRow] = Decoder.forProduct10[PgStatProgressCopyViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "type", "bytes_processed", "bytes_total", "tuples_processed", "tuples_excluded")(PgStatProgressCopyViewRow.apply)
-  implicit val encoder: Encoder[PgStatProgressCopyViewRow] = Encoder.forProduct10[PgStatProgressCopyViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "type", "bytes_processed", "bytes_total", "tuples_processed", "tuples_excluded")(x => (x.pid, x.datid, x.datname, x.relid, x.command, x.`type`, x.bytesProcessed, x.bytesTotal, x.tuplesProcessed, x.tuplesExcluded))
+  implicit val decoder: Decoder[PgStatProgressCopyViewRow] = Decoder.forProduct10[PgStatProgressCopyViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "type", "bytes_processed", "bytes_total", "tuples_processed", "tuples_excluded")(PgStatProgressCopyViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit val encoder: Encoder[PgStatProgressCopyViewRow] = Encoder.forProduct10[PgStatProgressCopyViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "type", "bytes_processed", "bytes_total", "tuples_processed", "tuples_excluded")(x => (x.pid, x.datid, x.datname, x.relid, x.command, x.`type`, x.bytesProcessed, x.bytesTotal, x.tuplesProcessed, x.tuplesExcluded))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit val read: Read[PgStatProgressCopyViewRow] = new Read[PgStatProgressCopyViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressCopyViewRow(
-      pid = Get[Int].unsafeGetNullable(rs, i + 0),
-      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      datname = Get[String].unsafeGetNullable(rs, i + 2),
-      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-      command = Get[String].unsafeGetNullable(rs, i + 4),
-      `type` = Get[String].unsafeGetNullable(rs, i + 5),
-      bytesProcessed = Get[Long].unsafeGetNullable(rs, i + 6),
-      bytesTotal = Get[Long].unsafeGetNullable(rs, i + 7),
-      tuplesProcessed = Get[Long].unsafeGetNullable(rs, i + 8),
-      tuplesExcluded = Get[Long].unsafeGetNullable(rs, i + 9)
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      command = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      `type` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      bytesProcessed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      bytesTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      tuplesProcessed = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
+      tuplesExcluded = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

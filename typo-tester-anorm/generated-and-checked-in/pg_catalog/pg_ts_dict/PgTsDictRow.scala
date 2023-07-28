@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_ts_dict
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,12 +32,12 @@ object PgTsDictRow {
   implicit val reads: Reads[PgTsDictRow] = Reads[PgTsDictRow](json => JsResult.fromTry(
       Try(
         PgTsDictRow(
-          oid = json.\("oid").as[PgTsDictId],
-          dictname = json.\("dictname").as[String],
-          dictnamespace = json.\("dictnamespace").as[/* oid */ Long],
-          dictowner = json.\("dictowner").as[/* oid */ Long],
-          dicttemplate = json.\("dicttemplate").as[/* oid */ Long],
-          dictinitoption = json.\("dictinitoption").toOption.map(_.as[String])
+          oid = json.\("oid").as(PgTsDictId.reads),
+          dictname = json.\("dictname").as(Reads.StringReads),
+          dictnamespace = json.\("dictnamespace").as(Reads.LongReads),
+          dictowner = json.\("dictowner").as(Reads.LongReads),
+          dicttemplate = json.\("dicttemplate").as(Reads.LongReads),
+          dictinitoption = json.\("dictinitoption").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -44,23 +45,23 @@ object PgTsDictRow {
   def rowParser(idx: Int): RowParser[PgTsDictRow] = RowParser[PgTsDictRow] { row =>
     Success(
       PgTsDictRow(
-        oid = row[PgTsDictId](idx + 0),
-        dictname = row[String](idx + 1),
-        dictnamespace = row[/* oid */ Long](idx + 2),
-        dictowner = row[/* oid */ Long](idx + 3),
-        dicttemplate = row[/* oid */ Long](idx + 4),
-        dictinitoption = row[Option[String]](idx + 5)
+        oid = row(idx + 0)(PgTsDictId.column),
+        dictname = row(idx + 1)(Column.columnToString),
+        dictnamespace = row(idx + 2)(Column.columnToLong),
+        dictowner = row(idx + 3)(Column.columnToLong),
+        dicttemplate = row(idx + 4)(Column.columnToLong),
+        dictinitoption = row(idx + 5)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgTsDictRow] = OWrites[PgTsDictRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "dictname" -> Json.toJson(o.dictname),
-      "dictnamespace" -> Json.toJson(o.dictnamespace),
-      "dictowner" -> Json.toJson(o.dictowner),
-      "dicttemplate" -> Json.toJson(o.dicttemplate),
-      "dictinitoption" -> Json.toJson(o.dictinitoption)
+      "oid" -> PgTsDictId.writes.writes(o.oid),
+      "dictname" -> Writes.StringWrites.writes(o.dictname),
+      "dictnamespace" -> Writes.LongWrites.writes(o.dictnamespace),
+      "dictowner" -> Writes.LongWrites.writes(o.dictowner),
+      "dicttemplate" -> Writes.LongWrites.writes(o.dicttemplate),
+      "dictinitoption" -> Writes.OptionWrites(Writes.StringWrites).writes(o.dictinitoption)
     ))
   )
 }

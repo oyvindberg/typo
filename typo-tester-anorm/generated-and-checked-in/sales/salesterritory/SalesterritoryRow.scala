@@ -10,15 +10,16 @@ package salesterritory
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -48,16 +49,16 @@ object SalesterritoryRow {
   implicit val reads: Reads[SalesterritoryRow] = Reads[SalesterritoryRow](json => JsResult.fromTry(
       Try(
         SalesterritoryRow(
-          territoryid = json.\("territoryid").as[SalesterritoryId],
-          name = json.\("name").as[Name],
-          countryregioncode = json.\("countryregioncode").as[CountryregionId],
-          group = json.\("group").as[/* max 50 chars */ String],
-          salesytd = json.\("salesytd").as[BigDecimal],
-          saleslastyear = json.\("saleslastyear").as[BigDecimal],
-          costytd = json.\("costytd").as[BigDecimal],
-          costlastyear = json.\("costlastyear").as[BigDecimal],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+          name = json.\("name").as(Name.reads),
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          group = json.\("group").as(Reads.StringReads),
+          salesytd = json.\("salesytd").as(Reads.bigDecReads),
+          saleslastyear = json.\("saleslastyear").as(Reads.bigDecReads),
+          costytd = json.\("costytd").as(Reads.bigDecReads),
+          costlastyear = json.\("costlastyear").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -65,31 +66,31 @@ object SalesterritoryRow {
   def rowParser(idx: Int): RowParser[SalesterritoryRow] = RowParser[SalesterritoryRow] { row =>
     Success(
       SalesterritoryRow(
-        territoryid = row[SalesterritoryId](idx + 0),
-        name = row[Name](idx + 1),
-        countryregioncode = row[CountryregionId](idx + 2),
-        group = row[/* max 50 chars */ String](idx + 3),
-        salesytd = row[BigDecimal](idx + 4),
-        saleslastyear = row[BigDecimal](idx + 5),
-        costytd = row[BigDecimal](idx + 6),
-        costlastyear = row[BigDecimal](idx + 7),
-        rowguid = row[UUID](idx + 8),
-        modifieddate = row[TypoLocalDateTime](idx + 9)
+        territoryid = row(idx + 0)(SalesterritoryId.column),
+        name = row(idx + 1)(Name.column),
+        countryregioncode = row(idx + 2)(CountryregionId.column),
+        group = row(idx + 3)(Column.columnToString),
+        salesytd = row(idx + 4)(Column.columnToScalaBigDecimal),
+        saleslastyear = row(idx + 5)(Column.columnToScalaBigDecimal),
+        costytd = row(idx + 6)(Column.columnToScalaBigDecimal),
+        costlastyear = row(idx + 7)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 8)(Column.columnToUUID),
+        modifieddate = row(idx + 9)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[SalesterritoryRow] = OWrites[SalesterritoryRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "territoryid" -> Json.toJson(o.territoryid),
-      "name" -> Json.toJson(o.name),
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "group" -> Json.toJson(o.group),
-      "salesytd" -> Json.toJson(o.salesytd),
-      "saleslastyear" -> Json.toJson(o.saleslastyear),
-      "costytd" -> Json.toJson(o.costytd),
-      "costlastyear" -> Json.toJson(o.costlastyear),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+      "name" -> Name.writes.writes(o.name),
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "group" -> Writes.StringWrites.writes(o.group),
+      "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),
+      "saleslastyear" -> Writes.BigDecimalWrites.writes(o.saleslastyear),
+      "costytd" -> Writes.BigDecimalWrites.writes(o.costytd),
+      "costlastyear" -> Writes.BigDecimalWrites.writes(o.costlastyear),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -9,17 +9,18 @@ package pg_user_mapping
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_user_mapping` */
 case class PgUserMappingId(value: /* oid */ Long) extends AnyVal
 object PgUserMappingId {
-  implicit val arrayGet: Get[Array[PgUserMappingId]] = Get[Array[/* oid */ Long]].map(_.map(PgUserMappingId.apply))
-  implicit val arrayPut: Put[Array[PgUserMappingId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[PgUserMappingId] = Decoder[/* oid */ Long].map(PgUserMappingId.apply)
-  implicit val encoder: Encoder[PgUserMappingId] = Encoder[/* oid */ Long].contramap(_.value)
-  implicit val get: Get[PgUserMappingId] = Get[/* oid */ Long].map(PgUserMappingId.apply)
+  implicit val arrayGet: Get[Array[PgUserMappingId]] = adventureworks.LongArrayMeta.get.map(_.map(PgUserMappingId.apply))
+  implicit val arrayPut: Put[Array[PgUserMappingId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgUserMappingId] = Decoder.decodeLong.map(PgUserMappingId.apply)
+  implicit val encoder: Encoder[PgUserMappingId] = Encoder.encodeLong.contramap(_.value)
+  implicit val get: Get[PgUserMappingId] = Meta.LongMeta.get.map(PgUserMappingId.apply)
   implicit val ordering: Ordering[PgUserMappingId] = Ordering.by(_.value)
-  implicit val put: Put[PgUserMappingId] = Put[/* oid */ Long].contramap(_.value)
+  implicit val put: Put[PgUserMappingId] = Meta.LongMeta.put.contramap(_.value)
 }

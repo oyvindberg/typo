@@ -12,8 +12,8 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -38,28 +38,28 @@ case class TrViewRow(
 )
 
 object TrViewRow {
-  implicit val decoder: Decoder[TrViewRow] = Decoder.forProduct8[TrViewRow, Option[Int], Option[SalestaxrateId], Option[StateprovinceId], Option[Int], Option[BigDecimal], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(TrViewRow.apply)
-  implicit val encoder: Encoder[TrViewRow] = Encoder.forProduct8[TrViewRow, Option[Int], Option[SalestaxrateId], Option[StateprovinceId], Option[Int], Option[BigDecimal], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.id, x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[TrViewRow] = Decoder.forProduct8[TrViewRow, Option[Int], Option[SalestaxrateId], Option[StateprovinceId], Option[Int], Option[BigDecimal], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(TrViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SalestaxrateId.decoder), Decoder.decodeOption(StateprovinceId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[TrViewRow] = Encoder.forProduct8[TrViewRow, Option[Int], Option[SalestaxrateId], Option[StateprovinceId], Option[Int], Option[BigDecimal], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.id, x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SalestaxrateId.encoder), Encoder.encodeOption(StateprovinceId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[TrViewRow] = new Read[TrViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[SalestaxrateId], Nullability.Nullable),
-      (Get[StateprovinceId], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (SalestaxrateId.get, Nullability.Nullable),
+      (StateprovinceId.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TrViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      salestaxrateid = Get[SalestaxrateId].unsafeGetNullable(rs, i + 1),
-      stateprovinceid = Get[StateprovinceId].unsafeGetNullable(rs, i + 2),
-      taxtype = Get[Int].unsafeGetNullable(rs, i + 3),
-      taxrate = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-      name = Get[Name].unsafeGetNullable(rs, i + 5),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 6),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      salestaxrateid = SalestaxrateId.get.unsafeGetNullable(rs, i + 1),
+      stateprovinceid = StateprovinceId.get.unsafeGetNullable(rs, i + 2),
+      taxtype = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
+      taxrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+      name = Name.get.unsafeGetNullable(rs, i + 5),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 6),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

@@ -8,8 +8,8 @@ package pg_catalog
 package pg_statio_user_sequences
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,22 +28,22 @@ case class PgStatioUserSequencesViewRow(
 )
 
 object PgStatioUserSequencesViewRow {
-  implicit val decoder: Decoder[PgStatioUserSequencesViewRow] = Decoder.forProduct5[PgStatioUserSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioUserSequencesViewRow.apply)
-  implicit val encoder: Encoder[PgStatioUserSequencesViewRow] = Encoder.forProduct5[PgStatioUserSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))
+  implicit val decoder: Decoder[PgStatioUserSequencesViewRow] = Decoder.forProduct5[PgStatioUserSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioUserSequencesViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit val encoder: Encoder[PgStatioUserSequencesViewRow] = Encoder.forProduct5[PgStatioUserSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit val read: Read[PgStatioUserSequencesViewRow] = new Read[PgStatioUserSequencesViewRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatioUserSequencesViewRow(
-      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-      schemaname = Get[String].unsafeGetNullable(rs, i + 1),
-      relname = Get[String].unsafeGetNullable(rs, i + 2),
-      blksRead = Get[Long].unsafeGetNullable(rs, i + 3),
-      blksHit = Get[Long].unsafeGetNullable(rs, i + 4)
+      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      blksRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      blksHit = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

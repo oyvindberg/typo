@@ -9,15 +9,16 @@ package pd
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.productdescription.ProductdescriptionId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -37,11 +38,11 @@ object PdViewRow {
   implicit val reads: Reads[PdViewRow] = Reads[PdViewRow](json => JsResult.fromTry(
       Try(
         PdViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          productdescriptionid = json.\("productdescriptionid").toOption.map(_.as[ProductdescriptionId]),
-          description = json.\("description").toOption.map(_.as[/* max 400 chars */ String]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          productdescriptionid = json.\("productdescriptionid").toOption.map(_.as(ProductdescriptionId.reads)),
+          description = json.\("description").toOption.map(_.as(Reads.StringReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -49,21 +50,21 @@ object PdViewRow {
   def rowParser(idx: Int): RowParser[PdViewRow] = RowParser[PdViewRow] { row =>
     Success(
       PdViewRow(
-        id = row[Option[Int]](idx + 0),
-        productdescriptionid = row[Option[ProductdescriptionId]](idx + 1),
-        description = row[Option[/* max 400 chars */ String]](idx + 2),
-        rowguid = row[Option[UUID]](idx + 3),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        productdescriptionid = row(idx + 1)(Column.columnToOption(ProductdescriptionId.column)),
+        description = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        rowguid = row(idx + 3)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PdViewRow] = OWrites[PdViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
-      "description" -> Json.toJson(o.description),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "productdescriptionid" -> Writes.OptionWrites(ProductdescriptionId.writes).writes(o.productdescriptionid),
+      "description" -> Writes.OptionWrites(Writes.StringWrites).writes(o.description),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

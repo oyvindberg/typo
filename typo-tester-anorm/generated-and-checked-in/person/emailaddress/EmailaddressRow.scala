@@ -9,15 +9,16 @@ package emailaddress
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,11 +40,11 @@ object EmailaddressRow {
   implicit val reads: Reads[EmailaddressRow] = Reads[EmailaddressRow](json => JsResult.fromTry(
       Try(
         EmailaddressRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          emailaddressid = json.\("emailaddressid").as[Int],
-          emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          emailaddressid = json.\("emailaddressid").as(Reads.IntReads),
+          emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,21 +52,21 @@ object EmailaddressRow {
   def rowParser(idx: Int): RowParser[EmailaddressRow] = RowParser[EmailaddressRow] { row =>
     Success(
       EmailaddressRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        emailaddressid = row[Int](idx + 1),
-        emailaddress = row[Option[/* max 50 chars */ String]](idx + 2),
-        rowguid = row[UUID](idx + 3),
-        modifieddate = row[TypoLocalDateTime](idx + 4)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        emailaddressid = row(idx + 1)(Column.columnToInt),
+        emailaddress = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        rowguid = row(idx + 3)(Column.columnToUUID),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[EmailaddressRow] = OWrites[EmailaddressRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "emailaddressid" -> Json.toJson(o.emailaddressid),
-      "emailaddress" -> Json.toJson(o.emailaddress),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "emailaddressid" -> Writes.IntWrites.writes(o.emailaddressid),
+      "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

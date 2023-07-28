@@ -10,14 +10,15 @@ package cr
 import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currencyrate.CurrencyrateId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,13 +43,13 @@ object CrViewRow {
   implicit val reads: Reads[CrViewRow] = Reads[CrViewRow](json => JsResult.fromTry(
       Try(
         CrViewRow(
-          currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
-          currencyratedate = json.\("currencyratedate").toOption.map(_.as[TypoLocalDateTime]),
-          fromcurrencycode = json.\("fromcurrencycode").toOption.map(_.as[CurrencyId]),
-          tocurrencycode = json.\("tocurrencycode").toOption.map(_.as[CurrencyId]),
-          averagerate = json.\("averagerate").toOption.map(_.as[BigDecimal]),
-          endofdayrate = json.\("endofdayrate").toOption.map(_.as[BigDecimal]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          currencyrateid = json.\("currencyrateid").toOption.map(_.as(CurrencyrateId.reads)),
+          currencyratedate = json.\("currencyratedate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          fromcurrencycode = json.\("fromcurrencycode").toOption.map(_.as(CurrencyId.reads)),
+          tocurrencycode = json.\("tocurrencycode").toOption.map(_.as(CurrencyId.reads)),
+          averagerate = json.\("averagerate").toOption.map(_.as(Reads.bigDecReads)),
+          endofdayrate = json.\("endofdayrate").toOption.map(_.as(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -56,25 +57,25 @@ object CrViewRow {
   def rowParser(idx: Int): RowParser[CrViewRow] = RowParser[CrViewRow] { row =>
     Success(
       CrViewRow(
-        currencyrateid = row[Option[CurrencyrateId]](idx + 0),
-        currencyratedate = row[Option[TypoLocalDateTime]](idx + 1),
-        fromcurrencycode = row[Option[CurrencyId]](idx + 2),
-        tocurrencycode = row[Option[CurrencyId]](idx + 3),
-        averagerate = row[Option[BigDecimal]](idx + 4),
-        endofdayrate = row[Option[BigDecimal]](idx + 5),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
+        currencyrateid = row(idx + 0)(Column.columnToOption(CurrencyrateId.column)),
+        currencyratedate = row(idx + 1)(Column.columnToOption(TypoLocalDateTime.column)),
+        fromcurrencycode = row(idx + 2)(Column.columnToOption(CurrencyId.column)),
+        tocurrencycode = row(idx + 3)(Column.columnToOption(CurrencyId.column)),
+        averagerate = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        endofdayrate = row(idx + 5)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[CrViewRow] = OWrites[CrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "currencyrateid" -> Json.toJson(o.currencyrateid),
-      "currencyratedate" -> Json.toJson(o.currencyratedate),
-      "fromcurrencycode" -> Json.toJson(o.fromcurrencycode),
-      "tocurrencycode" -> Json.toJson(o.tocurrencycode),
-      "averagerate" -> Json.toJson(o.averagerate),
-      "endofdayrate" -> Json.toJson(o.endofdayrate),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "currencyrateid" -> Writes.OptionWrites(CurrencyrateId.writes).writes(o.currencyrateid),
+      "currencyratedate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.currencyratedate),
+      "fromcurrencycode" -> Writes.OptionWrites(CurrencyId.writes).writes(o.fromcurrencycode),
+      "tocurrencycode" -> Writes.OptionWrites(CurrencyId.writes).writes(o.tocurrencycode),
+      "averagerate" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.averagerate),
+      "endofdayrate" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.endofdayrate),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

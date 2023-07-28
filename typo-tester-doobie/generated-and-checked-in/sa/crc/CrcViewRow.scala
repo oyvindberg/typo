@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,18 +26,18 @@ case class CrcViewRow(
 )
 
 object CrcViewRow {
-  implicit val decoder: Decoder[CrcViewRow] = Decoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CrcViewRow.apply)
-  implicit val encoder: Encoder[CrcViewRow] = Encoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))
+  implicit val decoder: Decoder[CrcViewRow] = Decoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CrcViewRow.apply)(Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[CrcViewRow] = Encoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[CrcViewRow] = new Read[CrcViewRow](
     gets = List(
-      (Get[CountryregionId], Nullability.Nullable),
-      (Get[CurrencyId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (CountryregionId.get, Nullability.Nullable),
+      (CurrencyId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
-      countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 0),
-      currencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2)
+      countryregioncode = CountryregionId.get.unsafeGetNullable(rs, i + 0),
+      currencycode = CurrencyId.get.unsafeGetNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

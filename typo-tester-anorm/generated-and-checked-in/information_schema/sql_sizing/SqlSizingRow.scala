@@ -9,14 +9,15 @@ package sql_sizing
 
 import adventureworks.information_schema.CardinalNumber
 import adventureworks.information_schema.CharacterData
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,10 +32,10 @@ object SqlSizingRow {
   implicit val reads: Reads[SqlSizingRow] = Reads[SqlSizingRow](json => JsResult.fromTry(
       Try(
         SqlSizingRow(
-          sizingId = json.\("sizing_id").toOption.map(_.as[CardinalNumber]),
-          sizingName = json.\("sizing_name").toOption.map(_.as[CharacterData]),
-          supportedValue = json.\("supported_value").toOption.map(_.as[CardinalNumber]),
-          comments = json.\("comments").toOption.map(_.as[CharacterData])
+          sizingId = json.\("sizing_id").toOption.map(_.as(CardinalNumber.reads)),
+          sizingName = json.\("sizing_name").toOption.map(_.as(CharacterData.reads)),
+          supportedValue = json.\("supported_value").toOption.map(_.as(CardinalNumber.reads)),
+          comments = json.\("comments").toOption.map(_.as(CharacterData.reads))
         )
       )
     ),
@@ -42,19 +43,19 @@ object SqlSizingRow {
   def rowParser(idx: Int): RowParser[SqlSizingRow] = RowParser[SqlSizingRow] { row =>
     Success(
       SqlSizingRow(
-        sizingId = row[Option[CardinalNumber]](idx + 0),
-        sizingName = row[Option[CharacterData]](idx + 1),
-        supportedValue = row[Option[CardinalNumber]](idx + 2),
-        comments = row[Option[CharacterData]](idx + 3)
+        sizingId = row(idx + 0)(Column.columnToOption(CardinalNumber.column)),
+        sizingName = row(idx + 1)(Column.columnToOption(CharacterData.column)),
+        supportedValue = row(idx + 2)(Column.columnToOption(CardinalNumber.column)),
+        comments = row(idx + 3)(Column.columnToOption(CharacterData.column))
       )
     )
   }
   implicit val writes: OWrites[SqlSizingRow] = OWrites[SqlSizingRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "sizing_id" -> Json.toJson(o.sizingId),
-      "sizing_name" -> Json.toJson(o.sizingName),
-      "supported_value" -> Json.toJson(o.supportedValue),
-      "comments" -> Json.toJson(o.comments)
+      "sizing_id" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.sizingId),
+      "sizing_name" -> Writes.OptionWrites(CharacterData.writes).writes(o.sizingName),
+      "supported_value" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.supportedValue),
+      "comments" -> Writes.OptionWrites(CharacterData.writes).writes(o.comments)
     ))
   )
 }

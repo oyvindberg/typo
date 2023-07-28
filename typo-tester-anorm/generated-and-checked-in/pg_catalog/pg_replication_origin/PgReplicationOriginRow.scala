@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_replication_origin
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -27,8 +28,8 @@ object PgReplicationOriginRow {
   implicit val reads: Reads[PgReplicationOriginRow] = Reads[PgReplicationOriginRow](json => JsResult.fromTry(
       Try(
         PgReplicationOriginRow(
-          roident = json.\("roident").as[PgReplicationOriginId],
-          roname = json.\("roname").as[String]
+          roident = json.\("roident").as(PgReplicationOriginId.reads),
+          roname = json.\("roname").as(Reads.StringReads)
         )
       )
     ),
@@ -36,15 +37,15 @@ object PgReplicationOriginRow {
   def rowParser(idx: Int): RowParser[PgReplicationOriginRow] = RowParser[PgReplicationOriginRow] { row =>
     Success(
       PgReplicationOriginRow(
-        roident = row[PgReplicationOriginId](idx + 0),
-        roname = row[String](idx + 1)
+        roident = row(idx + 0)(PgReplicationOriginId.column),
+        roname = row(idx + 1)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgReplicationOriginRow] = OWrites[PgReplicationOriginRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "roident" -> Json.toJson(o.roident),
-      "roname" -> Json.toJson(o.roname)
+      "roident" -> PgReplicationOriginId.writes.writes(o.roident),
+      "roname" -> Writes.StringWrites.writes(o.roname)
     ))
   )
 }

@@ -8,14 +8,15 @@ package pg_catalog
 package pg_am
 
 import adventureworks.TypoRegproc
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,10 +31,10 @@ object PgAmRow {
   implicit val reads: Reads[PgAmRow] = Reads[PgAmRow](json => JsResult.fromTry(
       Try(
         PgAmRow(
-          oid = json.\("oid").as[PgAmId],
-          amname = json.\("amname").as[String],
-          amhandler = json.\("amhandler").as[TypoRegproc],
-          amtype = json.\("amtype").as[String]
+          oid = json.\("oid").as(PgAmId.reads),
+          amname = json.\("amname").as(Reads.StringReads),
+          amhandler = json.\("amhandler").as(TypoRegproc.reads),
+          amtype = json.\("amtype").as(Reads.StringReads)
         )
       )
     ),
@@ -41,19 +42,19 @@ object PgAmRow {
   def rowParser(idx: Int): RowParser[PgAmRow] = RowParser[PgAmRow] { row =>
     Success(
       PgAmRow(
-        oid = row[PgAmId](idx + 0),
-        amname = row[String](idx + 1),
-        amhandler = row[TypoRegproc](idx + 2),
-        amtype = row[String](idx + 3)
+        oid = row(idx + 0)(PgAmId.column),
+        amname = row(idx + 1)(Column.columnToString),
+        amhandler = row(idx + 2)(TypoRegproc.column),
+        amtype = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgAmRow] = OWrites[PgAmRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "amname" -> Json.toJson(o.amname),
-      "amhandler" -> Json.toJson(o.amhandler),
-      "amtype" -> Json.toJson(o.amtype)
+      "oid" -> PgAmId.writes.writes(o.oid),
+      "amname" -> Writes.StringWrites.writes(o.amname),
+      "amhandler" -> TypoRegproc.writes.writes(o.amhandler),
+      "amtype" -> Writes.StringWrites.writes(o.amtype)
     ))
   )
 }

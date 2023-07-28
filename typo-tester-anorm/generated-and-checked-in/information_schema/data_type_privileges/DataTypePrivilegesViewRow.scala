@@ -9,14 +9,15 @@ package data_type_privileges
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,11 +34,11 @@ object DataTypePrivilegesViewRow {
   implicit val reads: Reads[DataTypePrivilegesViewRow] = Reads[DataTypePrivilegesViewRow](json => JsResult.fromTry(
       Try(
         DataTypePrivilegesViewRow(
-          objectCatalog = json.\("object_catalog").toOption.map(_.as[SqlIdentifier]),
-          objectSchema = json.\("object_schema").toOption.map(_.as[SqlIdentifier]),
-          objectName = json.\("object_name").toOption.map(_.as[SqlIdentifier]),
-          objectType = json.\("object_type").toOption.map(_.as[CharacterData]),
-          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as[SqlIdentifier])
+          objectCatalog = json.\("object_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          objectSchema = json.\("object_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          objectName = json.\("object_name").toOption.map(_.as(SqlIdentifier.reads)),
+          objectType = json.\("object_type").toOption.map(_.as(CharacterData.reads)),
+          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -45,21 +46,21 @@ object DataTypePrivilegesViewRow {
   def rowParser(idx: Int): RowParser[DataTypePrivilegesViewRow] = RowParser[DataTypePrivilegesViewRow] { row =>
     Success(
       DataTypePrivilegesViewRow(
-        objectCatalog = row[Option[SqlIdentifier]](idx + 0),
-        objectSchema = row[Option[SqlIdentifier]](idx + 1),
-        objectName = row[Option[SqlIdentifier]](idx + 2),
-        objectType = row[Option[CharacterData]](idx + 3),
-        dtdIdentifier = row[Option[SqlIdentifier]](idx + 4)
+        objectCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        objectSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        objectName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        objectType = row(idx + 3)(Column.columnToOption(CharacterData.column)),
+        dtdIdentifier = row(idx + 4)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[DataTypePrivilegesViewRow] = OWrites[DataTypePrivilegesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "object_catalog" -> Json.toJson(o.objectCatalog),
-      "object_schema" -> Json.toJson(o.objectSchema),
-      "object_name" -> Json.toJson(o.objectName),
-      "object_type" -> Json.toJson(o.objectType),
-      "dtd_identifier" -> Json.toJson(o.dtdIdentifier)
+      "object_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectCatalog),
+      "object_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectSchema),
+      "object_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectName),
+      "object_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.objectType),
+      "dtd_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.dtdIdentifier)
     ))
   )
 }

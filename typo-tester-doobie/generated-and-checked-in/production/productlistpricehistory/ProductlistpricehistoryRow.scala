@@ -10,8 +10,8 @@ package productlistpricehistory
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -32,22 +32,22 @@ case class ProductlistpricehistoryRow(
  }
 
 object ProductlistpricehistoryRow {
-  implicit val decoder: Decoder[ProductlistpricehistoryRow] = Decoder.forProduct5[ProductlistpricehistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "listprice", "modifieddate")(ProductlistpricehistoryRow.apply)
-  implicit val encoder: Encoder[ProductlistpricehistoryRow] = Encoder.forProduct5[ProductlistpricehistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "listprice", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.listprice, x.modifieddate))
+  implicit val decoder: Decoder[ProductlistpricehistoryRow] = Decoder.forProduct5[ProductlistpricehistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "listprice", "modifieddate")(ProductlistpricehistoryRow.apply)(ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ProductlistpricehistoryRow] = Encoder.forProduct5[ProductlistpricehistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "listprice", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.listprice, x.modifieddate))(ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit val read: Read[ProductlistpricehistoryRow] = new Read[ProductlistpricehistoryRow](
     gets = List(
-      (Get[ProductId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ProductId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductlistpricehistoryRow(
-      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-      startdate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 1),
-      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
-      listprice = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
+      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
+      listprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

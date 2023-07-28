@@ -10,14 +10,15 @@ package udt_privileges
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,13 +36,13 @@ object UdtPrivilegesViewRow {
   implicit val reads: Reads[UdtPrivilegesViewRow] = Reads[UdtPrivilegesViewRow](json => JsResult.fromTry(
       Try(
         UdtPrivilegesViewRow(
-          grantor = json.\("grantor").toOption.map(_.as[SqlIdentifier]),
-          grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
-          udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
-          udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
-          udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
-          privilegeType = json.\("privilege_type").toOption.map(_.as[CharacterData]),
-          isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
+          grantor = json.\("grantor").toOption.map(_.as(SqlIdentifier.reads)),
+          grantee = json.\("grantee").toOption.map(_.as(SqlIdentifier.reads)),
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          udtSchema = json.\("udt_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          udtName = json.\("udt_name").toOption.map(_.as(SqlIdentifier.reads)),
+          privilegeType = json.\("privilege_type").toOption.map(_.as(CharacterData.reads)),
+          isGrantable = json.\("is_grantable").toOption.map(_.as(YesOrNo.reads))
         )
       )
     ),
@@ -49,25 +50,25 @@ object UdtPrivilegesViewRow {
   def rowParser(idx: Int): RowParser[UdtPrivilegesViewRow] = RowParser[UdtPrivilegesViewRow] { row =>
     Success(
       UdtPrivilegesViewRow(
-        grantor = row[Option[SqlIdentifier]](idx + 0),
-        grantee = row[Option[SqlIdentifier]](idx + 1),
-        udtCatalog = row[Option[SqlIdentifier]](idx + 2),
-        udtSchema = row[Option[SqlIdentifier]](idx + 3),
-        udtName = row[Option[SqlIdentifier]](idx + 4),
-        privilegeType = row[Option[CharacterData]](idx + 5),
-        isGrantable = row[Option[YesOrNo]](idx + 6)
+        grantor = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        grantee = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        udtCatalog = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        udtSchema = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        udtName = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        privilegeType = row(idx + 5)(Column.columnToOption(CharacterData.column)),
+        isGrantable = row(idx + 6)(Column.columnToOption(YesOrNo.column))
       )
     )
   }
   implicit val writes: OWrites[UdtPrivilegesViewRow] = OWrites[UdtPrivilegesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "grantor" -> Json.toJson(o.grantor),
-      "grantee" -> Json.toJson(o.grantee),
-      "udt_catalog" -> Json.toJson(o.udtCatalog),
-      "udt_schema" -> Json.toJson(o.udtSchema),
-      "udt_name" -> Json.toJson(o.udtName),
-      "privilege_type" -> Json.toJson(o.privilegeType),
-      "is_grantable" -> Json.toJson(o.isGrantable)
+      "grantor" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantor),
+      "grantee" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantee),
+      "udt_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtCatalog),
+      "udt_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtSchema),
+      "udt_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtName),
+      "privilege_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.privilegeType),
+      "is_grantable" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isGrantable)
     ))
   )
 }

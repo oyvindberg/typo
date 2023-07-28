@@ -15,7 +15,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -37,9 +36,9 @@ object ProductmodelillustrationRow {
   implicit val reads: Reads[ProductmodelillustrationRow] = Reads[ProductmodelillustrationRow](json => JsResult.fromTry(
       Try(
         ProductmodelillustrationRow(
-          productmodelid = json.\("productmodelid").as[ProductmodelId],
-          illustrationid = json.\("illustrationid").as[IllustrationId],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
+          illustrationid = json.\("illustrationid").as(IllustrationId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,17 +46,17 @@ object ProductmodelillustrationRow {
   def rowParser(idx: Int): RowParser[ProductmodelillustrationRow] = RowParser[ProductmodelillustrationRow] { row =>
     Success(
       ProductmodelillustrationRow(
-        productmodelid = row[ProductmodelId](idx + 0),
-        illustrationid = row[IllustrationId](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        productmodelid = row(idx + 0)(ProductmodelId.column),
+        illustrationid = row(idx + 1)(IllustrationId.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductmodelillustrationRow] = OWrites[ProductmodelillustrationRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productmodelid" -> Json.toJson(o.productmodelid),
-      "illustrationid" -> Json.toJson(o.illustrationid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
+      "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

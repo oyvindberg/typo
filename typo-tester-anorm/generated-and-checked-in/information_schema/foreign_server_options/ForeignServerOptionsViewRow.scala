@@ -9,14 +9,15 @@ package foreign_server_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,10 +34,10 @@ object ForeignServerOptionsViewRow {
   implicit val reads: Reads[ForeignServerOptionsViewRow] = Reads[ForeignServerOptionsViewRow](json => JsResult.fromTry(
       Try(
         ForeignServerOptionsViewRow(
-          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
-          optionName = json.\("option_name").toOption.map(_.as[SqlIdentifier]),
-          optionValue = json.\("option_value").toOption.map(_.as[CharacterData])
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(SqlIdentifier.reads)),
+          optionName = json.\("option_name").toOption.map(_.as(SqlIdentifier.reads)),
+          optionValue = json.\("option_value").toOption.map(_.as(CharacterData.reads))
         )
       )
     ),
@@ -44,19 +45,19 @@ object ForeignServerOptionsViewRow {
   def rowParser(idx: Int): RowParser[ForeignServerOptionsViewRow] = RowParser[ForeignServerOptionsViewRow] { row =>
     Success(
       ForeignServerOptionsViewRow(
-        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 0),
-        foreignServerName = row[Option[SqlIdentifier]](idx + 1),
-        optionName = row[Option[SqlIdentifier]](idx + 2),
-        optionValue = row[Option[CharacterData]](idx + 3)
+        foreignServerCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerName = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        optionName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        optionValue = row(idx + 3)(Column.columnToOption(CharacterData.column))
       )
     )
   }
   implicit val writes: OWrites[ForeignServerOptionsViewRow] = OWrites[ForeignServerOptionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
-      "foreign_server_name" -> Json.toJson(o.foreignServerName),
-      "option_name" -> Json.toJson(o.optionName),
-      "option_value" -> Json.toJson(o.optionValue)
+      "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),
+      "foreign_server_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerName),
+      "option_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.optionName),
+      "option_value" -> Writes.OptionWrites(CharacterData.writes).writes(o.optionValue)
     ))
   )
 }

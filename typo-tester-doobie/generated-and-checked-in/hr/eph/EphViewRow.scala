@@ -10,8 +10,8 @@ package eph
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -31,24 +31,24 @@ case class EphViewRow(
 )
 
 object EphViewRow {
-  implicit val decoder: Decoder[EphViewRow] = Decoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EphViewRow.apply)
-  implicit val encoder: Encoder[EphViewRow] = Encoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.id, x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))
+  implicit val decoder: Decoder[EphViewRow] = Decoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EphViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[EphViewRow] = Encoder.forProduct6[EphViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[Int], Option[TypoLocalDateTime]]("id", "businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.id, x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[EphViewRow] = new Read[EphViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EphViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      ratechangedate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
-      rate = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-      payfrequency = Get[Int].unsafeGetNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      ratechangedate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
+      rate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
+      payfrequency = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

@@ -7,14 +7,18 @@ package adventureworks
 package information_schema
 package sql_parts
 
+import adventureworks.information_schema.CharacterData
+import adventureworks.information_schema.YesOrNo
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import fs2.Stream
 
 object SqlPartsRepoImpl extends SqlPartsRepo {
   override def insert(unsaved: SqlPartsRow): ConnectionIO[SqlPartsRow] = {
     sql"""insert into information_schema.sql_parts(feature_id, feature_name, is_supported, is_verified_by, "comments")
-          values (${unsaved.featureId}::information_schema.character_data, ${unsaved.featureName}::information_schema.character_data, ${unsaved.isSupported}::information_schema.yes_or_no, ${unsaved.isVerifiedBy}::information_schema.character_data, ${unsaved.comments}::information_schema.character_data)
+          values (${fromWrite(unsaved.featureId)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.featureName)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.isSupported)(Write.fromPutOption(YesOrNo.put))}::information_schema.yes_or_no, ${fromWrite(unsaved.isVerifiedBy)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data)
           returning feature_id, feature_name, is_supported, is_verified_by, "comments"
        """.query(SqlPartsRow.read).unique
   }

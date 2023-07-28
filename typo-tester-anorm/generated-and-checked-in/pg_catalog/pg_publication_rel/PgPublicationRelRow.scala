@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_publication_rel
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -28,9 +29,9 @@ object PgPublicationRelRow {
   implicit val reads: Reads[PgPublicationRelRow] = Reads[PgPublicationRelRow](json => JsResult.fromTry(
       Try(
         PgPublicationRelRow(
-          oid = json.\("oid").as[PgPublicationRelId],
-          prpubid = json.\("prpubid").as[/* oid */ Long],
-          prrelid = json.\("prrelid").as[/* oid */ Long]
+          oid = json.\("oid").as(PgPublicationRelId.reads),
+          prpubid = json.\("prpubid").as(Reads.LongReads),
+          prrelid = json.\("prrelid").as(Reads.LongReads)
         )
       )
     ),
@@ -38,17 +39,17 @@ object PgPublicationRelRow {
   def rowParser(idx: Int): RowParser[PgPublicationRelRow] = RowParser[PgPublicationRelRow] { row =>
     Success(
       PgPublicationRelRow(
-        oid = row[PgPublicationRelId](idx + 0),
-        prpubid = row[/* oid */ Long](idx + 1),
-        prrelid = row[/* oid */ Long](idx + 2)
+        oid = row(idx + 0)(PgPublicationRelId.column),
+        prpubid = row(idx + 1)(Column.columnToLong),
+        prrelid = row(idx + 2)(Column.columnToLong)
       )
     )
   }
   implicit val writes: OWrites[PgPublicationRelRow] = OWrites[PgPublicationRelRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "prpubid" -> Json.toJson(o.prpubid),
-      "prrelid" -> Json.toJson(o.prrelid)
+      "oid" -> PgPublicationRelId.writes.writes(o.oid),
+      "prpubid" -> Writes.LongWrites.writes(o.prpubid),
+      "prrelid" -> Writes.LongWrites.writes(o.prrelid)
     ))
   )
 }

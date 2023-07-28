@@ -10,14 +10,15 @@ package productreview
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -44,14 +45,14 @@ object ProductreviewRow {
   implicit val reads: Reads[ProductreviewRow] = Reads[ProductreviewRow](json => JsResult.fromTry(
       Try(
         ProductreviewRow(
-          productreviewid = json.\("productreviewid").as[ProductreviewId],
-          productid = json.\("productid").as[ProductId],
-          reviewername = json.\("reviewername").as[Name],
-          reviewdate = json.\("reviewdate").as[TypoLocalDateTime],
-          emailaddress = json.\("emailaddress").as[/* max 50 chars */ String],
-          rating = json.\("rating").as[Int],
-          comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productreviewid = json.\("productreviewid").as(ProductreviewId.reads),
+          productid = json.\("productid").as(ProductId.reads),
+          reviewername = json.\("reviewername").as(Name.reads),
+          reviewdate = json.\("reviewdate").as(TypoLocalDateTime.reads),
+          emailaddress = json.\("emailaddress").as(Reads.StringReads),
+          rating = json.\("rating").as(Reads.IntReads),
+          comments = json.\("comments").toOption.map(_.as(Reads.StringReads)),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -59,27 +60,27 @@ object ProductreviewRow {
   def rowParser(idx: Int): RowParser[ProductreviewRow] = RowParser[ProductreviewRow] { row =>
     Success(
       ProductreviewRow(
-        productreviewid = row[ProductreviewId](idx + 0),
-        productid = row[ProductId](idx + 1),
-        reviewername = row[Name](idx + 2),
-        reviewdate = row[TypoLocalDateTime](idx + 3),
-        emailaddress = row[/* max 50 chars */ String](idx + 4),
-        rating = row[Int](idx + 5),
-        comments = row[Option[/* max 3850 chars */ String]](idx + 6),
-        modifieddate = row[TypoLocalDateTime](idx + 7)
+        productreviewid = row(idx + 0)(ProductreviewId.column),
+        productid = row(idx + 1)(ProductId.column),
+        reviewername = row(idx + 2)(Name.column),
+        reviewdate = row(idx + 3)(TypoLocalDateTime.column),
+        emailaddress = row(idx + 4)(Column.columnToString),
+        rating = row(idx + 5)(Column.columnToInt),
+        comments = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        modifieddate = row(idx + 7)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductreviewRow] = OWrites[ProductreviewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productreviewid" -> Json.toJson(o.productreviewid),
-      "productid" -> Json.toJson(o.productid),
-      "reviewername" -> Json.toJson(o.reviewername),
-      "reviewdate" -> Json.toJson(o.reviewdate),
-      "emailaddress" -> Json.toJson(o.emailaddress),
-      "rating" -> Json.toJson(o.rating),
-      "comments" -> Json.toJson(o.comments),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productreviewid" -> ProductreviewId.writes.writes(o.productreviewid),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "reviewername" -> Name.writes.writes(o.reviewername),
+      "reviewdate" -> TypoLocalDateTime.writes.writes(o.reviewdate),
+      "emailaddress" -> Writes.StringWrites.writes(o.emailaddress),
+      "rating" -> Writes.IntWrites.writes(o.rating),
+      "comments" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comments),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -10,8 +10,8 @@ package pg_database
 import adventureworks.TypoAclItem
 import adventureworks.TypoXid
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -34,40 +34,40 @@ case class PgDatabaseRow(
 )
 
 object PgDatabaseRow {
-  implicit val decoder: Decoder[PgDatabaseRow] = Decoder.forProduct14[PgDatabaseRow, PgDatabaseId, String, /* oid */ Long, Int, String, String, Boolean, Boolean, Int, /* oid */ Long, TypoXid, TypoXid, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl")(PgDatabaseRow.apply)
-  implicit val encoder: Encoder[PgDatabaseRow] = Encoder.forProduct14[PgDatabaseRow, PgDatabaseId, String, /* oid */ Long, Int, String, String, Boolean, Boolean, Int, /* oid */ Long, TypoXid, TypoXid, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl")(x => (x.oid, x.datname, x.datdba, x.encoding, x.datcollate, x.datctype, x.datistemplate, x.datallowconn, x.datconnlimit, x.datlastsysoid, x.datfrozenxid, x.datminmxid, x.dattablespace, x.datacl))
+  implicit val decoder: Decoder[PgDatabaseRow] = Decoder.forProduct14[PgDatabaseRow, PgDatabaseId, String, /* oid */ Long, Int, String, String, Boolean, Boolean, Int, /* oid */ Long, TypoXid, TypoXid, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl")(PgDatabaseRow.apply)(PgDatabaseId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeInt, Decoder.decodeLong, TypoXid.decoder, TypoXid.decoder, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)))
+  implicit val encoder: Encoder[PgDatabaseRow] = Encoder.forProduct14[PgDatabaseRow, PgDatabaseId, String, /* oid */ Long, Int, String, String, Boolean, Boolean, Int, /* oid */ Long, TypoXid, TypoXid, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "datname", "datdba", "encoding", "datcollate", "datctype", "datistemplate", "datallowconn", "datconnlimit", "datlastsysoid", "datfrozenxid", "datminmxid", "dattablespace", "datacl")(x => (x.oid, x.datname, x.datdba, x.encoding, x.datcollate, x.datctype, x.datistemplate, x.datallowconn, x.datconnlimit, x.datlastsysoid, x.datfrozenxid, x.datminmxid, x.dattablespace, x.datacl))(PgDatabaseId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeInt, Encoder.encodeLong, TypoXid.encoder, TypoXid.encoder, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)))
   implicit val read: Read[PgDatabaseRow] = new Read[PgDatabaseRow](
     gets = List(
-      (Get[PgDatabaseId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[TypoXid], Nullability.NoNulls),
-      (Get[TypoXid], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Array[TypoAclItem]], Nullability.Nullable)
+      (PgDatabaseId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoXid.get, Nullability.NoNulls),
+      (TypoXid.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoAclItem.arrayGet, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgDatabaseRow(
-      oid = Get[PgDatabaseId].unsafeGetNonNullable(rs, i + 0),
-      datname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      datdba = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      encoding = Get[Int].unsafeGetNonNullable(rs, i + 3),
-      datcollate = Get[String].unsafeGetNonNullable(rs, i + 4),
-      datctype = Get[String].unsafeGetNonNullable(rs, i + 5),
-      datistemplate = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
-      datallowconn = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-      datconnlimit = Get[Int].unsafeGetNonNullable(rs, i + 8),
-      datlastsysoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 9),
-      datfrozenxid = Get[TypoXid].unsafeGetNonNullable(rs, i + 10),
-      datminmxid = Get[TypoXid].unsafeGetNonNullable(rs, i + 11),
-      dattablespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 12),
-      datacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 13)
+      oid = PgDatabaseId.get.unsafeGetNonNullable(rs, i + 0),
+      datname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      datdba = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      encoding = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      datcollate = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+      datctype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      datistemplate = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 6),
+      datallowconn = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 7),
+      datconnlimit = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 8),
+      datlastsysoid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 9),
+      datfrozenxid = TypoXid.get.unsafeGetNonNullable(rs, i + 10),
+      datminmxid = TypoXid.get.unsafeGetNonNullable(rs, i + 11),
+      dattablespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 12),
+      datacl = TypoAclItem.arrayGet.unsafeGetNullable(rs, i + 13)
     )
   )
 }

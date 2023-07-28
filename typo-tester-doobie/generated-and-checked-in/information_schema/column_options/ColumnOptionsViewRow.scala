@@ -10,7 +10,6 @@ package column_options
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -26,24 +25,24 @@ case class ColumnOptionsViewRow(
 )
 
 object ColumnOptionsViewRow {
-  implicit val decoder: Decoder[ColumnOptionsViewRow] = Decoder.forProduct6[ColumnOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(ColumnOptionsViewRow.apply)
-  implicit val encoder: Encoder[ColumnOptionsViewRow] = Encoder.forProduct6[ColumnOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.optionName, x.optionValue))
+  implicit val decoder: Decoder[ColumnOptionsViewRow] = Decoder.forProduct6[ColumnOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(ColumnOptionsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[ColumnOptionsViewRow] = Encoder.forProduct6[ColumnOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "column_name", "option_name", "option_value")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.optionName, x.optionValue))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[ColumnOptionsViewRow] = new Read[ColumnOptionsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnOptionsViewRow(
-      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 5)
+      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      columnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      optionName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      optionValue = CharacterData.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

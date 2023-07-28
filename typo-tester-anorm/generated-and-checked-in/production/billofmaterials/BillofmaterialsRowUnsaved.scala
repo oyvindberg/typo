@@ -14,9 +14,9 @@ import adventureworks.production.unitmeasure.UnitmeasureId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -76,30 +76,30 @@ object BillofmaterialsRowUnsaved {
   implicit val reads: Reads[BillofmaterialsRowUnsaved] = Reads[BillofmaterialsRowUnsaved](json => JsResult.fromTry(
       Try(
         BillofmaterialsRowUnsaved(
-          productassemblyid = json.\("productassemblyid").toOption.map(_.as[ProductId]),
-          componentid = json.\("componentid").as[ProductId],
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
-          unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
-          bomlevel = json.\("bomlevel").as[Int],
-          billofmaterialsid = json.\("billofmaterialsid").as[Defaulted[BillofmaterialsId]],
-          startdate = json.\("startdate").as[Defaulted[TypoLocalDateTime]],
-          perassemblyqty = json.\("perassemblyqty").as[Defaulted[BigDecimal]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          productassemblyid = json.\("productassemblyid").toOption.map(_.as(ProductId.reads)),
+          componentid = json.\("componentid").as(ProductId.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          bomlevel = json.\("bomlevel").as(Reads.IntReads),
+          billofmaterialsid = json.\("billofmaterialsid").as(Defaulted.reads(BillofmaterialsId.reads)),
+          startdate = json.\("startdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
+          perassemblyqty = json.\("perassemblyqty").as(Defaulted.reads(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[BillofmaterialsRowUnsaved] = OWrites[BillofmaterialsRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "productassemblyid" -> Json.toJson(o.productassemblyid),
-      "componentid" -> Json.toJson(o.componentid),
-      "enddate" -> Json.toJson(o.enddate),
-      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
-      "bomlevel" -> Json.toJson(o.bomlevel),
-      "billofmaterialsid" -> Json.toJson(o.billofmaterialsid),
-      "startdate" -> Json.toJson(o.startdate),
-      "perassemblyqty" -> Json.toJson(o.perassemblyqty),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productassemblyid" -> Writes.OptionWrites(ProductId.writes).writes(o.productassemblyid),
+      "componentid" -> ProductId.writes.writes(o.componentid),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "bomlevel" -> Writes.IntWrites.writes(o.bomlevel),
+      "billofmaterialsid" -> Defaulted.writes(BillofmaterialsId.writes).writes(o.billofmaterialsid),
+      "startdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.startdate),
+      "perassemblyqty" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.perassemblyqty),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

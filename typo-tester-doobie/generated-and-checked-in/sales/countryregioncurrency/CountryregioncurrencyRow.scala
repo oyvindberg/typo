@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,18 +29,18 @@ case class CountryregioncurrencyRow(
  }
 
 object CountryregioncurrencyRow {
-  implicit val decoder: Decoder[CountryregioncurrencyRow] = Decoder.forProduct3[CountryregioncurrencyRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(CountryregioncurrencyRow.apply)
-  implicit val encoder: Encoder[CountryregioncurrencyRow] = Encoder.forProduct3[CountryregioncurrencyRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))
+  implicit val decoder: Decoder[CountryregioncurrencyRow] = Decoder.forProduct3[CountryregioncurrencyRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(CountryregioncurrencyRow.apply)(CountryregionId.decoder, CurrencyId.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[CountryregioncurrencyRow] = Encoder.forProduct3[CountryregioncurrencyRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(CountryregionId.encoder, CurrencyId.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[CountryregioncurrencyRow] = new Read[CountryregioncurrencyRow](
     gets = List(
-      (Get[CountryregionId], Nullability.NoNulls),
-      (Get[CurrencyId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (CountryregionId.get, Nullability.NoNulls),
+      (CurrencyId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CountryregioncurrencyRow(
-      countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 0),
-      currencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
+      currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

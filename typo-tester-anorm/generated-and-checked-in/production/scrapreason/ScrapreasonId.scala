@@ -23,7 +23,7 @@ object ScrapreasonId {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[ScrapreasonId] = implicitly[Reads[Int]].map(ScrapreasonId.apply)
+  implicit val reads: Reads[ScrapreasonId] = Reads.IntReads.map(ScrapreasonId.apply)
   implicit val toStatement: ToStatement[ScrapreasonId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[ScrapreasonId] = implicitly[Writes[Int]].contramap(_.value)
+  implicit val writes: Writes[ScrapreasonId] = Writes.IntWrites.contramap(_.value)
 }

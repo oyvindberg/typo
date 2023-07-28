@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -45,14 +46,14 @@ object TrViewRow {
   implicit val reads: Reads[TrViewRow] = Reads[TrViewRow](json => JsResult.fromTry(
       Try(
         TrViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          salestaxrateid = json.\("salestaxrateid").toOption.map(_.as[SalestaxrateId]),
-          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
-          taxtype = json.\("taxtype").toOption.map(_.as[Int]),
-          taxrate = json.\("taxrate").toOption.map(_.as[BigDecimal]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          salestaxrateid = json.\("salestaxrateid").toOption.map(_.as(SalestaxrateId.reads)),
+          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as(StateprovinceId.reads)),
+          taxtype = json.\("taxtype").toOption.map(_.as(Reads.IntReads)),
+          taxrate = json.\("taxrate").toOption.map(_.as(Reads.bigDecReads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -60,27 +61,27 @@ object TrViewRow {
   def rowParser(idx: Int): RowParser[TrViewRow] = RowParser[TrViewRow] { row =>
     Success(
       TrViewRow(
-        id = row[Option[Int]](idx + 0),
-        salestaxrateid = row[Option[SalestaxrateId]](idx + 1),
-        stateprovinceid = row[Option[StateprovinceId]](idx + 2),
-        taxtype = row[Option[Int]](idx + 3),
-        taxrate = row[Option[BigDecimal]](idx + 4),
-        name = row[Option[Name]](idx + 5),
-        rowguid = row[Option[UUID]](idx + 6),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 7)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        salestaxrateid = row(idx + 1)(Column.columnToOption(SalestaxrateId.column)),
+        stateprovinceid = row(idx + 2)(Column.columnToOption(StateprovinceId.column)),
+        taxtype = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
+        taxrate = row(idx + 4)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        name = row(idx + 5)(Column.columnToOption(Name.column)),
+        rowguid = row(idx + 6)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[TrViewRow] = OWrites[TrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "salestaxrateid" -> Json.toJson(o.salestaxrateid),
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "taxtype" -> Json.toJson(o.taxtype),
-      "taxrate" -> Json.toJson(o.taxrate),
-      "name" -> Json.toJson(o.name),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "salestaxrateid" -> Writes.OptionWrites(SalestaxrateId.writes).writes(o.salestaxrateid),
+      "stateprovinceid" -> Writes.OptionWrites(StateprovinceId.writes).writes(o.stateprovinceid),
+      "taxtype" -> Writes.OptionWrites(Writes.IntWrites).writes(o.taxtype),
+      "taxrate" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.taxrate),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

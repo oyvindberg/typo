@@ -9,15 +9,16 @@ package so
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.sales.specialoffer.SpecialofferId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -51,18 +52,18 @@ object SoViewRow {
   implicit val reads: Reads[SoViewRow] = Reads[SoViewRow](json => JsResult.fromTry(
       Try(
         SoViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),
-          description = json.\("description").toOption.map(_.as[/* max 255 chars */ String]),
-          discountpct = json.\("discountpct").toOption.map(_.as[BigDecimal]),
-          `type` = json.\("type").toOption.map(_.as[/* max 50 chars */ String]),
-          category = json.\("category").toOption.map(_.as[/* max 50 chars */ String]),
-          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDateTime]),
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
-          minqty = json.\("minqty").toOption.map(_.as[Int]),
-          maxqty = json.\("maxqty").toOption.map(_.as[Int]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          specialofferid = json.\("specialofferid").toOption.map(_.as(SpecialofferId.reads)),
+          description = json.\("description").toOption.map(_.as(Reads.StringReads)),
+          discountpct = json.\("discountpct").toOption.map(_.as(Reads.bigDecReads)),
+          `type` = json.\("type").toOption.map(_.as(Reads.StringReads)),
+          category = json.\("category").toOption.map(_.as(Reads.StringReads)),
+          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          minqty = json.\("minqty").toOption.map(_.as(Reads.IntReads)),
+          maxqty = json.\("maxqty").toOption.map(_.as(Reads.IntReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -70,35 +71,35 @@ object SoViewRow {
   def rowParser(idx: Int): RowParser[SoViewRow] = RowParser[SoViewRow] { row =>
     Success(
       SoViewRow(
-        id = row[Option[Int]](idx + 0),
-        specialofferid = row[Option[SpecialofferId]](idx + 1),
-        description = row[Option[/* max 255 chars */ String]](idx + 2),
-        discountpct = row[Option[BigDecimal]](idx + 3),
-        `type` = row[Option[/* max 50 chars */ String]](idx + 4),
-        category = row[Option[/* max 50 chars */ String]](idx + 5),
-        startdate = row[Option[TypoLocalDateTime]](idx + 6),
-        enddate = row[Option[TypoLocalDateTime]](idx + 7),
-        minqty = row[Option[Int]](idx + 8),
-        maxqty = row[Option[Int]](idx + 9),
-        rowguid = row[Option[UUID]](idx + 10),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 11)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        specialofferid = row(idx + 1)(Column.columnToOption(SpecialofferId.column)),
+        description = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        discountpct = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        `type` = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        category = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        startdate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column)),
+        enddate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column)),
+        minqty = row(idx + 8)(Column.columnToOption(Column.columnToInt)),
+        maxqty = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
+        rowguid = row(idx + 10)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 11)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SoViewRow] = OWrites[SoViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "specialofferid" -> Json.toJson(o.specialofferid),
-      "description" -> Json.toJson(o.description),
-      "discountpct" -> Json.toJson(o.discountpct),
-      "type" -> Json.toJson(o.`type`),
-      "category" -> Json.toJson(o.category),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "minqty" -> Json.toJson(o.minqty),
-      "maxqty" -> Json.toJson(o.maxqty),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "specialofferid" -> Writes.OptionWrites(SpecialofferId.writes).writes(o.specialofferid),
+      "description" -> Writes.OptionWrites(Writes.StringWrites).writes(o.description),
+      "discountpct" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.discountpct),
+      "type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`type`),
+      "category" -> Writes.OptionWrites(Writes.StringWrites).writes(o.category),
+      "startdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+      "minqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.minqty),
+      "maxqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.maxqty),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

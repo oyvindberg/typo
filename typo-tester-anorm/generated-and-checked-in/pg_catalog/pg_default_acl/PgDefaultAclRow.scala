@@ -8,14 +8,15 @@ package pg_catalog
 package pg_default_acl
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,11 +32,11 @@ object PgDefaultAclRow {
   implicit val reads: Reads[PgDefaultAclRow] = Reads[PgDefaultAclRow](json => JsResult.fromTry(
       Try(
         PgDefaultAclRow(
-          oid = json.\("oid").as[PgDefaultAclId],
-          defaclrole = json.\("defaclrole").as[/* oid */ Long],
-          defaclnamespace = json.\("defaclnamespace").as[/* oid */ Long],
-          defaclobjtype = json.\("defaclobjtype").as[String],
-          defaclacl = json.\("defaclacl").as[Array[TypoAclItem]]
+          oid = json.\("oid").as(PgDefaultAclId.reads),
+          defaclrole = json.\("defaclrole").as(Reads.LongReads),
+          defaclnamespace = json.\("defaclnamespace").as(Reads.LongReads),
+          defaclobjtype = json.\("defaclobjtype").as(Reads.StringReads),
+          defaclacl = json.\("defaclacl").as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly))
         )
       )
     ),
@@ -43,21 +44,21 @@ object PgDefaultAclRow {
   def rowParser(idx: Int): RowParser[PgDefaultAclRow] = RowParser[PgDefaultAclRow] { row =>
     Success(
       PgDefaultAclRow(
-        oid = row[PgDefaultAclId](idx + 0),
-        defaclrole = row[/* oid */ Long](idx + 1),
-        defaclnamespace = row[/* oid */ Long](idx + 2),
-        defaclobjtype = row[String](idx + 3),
-        defaclacl = row[Array[TypoAclItem]](idx + 4)
+        oid = row(idx + 0)(PgDefaultAclId.column),
+        defaclrole = row(idx + 1)(Column.columnToLong),
+        defaclnamespace = row(idx + 2)(Column.columnToLong),
+        defaclobjtype = row(idx + 3)(Column.columnToString),
+        defaclacl = row(idx + 4)(TypoAclItem.arrayColumn)
       )
     )
   }
   implicit val writes: OWrites[PgDefaultAclRow] = OWrites[PgDefaultAclRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "defaclrole" -> Json.toJson(o.defaclrole),
-      "defaclnamespace" -> Json.toJson(o.defaclnamespace),
-      "defaclobjtype" -> Json.toJson(o.defaclobjtype),
-      "defaclacl" -> Json.toJson(o.defaclacl)
+      "oid" -> PgDefaultAclId.writes.writes(o.oid),
+      "defaclrole" -> Writes.LongWrites.writes(o.defaclrole),
+      "defaclnamespace" -> Writes.LongWrites.writes(o.defaclnamespace),
+      "defaclobjtype" -> Writes.StringWrites.writes(o.defaclobjtype),
+      "defaclacl" -> Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes).writes(o.defaclacl)
     ))
   )
 }

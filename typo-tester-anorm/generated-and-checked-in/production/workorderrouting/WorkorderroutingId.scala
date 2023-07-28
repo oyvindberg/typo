@@ -11,9 +11,9 @@ import adventureworks.production.workorder.WorkorderId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -24,18 +24,18 @@ object WorkorderroutingId {
   implicit val reads: Reads[WorkorderroutingId] = Reads[WorkorderroutingId](json => JsResult.fromTry(
       Try(
         WorkorderroutingId(
-          workorderid = json.\("workorderid").as[WorkorderId],
-          productid = json.\("productid").as[Int],
-          operationsequence = json.\("operationsequence").as[Int]
+          workorderid = json.\("workorderid").as(WorkorderId.reads),
+          productid = json.\("productid").as(Reads.IntReads),
+          operationsequence = json.\("operationsequence").as(Reads.IntReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[WorkorderroutingId] = OWrites[WorkorderroutingId](o =>
     new JsObject(ListMap[String, JsValue](
-      "workorderid" -> Json.toJson(o.workorderid),
-      "productid" -> Json.toJson(o.productid),
-      "operationsequence" -> Json.toJson(o.operationsequence)
+      "workorderid" -> WorkorderId.writes.writes(o.workorderid),
+      "productid" -> Writes.IntWrites.writes(o.productid),
+      "operationsequence" -> Writes.IntWrites.writes(o.operationsequence)
     ))
   )
 }

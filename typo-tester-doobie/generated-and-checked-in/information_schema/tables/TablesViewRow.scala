@@ -11,7 +11,6 @@ import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -33,36 +32,36 @@ case class TablesViewRow(
 )
 
 object TablesViewRow {
-  implicit val decoder: Decoder[TablesViewRow] = Decoder.forProduct12[TablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(TablesViewRow.apply)
-  implicit val encoder: Encoder[TablesViewRow] = Encoder.forProduct12[TablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.tableType, x.selfReferencingColumnName, x.referenceGeneration, x.userDefinedTypeCatalog, x.userDefinedTypeSchema, x.userDefinedTypeName, x.isInsertableInto, x.isTyped, x.commitAction))
+  implicit val decoder: Decoder[TablesViewRow] = Decoder.forProduct12[TablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(TablesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[TablesViewRow] = Encoder.forProduct12[TablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[CharacterData], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo], Option[YesOrNo], Option[CharacterData]]("table_catalog", "table_schema", "table_name", "table_type", "self_referencing_column_name", "reference_generation", "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", "is_insertable_into", "is_typed", "commit_action")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.tableType, x.selfReferencingColumnName, x.referenceGeneration, x.userDefinedTypeCatalog, x.userDefinedTypeSchema, x.userDefinedTypeName, x.isInsertableInto, x.isTyped, x.commitAction))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[TablesViewRow] = new Read[TablesViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TablesViewRow(
-      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      tableType = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-      selfReferencingColumnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      referenceGeneration = Get[CharacterData].unsafeGetNullable(rs, i + 5),
-      userDefinedTypeCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
-      userDefinedTypeSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 7),
-      userDefinedTypeName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 8),
-      isInsertableInto = Get[YesOrNo].unsafeGetNullable(rs, i + 9),
-      isTyped = Get[YesOrNo].unsafeGetNullable(rs, i + 10),
-      commitAction = Get[CharacterData].unsafeGetNullable(rs, i + 11)
+      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      tableType = CharacterData.get.unsafeGetNullable(rs, i + 3),
+      selfReferencingColumnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      referenceGeneration = CharacterData.get.unsafeGetNullable(rs, i + 5),
+      userDefinedTypeCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 6),
+      userDefinedTypeSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 7),
+      userDefinedTypeName = SqlIdentifier.get.unsafeGetNullable(rs, i + 8),
+      isInsertableInto = YesOrNo.get.unsafeGetNullable(rs, i + 9),
+      isTyped = YesOrNo.get.unsafeGetNullable(rs, i + 10),
+      commitAction = CharacterData.get.unsafeGetNullable(rs, i + 11)
     )
   )
 }

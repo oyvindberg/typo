@@ -9,8 +9,8 @@ package productphoto
 
 import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -30,24 +30,24 @@ case class ProductphotoRow(
 )
 
 object ProductphotoRow {
-  implicit val decoder: Decoder[ProductphotoRow] = Decoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(ProductphotoRow.apply)
-  implicit val encoder: Encoder[ProductphotoRow] = Encoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))
+  implicit val decoder: Decoder[ProductphotoRow] = Decoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(ProductphotoRow.apply)(ProductphotoId.decoder, Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ProductphotoRow] = Encoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))(ProductphotoId.encoder, Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
   implicit val read: Read[ProductphotoRow] = new Read[ProductphotoRow](
     gets = List(
-      (Get[ProductphotoId], Nullability.NoNulls),
-      (Get[Array[Byte]], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[Array[Byte]], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ProductphotoId.get, Nullability.NoNulls),
+      (Meta.ByteArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ByteArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductphotoRow(
-      productphotoid = Get[ProductphotoId].unsafeGetNonNullable(rs, i + 0),
-      thumbnailphoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 1),
-      thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-      largephoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 3),
-      largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 0),
+      thumbnailphoto = Meta.ByteArrayMeta.get.unsafeGetNullable(rs, i + 1),
+      thumbnailphotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      largephoto = Meta.ByteArrayMeta.get.unsafeGetNullable(rs, i + 3),
+      largephotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

@@ -10,35 +10,38 @@ package productdescription
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
 
 object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def delete(productdescriptionid: ProductdescriptionId): ConnectionIO[Boolean] = {
-    sql"delete from production.productdescription where productdescriptionid = ${productdescriptionid}".update.run.map(_ > 0)
+    sql"delete from production.productdescription where productdescriptionid = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
-          values (${unsaved.productdescriptionid}::int4, ${unsaved.description}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning productdescriptionid, description, rowguid, modifieddate::text
        """.query(ProductdescriptionRow.read).unique
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved): ConnectionIO[ProductdescriptionRow] = {
     val fs = List(
-      Some((Fragment.const(s"description"), fr"${unsaved.description}")),
+      Some((Fragment.const(s"description"), fr"${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}")),
       unsaved.productdescriptionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productdescriptionid"), fr"${value: ProductdescriptionId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productdescriptionid"), fr"${fromWrite(value: ProductdescriptionId)(Write.fromPut(ProductdescriptionId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -60,18 +63,18 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription".query(ProductdescriptionRow.read).stream
   }
   override def selectById(productdescriptionid: ProductdescriptionId): ConnectionIO[Option[ProductdescriptionRow]] = {
-    sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription where productdescriptionid = ${productdescriptionid}".query(ProductdescriptionRow.read).option
+    sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription where productdescriptionid = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}".query(ProductdescriptionRow.read).option
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): Stream[ConnectionIO, ProductdescriptionRow] = {
-    sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription where productdescriptionid = ANY(${productdescriptionids})".query(ProductdescriptionRow.read).stream
+    sql"select productdescriptionid, description, rowguid, modifieddate::text from production.productdescription where productdescriptionid = ANY(${fromWrite(productdescriptionids)(Write.fromPut(ProductdescriptionId.arrayPut))})".query(ProductdescriptionRow.read).stream
   }
   override def update(row: ProductdescriptionRow): ConnectionIO[Boolean] = {
     val productdescriptionid = row.productdescriptionid
     sql"""update production.productdescription
-          set description = ${row.description},
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productdescriptionid = ${productdescriptionid}
+          set description = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))},
+              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where productdescriptionid = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}
        """
       .update
       .run
@@ -80,10 +83,10 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def upsert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)
           values (
-            ${unsaved.productdescriptionid}::int4,
-            ${unsaved.description},
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4,
+            ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (productdescriptionid)
           do update set

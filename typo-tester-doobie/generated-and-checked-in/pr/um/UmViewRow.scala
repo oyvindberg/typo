@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,20 +28,20 @@ case class UmViewRow(
 )
 
 object UmViewRow {
-  implicit val decoder: Decoder[UmViewRow] = Decoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(UmViewRow.apply)
-  implicit val encoder: Encoder[UmViewRow] = Encoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(x => (x.id, x.unitmeasurecode, x.name, x.modifieddate))
+  implicit val decoder: Decoder[UmViewRow] = Decoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(UmViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(UnitmeasureId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[UmViewRow] = Encoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(x => (x.id, x.unitmeasurecode, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(UnitmeasureId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[UmViewRow] = new Read[UmViewRow](
     gets = List(
-      (Get[/* bpchar */ String], Nullability.Nullable),
-      (Get[UnitmeasureId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (UnitmeasureId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UmViewRow(
-      id = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 0),
-      unitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 1),
-      name = Get[Name].unsafeGetNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
+      id = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      unitmeasurecode = UnitmeasureId.get.unsafeGetNullable(rs, i + 1),
+      name = Name.get.unsafeGetNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

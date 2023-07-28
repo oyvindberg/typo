@@ -10,7 +10,6 @@ package countryregion
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,18 +24,18 @@ case class CountryregionRow(
 )
 
 object CountryregionRow {
-  implicit val decoder: Decoder[CountryregionRow] = Decoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CountryregionRow.apply)
-  implicit val encoder: Encoder[CountryregionRow] = Encoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))
+  implicit val decoder: Decoder[CountryregionRow] = Decoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CountryregionRow.apply)(CountryregionId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[CountryregionRow] = Encoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(CountryregionId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[CountryregionRow] = new Read[CountryregionRow](
     gets = List(
-      (Get[CountryregionId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (CountryregionId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CountryregionRow(
-      countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

@@ -13,8 +13,8 @@ import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -40,30 +40,30 @@ case class VViewRow(
 )
 
 object VViewRow {
-  implicit val decoder: Decoder[VViewRow] = Decoder.forProduct9[VViewRow, Option[Int], Option[BusinessentityId], Option[AccountNumber], Option[Name], Option[Int], Flag, Flag, Option[/* max 1024 chars */ String], Option[TypoLocalDateTime]]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VViewRow.apply)
-  implicit val encoder: Encoder[VViewRow] = Encoder.forProduct9[VViewRow, Option[Int], Option[BusinessentityId], Option[AccountNumber], Option[Name], Option[Int], Flag, Flag, Option[/* max 1024 chars */ String], Option[TypoLocalDateTime]]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.id, x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))
+  implicit val decoder: Decoder[VViewRow] = Decoder.forProduct9[VViewRow, Option[Int], Option[BusinessentityId], Option[AccountNumber], Option[Name], Option[Int], Flag, Flag, Option[/* max 1024 chars */ String], Option[TypoLocalDateTime]]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(AccountNumber.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeInt), Flag.decoder, Flag.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[VViewRow] = Encoder.forProduct9[VViewRow, Option[Int], Option[BusinessentityId], Option[AccountNumber], Option[Name], Option[Int], Flag, Flag, Option[/* max 1024 chars */ String], Option[TypoLocalDateTime]]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.id, x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(AccountNumber.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeInt), Flag.encoder, Flag.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[VViewRow] = new Read[VViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[AccountNumber], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[/* max 1024 chars */ String], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (AccountNumber.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Flag.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      accountnumber = Get[AccountNumber].unsafeGetNullable(rs, i + 2),
-      name = Get[Name].unsafeGetNullable(rs, i + 3),
-      creditrating = Get[Int].unsafeGetNullable(rs, i + 4),
-      preferredvendorstatus = Get[Flag].unsafeGetNonNullable(rs, i + 5),
-      activeflag = Get[Flag].unsafeGetNonNullable(rs, i + 6),
-      purchasingwebserviceurl = Get[/* max 1024 chars */ String].unsafeGetNullable(rs, i + 7),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 8)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      accountnumber = AccountNumber.get.unsafeGetNullable(rs, i + 2),
+      name = Name.get.unsafeGetNullable(rs, i + 3),
+      creditrating = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      preferredvendorstatus = Flag.get.unsafeGetNonNullable(rs, i + 5),
+      activeflag = Flag.get.unsafeGetNonNullable(rs, i + 6),
+      purchasingwebserviceurl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

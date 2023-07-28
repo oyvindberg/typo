@@ -8,8 +8,8 @@ package pg_catalog
 package pg_group
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -21,18 +21,18 @@ case class PgGroupViewRow(
 )
 
 object PgGroupViewRow {
-  implicit val decoder: Decoder[PgGroupViewRow] = Decoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(PgGroupViewRow.apply)
-  implicit val encoder: Encoder[PgGroupViewRow] = Encoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(x => (x.groname, x.grosysid, x.grolist))
+  implicit val decoder: Decoder[PgGroupViewRow] = Decoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(PgGroupViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))
+  implicit val encoder: Encoder[PgGroupViewRow] = Encoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(x => (x.groname, x.grosysid, x.grolist))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)))
   implicit val read: Read[PgGroupViewRow] = new Read[PgGroupViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[Array[/* oid */ Long]], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (adventureworks.LongArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgGroupViewRow(
-      groname = Get[String].unsafeGetNullable(rs, i + 0),
-      grosysid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      grolist = Get[Array[/* oid */ Long]].unsafeGetNullable(rs, i + 2)
+      groname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      grosysid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      grolist = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

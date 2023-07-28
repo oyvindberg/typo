@@ -24,7 +24,7 @@ object PersonId {
     override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Long]].jdbcType
   }
-  implicit val reads: Reads[PersonId] = implicitly[Reads[Long]].map(PersonId.apply)
+  implicit val reads: Reads[PersonId] = Reads.LongReads.map(PersonId.apply)
   implicit val toStatement: ToStatement[PersonId] = implicitly[ToStatement[Long]].contramap(_.value)
-  implicit val writes: Writes[PersonId] = implicitly[Writes[Long]].contramap(_.value)
+  implicit val writes: Writes[PersonId] = Writes.LongWrites.contramap(_.value)
 }

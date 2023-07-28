@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_subscription_rel
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,10 +32,10 @@ object PgSubscriptionRelRow {
   implicit val reads: Reads[PgSubscriptionRelRow] = Reads[PgSubscriptionRelRow](json => JsResult.fromTry(
       Try(
         PgSubscriptionRelRow(
-          srsubid = json.\("srsubid").as[/* oid */ Long],
-          srrelid = json.\("srrelid").as[/* oid */ Long],
-          srsubstate = json.\("srsubstate").as[String],
-          srsublsn = json.\("srsublsn").toOption.map(_.as[/* pg_lsn */ Long])
+          srsubid = json.\("srsubid").as(Reads.LongReads),
+          srrelid = json.\("srrelid").as(Reads.LongReads),
+          srsubstate = json.\("srsubstate").as(Reads.StringReads),
+          srsublsn = json.\("srsublsn").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -42,19 +43,19 @@ object PgSubscriptionRelRow {
   def rowParser(idx: Int): RowParser[PgSubscriptionRelRow] = RowParser[PgSubscriptionRelRow] { row =>
     Success(
       PgSubscriptionRelRow(
-        srsubid = row[/* oid */ Long](idx + 0),
-        srrelid = row[/* oid */ Long](idx + 1),
-        srsubstate = row[String](idx + 2),
-        srsublsn = row[Option[/* pg_lsn */ Long]](idx + 3)
+        srsubid = row(idx + 0)(Column.columnToLong),
+        srrelid = row(idx + 1)(Column.columnToLong),
+        srsubstate = row(idx + 2)(Column.columnToString),
+        srsublsn = row(idx + 3)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgSubscriptionRelRow] = OWrites[PgSubscriptionRelRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "srsubid" -> Json.toJson(o.srsubid),
-      "srrelid" -> Json.toJson(o.srrelid),
-      "srsubstate" -> Json.toJson(o.srsubstate),
-      "srsublsn" -> Json.toJson(o.srsublsn)
+      "srsubid" -> Writes.LongWrites.writes(o.srsubid),
+      "srrelid" -> Writes.LongWrites.writes(o.srrelid),
+      "srsubstate" -> Writes.StringWrites.writes(o.srsubstate),
+      "srsublsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.srsublsn)
     ))
   )
 }

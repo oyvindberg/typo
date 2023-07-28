@@ -8,8 +8,8 @@ package pg_catalog
 package pg_event_trigger
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -25,26 +25,26 @@ case class PgEventTriggerRow(
 )
 
 object PgEventTriggerRow {
-  implicit val decoder: Decoder[PgEventTriggerRow] = Decoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(PgEventTriggerRow.apply)
-  implicit val encoder: Encoder[PgEventTriggerRow] = Encoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(x => (x.oid, x.evtname, x.evtevent, x.evtowner, x.evtfoid, x.evtenabled, x.evttags))
+  implicit val decoder: Decoder[PgEventTriggerRow] = Decoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(PgEventTriggerRow.apply)(PgEventTriggerId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgEventTriggerRow] = Encoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(x => (x.oid, x.evtname, x.evtevent, x.evtowner, x.evtfoid, x.evtenabled, x.evttags))(PgEventTriggerId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgEventTriggerRow] = new Read[PgEventTriggerRow](
     gets = List(
-      (Get[PgEventTriggerId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[Array[String]], Nullability.Nullable)
+      (PgEventTriggerId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgEventTriggerRow(
-      oid = Get[PgEventTriggerId].unsafeGetNonNullable(rs, i + 0),
-      evtname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      evtevent = Get[String].unsafeGetNonNullable(rs, i + 2),
-      evtowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      evtfoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-      evtenabled = Get[String].unsafeGetNonNullable(rs, i + 5),
-      evttags = Get[Array[String]].unsafeGetNullable(rs, i + 6)
+      oid = PgEventTriggerId.get.unsafeGetNonNullable(rs, i + 0),
+      evtname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      evtevent = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      evtowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      evtfoid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      evtenabled = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      evttags = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }
