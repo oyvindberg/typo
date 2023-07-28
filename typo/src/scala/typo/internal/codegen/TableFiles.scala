@@ -120,7 +120,15 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
         val ordering = sc.Type.Ordering.of(id.tpe)
 
         // don't demand that user-specified types are ordered, but compositive key will be if they are
-        val orderingImplicits = cols.toList.filter(x => sc.Type.containsUserDefined(x.tpe)) match {
+        val orderingImplicits = cols.toList.filterNot { x =>
+          val baseType = sc.Type.base(x.tpe)
+          val hasOrdering = sc.Type.HasOrdering(baseType)
+          def isInternal = baseType match {
+            case sc.Type.Qualified(qident) if qident.idents.startsWith(options.pkg.idents) => true
+            case _                                                                         => false
+          }
+          hasOrdering || isInternal
+        } match {
           case Nil => sc.Code.Empty
           case nonEmpty =>
             val orderingParams = nonEmpty.map(_.tpe).distinct.zipWithIndex.map { case (colTpe, idx) => code"O$idx: ${sc.Type.Ordering.of(colTpe)}" }

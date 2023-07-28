@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 /** Type for the composite primary key of table `production.productlistpricehistory` */
 case class ProductlistpricehistoryId(productid: ProductId, startdate: LocalDateTime)
 object ProductlistpricehistoryId {
-  implicit def ordering: Ordering[ProductlistpricehistoryId] = Ordering.by(x => (x.productid, x.startdate))
+  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[ProductlistpricehistoryId] = Ordering.by(x => (x.productid, x.startdate))
   implicit val decoder: Decoder[ProductlistpricehistoryId] =
     (c: HCursor) =>
       for {

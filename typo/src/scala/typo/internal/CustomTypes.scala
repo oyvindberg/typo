@@ -176,7 +176,7 @@ class CustomTypes(pkg: sc.QIdent) {
       toTypo = (expr, target) => {
         code"""|{
                |  val b = ${sc.Type.Map}.newBuilder[${sc.Type.String}, ${sc.Type.String}]
-               |  $expr.forEach((k, v) => b += k.asInstanceOf[${sc.Type.String}] -> v.asInstanceOf[${sc.Type.String}])
+               |  $expr.forEach { case (k, v) => b += k.asInstanceOf[${sc.Type.String}] -> v.asInstanceOf[${sc.Type.String}]}
                |  $target(b.result())
                |}""".stripMargin
       }
@@ -186,7 +186,7 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => {
         code"""|{
                |  val b = new ${sc.Type.JavaHashMap}[${sc.Type.String}, ${sc.Type.String}]
-               |  $expr.value.foreach((k, v) => b.put(k, v))
+               |  $expr.value.foreach { case (k, v) => b.put(k, v)}
                |  b
                |}""".stripMargin
       }

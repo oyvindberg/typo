@@ -2,7 +2,7 @@ package adventureworks.person.businessentityaddress
 
 import adventureworks.person.address.{AddressRepoImpl, AddressRowUnsaved}
 import adventureworks.person.addresstype.{AddresstypeRepoImpl, AddresstypeRowUnsaved}
-import adventureworks.person.businessentity.{BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
+import adventureworks.person.businessentity.{BusinessentityRepoImpl, BusinessentityRowUnsaved}
 import adventureworks.person.countryregion.{CountryregionId, CountryregionRepoImpl, CountryregionRowUnsaved}
 import adventureworks.person.stateprovince.{StateprovinceId, StateprovinceRepoImpl, StateprovinceRowUnsaved}
 import adventureworks.public.Name
@@ -12,7 +12,6 @@ import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
-import java.sql.{Connection, DriverManager}
 import java.util.UUID
 
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {

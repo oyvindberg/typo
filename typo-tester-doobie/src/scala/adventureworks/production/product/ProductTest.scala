@@ -6,12 +6,10 @@ import adventureworks.production.productsubcategory.{ProductsubcategoryRepoImpl,
 import adventureworks.production.unitmeasure.{UnitmeasureId, UnitmeasureRepoImpl, UnitmeasureRowUnsaved}
 import adventureworks.public.{Flag, Name}
 import adventureworks.{Defaulted, TypoXml, withConnection}
-import org.postgresql.jdbc.PgSQLXML
+import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import doobie.free.connection.delay
 
-import java.sql.{Connection, DriverManager}
 import java.time.LocalDateTime
 import java.util.UUID
 

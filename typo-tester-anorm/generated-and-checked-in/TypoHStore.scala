@@ -47,14 +47,14 @@ object TypoHStore {
     override def set(s: PreparedStatement, index: Int, v: TypoHStore): Unit =
       s.setObject(index, {
                            val b = new HashMap[String, String]
-                           v.value.foreach((k, v) => b.put(k, v))
+                           v.value.foreach { case (k, v) => b.put(k, v)}
                            b
                          })
     override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoHStore] =
       v match {
         case v: java.util.Map[_, _] => Right({
                                                val b = Map.newBuilder[String, String]
-                                               v.forEach((k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String])
+                                               v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                                                TypoHStore(b.result())
                                              })
         case other => Left(TypeDoesNotMatch(s"Expected instance of java.util.Map[_, _] from JDBC to produce a TypoHStore, got ${other.getClass.getName}"))
@@ -67,7 +67,7 @@ object TypoHStore {
     override def set(s: PreparedStatement, index: Int, v: Array[TypoHStore]): Unit =
       s.setArray(index, s.getConnection.createArrayOf("hstore", v.map(v => {
                                                                              val b = new HashMap[String, String]
-                                                                             v.value.foreach((k, v) => b.put(k, v))
+                                                                             v.value.foreach { case (k, v) => b.put(k, v)}
                                                                              b
                                                                            })))
     override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoHStore]] =
@@ -77,7 +77,7 @@ object TypoHStore {
            case v: Array[_] =>
              Right(v.map(v => {
                                 val b = Map.newBuilder[String, String]
-                                v.asInstanceOf[java.util.Map[_, _]].forEach((k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String])
+                                v.asInstanceOf[java.util.Map[_, _]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                                 TypoHStore(b.result())
                               }))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoHStore, got ${other.getClass.getName}"))

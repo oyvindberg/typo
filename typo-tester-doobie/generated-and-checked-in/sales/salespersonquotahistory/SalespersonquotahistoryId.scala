@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 /** Type for the composite primary key of table `sales.salespersonquotahistory` */
 case class SalespersonquotahistoryId(businessentityid: BusinessentityId, quotadate: LocalDateTime)
 object SalespersonquotahistoryId {
-  implicit def ordering: Ordering[SalespersonquotahistoryId] = Ordering.by(x => (x.businessentityid, x.quotadate))
+  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[SalespersonquotahistoryId] = Ordering.by(x => (x.businessentityid, x.quotadate))
   implicit val decoder: Decoder[SalespersonquotahistoryId] =
     (c: HCursor) =>
       for {
