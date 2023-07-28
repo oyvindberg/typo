@@ -25,7 +25,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           returning productid, modifieddate::text, documentnode
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow = {
     val namedParameters = List(
@@ -56,7 +56,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductdocumentRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
     SQL"""select productid, modifieddate::text, documentnode
@@ -89,6 +89,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           returning productid, modifieddate::text, documentnode
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
-  
+    
   }
 }

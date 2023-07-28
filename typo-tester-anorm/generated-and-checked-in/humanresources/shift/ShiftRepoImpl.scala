@@ -24,7 +24,7 @@ object ShiftRepoImpl extends ShiftRepo {
           returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """
       .executeInsert(ShiftRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
     val namedParameters = List(
@@ -57,7 +57,7 @@ object ShiftRepoImpl extends ShiftRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ShiftRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     SQL"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text
@@ -75,7 +75,7 @@ object ShiftRepoImpl extends ShiftRepo {
           from humanresources.shift
           where shiftid = ANY($shiftids)
        """.as(ShiftRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
     val shiftid = row.shiftid
@@ -105,6 +105,6 @@ object ShiftRepoImpl extends ShiftRepo {
           returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """
       .executeInsert(ShiftRow.rowParser(1).single)
-  
+    
   }
 }

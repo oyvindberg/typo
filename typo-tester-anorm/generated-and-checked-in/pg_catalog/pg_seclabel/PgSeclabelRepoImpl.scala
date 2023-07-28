@@ -20,7 +20,7 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
           returning objoid, classoid, objsubid, provider, "label"
        """
       .executeInsert(PgSeclabelRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgSeclabelRow] = {
     SQL"""select objoid, classoid, objsubid, provider, "label"
@@ -55,6 +55,6 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
           returning objoid, classoid, objsubid, provider, "label"
        """
       .executeInsert(PgSeclabelRow.rowParser(1).single)
-  
+    
   }
 }

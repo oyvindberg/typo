@@ -20,7 +20,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
           returning oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
        """
       .executeInsert(PgDatabaseRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgDatabaseRow] = {
     SQL"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
@@ -38,7 +38,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
           from pg_catalog.pg_database
           where oid = ANY($oids)
        """.as(PgDatabaseRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgDatabaseRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -95,6 +95,6 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
           returning oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
        """
       .executeInsert(PgDatabaseRow.rowParser(1).single)
-  
+    
   }
 }

@@ -44,8 +44,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
               amopopr = ${fromWrite(row.amopopr)(Write.fromPut(Meta.LongMeta.put))}::oid,
               amopmethod = ${fromWrite(row.amopmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,
               amopsortfamily = ${fromWrite(row.amopsortfamily)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where oid = ${fromWrite(oid)(Write.fromPut(PgAmopId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgAmopId.put))}"""
       .update
       .run
       .map(_ > 0)

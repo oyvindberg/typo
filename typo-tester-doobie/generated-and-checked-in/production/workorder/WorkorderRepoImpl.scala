@@ -60,7 +60,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
          """
     }
     q.query(WorkorderRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
     sql"select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text from production.workorder".query(WorkorderRow.read).stream
@@ -82,8 +82,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
               duedate = ${fromWrite(row.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
               scrapreasonid = ${fromWrite(row.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where workorderid = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}
-       """
+          where workorderid = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}"""
       .update
       .run
       .map(_ > 0)

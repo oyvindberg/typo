@@ -60,7 +60,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
          """
     }
     q.query(ProductmodelRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
     sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel""".query(ProductmodelRow.read).stream
@@ -79,8 +79,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
               instructions = ${fromWrite(row.instructions)(Write.fromPutOption(TypoXml.put))}::xml,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productmodelid = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}
-       """
+          where productmodelid = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}"""
       .update
       .run
       .map(_ > 0)

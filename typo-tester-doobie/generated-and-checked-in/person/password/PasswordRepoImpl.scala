@@ -56,7 +56,7 @@ object PasswordRepoImpl extends PasswordRepo {
          """
     }
     q.query(PasswordRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
     sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password"""".query(PasswordRow.read).stream
@@ -74,8 +74,7 @@ object PasswordRepoImpl extends PasswordRepo {
               passwordsalt = ${fromWrite(row.passwordsalt)(Write.fromPut(Meta.StringMeta.put))},
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}
-       """
+          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)

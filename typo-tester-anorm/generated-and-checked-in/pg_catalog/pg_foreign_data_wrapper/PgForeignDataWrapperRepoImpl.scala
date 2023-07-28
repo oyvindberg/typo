@@ -20,7 +20,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
           returning oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions
        """
       .executeInsert(PgForeignDataWrapperRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgForeignDataWrapperRow] = {
     SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions
@@ -38,7 +38,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
           from pg_catalog.pg_foreign_data_wrapper
           where oid = ANY($oids)
        """.as(PgForeignDataWrapperRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgForeignDataWrapperRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -74,6 +74,6 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
           returning oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions
        """
       .executeInsert(PgForeignDataWrapperRow.rowParser(1).single)
-  
+    
   }
 }

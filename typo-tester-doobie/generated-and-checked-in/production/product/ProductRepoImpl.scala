@@ -89,7 +89,7 @@ object ProductRepoImpl extends ProductRepo {
          """
     }
     q.query(ProductRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductRow] = {
     sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product""".query(ProductRow.read).stream
@@ -127,8 +127,7 @@ object ProductRepoImpl extends ProductRepo {
               discontinueddate = ${fromWrite(row.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productid = ${fromWrite(productid)(Write.fromPut(ProductId.put))}
-       """
+          where productid = ${fromWrite(productid)(Write.fromPut(ProductId.put))}"""
       .update
       .run
       .map(_ > 0)

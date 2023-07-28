@@ -40,8 +40,7 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
           set adrelid = ${fromWrite(row.adrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
               adnum = ${fromWrite(row.adnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
               adbin = ${fromWrite(row.adbin)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgAttrdefId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgAttrdefId.put))}"""
       .update
       .run
       .map(_ > 0)

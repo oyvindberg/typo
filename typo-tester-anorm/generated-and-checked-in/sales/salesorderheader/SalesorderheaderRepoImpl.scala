@@ -26,7 +26,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           returning salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text
        """
       .executeInsert(SalesorderheaderRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
     val namedParameters = List(
@@ -103,7 +103,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalesorderheaderRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     SQL"""select salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text
@@ -121,7 +121,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           from sales.salesorderheader
           where salesorderid = ANY($salesorderids)
        """.as(SalesorderheaderRow.rowParser(1).*)
-  
+    
   }
   override def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean = {
     val salesorderid = row.salesorderid
@@ -211,6 +211,6 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           returning salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text
        """
       .executeInsert(SalesorderheaderRow.rowParser(1).single)
-  
+    
   }
 }

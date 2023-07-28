@@ -50,7 +50,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
          """
     }
     q.query(SalesorderheadersalesreasonRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
     sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason".query(SalesorderheadersalesreasonRow.read).stream
@@ -62,8 +62,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     val compositeId = row.compositeId
     sql"""update sales.salesorderheadersalesreason
           set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesreasonid = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}
-       """
+          where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesreasonid = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}"""
       .update
       .run
       .map(_ > 0)

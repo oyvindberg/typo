@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json.Json
 
 case class RelationFiles(naming: Naming, names: ComputedNames, options: InternalOptions) {
   val RowFile: sc.File = {
@@ -21,10 +21,9 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
           val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
           s"Points to [[${sc.renderTree(shortened)}.${naming.field(columnName).value}]]"
         },
-        col.dbCol.jsonDescription match {
-          case JsNull => None
-          case other  => if (options.debugTypes) Some(s"debug: ${Json.stringify(other)}") else None
-        }
+        if (options.debugTypes)
+          col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
+        else None
       ).flatten
 
       val comment = commentPieces match {
@@ -75,7 +74,7 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val str =
       code"""trait ${names.RepoName.name} {
-            |  ${repoMethods.sortedBy(dbLib.repoSig).map(dbLib.repoSig).mkCode("\n")}
+            |  ${repoMethods.map(dbLib.repoSig).mkCode("\n")}
             |}
             |""".stripMargin
 
@@ -83,7 +82,7 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
   }
 
   def RepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
-    val renderedMethods: NonEmptyList[sc.Code] = repoMethods.sortedBy { dbLib.repoSig }.map { repoMethod =>
+    val renderedMethods: NonEmptyList[sc.Code] = repoMethods.map { repoMethod =>
       code"""|override ${dbLib.repoSig(repoMethod)} = {
              |  ${dbLib.repoImpl(repoMethod)}
              |}""".stripMargin
@@ -104,7 +103,7 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
       }
 
     val methods: NonEmptyList[sc.Code] =
-      repoMethods.sortedBy { dbLib.repoSig }.map { repoMethod =>
+      repoMethods.map { repoMethod =>
         code"""|override ${dbLib.repoSig(repoMethod)} = {
                |  ${dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
                |}""".stripMargin

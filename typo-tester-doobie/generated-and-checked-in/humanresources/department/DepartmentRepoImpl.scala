@@ -53,7 +53,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
          """
     }
     q.query(DepartmentRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
     sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department""".query(DepartmentRow.read).stream
@@ -70,8 +70,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               groupname = ${fromWrite(row.groupname)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}
-       """
+          where departmentid = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}"""
       .update
       .run
       .map(_ > 0)

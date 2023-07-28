@@ -25,7 +25,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text
        """
       .executeInsert(SalesorderdetailRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
     val namedParameters = List(
@@ -69,7 +69,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalesorderdetailRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
     SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text
@@ -123,6 +123,6 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text
        """
       .executeInsert(SalesorderdetailRow.rowParser(1).single)
-  
+    
   }
 }

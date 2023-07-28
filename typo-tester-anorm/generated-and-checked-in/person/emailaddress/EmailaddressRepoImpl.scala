@@ -25,7 +25,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow = {
     val namedParameters = List(
@@ -61,7 +61,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(EmailaddressRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
     SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
@@ -100,6 +100,6 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
-  
+    
   }
 }

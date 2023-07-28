@@ -99,6 +99,7 @@ package object typo {
     * @return
     */
   def minimize(allFiles: List[sc.File], entryPoints: Iterable[sc.File]): List[sc.File] = {
+    val filesByQident = allFiles.iterator.map(x => (x.tpe.value, x)).toMap
     val toKeep: Set[sc.QIdent] = {
       val b = collection.mutable.HashSet.empty[sc.QIdent]
       b ++= entryPoints.map(_.tpe.value)
@@ -109,7 +110,7 @@ package object typo {
             case x: sc.QIdent =>
               if (!b(x)) {
                 b += x
-                allFiles.find(_.tpe.value == x).foreach(f => go(f.contents))
+                filesByQident.get(x).foreach(f => go(f.contents))
               }
 
             case sc.Param(_, tpe, maybeCode) =>

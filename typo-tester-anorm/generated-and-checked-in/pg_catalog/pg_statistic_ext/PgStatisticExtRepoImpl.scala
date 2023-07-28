@@ -20,7 +20,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
           returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
        """
       .executeInsert(PgStatisticExtRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtRow] = {
     SQL"""select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
@@ -38,7 +38,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
           from pg_catalog.pg_statistic_ext
           where oid = ANY($oids)
        """.as(PgStatisticExtRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgStatisticExtRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -80,6 +80,6 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
           returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
        """
       .executeInsert(PgStatisticExtRow.rowParser(1).single)
-  
+    
   }
 }

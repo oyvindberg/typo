@@ -41,8 +41,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
               defaclnamespace = ${fromWrite(row.defaclnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
               defaclobjtype = ${fromWrite(row.defaclobjtype)(Write.fromPut(Meta.StringMeta.put))}::char,
               defaclacl = ${fromWrite(row.defaclacl)(Write.fromPut(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgDefaultAclId.put))}"""
       .update
       .run
       .map(_ > 0)

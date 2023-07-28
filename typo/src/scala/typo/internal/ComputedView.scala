@@ -50,9 +50,9 @@ case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
       RepoMethod.SelectByFieldValues(view.name, cols, fieldValueName, fieldValuesParam, names.RowName)
     }
 
-    NonEmptyList(
+    NonEmptyList[RepoMethod](
       RepoMethod.SelectAll(view.name, cols, names.RowName),
       maybeSelectByFieldValues.toList
-    )
+    ).sorted
   }
 }

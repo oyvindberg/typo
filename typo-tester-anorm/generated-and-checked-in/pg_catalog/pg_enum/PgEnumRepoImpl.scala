@@ -20,7 +20,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
           returning oid, enumtypid, enumsortorder, enumlabel
        """
       .executeInsert(PgEnumRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgEnumRow] = {
     SQL"""select oid, enumtypid, enumsortorder, enumlabel
@@ -38,7 +38,7 @@ object PgEnumRepoImpl extends PgEnumRepo {
           from pg_catalog.pg_enum
           where oid = ANY($oids)
        """.as(PgEnumRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgEnumRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -65,6 +65,6 @@ object PgEnumRepoImpl extends PgEnumRepo {
           returning oid, enumtypid, enumsortorder, enumlabel
        """
       .executeInsert(PgEnumRow.rowParser(1).single)
-  
+    
   }
 }

@@ -20,7 +20,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
           returning aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
        """
       .executeInsert(PgAggregateRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAggregateRow] = {
     SQL"""select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
@@ -38,7 +38,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
           from pg_catalog.pg_aggregate
           where aggfnoid = ANY($aggfnoids)
        """.as(PgAggregateRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgAggregateRow)(implicit c: Connection): Boolean = {
     val aggfnoid = row.aggfnoid
@@ -119,6 +119,6 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
           returning aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval
        """
       .executeInsert(PgAggregateRow.rowParser(1).single)
-  
+    
   }
 }

@@ -20,7 +20,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
           returning seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
        """
       .executeInsert(PgSequenceRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgSequenceRow] = {
     SQL"""select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
@@ -38,7 +38,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
           from pg_catalog.pg_sequence
           where seqrelid = ANY($seqrelids)
        """.as(PgSequenceRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgSequenceRow)(implicit c: Connection): Boolean = {
     val seqrelid = row.seqrelid
@@ -77,6 +77,6 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
           returning seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
        """
       .executeInsert(PgSequenceRow.rowParser(1).single)
-  
+    
   }
 }

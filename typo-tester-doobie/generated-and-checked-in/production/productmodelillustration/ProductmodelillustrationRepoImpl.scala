@@ -50,7 +50,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
          """
     }
     q.query(ProductmodelillustrationRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
     sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration".query(ProductmodelillustrationRow.read).stream
@@ -62,8 +62,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     val compositeId = row.compositeId
     sql"""update production.productmodelillustration
           set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productmodelid = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND illustrationid = ${fromWrite(compositeId.illustrationid)(Write.fromPut(IllustrationId.put))}
-       """
+          where productmodelid = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND illustrationid = ${fromWrite(compositeId.illustrationid)(Write.fromPut(IllustrationId.put))}"""
       .update
       .run
       .map(_ > 0)

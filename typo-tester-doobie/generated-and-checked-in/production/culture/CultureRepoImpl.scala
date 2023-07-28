@@ -49,7 +49,7 @@ object CultureRepoImpl extends CultureRepo {
          """
     }
     q.query(CultureRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
     sql"""select cultureid, "name", modifieddate::text from production.culture""".query(CultureRow.read).stream
@@ -65,8 +65,7 @@ object CultureRepoImpl extends CultureRepo {
     sql"""update production.culture
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where cultureid = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}
-       """
+          where cultureid = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}"""
       .update
       .run
       .map(_ > 0)

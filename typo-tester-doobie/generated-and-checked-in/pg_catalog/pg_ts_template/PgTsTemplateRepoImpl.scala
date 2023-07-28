@@ -41,8 +41,7 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
               tmplnamespace = ${fromWrite(row.tmplnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
               tmplinit = ${fromWrite(row.tmplinit)(Write.fromPut(TypoRegproc.put))}::regproc,
               tmpllexize = ${fromWrite(row.tmpllexize)(Write.fromPut(TypoRegproc.put))}::regproc
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTsTemplateId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsTemplateId.put))}"""
       .update
       .run
       .map(_ > 0)

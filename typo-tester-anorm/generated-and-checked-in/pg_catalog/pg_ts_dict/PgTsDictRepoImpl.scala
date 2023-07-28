@@ -20,7 +20,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
           returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
        """
       .executeInsert(PgTsDictRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTsDictRow] = {
     SQL"""select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
@@ -38,7 +38,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
           from pg_catalog.pg_ts_dict
           where oid = ANY($oids)
        """.as(PgTsDictRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTsDictRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
           returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
        """
       .executeInsert(PgTsDictRow.rowParser(1).single)
-  
+    
   }
 }

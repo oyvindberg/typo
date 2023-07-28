@@ -68,7 +68,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
          """
     }
     q.query(StateprovinceRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
     sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince""".query(StateprovinceRow.read).stream
@@ -89,8 +89,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
               territoryid = ${fromWrite(row.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where stateprovinceid = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}
-       """
+          where stateprovinceid = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}"""
       .update
       .run
       .map(_ > 0)

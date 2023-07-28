@@ -61,7 +61,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
          """
     }
     q.query(TransactionhistoryarchiveRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive".query(TransactionhistoryarchiveRow.read).stream
@@ -83,8 +83,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
               quantity = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
               actualcost = ${fromWrite(row.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where transactionid = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryarchiveId.put))}
-       """
+          where transactionid = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryarchiveId.put))}"""
       .update
       .run
       .map(_ > 0)

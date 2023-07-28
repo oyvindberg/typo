@@ -62,7 +62,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
          """
     }
     q.query(ProductreviewRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
     sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview""".query(ProductreviewRow.read).stream
@@ -83,8 +83,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
               rating = ${fromWrite(row.rating)(Write.fromPut(Meta.IntMeta.put))}::int4,
               "comments" = ${fromWrite(row.comments)(Write.fromPutOption(Meta.StringMeta.put))},
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where productreviewid = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}
-       """
+          where productreviewid = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}"""
       .update
       .run
       .map(_ > 0)

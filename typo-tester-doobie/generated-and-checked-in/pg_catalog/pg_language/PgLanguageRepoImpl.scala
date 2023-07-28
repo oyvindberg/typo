@@ -45,8 +45,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
               laninline = ${fromWrite(row.laninline)(Write.fromPut(Meta.LongMeta.put))}::oid,
               lanvalidator = ${fromWrite(row.lanvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid,
               lanacl = ${fromWrite(row.lanacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgLanguageId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -59,7 +59,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
          """
     }
     q.query(EmailaddressRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
     sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress".query(EmailaddressRow.read).stream
@@ -73,8 +73,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           set emailaddress = ${fromWrite(row.emailaddress)(Write.fromPutOption(Meta.StringMeta.put))},
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND emailaddressid = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND emailaddressid = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

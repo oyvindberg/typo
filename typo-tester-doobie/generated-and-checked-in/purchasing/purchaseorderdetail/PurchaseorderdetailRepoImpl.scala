@@ -60,7 +60,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
          """
     }
     q.query(PurchaseorderdetailRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
     sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail".query(PurchaseorderdetailRow.read).stream
@@ -78,8 +78,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
               receivedqty = ${fromWrite(row.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               rejectedqty = ${fromWrite(row.rejectedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where purchaseorderid = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND purchaseorderdetailid = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}
-       """
+          where purchaseorderid = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND purchaseorderdetailid = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)

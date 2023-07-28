@@ -20,7 +20,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
           returning stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgStatisticExtDataRow] = {
     SQL"""select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
@@ -38,7 +38,7 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
           from pg_catalog.pg_statistic_ext_data
           where stxoid = ANY($stxoids)
        """.as(PgStatisticExtDataRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgStatisticExtDataRow)(implicit c: Connection): Boolean = {
     val stxoid = row.stxoid
@@ -68,6 +68,6 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
           returning stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
        """
       .executeInsert(PgStatisticExtDataRow.rowParser(1).single)
-  
+    
   }
 }

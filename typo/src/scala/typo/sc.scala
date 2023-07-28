@@ -337,19 +337,25 @@ object sc {
           case Type.UserDefined(underlying)        => s"/* user-picked */ ${renderTree(underlying)}"
         }
       case StringInterpolate(_, prefix, content) =>
-        content.render.linesIterator.toList match {
-          case List(one) if content.render.contains(Quote) =>
+        content.render.lines match {
+          case Array(one) if one.contains(Quote) =>
             s"${renderTree(prefix)}$TripleQuote$one$TripleQuote"
-          case List(one) =>
+          case Array(one) =>
             s"${renderTree(prefix)}$Quote$one$Quote"
           case more =>
             val renderedPrefix = renderTree(prefix)
             val pre = s"$renderedPrefix$TripleQuote"
-            more.mkString(
-              pre,
-              s"\n${" " * pre.length}",
-              s"\n${" " * renderedPrefix.length}$TripleQuote"
-            )
+            val ret = more.iterator.zipWithIndex.map {
+              case (line, n) if n == 0 => pre + line
+              // if line is last
+              case (line, n) if n == more.length - 1 =>
+                // if its empty align triple quotes with previous
+                if (line.isEmpty) s"${" " * renderedPrefix.length}$TripleQuote"
+                // or just align like the rest and put it at the end
+                else s"${" " * pre.length}$line$TripleQuote"
+              case (line, _) => s"${" " * pre.length}$line"
+            }.mkString
+            ret
         }
       case Given(tparams, name, implicitParams, tpe, body) =>
         val renderedName = renderTree(name)
@@ -361,7 +367,7 @@ object sc {
         else {
           val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
           val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
-          s"implicit def $renderedName${renderedTparams}$renderedImplicitParams: $renderedTpe = $renderedBody"
+          s"implicit def $renderedName$renderedTparams$renderedImplicitParams: $renderedTpe = $renderedBody"
         }
       case Value(tparams, name, implicitParams, tpe, body) =>
         val renderedName = renderTree(name)
@@ -373,13 +379,13 @@ object sc {
         else {
           val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
           val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(", ", ", ")")
-          s"def $renderedName${renderedTparams}$renderedImplicitParams: $renderedTpe = $renderedBody"
+          s"def $renderedName$renderedTparams$renderedImplicitParams: $renderedTpe = $renderedBody"
         }
       case Obj(name, members, body) =>
         if (members.isEmpty && body.isEmpty) ""
         else {
           val codeMembers: List[String] =
-            body.map(_.render).toList ++ members.sortBy(_.name).map(renderTree)
+            body.map(_.render.asString).toList ++ members.sortBy(_.name).map(renderTree)
 
           s"""|object ${name.name.value} {
               |${codeMembers.flatMap(_.linesIterator).map("  " + _).mkString("\n")}
@@ -407,50 +413,54 @@ object sc {
       }
 
     // render tree as a string in such a way that newlines inside interpolated strings preserves outer indentation
-    lazy val render: String =
+    lazy val render: Lines =
       this match {
         case Code.Interpolated(parts, args) =>
-          val lines = List.newBuilder[String]
-          var currentLine = ""
+          val lines = Array.newBuilder[String]
+          val currentLine = new StringBuilder()
 
-          def consume(str: String, indent: Int): Unit = {
+          def consume(str: Lines, indent: Int): Unit =
             // @unchecked because scala 2 and 3 disagree on exhaustivity
-            (str.linesWithSeparators.toList: @unchecked) match {
-              case Nil => ()
-              case List(one) if one.endsWith("\n") =>
-                lines += (currentLine + one)
-                currentLine = ""
-              case List(one) =>
-                currentLine += one
-              case List(first, rest*) =>
-                lines += (currentLine + first)
-                val indentedRest = rest.toList.map(str => (" " * indent) + str)
+            (str.lines: @unchecked) match {
+              case Array() => ()
+              case Array(one) if one.endsWith("\n") =>
+                currentLine.append(one)
+                lines += currentLine.result()
+                currentLine.clear()
+              case Array(one) =>
+                currentLine.append(one)
+                ()
+              case Array(first, rest*) =>
+                currentLine.append(first)
+                lines += currentLine.result()
+                currentLine.clear()
+                val indentedRest = rest.map(str => (" " * indent) + str)
                 if (indentedRest.lastOption.exists(_.endsWith("\n"))) {
                   lines ++= indentedRest
-                  currentLine = ""
                 } else {
                   lines ++= indentedRest.init
-                  currentLine = indentedRest.last
+                  currentLine.append(indentedRest.last)
+                  ()
                 }
             }
-          }
+
           // do the string interpolation
-          parts.zipWithIndex.foreach { case (str, n) =>
+          parts.iterator.zipWithIndex.foreach { case (str, n) =>
             if (n > 0) {
               val rendered = args(n - 1).render
               // consider the current indentation level when interpolating in multiline strings
               consume(rendered, indent = currentLine.length)
             }
             val escaped = StringContext.processEscapes(str)
-            consume(escaped, indent = 0)
+            consume(Lines(escaped), indent = 0)
           }
           // commit last line
-          lines += currentLine
+          lines += currentLine.result()
           // recombine lines back into one string
-          lines.result().mkString
-        case Code.Combined(codes) => codes.map(_.render).mkString
-        case Code.Str(str)        => str
-        case Code.Tree(tree)      => renderTree(tree)
+          Lines(lines.result())
+        case Code.Combined(codes) => codes.iterator.map(_.render).reduceOption(_ ++ _).getOrElse(Lines.Empty)
+        case Code.Str(str)        => Lines(str)
+        case Code.Tree(tree)      => Lines(renderTree(tree))
       }
 
     def mapTrees(f: Tree => Tree): Code =
@@ -464,9 +474,27 @@ object sc {
     def ++(other: Code): Code = Code.Combined(List(this, other))
   }
 
+  case class Lines(lines: Array[String]) {
+    def ++(other: Lines): Lines =
+      if (this == Lines.Empty) other
+      else if (other == Lines.Empty) this
+      else if (lines.last.endsWith("\n")) new Lines(lines ++ other.lines)
+      else {
+        val newArray = lines.init.iterator ++ Iterator(lines.last + other.lines.head) ++ other.lines.iterator.drop(1)
+        new Lines(newArray.toArray)
+      }
+
+    def asString: String = lines.mkString
+    override def toString: String = asString
+  }
+
+  object Lines {
+    val Empty = new Lines(Array())
+    def apply(str: String): Lines = if (str.isEmpty) Empty else new Lines(str.linesWithSeparators.toArray)
+  }
+
   object Code {
     val Empty: Code = Str("")
-    implicit val ordering: Ordering[Code] = Ordering.by(_.render)
     case class Interpolated(parts: Seq[String], args: Seq[Code]) extends Code
     case class Combined(codes: List[Code]) extends Code
     case class Str(value: String) extends Code

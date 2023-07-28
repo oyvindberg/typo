@@ -43,8 +43,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
               rngsubopc = ${fromWrite(row.rngsubopc)(Write.fromPut(Meta.LongMeta.put))}::oid,
               rngcanonical = ${fromWrite(row.rngcanonical)(Write.fromPut(TypoRegproc.put))}::regproc,
               rngsubdiff = ${fromWrite(row.rngsubdiff)(Write.fromPut(TypoRegproc.put))}::regproc
-          where rngtypid = ${fromWrite(rngtypid)(Write.fromPut(PgRangeId.put))}
-       """
+          where rngtypid = ${fromWrite(rngtypid)(Write.fromPut(PgRangeId.put))}"""
       .update
       .run
       .map(_ > 0)

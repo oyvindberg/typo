@@ -20,7 +20,7 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
           returning srsubid, srrelid, srsubstate, srsublsn
        """
       .executeInsert(PgSubscriptionRelRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgSubscriptionRelRow] = {
     SQL"""select srsubid, srrelid, srsubstate, srsublsn
@@ -56,6 +56,6 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
           returning srsubid, srrelid, srsubstate, srsublsn
        """
       .executeInsert(PgSubscriptionRelRow.rowParser(1).single)
-  
+    
   }
 }

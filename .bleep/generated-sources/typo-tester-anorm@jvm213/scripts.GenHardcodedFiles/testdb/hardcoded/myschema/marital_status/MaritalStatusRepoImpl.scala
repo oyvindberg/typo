@@ -21,7 +21,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           returning "id"
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"
@@ -39,7 +39,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           from myschema.marital_status
           where "id" = ANY($ids)
        """.as(MaritalStatusRow.rowParser(1).*)
-  
+    
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     SQL"""insert into myschema.marital_status("id")
@@ -52,6 +52,6 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           returning "id"
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
-  
+    
   }
 }

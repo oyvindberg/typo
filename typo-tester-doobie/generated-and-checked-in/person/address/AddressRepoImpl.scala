@@ -63,7 +63,7 @@ object AddressRepoImpl extends AddressRepo {
          """
     }
     q.query(AddressRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
     sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address".query(AddressRow.read).stream
@@ -85,8 +85,7 @@ object AddressRepoImpl extends AddressRepo {
               spatiallocation = ${fromWrite(row.spatiallocation)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where addressid = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}
-       """
+          where addressid = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -51,8 +51,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
               datminmxid = ${fromWrite(row.datminmxid)(Write.fromPut(TypoXid.put))}::xid,
               dattablespace = ${fromWrite(row.dattablespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
               datacl = ${fromWrite(row.datacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgDatabaseId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgDatabaseId.put))}"""
       .update
       .run
       .map(_ > 0)

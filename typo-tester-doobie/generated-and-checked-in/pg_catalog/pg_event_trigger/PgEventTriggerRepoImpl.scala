@@ -42,8 +42,7 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
               evtfoid = ${fromWrite(row.evtfoid)(Write.fromPut(Meta.LongMeta.put))}::oid,
               evtenabled = ${fromWrite(row.evtenabled)(Write.fromPut(Meta.StringMeta.put))}::char,
               evttags = ${fromWrite(row.evttags)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgEventTriggerId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgEventTriggerId.put))}"""
       .update
       .run
       .map(_ > 0)

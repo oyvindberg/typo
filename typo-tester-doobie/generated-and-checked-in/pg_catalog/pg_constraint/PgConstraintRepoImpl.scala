@@ -61,8 +61,7 @@ object PgConstraintRepoImpl extends PgConstraintRepo {
               conffeqop = ${fromWrite(row.conffeqop)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
               conexclop = ${fromWrite(row.conexclop)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
               conbin = ${fromWrite(row.conbin)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgConstraintId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgConstraintId.put))}"""
       .update
       .run
       .map(_ > 0)

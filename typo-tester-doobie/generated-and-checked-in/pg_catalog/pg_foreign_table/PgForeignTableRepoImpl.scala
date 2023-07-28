@@ -38,8 +38,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     sql"""update pg_catalog.pg_foreign_table
           set ftserver = ${fromWrite(row.ftserver)(Write.fromPut(Meta.LongMeta.put))}::oid,
               ftoptions = ${fromWrite(row.ftoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where ftrelid = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}
-       """
+          where ftrelid = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}"""
       .update
       .run
       .map(_ > 0)

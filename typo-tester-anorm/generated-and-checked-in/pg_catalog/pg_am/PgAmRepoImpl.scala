@@ -20,7 +20,7 @@ object PgAmRepoImpl extends PgAmRepo {
           returning oid, amname, amhandler, amtype
        """
       .executeInsert(PgAmRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAmRow] = {
     SQL"""select oid, amname, amhandler, amtype
@@ -38,7 +38,7 @@ object PgAmRepoImpl extends PgAmRepo {
           from pg_catalog.pg_am
           where oid = ANY($oids)
        """.as(PgAmRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgAmRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -65,6 +65,6 @@ object PgAmRepoImpl extends PgAmRepo {
           returning oid, amname, amhandler, amtype
        """
       .executeInsert(PgAmRow.rowParser(1).single)
-  
+    
   }
 }

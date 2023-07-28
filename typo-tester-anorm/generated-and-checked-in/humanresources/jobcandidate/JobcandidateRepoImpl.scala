@@ -24,7 +24,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           returning jobcandidateid, businessentityid, resume, modifieddate::text
        """
       .executeInsert(JobcandidateRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
     val namedParameters = List(
@@ -56,7 +56,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(JobcandidateRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate::text
@@ -74,7 +74,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           from humanresources.jobcandidate
           where jobcandidateid = ANY($jobcandidateids)
        """.as(JobcandidateRow.rowParser(1).*)
-  
+    
   }
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
     val jobcandidateid = row.jobcandidateid
@@ -101,6 +101,6 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           returning jobcandidateid, businessentityid, resume, modifieddate::text
        """
       .executeInsert(JobcandidateRow.rowParser(1).single)
-  
+    
   }
 }

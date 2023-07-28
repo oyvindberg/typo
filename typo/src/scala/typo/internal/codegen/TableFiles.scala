@@ -2,7 +2,7 @@ package typo
 package internal
 package codegen
 
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json.Json
 
 case class TableFiles(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
   val relation = RelationFiles(table.naming, table.names, options)
@@ -51,10 +51,9 @@ case class TableFiles(table: ComputedTable, options: InternalOptions, genOrderin
           val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, relation.RowFile.tpe.value.idents))
           s"Points to [[${sc.renderTree(shortened)}.${table.naming.field(columnName).value}]]"
         },
-        col.dbCol.jsonDescription match {
-          case JsNull => None
-          case other  => if (options.debugTypes) Some(s"debug: ${Json.stringify(other)}") else None
-        }
+        if (options.debugTypes)
+          col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
+        else None
       ).flatten
 
       val comment = commentPieces match {

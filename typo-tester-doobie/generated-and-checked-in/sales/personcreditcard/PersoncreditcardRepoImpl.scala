@@ -50,7 +50,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
          """
     }
     q.query(PersoncreditcardRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
     sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard".query(PersoncreditcardRow.read).stream
@@ -62,8 +62,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     val compositeId = row.compositeId
     sql"""update sales.personcreditcard
           set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND creditcardid = ${fromWrite(compositeId.creditcardid)(Write.fromPut(CreditcardId.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND creditcardid = ${fromWrite(compositeId.creditcardid)(Write.fromPut(CreditcardId.put))}"""
       .update
       .run
       .map(_ > 0)

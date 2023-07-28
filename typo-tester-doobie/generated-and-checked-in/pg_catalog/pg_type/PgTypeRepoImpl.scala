@@ -70,8 +70,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
               typdefaultbin = ${fromWrite(row.typdefaultbin)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
               typdefault = ${fromWrite(row.typdefault)(Write.fromPutOption(Meta.StringMeta.put))},
               typacl = ${fromWrite(row.typacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTypeId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTypeId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -20,7 +20,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
           returning oid, prpubid, prrelid
        """
       .executeInsert(PgPublicationRelRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgPublicationRelRow] = {
     SQL"""select oid, prpubid, prrelid
@@ -38,7 +38,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
           from pg_catalog.pg_publication_rel
           where oid = ANY($oids)
        """.as(PgPublicationRelRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgPublicationRelRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -62,6 +62,6 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
           returning oid, prpubid, prrelid
        """
       .executeInsert(PgPublicationRelRow.rowParser(1).single)
-  
+    
   }
 }

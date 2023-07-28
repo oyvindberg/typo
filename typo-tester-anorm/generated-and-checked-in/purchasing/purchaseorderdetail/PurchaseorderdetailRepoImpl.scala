@@ -24,7 +24,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           returning purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
        """
       .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
     val namedParameters = List(
@@ -61,7 +61,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
@@ -112,6 +112,6 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           returning purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
        """
       .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
-  
+    
   }
 }

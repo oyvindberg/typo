@@ -20,7 +20,7 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
           returning mapcfg, maptokentype, mapseqno, mapdict
        """
       .executeInsert(PgTsConfigMapRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTsConfigMapRow] = {
     SQL"""select mapcfg, maptokentype, mapseqno, mapdict
@@ -54,6 +54,6 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
           returning mapcfg, maptokentype, mapseqno, mapdict
        """
       .executeInsert(PgTsConfigMapRow.rowParser(1).single)
-  
+    
   }
 }

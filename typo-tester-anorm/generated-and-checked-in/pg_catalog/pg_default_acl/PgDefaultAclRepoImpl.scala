@@ -20,7 +20,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
           returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
        """
       .executeInsert(PgDefaultAclRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgDefaultAclRow] = {
     SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
@@ -38,7 +38,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
           from pg_catalog.pg_default_acl
           where oid = ANY($oids)
        """.as(PgDefaultAclRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgDefaultAclRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
           returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
        """
       .executeInsert(PgDefaultAclRow.rowParser(1).single)
-  
+    
   }
 }

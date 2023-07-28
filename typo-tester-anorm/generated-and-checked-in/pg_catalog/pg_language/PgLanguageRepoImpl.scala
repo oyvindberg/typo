@@ -20,7 +20,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
           returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
        """
       .executeInsert(PgLanguageRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgLanguageRow] = {
     SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
@@ -38,7 +38,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
           from pg_catalog.pg_language
           where oid = ANY($oids)
        """.as(PgLanguageRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgLanguageRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -80,6 +80,6 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
           returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
        """
       .executeInsert(PgLanguageRow.rowParser(1).single)
-  
+    
   }
 }

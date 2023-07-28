@@ -69,8 +69,7 @@ object PgProcRepoImpl extends PgProcRepo {
               prosqlbody = ${fromWrite(row.prosqlbody)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
               proconfig = ${fromWrite(row.proconfig)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
               proacl = ${fromWrite(row.proacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
-          where oid = ${fromWrite(oid)(Write.fromPut(PgProcId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgProcId.put))}"""
       .update
       .run
       .map(_ > 0)

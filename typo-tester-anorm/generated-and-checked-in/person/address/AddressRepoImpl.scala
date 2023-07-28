@@ -25,7 +25,7 @@ object AddressRepoImpl extends AddressRepo {
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
        """
       .executeInsert(AddressRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
     val namedParameters = List(
@@ -65,7 +65,7 @@ object AddressRepoImpl extends AddressRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(AddressRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
@@ -83,7 +83,7 @@ object AddressRepoImpl extends AddressRepo {
           from person.address
           where addressid = ANY($addressids)
        """.as(AddressRow.rowParser(1).*)
-  
+    
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
     val addressid = row.addressid
@@ -125,6 +125,6 @@ object AddressRepoImpl extends AddressRepo {
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
        """
       .executeInsert(AddressRow.rowParser(1).single)
-  
+    
   }
 }

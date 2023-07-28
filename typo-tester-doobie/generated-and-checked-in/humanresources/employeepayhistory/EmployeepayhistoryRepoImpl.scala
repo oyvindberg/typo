@@ -52,7 +52,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
          """
     }
     q.query(EmployeepayhistoryRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
     sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory".query(EmployeepayhistoryRow.read).stream
@@ -66,8 +66,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           set rate = ${fromWrite(row.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               payfrequency = ${fromWrite(row.payfrequency)(Write.fromPut(Meta.IntMeta.put))}::int2,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND ratechangedate = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND ratechangedate = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}"""
       .update
       .run
       .map(_ > 0)

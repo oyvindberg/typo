@@ -49,7 +49,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
          """
     }
     q.query(UnitmeasureRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
     sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure""".query(UnitmeasureRow.read).stream
@@ -65,8 +65,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""update production.unitmeasure
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}
-       """
+          where unitmeasurecode = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}"""
       .update
       .run
       .map(_ > 0)

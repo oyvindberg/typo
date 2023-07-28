@@ -24,7 +24,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           returning unitmeasurecode, "name", modifieddate::text
        """
       .executeInsert(UnitmeasureRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
     val namedParameters = List(
@@ -52,7 +52,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(UnitmeasureRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select unitmeasurecode, "name", modifieddate::text
@@ -70,7 +70,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           from production.unitmeasure
           where unitmeasurecode = ANY($unitmeasurecodes)
        """.as(UnitmeasureRow.rowParser(1).*)
-  
+    
   }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     val unitmeasurecode = row.unitmeasurecode
@@ -94,6 +94,6 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           returning unitmeasurecode, "name", modifieddate::text
        """
       .executeInsert(UnitmeasureRow.rowParser(1).single)
-  
+    
   }
 }

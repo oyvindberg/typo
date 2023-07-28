@@ -25,7 +25,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     val namedParameters = List(
@@ -68,7 +68,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ShipmethodRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
@@ -86,7 +86,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           from purchasing.shipmethod
           where shipmethodid = ANY($shipmethodids)
        """.as(ShipmethodRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     val shipmethodid = row.shipmethodid
@@ -119,6 +119,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
-  
+    
   }
 }

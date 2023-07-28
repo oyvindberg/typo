@@ -66,7 +66,7 @@ object PersonRepoImpl extends PersonRepo {
          """
     }
     q.query(PersonRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".query(PersonRow.read).stream
@@ -90,8 +90,7 @@ object PersonRepoImpl extends PersonRepo {
               marital_status_id = ${fromWrite(row.maritalStatusId)(Write.fromPut(MaritalStatusId.put))},
               work_email = ${fromWrite(row.workEmail)(Write.fromPutOption(Meta.StringMeta.put))},
               sector = ${fromWrite(row.sector)(Write.fromPut(Sector.put))}::myschema.sector
-          where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}
-       """
+          where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}"""
       .update
       .run
       .map(_ > 0)

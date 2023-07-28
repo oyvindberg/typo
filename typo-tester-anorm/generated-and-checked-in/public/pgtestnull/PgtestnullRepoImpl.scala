@@ -17,7 +17,7 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
           returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, "timestamp"::text, timestampz::text, "time"::text, timez::text, "date"::text, uuid, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets, timestamps::text[], timestampzs::text[], times::text[], timezs::text[], dates::text[], uuids
        """
       .executeInsert(PgtestnullRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgtestnullRow] = {
     SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, "timestamp"::text, timestampz::text, "time"::text, timez::text, "date"::text, uuid, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets, timestamps::text[], timestampzs::text[], times::text[], timezs::text[], dates::text[], uuids

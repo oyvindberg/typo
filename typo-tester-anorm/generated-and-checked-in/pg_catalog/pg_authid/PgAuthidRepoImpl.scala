@@ -20,7 +20,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
           returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """
       .executeInsert(PgAuthidRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAuthidRow] = {
     SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
@@ -38,7 +38,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
           from pg_catalog.pg_authid
           where oid = ANY($oids)
        """.as(PgAuthidRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgAuthidRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -89,6 +89,6 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
           returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """
       .executeInsert(PgAuthidRow.rowParser(1).single)
-  
+    
   }
 }

@@ -20,7 +20,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
           returning oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
        """
       .executeInsert(PgAmopRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgAmopRow] = {
     SQL"""select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
@@ -38,7 +38,7 @@ object PgAmopRepoImpl extends PgAmopRepo {
           from pg_catalog.pg_amop
           where oid = ANY($oids)
        """.as(PgAmopRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgAmopRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -80,6 +80,6 @@ object PgAmopRepoImpl extends PgAmopRepo {
           returning oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
        """
       .executeInsert(PgAmopRow.rowParser(1).single)
-  
+    
   }
 }

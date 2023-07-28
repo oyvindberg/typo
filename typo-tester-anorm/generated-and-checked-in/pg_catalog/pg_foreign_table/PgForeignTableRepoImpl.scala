@@ -20,7 +20,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
           returning ftrelid, ftserver, ftoptions
        """
       .executeInsert(PgForeignTableRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgForeignTableRow] = {
     SQL"""select ftrelid, ftserver, ftoptions
@@ -38,7 +38,7 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
           from pg_catalog.pg_foreign_table
           where ftrelid = ANY($ftrelids)
        """.as(PgForeignTableRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgForeignTableRow)(implicit c: Connection): Boolean = {
     val ftrelid = row.ftrelid
@@ -62,6 +62,6 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
           returning ftrelid, ftserver, ftoptions
        """
       .executeInsert(PgForeignTableRow.rowParser(1).single)
-  
+    
   }
 }

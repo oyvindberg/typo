@@ -20,7 +20,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
           returning oid, lomowner, lomacl
        """
       .executeInsert(PgLargeobjectMetadataRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgLargeobjectMetadataRow] = {
     SQL"""select oid, lomowner, lomacl
@@ -38,7 +38,7 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
           from pg_catalog.pg_largeobject_metadata
           where oid = ANY($oids)
        """.as(PgLargeobjectMetadataRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgLargeobjectMetadataRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -62,6 +62,6 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
           returning oid, lomowner, lomacl
        """
       .executeInsert(PgLargeobjectMetadataRow.rowParser(1).single)
-  
+    
   }
 }

@@ -34,8 +34,7 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_db_role_setting
           set setconfig = ${fromWrite(row.setconfig)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where setdatabase = ${fromWrite(compositeId.setdatabase)(Write.fromPut(Meta.LongMeta.put))} AND setrole = ${fromWrite(compositeId.setrole)(Write.fromPut(Meta.LongMeta.put))}
-       """
+          where setdatabase = ${fromWrite(compositeId.setdatabase)(Write.fromPut(Meta.LongMeta.put))} AND setrole = ${fromWrite(compositeId.setrole)(Write.fromPut(Meta.LongMeta.put))}"""
       .update
       .run
       .map(_ > 0)

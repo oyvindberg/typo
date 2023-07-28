@@ -25,7 +25,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
        """
       .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
     val namedParameters = List(
@@ -58,7 +58,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     SQL"""select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
@@ -97,6 +97,6 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
        """
       .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
-  
+    
   }
 }

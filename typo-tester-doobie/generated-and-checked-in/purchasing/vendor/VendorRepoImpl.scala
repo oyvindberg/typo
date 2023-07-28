@@ -64,7 +64,7 @@ object VendorRepoImpl extends VendorRepo {
          """
     }
     q.query(VendorRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
     sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor""".query(VendorRow.read).stream
@@ -85,8 +85,7 @@ object VendorRepoImpl extends VendorRepo {
               activeflag = ${fromWrite(row.activeflag)(Write.fromPut(Flag.put))}::"public"."Flag",
               purchasingwebserviceurl = ${fromWrite(row.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))},
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}
-       """
+          where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)

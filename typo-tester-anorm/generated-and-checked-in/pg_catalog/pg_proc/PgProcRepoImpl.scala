@@ -20,7 +20,7 @@ object PgProcRepoImpl extends PgProcRepo {
           returning oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
        """
       .executeInsert(PgProcRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgProcRow] = {
     SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
@@ -38,7 +38,7 @@ object PgProcRepoImpl extends PgProcRepo {
           from pg_catalog.pg_proc
           where oid = ANY($oids)
        """.as(PgProcRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgProcRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -143,6 +143,6 @@ object PgProcRepoImpl extends PgProcRepo {
           returning oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
        """
       .executeInsert(PgProcRow.rowParser(1).single)
-  
+    
   }
 }

@@ -52,7 +52,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
          """
     }
     q.query(ScrapreasonRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
     sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason""".query(ScrapreasonRow.read).stream
@@ -68,8 +68,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""update production.scrapreason
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}
-       """
+          where scrapreasonid = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}"""
       .update
       .run
       .map(_ > 0)

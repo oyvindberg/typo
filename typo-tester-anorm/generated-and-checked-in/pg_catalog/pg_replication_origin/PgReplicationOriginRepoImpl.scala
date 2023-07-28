@@ -20,7 +20,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
           returning roident, roname
        """
       .executeInsert(PgReplicationOriginRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgReplicationOriginRow] = {
     SQL"""select roident, roname
@@ -38,7 +38,7 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
           from pg_catalog.pg_replication_origin
           where roident = ANY($roidents)
        """.as(PgReplicationOriginRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgReplicationOriginRow)(implicit c: Connection): Boolean = {
     val roident = row.roident
@@ -59,6 +59,6 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
           returning roident, roname
        """
       .executeInsert(PgReplicationOriginRow.rowParser(1).single)
-  
+    
   }
 }

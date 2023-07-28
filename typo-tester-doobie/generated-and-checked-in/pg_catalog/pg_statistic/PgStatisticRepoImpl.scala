@@ -62,8 +62,7 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
               stavalues3 = ${fromWrite(row.stavalues3)(Write.fromPutOption(TypoAnyArray.put))}::anyarray,
               stavalues4 = ${fromWrite(row.stavalues4)(Write.fromPutOption(TypoAnyArray.put))}::anyarray,
               stavalues5 = ${fromWrite(row.stavalues5)(Write.fromPutOption(TypoAnyArray.put))}::anyarray
-          where starelid = ${fromWrite(compositeId.starelid)(Write.fromPut(Meta.LongMeta.put))} AND staattnum = ${fromWrite(compositeId.staattnum)(Write.fromPut(Meta.IntMeta.put))} AND stainherit = ${fromWrite(compositeId.stainherit)(Write.fromPut(Meta.BooleanMeta.put))}
-       """
+          where starelid = ${fromWrite(compositeId.starelid)(Write.fromPut(Meta.LongMeta.put))} AND staattnum = ${fromWrite(compositeId.staattnum)(Write.fromPut(Meta.IntMeta.put))} AND stainherit = ${fromWrite(compositeId.stainherit)(Write.fromPut(Meta.BooleanMeta.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -17,7 +17,7 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
           returning sizing_id, sizing_name, supported_value, "comments"
        """
       .executeInsert(SqlSizingRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[SqlSizingRow] = {
     SQL"""select sizing_id, sizing_name, supported_value, "comments"

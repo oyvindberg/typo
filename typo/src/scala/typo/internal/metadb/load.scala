@@ -94,6 +94,9 @@ object load {
         (db.RelationName(maybeSchema.map(_.value), table), db.ColName(column)) -> description
       }.toMap
 
+    val columnsByTable: Map[(Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]), List[ColumnsViewRow]] = input.columnsViewRows
+      .groupBy(c => (c.tableCatalog, c.tableSchema, c.tableName))
+
     val relations: List[db.Relation] = {
       input.tablesViewRows.flatMap { table =>
         val relationName = db.RelationName(
@@ -101,13 +104,12 @@ object load {
           name = table.tableName.get.value
         )
 
-        val columns = input.columnsViewRows
-          .filter(c => c.tableCatalog == table.tableCatalog && c.tableSchema == table.tableSchema && c.tableName == table.tableName)
+        val columns = columnsByTable((table.tableCatalog, table.tableSchema, table.tableName))
           .sortBy(_.ordinalPosition)
 
         def mappedCols: List[db.Col] =
           columns.map { c =>
-            val jsonDescription = minimalJson(c)
+            val jsonDescription = DebugJson(c)
 
             val colName = db.ColName(c.columnName.get.value)
             db.Col(
@@ -120,7 +122,7 @@ object load {
                 case other                => throw new Exception(s"Unknown nullability: $other")
               },
               tpe = typeMapperDb.col(c).getOrElse {
-                System.err.println(s"Couldn't translate type from column $jsonDescription")
+                System.err.println(s"Couldn't translate type from column ${jsonDescription.maybeJson.getOrElse(colName.value)}")
                 db.Type.Text
               },
               udtName = c.udtName.map(_.value),

@@ -38,8 +38,7 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     sql"""update pg_catalog.pg_publication_rel
           set prpubid = ${fromWrite(row.prpubid)(Write.fromPut(Meta.LongMeta.put))}::oid,
               prrelid = ${fromWrite(row.prrelid)(Write.fromPut(Meta.LongMeta.put))}::oid
-          where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationRelId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationRelId.put))}"""
       .update
       .run
       .map(_ > 0)

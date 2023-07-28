@@ -20,7 +20,7 @@ object PgShseclabelRepoImpl extends PgShseclabelRepo {
           returning objoid, classoid, provider, "label"
        """
       .executeInsert(PgShseclabelRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgShseclabelRow] = {
     SQL"""select objoid, classoid, provider, "label"
@@ -54,6 +54,6 @@ object PgShseclabelRepoImpl extends PgShseclabelRepo {
           returning objoid, classoid, provider, "label"
        """
       .executeInsert(PgShseclabelRow.rowParser(1).single)
-  
+    
   }
 }

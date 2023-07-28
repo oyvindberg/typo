@@ -20,7 +20,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
           returning oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
        """
       .executeInsert(PgTypeRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgTypeRow] = {
     SQL"""select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
@@ -38,7 +38,7 @@ object PgTypeRepoImpl extends PgTypeRepo {
           from pg_catalog.pg_type
           where oid = ANY($oids)
        """.as(PgTypeRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgTypeRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -149,6 +149,6 @@ object PgTypeRepoImpl extends PgTypeRepo {
           returning oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
        """
       .executeInsert(PgTypeRow.rowParser(1).single)
-  
+    
   }
 }

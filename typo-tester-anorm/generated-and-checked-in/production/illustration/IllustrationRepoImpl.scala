@@ -24,7 +24,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           returning illustrationid, diagram, modifieddate::text
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     val namedParameters = List(
@@ -55,7 +55,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(IllustrationRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate::text
@@ -73,7 +73,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
           from production.illustration
           where illustrationid = ANY($illustrationids)
        """.as(IllustrationRow.rowParser(1).*)
-  
+    
   }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
     val illustrationid = row.illustrationid
@@ -97,6 +97,6 @@ object IllustrationRepoImpl extends IllustrationRepo {
           returning illustrationid, diagram, modifieddate::text
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
-  
+    
   }
 }

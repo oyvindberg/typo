@@ -35,8 +35,7 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
     sql"""update pg_catalog.pg_auth_members
           set grantor = ${fromWrite(row.grantor)(Write.fromPut(Meta.LongMeta.put))}::oid,
               admin_option = ${fromWrite(row.adminOption)(Write.fromPut(Meta.BooleanMeta.put))}
-          where roleid = ${fromWrite(compositeId.roleid)(Write.fromPut(Meta.LongMeta.put))} AND "member" = ${fromWrite(compositeId.member)(Write.fromPut(Meta.LongMeta.put))}
-       """
+          where roleid = ${fromWrite(compositeId.roleid)(Write.fromPut(Meta.LongMeta.put))} AND "member" = ${fromWrite(compositeId.member)(Write.fromPut(Meta.LongMeta.put))}"""
       .update
       .run
       .map(_ > 0)

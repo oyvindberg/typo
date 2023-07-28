@@ -58,8 +58,7 @@ object PgIndexRepoImpl extends PgIndexRepo {
               indoption = ${fromWrite(row.indoption)(Write.fromPut(TypoInt2Vector.put))}::int2vector,
               indexprs = ${fromWrite(row.indexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
               indpred = ${fromWrite(row.indpred)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
-          where indexrelid = ${fromWrite(indexrelid)(Write.fromPut(PgIndexId.put))}
-       """
+          where indexrelid = ${fromWrite(indexrelid)(Write.fromPut(PgIndexId.put))}"""
       .update
       .run
       .map(_ > 0)

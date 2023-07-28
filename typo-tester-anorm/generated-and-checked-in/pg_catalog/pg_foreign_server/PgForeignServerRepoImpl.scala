@@ -20,7 +20,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
           returning oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
        """
       .executeInsert(PgForeignServerRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgForeignServerRow] = {
     SQL"""select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
@@ -38,7 +38,7 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
           from pg_catalog.pg_foreign_server
           where oid = ANY($oids)
        """.as(PgForeignServerRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgForeignServerRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -77,6 +77,6 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
           returning oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
        """
       .executeInsert(PgForeignServerRow.rowParser(1).single)
-  
+    
   }
 }

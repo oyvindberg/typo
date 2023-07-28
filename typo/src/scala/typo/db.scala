@@ -1,6 +1,6 @@
 package typo
 
-import play.api.libs.json.JsValue
+import typo.internal.DebugJson
 
 /** Describes what tables look like in postgres
   */
@@ -73,7 +73,7 @@ object db {
       nullability: Nullability,
       columnDefault: Option[String],
       comment: Option[String],
-      jsonDescription: JsValue
+      jsonDescription: DebugJson
   )
   case class RelationName(schema: Option[String], name: String) {
     def value = s"${schema.map(_ + ".").getOrElse("")}$name"

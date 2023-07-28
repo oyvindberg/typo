@@ -24,7 +24,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           returning scrapreasonid, "name", modifieddate::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
@@ -55,7 +55,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ScrapreasonRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
     SQL"""select scrapreasonid, "name", modifieddate::text
@@ -73,7 +73,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           from production.scrapreason
           where scrapreasonid = ANY($scrapreasonids)
        """.as(ScrapreasonRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     val scrapreasonid = row.scrapreasonid
@@ -97,6 +97,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           returning scrapreasonid, "name", modifieddate::text
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
-  
+    
   }
 }

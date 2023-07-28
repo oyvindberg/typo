@@ -52,7 +52,7 @@ object PersonRepoImpl extends PersonRepo {
          """
     }
     q.query(PersonRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "one", two, "name" from compositepk.person""".query(PersonRow.read).stream
@@ -64,8 +64,7 @@ object PersonRepoImpl extends PersonRepo {
     val compositeId = row.compositeId
     sql"""update compositepk.person
           set "name" = ${fromWrite(row.name)(Write.fromPutOption(Meta.StringMeta.put))}
-          where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}
-       """
+          where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}"""
       .update
       .run
       .map(_ > 0)

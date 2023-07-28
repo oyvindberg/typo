@@ -46,8 +46,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
               partclass = ${fromWrite(row.partclass)(Write.fromPut(TypoOidVector.put))}::oidvector,
               partcollation = ${fromWrite(row.partcollation)(Write.fromPut(TypoOidVector.put))}::oidvector,
               partexprs = ${fromWrite(row.partexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
-          where partrelid = ${fromWrite(partrelid)(Write.fromPut(PgPartitionedTableId.put))}
-       """
+          where partrelid = ${fromWrite(partrelid)(Write.fromPut(PgPartitionedTableId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -26,7 +26,7 @@ object StoreRepoImpl extends StoreRepo {
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """
       .executeInsert(StoreRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow = {
     val namedParameters = List(
@@ -60,7 +60,7 @@ object StoreRepoImpl extends StoreRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(StoreRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
@@ -78,7 +78,7 @@ object StoreRepoImpl extends StoreRepo {
           from sales.store
           where businessentityid = ANY($businessentityids)
        """.as(StoreRow.rowParser(1).*)
-  
+    
   }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
@@ -111,6 +111,6 @@ object StoreRepoImpl extends StoreRepo {
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """
       .executeInsert(StoreRow.rowParser(1).single)
-  
+    
   }
 }

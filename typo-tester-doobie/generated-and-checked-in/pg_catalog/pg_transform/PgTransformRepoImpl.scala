@@ -41,8 +41,7 @@ object PgTransformRepoImpl extends PgTransformRepo {
               trflang = ${fromWrite(row.trflang)(Write.fromPut(Meta.LongMeta.put))}::oid,
               trffromsql = ${fromWrite(row.trffromsql)(Write.fromPut(TypoRegproc.put))}::regproc,
               trftosql = ${fromWrite(row.trftosql)(Write.fromPut(TypoRegproc.put))}::regproc
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTransformId.put))}"""
       .update
       .run
       .map(_ > 0)

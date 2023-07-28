@@ -71,8 +71,7 @@ object PgClassRepoImpl extends PgClassRepo {
               relacl = ${fromWrite(row.relacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
               reloptions = ${fromWrite(row.reloptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
               relpartbound = ${fromWrite(row.relpartbound)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
-          where oid = ${fromWrite(oid)(Write.fromPut(PgClassId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgClassId.put))}"""
       .update
       .run
       .map(_ > 0)

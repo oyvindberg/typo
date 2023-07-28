@@ -20,7 +20,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
           returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
        """
       .executeInsert(PgConversionRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgConversionRow] = {
     SQL"""select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
@@ -38,7 +38,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
           from pg_catalog.pg_conversion
           where oid = ANY($oids)
        """.as(PgConversionRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgConversionRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -77,6 +77,6 @@ object PgConversionRepoImpl extends PgConversionRepo {
           returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
        """
       .executeInsert(PgConversionRow.rowParser(1).single)
-  
+    
   }
 }

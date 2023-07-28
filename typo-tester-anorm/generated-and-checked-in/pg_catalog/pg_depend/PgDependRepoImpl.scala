@@ -17,7 +17,7 @@ object PgDependRepoImpl extends PgDependRepo {
           returning classid, objid, objsubid, refclassid, refobjid, refobjsubid, deptype
        """
       .executeInsert(PgDependRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgDependRow] = {
     SQL"""select classid, objid, objsubid, refclassid, refobjid, refobjsubid, deptype

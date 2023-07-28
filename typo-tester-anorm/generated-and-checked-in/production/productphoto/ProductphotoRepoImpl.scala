@@ -24,7 +24,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
     val namedParameters = List(
@@ -58,7 +58,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductphotoRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
@@ -76,7 +76,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           from production.productphoto
           where productphotoid = ANY($productphotoids)
        """.as(ProductphotoRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
     val productphotoid = row.productphotoid
@@ -109,6 +109,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
-  
+    
   }
 }

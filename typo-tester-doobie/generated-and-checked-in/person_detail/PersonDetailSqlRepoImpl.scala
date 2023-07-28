@@ -27,9 +27,8 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.person p ON p.businessentityid = s.businessentityid
                      JOIN person.businessentityaddress bea ON bea.businessentityid = s.businessentityid
                      JOIN person.address a ON a.addressid = bea.addressid
-            where s.businessentityid = $businessentityid
-         """
+            where s.businessentityid = $businessentityid"""
     sql.query(PersonDetailSqlRow.read).stream
-  
+    
   }
 }

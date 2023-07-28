@@ -41,8 +41,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
               dictowner = ${fromWrite(row.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
               dicttemplate = ${fromWrite(row.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid,
               dictinitoption = ${fromWrite(row.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))}
-          where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -20,7 +20,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
           returning rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
        """
       .executeInsert(PgRangeRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgRangeRow] = {
     SQL"""select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
@@ -38,7 +38,7 @@ object PgRangeRepoImpl extends PgRangeRepo {
           from pg_catalog.pg_range
           where rngtypid = ANY($rngtypids)
        """.as(PgRangeRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgRangeRow)(implicit c: Connection): Boolean = {
     val rngtypid = row.rngtypid
@@ -74,6 +74,6 @@ object PgRangeRepoImpl extends PgRangeRepo {
           returning rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
        """
       .executeInsert(PgRangeRow.rowParser(1).single)
-  
+    
   }
 }

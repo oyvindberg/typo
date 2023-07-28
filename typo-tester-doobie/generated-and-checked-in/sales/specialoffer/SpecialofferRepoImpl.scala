@@ -70,7 +70,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
          """
     }
     q.query(SpecialofferRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferRow] = {
     sql"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text from sales.specialoffer""".query(SpecialofferRow.read).stream
@@ -94,8 +94,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
               maxqty = ${fromWrite(row.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where specialofferid = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}
-       """
+          where specialofferid = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}"""
       .update
       .run
       .map(_ > 0)

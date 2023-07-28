@@ -49,7 +49,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
          """
     }
     q.query(CurrencyRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
     sql"""select currencycode, "name", modifieddate::text from sales.currency""".query(CurrencyRow.read).stream
@@ -65,8 +65,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""update sales.currency
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}
-       """
+          where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}"""
       .update
       .run
       .map(_ > 0)

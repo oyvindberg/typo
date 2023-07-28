@@ -66,7 +66,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
          """
     }
     q.query(ShipmethodRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
     sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod""".query(ShipmethodRow.read).stream
@@ -85,8 +85,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
               shiprate = ${fromWrite(row.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where shipmethodid = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}
-       """
+          where shipmethodid = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -20,7 +20,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           returning oid, nspname, nspowner, nspacl
        """
       .executeInsert(PgNamespaceRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl
@@ -38,7 +38,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           from pg_catalog.pg_namespace
           where oid = ANY($oids)
        """.as(PgNamespaceRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgNamespaceRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -65,6 +65,6 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           returning oid, nspname, nspowner, nspacl
        """
       .executeInsert(PgNamespaceRow.rowParser(1).single)
-  
+    
   }
 }

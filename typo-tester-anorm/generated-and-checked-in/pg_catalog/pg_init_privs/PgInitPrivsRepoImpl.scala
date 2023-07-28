@@ -20,7 +20,7 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
           returning objoid, classoid, objsubid, privtype, initprivs
        """
       .executeInsert(PgInitPrivsRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgInitPrivsRow] = {
     SQL"""select objoid, classoid, objsubid, privtype, initprivs
@@ -57,6 +57,6 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
           returning objoid, classoid, objsubid, privtype, initprivs
        """
       .executeInsert(PgInitPrivsRow.rowParser(1).single)
-  
+    
   }
 }

@@ -25,7 +25,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           returning productdescriptionid, description, rowguid, modifieddate::text
        """
       .executeInsert(ProductdescriptionRow.rowParser(1).single)
-  
+    
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow = {
     val namedParameters = List(
@@ -60,7 +60,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
         .on(namedParameters.map(_._1) :_*)
         .executeInsert(ProductdescriptionRow.rowParser(1).single)
     }
-  
+    
   }
   override def selectAll(implicit c: Connection): List[ProductdescriptionRow] = {
     SQL"""select productdescriptionid, description, rowguid, modifieddate::text
@@ -78,7 +78,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           from production.productdescription
           where productdescriptionid = ANY($productdescriptionids)
        """.as(ProductdescriptionRow.rowParser(1).*)
-  
+    
   }
   override def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
     val productdescriptionid = row.productdescriptionid
@@ -105,6 +105,6 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           returning productdescriptionid, description, rowguid, modifieddate::text
        """
       .executeInsert(ProductdescriptionRow.rowParser(1).single)
-  
+    
   }
 }

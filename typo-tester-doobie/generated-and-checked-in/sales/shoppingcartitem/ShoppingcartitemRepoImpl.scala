@@ -62,7 +62,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
          """
     }
     q.query(ShoppingcartitemRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
     sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem".query(ShoppingcartitemRow.read).stream
@@ -81,8 +81,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               productid = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
               datecreated = ${fromWrite(row.datecreated)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where shoppingcartitemid = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}
-       """
+          where shoppingcartitemid = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}"""
       .update
       .run
       .map(_ > 0)

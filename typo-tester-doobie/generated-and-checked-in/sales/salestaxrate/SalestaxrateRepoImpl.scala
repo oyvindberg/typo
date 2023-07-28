@@ -65,7 +65,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
          """
     }
     q.query(SalestaxrateRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
     sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate""".query(SalestaxrateRow.read).stream
@@ -85,8 +85,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
               "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where salestaxrateid = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}
-       """
+          where salestaxrateid = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}"""
       .update
       .run
       .map(_ > 0)

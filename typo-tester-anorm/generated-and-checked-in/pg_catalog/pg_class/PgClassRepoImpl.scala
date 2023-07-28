@@ -20,7 +20,7 @@ object PgClassRepoImpl extends PgClassRepo {
           returning oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
        """
       .executeInsert(PgClassRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgClassRow] = {
     SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
@@ -38,7 +38,7 @@ object PgClassRepoImpl extends PgClassRepo {
           from pg_catalog.pg_class
           where oid = ANY($oids)
        """.as(PgClassRow.rowParser(1).*)
-  
+    
   }
   override def update(row: PgClassRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -152,6 +152,6 @@ object PgClassRepoImpl extends PgClassRepo {
           returning oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
        """
       .executeInsert(PgClassRow.rowParser(1).single)
-  
+    
   }
 }

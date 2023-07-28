@@ -203,6 +203,6 @@ case class ComputedTable(
         }
         .distinctByCompat(x => x.params.map(_.tpe)) // avoid erasure clashes
     )
-    NonEmptyList.fromList(maybeMethods.flatten)
+    NonEmptyList.fromList(maybeMethods.flatten.sorted)
   }
 }

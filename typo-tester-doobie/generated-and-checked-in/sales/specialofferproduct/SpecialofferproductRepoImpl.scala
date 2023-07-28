@@ -55,7 +55,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
          """
     }
     q.query(SpecialofferproductRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
     sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct".query(SpecialofferproductRow.read).stream
@@ -68,8 +68,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""update sales.specialofferproduct
           set rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where specialofferid = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}
-       """
+          where specialofferid = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -56,7 +56,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
          """
     }
     q.query(SalespersonquotahistoryRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory".query(SalespersonquotahistoryRow.read).stream
@@ -70,8 +70,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           set salesquota = ${fromWrite(row.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND quotadate = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}
-       """
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND quotadate = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}"""
       .update
       .run
       .map(_ > 0)

@@ -46,8 +46,7 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
               subslotname = ${fromWrite(row.subslotname)(Write.fromPutOption(Meta.StringMeta.put))}::name,
               subsynccommit = ${fromWrite(row.subsynccommit)(Write.fromPut(Meta.StringMeta.put))},
               subpublications = ${fromWrite(row.subpublications)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgSubscriptionId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgSubscriptionId.put))}"""
       .update
       .run
       .map(_ > 0)

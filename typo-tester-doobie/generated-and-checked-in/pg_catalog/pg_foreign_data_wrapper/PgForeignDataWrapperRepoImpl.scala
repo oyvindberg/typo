@@ -43,8 +43,7 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
               fdwvalidator = ${fromWrite(row.fdwvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid,
               fdwacl = ${fromWrite(row.fdwacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
               fdwoptions = ${fromWrite(row.fdwoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
-          where oid = ${fromWrite(oid)(Write.fromPut(PgForeignDataWrapperId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgForeignDataWrapperId.put))}"""
       .update
       .run
       .map(_ > 0)

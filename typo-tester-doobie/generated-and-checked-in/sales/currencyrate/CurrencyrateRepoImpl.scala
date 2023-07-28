@@ -57,7 +57,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
          """
     }
     q.query(CurrencyrateRow.read).unique
-  
+    
   }
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
     sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate".query(CurrencyrateRow.read).stream
@@ -77,8 +77,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
               averagerate = ${fromWrite(row.averagerate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               endofdayrate = ${fromWrite(row.endofdayrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where currencyrateid = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}
-       """
+          where currencyrateid = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}"""
       .update
       .run
       .map(_ > 0)

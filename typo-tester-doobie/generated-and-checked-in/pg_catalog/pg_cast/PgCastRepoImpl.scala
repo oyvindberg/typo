@@ -41,8 +41,7 @@ object PgCastRepoImpl extends PgCastRepo {
               castfunc = ${fromWrite(row.castfunc)(Write.fromPut(Meta.LongMeta.put))}::oid,
               castcontext = ${fromWrite(row.castcontext)(Write.fromPut(Meta.StringMeta.put))}::char,
               castmethod = ${fromWrite(row.castmethod)(Write.fromPut(Meta.StringMeta.put))}::char
-          where oid = ${fromWrite(oid)(Write.fromPut(PgCastId.put))}
-       """
+          where oid = ${fromWrite(oid)(Write.fromPut(PgCastId.put))}"""
       .update
       .run
       .map(_ > 0)

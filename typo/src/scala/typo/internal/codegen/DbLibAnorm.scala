@@ -269,12 +269,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
-          val colCast = sc.StrLit(sqlCast.toPgCode(col).render)
+          val colCast = sc.StrLit(sqlCast.toPgCode(col).render.asString)
           code"""Some(($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from(${unsavedParam.name}.${col.name})), $colCast))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, dbCol), origType) =>
           val dbName = sc.StrLit(dbCol.name.value)
-          val colCast = sc.StrLit(sqlCast.toPgCode(col).render)
+          val colCast = sc.StrLit(sqlCast.toPgCode(col).render.asString)
 
           code"""|${unsavedParam.name}.$ident match {
                    |  case ${default.Defaulted}.${default.UseDefault} => None
@@ -554,7 +554,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"""|$Column.nonNull[$tpe]((v1: ${sc.Type.Any}, _) =>
                |  v1 match {
                |    case $v: ${ct.toTypo.jdbcType} => ${sc.Type.Right}(${ct.toTypo0(v)})
-               |    case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of ${ct.toTypo.jdbcType.render}, got $${other.getClass.getName}"))
+               |    case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of ${ct.toTypo.jdbcType.render.asString}, got $${other.getClass.getName}"))
                |  }
                |)""".stripMargin
       )
@@ -595,7 +595,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |           ${sc.Type.Right}($v.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))
                  |         case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of ${ct.typoType}, got $${other.getClass.getName}"))
                  |       }
-                 |    case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of ${sc.Type.PgArray.render}, got $${other.getClass.getName}"))
+                 |    case other => ${sc.Type.Left}($TypeDoesNotMatch(s"Expected instance of ${sc.Type.PgArray.render.asString}, got $${other.getClass.getName}"))
                  |  }
                  |)""".stripMargin
         )
