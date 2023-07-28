@@ -37,23 +37,23 @@ case class VpersondemographicsViewRow(
 )
 
 object VpersondemographicsViewRow {
-  val rowParser: RowParser[VpersondemographicsViewRow] =
+  def rowParser(idx: Int): RowParser[VpersondemographicsViewRow] =
     RowParser[VpersondemographicsViewRow] { row =>
       Success(
         VpersondemographicsViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          totalpurchaseytd = row[Option[TypoMoney]]("totalpurchaseytd"),
-          datefirstpurchase = row[Option[LocalDate]]("datefirstpurchase"),
-          birthdate = row[Option[LocalDate]]("birthdate"),
-          maritalstatus = row[Option[/* max 1 chars */ String]]("maritalstatus"),
-          yearlyincome = row[Option[/* max 30 chars */ String]]("yearlyincome"),
-          gender = row[Option[/* max 1 chars */ String]]("gender"),
-          totalchildren = row[Option[Int]]("totalchildren"),
-          numberchildrenathome = row[Option[Int]]("numberchildrenathome"),
-          education = row[Option[/* max 30 chars */ String]]("education"),
-          occupation = row[Option[/* max 30 chars */ String]]("occupation"),
-          homeownerflag = row[Option[Boolean]]("homeownerflag"),
-          numbercarsowned = row[Option[Int]]("numbercarsowned")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          totalpurchaseytd = row[Option[TypoMoney]](idx + 1),
+          datefirstpurchase = row[Option[LocalDate]](idx + 2),
+          birthdate = row[Option[LocalDate]](idx + 3),
+          maritalstatus = row[Option[/* max 1 chars */ String]](idx + 4),
+          yearlyincome = row[Option[/* max 30 chars */ String]](idx + 5),
+          gender = row[Option[/* max 1 chars */ String]](idx + 6),
+          totalchildren = row[Option[Int]](idx + 7),
+          numberchildrenathome = row[Option[Int]](idx + 8),
+          education = row[Option[/* max 30 chars */ String]](idx + 9),
+          occupation = row[Option[/* max 30 chars */ String]](idx + 10),
+          homeownerflag = row[Option[Boolean]](idx + 11),
+          numbercarsowned = row[Option[Int]](idx + 12)
         )
       )
     }

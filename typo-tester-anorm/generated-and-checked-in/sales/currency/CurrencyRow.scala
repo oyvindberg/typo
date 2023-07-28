@@ -27,13 +27,13 @@ case class CurrencyRow(
 )
 
 object CurrencyRow {
-  val rowParser: RowParser[CurrencyRow] =
+  def rowParser(idx: Int): RowParser[CurrencyRow] =
     RowParser[CurrencyRow] { row =>
       Success(
         CurrencyRow(
-          currencycode = row[CurrencyId]("currencycode"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          currencycode = row[CurrencyId](idx + 0),
+          name = row[Name](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

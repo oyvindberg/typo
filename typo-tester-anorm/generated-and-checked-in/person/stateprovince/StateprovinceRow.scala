@@ -42,18 +42,18 @@ case class StateprovinceRow(
 )
 
 object StateprovinceRow {
-  val rowParser: RowParser[StateprovinceRow] =
+  def rowParser(idx: Int): RowParser[StateprovinceRow] =
     RowParser[StateprovinceRow] { row =>
       Success(
         StateprovinceRow(
-          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
-          stateprovincecode = row[/* bpchar */ String]("stateprovincecode"),
-          countryregioncode = row[CountryregionId]("countryregioncode"),
-          isonlystateprovinceflag = row[Flag]("isonlystateprovinceflag"),
-          name = row[Name]("name"),
-          territoryid = row[SalesterritoryId]("territoryid"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          stateprovinceid = row[StateprovinceId](idx + 0),
+          stateprovincecode = row[/* bpchar */ String](idx + 1),
+          countryregioncode = row[CountryregionId](idx + 2),
+          isonlystateprovinceflag = row[Flag](idx + 3),
+          name = row[Name](idx + 4),
+          territoryid = row[SalesterritoryId](idx + 5),
+          rowguid = row[UUID](idx + 6),
+          modifieddate = row[LocalDateTime](idx + 7)
         )
       )
     }

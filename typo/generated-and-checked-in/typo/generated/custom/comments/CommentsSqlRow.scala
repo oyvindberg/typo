@@ -36,14 +36,14 @@ case class CommentsSqlRow(
 )
 
 object CommentsSqlRow {
-  val rowParser: RowParser[CommentsSqlRow] =
+  def rowParser(idx: Int): RowParser[CommentsSqlRow] =
     RowParser[CommentsSqlRow] { row =>
       Success(
         CommentsSqlRow(
-          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
-          tableName = row[Option[SqlIdentifier]]("table_name"),
-          columnName = row[Option[SqlIdentifier]]("column_name"),
-          description = row[String]("description")
+          tableSchema = row[Option[SqlIdentifier]](idx + 0),
+          tableName = row[Option[SqlIdentifier]](idx + 1),
+          columnName = row[Option[SqlIdentifier]](idx + 2),
+          description = row[String](idx + 3)
         )
       )
     }

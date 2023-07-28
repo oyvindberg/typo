@@ -43,20 +43,20 @@ case class WViewRow(
 )
 
 object WViewRow {
-  val rowParser: RowParser[WViewRow] =
+  def rowParser(idx: Int): RowParser[WViewRow] =
     RowParser[WViewRow] { row =>
       Success(
         WViewRow(
-          id = row[Option[Int]]("id"),
-          workorderid = row[Option[WorkorderId]]("workorderid"),
-          productid = row[Option[ProductId]]("productid"),
-          orderqty = row[Option[Int]]("orderqty"),
-          scrappedqty = row[Option[Int]]("scrappedqty"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          duedate = row[Option[LocalDateTime]]("duedate"),
-          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          workorderid = row[Option[WorkorderId]](idx + 1),
+          productid = row[Option[ProductId]](idx + 2),
+          orderqty = row[Option[Int]](idx + 3),
+          scrappedqty = row[Option[Int]](idx + 4),
+          startdate = row[Option[LocalDateTime]](idx + 5),
+          enddate = row[Option[LocalDateTime]](idx + 6),
+          duedate = row[Option[LocalDateTime]](idx + 7),
+          scrapreasonid = row[Option[ScrapreasonId]](idx + 8),
+          modifieddate = row[Option[LocalDateTime]](idx + 9)
         )
       )
     }

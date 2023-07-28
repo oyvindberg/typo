@@ -41,18 +41,18 @@ case class VendorRow(
 )
 
 object VendorRow {
-  val rowParser: RowParser[VendorRow] =
+  def rowParser(idx: Int): RowParser[VendorRow] =
     RowParser[VendorRow] { row =>
       Success(
         VendorRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          accountnumber = row[AccountNumber]("accountnumber"),
-          name = row[Name]("name"),
-          creditrating = row[Int]("creditrating"),
-          preferredvendorstatus = row[Flag]("preferredvendorstatus"),
-          activeflag = row[Flag]("activeflag"),
-          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]]("purchasingwebserviceurl"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          accountnumber = row[AccountNumber](idx + 1),
+          name = row[Name](idx + 2),
+          creditrating = row[Int](idx + 3),
+          preferredvendorstatus = row[Flag](idx + 4),
+          activeflag = row[Flag](idx + 5),
+          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]](idx + 6),
+          modifieddate = row[LocalDateTime](idx + 7)
         )
       )
     }

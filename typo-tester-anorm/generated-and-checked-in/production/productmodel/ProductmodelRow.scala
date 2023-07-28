@@ -34,16 +34,16 @@ case class ProductmodelRow(
 )
 
 object ProductmodelRow {
-  val rowParser: RowParser[ProductmodelRow] =
+  def rowParser(idx: Int): RowParser[ProductmodelRow] =
     RowParser[ProductmodelRow] { row =>
       Success(
         ProductmodelRow(
-          productmodelid = row[ProductmodelId]("productmodelid"),
-          name = row[Name]("name"),
-          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
-          instructions = row[Option[TypoXml]]("instructions"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productmodelid = row[ProductmodelId](idx + 0),
+          name = row[Name](idx + 1),
+          catalogdescription = row[Option[TypoXml]](idx + 2),
+          instructions = row[Option[TypoXml]](idx + 3),
+          rowguid = row[UUID](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

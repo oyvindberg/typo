@@ -62,32 +62,32 @@ case class VsalespersonViewRow(
 )
 
 object VsalespersonViewRow {
-  val rowParser: RowParser[VsalespersonViewRow] =
+  def rowParser(idx: Int): RowParser[VsalespersonViewRow] =
     RowParser[VsalespersonViewRow] { row =>
       Success(
         VsalespersonViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          jobtitle = row[Option[/* max 50 chars */ String]]("jobtitle"),
-          phonenumber = row[Option[Phone]]("phonenumber"),
-          phonenumbertype = row[Option[Name]]("phonenumbertype"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          emailpromotion = row[Option[Int]]("emailpromotion"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovincename = row[Option[Name]]("stateprovincename"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          countryregionname = row[Option[Name]]("countryregionname"),
-          territoryname = row[Option[Name]]("territoryname"),
-          territorygroup = row[Option[/* max 50 chars */ String]]("territorygroup"),
-          salesquota = row[Option[BigDecimal]]("salesquota"),
-          salesytd = row[Option[BigDecimal]]("salesytd"),
-          saleslastyear = row[Option[BigDecimal]]("saleslastyear")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          title = row[Option[/* max 8 chars */ String]](idx + 1),
+          firstname = row[Option[Name]](idx + 2),
+          middlename = row[Option[Name]](idx + 3),
+          lastname = row[Option[Name]](idx + 4),
+          suffix = row[Option[/* max 10 chars */ String]](idx + 5),
+          jobtitle = row[Option[/* max 50 chars */ String]](idx + 6),
+          phonenumber = row[Option[Phone]](idx + 7),
+          phonenumbertype = row[Option[Name]](idx + 8),
+          emailaddress = row[Option[/* max 50 chars */ String]](idx + 9),
+          emailpromotion = row[Option[Int]](idx + 10),
+          addressline1 = row[Option[/* max 60 chars */ String]](idx + 11),
+          addressline2 = row[Option[/* max 60 chars */ String]](idx + 12),
+          city = row[Option[/* max 30 chars */ String]](idx + 13),
+          stateprovincename = row[Option[Name]](idx + 14),
+          postalcode = row[Option[/* max 15 chars */ String]](idx + 15),
+          countryregionname = row[Option[Name]](idx + 16),
+          territoryname = row[Option[Name]](idx + 17),
+          territorygroup = row[Option[/* max 50 chars */ String]](idx + 18),
+          salesquota = row[Option[BigDecimal]](idx + 19),
+          salesytd = row[Option[BigDecimal]](idx + 20),
+          saleslastyear = row[Option[BigDecimal]](idx + 21)
         )
       )
     }

@@ -36,14 +36,14 @@ case class ProductmodelproductdescriptioncultureRow(
  }
 
 object ProductmodelproductdescriptioncultureRow {
-  val rowParser: RowParser[ProductmodelproductdescriptioncultureRow] =
+  def rowParser(idx: Int): RowParser[ProductmodelproductdescriptioncultureRow] =
     RowParser[ProductmodelproductdescriptioncultureRow] { row =>
       Success(
         ProductmodelproductdescriptioncultureRow(
-          productmodelid = row[ProductmodelId]("productmodelid"),
-          productdescriptionid = row[ProductdescriptionId]("productdescriptionid"),
-          cultureid = row[CultureId]("cultureid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productmodelid = row[ProductmodelId](idx + 0),
+          productdescriptionid = row[ProductdescriptionId](idx + 1),
+          cultureid = row[CultureId](idx + 2),
+          modifieddate = row[LocalDateTime](idx + 3)
         )
       )
     }

@@ -29,13 +29,13 @@ case class SohsrViewRow(
 )
 
 object SohsrViewRow {
-  val rowParser: RowParser[SohsrViewRow] =
+  def rowParser(idx: Int): RowParser[SohsrViewRow] =
     RowParser[SohsrViewRow] { row =>
       Success(
         SohsrViewRow(
-          salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
-          salesreasonid = row[Option[SalesreasonId]]("salesreasonid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          salesorderid = row[Option[SalesorderheaderId]](idx + 0),
+          salesreasonid = row[Option[SalesreasonId]](idx + 1),
+          modifieddate = row[Option[LocalDateTime]](idx + 2)
         )
       )
     }

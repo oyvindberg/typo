@@ -37,17 +37,17 @@ case class SalestaxrateRow(
 )
 
 object SalestaxrateRow {
-  val rowParser: RowParser[SalestaxrateRow] =
+  def rowParser(idx: Int): RowParser[SalestaxrateRow] =
     RowParser[SalestaxrateRow] { row =>
       Success(
         SalestaxrateRow(
-          salestaxrateid = row[SalestaxrateId]("salestaxrateid"),
-          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
-          taxtype = row[Int]("taxtype"),
-          taxrate = row[BigDecimal]("taxrate"),
-          name = row[Name]("name"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          salestaxrateid = row[SalestaxrateId](idx + 0),
+          stateprovinceid = row[StateprovinceId](idx + 1),
+          taxtype = row[Int](idx + 2),
+          taxrate = row[BigDecimal](idx + 3),
+          name = row[Name](idx + 4),
+          rowguid = row[UUID](idx + 5),
+          modifieddate = row[LocalDateTime](idx + 6)
         )
       )
     }

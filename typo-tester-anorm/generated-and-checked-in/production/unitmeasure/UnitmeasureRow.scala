@@ -27,13 +27,13 @@ case class UnitmeasureRow(
 )
 
 object UnitmeasureRow {
-  val rowParser: RowParser[UnitmeasureRow] =
+  def rowParser(idx: Int): RowParser[UnitmeasureRow] =
     RowParser[UnitmeasureRow] { row =>
       Success(
         UnitmeasureRow(
-          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          unitmeasurecode = row[UnitmeasureId](idx + 0),
+          name = row[Name](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

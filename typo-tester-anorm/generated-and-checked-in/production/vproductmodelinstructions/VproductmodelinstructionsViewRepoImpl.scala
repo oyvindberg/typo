@@ -16,7 +16,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
     SQL"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
           from production.vproductmodelinstructions
-       """.as(VproductmodelinstructionsViewRow.rowParser.*)
+       """.as(VproductmodelinstructionsViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VproductmodelinstructionsViewFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
     fieldValues match {
@@ -44,7 +44,7 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VproductmodelinstructionsViewRow.rowParser.*)
+          .as(VproductmodelinstructionsViewRow.rowParser(1).*)
     }
   
   }

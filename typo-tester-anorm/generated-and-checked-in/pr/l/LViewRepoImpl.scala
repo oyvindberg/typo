@@ -16,7 +16,7 @@ object LViewRepoImpl extends LViewRepo {
   override def selectAll(implicit c: Connection): List[LViewRow] = {
     SQL"""select "id", locationid, "name", costrate, availability, modifieddate
           from pr.l
-       """.as(LViewRow.rowParser.*)
+       """.as(LViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[LViewFieldOrIdValue[_]])(implicit c: Connection): List[LViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object LViewRepoImpl extends LViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(LViewRow.rowParser.*)
+          .as(LViewRow.rowParser(1).*)
     }
   
   }

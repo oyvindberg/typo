@@ -46,20 +46,20 @@ case class TableConstraintsViewRow(
 )
 
 object TableConstraintsViewRow {
-  val rowParser: RowParser[TableConstraintsViewRow] =
+  def rowParser(idx: Int): RowParser[TableConstraintsViewRow] =
     RowParser[TableConstraintsViewRow] { row =>
       Success(
         TableConstraintsViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]]("constraint_catalog"),
-          constraintSchema = row[Option[SqlIdentifier]]("constraint_schema"),
-          constraintName = row[Option[SqlIdentifier]]("constraint_name"),
-          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
-          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
-          tableName = row[Option[SqlIdentifier]]("table_name"),
-          constraintType = row[Option[CharacterData]]("constraint_type"),
-          isDeferrable = row[Option[YesOrNo]]("is_deferrable"),
-          initiallyDeferred = row[Option[YesOrNo]]("initially_deferred"),
-          enforced = row[Option[YesOrNo]]("enforced")
+          constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
+          constraintSchema = row[Option[SqlIdentifier]](idx + 1),
+          constraintName = row[Option[SqlIdentifier]](idx + 2),
+          tableCatalog = row[Option[SqlIdentifier]](idx + 3),
+          tableSchema = row[Option[SqlIdentifier]](idx + 4),
+          tableName = row[Option[SqlIdentifier]](idx + 5),
+          constraintType = row[Option[CharacterData]](idx + 6),
+          isDeferrable = row[Option[YesOrNo]](idx + 7),
+          initiallyDeferred = row[Option[YesOrNo]](idx + 8),
+          enforced = row[Option[YesOrNo]](idx + 9)
         )
       )
     }

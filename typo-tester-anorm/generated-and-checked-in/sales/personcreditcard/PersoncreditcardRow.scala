@@ -32,13 +32,13 @@ case class PersoncreditcardRow(
  }
 
 object PersoncreditcardRow {
-  val rowParser: RowParser[PersoncreditcardRow] =
+  def rowParser(idx: Int): RowParser[PersoncreditcardRow] =
     RowParser[PersoncreditcardRow] { row =>
       Success(
         PersoncreditcardRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          creditcardid = row[CreditcardId]("creditcardid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          creditcardid = row[CreditcardId](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

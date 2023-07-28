@@ -37,22 +37,22 @@ case class VstorewithdemographicsViewRow(
 )
 
 object VstorewithdemographicsViewRow {
-  val rowParser: RowParser[VstorewithdemographicsViewRow] =
+  def rowParser(idx: Int): RowParser[VstorewithdemographicsViewRow] =
     RowParser[VstorewithdemographicsViewRow] { row =>
       Success(
         VstorewithdemographicsViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          AnnualSales = row[Option[TypoMoney]]("AnnualSales"),
-          AnnualRevenue = row[Option[TypoMoney]]("AnnualRevenue"),
-          BankName = row[Option[/* max 50 chars */ String]]("BankName"),
-          BusinessType = row[Option[/* max 5 chars */ String]]("BusinessType"),
-          YearOpened = row[Option[Int]]("YearOpened"),
-          Specialty = row[Option[/* max 50 chars */ String]]("Specialty"),
-          SquareFeet = row[Option[Int]]("SquareFeet"),
-          Brands = row[Option[/* max 30 chars */ String]]("Brands"),
-          Internet = row[Option[/* max 30 chars */ String]]("Internet"),
-          NumberEmployees = row[Option[Int]]("NumberEmployees")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          name = row[Option[Name]](idx + 1),
+          AnnualSales = row[Option[TypoMoney]](idx + 2),
+          AnnualRevenue = row[Option[TypoMoney]](idx + 3),
+          BankName = row[Option[/* max 50 chars */ String]](idx + 4),
+          BusinessType = row[Option[/* max 5 chars */ String]](idx + 5),
+          YearOpened = row[Option[Int]](idx + 6),
+          Specialty = row[Option[/* max 50 chars */ String]](idx + 7),
+          SquareFeet = row[Option[Int]](idx + 8),
+          Brands = row[Option[/* max 30 chars */ String]](idx + 9),
+          Internet = row[Option[/* max 30 chars */ String]](idx + 10),
+          NumberEmployees = row[Option[Int]](idx + 11)
         )
       )
     }

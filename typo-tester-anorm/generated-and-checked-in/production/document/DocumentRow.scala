@@ -50,23 +50,23 @@ case class DocumentRow(
 )
 
 object DocumentRow {
-  val rowParser: RowParser[DocumentRow] =
+  def rowParser(idx: Int): RowParser[DocumentRow] =
     RowParser[DocumentRow] { row =>
       Success(
         DocumentRow(
-          title = row[/* max 50 chars */ String]("title"),
-          owner = row[BusinessentityId]("owner"),
-          folderflag = row[Flag]("folderflag"),
-          filename = row[/* max 400 chars */ String]("filename"),
-          fileextension = row[Option[/* max 8 chars */ String]]("fileextension"),
-          revision = row[/* bpchar */ String]("revision"),
-          changenumber = row[Int]("changenumber"),
-          status = row[Int]("status"),
-          documentsummary = row[Option[String]]("documentsummary"),
-          document = row[Option[Array[Byte]]]("document"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate"),
-          documentnode = row[DocumentId]("documentnode")
+          title = row[/* max 50 chars */ String](idx + 0),
+          owner = row[BusinessentityId](idx + 1),
+          folderflag = row[Flag](idx + 2),
+          filename = row[/* max 400 chars */ String](idx + 3),
+          fileextension = row[Option[/* max 8 chars */ String]](idx + 4),
+          revision = row[/* bpchar */ String](idx + 5),
+          changenumber = row[Int](idx + 6),
+          status = row[Int](idx + 7),
+          documentsummary = row[Option[String]](idx + 8),
+          document = row[Option[Array[Byte]]](idx + 9),
+          rowguid = row[UUID](idx + 10),
+          modifieddate = row[LocalDateTime](idx + 11),
+          documentnode = row[DocumentId](idx + 12)
         )
       )
     }

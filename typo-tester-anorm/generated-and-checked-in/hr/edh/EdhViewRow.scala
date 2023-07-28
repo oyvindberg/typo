@@ -38,17 +38,17 @@ case class EdhViewRow(
 )
 
 object EdhViewRow {
-  val rowParser: RowParser[EdhViewRow] =
+  def rowParser(idx: Int): RowParser[EdhViewRow] =
     RowParser[EdhViewRow] { row =>
       Success(
         EdhViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          departmentid = row[Option[DepartmentId]]("departmentid"),
-          shiftid = row[Option[ShiftId]]("shiftid"),
-          startdate = row[Option[LocalDate]]("startdate"),
-          enddate = row[Option[LocalDate]]("enddate"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          departmentid = row[Option[DepartmentId]](idx + 2),
+          shiftid = row[Option[ShiftId]](idx + 3),
+          startdate = row[Option[LocalDate]](idx + 4),
+          enddate = row[Option[LocalDate]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

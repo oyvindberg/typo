@@ -16,7 +16,7 @@ object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
   override def selectAll(implicit c: Connection): List[VstorewithaddressesViewRow] = {
     SQL"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
           from sales.vstorewithaddresses
-       """.as(VstorewithaddressesViewRow.rowParser.*)
+       """.as(VstorewithaddressesViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithaddressesViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithaddressesViewRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VstorewithaddressesViewRow.rowParser.*)
+          .as(VstorewithaddressesViewRow.rowParser(1).*)
     }
   
   }

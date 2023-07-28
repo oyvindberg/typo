@@ -16,7 +16,7 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
   override def selectAll(implicit c: Connection): List[VstorewithdemographicsViewRow] = {
     SQL"""select businessentityid, "name", AnnualSales::numeric, AnnualRevenue::numeric, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees
           from sales.vstorewithdemographics
-       """.as(VstorewithdemographicsViewRow.rowParser.*)
+       """.as(VstorewithdemographicsViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VstorewithdemographicsViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithdemographicsViewRow] = {
     fieldValues match {
@@ -45,7 +45,7 @@ object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VstorewithdemographicsViewRow.rowParser.*)
+          .as(VstorewithdemographicsViewRow.rowParser(1).*)
     }
   
   }

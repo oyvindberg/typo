@@ -40,17 +40,17 @@ case class ProductinventoryRow(
  }
 
 object ProductinventoryRow {
-  val rowParser: RowParser[ProductinventoryRow] =
+  def rowParser(idx: Int): RowParser[ProductinventoryRow] =
     RowParser[ProductinventoryRow] { row =>
       Success(
         ProductinventoryRow(
-          productid = row[ProductId]("productid"),
-          locationid = row[LocationId]("locationid"),
-          shelf = row[/* max 10 chars */ String]("shelf"),
-          bin = row[Int]("bin"),
-          quantity = row[Int]("quantity"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productid = row[ProductId](idx + 0),
+          locationid = row[LocationId](idx + 1),
+          shelf = row[/* max 10 chars */ String](idx + 2),
+          bin = row[Int](idx + 3),
+          quantity = row[Int](idx + 4),
+          rowguid = row[UUID](idx + 5),
+          modifieddate = row[LocalDateTime](idx + 6)
         )
       )
     }

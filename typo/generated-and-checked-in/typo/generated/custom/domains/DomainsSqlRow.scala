@@ -46,18 +46,18 @@ case class DomainsSqlRow(
 )
 
 object DomainsSqlRow {
-  val rowParser: RowParser[DomainsSqlRow] =
+  def rowParser(idx: Int): RowParser[DomainsSqlRow] =
     RowParser[DomainsSqlRow] { row =>
       Success(
         DomainsSqlRow(
-          schema = row[String]("schema"),
-          name = row[String]("name"),
-          `type` = row[String]("type"),
-          collation = row[Option[String]]("collation"),
-          isNotNull = row[Boolean]("isNotNull"),
-          default = row[Option[String]]("default"),
-          constraintName = row[Option[String]]("constraintName"),
-          constraintDefinition = row[/* nullability unknown */ Option[String]]("constraintDefinition")
+          schema = row[String](idx + 0),
+          name = row[String](idx + 1),
+          `type` = row[String](idx + 2),
+          collation = row[Option[String]](idx + 3),
+          isNotNull = row[Boolean](idx + 4),
+          default = row[Option[String]](idx + 5),
+          constraintName = row[Option[String]](idx + 6),
+          constraintDefinition = row[/* nullability unknown */ Option[String]](idx + 7)
         )
       )
     }

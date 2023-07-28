@@ -16,7 +16,7 @@ object PViewRepoImpl extends PViewRepo {
   override def selectAll(implicit c: Connection): List[PViewRow] = {
     SQL"""select "id", productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from pr."p"
-       """.as(PViewRow.rowParser.*)
+       """.as(PViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]])(implicit c: Connection): List[PViewRow] = {
     fieldValues match {
@@ -59,7 +59,7 @@ object PViewRepoImpl extends PViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PViewRow.rowParser.*)
+          .as(PViewRow.rowParser(1).*)
     }
   
   }

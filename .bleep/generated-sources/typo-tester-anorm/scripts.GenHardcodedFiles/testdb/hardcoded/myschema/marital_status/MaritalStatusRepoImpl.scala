@@ -24,13 +24,13 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           values (${unsaved.id}::int8)
           returning "id"
        """
-      .executeInsert(MaritalStatusRow.rowParser.single)
+      .executeInsert(MaritalStatusRow.rowParser(1).single)
   
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"
           from myschema.marital_status
-       """.as(MaritalStatusRow.rowParser.*)
+       """.as(MaritalStatusRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
     fieldValues match {
@@ -48,7 +48,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(MaritalStatusRow.rowParser.*)
+          .as(MaritalStatusRow.rowParser(1).*)
     }
   
   }
@@ -56,7 +56,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     SQL"""select "id"
           from myschema.marital_status
           where "id" = $id
-       """.as(MaritalStatusRow.rowParser.singleOpt)
+       """.as(MaritalStatusRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     implicit val toStatement: ToStatement[Array[MaritalStatusId]] =
@@ -66,7 +66,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     SQL"""select "id"
           from myschema.marital_status
           where "id" = ANY($ids)
-       """.as(MaritalStatusRow.rowParser.*)
+       """.as(MaritalStatusRow.rowParser(1).*)
   
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
@@ -79,7 +79,7 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
             
           returning "id"
        """
-      .executeInsert(MaritalStatusRow.rowParser.single)
+      .executeInsert(MaritalStatusRow.rowParser(1).single)
   
   }
 }

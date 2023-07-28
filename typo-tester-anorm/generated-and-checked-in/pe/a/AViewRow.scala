@@ -43,20 +43,20 @@ case class AViewRow(
 )
 
 object AViewRow {
-  val rowParser: RowParser[AViewRow] =
+  def rowParser(idx: Int): RowParser[AViewRow] =
     RowParser[AViewRow] { row =>
       Success(
         AViewRow(
-          id = row[Option[Int]]("id"),
-          addressid = row[Option[AddressId]]("addressid"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          spatiallocation = row[Option[Byte]]("spatiallocation"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          addressid = row[Option[AddressId]](idx + 1),
+          addressline1 = row[Option[/* max 60 chars */ String]](idx + 2),
+          addressline2 = row[Option[/* max 60 chars */ String]](idx + 3),
+          city = row[Option[/* max 30 chars */ String]](idx + 4),
+          stateprovinceid = row[Option[StateprovinceId]](idx + 5),
+          postalcode = row[Option[/* max 15 chars */ String]](idx + 6),
+          spatiallocation = row[Option[Byte]](idx + 7),
+          rowguid = row[Option[UUID]](idx + 8),
+          modifieddate = row[Option[LocalDateTime]](idx + 9)
         )
       )
     }

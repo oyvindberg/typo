@@ -16,7 +16,7 @@ object DViewRepoImpl extends DViewRepo {
   override def selectAll(implicit c: Connection): List[DViewRow] = {
     SQL"""select "id", departmentid, "name", groupname, modifieddate
           from hr.d
-       """.as(DViewRow.rowParser.*)
+       """.as(DViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[DViewFieldOrIdValue[_]])(implicit c: Connection): List[DViewRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object DViewRepoImpl extends DViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(DViewRow.rowParser.*)
+          .as(DViewRow.rowParser(1).*)
     }
   
   }

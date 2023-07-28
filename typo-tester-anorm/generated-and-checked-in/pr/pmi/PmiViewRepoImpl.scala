@@ -16,7 +16,7 @@ object PmiViewRepoImpl extends PmiViewRepo {
   override def selectAll(implicit c: Connection): List[PmiViewRow] = {
     SQL"""select productmodelid, illustrationid, modifieddate
           from pr.pmi
-       """.as(PmiViewRow.rowParser.*)
+       """.as(PmiViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PmiViewFieldOrIdValue[_]])(implicit c: Connection): List[PmiViewRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object PmiViewRepoImpl extends PmiViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PmiViewRow.rowParser.*)
+          .as(PmiViewRow.rowParser(1).*)
     }
   
   }

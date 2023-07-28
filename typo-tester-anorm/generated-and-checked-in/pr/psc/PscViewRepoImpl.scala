@@ -16,7 +16,7 @@ object PscViewRepoImpl extends PscViewRepo {
   override def selectAll(implicit c: Connection): List[PscViewRow] = {
     SQL"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
           from pr.psc
-       """.as(PscViewRow.rowParser.*)
+       """.as(PscViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PscViewFieldOrIdValue[_]])(implicit c: Connection): List[PscViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PscViewRepoImpl extends PscViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PscViewRow.rowParser.*)
+          .as(PscViewRow.rowParser(1).*)
     }
   
   }

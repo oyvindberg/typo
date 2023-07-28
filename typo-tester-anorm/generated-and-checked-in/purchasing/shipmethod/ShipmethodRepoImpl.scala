@@ -26,7 +26,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
        """
-      .executeInsert(ShipmethodRow.rowParser.single)
+      .executeInsert(ShipmethodRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
@@ -58,7 +58,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       SQL"""insert into purchasing.shipmethod default values
             returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
          """
-        .executeInsert(ShipmethodRow.rowParser.single)
+        .executeInsert(ShipmethodRow.rowParser(1).single)
     } else {
       val q = s"""insert into purchasing.shipmethod(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -68,14 +68,14 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ShipmethodRow.rowParser.single)
+        .executeInsert(ShipmethodRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
-       """.as(ShipmethodRow.rowParser.*)
+       """.as(ShipmethodRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow] = {
     fieldValues match {
@@ -98,7 +98,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ShipmethodRow.rowParser.*)
+          .as(ShipmethodRow.rowParser(1).*)
     }
   
   }
@@ -106,7 +106,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
           where shipmethodid = $shipmethodid
-       """.as(ShipmethodRow.rowParser.singleOpt)
+       """.as(ShipmethodRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow] = {
     implicit val toStatement: ToStatement[Array[ShipmethodId]] =
@@ -116,7 +116,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
           where shipmethodid = ANY($shipmethodids)
-       """.as(ShipmethodRow.rowParser.*)
+       """.as(ShipmethodRow.rowParser(1).*)
   
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
@@ -174,7 +174,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             modifieddate = EXCLUDED.modifieddate
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
        """
-      .executeInsert(ShipmethodRow.rowParser.single)
+      .executeInsert(ShipmethodRow.rowParser(1).single)
   
   }
 }

@@ -25,7 +25,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           values (${unsaved.jobcandidateid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.resume}::xml, ${unsaved.modifieddate}::timestamp)
           returning jobcandidateid, businessentityid, resume, modifieddate
        """
-      .executeInsert(JobcandidateRow.rowParser.single)
+      .executeInsert(JobcandidateRow.rowParser(1).single)
   
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
@@ -46,7 +46,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       SQL"""insert into humanresources.jobcandidate default values
             returning jobcandidateid, businessentityid, resume, modifieddate
          """
-        .executeInsert(JobcandidateRow.rowParser.single)
+        .executeInsert(JobcandidateRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.jobcandidate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -56,14 +56,14 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(JobcandidateRow.rowParser.single)
+        .executeInsert(JobcandidateRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate
           from humanresources.jobcandidate
-       """.as(JobcandidateRow.rowParser.*)
+       """.as(JobcandidateRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]])(implicit c: Connection): List[JobcandidateRow] = {
     fieldValues match {
@@ -84,7 +84,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(JobcandidateRow.rowParser.*)
+          .as(JobcandidateRow.rowParser(1).*)
     }
   
   }
@@ -92,7 +92,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate
           from humanresources.jobcandidate
           where jobcandidateid = $jobcandidateid
-       """.as(JobcandidateRow.rowParser.singleOpt)
+       """.as(JobcandidateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
     implicit val toStatement: ToStatement[Array[JobcandidateId]] =
@@ -102,7 +102,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate
           from humanresources.jobcandidate
           where jobcandidateid = ANY($jobcandidateids)
-       """.as(JobcandidateRow.rowParser.*)
+       """.as(JobcandidateRow.rowParser(1).*)
   
   }
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
@@ -152,7 +152,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
             modifieddate = EXCLUDED.modifieddate
           returning jobcandidateid, businessentityid, resume, modifieddate
        """
-      .executeInsert(JobcandidateRow.rowParser.single)
+      .executeInsert(JobcandidateRow.rowParser(1).single)
   
   }
 }

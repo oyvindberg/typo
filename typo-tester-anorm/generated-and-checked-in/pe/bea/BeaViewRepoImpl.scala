@@ -16,7 +16,7 @@ object BeaViewRepoImpl extends BeaViewRepo {
   override def selectAll(implicit c: Connection): List[BeaViewRow] = {
     SQL"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate
           from pe.bea
-       """.as(BeaViewRow.rowParser.*)
+       """.as(BeaViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[BeaViewFieldOrIdValue[_]])(implicit c: Connection): List[BeaViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object BeaViewRepoImpl extends BeaViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BeaViewRow.rowParser.*)
+          .as(BeaViewRow.rowParser(1).*)
     }
   
   }

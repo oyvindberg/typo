@@ -39,18 +39,18 @@ case class PiViewRow(
 )
 
 object PiViewRow {
-  val rowParser: RowParser[PiViewRow] =
+  def rowParser(idx: Int): RowParser[PiViewRow] =
     RowParser[PiViewRow] { row =>
       Success(
         PiViewRow(
-          id = row[Option[Int]]("id"),
-          productid = row[Option[ProductId]]("productid"),
-          locationid = row[Option[LocationId]]("locationid"),
-          shelf = row[Option[/* max 10 chars */ String]]("shelf"),
-          bin = row[Option[Int]]("bin"),
-          quantity = row[Option[Int]]("quantity"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productid = row[Option[ProductId]](idx + 1),
+          locationid = row[Option[LocationId]](idx + 2),
+          shelf = row[Option[/* max 10 chars */ String]](idx + 3),
+          bin = row[Option[Int]](idx + 4),
+          quantity = row[Option[Int]](idx + 5),
+          rowguid = row[Option[UUID]](idx + 6),
+          modifieddate = row[Option[LocalDateTime]](idx + 7)
         )
       )
     }

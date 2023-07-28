@@ -37,17 +37,17 @@ case class SmViewRow(
 )
 
 object SmViewRow {
-  val rowParser: RowParser[SmViewRow] =
+  def rowParser(idx: Int): RowParser[SmViewRow] =
     RowParser[SmViewRow] { row =>
       Success(
         SmViewRow(
-          id = row[Option[Int]]("id"),
-          shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
-          name = row[Option[Name]]("name"),
-          shipbase = row[Option[BigDecimal]]("shipbase"),
-          shiprate = row[Option[BigDecimal]]("shiprate"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          shipmethodid = row[Option[ShipmethodId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          shipbase = row[Option[BigDecimal]](idx + 3),
+          shiprate = row[Option[BigDecimal]](idx + 4),
+          rowguid = row[Option[UUID]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

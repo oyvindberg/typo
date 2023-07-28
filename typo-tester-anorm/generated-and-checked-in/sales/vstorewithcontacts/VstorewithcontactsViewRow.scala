@@ -45,22 +45,22 @@ case class VstorewithcontactsViewRow(
 )
 
 object VstorewithcontactsViewRow {
-  val rowParser: RowParser[VstorewithcontactsViewRow] =
+  def rowParser(idx: Int): RowParser[VstorewithcontactsViewRow] =
     RowParser[VstorewithcontactsViewRow] { row =>
       Success(
         VstorewithcontactsViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          contacttype = row[Option[Name]]("contacttype"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          phonenumber = row[Option[Phone]]("phonenumber"),
-          phonenumbertype = row[Option[Name]]("phonenumbertype"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          emailpromotion = row[Option[Int]]("emailpromotion")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          name = row[Option[Name]](idx + 1),
+          contacttype = row[Option[Name]](idx + 2),
+          title = row[Option[/* max 8 chars */ String]](idx + 3),
+          firstname = row[Option[Name]](idx + 4),
+          middlename = row[Option[Name]](idx + 5),
+          lastname = row[Option[Name]](idx + 6),
+          suffix = row[Option[/* max 10 chars */ String]](idx + 7),
+          phonenumber = row[Option[Phone]](idx + 8),
+          phonenumbertype = row[Option[Name]](idx + 9),
+          emailaddress = row[Option[/* max 50 chars */ String]](idx + 10),
+          emailpromotion = row[Option[Int]](idx + 11)
         )
       )
     }

@@ -26,7 +26,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
        """
-      .executeInsert(SalestaxrateRow.rowParser.single)
+      .executeInsert(SalestaxrateRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
@@ -56,7 +56,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       SQL"""insert into sales.salestaxrate default values
             returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
          """
-        .executeInsert(SalestaxrateRow.rowParser.single)
+        .executeInsert(SalestaxrateRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salestaxrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -66,14 +66,14 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SalestaxrateRow.rowParser.single)
+        .executeInsert(SalestaxrateRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
-       """.as(SalestaxrateRow.rowParser.*)
+       """.as(SalestaxrateRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow] = {
     fieldValues match {
@@ -97,7 +97,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalestaxrateRow.rowParser.*)
+          .as(SalestaxrateRow.rowParser(1).*)
     }
   
   }
@@ -105,7 +105,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
           where salestaxrateid = $salestaxrateid
-       """.as(SalestaxrateRow.rowParser.singleOpt)
+       """.as(SalestaxrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     implicit val toStatement: ToStatement[Array[SalestaxrateId]] =
@@ -115,7 +115,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
           where salestaxrateid = ANY($salestaxrateids)
-       """.as(SalestaxrateRow.rowParser.*)
+       """.as(SalestaxrateRow.rowParser(1).*)
   
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
@@ -177,7 +177,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             modifieddate = EXCLUDED.modifieddate
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
        """
-      .executeInsert(SalestaxrateRow.rowParser.single)
+      .executeInsert(SalestaxrateRow.rowParser(1).single)
   
   }
 }

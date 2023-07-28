@@ -34,15 +34,15 @@ case class EmailaddressRow(
  }
 
 object EmailaddressRow {
-  val rowParser: RowParser[EmailaddressRow] =
+  def rowParser(idx: Int): RowParser[EmailaddressRow] =
     RowParser[EmailaddressRow] { row =>
       Success(
         EmailaddressRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          emailaddressid = row[Int]("emailaddressid"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          emailaddressid = row[Int](idx + 1),
+          emailaddress = row[Option[/* max 50 chars */ String]](idx + 2),
+          rowguid = row[UUID](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

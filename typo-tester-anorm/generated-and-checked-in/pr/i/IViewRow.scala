@@ -30,14 +30,14 @@ case class IViewRow(
 )
 
 object IViewRow {
-  val rowParser: RowParser[IViewRow] =
+  def rowParser(idx: Int): RowParser[IViewRow] =
     RowParser[IViewRow] { row =>
       Success(
         IViewRow(
-          id = row[Option[Int]]("id"),
-          illustrationid = row[Option[IllustrationId]]("illustrationid"),
-          diagram = row[Option[TypoXml]]("diagram"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          illustrationid = row[Option[IllustrationId]](idx + 1),
+          diagram = row[Option[TypoXml]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

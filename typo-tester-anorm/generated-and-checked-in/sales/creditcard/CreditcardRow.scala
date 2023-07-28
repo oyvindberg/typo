@@ -32,16 +32,16 @@ case class CreditcardRow(
 )
 
 object CreditcardRow {
-  val rowParser: RowParser[CreditcardRow] =
+  def rowParser(idx: Int): RowParser[CreditcardRow] =
     RowParser[CreditcardRow] { row =>
       Success(
         CreditcardRow(
-          creditcardid = row[CreditcardId]("creditcardid"),
-          cardtype = row[/* max 50 chars */ String]("cardtype"),
-          cardnumber = row[/* max 25 chars */ String]("cardnumber"),
-          expmonth = row[Int]("expmonth"),
-          expyear = row[Int]("expyear"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          creditcardid = row[CreditcardId](idx + 0),
+          cardtype = row[/* max 50 chars */ String](idx + 1),
+          cardnumber = row[/* max 25 chars */ String](idx + 2),
+          expmonth = row[Int](idx + 3),
+          expyear = row[Int](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

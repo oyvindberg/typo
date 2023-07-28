@@ -32,15 +32,15 @@ case class DViewRow(
 )
 
 object DViewRow {
-  val rowParser: RowParser[DViewRow] =
+  def rowParser(idx: Int): RowParser[DViewRow] =
     RowParser[DViewRow] { row =>
       Success(
         DViewRow(
-          id = row[Option[Int]]("id"),
-          departmentid = row[Option[DepartmentId]]("departmentid"),
-          name = row[Option[Name]]("name"),
-          groupname = row[Option[Name]]("groupname"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          departmentid = row[Option[DepartmentId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          groupname = row[Option[Name]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

@@ -54,25 +54,25 @@ case class EmployeeRow(
 )
 
 object EmployeeRow {
-  val rowParser: RowParser[EmployeeRow] =
+  def rowParser(idx: Int): RowParser[EmployeeRow] =
     RowParser[EmployeeRow] { row =>
       Success(
         EmployeeRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          nationalidnumber = row[/* max 15 chars */ String]("nationalidnumber"),
-          loginid = row[/* max 256 chars */ String]("loginid"),
-          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
-          birthdate = row[LocalDate]("birthdate"),
-          maritalstatus = row[/* bpchar */ String]("maritalstatus"),
-          gender = row[/* bpchar */ String]("gender"),
-          hiredate = row[LocalDate]("hiredate"),
-          salariedflag = row[Flag]("salariedflag"),
-          vacationhours = row[Int]("vacationhours"),
-          sickleavehours = row[Int]("sickleavehours"),
-          currentflag = row[Flag]("currentflag"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate"),
-          organizationnode = row[Option[String]]("organizationnode")
+          businessentityid = row[BusinessentityId](idx + 0),
+          nationalidnumber = row[/* max 15 chars */ String](idx + 1),
+          loginid = row[/* max 256 chars */ String](idx + 2),
+          jobtitle = row[/* max 50 chars */ String](idx + 3),
+          birthdate = row[LocalDate](idx + 4),
+          maritalstatus = row[/* bpchar */ String](idx + 5),
+          gender = row[/* bpchar */ String](idx + 6),
+          hiredate = row[LocalDate](idx + 7),
+          salariedflag = row[Flag](idx + 8),
+          vacationhours = row[Int](idx + 9),
+          sickleavehours = row[Int](idx + 10),
+          currentflag = row[Flag](idx + 11),
+          rowguid = row[UUID](idx + 12),
+          modifieddate = row[LocalDateTime](idx + 13),
+          organizationnode = row[Option[String]](idx + 14)
         )
       )
     }

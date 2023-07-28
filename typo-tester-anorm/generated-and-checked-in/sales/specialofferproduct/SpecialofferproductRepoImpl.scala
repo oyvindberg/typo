@@ -24,7 +24,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           values (${unsaved.specialofferid}::int4, ${unsaved.productid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning specialofferid, productid, rowguid, modifieddate
        """
-      .executeInsert(SpecialofferproductRow.rowParser.single)
+      .executeInsert(SpecialofferproductRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow = {
@@ -45,7 +45,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
       SQL"""insert into sales.specialofferproduct default values
             returning specialofferid, productid, rowguid, modifieddate
          """
-        .executeInsert(SpecialofferproductRow.rowParser.single)
+        .executeInsert(SpecialofferproductRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.specialofferproduct(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -55,14 +55,14 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SpecialofferproductRow.rowParser.single)
+        .executeInsert(SpecialofferproductRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
     SQL"""select specialofferid, productid, rowguid, modifieddate
           from sales.specialofferproduct
-       """.as(SpecialofferproductRow.rowParser.*)
+       """.as(SpecialofferproductRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SpecialofferproductFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferproductRow] = {
     fieldValues match {
@@ -83,7 +83,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SpecialofferproductRow.rowParser.*)
+          .as(SpecialofferproductRow.rowParser(1).*)
     }
   
   }
@@ -91,7 +91,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     SQL"""select specialofferid, productid, rowguid, modifieddate
           from sales.specialofferproduct
           where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
-       """.as(SpecialofferproductRow.rowParser.singleOpt)
+       """.as(SpecialofferproductRow.rowParser(1).singleOpt)
   }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -137,7 +137,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             modifieddate = EXCLUDED.modifieddate
           returning specialofferid, productid, rowguid, modifieddate
        """
-      .executeInsert(SpecialofferproductRow.rowParser.single)
+      .executeInsert(SpecialofferproductRow.rowParser(1).single)
   
   }
 }

@@ -16,7 +16,7 @@ object CuViewRepoImpl extends CuViewRepo {
   override def selectAll(implicit c: Connection): List[CuViewRow] = {
     SQL"""select "id", currencycode, "name", modifieddate
           from sa.cu
-       """.as(CuViewRow.rowParser.*)
+       """.as(CuViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CuViewFieldOrIdValue[_]])(implicit c: Connection): List[CuViewRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object CuViewRepoImpl extends CuViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CuViewRow.rowParser.*)
+          .as(CuViewRow.rowParser(1).*)
     }
   
   }

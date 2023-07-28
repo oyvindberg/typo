@@ -32,13 +32,13 @@ case class ProductdocumentRow(
  }
 
 object ProductdocumentRow {
-  val rowParser: RowParser[ProductdocumentRow] =
+  def rowParser(idx: Int): RowParser[ProductdocumentRow] =
     RowParser[ProductdocumentRow] { row =>
       Success(
         ProductdocumentRow(
-          productid = row[ProductId]("productid"),
-          modifieddate = row[LocalDateTime]("modifieddate"),
-          documentnode = row[DocumentId]("documentnode")
+          productid = row[ProductId](idx + 0),
+          modifieddate = row[LocalDateTime](idx + 1),
+          documentnode = row[DocumentId](idx + 2)
         )
       )
     }

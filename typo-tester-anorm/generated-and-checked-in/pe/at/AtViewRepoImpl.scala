@@ -16,7 +16,7 @@ object AtViewRepoImpl extends AtViewRepo {
   override def selectAll(implicit c: Connection): List[AtViewRow] = {
     SQL"""select "id", addresstypeid, "name", rowguid, modifieddate
           from pe."at"
-       """.as(AtViewRow.rowParser.*)
+       """.as(AtViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[AtViewFieldOrIdValue[_]])(implicit c: Connection): List[AtViewRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object AtViewRepoImpl extends AtViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(AtViewRow.rowParser.*)
+          .as(AtViewRow.rowParser(1).*)
     }
   
   }

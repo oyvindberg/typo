@@ -16,7 +16,7 @@ object CcViewRepoImpl extends CcViewRepo {
   override def selectAll(implicit c: Connection): List[CcViewRow] = {
     SQL"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
           from sa.cc
-       """.as(CcViewRow.rowParser.*)
+       """.as(CcViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CcViewFieldOrIdValue[_]])(implicit c: Connection): List[CcViewRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object CcViewRepoImpl extends CcViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CcViewRow.rowParser.*)
+          .as(CcViewRow.rowParser(1).*)
     }
   
   }

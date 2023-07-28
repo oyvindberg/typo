@@ -27,7 +27,7 @@ object ProductRepoImpl extends ProductRepo {
           values (${unsaved.productid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.productnumber}, ${unsaved.makeflag}::"public"."Flag", ${unsaved.finishedgoodsflag}::"public"."Flag", ${unsaved.color}, ${unsaved.safetystocklevel}::int2, ${unsaved.reorderpoint}::int2, ${unsaved.standardcost}::numeric, ${unsaved.listprice}::numeric, ${unsaved.size}, ${unsaved.sizeunitmeasurecode}::bpchar, ${unsaved.weightunitmeasurecode}::bpchar, ${unsaved.weight}::numeric, ${unsaved.daystomanufacture}::int4, ${unsaved.productline}::bpchar, ${unsaved.`class`}::bpchar, ${unsaved.style}::bpchar, ${unsaved.productsubcategoryid}::int4, ${unsaved.productmodelid}::int4, ${unsaved.sellstartdate}::timestamp, ${unsaved.sellenddate}::timestamp, ${unsaved.discontinueddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
        """
-      .executeInsert(ProductRow.rowParser.single)
+      .executeInsert(ProductRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow = {
@@ -78,7 +78,7 @@ object ProductRepoImpl extends ProductRepo {
       SQL"""insert into production.product default values
             returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
          """
-        .executeInsert(ProductRow.rowParser.single)
+        .executeInsert(ProductRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.product(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -88,14 +88,14 @@ object ProductRepoImpl extends ProductRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ProductRow.rowParser.single)
+        .executeInsert(ProductRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductRow] = {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from production.product
-       """.as(ProductRow.rowParser.*)
+       """.as(ProductRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ProductFieldOrIdValue[_]])(implicit c: Connection): List[ProductRow] = {
     fieldValues match {
@@ -137,7 +137,7 @@ object ProductRepoImpl extends ProductRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductRow.rowParser.*)
+          .as(ProductRow.rowParser(1).*)
     }
   
   }
@@ -145,7 +145,7 @@ object ProductRepoImpl extends ProductRepo {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from production.product
           where productid = $productid
-       """.as(ProductRow.rowParser.singleOpt)
+       """.as(ProductRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productids: Array[ProductId])(implicit c: Connection): List[ProductRow] = {
     implicit val toStatement: ToStatement[Array[ProductId]] =
@@ -155,7 +155,7 @@ object ProductRepoImpl extends ProductRepo {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from production.product
           where productid = ANY($productids)
-       """.as(ProductRow.rowParser.*)
+       """.as(ProductRow.rowParser(1).*)
   
   }
   override def update(row: ProductRow)(implicit c: Connection): Boolean = {
@@ -289,7 +289,7 @@ object ProductRepoImpl extends ProductRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
        """
-      .executeInsert(ProductRow.rowParser.single)
+      .executeInsert(ProductRow.rowParser(1).single)
   
   }
 }

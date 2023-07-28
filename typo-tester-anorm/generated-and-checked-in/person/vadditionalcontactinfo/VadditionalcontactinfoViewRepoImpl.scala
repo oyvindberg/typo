@@ -16,7 +16,7 @@ object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoViewRow] = {
     SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate
           from person.vadditionalcontactinfo
-       """.as(VadditionalcontactinfoViewRow.rowParser.*)
+       """.as(VadditionalcontactinfoViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VadditionalcontactinfoViewFieldOrIdValue[_]])(implicit c: Connection): List[VadditionalcontactinfoViewRow] = {
     fieldValues match {
@@ -50,7 +50,7 @@ object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VadditionalcontactinfoViewRow.rowParser.*)
+          .as(VadditionalcontactinfoViewRow.rowParser(1).*)
     }
   
   }

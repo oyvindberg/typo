@@ -40,19 +40,19 @@ case class AddressRow(
 )
 
 object AddressRow {
-  val rowParser: RowParser[AddressRow] =
+  def rowParser(idx: Int): RowParser[AddressRow] =
     RowParser[AddressRow] { row =>
       Success(
         AddressRow(
-          addressid = row[AddressId]("addressid"),
-          addressline1 = row[/* max 60 chars */ String]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[/* max 30 chars */ String]("city"),
-          stateprovinceid = row[StateprovinceId]("stateprovinceid"),
-          postalcode = row[/* max 15 chars */ String]("postalcode"),
-          spatiallocation = row[Option[Array[Byte]]]("spatiallocation"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          addressid = row[AddressId](idx + 0),
+          addressline1 = row[/* max 60 chars */ String](idx + 1),
+          addressline2 = row[Option[/* max 60 chars */ String]](idx + 2),
+          city = row[/* max 30 chars */ String](idx + 3),
+          stateprovinceid = row[StateprovinceId](idx + 4),
+          postalcode = row[/* max 15 chars */ String](idx + 5),
+          spatiallocation = row[Option[Array[Byte]]](idx + 6),
+          rowguid = row[UUID](idx + 7),
+          modifieddate = row[LocalDateTime](idx + 8)
         )
       )
     }

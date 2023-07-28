@@ -33,16 +33,16 @@ case class ShipmethodRow(
 )
 
 object ShipmethodRow {
-  val rowParser: RowParser[ShipmethodRow] =
+  def rowParser(idx: Int): RowParser[ShipmethodRow] =
     RowParser[ShipmethodRow] { row =>
       Success(
         ShipmethodRow(
-          shipmethodid = row[ShipmethodId]("shipmethodid"),
-          name = row[Name]("name"),
-          shipbase = row[BigDecimal]("shipbase"),
-          shiprate = row[BigDecimal]("shiprate"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          shipmethodid = row[ShipmethodId](idx + 0),
+          name = row[Name](idx + 1),
+          shipbase = row[BigDecimal](idx + 2),
+          shiprate = row[BigDecimal](idx + 3),
+          rowguid = row[UUID](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

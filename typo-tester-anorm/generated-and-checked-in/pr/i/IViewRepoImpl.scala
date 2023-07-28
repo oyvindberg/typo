@@ -16,7 +16,7 @@ object IViewRepoImpl extends IViewRepo {
   override def selectAll(implicit c: Connection): List[IViewRow] = {
     SQL"""select "id", illustrationid, diagram, modifieddate
           from pr.i
-       """.as(IViewRow.rowParser.*)
+       """.as(IViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[IViewFieldOrIdValue[_]])(implicit c: Connection): List[IViewRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object IViewRepoImpl extends IViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(IViewRow.rowParser.*)
+          .as(IViewRow.rowParser(1).*)
     }
   
   }

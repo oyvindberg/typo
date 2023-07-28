@@ -27,13 +27,13 @@ case class CultureRow(
 )
 
 object CultureRow {
-  val rowParser: RowParser[CultureRow] =
+  def rowParser(idx: Int): RowParser[CultureRow] =
     RowParser[CultureRow] { row =>
       Success(
         CultureRow(
-          cultureid = row[CultureId]("cultureid"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          cultureid = row[CultureId](idx + 0),
+          name = row[Name](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

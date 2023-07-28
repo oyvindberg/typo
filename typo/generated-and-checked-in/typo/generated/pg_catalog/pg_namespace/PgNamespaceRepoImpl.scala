@@ -26,13 +26,13 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           values (${unsaved.oid}::oid, ${unsaved.nspname}::name, ${unsaved.nspowner}::oid, ${unsaved.nspacl}::_aclitem)
           returning oid, nspname, nspowner, nspacl
        """
-      .executeInsert(PgNamespaceRow.rowParser.single)
+      .executeInsert(PgNamespaceRow.rowParser(1).single)
   
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
-       """.as(PgNamespaceRow.rowParser.*)
+       """.as(PgNamespaceRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
     fieldValues match {
@@ -53,7 +53,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PgNamespaceRow.rowParser.*)
+          .as(PgNamespaceRow.rowParser(1).*)
     }
   
   }
@@ -61,7 +61,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
           where oid = $oid
-       """.as(PgNamespaceRow.rowParser.singleOpt)
+       """.as(PgNamespaceRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
     implicit val toStatement: ToStatement[Array[PgNamespaceId]] =
@@ -71,7 +71,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
           where oid = ANY($oids)
-       """.as(PgNamespaceRow.rowParser.*)
+       """.as(PgNamespaceRow.rowParser(1).*)
   
   }
   override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
@@ -124,7 +124,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
             nspacl = EXCLUDED.nspacl
           returning oid, nspname, nspowner, nspacl
        """
-      .executeInsert(PgNamespaceRow.rowParser.single)
+      .executeInsert(PgNamespaceRow.rowParser(1).single)
   
   }
 }

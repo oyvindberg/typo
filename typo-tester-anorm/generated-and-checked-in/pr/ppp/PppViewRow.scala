@@ -32,14 +32,14 @@ case class PppViewRow(
 )
 
 object PppViewRow {
-  val rowParser: RowParser[PppViewRow] =
+  def rowParser(idx: Int): RowParser[PppViewRow] =
     RowParser[PppViewRow] { row =>
       Success(
         PppViewRow(
-          productid = row[Option[ProductId]]("productid"),
-          productphotoid = row[Option[ProductphotoId]]("productphotoid"),
-          primary = row[Flag]("primary"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          productid = row[Option[ProductId]](idx + 0),
+          productphotoid = row[Option[ProductphotoId]](idx + 1),
+          primary = row[Flag](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

@@ -36,17 +36,17 @@ case class SciViewRow(
 )
 
 object SciViewRow {
-  val rowParser: RowParser[SciViewRow] =
+  def rowParser(idx: Int): RowParser[SciViewRow] =
     RowParser[SciViewRow] { row =>
       Success(
         SciViewRow(
-          id = row[Option[Int]]("id"),
-          shoppingcartitemid = row[Option[ShoppingcartitemId]]("shoppingcartitemid"),
-          shoppingcartid = row[Option[/* max 50 chars */ String]]("shoppingcartid"),
-          quantity = row[Option[Int]]("quantity"),
-          productid = row[Option[ProductId]]("productid"),
-          datecreated = row[Option[LocalDateTime]]("datecreated"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          shoppingcartitemid = row[Option[ShoppingcartitemId]](idx + 1),
+          shoppingcartid = row[Option[/* max 50 chars */ String]](idx + 2),
+          quantity = row[Option[Int]](idx + 3),
+          productid = row[Option[ProductId]](idx + 4),
+          datecreated = row[Option[LocalDateTime]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

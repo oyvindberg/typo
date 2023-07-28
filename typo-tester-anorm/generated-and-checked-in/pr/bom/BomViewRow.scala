@@ -43,20 +43,20 @@ case class BomViewRow(
 )
 
 object BomViewRow {
-  val rowParser: RowParser[BomViewRow] =
+  def rowParser(idx: Int): RowParser[BomViewRow] =
     RowParser[BomViewRow] { row =>
       Success(
         BomViewRow(
-          id = row[Option[Int]]("id"),
-          billofmaterialsid = row[Option[BillofmaterialsId]]("billofmaterialsid"),
-          productassemblyid = row[Option[ProductId]]("productassemblyid"),
-          componentid = row[Option[ProductId]]("componentid"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          unitmeasurecode = row[Option[UnitmeasureId]]("unitmeasurecode"),
-          bomlevel = row[Option[Int]]("bomlevel"),
-          perassemblyqty = row[Option[BigDecimal]]("perassemblyqty"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          billofmaterialsid = row[Option[BillofmaterialsId]](idx + 1),
+          productassemblyid = row[Option[ProductId]](idx + 2),
+          componentid = row[Option[ProductId]](idx + 3),
+          startdate = row[Option[LocalDateTime]](idx + 4),
+          enddate = row[Option[LocalDateTime]](idx + 5),
+          unitmeasurecode = row[Option[UnitmeasureId]](idx + 6),
+          bomlevel = row[Option[Int]](idx + 7),
+          perassemblyqty = row[Option[BigDecimal]](idx + 8),
+          modifieddate = row[Option[LocalDateTime]](idx + 9)
         )
       )
     }

@@ -43,19 +43,19 @@ case class ReferentialConstraintsViewRow(
 )
 
 object ReferentialConstraintsViewRow {
-  val rowParser: RowParser[ReferentialConstraintsViewRow] =
+  def rowParser(idx: Int): RowParser[ReferentialConstraintsViewRow] =
     RowParser[ReferentialConstraintsViewRow] { row =>
       Success(
         ReferentialConstraintsViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]]("constraint_catalog"),
-          constraintSchema = row[Option[SqlIdentifier]]("constraint_schema"),
-          constraintName = row[Option[SqlIdentifier]]("constraint_name"),
-          uniqueConstraintCatalog = row[Option[SqlIdentifier]]("unique_constraint_catalog"),
-          uniqueConstraintSchema = row[Option[SqlIdentifier]]("unique_constraint_schema"),
-          uniqueConstraintName = row[Option[SqlIdentifier]]("unique_constraint_name"),
-          matchOption = row[Option[CharacterData]]("match_option"),
-          updateRule = row[Option[CharacterData]]("update_rule"),
-          deleteRule = row[Option[CharacterData]]("delete_rule")
+          constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
+          constraintSchema = row[Option[SqlIdentifier]](idx + 1),
+          constraintName = row[Option[SqlIdentifier]](idx + 2),
+          uniqueConstraintCatalog = row[Option[SqlIdentifier]](idx + 3),
+          uniqueConstraintSchema = row[Option[SqlIdentifier]](idx + 4),
+          uniqueConstraintName = row[Option[SqlIdentifier]](idx + 5),
+          matchOption = row[Option[CharacterData]](idx + 6),
+          updateRule = row[Option[CharacterData]](idx + 7),
+          deleteRule = row[Option[CharacterData]](idx + 8)
         )
       )
     }

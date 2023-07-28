@@ -33,15 +33,15 @@ case class SopViewRow(
 )
 
 object SopViewRow {
-  val rowParser: RowParser[SopViewRow] =
+  def rowParser(idx: Int): RowParser[SopViewRow] =
     RowParser[SopViewRow] { row =>
       Success(
         SopViewRow(
-          id = row[Option[Int]]("id"),
-          specialofferid = row[Option[SpecialofferId]]("specialofferid"),
-          productid = row[Option[ProductId]]("productid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          specialofferid = row[Option[SpecialofferId]](idx + 1),
+          productid = row[Option[ProductId]](idx + 2),
+          rowguid = row[Option[UUID]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

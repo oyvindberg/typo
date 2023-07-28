@@ -16,7 +16,7 @@ object PaViewRepoImpl extends PaViewRepo {
   override def selectAll(implicit c: Connection): List[PaViewRow] = {
     SQL"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
           from pe.pa
-       """.as(PaViewRow.rowParser.*)
+       """.as(PaViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PaViewFieldOrIdValue[_]])(implicit c: Connection): List[PaViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PaViewRepoImpl extends PaViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PaViewRow.rowParser.*)
+          .as(PaViewRow.rowParser(1).*)
     }
   
   }

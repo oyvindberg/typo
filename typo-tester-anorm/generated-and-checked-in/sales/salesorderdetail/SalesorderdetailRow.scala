@@ -48,20 +48,20 @@ case class SalesorderdetailRow(
  }
 
 object SalesorderdetailRow {
-  val rowParser: RowParser[SalesorderdetailRow] =
+  def rowParser(idx: Int): RowParser[SalesorderdetailRow] =
     RowParser[SalesorderdetailRow] { row =>
       Success(
         SalesorderdetailRow(
-          salesorderid = row[SalesorderheaderId]("salesorderid"),
-          salesorderdetailid = row[Int]("salesorderdetailid"),
-          carriertrackingnumber = row[Option[/* max 25 chars */ String]]("carriertrackingnumber"),
-          orderqty = row[Int]("orderqty"),
-          productid = row[ProductId]("productid"),
-          specialofferid = row[SpecialofferId]("specialofferid"),
-          unitprice = row[BigDecimal]("unitprice"),
-          unitpricediscount = row[BigDecimal]("unitpricediscount"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          salesorderid = row[SalesorderheaderId](idx + 0),
+          salesorderdetailid = row[Int](idx + 1),
+          carriertrackingnumber = row[Option[/* max 25 chars */ String]](idx + 2),
+          orderqty = row[Int](idx + 3),
+          productid = row[ProductId](idx + 4),
+          specialofferid = row[SpecialofferId](idx + 5),
+          unitprice = row[BigDecimal](idx + 6),
+          unitpricediscount = row[BigDecimal](idx + 7),
+          rowguid = row[UUID](idx + 8),
+          modifieddate = row[LocalDateTime](idx + 9)
         )
       )
     }

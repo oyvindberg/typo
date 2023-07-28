@@ -25,7 +25,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
           values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning unitmeasurecode, "name", modifieddate
        """
-      .executeInsert(UnitmeasureRow.rowParser.single)
+      .executeInsert(UnitmeasureRow.rowParser(1).single)
   
   }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
@@ -42,7 +42,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       SQL"""insert into production.unitmeasure default values
             returning unitmeasurecode, "name", modifieddate
          """
-        .executeInsert(UnitmeasureRow.rowParser.single)
+        .executeInsert(UnitmeasureRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.unitmeasure(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -52,14 +52,14 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(UnitmeasureRow.rowParser.single)
+        .executeInsert(UnitmeasureRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select unitmeasurecode, "name", modifieddate
           from production.unitmeasure
-       """.as(UnitmeasureRow.rowParser.*)
+       """.as(UnitmeasureRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]])(implicit c: Connection): List[UnitmeasureRow] = {
     fieldValues match {
@@ -79,7 +79,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(UnitmeasureRow.rowParser.*)
+          .as(UnitmeasureRow.rowParser(1).*)
     }
   
   }
@@ -87,7 +87,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     SQL"""select unitmeasurecode, "name", modifieddate
           from production.unitmeasure
           where unitmeasurecode = $unitmeasurecode
-       """.as(UnitmeasureRow.rowParser.singleOpt)
+       """.as(UnitmeasureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     implicit val toStatement: ToStatement[Array[UnitmeasureId]] =
@@ -97,7 +97,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     SQL"""select unitmeasurecode, "name", modifieddate
           from production.unitmeasure
           where unitmeasurecode = ANY($unitmeasurecodes)
-       """.as(UnitmeasureRow.rowParser.*)
+       """.as(UnitmeasureRow.rowParser(1).*)
   
   }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
@@ -143,7 +143,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
             modifieddate = EXCLUDED.modifieddate
           returning unitmeasurecode, "name", modifieddate
        """
-      .executeInsert(UnitmeasureRow.rowParser.single)
+      .executeInsert(UnitmeasureRow.rowParser(1).single)
   
   }
 }

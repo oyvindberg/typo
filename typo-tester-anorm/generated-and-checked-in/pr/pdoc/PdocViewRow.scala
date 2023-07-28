@@ -30,14 +30,14 @@ case class PdocViewRow(
 )
 
 object PdocViewRow {
-  val rowParser: RowParser[PdocViewRow] =
+  def rowParser(idx: Int): RowParser[PdocViewRow] =
     RowParser[PdocViewRow] { row =>
       Success(
         PdocViewRow(
-          id = row[Option[Int]]("id"),
-          productid = row[Option[ProductId]]("productid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
-          documentnode = row[Option[DocumentId]]("documentnode")
+          id = row[Option[Int]](idx + 0),
+          productid = row[Option[ProductId]](idx + 1),
+          modifieddate = row[Option[LocalDateTime]](idx + 2),
+          documentnode = row[Option[DocumentId]](idx + 3)
         )
       )
     }

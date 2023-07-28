@@ -43,21 +43,21 @@ case class VemployeedepartmenthistoryViewRow(
 )
 
 object VemployeedepartmenthistoryViewRow {
-  val rowParser: RowParser[VemployeedepartmenthistoryViewRow] =
+  def rowParser(idx: Int): RowParser[VemployeedepartmenthistoryViewRow] =
     RowParser[VemployeedepartmenthistoryViewRow] { row =>
       Success(
         VemployeedepartmenthistoryViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          shift = row[Option[Name]]("shift"),
-          department = row[Option[Name]]("department"),
-          groupname = row[Option[Name]]("groupname"),
-          startdate = row[Option[LocalDate]]("startdate"),
-          enddate = row[Option[LocalDate]]("enddate")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          title = row[Option[/* max 8 chars */ String]](idx + 1),
+          firstname = row[Option[Name]](idx + 2),
+          middlename = row[Option[Name]](idx + 3),
+          lastname = row[Option[Name]](idx + 4),
+          suffix = row[Option[/* max 10 chars */ String]](idx + 5),
+          shift = row[Option[Name]](idx + 6),
+          department = row[Option[Name]](idx + 7),
+          groupname = row[Option[Name]](idx + 8),
+          startdate = row[Option[LocalDate]](idx + 9),
+          enddate = row[Option[LocalDate]](idx + 10)
         )
       )
     }

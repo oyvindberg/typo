@@ -16,7 +16,7 @@ object PccViewRepoImpl extends PccViewRepo {
   override def selectAll(implicit c: Connection): List[PccViewRow] = {
     SQL"""select "id", businessentityid, creditcardid, modifieddate
           from sa.pcc
-       """.as(PccViewRow.rowParser.*)
+       """.as(PccViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PccViewFieldOrIdValue[_]])(implicit c: Connection): List[PccViewRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PccViewRepoImpl extends PccViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PccViewRow.rowParser.*)
+          .as(PccViewRow.rowParser(1).*)
     }
   
   }

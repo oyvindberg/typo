@@ -16,7 +16,7 @@ object WViewRepoImpl extends WViewRepo {
   override def selectAll(implicit c: Connection): List[WViewRow] = {
     SQL"""select "id", workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from pr.w
-       """.as(WViewRow.rowParser.*)
+       """.as(WViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[WViewFieldOrIdValue[_]])(implicit c: Connection): List[WViewRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object WViewRepoImpl extends WViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(WViewRow.rowParser.*)
+          .as(WViewRow.rowParser(1).*)
     }
   
   }

@@ -25,7 +25,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
           returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
        """
-      .executeInsert(ProductreviewRow.rowParser.single)
+      .executeInsert(ProductreviewRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
@@ -53,7 +53,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       SQL"""insert into production.productreview default values
             returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
          """
-        .executeInsert(ProductreviewRow.rowParser.single)
+        .executeInsert(ProductreviewRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productreview(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -63,14 +63,14 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ProductreviewRow.rowParser.single)
+        .executeInsert(ProductreviewRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from production.productreview
-       """.as(ProductreviewRow.rowParser.*)
+       """.as(ProductreviewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]])(implicit c: Connection): List[ProductreviewRow] = {
     fieldValues match {
@@ -95,7 +95,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductreviewRow.rowParser.*)
+          .as(ProductreviewRow.rowParser(1).*)
     }
   
   }
@@ -103,7 +103,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from production.productreview
           where productreviewid = $productreviewid
-       """.as(ProductreviewRow.rowParser.singleOpt)
+       """.as(ProductreviewRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
     implicit val toStatement: ToStatement[Array[ProductreviewId]] =
@@ -113,7 +113,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from production.productreview
           where productreviewid = ANY($productreviewids)
-       """.as(ProductreviewRow.rowParser.*)
+       """.as(ProductreviewRow.rowParser(1).*)
   
   }
   override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
@@ -179,7 +179,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
        """
-      .executeInsert(ProductreviewRow.rowParser.single)
+      .executeInsert(ProductreviewRow.rowParser(1).single)
   
   }
 }

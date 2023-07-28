@@ -16,7 +16,7 @@ object PodViewRepoImpl extends PodViewRepo {
   override def selectAll(implicit c: Connection): List[PodViewRow] = {
     SQL"""select "id", purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
           from pu.pod
-       """.as(PodViewRow.rowParser.*)
+       """.as(PodViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PodViewFieldOrIdValue[_]])(implicit c: Connection): List[PodViewRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object PodViewRepoImpl extends PodViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PodViewRow.rowParser.*)
+          .as(PodViewRow.rowParser(1).*)
     }
   
   }

@@ -49,22 +49,22 @@ case class PurchaseorderheaderRow(
 )
 
 object PurchaseorderheaderRow {
-  val rowParser: RowParser[PurchaseorderheaderRow] =
+  def rowParser(idx: Int): RowParser[PurchaseorderheaderRow] =
     RowParser[PurchaseorderheaderRow] { row =>
       Success(
         PurchaseorderheaderRow(
-          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
-          revisionnumber = row[Int]("revisionnumber"),
-          status = row[Int]("status"),
-          employeeid = row[BusinessentityId]("employeeid"),
-          vendorid = row[BusinessentityId]("vendorid"),
-          shipmethodid = row[ShipmethodId]("shipmethodid"),
-          orderdate = row[LocalDateTime]("orderdate"),
-          shipdate = row[Option[LocalDateTime]]("shipdate"),
-          subtotal = row[BigDecimal]("subtotal"),
-          taxamt = row[BigDecimal]("taxamt"),
-          freight = row[BigDecimal]("freight"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          purchaseorderid = row[PurchaseorderheaderId](idx + 0),
+          revisionnumber = row[Int](idx + 1),
+          status = row[Int](idx + 2),
+          employeeid = row[BusinessentityId](idx + 3),
+          vendorid = row[BusinessentityId](idx + 4),
+          shipmethodid = row[ShipmethodId](idx + 5),
+          orderdate = row[LocalDateTime](idx + 6),
+          shipdate = row[Option[LocalDateTime]](idx + 7),
+          subtotal = row[BigDecimal](idx + 8),
+          taxamt = row[BigDecimal](idx + 9),
+          freight = row[BigDecimal](idx + 10),
+          modifieddate = row[LocalDateTime](idx + 11)
         )
       )
     }

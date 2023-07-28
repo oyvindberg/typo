@@ -42,19 +42,19 @@ case class VViewRow(
 )
 
 object VViewRow {
-  val rowParser: RowParser[VViewRow] =
+  def rowParser(idx: Int): RowParser[VViewRow] =
     RowParser[VViewRow] { row =>
       Success(
         VViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          accountnumber = row[Option[AccountNumber]]("accountnumber"),
-          name = row[Option[Name]]("name"),
-          creditrating = row[Option[Int]]("creditrating"),
-          preferredvendorstatus = row[Flag]("preferredvendorstatus"),
-          activeflag = row[Flag]("activeflag"),
-          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]]("purchasingwebserviceurl"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          accountnumber = row[Option[AccountNumber]](idx + 2),
+          name = row[Option[Name]](idx + 3),
+          creditrating = row[Option[Int]](idx + 4),
+          preferredvendorstatus = row[Flag](idx + 5),
+          activeflag = row[Flag](idx + 6),
+          purchasingwebserviceurl = row[Option[/* max 1024 chars */ String]](idx + 7),
+          modifieddate = row[Option[LocalDateTime]](idx + 8)
         )
       )
     }

@@ -38,17 +38,17 @@ case class CViewRow(
 )
 
 object CViewRow {
-  val rowParser: RowParser[CViewRow] =
+  def rowParser(idx: Int): RowParser[CViewRow] =
     RowParser[CViewRow] { row =>
       Success(
         CViewRow(
-          id = row[Option[Int]]("id"),
-          customerid = row[Option[CustomerId]]("customerid"),
-          personid = row[Option[BusinessentityId]]("personid"),
-          storeid = row[Option[BusinessentityId]]("storeid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          customerid = row[Option[CustomerId]](idx + 1),
+          personid = row[Option[BusinessentityId]](idx + 2),
+          storeid = row[Option[BusinessentityId]](idx + 3),
+          territoryid = row[Option[SalesterritoryId]](idx + 4),
+          rowguid = row[Option[UUID]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

@@ -27,13 +27,13 @@ case class ScrapreasonRow(
 )
 
 object ScrapreasonRow {
-  val rowParser: RowParser[ScrapreasonRow] =
+  def rowParser(idx: Int): RowParser[ScrapreasonRow] =
     RowParser[ScrapreasonRow] { row =>
       Success(
         ScrapreasonRow(
-          scrapreasonid = row[ScrapreasonId]("scrapreasonid"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          scrapreasonid = row[ScrapreasonId](idx + 0),
+          name = row[Name](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

@@ -40,18 +40,18 @@ case class TrViewRow(
 )
 
 object TrViewRow {
-  val rowParser: RowParser[TrViewRow] =
+  def rowParser(idx: Int): RowParser[TrViewRow] =
     RowParser[TrViewRow] { row =>
       Success(
         TrViewRow(
-          id = row[Option[Int]]("id"),
-          salestaxrateid = row[Option[SalestaxrateId]]("salestaxrateid"),
-          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
-          taxtype = row[Option[Int]]("taxtype"),
-          taxrate = row[Option[BigDecimal]]("taxrate"),
-          name = row[Option[Name]]("name"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          salestaxrateid = row[Option[SalestaxrateId]](idx + 1),
+          stateprovinceid = row[Option[StateprovinceId]](idx + 2),
+          taxtype = row[Option[Int]](idx + 3),
+          taxrate = row[Option[BigDecimal]](idx + 4),
+          name = row[Option[Name]](idx + 5),
+          rowguid = row[Option[UUID]](idx + 6),
+          modifieddate = row[Option[LocalDateTime]](idx + 7)
         )
       )
     }

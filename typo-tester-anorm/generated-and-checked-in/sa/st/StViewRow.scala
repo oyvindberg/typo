@@ -46,21 +46,21 @@ case class StViewRow(
 )
 
 object StViewRow {
-  val rowParser: RowParser[StViewRow] =
+  def rowParser(idx: Int): RowParser[StViewRow] =
     RowParser[StViewRow] { row =>
       Success(
         StViewRow(
-          id = row[Option[Int]]("id"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          name = row[Option[Name]]("name"),
-          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
-          group = row[Option[/* max 50 chars */ String]]("group"),
-          salesytd = row[Option[BigDecimal]]("salesytd"),
-          saleslastyear = row[Option[BigDecimal]]("saleslastyear"),
-          costytd = row[Option[BigDecimal]]("costytd"),
-          costlastyear = row[Option[BigDecimal]]("costlastyear"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          territoryid = row[Option[SalesterritoryId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          countryregioncode = row[Option[CountryregionId]](idx + 3),
+          group = row[Option[/* max 50 chars */ String]](idx + 4),
+          salesytd = row[Option[BigDecimal]](idx + 5),
+          saleslastyear = row[Option[BigDecimal]](idx + 6),
+          costytd = row[Option[BigDecimal]](idx + 7),
+          costlastyear = row[Option[BigDecimal]](idx + 8),
+          rowguid = row[Option[UUID]](idx + 9),
+          modifieddate = row[Option[LocalDateTime]](idx + 10)
         )
       )
     }

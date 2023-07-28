@@ -19,7 +19,7 @@ object TablesViewRepoImpl extends TablesViewRepo {
   override def selectAll(implicit c: Connection): List[TablesViewRow] = {
     SQL"""select table_catalog, table_schema, "table_name", table_type, self_referencing_column_name, reference_generation, "user_defined_type_catalog", "user_defined_type_schema", "user_defined_type_name", is_insertable_into, is_typed, commit_action
           from information_schema."tables"
-       """.as(TablesViewRow.rowParser.*)
+       """.as(TablesViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[TablesViewFieldOrIdValue[_]])(implicit c: Connection): List[TablesViewRow] = {
     fieldValues match {
@@ -48,7 +48,7 @@ object TablesViewRepoImpl extends TablesViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(TablesViewRow.rowParser.*)
+          .as(TablesViewRow.rowParser(1).*)
     }
   
   }

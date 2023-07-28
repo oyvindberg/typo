@@ -34,15 +34,15 @@ case class EmployeepayhistoryRow(
  }
 
 object EmployeepayhistoryRow {
-  val rowParser: RowParser[EmployeepayhistoryRow] =
+  def rowParser(idx: Int): RowParser[EmployeepayhistoryRow] =
     RowParser[EmployeepayhistoryRow] { row =>
       Success(
         EmployeepayhistoryRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          ratechangedate = row[LocalDateTime]("ratechangedate"),
-          rate = row[BigDecimal]("rate"),
-          payfrequency = row[Int]("payfrequency"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          ratechangedate = row[LocalDateTime](idx + 1),
+          rate = row[BigDecimal](idx + 2),
+          payfrequency = row[Int](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

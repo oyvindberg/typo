@@ -27,17 +27,17 @@ case class VsalespersonsalesbyfiscalyearsViewRow(
 )
 
 object VsalespersonsalesbyfiscalyearsViewRow {
-  val rowParser: RowParser[VsalespersonsalesbyfiscalyearsViewRow] =
+  def rowParser(idx: Int): RowParser[VsalespersonsalesbyfiscalyearsViewRow] =
     RowParser[VsalespersonsalesbyfiscalyearsViewRow] { row =>
       Success(
         VsalespersonsalesbyfiscalyearsViewRow(
-          SalesPersonID = row[Option[Int]]("SalesPersonID"),
-          FullName = row[Option[String]]("FullName"),
-          JobTitle = row[Option[String]]("JobTitle"),
-          SalesTerritory = row[Option[String]]("SalesTerritory"),
-          `2012` = row[Option[BigDecimal]]("2012"),
-          `2013` = row[Option[BigDecimal]]("2013"),
-          `2014` = row[Option[BigDecimal]]("2014")
+          SalesPersonID = row[Option[Int]](idx + 0),
+          FullName = row[Option[String]](idx + 1),
+          JobTitle = row[Option[String]](idx + 2),
+          SalesTerritory = row[Option[String]](idx + 3),
+          `2012` = row[Option[BigDecimal]](idx + 4),
+          `2013` = row[Option[BigDecimal]](idx + 5),
+          `2014` = row[Option[BigDecimal]](idx + 6)
         )
       )
     }

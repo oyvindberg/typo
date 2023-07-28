@@ -42,21 +42,21 @@ case class SpecialofferRow(
 )
 
 object SpecialofferRow {
-  val rowParser: RowParser[SpecialofferRow] =
+  def rowParser(idx: Int): RowParser[SpecialofferRow] =
     RowParser[SpecialofferRow] { row =>
       Success(
         SpecialofferRow(
-          specialofferid = row[SpecialofferId]("specialofferid"),
-          description = row[/* max 255 chars */ String]("description"),
-          discountpct = row[BigDecimal]("discountpct"),
-          `type` = row[/* max 50 chars */ String]("type"),
-          category = row[/* max 50 chars */ String]("category"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[LocalDateTime]("enddate"),
-          minqty = row[Int]("minqty"),
-          maxqty = row[Option[Int]]("maxqty"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          specialofferid = row[SpecialofferId](idx + 0),
+          description = row[/* max 255 chars */ String](idx + 1),
+          discountpct = row[BigDecimal](idx + 2),
+          `type` = row[/* max 50 chars */ String](idx + 3),
+          category = row[/* max 50 chars */ String](idx + 4),
+          startdate = row[LocalDateTime](idx + 5),
+          enddate = row[LocalDateTime](idx + 6),
+          minqty = row[Int](idx + 7),
+          maxqty = row[Option[Int]](idx + 8),
+          rowguid = row[UUID](idx + 9),
+          modifieddate = row[LocalDateTime](idx + 10)
         )
       )
     }

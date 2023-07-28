@@ -27,7 +27,7 @@ object PersonRepoImpl extends PersonRepo {
           values (${unsaved.id}::int8, ${unsaved.favouriteFootballClubId}, ${unsaved.name}, ${unsaved.nickName}, ${unsaved.blogUrl}, ${unsaved.email}, ${unsaved.phone}, ${unsaved.likesPizza}, ${unsaved.maritalStatusId}, ${unsaved.workEmail}, ${unsaved.sector}::myschema.sector)
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
        """
-      .executeInsert(PersonRow.rowParser.single)
+      .executeInsert(PersonRow.rowParser(1).single)
   
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
@@ -58,7 +58,7 @@ object PersonRepoImpl extends PersonRepo {
       SQL"""insert into myschema.person default values
             returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
          """
-        .executeInsert(PersonRow.rowParser.single)
+        .executeInsert(PersonRow.rowParser(1).single)
     } else {
       val q = s"""insert into myschema.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -68,14 +68,14 @@ object PersonRepoImpl extends PersonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(PersonRow.rowParser.single)
+        .executeInsert(PersonRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
-       """.as(PersonRow.rowParser.*)
+       """.as(PersonRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -103,7 +103,7 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonRow.rowParser.*)
+          .as(PersonRow.rowParser(1).*)
     }
   
   }
@@ -111,7 +111,7 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
           where "id" = $id
-       """.as(PersonRow.rowParser.singleOpt)
+       """.as(PersonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow] = {
     implicit val toStatement: ToStatement[Array[PersonId]] =
@@ -121,7 +121,7 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
           where "id" = ANY($ids)
-       """.as(PersonRow.rowParser.*)
+       """.as(PersonRow.rowParser(1).*)
   
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
@@ -199,7 +199,7 @@ object PersonRepoImpl extends PersonRepo {
             sector = EXCLUDED.sector
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
        """
-      .executeInsert(PersonRow.rowParser.single)
+      .executeInsert(PersonRow.rowParser(1).single)
   
   }
 }

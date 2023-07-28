@@ -23,7 +23,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
           values (${unsaved.productid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.averageleadtime}::int4, ${unsaved.standardprice}::numeric, ${unsaved.lastreceiptcost}::numeric, ${unsaved.lastreceiptdate}::timestamp, ${unsaved.minorderqty}::int4, ${unsaved.maxorderqty}::int4, ${unsaved.onorderqty}::int4, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
        """
-      .executeInsert(ProductvendorRow.rowParser.single)
+      .executeInsert(ProductvendorRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
@@ -48,7 +48,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
       SQL"""insert into purchasing.productvendor default values
             returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
          """
-        .executeInsert(ProductvendorRow.rowParser.single)
+        .executeInsert(ProductvendorRow.rowParser(1).single)
     } else {
       val q = s"""insert into purchasing.productvendor(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -58,14 +58,14 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ProductvendorRow.rowParser.single)
+        .executeInsert(ProductvendorRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {
     SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
           from purchasing.productvendor
-       """.as(ProductvendorRow.rowParser.*)
+       """.as(ProductvendorRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ProductvendorFieldOrIdValue[_]])(implicit c: Connection): List[ProductvendorRow] = {
     fieldValues match {
@@ -93,7 +93,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductvendorRow.rowParser.*)
+          .as(ProductvendorRow.rowParser(1).*)
     }
   
   }
@@ -101,7 +101,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     SQL"""select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
           from purchasing.productvendor
           where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
-       """.as(ProductvendorRow.rowParser.singleOpt)
+       """.as(ProductvendorRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -175,7 +175,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
        """
-      .executeInsert(ProductvendorRow.rowParser.single)
+      .executeInsert(ProductvendorRow.rowParser(1).single)
   
   }
 }

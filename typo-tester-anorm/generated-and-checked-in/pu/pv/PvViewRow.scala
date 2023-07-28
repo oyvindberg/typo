@@ -47,22 +47,22 @@ case class PvViewRow(
 )
 
 object PvViewRow {
-  val rowParser: RowParser[PvViewRow] =
+  def rowParser(idx: Int): RowParser[PvViewRow] =
     RowParser[PvViewRow] { row =>
       Success(
         PvViewRow(
-          id = row[Option[Int]]("id"),
-          productid = row[Option[ProductId]]("productid"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          averageleadtime = row[Option[Int]]("averageleadtime"),
-          standardprice = row[Option[BigDecimal]]("standardprice"),
-          lastreceiptcost = row[Option[BigDecimal]]("lastreceiptcost"),
-          lastreceiptdate = row[Option[LocalDateTime]]("lastreceiptdate"),
-          minorderqty = row[Option[Int]]("minorderqty"),
-          maxorderqty = row[Option[Int]]("maxorderqty"),
-          onorderqty = row[Option[Int]]("onorderqty"),
-          unitmeasurecode = row[Option[UnitmeasureId]]("unitmeasurecode"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productid = row[Option[ProductId]](idx + 1),
+          businessentityid = row[Option[BusinessentityId]](idx + 2),
+          averageleadtime = row[Option[Int]](idx + 3),
+          standardprice = row[Option[BigDecimal]](idx + 4),
+          lastreceiptcost = row[Option[BigDecimal]](idx + 5),
+          lastreceiptdate = row[Option[LocalDateTime]](idx + 6),
+          minorderqty = row[Option[Int]](idx + 7),
+          maxorderqty = row[Option[Int]](idx + 8),
+          onorderqty = row[Option[Int]](idx + 9),
+          unitmeasurecode = row[Option[UnitmeasureId]](idx + 10),
+          modifieddate = row[Option[LocalDateTime]](idx + 11)
         )
       )
     }

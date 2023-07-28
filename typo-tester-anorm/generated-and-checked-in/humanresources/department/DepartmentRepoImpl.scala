@@ -25,7 +25,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
           values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning departmentid, "name", groupname, modifieddate
        """
-      .executeInsert(DepartmentRow.rowParser.single)
+      .executeInsert(DepartmentRow.rowParser(1).single)
   
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
@@ -46,7 +46,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
       SQL"""insert into humanresources.department default values
             returning departmentid, "name", groupname, modifieddate
          """
-        .executeInsert(DepartmentRow.rowParser.single)
+        .executeInsert(DepartmentRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.department(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -56,14 +56,14 @@ object DepartmentRepoImpl extends DepartmentRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(DepartmentRow.rowParser.single)
+        .executeInsert(DepartmentRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
-       """.as(DepartmentRow.rowParser.*)
+       """.as(DepartmentRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]])(implicit c: Connection): List[DepartmentRow] = {
     fieldValues match {
@@ -84,7 +84,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(DepartmentRow.rowParser.*)
+          .as(DepartmentRow.rowParser(1).*)
     }
   
   }
@@ -92,7 +92,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
           where departmentid = $departmentid
-       """.as(DepartmentRow.rowParser.singleOpt)
+       """.as(DepartmentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
     implicit val toStatement: ToStatement[Array[DepartmentId]] =
@@ -102,7 +102,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
           where departmentid = ANY($departmentids)
-       """.as(DepartmentRow.rowParser.*)
+       """.as(DepartmentRow.rowParser(1).*)
   
   }
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
@@ -152,7 +152,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
             modifieddate = EXCLUDED.modifieddate
           returning departmentid, "name", groupname, modifieddate
        """
-      .executeInsert(DepartmentRow.rowParser.single)
+      .executeInsert(DepartmentRow.rowParser(1).single)
   
   }
 }

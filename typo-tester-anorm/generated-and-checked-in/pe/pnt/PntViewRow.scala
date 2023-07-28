@@ -30,14 +30,14 @@ case class PntViewRow(
 )
 
 object PntViewRow {
-  val rowParser: RowParser[PntViewRow] =
+  def rowParser(idx: Int): RowParser[PntViewRow] =
     RowParser[PntViewRow] { row =>
       Success(
         PntViewRow(
-          id = row[Option[Int]]("id"),
-          phonenumbertypeid = row[Option[PhonenumbertypeId]]("phonenumbertypeid"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

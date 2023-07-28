@@ -36,16 +36,16 @@ case class BeaViewRow(
 )
 
 object BeaViewRow {
-  val rowParser: RowParser[BeaViewRow] =
+  def rowParser(idx: Int): RowParser[BeaViewRow] =
     RowParser[BeaViewRow] { row =>
       Success(
         BeaViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          addressid = row[Option[AddressId]]("addressid"),
-          addresstypeid = row[Option[AddresstypeId]]("addresstypeid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          addressid = row[Option[AddressId]](idx + 2),
+          addresstypeid = row[Option[AddresstypeId]](idx + 3),
+          rowguid = row[Option[UUID]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

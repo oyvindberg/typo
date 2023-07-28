@@ -39,18 +39,18 @@ case class ProductreviewRow(
 )
 
 object ProductreviewRow {
-  val rowParser: RowParser[ProductreviewRow] =
+  def rowParser(idx: Int): RowParser[ProductreviewRow] =
     RowParser[ProductreviewRow] { row =>
       Success(
         ProductreviewRow(
-          productreviewid = row[ProductreviewId]("productreviewid"),
-          productid = row[ProductId]("productid"),
-          reviewername = row[Name]("reviewername"),
-          reviewdate = row[LocalDateTime]("reviewdate"),
-          emailaddress = row[/* max 50 chars */ String]("emailaddress"),
-          rating = row[Int]("rating"),
-          comments = row[Option[/* max 3850 chars */ String]]("comments"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productreviewid = row[ProductreviewId](idx + 0),
+          productid = row[ProductId](idx + 1),
+          reviewername = row[Name](idx + 2),
+          reviewdate = row[LocalDateTime](idx + 3),
+          emailaddress = row[/* max 50 chars */ String](idx + 4),
+          rating = row[Int](idx + 5),
+          comments = row[Option[/* max 3850 chars */ String]](idx + 6),
+          modifieddate = row[LocalDateTime](idx + 7)
         )
       )
     }

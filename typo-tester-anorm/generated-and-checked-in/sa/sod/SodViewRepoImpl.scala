@@ -16,7 +16,7 @@ object SodViewRepoImpl extends SodViewRepo {
   override def selectAll(implicit c: Connection): List[SodViewRow] = {
     SQL"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
           from sa.sod
-       """.as(SodViewRow.rowParser.*)
+       """.as(SodViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SodViewFieldOrIdValue[_]])(implicit c: Connection): List[SodViewRow] = {
     fieldValues match {
@@ -44,7 +44,7 @@ object SodViewRepoImpl extends SodViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SodViewRow.rowParser.*)
+          .as(SodViewRow.rowParser(1).*)
     }
   
   }

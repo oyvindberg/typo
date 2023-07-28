@@ -40,19 +40,19 @@ case class TransactionhistoryRow(
 )
 
 object TransactionhistoryRow {
-  val rowParser: RowParser[TransactionhistoryRow] =
+  def rowParser(idx: Int): RowParser[TransactionhistoryRow] =
     RowParser[TransactionhistoryRow] { row =>
       Success(
         TransactionhistoryRow(
-          transactionid = row[TransactionhistoryId]("transactionid"),
-          productid = row[ProductId]("productid"),
-          referenceorderid = row[Int]("referenceorderid"),
-          referenceorderlineid = row[Int]("referenceorderlineid"),
-          transactiondate = row[LocalDateTime]("transactiondate"),
-          transactiontype = row[/* bpchar */ String]("transactiontype"),
-          quantity = row[Int]("quantity"),
-          actualcost = row[BigDecimal]("actualcost"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          transactionid = row[TransactionhistoryId](idx + 0),
+          productid = row[ProductId](idx + 1),
+          referenceorderid = row[Int](idx + 2),
+          referenceorderlineid = row[Int](idx + 3),
+          transactiondate = row[LocalDateTime](idx + 4),
+          transactiontype = row[/* bpchar */ String](idx + 5),
+          quantity = row[Int](idx + 6),
+          actualcost = row[BigDecimal](idx + 7),
+          modifieddate = row[LocalDateTime](idx + 8)
         )
       )
     }

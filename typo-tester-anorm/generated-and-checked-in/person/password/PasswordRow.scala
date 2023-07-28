@@ -31,15 +31,15 @@ case class PasswordRow(
 )
 
 object PasswordRow {
-  val rowParser: RowParser[PasswordRow] =
+  def rowParser(idx: Int): RowParser[PasswordRow] =
     RowParser[PasswordRow] { row =>
       Success(
         PasswordRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          passwordhash = row[/* max 128 chars */ String]("passwordhash"),
-          passwordsalt = row[/* max 10 chars */ String]("passwordsalt"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          passwordhash = row[/* max 128 chars */ String](idx + 1),
+          passwordsalt = row[/* max 10 chars */ String](idx + 2),
+          rowguid = row[UUID](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

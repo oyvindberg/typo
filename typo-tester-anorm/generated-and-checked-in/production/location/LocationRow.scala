@@ -31,15 +31,15 @@ case class LocationRow(
 )
 
 object LocationRow {
-  val rowParser: RowParser[LocationRow] =
+  def rowParser(idx: Int): RowParser[LocationRow] =
     RowParser[LocationRow] { row =>
       Success(
         LocationRow(
-          locationid = row[LocationId]("locationid"),
-          name = row[Name]("name"),
-          costrate = row[BigDecimal]("costrate"),
-          availability = row[BigDecimal]("availability"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          locationid = row[LocationId](idx + 0),
+          name = row[Name](idx + 1),
+          costrate = row[BigDecimal](idx + 2),
+          availability = row[BigDecimal](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

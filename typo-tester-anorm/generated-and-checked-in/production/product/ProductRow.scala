@@ -79,35 +79,35 @@ case class ProductRow(
 )
 
 object ProductRow {
-  val rowParser: RowParser[ProductRow] =
+  def rowParser(idx: Int): RowParser[ProductRow] =
     RowParser[ProductRow] { row =>
       Success(
         ProductRow(
-          productid = row[ProductId]("productid"),
-          name = row[Name]("name"),
-          productnumber = row[/* max 25 chars */ String]("productnumber"),
-          makeflag = row[Flag]("makeflag"),
-          finishedgoodsflag = row[Flag]("finishedgoodsflag"),
-          color = row[Option[/* max 15 chars */ String]]("color"),
-          safetystocklevel = row[Int]("safetystocklevel"),
-          reorderpoint = row[Int]("reorderpoint"),
-          standardcost = row[BigDecimal]("standardcost"),
-          listprice = row[BigDecimal]("listprice"),
-          size = row[Option[/* max 5 chars */ String]]("size"),
-          sizeunitmeasurecode = row[Option[UnitmeasureId]]("sizeunitmeasurecode"),
-          weightunitmeasurecode = row[Option[UnitmeasureId]]("weightunitmeasurecode"),
-          weight = row[Option[BigDecimal]]("weight"),
-          daystomanufacture = row[Int]("daystomanufacture"),
-          productline = row[Option[/* bpchar */ String]]("productline"),
-          `class` = row[Option[/* bpchar */ String]]("class"),
-          style = row[Option[/* bpchar */ String]]("style"),
-          productsubcategoryid = row[Option[ProductsubcategoryId]]("productsubcategoryid"),
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          sellstartdate = row[LocalDateTime]("sellstartdate"),
-          sellenddate = row[Option[LocalDateTime]]("sellenddate"),
-          discontinueddate = row[Option[LocalDateTime]]("discontinueddate"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productid = row[ProductId](idx + 0),
+          name = row[Name](idx + 1),
+          productnumber = row[/* max 25 chars */ String](idx + 2),
+          makeflag = row[Flag](idx + 3),
+          finishedgoodsflag = row[Flag](idx + 4),
+          color = row[Option[/* max 15 chars */ String]](idx + 5),
+          safetystocklevel = row[Int](idx + 6),
+          reorderpoint = row[Int](idx + 7),
+          standardcost = row[BigDecimal](idx + 8),
+          listprice = row[BigDecimal](idx + 9),
+          size = row[Option[/* max 5 chars */ String]](idx + 10),
+          sizeunitmeasurecode = row[Option[UnitmeasureId]](idx + 11),
+          weightunitmeasurecode = row[Option[UnitmeasureId]](idx + 12),
+          weight = row[Option[BigDecimal]](idx + 13),
+          daystomanufacture = row[Int](idx + 14),
+          productline = row[Option[/* bpchar */ String]](idx + 15),
+          `class` = row[Option[/* bpchar */ String]](idx + 16),
+          style = row[Option[/* bpchar */ String]](idx + 17),
+          productsubcategoryid = row[Option[ProductsubcategoryId]](idx + 18),
+          productmodelid = row[Option[ProductmodelId]](idx + 19),
+          sellstartdate = row[LocalDateTime](idx + 20),
+          sellenddate = row[Option[LocalDateTime]](idx + 21),
+          discontinueddate = row[Option[LocalDateTime]](idx + 22),
+          rowguid = row[UUID](idx + 23),
+          modifieddate = row[LocalDateTime](idx + 24)
         )
       )
     }

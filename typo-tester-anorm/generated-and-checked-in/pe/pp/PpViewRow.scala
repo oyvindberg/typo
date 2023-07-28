@@ -33,15 +33,15 @@ case class PpViewRow(
 )
 
 object PpViewRow {
-  val rowParser: RowParser[PpViewRow] =
+  def rowParser(idx: Int): RowParser[PpViewRow] =
     RowParser[PpViewRow] { row =>
       Success(
         PpViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          phonenumber = row[Option[Phone]]("phonenumber"),
-          phonenumbertypeid = row[Option[PhonenumbertypeId]]("phonenumbertypeid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          phonenumber = row[Option[Phone]](idx + 2),
+          phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

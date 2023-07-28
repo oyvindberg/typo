@@ -23,7 +23,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           values (${unsaved.purchaseorderid}::int4, ${unsaved.purchaseorderdetailid}::int4, ${unsaved.duedate}::timestamp, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.receivedqty}::numeric, ${unsaved.rejectedqty}::numeric, ${unsaved.modifieddate}::timestamp)
           returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
        """
-      .executeInsert(PurchaseorderdetailRow.rowParser.single)
+      .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
   
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved)(implicit c: Connection): PurchaseorderdetailRow = {
@@ -49,7 +49,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
       SQL"""insert into purchasing.purchaseorderdetail default values
             returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
          """
-        .executeInsert(PurchaseorderdetailRow.rowParser.single)
+        .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
     } else {
       val q = s"""insert into purchasing.purchaseorderdetail(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +59,14 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(PurchaseorderdetailRow.rowParser.single)
+        .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
           from purchasing.purchaseorderdetail
-       """.as(PurchaseorderdetailRow.rowParser.*)
+       """.as(PurchaseorderdetailRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PurchaseorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderdetailRow] = {
     fieldValues match {
@@ -92,7 +92,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PurchaseorderdetailRow.rowParser.*)
+          .as(PurchaseorderdetailRow.rowParser(1).*)
     }
   
   }
@@ -100,7 +100,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     SQL"""select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
           from purchasing.purchaseorderdetail
           where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
-       """.as(PurchaseorderdetailRow.rowParser.singleOpt)
+       """.as(PurchaseorderdetailRow.rowParser(1).singleOpt)
   }
   override def update(row: PurchaseorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -166,7 +166,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             modifieddate = EXCLUDED.modifieddate
           returning purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate
        """
-      .executeInsert(PurchaseorderdetailRow.rowParser.single)
+      .executeInsert(PurchaseorderdetailRow.rowParser(1).single)
   
   }
 }

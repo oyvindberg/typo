@@ -38,17 +38,17 @@ case class PmViewRow(
 )
 
 object PmViewRow {
-  val rowParser: RowParser[PmViewRow] =
+  def rowParser(idx: Int): RowParser[PmViewRow] =
     RowParser[PmViewRow] { row =>
       Success(
         PmViewRow(
-          id = row[Option[Int]]("id"),
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          name = row[Option[Name]]("name"),
-          catalogdescription = row[Option[TypoXml]]("catalogdescription"),
-          instructions = row[Option[TypoXml]]("instructions"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productmodelid = row[Option[ProductmodelId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          catalogdescription = row[Option[TypoXml]](idx + 3),
+          instructions = row[Option[TypoXml]](idx + 4),
+          rowguid = row[Option[UUID]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

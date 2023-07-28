@@ -37,19 +37,19 @@ case class VvendorwithaddressesViewRow(
 )
 
 object VvendorwithaddressesViewRow {
-  val rowParser: RowParser[VvendorwithaddressesViewRow] =
+  def rowParser(idx: Int): RowParser[VvendorwithaddressesViewRow] =
     RowParser[VvendorwithaddressesViewRow] { row =>
       Success(
         VvendorwithaddressesViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          addresstype = row[Option[Name]]("addresstype"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovincename = row[Option[Name]]("stateprovincename"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          countryregionname = row[Option[Name]]("countryregionname")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          name = row[Option[Name]](idx + 1),
+          addresstype = row[Option[Name]](idx + 2),
+          addressline1 = row[Option[/* max 60 chars */ String]](idx + 3),
+          addressline2 = row[Option[/* max 60 chars */ String]](idx + 4),
+          city = row[Option[/* max 30 chars */ String]](idx + 5),
+          stateprovincename = row[Option[Name]](idx + 6),
+          postalcode = row[Option[/* max 15 chars */ String]](idx + 7),
+          countryregionname = row[Option[Name]](idx + 8)
         )
       )
     }

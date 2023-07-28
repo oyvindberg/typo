@@ -32,15 +32,15 @@ case class SrViewRow(
 )
 
 object SrViewRow {
-  val rowParser: RowParser[SrViewRow] =
+  def rowParser(idx: Int): RowParser[SrViewRow] =
     RowParser[SrViewRow] { row =>
       Success(
         SrViewRow(
-          id = row[Option[Int]]("id"),
-          salesreasonid = row[Option[SalesreasonId]]("salesreasonid"),
-          name = row[Option[Name]]("name"),
-          reasontype = row[Option[Name]]("reasontype"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          salesreasonid = row[Option[SalesreasonId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          reasontype = row[Option[Name]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

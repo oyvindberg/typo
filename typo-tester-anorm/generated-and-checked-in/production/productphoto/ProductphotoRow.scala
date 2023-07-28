@@ -32,16 +32,16 @@ case class ProductphotoRow(
 )
 
 object ProductphotoRow {
-  val rowParser: RowParser[ProductphotoRow] =
+  def rowParser(idx: Int): RowParser[ProductphotoRow] =
     RowParser[ProductphotoRow] { row =>
       Success(
         ProductphotoRow(
-          productphotoid = row[ProductphotoId]("productphotoid"),
-          thumbnailphoto = row[Option[Array[Byte]]]("thumbnailphoto"),
-          thumbnailphotofilename = row[Option[/* max 50 chars */ String]]("thumbnailphotofilename"),
-          largephoto = row[Option[Array[Byte]]]("largephoto"),
-          largephotofilename = row[Option[/* max 50 chars */ String]]("largephotofilename"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productphotoid = row[ProductphotoId](idx + 0),
+          thumbnailphoto = row[Option[Array[Byte]]](idx + 1),
+          thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 2),
+          largephoto = row[Option[Array[Byte]]](idx + 3),
+          largephotofilename = row[Option[/* max 50 chars */ String]](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

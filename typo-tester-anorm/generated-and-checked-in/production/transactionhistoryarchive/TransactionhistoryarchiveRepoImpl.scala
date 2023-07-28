@@ -25,7 +25,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
           values (${unsaved.transactionid}::int4, ${unsaved.productid}::int4, ${unsaved.referenceorderid}::int4, ${unsaved.referenceorderlineid}::int4, ${unsaved.transactiondate}::timestamp, ${unsaved.transactiontype}::bpchar, ${unsaved.quantity}::int4, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
        """
-      .executeInsert(TransactionhistoryarchiveRow.rowParser.single)
+      .executeInsert(TransactionhistoryarchiveRow.rowParser(1).single)
   
   }
   override def insert(unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow = {
@@ -54,7 +54,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
       SQL"""insert into production.transactionhistoryarchive default values
             returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
          """
-        .executeInsert(TransactionhistoryarchiveRow.rowParser.single)
+        .executeInsert(TransactionhistoryarchiveRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.transactionhistoryarchive(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -64,14 +64,14 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(TransactionhistoryarchiveRow.rowParser.single)
+        .executeInsert(TransactionhistoryarchiveRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistoryarchive
-       """.as(TransactionhistoryarchiveRow.rowParser.*)
+       """.as(TransactionhistoryarchiveRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[TransactionhistoryarchiveFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     fieldValues match {
@@ -97,7 +97,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(TransactionhistoryarchiveRow.rowParser.*)
+          .as(TransactionhistoryarchiveRow.rowParser(1).*)
     }
   
   }
@@ -105,7 +105,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistoryarchive
           where transactionid = $transactionid
-       """.as(TransactionhistoryarchiveRow.rowParser.singleOpt)
+       """.as(TransactionhistoryarchiveRow.rowParser(1).singleOpt)
   }
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     implicit val toStatement: ToStatement[Array[TransactionhistoryarchiveId]] =
@@ -115,7 +115,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistoryarchive
           where transactionid = ANY($transactionids)
-       """.as(TransactionhistoryarchiveRow.rowParser.*)
+       """.as(TransactionhistoryarchiveRow.rowParser(1).*)
   
   }
   override def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean = {
@@ -185,7 +185,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             modifieddate = EXCLUDED.modifieddate
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
        """
-      .executeInsert(TransactionhistoryarchiveRow.rowParser.single)
+      .executeInsert(TransactionhistoryarchiveRow.rowParser(1).single)
   
   }
 }

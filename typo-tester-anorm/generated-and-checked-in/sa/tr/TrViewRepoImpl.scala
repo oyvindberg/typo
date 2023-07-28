@@ -16,7 +16,7 @@ object TrViewRepoImpl extends TrViewRepo {
   override def selectAll(implicit c: Connection): List[TrViewRow] = {
     SQL"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sa.tr
-       """.as(TrViewRow.rowParser.*)
+       """.as(TrViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[TrViewFieldOrIdValue[_]])(implicit c: Connection): List[TrViewRow] = {
     fieldValues match {
@@ -41,7 +41,7 @@ object TrViewRepoImpl extends TrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(TrViewRow.rowParser.*)
+          .as(TrViewRow.rowParser(1).*)
     }
   
   }

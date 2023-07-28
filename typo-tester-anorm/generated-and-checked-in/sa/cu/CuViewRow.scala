@@ -30,14 +30,14 @@ case class CuViewRow(
 )
 
 object CuViewRow {
-  val rowParser: RowParser[CuViewRow] =
+  def rowParser(idx: Int): RowParser[CuViewRow] =
     RowParser[CuViewRow] { row =>
       Success(
         CuViewRow(
-          id = row[Option[/* bpchar */ String]]("id"),
-          currencycode = row[Option[CurrencyId]]("currencycode"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[/* bpchar */ String]](idx + 0),
+          currencycode = row[Option[CurrencyId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

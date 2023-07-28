@@ -23,7 +23,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           values (${unsaved.productmodelid}::int4, ${unsaved.illustrationid}::int4, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, illustrationid, modifieddate
        """
-      .executeInsert(ProductmodelillustrationRow.rowParser.single)
+      .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
@@ -40,7 +40,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
       SQL"""insert into production.productmodelillustration default values
             returning productmodelid, illustrationid, modifieddate
          """
-        .executeInsert(ProductmodelillustrationRow.rowParser.single)
+        .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productmodelillustration(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -50,14 +50,14 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ProductmodelillustrationRow.rowParser.single)
+        .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelillustrationRow] = {
     SQL"""select productmodelid, illustrationid, modifieddate
           from production.productmodelillustration
-       """.as(ProductmodelillustrationRow.rowParser.*)
+       """.as(ProductmodelillustrationRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelillustrationRow] = {
     fieldValues match {
@@ -77,7 +77,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductmodelillustrationRow.rowParser.*)
+          .as(ProductmodelillustrationRow.rowParser(1).*)
     }
   
   }
@@ -85,7 +85,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     SQL"""select productmodelid, illustrationid, modifieddate
           from production.productmodelillustration
           where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
-       """.as(ProductmodelillustrationRow.rowParser.singleOpt)
+       """.as(ProductmodelillustrationRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -127,7 +127,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, illustrationid, modifieddate
        """
-      .executeInsert(ProductmodelillustrationRow.rowParser.single)
+      .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
   
   }
 }

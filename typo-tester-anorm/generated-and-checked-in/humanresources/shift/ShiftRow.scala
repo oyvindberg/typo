@@ -32,15 +32,15 @@ case class ShiftRow(
 )
 
 object ShiftRow {
-  val rowParser: RowParser[ShiftRow] =
+  def rowParser(idx: Int): RowParser[ShiftRow] =
     RowParser[ShiftRow] { row =>
       Success(
         ShiftRow(
-          shiftid = row[ShiftId]("shiftid"),
-          name = row[Name]("name"),
-          starttime = row[LocalTime]("starttime"),
-          endtime = row[LocalTime]("endtime"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          shiftid = row[ShiftId](idx + 0),
+          name = row[Name](idx + 1),
+          starttime = row[LocalTime](idx + 2),
+          endtime = row[LocalTime](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

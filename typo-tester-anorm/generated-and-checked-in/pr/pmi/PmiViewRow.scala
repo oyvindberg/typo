@@ -29,13 +29,13 @@ case class PmiViewRow(
 )
 
 object PmiViewRow {
-  val rowParser: RowParser[PmiViewRow] =
+  def rowParser(idx: Int): RowParser[PmiViewRow] =
     RowParser[PmiViewRow] { row =>
       Success(
         PmiViewRow(
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          illustrationid = row[Option[IllustrationId]]("illustrationid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          productmodelid = row[Option[ProductmodelId]](idx + 0),
+          illustrationid = row[Option[IllustrationId]](idx + 1),
+          modifieddate = row[Option[LocalDateTime]](idx + 2)
         )
       )
     }

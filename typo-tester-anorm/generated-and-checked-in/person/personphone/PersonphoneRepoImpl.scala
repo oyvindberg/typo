@@ -23,7 +23,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
        """
-      .executeInsert(PersonphoneRow.rowParser.single)
+      .executeInsert(PersonphoneRow.rowParser(1).single)
   
   }
   override def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
@@ -41,7 +41,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       SQL"""insert into person.personphone default values
             returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
          """
-        .executeInsert(PersonphoneRow.rowParser.single)
+        .executeInsert(PersonphoneRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.personphone(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -51,14 +51,14 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(PersonphoneRow.rowParser.single)
+        .executeInsert(PersonphoneRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
           from person.personphone
-       """.as(PersonphoneRow.rowParser.*)
+       """.as(PersonphoneRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]])(implicit c: Connection): List[PersonphoneRow] = {
     fieldValues match {
@@ -79,7 +79,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonphoneRow.rowParser.*)
+          .as(PersonphoneRow.rowParser(1).*)
     }
   
   }
@@ -87,7 +87,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
           from person.personphone
           where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
-       """.as(PersonphoneRow.rowParser.singleOpt)
+       """.as(PersonphoneRow.rowParser(1).singleOpt)
   }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -130,7 +130,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
        """
-      .executeInsert(PersonphoneRow.rowParser.single)
+      .executeInsert(PersonphoneRow.rowParser(1).single)
   
   }
 }

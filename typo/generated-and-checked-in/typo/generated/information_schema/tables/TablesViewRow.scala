@@ -50,22 +50,22 @@ case class TablesViewRow(
 )
 
 object TablesViewRow {
-  val rowParser: RowParser[TablesViewRow] =
+  def rowParser(idx: Int): RowParser[TablesViewRow] =
     RowParser[TablesViewRow] { row =>
       Success(
         TablesViewRow(
-          tableCatalog = row[Option[SqlIdentifier]]("table_catalog"),
-          tableSchema = row[Option[SqlIdentifier]]("table_schema"),
-          tableName = row[Option[SqlIdentifier]]("table_name"),
-          tableType = row[Option[CharacterData]]("table_type"),
-          selfReferencingColumnName = row[Option[SqlIdentifier]]("self_referencing_column_name"),
-          referenceGeneration = row[Option[CharacterData]]("reference_generation"),
-          userDefinedTypeCatalog = row[Option[SqlIdentifier]]("user_defined_type_catalog"),
-          userDefinedTypeSchema = row[Option[SqlIdentifier]]("user_defined_type_schema"),
-          userDefinedTypeName = row[Option[SqlIdentifier]]("user_defined_type_name"),
-          isInsertableInto = row[Option[YesOrNo]]("is_insertable_into"),
-          isTyped = row[Option[YesOrNo]]("is_typed"),
-          commitAction = row[Option[CharacterData]]("commit_action")
+          tableCatalog = row[Option[SqlIdentifier]](idx + 0),
+          tableSchema = row[Option[SqlIdentifier]](idx + 1),
+          tableName = row[Option[SqlIdentifier]](idx + 2),
+          tableType = row[Option[CharacterData]](idx + 3),
+          selfReferencingColumnName = row[Option[SqlIdentifier]](idx + 4),
+          referenceGeneration = row[Option[CharacterData]](idx + 5),
+          userDefinedTypeCatalog = row[Option[SqlIdentifier]](idx + 6),
+          userDefinedTypeSchema = row[Option[SqlIdentifier]](idx + 7),
+          userDefinedTypeName = row[Option[SqlIdentifier]](idx + 8),
+          isInsertableInto = row[Option[YesOrNo]](idx + 9),
+          isTyped = row[Option[YesOrNo]](idx + 10),
+          commitAction = row[Option[CharacterData]](idx + 11)
         )
       )
     }

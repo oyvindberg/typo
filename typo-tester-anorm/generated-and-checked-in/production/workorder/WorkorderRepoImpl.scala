@@ -25,7 +25,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.orderqty}::int4, ${unsaved.scrappedqty}::int2, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.scrapreasonid}::int2, ${unsaved.modifieddate}::timestamp)
           returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
        """
-      .executeInsert(WorkorderRow.rowParser.single)
+      .executeInsert(WorkorderRow.rowParser(1).single)
   
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
@@ -51,7 +51,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
       SQL"""insert into production.workorder default values
             returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
          """
-        .executeInsert(WorkorderRow.rowParser.single)
+        .executeInsert(WorkorderRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.workorder(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -61,14 +61,14 @@ object WorkorderRepoImpl extends WorkorderRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(WorkorderRow.rowParser.single)
+        .executeInsert(WorkorderRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
-       """.as(WorkorderRow.rowParser.*)
+       """.as(WorkorderRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow] = {
     fieldValues match {
@@ -94,7 +94,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(WorkorderRow.rowParser.*)
+          .as(WorkorderRow.rowParser(1).*)
     }
   
   }
@@ -102,7 +102,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
           where workorderid = $workorderid
-       """.as(WorkorderRow.rowParser.singleOpt)
+       """.as(WorkorderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     implicit val toStatement: ToStatement[Array[WorkorderId]] =
@@ -112,7 +112,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
           where workorderid = ANY($workorderids)
-       """.as(WorkorderRow.rowParser.*)
+       """.as(WorkorderRow.rowParser(1).*)
   
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
@@ -182,7 +182,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
             modifieddate = EXCLUDED.modifieddate
           returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
        """
-      .executeInsert(WorkorderRow.rowParser.single)
+      .executeInsert(WorkorderRow.rowParser(1).single)
   
   }
 }

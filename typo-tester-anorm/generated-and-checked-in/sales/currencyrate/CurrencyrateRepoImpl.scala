@@ -25,7 +25,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           values (${unsaved.currencyrateid}::int4, ${unsaved.currencyratedate}::timestamp, ${unsaved.fromcurrencycode}::bpchar, ${unsaved.tocurrencycode}::bpchar, ${unsaved.averagerate}::numeric, ${unsaved.endofdayrate}::numeric, ${unsaved.modifieddate}::timestamp)
           returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
        """
-      .executeInsert(CurrencyrateRow.rowParser.single)
+      .executeInsert(CurrencyrateRow.rowParser(1).single)
   
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
@@ -49,7 +49,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       SQL"""insert into sales.currencyrate default values
             returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
          """
-        .executeInsert(CurrencyrateRow.rowParser.single)
+        .executeInsert(CurrencyrateRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.currencyrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +59,14 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(CurrencyrateRow.rowParser.single)
+        .executeInsert(CurrencyrateRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sales.currencyrate
-       """.as(CurrencyrateRow.rowParser.*)
+       """.as(CurrencyrateRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyrateRow] = {
     fieldValues match {
@@ -90,7 +90,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CurrencyrateRow.rowParser.*)
+          .as(CurrencyrateRow.rowParser(1).*)
     }
   
   }
@@ -98,7 +98,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sales.currencyrate
           where currencyrateid = $currencyrateid
-       """.as(CurrencyrateRow.rowParser.singleOpt)
+       """.as(CurrencyrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
     implicit val toStatement: ToStatement[Array[CurrencyrateId]] =
@@ -108,7 +108,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sales.currencyrate
           where currencyrateid = ANY($currencyrateids)
-       """.as(CurrencyrateRow.rowParser.*)
+       """.as(CurrencyrateRow.rowParser(1).*)
   
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
@@ -170,7 +170,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
             modifieddate = EXCLUDED.modifieddate
           returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
        """
-      .executeInsert(CurrencyrateRow.rowParser.single)
+      .executeInsert(CurrencyrateRow.rowParser(1).single)
   
   }
 }

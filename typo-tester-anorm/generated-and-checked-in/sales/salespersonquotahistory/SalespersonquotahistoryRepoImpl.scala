@@ -24,7 +24,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.quotadate}::timestamp, ${unsaved.salesquota}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, quotadate, salesquota, rowguid, modifieddate
        """
-      .executeInsert(SalespersonquotahistoryRow.rowParser.single)
+      .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
@@ -46,7 +46,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       SQL"""insert into sales.salespersonquotahistory default values
             returning businessentityid, quotadate, salesquota, rowguid, modifieddate
          """
-        .executeInsert(SalespersonquotahistoryRow.rowParser.single)
+        .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salespersonquotahistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -56,14 +56,14 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SalespersonquotahistoryRow.rowParser.single)
+        .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
           from sales.salespersonquotahistory
-       """.as(SalespersonquotahistoryRow.rowParser.*)
+       """.as(SalespersonquotahistoryRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonquotahistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     fieldValues match {
@@ -85,7 +85,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalespersonquotahistoryRow.rowParser.*)
+          .as(SalespersonquotahistoryRow.rowParser(1).*)
     }
   
   }
@@ -93,7 +93,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     SQL"""select businessentityid, quotadate, salesquota, rowguid, modifieddate
           from sales.salespersonquotahistory
           where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}
-       """.as(SalespersonquotahistoryRow.rowParser.singleOpt)
+       """.as(SalespersonquotahistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -143,7 +143,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, quotadate, salesquota, rowguid, modifieddate
        """
-      .executeInsert(SalespersonquotahistoryRow.rowParser.single)
+      .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
   
   }
 }

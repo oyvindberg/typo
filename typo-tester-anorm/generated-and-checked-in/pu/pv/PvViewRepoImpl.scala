@@ -16,7 +16,7 @@ object PvViewRepoImpl extends PvViewRepo {
   override def selectAll(implicit c: Connection): List[PvViewRow] = {
     SQL"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
           from pu.pv
-       """.as(PvViewRow.rowParser.*)
+       """.as(PvViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PvViewFieldOrIdValue[_]])(implicit c: Connection): List[PvViewRow] = {
     fieldValues match {
@@ -45,7 +45,7 @@ object PvViewRepoImpl extends PvViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PvViewRow.rowParser.*)
+          .as(PvViewRow.rowParser(1).*)
     }
   
   }

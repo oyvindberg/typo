@@ -37,15 +37,15 @@ case class BusinessentitycontactRow(
  }
 
 object BusinessentitycontactRow {
-  val rowParser: RowParser[BusinessentitycontactRow] =
+  def rowParser(idx: Int): RowParser[BusinessentitycontactRow] =
     RowParser[BusinessentitycontactRow] { row =>
       Success(
         BusinessentitycontactRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          personid = row[BusinessentityId]("personid"),
-          contacttypeid = row[ContacttypeId]("contacttypeid"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          personid = row[BusinessentityId](idx + 1),
+          contacttypeid = row[ContacttypeId](idx + 2),
+          rowguid = row[UUID](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

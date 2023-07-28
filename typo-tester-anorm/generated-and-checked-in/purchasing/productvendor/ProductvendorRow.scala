@@ -50,21 +50,21 @@ case class ProductvendorRow(
  }
 
 object ProductvendorRow {
-  val rowParser: RowParser[ProductvendorRow] =
+  def rowParser(idx: Int): RowParser[ProductvendorRow] =
     RowParser[ProductvendorRow] { row =>
       Success(
         ProductvendorRow(
-          productid = row[ProductId]("productid"),
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          averageleadtime = row[Int]("averageleadtime"),
-          standardprice = row[BigDecimal]("standardprice"),
-          lastreceiptcost = row[Option[BigDecimal]]("lastreceiptcost"),
-          lastreceiptdate = row[Option[LocalDateTime]]("lastreceiptdate"),
-          minorderqty = row[Int]("minorderqty"),
-          maxorderqty = row[Int]("maxorderqty"),
-          onorderqty = row[Option[Int]]("onorderqty"),
-          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productid = row[ProductId](idx + 0),
+          businessentityid = row[BusinessentityId](idx + 1),
+          averageleadtime = row[Int](idx + 2),
+          standardprice = row[BigDecimal](idx + 3),
+          lastreceiptcost = row[Option[BigDecimal]](idx + 4),
+          lastreceiptdate = row[Option[LocalDateTime]](idx + 5),
+          minorderqty = row[Int](idx + 6),
+          maxorderqty = row[Int](idx + 7),
+          onorderqty = row[Option[Int]](idx + 8),
+          unitmeasurecode = row[UnitmeasureId](idx + 9),
+          modifieddate = row[LocalDateTime](idx + 10)
         )
       )
     }

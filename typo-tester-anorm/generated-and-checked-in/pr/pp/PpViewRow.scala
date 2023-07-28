@@ -35,17 +35,17 @@ case class PpViewRow(
 )
 
 object PpViewRow {
-  val rowParser: RowParser[PpViewRow] =
+  def rowParser(idx: Int): RowParser[PpViewRow] =
     RowParser[PpViewRow] { row =>
       Success(
         PpViewRow(
-          id = row[Option[Int]]("id"),
-          productphotoid = row[Option[ProductphotoId]]("productphotoid"),
-          thumbnailphoto = row[Option[Byte]]("thumbnailphoto"),
-          thumbnailphotofilename = row[Option[/* max 50 chars */ String]]("thumbnailphotofilename"),
-          largephoto = row[Option[Byte]]("largephoto"),
-          largephotofilename = row[Option[/* max 50 chars */ String]]("largephotofilename"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productphotoid = row[Option[ProductphotoId]](idx + 1),
+          thumbnailphoto = row[Option[Byte]](idx + 2),
+          thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 3),
+          largephoto = row[Option[Byte]](idx + 4),
+          largephotofilename = row[Option[/* max 50 chars */ String]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

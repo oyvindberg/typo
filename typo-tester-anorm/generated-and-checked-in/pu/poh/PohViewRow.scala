@@ -49,23 +49,23 @@ case class PohViewRow(
 )
 
 object PohViewRow {
-  val rowParser: RowParser[PohViewRow] =
+  def rowParser(idx: Int): RowParser[PohViewRow] =
     RowParser[PohViewRow] { row =>
       Success(
         PohViewRow(
-          id = row[Option[Int]]("id"),
-          purchaseorderid = row[Option[PurchaseorderheaderId]]("purchaseorderid"),
-          revisionnumber = row[Option[Int]]("revisionnumber"),
-          status = row[Option[Int]]("status"),
-          employeeid = row[Option[BusinessentityId]]("employeeid"),
-          vendorid = row[Option[BusinessentityId]]("vendorid"),
-          shipmethodid = row[Option[ShipmethodId]]("shipmethodid"),
-          orderdate = row[Option[LocalDateTime]]("orderdate"),
-          shipdate = row[Option[LocalDateTime]]("shipdate"),
-          subtotal = row[Option[BigDecimal]]("subtotal"),
-          taxamt = row[Option[BigDecimal]]("taxamt"),
-          freight = row[Option[BigDecimal]]("freight"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          purchaseorderid = row[Option[PurchaseorderheaderId]](idx + 1),
+          revisionnumber = row[Option[Int]](idx + 2),
+          status = row[Option[Int]](idx + 3),
+          employeeid = row[Option[BusinessentityId]](idx + 4),
+          vendorid = row[Option[BusinessentityId]](idx + 5),
+          shipmethodid = row[Option[ShipmethodId]](idx + 6),
+          orderdate = row[Option[LocalDateTime]](idx + 7),
+          shipdate = row[Option[LocalDateTime]](idx + 8),
+          subtotal = row[Option[BigDecimal]](idx + 9),
+          taxamt = row[Option[BigDecimal]](idx + 10),
+          freight = row[Option[BigDecimal]](idx + 11),
+          modifieddate = row[Option[LocalDateTime]](idx + 12)
         )
       )
     }

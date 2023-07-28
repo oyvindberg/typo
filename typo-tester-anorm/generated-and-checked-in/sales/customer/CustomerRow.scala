@@ -37,16 +37,16 @@ case class CustomerRow(
 )
 
 object CustomerRow {
-  val rowParser: RowParser[CustomerRow] =
+  def rowParser(idx: Int): RowParser[CustomerRow] =
     RowParser[CustomerRow] { row =>
       Success(
         CustomerRow(
-          customerid = row[CustomerId]("customerid"),
-          personid = row[Option[BusinessentityId]]("personid"),
-          storeid = row[Option[BusinessentityId]]("storeid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          customerid = row[CustomerId](idx + 0),
+          personid = row[Option[BusinessentityId]](idx + 1),
+          storeid = row[Option[BusinessentityId]](idx + 2),
+          territoryid = row[Option[SalesterritoryId]](idx + 3),
+          rowguid = row[UUID](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

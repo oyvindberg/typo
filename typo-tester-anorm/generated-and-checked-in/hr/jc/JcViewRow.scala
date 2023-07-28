@@ -33,15 +33,15 @@ case class JcViewRow(
 )
 
 object JcViewRow {
-  val rowParser: RowParser[JcViewRow] =
+  def rowParser(idx: Int): RowParser[JcViewRow] =
     RowParser[JcViewRow] { row =>
       Success(
         JcViewRow(
-          id = row[Option[Int]]("id"),
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[TypoXml]]("resume"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          jobcandidateid = row[Option[JobcandidateId]](idx + 1),
+          businessentityid = row[Option[BusinessentityId]](idx + 2),
+          resume = row[Option[TypoXml]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

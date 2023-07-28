@@ -34,21 +34,21 @@ case class VjobcandidateemploymentViewRow(
 )
 
 object VjobcandidateemploymentViewRow {
-  val rowParser: RowParser[VjobcandidateemploymentViewRow] =
+  def rowParser(idx: Int): RowParser[VjobcandidateemploymentViewRow] =
     RowParser[VjobcandidateemploymentViewRow] { row =>
       Success(
         VjobcandidateemploymentViewRow(
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          `Emp.StartDate` = row[Option[LocalDate]]("Emp.StartDate"),
-          `Emp.EndDate` = row[Option[LocalDate]]("Emp.EndDate"),
-          `Emp.OrgName` = row[Option[/* max 100 chars */ String]]("Emp.OrgName"),
-          `Emp.JobTitle` = row[Option[/* max 100 chars */ String]]("Emp.JobTitle"),
-          `Emp.Responsibility` = row[Option[String]]("Emp.Responsibility"),
-          `Emp.FunctionCategory` = row[Option[String]]("Emp.FunctionCategory"),
-          `Emp.IndustryCategory` = row[Option[String]]("Emp.IndustryCategory"),
-          `Emp.Loc.CountryRegion` = row[Option[String]]("Emp.Loc.CountryRegion"),
-          `Emp.Loc.State` = row[Option[String]]("Emp.Loc.State"),
-          `Emp.Loc.City` = row[Option[String]]("Emp.Loc.City")
+          jobcandidateid = row[Option[JobcandidateId]](idx + 0),
+          `Emp.StartDate` = row[Option[LocalDate]](idx + 1),
+          `Emp.EndDate` = row[Option[LocalDate]](idx + 2),
+          `Emp.OrgName` = row[Option[/* max 100 chars */ String]](idx + 3),
+          `Emp.JobTitle` = row[Option[/* max 100 chars */ String]](idx + 4),
+          `Emp.Responsibility` = row[Option[String]](idx + 5),
+          `Emp.FunctionCategory` = row[Option[String]](idx + 6),
+          `Emp.IndustryCategory` = row[Option[String]](idx + 7),
+          `Emp.Loc.CountryRegion` = row[Option[String]](idx + 8),
+          `Emp.Loc.State` = row[Option[String]](idx + 9),
+          `Emp.Loc.City` = row[Option[String]](idx + 10)
         )
       )
     }

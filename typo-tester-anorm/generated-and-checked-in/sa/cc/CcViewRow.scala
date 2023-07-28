@@ -35,17 +35,17 @@ case class CcViewRow(
 )
 
 object CcViewRow {
-  val rowParser: RowParser[CcViewRow] =
+  def rowParser(idx: Int): RowParser[CcViewRow] =
     RowParser[CcViewRow] { row =>
       Success(
         CcViewRow(
-          id = row[Option[Int]]("id"),
-          creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          cardtype = row[Option[/* max 50 chars */ String]]("cardtype"),
-          cardnumber = row[Option[/* max 25 chars */ String]]("cardnumber"),
-          expmonth = row[Option[Int]]("expmonth"),
-          expyear = row[Option[Int]]("expyear"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          creditcardid = row[Option[CreditcardId]](idx + 1),
+          cardtype = row[Option[/* max 50 chars */ String]](idx + 2),
+          cardnumber = row[Option[/* max 25 chars */ String]](idx + 3),
+          expmonth = row[Option[Int]](idx + 4),
+          expyear = row[Option[Int]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }
