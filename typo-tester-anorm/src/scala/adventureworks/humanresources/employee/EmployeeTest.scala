@@ -4,11 +4,9 @@ import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRep
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
 import adventureworks.{Defaulted, TypoXml, withConnection}
-import org.postgresql.jdbc.PgSQLXML
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
-import java.sql.{Connection, DriverManager}
 import java.time.LocalDate
 import java.util.UUID
 

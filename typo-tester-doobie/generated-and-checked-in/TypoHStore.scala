@@ -32,7 +32,7 @@ object TypoHStore {
     Get.Advanced.other[java.util.Map[_, _]](cats.data.NonEmptyList.one("hstore"))
       .map(v => {
                   val b = Map.newBuilder[String, String]
-                  v.forEach((k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String])
+                  v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                   TypoHStore(b.result())
                 })
   
@@ -40,7 +40,7 @@ object TypoHStore {
     Put.Advanced.other[java.util.Map[String, String]](NonEmptyList.one("hstore"))
       .contramap(v => {
                         val b = new HashMap[String, String]
-                        v.value.foreach((k, v) => b.put(k, v))
+                        v.value.foreach { case (k, v) => b.put(k, v)}
                         b
                       })
   
@@ -48,7 +48,7 @@ object TypoHStore {
     Get.Advanced.array[AnyRef](NonEmptyList.one("_hstore"))
       .map(_.map(v => {
                         val b = Map.newBuilder[String, String]
-                        v.asInstanceOf[java.util.Map[_, _]].forEach((k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String])
+                        v.asInstanceOf[java.util.Map[_, _]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                         TypoHStore(b.result())
                       }))
   
@@ -56,7 +56,7 @@ object TypoHStore {
     Put.Advanced.array[AnyRef](NonEmptyList.one("_hstore"), "hstore")
       .contramap(_.map(v => {
                               val b = new HashMap[String, String]
-                              v.value.foreach((k, v) => b.put(k, v))
+                              v.value.foreach { case (k, v) => b.put(k, v)}
                               b
                             }))
 

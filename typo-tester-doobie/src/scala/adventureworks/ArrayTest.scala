@@ -2,14 +2,8 @@ package adventureworks
 
 import adventureworks.public.pgtest.{PgtestRepoImpl, PgtestRow}
 import adventureworks.public.pgtestnull.{PgtestnullRepoImpl, PgtestnullRow}
-import org.postgresql.geometric.*
-import org.postgresql.jdbc.PgSQLXML
-import org.postgresql.util.{PGInterval, PGmoney, PGobject}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-
-import java.sql.{Connection, DriverManager}
-import java.util.UUID
 
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {

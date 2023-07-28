@@ -157,6 +157,10 @@ object sc {
         .map(x => (x.value.name, x))
         .toMap
 
+    /* also in scala 2.12 */
+    val HasOrdering: Set[Type] =
+      Set(BigDecimal, Boolean, Byte, Double, Float, Int, Long, Short, String)
+
     object Optional {
       def unapply(tpe: sc.Type): Option[sc.Type] = tpe match {
         case Wildcard                        => scala.None

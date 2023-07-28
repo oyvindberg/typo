@@ -113,7 +113,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
 
     targets.foreach { target =>
       val (dbLib, jsonLib) =
-        if (target.project.value.endsWith("doobie"))
+        if (target.project.value.contains("doobie"))
           (DbLibName.Doobie, JsonLibName.Circe)
         else (DbLibName.Anorm, JsonLibName.PlayJson)
       val metaDb = MetaDb(relations = all, enums = enums, domains = Nil, sqlFiles = Nil)

@@ -31,7 +31,7 @@ projects:
     - org.playframework.anorm::anorm:2.7.0
     - org.postgresql:postgresql:42.6.0
     - org.scalatest::scalatest:3.3.0-SNAP4
-    extends: template-nocross
+    extends: template-cross
     isTestProject: true
     sourcegen:
       main: scripts.GenHardcodedFiles
@@ -43,7 +43,7 @@ projects:
     - org.postgresql:postgresql:42.6.0
     - org.scalatest::scalatest:3.3.0-SNAP4
     - org.tpolecat::doobie-postgres:1.0.0-RC2
-    extends: template-nocross
+    extends: template-cross
     isTestProject: true
     sourcegen:
       main: scripts.GenHardcodedFiles

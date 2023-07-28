@@ -11,7 +11,6 @@ import adventureworks.{Defaulted, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
-import java.sql.{Connection, DriverManager}
 import java.util.UUID
 
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {

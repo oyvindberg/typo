@@ -5,8 +5,6 @@ import adventureworks.{Defaulted, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
-import java.sql.{Connection, DriverManager}
-
 class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = DepartmentRepoImpl
 

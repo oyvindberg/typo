@@ -1,9 +1,9 @@
 package adventureworks
 
 import cats.effect.IO
-import doobie._
-import doobie.syntax.all._
 import cats.effect.unsafe.implicits.global
+import doobie.*
+import doobie.syntax.all.*
 
 object withConnection {
   val xa = Transactor.fromDriverManager[IO](

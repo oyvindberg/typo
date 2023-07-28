@@ -1,17 +1,15 @@
 package adventureworks.humanresources.employee
 
-import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRow, BusinessentityRowUnsaved}
+import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepoImpl, BusinessentityRowUnsaved}
 import adventureworks.person.person.{PersonRepoImpl, PersonRowUnsaved}
 import adventureworks.public.{Flag, Name}
 import adventureworks.{Defaulted, TypoXml, withConnection}
-import org.postgresql.jdbc.PgSQLXML
+import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
-import java.sql.{Connection, DriverManager}
 import java.time.LocalDate
 import java.util.UUID
-import doobie.free.connection.delay
 
 class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = EmployeeRepoImpl

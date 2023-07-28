@@ -19,7 +19,7 @@ import scala.util.Try
 /** Type for the composite primary key of table `sales.salespersonquotahistory` */
 case class SalespersonquotahistoryId(businessentityid: BusinessentityId, quotadate: LocalDateTime)
 object SalespersonquotahistoryId {
-  implicit def ordering: Ordering[SalespersonquotahistoryId] = Ordering.by(x => (x.businessentityid, x.quotadate))
+  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[SalespersonquotahistoryId] = Ordering.by(x => (x.businessentityid, x.quotadate))
   implicit val oFormat: OFormat[SalespersonquotahistoryId] = new OFormat[SalespersonquotahistoryId]{
     override def writes(o: SalespersonquotahistoryId): JsObject =
       Json.obj(

@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 /** Type for the composite primary key of table `humanresources.employeepayhistory` */
 case class EmployeepayhistoryId(businessentityid: BusinessentityId, ratechangedate: LocalDateTime)
 object EmployeepayhistoryId {
-  implicit def ordering: Ordering[EmployeepayhistoryId] = Ordering.by(x => (x.businessentityid, x.ratechangedate))
+  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[EmployeepayhistoryId] = Ordering.by(x => (x.businessentityid, x.ratechangedate))
   implicit val decoder: Decoder[EmployeepayhistoryId] =
     (c: HCursor) =>
       for {
