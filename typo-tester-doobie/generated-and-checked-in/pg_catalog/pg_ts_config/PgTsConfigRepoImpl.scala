@@ -8,16 +8,19 @@ package pg_catalog
 package pg_ts_config
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def delete(oid: PgTsConfigId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_config where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_config where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow] = {
     sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
-          values (${unsaved.oid}::oid, ${unsaved.cfgname}::name, ${unsaved.cfgnamespace}::oid, ${unsaved.cfgowner}::oid, ${unsaved.cfgparser}::oid)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsConfigId.put))}::oid, ${fromWrite(unsaved.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid)
           returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
        """.query(PgTsConfigRow.read).unique
   }
@@ -25,19 +28,19 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config".query(PgTsConfigRow.read).stream
   }
   override def selectById(oid: PgTsConfigId): ConnectionIO[Option[PgTsConfigRow]] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ${oid}".query(PgTsConfigRow.read).option
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}".query(PgTsConfigRow.read).option
   }
   override def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${oids})".query(PgTsConfigRow.read).stream
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTsConfigId.arrayPut))})".query(PgTsConfigRow.read).stream
   }
   override def update(row: PgTsConfigRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_config
-          set cfgname = ${row.cfgname}::name,
-              cfgnamespace = ${row.cfgnamespace}::oid,
-              cfgowner = ${row.cfgowner}::oid,
-              cfgparser = ${row.cfgparser}::oid
-          where oid = ${oid}
+          set cfgname = ${fromWrite(row.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              cfgnamespace = ${fromWrite(row.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              cfgowner = ${fromWrite(row.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              cfgparser = ${fromWrite(row.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsConfigId.put))}
        """
       .update
       .run
@@ -46,11 +49,11 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
   override def upsert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow] = {
     sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.cfgname}::name,
-            ${unsaved.cfgnamespace}::oid,
-            ${unsaved.cfgowner}::oid,
-            ${unsaved.cfgparser}::oid
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgTsConfigId.put))}::oid,
+            ${fromWrite(unsaved.cfgname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.cfgnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.cfgowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.cfgparser)(Write.fromPut(Meta.LongMeta.put))}::oid
           )
           on conflict (oid)
           do update set

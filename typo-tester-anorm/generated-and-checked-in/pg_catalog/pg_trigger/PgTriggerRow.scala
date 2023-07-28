@@ -9,14 +9,15 @@ package pg_trigger
 
 import adventureworks.TypoInt2Vector
 import adventureworks.TypoPgNodeTree
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -46,25 +47,25 @@ object PgTriggerRow {
   implicit val reads: Reads[PgTriggerRow] = Reads[PgTriggerRow](json => JsResult.fromTry(
       Try(
         PgTriggerRow(
-          oid = json.\("oid").as[PgTriggerId],
-          tgrelid = json.\("tgrelid").as[/* oid */ Long],
-          tgparentid = json.\("tgparentid").as[/* oid */ Long],
-          tgname = json.\("tgname").as[String],
-          tgfoid = json.\("tgfoid").as[/* oid */ Long],
-          tgtype = json.\("tgtype").as[Int],
-          tgenabled = json.\("tgenabled").as[String],
-          tgisinternal = json.\("tgisinternal").as[Boolean],
-          tgconstrrelid = json.\("tgconstrrelid").as[/* oid */ Long],
-          tgconstrindid = json.\("tgconstrindid").as[/* oid */ Long],
-          tgconstraint = json.\("tgconstraint").as[/* oid */ Long],
-          tgdeferrable = json.\("tgdeferrable").as[Boolean],
-          tginitdeferred = json.\("tginitdeferred").as[Boolean],
-          tgnargs = json.\("tgnargs").as[Int],
-          tgattr = json.\("tgattr").as[TypoInt2Vector],
-          tgargs = json.\("tgargs").as[Array[Byte]],
-          tgqual = json.\("tgqual").toOption.map(_.as[TypoPgNodeTree]),
-          tgoldtable = json.\("tgoldtable").toOption.map(_.as[String]),
-          tgnewtable = json.\("tgnewtable").toOption.map(_.as[String])
+          oid = json.\("oid").as(PgTriggerId.reads),
+          tgrelid = json.\("tgrelid").as(Reads.LongReads),
+          tgparentid = json.\("tgparentid").as(Reads.LongReads),
+          tgname = json.\("tgname").as(Reads.StringReads),
+          tgfoid = json.\("tgfoid").as(Reads.LongReads),
+          tgtype = json.\("tgtype").as(Reads.IntReads),
+          tgenabled = json.\("tgenabled").as(Reads.StringReads),
+          tgisinternal = json.\("tgisinternal").as(Reads.BooleanReads),
+          tgconstrrelid = json.\("tgconstrrelid").as(Reads.LongReads),
+          tgconstrindid = json.\("tgconstrindid").as(Reads.LongReads),
+          tgconstraint = json.\("tgconstraint").as(Reads.LongReads),
+          tgdeferrable = json.\("tgdeferrable").as(Reads.BooleanReads),
+          tginitdeferred = json.\("tginitdeferred").as(Reads.BooleanReads),
+          tgnargs = json.\("tgnargs").as(Reads.IntReads),
+          tgattr = json.\("tgattr").as(TypoInt2Vector.reads),
+          tgargs = json.\("tgargs").as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly)),
+          tgqual = json.\("tgqual").toOption.map(_.as(TypoPgNodeTree.reads)),
+          tgoldtable = json.\("tgoldtable").toOption.map(_.as(Reads.StringReads)),
+          tgnewtable = json.\("tgnewtable").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -72,49 +73,49 @@ object PgTriggerRow {
   def rowParser(idx: Int): RowParser[PgTriggerRow] = RowParser[PgTriggerRow] { row =>
     Success(
       PgTriggerRow(
-        oid = row[PgTriggerId](idx + 0),
-        tgrelid = row[/* oid */ Long](idx + 1),
-        tgparentid = row[/* oid */ Long](idx + 2),
-        tgname = row[String](idx + 3),
-        tgfoid = row[/* oid */ Long](idx + 4),
-        tgtype = row[Int](idx + 5),
-        tgenabled = row[String](idx + 6),
-        tgisinternal = row[Boolean](idx + 7),
-        tgconstrrelid = row[/* oid */ Long](idx + 8),
-        tgconstrindid = row[/* oid */ Long](idx + 9),
-        tgconstraint = row[/* oid */ Long](idx + 10),
-        tgdeferrable = row[Boolean](idx + 11),
-        tginitdeferred = row[Boolean](idx + 12),
-        tgnargs = row[Int](idx + 13),
-        tgattr = row[TypoInt2Vector](idx + 14),
-        tgargs = row[Array[Byte]](idx + 15),
-        tgqual = row[Option[TypoPgNodeTree]](idx + 16),
-        tgoldtable = row[Option[String]](idx + 17),
-        tgnewtable = row[Option[String]](idx + 18)
+        oid = row(idx + 0)(PgTriggerId.column),
+        tgrelid = row(idx + 1)(Column.columnToLong),
+        tgparentid = row(idx + 2)(Column.columnToLong),
+        tgname = row(idx + 3)(Column.columnToString),
+        tgfoid = row(idx + 4)(Column.columnToLong),
+        tgtype = row(idx + 5)(Column.columnToInt),
+        tgenabled = row(idx + 6)(Column.columnToString),
+        tgisinternal = row(idx + 7)(Column.columnToBoolean),
+        tgconstrrelid = row(idx + 8)(Column.columnToLong),
+        tgconstrindid = row(idx + 9)(Column.columnToLong),
+        tgconstraint = row(idx + 10)(Column.columnToLong),
+        tgdeferrable = row(idx + 11)(Column.columnToBoolean),
+        tginitdeferred = row(idx + 12)(Column.columnToBoolean),
+        tgnargs = row(idx + 13)(Column.columnToInt),
+        tgattr = row(idx + 14)(TypoInt2Vector.column),
+        tgargs = row(idx + 15)(Column.columnToByteArray),
+        tgqual = row(idx + 16)(Column.columnToOption(TypoPgNodeTree.column)),
+        tgoldtable = row(idx + 17)(Column.columnToOption(Column.columnToString)),
+        tgnewtable = row(idx + 18)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgTriggerRow] = OWrites[PgTriggerRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "tgrelid" -> Json.toJson(o.tgrelid),
-      "tgparentid" -> Json.toJson(o.tgparentid),
-      "tgname" -> Json.toJson(o.tgname),
-      "tgfoid" -> Json.toJson(o.tgfoid),
-      "tgtype" -> Json.toJson(o.tgtype),
-      "tgenabled" -> Json.toJson(o.tgenabled),
-      "tgisinternal" -> Json.toJson(o.tgisinternal),
-      "tgconstrrelid" -> Json.toJson(o.tgconstrrelid),
-      "tgconstrindid" -> Json.toJson(o.tgconstrindid),
-      "tgconstraint" -> Json.toJson(o.tgconstraint),
-      "tgdeferrable" -> Json.toJson(o.tgdeferrable),
-      "tginitdeferred" -> Json.toJson(o.tginitdeferred),
-      "tgnargs" -> Json.toJson(o.tgnargs),
-      "tgattr" -> Json.toJson(o.tgattr),
-      "tgargs" -> Json.toJson(o.tgargs),
-      "tgqual" -> Json.toJson(o.tgqual),
-      "tgoldtable" -> Json.toJson(o.tgoldtable),
-      "tgnewtable" -> Json.toJson(o.tgnewtable)
+      "oid" -> PgTriggerId.writes.writes(o.oid),
+      "tgrelid" -> Writes.LongWrites.writes(o.tgrelid),
+      "tgparentid" -> Writes.LongWrites.writes(o.tgparentid),
+      "tgname" -> Writes.StringWrites.writes(o.tgname),
+      "tgfoid" -> Writes.LongWrites.writes(o.tgfoid),
+      "tgtype" -> Writes.IntWrites.writes(o.tgtype),
+      "tgenabled" -> Writes.StringWrites.writes(o.tgenabled),
+      "tgisinternal" -> Writes.BooleanWrites.writes(o.tgisinternal),
+      "tgconstrrelid" -> Writes.LongWrites.writes(o.tgconstrrelid),
+      "tgconstrindid" -> Writes.LongWrites.writes(o.tgconstrindid),
+      "tgconstraint" -> Writes.LongWrites.writes(o.tgconstraint),
+      "tgdeferrable" -> Writes.BooleanWrites.writes(o.tgdeferrable),
+      "tginitdeferred" -> Writes.BooleanWrites.writes(o.tginitdeferred),
+      "tgnargs" -> Writes.IntWrites.writes(o.tgnargs),
+      "tgattr" -> TypoInt2Vector.writes.writes(o.tgattr),
+      "tgargs" -> Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites).writes(o.tgargs),
+      "tgqual" -> Writes.OptionWrites(TypoPgNodeTree.writes).writes(o.tgqual),
+      "tgoldtable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tgoldtable),
+      "tgnewtable" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tgnewtable)
     ))
   )
 }

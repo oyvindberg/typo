@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_largeobject_metadata
 
+import adventureworks.TypoAclItem
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def delete(oid: PgLargeobjectMetadataId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_largeobject_metadata where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_largeobject_metadata where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow): ConnectionIO[PgLargeobjectMetadataRow] = {
     sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
-          values (${unsaved.oid}::oid, ${unsaved.lomowner}::oid, ${unsaved.lomacl}::_aclitem)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgLargeobjectMetadataId.put))}::oid, ${fromWrite(unsaved.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, lomowner, lomacl
        """.query(PgLargeobjectMetadataRow.read).unique
   }
@@ -25,17 +29,17 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata".query(PgLargeobjectMetadataRow.read).stream
   }
   override def selectById(oid: PgLargeobjectMetadataId): ConnectionIO[Option[PgLargeobjectMetadataRow]] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ${oid}".query(PgLargeobjectMetadataRow.read).option
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}".query(PgLargeobjectMetadataRow.read).option
   }
   override def selectByIds(oids: Array[PgLargeobjectMetadataId]): Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${oids})".query(PgLargeobjectMetadataRow.read).stream
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${fromWrite(oids)(Write.fromPut(PgLargeobjectMetadataId.arrayPut))})".query(PgLargeobjectMetadataRow.read).stream
   }
   override def update(row: PgLargeobjectMetadataRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_largeobject_metadata
-          set lomowner = ${row.lomowner}::oid,
-              lomacl = ${row.lomacl}::_aclitem
-          where oid = ${oid}
+          set lomowner = ${fromWrite(row.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              lomacl = ${fromWrite(row.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
+          where oid = ${fromWrite(oid)(Write.fromPut(PgLargeobjectMetadataId.put))}
        """
       .update
       .run
@@ -44,9 +48,9 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def upsert(unsaved: PgLargeobjectMetadataRow): ConnectionIO[PgLargeobjectMetadataRow] = {
     sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.lomowner}::oid,
-            ${unsaved.lomacl}::_aclitem
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgLargeobjectMetadataId.put))}::oid,
+            ${fromWrite(unsaved.lomowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.lomacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
           )
           on conflict (oid)
           do update set

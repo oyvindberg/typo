@@ -9,17 +9,18 @@ package specialoffer
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `sales.specialoffer` */
 case class SpecialofferId(value: Int) extends AnyVal
 object SpecialofferId {
-  implicit val arrayGet: Get[Array[SpecialofferId]] = Get[Array[Int]].map(_.map(SpecialofferId.apply))
-  implicit val arrayPut: Put[Array[SpecialofferId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[SpecialofferId] = Decoder[Int].map(SpecialofferId.apply)
-  implicit val encoder: Encoder[SpecialofferId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[SpecialofferId] = Get[Int].map(SpecialofferId.apply)
+  implicit val arrayGet: Get[Array[SpecialofferId]] = adventureworks.IntegerArrayMeta.get.map(_.map(SpecialofferId.apply))
+  implicit val arrayPut: Put[Array[SpecialofferId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[SpecialofferId] = Decoder.decodeInt.map(SpecialofferId.apply)
+  implicit val encoder: Encoder[SpecialofferId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[SpecialofferId] = Meta.IntMeta.get.map(SpecialofferId.apply)
   implicit val ordering: Ordering[SpecialofferId] = Ordering.by(_.value)
-  implicit val put: Put[SpecialofferId] = Put[Int].contramap(_.value)
+  implicit val put: Put[SpecialofferId] = Meta.IntMeta.put.contramap(_.value)
 }

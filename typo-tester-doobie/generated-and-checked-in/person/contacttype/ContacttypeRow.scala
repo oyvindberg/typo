@@ -10,7 +10,6 @@ package contacttype
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,18 +24,18 @@ case class ContacttypeRow(
 )
 
 object ContacttypeRow {
-  implicit val decoder: Decoder[ContacttypeRow] = Decoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(ContacttypeRow.apply)
-  implicit val encoder: Encoder[ContacttypeRow] = Encoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(x => (x.contacttypeid, x.name, x.modifieddate))
+  implicit val decoder: Decoder[ContacttypeRow] = Decoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(ContacttypeRow.apply)(ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ContacttypeRow] = Encoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(x => (x.contacttypeid, x.name, x.modifieddate))(ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[ContacttypeRow] = new Read[ContacttypeRow](
     gets = List(
-      (Get[ContacttypeId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ContacttypeId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ContacttypeRow(
-      contacttypeid = Get[ContacttypeId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

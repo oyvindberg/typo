@@ -9,8 +9,8 @@ package pg_stats_ext_exprs
 
 import adventureworks.TypoAnyArray
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -35,44 +35,44 @@ case class PgStatsExtExprsViewRow(
 )
 
 object PgStatsExtExprsViewRow {
-  implicit val decoder: Decoder[PgStatsExtExprsViewRow] = Decoder.forProduct16[PgStatsExtExprsViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "expr", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(PgStatsExtExprsViewRow.apply)
-  implicit val encoder: Encoder[PgStatsExtExprsViewRow] = Encoder.forProduct16[PgStatsExtExprsViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "expr", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(x => (x.schemaname, x.tablename, x.statisticsSchemaname, x.statisticsName, x.statisticsOwner, x.expr, x.nullFrac, x.avgWidth, x.nDistinct, x.mostCommonVals, x.mostCommonFreqs, x.histogramBounds, x.correlation, x.mostCommonElems, x.mostCommonElemFreqs, x.elemCountHistogram))
+  implicit val decoder: Decoder[PgStatsExtExprsViewRow] = Decoder.forProduct16[PgStatsExtExprsViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "expr", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(PgStatsExtExprsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeFloat), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeFloat), Decoder.decodeOption(TypoAnyArray.decoder), Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)), Decoder.decodeOption(TypoAnyArray.decoder), Decoder.decodeOption(Decoder.decodeFloat), Decoder.decodeOption(TypoAnyArray.decoder), Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)))
+  implicit val encoder: Encoder[PgStatsExtExprsViewRow] = Encoder.forProduct16[PgStatsExtExprsViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "expr", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(x => (x.schemaname, x.tablename, x.statisticsSchemaname, x.statisticsName, x.statisticsOwner, x.expr, x.nullFrac, x.avgWidth, x.nDistinct, x.mostCommonVals, x.mostCommonFreqs, x.histogramBounds, x.correlation, x.mostCommonElems, x.mostCommonElemFreqs, x.elemCountHistogram))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeFloat), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeFloat), Encoder.encodeOption(TypoAnyArray.encoder), Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)), Encoder.encodeOption(TypoAnyArray.encoder), Encoder.encodeOption(Encoder.encodeFloat), Encoder.encodeOption(TypoAnyArray.encoder), Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)))
   implicit val read: Read[PgStatsExtExprsViewRow] = new Read[PgStatsExtExprsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Float], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Float], Nullability.Nullable),
-      (Get[TypoAnyArray], Nullability.Nullable),
-      (Get[Array[Float]], Nullability.Nullable),
-      (Get[TypoAnyArray], Nullability.Nullable),
-      (Get[Float], Nullability.Nullable),
-      (Get[TypoAnyArray], Nullability.Nullable),
-      (Get[Array[Float]], Nullability.Nullable),
-      (Get[Array[Float]], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.FloatMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.FloatMeta.get, Nullability.Nullable),
+      (TypoAnyArray.get, Nullability.Nullable),
+      (adventureworks.FloatArrayMeta.get, Nullability.Nullable),
+      (TypoAnyArray.get, Nullability.Nullable),
+      (Meta.FloatMeta.get, Nullability.Nullable),
+      (TypoAnyArray.get, Nullability.Nullable),
+      (adventureworks.FloatArrayMeta.get, Nullability.Nullable),
+      (adventureworks.FloatArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatsExtExprsViewRow(
-      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-      tablename = Get[String].unsafeGetNullable(rs, i + 1),
-      statisticsSchemaname = Get[String].unsafeGetNullable(rs, i + 2),
-      statisticsName = Get[String].unsafeGetNullable(rs, i + 3),
-      statisticsOwner = Get[String].unsafeGetNullable(rs, i + 4),
-      expr = Get[String].unsafeGetNullable(rs, i + 5),
-      nullFrac = Get[Float].unsafeGetNullable(rs, i + 6),
-      avgWidth = Get[Int].unsafeGetNullable(rs, i + 7),
-      nDistinct = Get[Float].unsafeGetNullable(rs, i + 8),
-      mostCommonVals = Get[TypoAnyArray].unsafeGetNullable(rs, i + 9),
-      mostCommonFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 10),
-      histogramBounds = Get[TypoAnyArray].unsafeGetNullable(rs, i + 11),
-      correlation = Get[Float].unsafeGetNullable(rs, i + 12),
-      mostCommonElems = Get[TypoAnyArray].unsafeGetNullable(rs, i + 13),
-      mostCommonElemFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 14),
-      elemCountHistogram = Get[Array[Float]].unsafeGetNullable(rs, i + 15)
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      tablename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      statisticsSchemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      statisticsName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      statisticsOwner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      expr = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      nullFrac = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 6),
+      avgWidth = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
+      nDistinct = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 8),
+      mostCommonVals = TypoAnyArray.get.unsafeGetNullable(rs, i + 9),
+      mostCommonFreqs = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 10),
+      histogramBounds = TypoAnyArray.get.unsafeGetNullable(rs, i + 11),
+      correlation = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 12),
+      mostCommonElems = TypoAnyArray.get.unsafeGetNullable(rs, i + 13),
+      mostCommonElemFreqs = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 14),
+      elemCountHistogram = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 15)
     )
   )
 }

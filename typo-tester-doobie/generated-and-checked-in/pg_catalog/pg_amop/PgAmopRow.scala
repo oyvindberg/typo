@@ -8,8 +8,8 @@ package pg_catalog
 package pg_amop
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -27,30 +27,30 @@ case class PgAmopRow(
 )
 
 object PgAmopRow {
-  implicit val decoder: Decoder[PgAmopRow] = Decoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(PgAmopRow.apply)
-  implicit val encoder: Encoder[PgAmopRow] = Encoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(x => (x.oid, x.amopfamily, x.amoplefttype, x.amoprighttype, x.amopstrategy, x.amoppurpose, x.amopopr, x.amopmethod, x.amopsortfamily))
+  implicit val decoder: Decoder[PgAmopRow] = Decoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(PgAmopRow.apply)(PgAmopId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit val encoder: Encoder[PgAmopRow] = Encoder.forProduct9[PgAmopRow, PgAmopId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "amopfamily", "amoplefttype", "amoprighttype", "amopstrategy", "amoppurpose", "amopopr", "amopmethod", "amopsortfamily")(x => (x.oid, x.amopfamily, x.amoplefttype, x.amoprighttype, x.amopstrategy, x.amoppurpose, x.amopopr, x.amopmethod, x.amopsortfamily))(PgAmopId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
   implicit val read: Read[PgAmopRow] = new Read[PgAmopRow](
     gets = List(
-      (Get[PgAmopId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls)
+      (PgAmopId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgAmopRow(
-      oid = Get[PgAmopId].unsafeGetNonNullable(rs, i + 0),
-      amopfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      amoplefttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      amoprighttype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      amopstrategy = Get[Int].unsafeGetNonNullable(rs, i + 4),
-      amoppurpose = Get[String].unsafeGetNonNullable(rs, i + 5),
-      amopopr = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
-      amopmethod = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
-      amopsortfamily = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8)
+      oid = PgAmopId.get.unsafeGetNonNullable(rs, i + 0),
+      amopfamily = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      amoplefttype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      amoprighttype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      amopstrategy = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      amoppurpose = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      amopopr = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      amopmethod = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
+      amopsortfamily = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 8)
     )
   )
 }

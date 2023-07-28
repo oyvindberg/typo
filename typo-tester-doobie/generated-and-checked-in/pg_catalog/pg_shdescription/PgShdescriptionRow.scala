@@ -8,8 +8,8 @@ package pg_catalog
 package pg_shdescription
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -23,18 +23,18 @@ case class PgShdescriptionRow(
  }
 
 object PgShdescriptionRow {
-  implicit val decoder: Decoder[PgShdescriptionRow] = Decoder.forProduct3[PgShdescriptionRow, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "description")(PgShdescriptionRow.apply)
-  implicit val encoder: Encoder[PgShdescriptionRow] = Encoder.forProduct3[PgShdescriptionRow, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "description")(x => (x.objoid, x.classoid, x.description))
+  implicit val decoder: Decoder[PgShdescriptionRow] = Decoder.forProduct3[PgShdescriptionRow, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "description")(PgShdescriptionRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString)
+  implicit val encoder: Encoder[PgShdescriptionRow] = Encoder.forProduct3[PgShdescriptionRow, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "description")(x => (x.objoid, x.classoid, x.description))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString)
   implicit val read: Read[PgShdescriptionRow] = new Read[PgShdescriptionRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgShdescriptionRow(
-      objoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      classoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      description = Get[String].unsafeGetNonNullable(rs, i + 2)
+      objoid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      classoid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      description = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

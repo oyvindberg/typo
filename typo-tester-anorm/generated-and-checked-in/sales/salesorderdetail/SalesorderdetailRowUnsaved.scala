@@ -16,9 +16,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -80,32 +80,32 @@ object SalesorderdetailRowUnsaved {
   implicit val reads: Reads[SalesorderdetailRowUnsaved] = Reads[SalesorderdetailRowUnsaved](json => JsResult.fromTry(
       Try(
         SalesorderdetailRowUnsaved(
-          salesorderid = json.\("salesorderid").as[SalesorderheaderId],
-          carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[/* max 25 chars */ String]),
-          orderqty = json.\("orderqty").as[Int],
-          productid = json.\("productid").as[ProductId],
-          specialofferid = json.\("specialofferid").as[SpecialofferId],
-          unitprice = json.\("unitprice").as[BigDecimal],
-          salesorderdetailid = json.\("salesorderdetailid").as[Defaulted[Int]],
-          unitpricediscount = json.\("unitpricediscount").as[Defaulted[BigDecimal]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
+          carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as(Reads.StringReads)),
+          orderqty = json.\("orderqty").as(Reads.IntReads),
+          productid = json.\("productid").as(ProductId.reads),
+          specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
+          unitprice = json.\("unitprice").as(Reads.bigDecReads),
+          salesorderdetailid = json.\("salesorderdetailid").as(Defaulted.reads(Reads.IntReads)),
+          unitpricediscount = json.\("unitpricediscount").as(Defaulted.reads(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[SalesorderdetailRowUnsaved] = OWrites[SalesorderdetailRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "salesorderid" -> Json.toJson(o.salesorderid),
-      "carriertrackingnumber" -> Json.toJson(o.carriertrackingnumber),
-      "orderqty" -> Json.toJson(o.orderqty),
-      "productid" -> Json.toJson(o.productid),
-      "specialofferid" -> Json.toJson(o.specialofferid),
-      "unitprice" -> Json.toJson(o.unitprice),
-      "salesorderdetailid" -> Json.toJson(o.salesorderdetailid),
-      "unitpricediscount" -> Json.toJson(o.unitpricediscount),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
+      "carriertrackingnumber" -> Writes.OptionWrites(Writes.StringWrites).writes(o.carriertrackingnumber),
+      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
+      "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),
+      "salesorderdetailid" -> Defaulted.writes(Writes.IntWrites).writes(o.salesorderdetailid),
+      "unitpricediscount" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.unitpricediscount),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -10,14 +10,15 @@ package pg_index
 import adventureworks.TypoInt2Vector
 import adventureworks.TypoOidVector
 import adventureworks.TypoPgNodeTree
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -48,26 +49,26 @@ object PgIndexRow {
   implicit val reads: Reads[PgIndexRow] = Reads[PgIndexRow](json => JsResult.fromTry(
       Try(
         PgIndexRow(
-          indexrelid = json.\("indexrelid").as[PgIndexId],
-          indrelid = json.\("indrelid").as[/* oid */ Long],
-          indnatts = json.\("indnatts").as[Int],
-          indnkeyatts = json.\("indnkeyatts").as[Int],
-          indisunique = json.\("indisunique").as[Boolean],
-          indisprimary = json.\("indisprimary").as[Boolean],
-          indisexclusion = json.\("indisexclusion").as[Boolean],
-          indimmediate = json.\("indimmediate").as[Boolean],
-          indisclustered = json.\("indisclustered").as[Boolean],
-          indisvalid = json.\("indisvalid").as[Boolean],
-          indcheckxmin = json.\("indcheckxmin").as[Boolean],
-          indisready = json.\("indisready").as[Boolean],
-          indislive = json.\("indislive").as[Boolean],
-          indisreplident = json.\("indisreplident").as[Boolean],
-          indkey = json.\("indkey").as[TypoInt2Vector],
-          indcollation = json.\("indcollation").as[TypoOidVector],
-          indclass = json.\("indclass").as[TypoOidVector],
-          indoption = json.\("indoption").as[TypoInt2Vector],
-          indexprs = json.\("indexprs").toOption.map(_.as[TypoPgNodeTree]),
-          indpred = json.\("indpred").toOption.map(_.as[TypoPgNodeTree])
+          indexrelid = json.\("indexrelid").as(PgIndexId.reads),
+          indrelid = json.\("indrelid").as(Reads.LongReads),
+          indnatts = json.\("indnatts").as(Reads.IntReads),
+          indnkeyatts = json.\("indnkeyatts").as(Reads.IntReads),
+          indisunique = json.\("indisunique").as(Reads.BooleanReads),
+          indisprimary = json.\("indisprimary").as(Reads.BooleanReads),
+          indisexclusion = json.\("indisexclusion").as(Reads.BooleanReads),
+          indimmediate = json.\("indimmediate").as(Reads.BooleanReads),
+          indisclustered = json.\("indisclustered").as(Reads.BooleanReads),
+          indisvalid = json.\("indisvalid").as(Reads.BooleanReads),
+          indcheckxmin = json.\("indcheckxmin").as(Reads.BooleanReads),
+          indisready = json.\("indisready").as(Reads.BooleanReads),
+          indislive = json.\("indislive").as(Reads.BooleanReads),
+          indisreplident = json.\("indisreplident").as(Reads.BooleanReads),
+          indkey = json.\("indkey").as(TypoInt2Vector.reads),
+          indcollation = json.\("indcollation").as(TypoOidVector.reads),
+          indclass = json.\("indclass").as(TypoOidVector.reads),
+          indoption = json.\("indoption").as(TypoInt2Vector.reads),
+          indexprs = json.\("indexprs").toOption.map(_.as(TypoPgNodeTree.reads)),
+          indpred = json.\("indpred").toOption.map(_.as(TypoPgNodeTree.reads))
         )
       )
     ),
@@ -75,51 +76,51 @@ object PgIndexRow {
   def rowParser(idx: Int): RowParser[PgIndexRow] = RowParser[PgIndexRow] { row =>
     Success(
       PgIndexRow(
-        indexrelid = row[PgIndexId](idx + 0),
-        indrelid = row[/* oid */ Long](idx + 1),
-        indnatts = row[Int](idx + 2),
-        indnkeyatts = row[Int](idx + 3),
-        indisunique = row[Boolean](idx + 4),
-        indisprimary = row[Boolean](idx + 5),
-        indisexclusion = row[Boolean](idx + 6),
-        indimmediate = row[Boolean](idx + 7),
-        indisclustered = row[Boolean](idx + 8),
-        indisvalid = row[Boolean](idx + 9),
-        indcheckxmin = row[Boolean](idx + 10),
-        indisready = row[Boolean](idx + 11),
-        indislive = row[Boolean](idx + 12),
-        indisreplident = row[Boolean](idx + 13),
-        indkey = row[TypoInt2Vector](idx + 14),
-        indcollation = row[TypoOidVector](idx + 15),
-        indclass = row[TypoOidVector](idx + 16),
-        indoption = row[TypoInt2Vector](idx + 17),
-        indexprs = row[Option[TypoPgNodeTree]](idx + 18),
-        indpred = row[Option[TypoPgNodeTree]](idx + 19)
+        indexrelid = row(idx + 0)(PgIndexId.column),
+        indrelid = row(idx + 1)(Column.columnToLong),
+        indnatts = row(idx + 2)(Column.columnToInt),
+        indnkeyatts = row(idx + 3)(Column.columnToInt),
+        indisunique = row(idx + 4)(Column.columnToBoolean),
+        indisprimary = row(idx + 5)(Column.columnToBoolean),
+        indisexclusion = row(idx + 6)(Column.columnToBoolean),
+        indimmediate = row(idx + 7)(Column.columnToBoolean),
+        indisclustered = row(idx + 8)(Column.columnToBoolean),
+        indisvalid = row(idx + 9)(Column.columnToBoolean),
+        indcheckxmin = row(idx + 10)(Column.columnToBoolean),
+        indisready = row(idx + 11)(Column.columnToBoolean),
+        indislive = row(idx + 12)(Column.columnToBoolean),
+        indisreplident = row(idx + 13)(Column.columnToBoolean),
+        indkey = row(idx + 14)(TypoInt2Vector.column),
+        indcollation = row(idx + 15)(TypoOidVector.column),
+        indclass = row(idx + 16)(TypoOidVector.column),
+        indoption = row(idx + 17)(TypoInt2Vector.column),
+        indexprs = row(idx + 18)(Column.columnToOption(TypoPgNodeTree.column)),
+        indpred = row(idx + 19)(Column.columnToOption(TypoPgNodeTree.column))
       )
     )
   }
   implicit val writes: OWrites[PgIndexRow] = OWrites[PgIndexRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "indexrelid" -> Json.toJson(o.indexrelid),
-      "indrelid" -> Json.toJson(o.indrelid),
-      "indnatts" -> Json.toJson(o.indnatts),
-      "indnkeyatts" -> Json.toJson(o.indnkeyatts),
-      "indisunique" -> Json.toJson(o.indisunique),
-      "indisprimary" -> Json.toJson(o.indisprimary),
-      "indisexclusion" -> Json.toJson(o.indisexclusion),
-      "indimmediate" -> Json.toJson(o.indimmediate),
-      "indisclustered" -> Json.toJson(o.indisclustered),
-      "indisvalid" -> Json.toJson(o.indisvalid),
-      "indcheckxmin" -> Json.toJson(o.indcheckxmin),
-      "indisready" -> Json.toJson(o.indisready),
-      "indislive" -> Json.toJson(o.indislive),
-      "indisreplident" -> Json.toJson(o.indisreplident),
-      "indkey" -> Json.toJson(o.indkey),
-      "indcollation" -> Json.toJson(o.indcollation),
-      "indclass" -> Json.toJson(o.indclass),
-      "indoption" -> Json.toJson(o.indoption),
-      "indexprs" -> Json.toJson(o.indexprs),
-      "indpred" -> Json.toJson(o.indpred)
+      "indexrelid" -> PgIndexId.writes.writes(o.indexrelid),
+      "indrelid" -> Writes.LongWrites.writes(o.indrelid),
+      "indnatts" -> Writes.IntWrites.writes(o.indnatts),
+      "indnkeyatts" -> Writes.IntWrites.writes(o.indnkeyatts),
+      "indisunique" -> Writes.BooleanWrites.writes(o.indisunique),
+      "indisprimary" -> Writes.BooleanWrites.writes(o.indisprimary),
+      "indisexclusion" -> Writes.BooleanWrites.writes(o.indisexclusion),
+      "indimmediate" -> Writes.BooleanWrites.writes(o.indimmediate),
+      "indisclustered" -> Writes.BooleanWrites.writes(o.indisclustered),
+      "indisvalid" -> Writes.BooleanWrites.writes(o.indisvalid),
+      "indcheckxmin" -> Writes.BooleanWrites.writes(o.indcheckxmin),
+      "indisready" -> Writes.BooleanWrites.writes(o.indisready),
+      "indislive" -> Writes.BooleanWrites.writes(o.indislive),
+      "indisreplident" -> Writes.BooleanWrites.writes(o.indisreplident),
+      "indkey" -> TypoInt2Vector.writes.writes(o.indkey),
+      "indcollation" -> TypoOidVector.writes.writes(o.indcollation),
+      "indclass" -> TypoOidVector.writes.writes(o.indclass),
+      "indoption" -> TypoInt2Vector.writes.writes(o.indoption),
+      "indexprs" -> Writes.OptionWrites(TypoPgNodeTree.writes).writes(o.indexprs),
+      "indpred" -> Writes.OptionWrites(TypoPgNodeTree.writes).writes(o.indpred)
     ))
   )
 }

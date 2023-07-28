@@ -8,14 +8,15 @@ package pg_catalog
 package pg_rewrite
 
 import adventureworks.TypoPgNodeTree
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,14 +35,14 @@ object PgRewriteRow {
   implicit val reads: Reads[PgRewriteRow] = Reads[PgRewriteRow](json => JsResult.fromTry(
       Try(
         PgRewriteRow(
-          oid = json.\("oid").as[PgRewriteId],
-          rulename = json.\("rulename").as[String],
-          evClass = json.\("ev_class").as[/* oid */ Long],
-          evType = json.\("ev_type").as[String],
-          evEnabled = json.\("ev_enabled").as[String],
-          isInstead = json.\("is_instead").as[Boolean],
-          evQual = json.\("ev_qual").as[TypoPgNodeTree],
-          evAction = json.\("ev_action").as[TypoPgNodeTree]
+          oid = json.\("oid").as(PgRewriteId.reads),
+          rulename = json.\("rulename").as(Reads.StringReads),
+          evClass = json.\("ev_class").as(Reads.LongReads),
+          evType = json.\("ev_type").as(Reads.StringReads),
+          evEnabled = json.\("ev_enabled").as(Reads.StringReads),
+          isInstead = json.\("is_instead").as(Reads.BooleanReads),
+          evQual = json.\("ev_qual").as(TypoPgNodeTree.reads),
+          evAction = json.\("ev_action").as(TypoPgNodeTree.reads)
         )
       )
     ),
@@ -49,27 +50,27 @@ object PgRewriteRow {
   def rowParser(idx: Int): RowParser[PgRewriteRow] = RowParser[PgRewriteRow] { row =>
     Success(
       PgRewriteRow(
-        oid = row[PgRewriteId](idx + 0),
-        rulename = row[String](idx + 1),
-        evClass = row[/* oid */ Long](idx + 2),
-        evType = row[String](idx + 3),
-        evEnabled = row[String](idx + 4),
-        isInstead = row[Boolean](idx + 5),
-        evQual = row[TypoPgNodeTree](idx + 6),
-        evAction = row[TypoPgNodeTree](idx + 7)
+        oid = row(idx + 0)(PgRewriteId.column),
+        rulename = row(idx + 1)(Column.columnToString),
+        evClass = row(idx + 2)(Column.columnToLong),
+        evType = row(idx + 3)(Column.columnToString),
+        evEnabled = row(idx + 4)(Column.columnToString),
+        isInstead = row(idx + 5)(Column.columnToBoolean),
+        evQual = row(idx + 6)(TypoPgNodeTree.column),
+        evAction = row(idx + 7)(TypoPgNodeTree.column)
       )
     )
   }
   implicit val writes: OWrites[PgRewriteRow] = OWrites[PgRewriteRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "rulename" -> Json.toJson(o.rulename),
-      "ev_class" -> Json.toJson(o.evClass),
-      "ev_type" -> Json.toJson(o.evType),
-      "ev_enabled" -> Json.toJson(o.evEnabled),
-      "is_instead" -> Json.toJson(o.isInstead),
-      "ev_qual" -> Json.toJson(o.evQual),
-      "ev_action" -> Json.toJson(o.evAction)
+      "oid" -> PgRewriteId.writes.writes(o.oid),
+      "rulename" -> Writes.StringWrites.writes(o.rulename),
+      "ev_class" -> Writes.LongWrites.writes(o.evClass),
+      "ev_type" -> Writes.StringWrites.writes(o.evType),
+      "ev_enabled" -> Writes.StringWrites.writes(o.evEnabled),
+      "is_instead" -> Writes.BooleanWrites.writes(o.isInstead),
+      "ev_qual" -> TypoPgNodeTree.writes.writes(o.evQual),
+      "ev_action" -> TypoPgNodeTree.writes.writes(o.evAction)
     ))
   )
 }

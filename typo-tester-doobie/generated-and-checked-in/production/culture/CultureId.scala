@@ -9,17 +9,18 @@ package culture
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.culture` */
 case class CultureId(value: /* bpchar */ String) extends AnyVal
 object CultureId {
-  implicit val arrayGet: Get[Array[CultureId]] = Get[Array[/* bpchar */ String]].map(_.map(CultureId.apply))
-  implicit val arrayPut: Put[Array[CultureId]] = Put[Array[/* bpchar */ String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[CultureId] = Decoder[/* bpchar */ String].map(CultureId.apply)
-  implicit val encoder: Encoder[CultureId] = Encoder[/* bpchar */ String].contramap(_.value)
-  implicit val get: Get[CultureId] = Get[/* bpchar */ String].map(CultureId.apply)
+  implicit val arrayGet: Get[Array[CultureId]] = adventureworks.StringArrayMeta.get.map(_.map(CultureId.apply))
+  implicit val arrayPut: Put[Array[CultureId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[CultureId] = Decoder.decodeString.map(CultureId.apply)
+  implicit val encoder: Encoder[CultureId] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[CultureId] = Meta.StringMeta.get.map(CultureId.apply)
   implicit val ordering: Ordering[CultureId] = Ordering.by(_.value)
-  implicit val put: Put[CultureId] = Put[/* bpchar */ String].contramap(_.value)
+  implicit val put: Put[CultureId] = Meta.StringMeta.put.contramap(_.value)
 }

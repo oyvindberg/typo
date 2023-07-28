@@ -10,31 +10,34 @@ package productdocument
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
+import adventureworks.production.product.ProductId
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
-    sql"delete from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".update.run.map(_ > 0)
+    sql"delete from production.productdocument where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND documentnode = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)
-          values (${unsaved.productid}::int4, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
+          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
           returning productid, modifieddate::text, documentnode
        """.query(ProductdocumentRow.read).unique
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
     val fs = List(
-      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
+      Some((Fragment.const(s"productid"), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"documentnode"), fr"${value: DocumentId}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"documentnode"), fr"${fromWrite(value: DocumentId)(Write.fromPut(DocumentId.put))}"))
       }
     ).flatten
     
@@ -56,13 +59,13 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     sql"select productid, modifieddate::text, documentnode from production.productdocument".query(ProductdocumentRow.read).stream
   }
   override def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]] = {
-    sql"select productid, modifieddate::text, documentnode from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".query(ProductdocumentRow.read).option
+    sql"select productid, modifieddate::text, documentnode from production.productdocument where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND documentnode = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}".query(ProductdocumentRow.read).option
   }
   override def update(row: ProductdocumentRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productdocument
-          set modifieddate = ${row.modifieddate}::timestamp
-          where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
+          set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND documentnode = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}
        """
       .update
       .run
@@ -71,9 +74,9 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)
           values (
-            ${unsaved.productid}::int4,
-            ${unsaved.modifieddate}::timestamp,
-            ${unsaved.documentnode}
+            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))}
           )
           on conflict (productid, documentnode)
           do update set

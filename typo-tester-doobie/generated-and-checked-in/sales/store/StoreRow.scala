@@ -12,7 +12,6 @@ import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -35,24 +34,24 @@ case class StoreRow(
 )
 
 object StoreRow {
-  implicit val decoder: Decoder[StoreRow] = Decoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(StoreRow.apply)
-  implicit val encoder: Encoder[StoreRow] = Encoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.name, x.salespersonid, x.demographics, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[StoreRow] = Decoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(StoreRow.apply)(BusinessentityId.decoder, Name.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[StoreRow] = Encoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.name, x.salespersonid, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Name.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[StoreRow] = new Read[StoreRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => StoreRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      salespersonid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-      demographics = Get[TypoXml].unsafeGetNullable(rs, i + 3),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      salespersonid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
+      demographics = TypoXml.get.unsafeGetNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

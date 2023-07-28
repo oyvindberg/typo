@@ -10,8 +10,8 @@ package spqh
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -32,24 +32,24 @@ case class SpqhViewRow(
 )
 
 object SpqhViewRow {
-  implicit val decoder: Decoder[SpqhViewRow] = Decoder.forProduct6[SpqhViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SpqhViewRow.apply)
-  implicit val encoder: Encoder[SpqhViewRow] = Encoder.forProduct6[SpqhViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[SpqhViewRow] = Decoder.forProduct6[SpqhViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SpqhViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[SpqhViewRow] = Encoder.forProduct6[SpqhViewRow, Option[Int], Option[BusinessentityId], Option[TypoLocalDateTime], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[SpqhViewRow] = new Read[SpqhViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpqhViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      quotadate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
-      salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      quotadate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
+      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

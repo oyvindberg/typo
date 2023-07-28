@@ -15,9 +15,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -66,7 +66,7 @@ object TypoHStore {
   implicit val reads: Reads[TypoHStore] = Reads[TypoHStore](json => JsResult.fromTry(
       Try(
         TypoHStore(
-          value = json.\("value").as[Map[String, String]]
+          value = json.\("value").as(implicitly[Reads[Map[String, String]]])
         )
       )
     ),
@@ -78,7 +78,7 @@ object TypoHStore {
                                                               }))
   implicit val writes: OWrites[TypoHStore] = OWrites[TypoHStore](o =>
     new JsObject(ListMap[String, JsValue](
-      "value" -> Json.toJson(o.value)
+      "value" -> implicitly[Writes[Map[String, String]]].writes(o.value)
     ))
   )
 }

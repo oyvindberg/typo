@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stats_ext
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -32,40 +32,40 @@ case class PgStatsExtViewRow(
 )
 
 object PgStatsExtViewRow {
-  implicit val decoder: Decoder[PgStatsExtViewRow] = Decoder.forProduct14[PgStatsExtViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[Array[String]], Option[Array[String]], Option[Array[String]], Option[String], Option[String], Option[Array[String]], Option[Array[Boolean]], Option[Array[Double]], Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(PgStatsExtViewRow.apply)
-  implicit val encoder: Encoder[PgStatsExtViewRow] = Encoder.forProduct14[PgStatsExtViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[Array[String]], Option[Array[String]], Option[Array[String]], Option[String], Option[String], Option[Array[String]], Option[Array[Boolean]], Option[Array[Double]], Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(x => (x.schemaname, x.tablename, x.statisticsSchemaname, x.statisticsName, x.statisticsOwner, x.attnames, x.exprs, x.kinds, x.nDistinct, x.dependencies, x.mostCommonVals, x.mostCommonValNulls, x.mostCommonFreqs, x.mostCommonBaseFreqs))
+  implicit val decoder: Decoder[PgStatsExtViewRow] = Decoder.forProduct14[PgStatsExtViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[Array[String]], Option[Array[String]], Option[Array[String]], Option[String], Option[String], Option[Array[String]], Option[Array[Boolean]], Option[Array[Double]], Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(PgStatsExtViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Boolean](Decoder.decodeBoolean, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)))
+  implicit val encoder: Encoder[PgStatsExtViewRow] = Encoder.forProduct14[PgStatsExtViewRow, Option[String], Option[String], Option[String], Option[String], Option[String], Option[Array[String]], Option[Array[String]], Option[Array[String]], Option[String], Option[String], Option[Array[String]], Option[Array[Boolean]], Option[Array[Double]], Option[Array[Double]]]("schemaname", "tablename", "statistics_schemaname", "statistics_name", "statistics_owner", "attnames", "exprs", "kinds", "n_distinct", "dependencies", "most_common_vals", "most_common_val_nulls", "most_common_freqs", "most_common_base_freqs")(x => (x.schemaname, x.tablename, x.statisticsSchemaname, x.statisticsName, x.statisticsOwner, x.attnames, x.exprs, x.kinds, x.nDistinct, x.dependencies, x.mostCommonVals, x.mostCommonValNulls, x.mostCommonFreqs, x.mostCommonBaseFreqs))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Boolean, Array](Encoder.encodeBoolean, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)))
   implicit val read: Read[PgStatsExtViewRow] = new Read[PgStatsExtViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable),
-      (Get[Array[Boolean]], Nullability.Nullable),
-      (Get[Array[Double]], Nullability.Nullable),
-      (Get[Array[Double]], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (adventureworks.BooleanArrayMeta.get, Nullability.Nullable),
+      (adventureworks.DoubleArrayMeta.get, Nullability.Nullable),
+      (adventureworks.DoubleArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatsExtViewRow(
-      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-      tablename = Get[String].unsafeGetNullable(rs, i + 1),
-      statisticsSchemaname = Get[String].unsafeGetNullable(rs, i + 2),
-      statisticsName = Get[String].unsafeGetNullable(rs, i + 3),
-      statisticsOwner = Get[String].unsafeGetNullable(rs, i + 4),
-      attnames = Get[Array[String]].unsafeGetNullable(rs, i + 5),
-      exprs = Get[Array[String]].unsafeGetNullable(rs, i + 6),
-      kinds = Get[Array[String]].unsafeGetNullable(rs, i + 7),
-      nDistinct = Get[String].unsafeGetNullable(rs, i + 8),
-      dependencies = Get[String].unsafeGetNullable(rs, i + 9),
-      mostCommonVals = Get[Array[String]].unsafeGetNullable(rs, i + 10),
-      mostCommonValNulls = Get[Array[Boolean]].unsafeGetNullable(rs, i + 11),
-      mostCommonFreqs = Get[Array[Double]].unsafeGetNullable(rs, i + 12),
-      mostCommonBaseFreqs = Get[Array[Double]].unsafeGetNullable(rs, i + 13)
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      tablename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      statisticsSchemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      statisticsName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      statisticsOwner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      attnames = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 5),
+      exprs = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 6),
+      kinds = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 7),
+      nDistinct = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      dependencies = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      mostCommonVals = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 10),
+      mostCommonValNulls = adventureworks.BooleanArrayMeta.get.unsafeGetNullable(rs, i + 11),
+      mostCommonFreqs = adventureworks.DoubleArrayMeta.get.unsafeGetNullable(rs, i + 12),
+      mostCommonBaseFreqs = adventureworks.DoubleArrayMeta.get.unsafeGetNullable(rs, i + 13)
     )
   )
 }

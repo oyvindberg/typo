@@ -8,14 +8,15 @@ package pg_catalog
 package pg_init_privs
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,11 +34,11 @@ object PgInitPrivsRow {
   implicit val reads: Reads[PgInitPrivsRow] = Reads[PgInitPrivsRow](json => JsResult.fromTry(
       Try(
         PgInitPrivsRow(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long],
-          objsubid = json.\("objsubid").as[Int],
-          privtype = json.\("privtype").as[String],
-          initprivs = json.\("initprivs").as[Array[TypoAclItem]]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads),
+          objsubid = json.\("objsubid").as(Reads.IntReads),
+          privtype = json.\("privtype").as(Reads.StringReads),
+          initprivs = json.\("initprivs").as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly))
         )
       )
     ),
@@ -45,21 +46,21 @@ object PgInitPrivsRow {
   def rowParser(idx: Int): RowParser[PgInitPrivsRow] = RowParser[PgInitPrivsRow] { row =>
     Success(
       PgInitPrivsRow(
-        objoid = row[/* oid */ Long](idx + 0),
-        classoid = row[/* oid */ Long](idx + 1),
-        objsubid = row[Int](idx + 2),
-        privtype = row[String](idx + 3),
-        initprivs = row[Array[TypoAclItem]](idx + 4)
+        objoid = row(idx + 0)(Column.columnToLong),
+        classoid = row(idx + 1)(Column.columnToLong),
+        objsubid = row(idx + 2)(Column.columnToInt),
+        privtype = row(idx + 3)(Column.columnToString),
+        initprivs = row(idx + 4)(TypoAclItem.arrayColumn)
       )
     )
   }
   implicit val writes: OWrites[PgInitPrivsRow] = OWrites[PgInitPrivsRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "objsubid" -> Json.toJson(o.objsubid),
-      "privtype" -> Json.toJson(o.privtype),
-      "initprivs" -> Json.toJson(o.initprivs)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid),
+      "objsubid" -> Writes.IntWrites.writes(o.objsubid),
+      "privtype" -> Writes.StringWrites.writes(o.privtype),
+      "initprivs" -> Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes).writes(o.initprivs)
     ))
   )
 }

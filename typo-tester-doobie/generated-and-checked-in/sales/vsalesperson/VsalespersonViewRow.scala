@@ -11,8 +11,8 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -60,56 +60,56 @@ case class VsalespersonViewRow(
 )
 
 object VsalespersonViewRow {
-  implicit val decoder: Decoder[VsalespersonViewRow] = Decoder.forProduct22[VsalespersonViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[Name], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear")(VsalespersonViewRow.apply)
-  implicit val encoder: Encoder[VsalespersonViewRow] = Encoder.forProduct22[VsalespersonViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[Name], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname, x.territoryname, x.territorygroup, x.salesquota, x.salesytd, x.saleslastyear))
+  implicit val decoder: Decoder[VsalespersonViewRow] = Decoder.forProduct22[VsalespersonViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[Name], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear")(VsalespersonViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal))
+  implicit val encoder: Encoder[VsalespersonViewRow] = Encoder.forProduct22[VsalespersonViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[/* max 50 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[Name], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.jobtitle, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname, x.territoryname, x.territorygroup, x.salesquota, x.salesytd, x.saleslastyear))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal))
   implicit val read: Read[VsalespersonViewRow] = new Read[VsalespersonViewRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[/* max 8 chars */ String], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[/* max 10 chars */ String], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[Phone], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[/* max 60 chars */ String], Nullability.Nullable),
-      (Get[/* max 60 chars */ String], Nullability.Nullable),
-      (Get[/* max 30 chars */ String], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[/* max 15 chars */ String], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable)
+      (BusinessentityId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Phone.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VsalespersonViewRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-      firstname = Get[Name].unsafeGetNullable(rs, i + 2),
-      middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-      lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
-      jobtitle = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 6),
-      phonenumber = Get[Phone].unsafeGetNullable(rs, i + 7),
-      phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 8),
-      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 9),
-      emailpromotion = Get[Int].unsafeGetNullable(rs, i + 10),
-      addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 11),
-      addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 12),
-      city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 13),
-      stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
-      postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 15),
-      countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
-      territoryname = Get[Name].unsafeGetNullable(rs, i + 17),
-      territorygroup = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 18),
-      salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 19),
-      salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 20),
-      saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 21)
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 0),
+      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      firstname = Name.get.unsafeGetNullable(rs, i + 2),
+      middlename = Name.get.unsafeGetNullable(rs, i + 3),
+      lastname = Name.get.unsafeGetNullable(rs, i + 4),
+      suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      jobtitle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      phonenumber = Phone.get.unsafeGetNullable(rs, i + 7),
+      phonenumbertype = Name.get.unsafeGetNullable(rs, i + 8),
+      emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      emailpromotion = Meta.IntMeta.get.unsafeGetNullable(rs, i + 10),
+      addressline1 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
+      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
+      city = Meta.StringMeta.get.unsafeGetNullable(rs, i + 13),
+      stateprovincename = Name.get.unsafeGetNullable(rs, i + 14),
+      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 15),
+      countryregionname = Name.get.unsafeGetNullable(rs, i + 16),
+      territoryname = Name.get.unsafeGetNullable(rs, i + 17),
+      territorygroup = Meta.StringMeta.get.unsafeGetNullable(rs, i + 18),
+      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 19),
+      salesytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 20),
+      saleslastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 21)
     )
   )
 }

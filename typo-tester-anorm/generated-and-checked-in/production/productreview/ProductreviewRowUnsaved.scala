@@ -14,9 +14,9 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -67,28 +67,28 @@ object ProductreviewRowUnsaved {
   implicit val reads: Reads[ProductreviewRowUnsaved] = Reads[ProductreviewRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductreviewRowUnsaved(
-          productid = json.\("productid").as[ProductId],
-          reviewername = json.\("reviewername").as[Name],
-          emailaddress = json.\("emailaddress").as[/* max 50 chars */ String],
-          rating = json.\("rating").as[Int],
-          comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
-          productreviewid = json.\("productreviewid").as[Defaulted[ProductreviewId]],
-          reviewdate = json.\("reviewdate").as[Defaulted[TypoLocalDateTime]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          productid = json.\("productid").as(ProductId.reads),
+          reviewername = json.\("reviewername").as(Name.reads),
+          emailaddress = json.\("emailaddress").as(Reads.StringReads),
+          rating = json.\("rating").as(Reads.IntReads),
+          comments = json.\("comments").toOption.map(_.as(Reads.StringReads)),
+          productreviewid = json.\("productreviewid").as(Defaulted.reads(ProductreviewId.reads)),
+          reviewdate = json.\("reviewdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductreviewRowUnsaved] = OWrites[ProductreviewRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "reviewername" -> Json.toJson(o.reviewername),
-      "emailaddress" -> Json.toJson(o.emailaddress),
-      "rating" -> Json.toJson(o.rating),
-      "comments" -> Json.toJson(o.comments),
-      "productreviewid" -> Json.toJson(o.productreviewid),
-      "reviewdate" -> Json.toJson(o.reviewdate),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "reviewername" -> Name.writes.writes(o.reviewername),
+      "emailaddress" -> Writes.StringWrites.writes(o.emailaddress),
+      "rating" -> Writes.IntWrites.writes(o.rating),
+      "comments" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comments),
+      "productreviewid" -> Defaulted.writes(ProductreviewId.writes).writes(o.productreviewid),
+      "reviewdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.reviewdate),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

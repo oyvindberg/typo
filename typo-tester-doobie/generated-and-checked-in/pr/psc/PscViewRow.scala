@@ -12,8 +12,8 @@ import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -34,24 +34,24 @@ case class PscViewRow(
 )
 
 object PscViewRow {
-  implicit val decoder: Decoder[PscViewRow] = Decoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(PscViewRow.apply)
-  implicit val encoder: Encoder[PscViewRow] = Encoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[PscViewRow] = Decoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(PscViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductsubcategoryId.decoder), Decoder.decodeOption(ProductcategoryId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PscViewRow] = Encoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductsubcategoryId.encoder), Encoder.encodeOption(ProductcategoryId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PscViewRow] = new Read[PscViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[ProductsubcategoryId], Nullability.Nullable),
-      (Get[ProductcategoryId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (ProductsubcategoryId.get, Nullability.Nullable),
+      (ProductcategoryId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PscViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 1),
-      productcategoryid = Get[ProductcategoryId].unsafeGetNullable(rs, i + 2),
-      name = Get[Name].unsafeGetNullable(rs, i + 3),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      productsubcategoryid = ProductsubcategoryId.get.unsafeGetNullable(rs, i + 1),
+      productcategoryid = ProductcategoryId.get.unsafeGetNullable(rs, i + 2),
+      name = Name.get.unsafeGetNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

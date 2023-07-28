@@ -10,9 +10,9 @@ package pg_seclabel
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,20 +23,20 @@ object PgSeclabelId {
   implicit val reads: Reads[PgSeclabelId] = Reads[PgSeclabelId](json => JsResult.fromTry(
       Try(
         PgSeclabelId(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long],
-          objsubid = json.\("objsubid").as[Int],
-          provider = json.\("provider").as[String]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads),
+          objsubid = json.\("objsubid").as(Reads.IntReads),
+          provider = json.\("provider").as(Reads.StringReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgSeclabelId] = OWrites[PgSeclabelId](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "objsubid" -> Json.toJson(o.objsubid),
-      "provider" -> Json.toJson(o.provider)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid),
+      "objsubid" -> Writes.IntWrites.writes(o.objsubid),
+      "provider" -> Writes.StringWrites.writes(o.provider)
     ))
   )
 }

@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -46,18 +45,18 @@ object ContacttypeRowUnsaved {
   implicit val reads: Reads[ContacttypeRowUnsaved] = Reads[ContacttypeRowUnsaved](json => JsResult.fromTry(
       Try(
         ContacttypeRowUnsaved(
-          name = json.\("name").as[Name],
-          contacttypeid = json.\("contacttypeid").as[Defaulted[ContacttypeId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          contacttypeid = json.\("contacttypeid").as(Defaulted.reads(ContacttypeId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ContacttypeRowUnsaved] = OWrites[ContacttypeRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "contacttypeid" -> Json.toJson(o.contacttypeid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "contacttypeid" -> Defaulted.writes(ContacttypeId.writes).writes(o.contacttypeid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

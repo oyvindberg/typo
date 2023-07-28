@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_publication_tables
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -28,9 +29,9 @@ object PgPublicationTablesViewRow {
   implicit val reads: Reads[PgPublicationTablesViewRow] = Reads[PgPublicationTablesViewRow](json => JsResult.fromTry(
       Try(
         PgPublicationTablesViewRow(
-          pubname = json.\("pubname").toOption.map(_.as[String]),
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          tablename = json.\("tablename").toOption.map(_.as[String])
+          pubname = json.\("pubname").toOption.map(_.as(Reads.StringReads)),
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -38,17 +39,17 @@ object PgPublicationTablesViewRow {
   def rowParser(idx: Int): RowParser[PgPublicationTablesViewRow] = RowParser[PgPublicationTablesViewRow] { row =>
     Success(
       PgPublicationTablesViewRow(
-        pubname = row[Option[String]](idx + 0),
-        schemaname = row[Option[String]](idx + 1),
-        tablename = row[Option[String]](idx + 2)
+        pubname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 2)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgPublicationTablesViewRow] = OWrites[PgPublicationTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pubname" -> Json.toJson(o.pubname),
-      "schemaname" -> Json.toJson(o.schemaname),
-      "tablename" -> Json.toJson(o.tablename)
+      "pubname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.pubname),
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename)
     ))
   )
 }

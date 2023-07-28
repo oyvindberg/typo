@@ -12,7 +12,6 @@ import adventureworks.sales.creditcard.CreditcardId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -25,16 +24,16 @@ object PersoncreditcardId {
   implicit val reads: Reads[PersoncreditcardId] = Reads[PersoncreditcardId](json => JsResult.fromTry(
       Try(
         PersoncreditcardId(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          creditcardid = json.\("creditcardid").as[CreditcardId]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          creditcardid = json.\("creditcardid").as(CreditcardId.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PersoncreditcardId] = OWrites[PersoncreditcardId](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "creditcardid" -> Json.toJson(o.creditcardid)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "creditcardid" -> CreditcardId.writes.writes(o.creditcardid)
     ))
   )
 }

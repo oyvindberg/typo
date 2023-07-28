@@ -24,7 +24,7 @@ object Phone {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[Phone] = implicitly[Reads[String]].map(Phone.apply)
+  implicit val reads: Reads[Phone] = Reads.StringReads.map(Phone.apply)
   implicit val toStatement: ToStatement[Phone] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[Phone] = implicitly[Writes[String]].contramap(_.value)
+  implicit val writes: Writes[Phone] = Writes.StringWrites.contramap(_.value)
 }

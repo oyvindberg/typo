@@ -23,12 +23,12 @@ package object typo {
     val options = InternalOptions(
       pkg = pkg,
       jsonLibs = publicOptions.jsonLibs.map {
-        case JsonLibName.Circe    => JsonLibCirce
-        case JsonLibName.PlayJson => JsonLibPlay
+        case JsonLibName.Circe    => JsonLibCirce(pkg, default, publicOptions.inlineImplicits)
+        case JsonLibName.PlayJson => JsonLibPlay(pkg, default, publicOptions.inlineImplicits)
       },
       dbLib = publicOptions.dbLib.map {
-        case DbLibName.Anorm  => DbLibAnorm
-        case DbLibName.Doobie => DbLibDoobie
+        case DbLibName.Anorm  => new DbLibAnorm(pkg, publicOptions.inlineImplicits)
+        case DbLibName.Doobie => new DbLibDoobie(pkg, publicOptions.inlineImplicits)
       },
       naming = naming,
       typeOverride = publicOptions.typeOverride,

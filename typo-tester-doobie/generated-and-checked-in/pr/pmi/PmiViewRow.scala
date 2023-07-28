@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,18 +26,18 @@ case class PmiViewRow(
 )
 
 object PmiViewRow {
-  implicit val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)
-  implicit val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))
+  implicit val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PmiViewRow] = new Read[PmiViewRow](
     gets = List(
-      (Get[ProductmodelId], Nullability.Nullable),
-      (Get[IllustrationId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (ProductmodelId.get, Nullability.Nullable),
+      (IllustrationId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
-      productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-      illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2)
+      productmodelid = ProductmodelId.get.unsafeGetNullable(rs, i + 0),
+      illustrationid = IllustrationId.get.unsafeGetNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

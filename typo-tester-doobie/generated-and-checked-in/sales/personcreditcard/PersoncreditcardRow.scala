@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,18 +29,18 @@ case class PersoncreditcardRow(
  }
 
 object PersoncreditcardRow {
-  implicit val decoder: Decoder[PersoncreditcardRow] = Decoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRow.apply)
-  implicit val encoder: Encoder[PersoncreditcardRow] = Encoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))
+  implicit val decoder: Decoder[PersoncreditcardRow] = Decoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRow.apply)(BusinessentityId.decoder, CreditcardId.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[PersoncreditcardRow] = Encoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CreditcardId.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[PersoncreditcardRow] = new Read[PersoncreditcardRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[CreditcardId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (CreditcardId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PersoncreditcardRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      creditcardid = CreditcardId.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

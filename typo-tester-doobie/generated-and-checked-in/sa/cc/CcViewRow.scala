@@ -10,8 +10,8 @@ package cc
 import adventureworks.TypoLocalDateTime
 import adventureworks.sales.creditcard.CreditcardId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -33,26 +33,26 @@ case class CcViewRow(
 )
 
 object CcViewRow {
-  implicit val decoder: Decoder[CcViewRow] = Decoder.forProduct7[CcViewRow, Option[Int], Option[CreditcardId], Option[/* max 50 chars */ String], Option[/* max 25 chars */ String], Option[Int], Option[Int], Option[TypoLocalDateTime]]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CcViewRow.apply)
-  implicit val encoder: Encoder[CcViewRow] = Encoder.forProduct7[CcViewRow, Option[Int], Option[CreditcardId], Option[/* max 50 chars */ String], Option[/* max 25 chars */ String], Option[Int], Option[Int], Option[TypoLocalDateTime]]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.id, x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))
+  implicit val decoder: Decoder[CcViewRow] = Decoder.forProduct7[CcViewRow, Option[Int], Option[CreditcardId], Option[/* max 50 chars */ String], Option[/* max 25 chars */ String], Option[Int], Option[Int], Option[TypoLocalDateTime]]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CcViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(CreditcardId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[CcViewRow] = Encoder.forProduct7[CcViewRow, Option[Int], Option[CreditcardId], Option[/* max 50 chars */ String], Option[/* max 25 chars */ String], Option[Int], Option[Int], Option[TypoLocalDateTime]]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.id, x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(CreditcardId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[CcViewRow] = new Read[CcViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[CreditcardId], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[/* max 25 chars */ String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (CreditcardId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 1),
-      cardtype = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-      cardnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
-      expmonth = Get[Int].unsafeGetNullable(rs, i + 4),
-      expyear = Get[Int].unsafeGetNullable(rs, i + 5),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      creditcardid = CreditcardId.get.unsafeGetNullable(rs, i + 1),
+      cardtype = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      cardnumber = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      expmonth = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      expyear = Meta.IntMeta.get.unsafeGetNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

@@ -8,14 +8,15 @@ package pg_catalog
 package pg_range
 
 import adventureworks.TypoRegproc
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,13 +34,13 @@ object PgRangeRow {
   implicit val reads: Reads[PgRangeRow] = Reads[PgRangeRow](json => JsResult.fromTry(
       Try(
         PgRangeRow(
-          rngtypid = json.\("rngtypid").as[PgRangeId],
-          rngsubtype = json.\("rngsubtype").as[/* oid */ Long],
-          rngmultitypid = json.\("rngmultitypid").as[/* oid */ Long],
-          rngcollation = json.\("rngcollation").as[/* oid */ Long],
-          rngsubopc = json.\("rngsubopc").as[/* oid */ Long],
-          rngcanonical = json.\("rngcanonical").as[TypoRegproc],
-          rngsubdiff = json.\("rngsubdiff").as[TypoRegproc]
+          rngtypid = json.\("rngtypid").as(PgRangeId.reads),
+          rngsubtype = json.\("rngsubtype").as(Reads.LongReads),
+          rngmultitypid = json.\("rngmultitypid").as(Reads.LongReads),
+          rngcollation = json.\("rngcollation").as(Reads.LongReads),
+          rngsubopc = json.\("rngsubopc").as(Reads.LongReads),
+          rngcanonical = json.\("rngcanonical").as(TypoRegproc.reads),
+          rngsubdiff = json.\("rngsubdiff").as(TypoRegproc.reads)
         )
       )
     ),
@@ -47,25 +48,25 @@ object PgRangeRow {
   def rowParser(idx: Int): RowParser[PgRangeRow] = RowParser[PgRangeRow] { row =>
     Success(
       PgRangeRow(
-        rngtypid = row[PgRangeId](idx + 0),
-        rngsubtype = row[/* oid */ Long](idx + 1),
-        rngmultitypid = row[/* oid */ Long](idx + 2),
-        rngcollation = row[/* oid */ Long](idx + 3),
-        rngsubopc = row[/* oid */ Long](idx + 4),
-        rngcanonical = row[TypoRegproc](idx + 5),
-        rngsubdiff = row[TypoRegproc](idx + 6)
+        rngtypid = row(idx + 0)(PgRangeId.column),
+        rngsubtype = row(idx + 1)(Column.columnToLong),
+        rngmultitypid = row(idx + 2)(Column.columnToLong),
+        rngcollation = row(idx + 3)(Column.columnToLong),
+        rngsubopc = row(idx + 4)(Column.columnToLong),
+        rngcanonical = row(idx + 5)(TypoRegproc.column),
+        rngsubdiff = row(idx + 6)(TypoRegproc.column)
       )
     )
   }
   implicit val writes: OWrites[PgRangeRow] = OWrites[PgRangeRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "rngtypid" -> Json.toJson(o.rngtypid),
-      "rngsubtype" -> Json.toJson(o.rngsubtype),
-      "rngmultitypid" -> Json.toJson(o.rngmultitypid),
-      "rngcollation" -> Json.toJson(o.rngcollation),
-      "rngsubopc" -> Json.toJson(o.rngsubopc),
-      "rngcanonical" -> Json.toJson(o.rngcanonical),
-      "rngsubdiff" -> Json.toJson(o.rngsubdiff)
+      "rngtypid" -> PgRangeId.writes.writes(o.rngtypid),
+      "rngsubtype" -> Writes.LongWrites.writes(o.rngsubtype),
+      "rngmultitypid" -> Writes.LongWrites.writes(o.rngmultitypid),
+      "rngcollation" -> Writes.LongWrites.writes(o.rngcollation),
+      "rngsubopc" -> Writes.LongWrites.writes(o.rngsubopc),
+      "rngcanonical" -> TypoRegproc.writes.writes(o.rngcanonical),
+      "rngsubdiff" -> TypoRegproc.writes.writes(o.rngsubdiff)
     ))
   )
 }

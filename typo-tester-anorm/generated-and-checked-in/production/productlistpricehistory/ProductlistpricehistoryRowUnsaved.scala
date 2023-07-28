@@ -13,9 +13,9 @@ import adventureworks.production.product.ProductId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -49,22 +49,22 @@ object ProductlistpricehistoryRowUnsaved {
   implicit val reads: Reads[ProductlistpricehistoryRowUnsaved] = Reads[ProductlistpricehistoryRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductlistpricehistoryRowUnsaved(
-          productid = json.\("productid").as[ProductId],
-          startdate = json.\("startdate").as[TypoLocalDateTime],
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
-          listprice = json.\("listprice").as[BigDecimal],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          productid = json.\("productid").as(ProductId.reads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          listprice = json.\("listprice").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductlistpricehistoryRowUnsaved] = OWrites[ProductlistpricehistoryRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "listprice" -> Json.toJson(o.listprice),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+      "listprice" -> Writes.BigDecimalWrites.writes(o.listprice),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

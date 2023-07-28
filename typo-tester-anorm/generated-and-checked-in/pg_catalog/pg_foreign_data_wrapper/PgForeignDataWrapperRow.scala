@@ -8,14 +8,15 @@ package pg_catalog
 package pg_foreign_data_wrapper
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,13 +34,13 @@ object PgForeignDataWrapperRow {
   implicit val reads: Reads[PgForeignDataWrapperRow] = Reads[PgForeignDataWrapperRow](json => JsResult.fromTry(
       Try(
         PgForeignDataWrapperRow(
-          oid = json.\("oid").as[PgForeignDataWrapperId],
-          fdwname = json.\("fdwname").as[String],
-          fdwowner = json.\("fdwowner").as[/* oid */ Long],
-          fdwhandler = json.\("fdwhandler").as[/* oid */ Long],
-          fdwvalidator = json.\("fdwvalidator").as[/* oid */ Long],
-          fdwacl = json.\("fdwacl").toOption.map(_.as[Array[TypoAclItem]]),
-          fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]])
+          oid = json.\("oid").as(PgForeignDataWrapperId.reads),
+          fdwname = json.\("fdwname").as(Reads.StringReads),
+          fdwowner = json.\("fdwowner").as(Reads.LongReads),
+          fdwhandler = json.\("fdwhandler").as(Reads.LongReads),
+          fdwvalidator = json.\("fdwvalidator").as(Reads.LongReads),
+          fdwacl = json.\("fdwacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly))),
+          fdwoptions = json.\("fdwoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -47,25 +48,25 @@ object PgForeignDataWrapperRow {
   def rowParser(idx: Int): RowParser[PgForeignDataWrapperRow] = RowParser[PgForeignDataWrapperRow] { row =>
     Success(
       PgForeignDataWrapperRow(
-        oid = row[PgForeignDataWrapperId](idx + 0),
-        fdwname = row[String](idx + 1),
-        fdwowner = row[/* oid */ Long](idx + 2),
-        fdwhandler = row[/* oid */ Long](idx + 3),
-        fdwvalidator = row[/* oid */ Long](idx + 4),
-        fdwacl = row[Option[Array[TypoAclItem]]](idx + 5),
-        fdwoptions = row[Option[Array[String]]](idx + 6)
+        oid = row(idx + 0)(PgForeignDataWrapperId.column),
+        fdwname = row(idx + 1)(Column.columnToString),
+        fdwowner = row(idx + 2)(Column.columnToLong),
+        fdwhandler = row(idx + 3)(Column.columnToLong),
+        fdwvalidator = row(idx + 4)(Column.columnToLong),
+        fdwacl = row(idx + 5)(Column.columnToOption(TypoAclItem.arrayColumn)),
+        fdwoptions = row(idx + 6)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgForeignDataWrapperRow] = OWrites[PgForeignDataWrapperRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "fdwname" -> Json.toJson(o.fdwname),
-      "fdwowner" -> Json.toJson(o.fdwowner),
-      "fdwhandler" -> Json.toJson(o.fdwhandler),
-      "fdwvalidator" -> Json.toJson(o.fdwvalidator),
-      "fdwacl" -> Json.toJson(o.fdwacl),
-      "fdwoptions" -> Json.toJson(o.fdwoptions)
+      "oid" -> PgForeignDataWrapperId.writes.writes(o.oid),
+      "fdwname" -> Writes.StringWrites.writes(o.fdwname),
+      "fdwowner" -> Writes.LongWrites.writes(o.fdwowner),
+      "fdwhandler" -> Writes.LongWrites.writes(o.fdwhandler),
+      "fdwvalidator" -> Writes.LongWrites.writes(o.fdwvalidator),
+      "fdwacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.fdwacl),
+      "fdwoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.fdwoptions)
     ))
   )
 }

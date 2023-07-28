@@ -8,16 +8,19 @@ package pg_catalog
 package pg_opclass
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_opclass where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_opclass where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgOpclassRow): ConnectionIO[PgOpclassRow] = {
     sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
-          values (${unsaved.oid}::oid, ${unsaved.opcmethod}::oid, ${unsaved.opcname}::name, ${unsaved.opcnamespace}::oid, ${unsaved.opcowner}::oid, ${unsaved.opcfamily}::oid, ${unsaved.opcintype}::oid, ${unsaved.opcdefault}, ${unsaved.opckeytype}::oid)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgOpclassId.put))}::oid, ${fromWrite(unsaved.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.opcnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid)
           returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
        """.query(PgOpclassRow.read).unique
   }
@@ -25,23 +28,23 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass".query(PgOpclassRow.read).stream
   }
   override def selectById(oid: PgOpclassId): ConnectionIO[Option[PgOpclassRow]] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ${oid}".query(PgOpclassRow.read).option
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}".query(PgOpclassRow.read).option
   }
   override def selectByIds(oids: Array[PgOpclassId]): Stream[ConnectionIO, PgOpclassRow] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${oids})".query(PgOpclassRow.read).stream
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${fromWrite(oids)(Write.fromPut(PgOpclassId.arrayPut))})".query(PgOpclassRow.read).stream
   }
   override def update(row: PgOpclassRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_opclass
-          set opcmethod = ${row.opcmethod}::oid,
-              opcname = ${row.opcname}::name,
-              opcnamespace = ${row.opcnamespace}::oid,
-              opcowner = ${row.opcowner}::oid,
-              opcfamily = ${row.opcfamily}::oid,
-              opcintype = ${row.opcintype}::oid,
-              opcdefault = ${row.opcdefault},
-              opckeytype = ${row.opckeytype}::oid
-          where oid = ${oid}
+          set opcmethod = ${fromWrite(row.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              opcname = ${fromWrite(row.opcname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              opcnamespace = ${fromWrite(row.opcnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              opcowner = ${fromWrite(row.opcowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              opcfamily = ${fromWrite(row.opcfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              opcintype = ${fromWrite(row.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              opcdefault = ${fromWrite(row.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))},
+              opckeytype = ${fromWrite(row.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid
+          where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}
        """
       .update
       .run
@@ -50,15 +53,15 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
   override def upsert(unsaved: PgOpclassRow): ConnectionIO[PgOpclassRow] = {
     sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.opcmethod}::oid,
-            ${unsaved.opcname}::name,
-            ${unsaved.opcnamespace}::oid,
-            ${unsaved.opcowner}::oid,
-            ${unsaved.opcfamily}::oid,
-            ${unsaved.opcintype}::oid,
-            ${unsaved.opcdefault},
-            ${unsaved.opckeytype}::oid
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgOpclassId.put))}::oid,
+            ${fromWrite(unsaved.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.opcname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.opcnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.opcowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.opcfamily)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid
           )
           on conflict (oid)
           do update set

@@ -9,29 +9,34 @@ package personphone
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.phonenumbertype.PhonenumbertypeId
+import adventureworks.public.Phone
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
-    sql"delete from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".update.run.map(_ > 0)
+    sql"delete from person.personphone where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND phonenumber = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND phonenumbertypeid = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
-          values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::"public".Phone, ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """.query(PersonphoneRow.read).unique
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
-      Some((Fragment.const(s"businessentityid"), fr"${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s"phonenumber"), fr"""${unsaved.phonenumber}::"public".Phone""")),
-      Some((Fragment.const(s"phonenumbertypeid"), fr"${unsaved.phonenumbertypeid}::int4")),
+      Some((Fragment.const(s"businessentityid"), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s"phonenumber"), fr"""${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::"public".Phone""")),
+      Some((Fragment.const(s"phonenumbertypeid"), fr"${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -53,13 +58,13 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone".query(PersonphoneRow.read).stream
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
-    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".query(PersonphoneRow.read).option
+    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND phonenumber = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND phonenumbertypeid = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}".query(PersonphoneRow.read).option
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.personphone
-          set modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
+          set modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND phonenumber = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND phonenumbertypeid = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}
        """
       .update
       .run
@@ -68,10 +73,10 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (
-            ${unsaved.businessentityid}::int4,
-            ${unsaved.phonenumber}::"public".Phone,
-            ${unsaved.phonenumbertypeid}::int4,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::"public".Phone,
+            ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (businessentityid, phonenumber, phonenumbertypeid)
           do update set

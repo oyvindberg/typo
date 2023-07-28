@@ -10,9 +10,9 @@ package pg_db_role_setting
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,16 +23,16 @@ object PgDbRoleSettingId {
   implicit val reads: Reads[PgDbRoleSettingId] = Reads[PgDbRoleSettingId](json => JsResult.fromTry(
       Try(
         PgDbRoleSettingId(
-          setdatabase = json.\("setdatabase").as[/* oid */ Long],
-          setrole = json.\("setrole").as[/* oid */ Long]
+          setdatabase = json.\("setdatabase").as(Reads.LongReads),
+          setrole = json.\("setrole").as(Reads.LongReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgDbRoleSettingId] = OWrites[PgDbRoleSettingId](o =>
     new JsObject(ListMap[String, JsValue](
-      "setdatabase" -> Json.toJson(o.setdatabase),
-      "setrole" -> Json.toJson(o.setrole)
+      "setdatabase" -> Writes.LongWrites.writes(o.setdatabase),
+      "setrole" -> Writes.LongWrites.writes(o.setrole)
     ))
   )
 }

@@ -10,14 +10,15 @@ package vemployeedepartmenthistory
 import adventureworks.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -48,17 +49,17 @@ object VemployeedepartmenthistoryViewRow {
   implicit val reads: Reads[VemployeedepartmenthistoryViewRow] = Reads[VemployeedepartmenthistoryViewRow](json => JsResult.fromTry(
       Try(
         VemployeedepartmenthistoryViewRow(
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-          firstname = json.\("firstname").toOption.map(_.as[Name]),
-          middlename = json.\("middlename").toOption.map(_.as[Name]),
-          lastname = json.\("lastname").toOption.map(_.as[Name]),
-          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-          shift = json.\("shift").toOption.map(_.as[Name]),
-          department = json.\("department").toOption.map(_.as[Name]),
-          groupname = json.\("groupname").toOption.map(_.as[Name]),
-          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDate]),
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate])
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          title = json.\("title").toOption.map(_.as(Reads.StringReads)),
+          firstname = json.\("firstname").toOption.map(_.as(Name.reads)),
+          middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
+          lastname = json.\("lastname").toOption.map(_.as(Name.reads)),
+          suffix = json.\("suffix").toOption.map(_.as(Reads.StringReads)),
+          shift = json.\("shift").toOption.map(_.as(Name.reads)),
+          department = json.\("department").toOption.map(_.as(Name.reads)),
+          groupname = json.\("groupname").toOption.map(_.as(Name.reads)),
+          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDate.reads)),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDate.reads))
         )
       )
     ),
@@ -66,33 +67,33 @@ object VemployeedepartmenthistoryViewRow {
   def rowParser(idx: Int): RowParser[VemployeedepartmenthistoryViewRow] = RowParser[VemployeedepartmenthistoryViewRow] { row =>
     Success(
       VemployeedepartmenthistoryViewRow(
-        businessentityid = row[Option[BusinessentityId]](idx + 0),
-        title = row[Option[/* max 8 chars */ String]](idx + 1),
-        firstname = row[Option[Name]](idx + 2),
-        middlename = row[Option[Name]](idx + 3),
-        lastname = row[Option[Name]](idx + 4),
-        suffix = row[Option[/* max 10 chars */ String]](idx + 5),
-        shift = row[Option[Name]](idx + 6),
-        department = row[Option[Name]](idx + 7),
-        groupname = row[Option[Name]](idx + 8),
-        startdate = row[Option[TypoLocalDate]](idx + 9),
-        enddate = row[Option[TypoLocalDate]](idx + 10)
+        businessentityid = row(idx + 0)(Column.columnToOption(BusinessentityId.column)),
+        title = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        firstname = row(idx + 2)(Column.columnToOption(Name.column)),
+        middlename = row(idx + 3)(Column.columnToOption(Name.column)),
+        lastname = row(idx + 4)(Column.columnToOption(Name.column)),
+        suffix = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        shift = row(idx + 6)(Column.columnToOption(Name.column)),
+        department = row(idx + 7)(Column.columnToOption(Name.column)),
+        groupname = row(idx + 8)(Column.columnToOption(Name.column)),
+        startdate = row(idx + 9)(Column.columnToOption(TypoLocalDate.column)),
+        enddate = row(idx + 10)(Column.columnToOption(TypoLocalDate.column))
       )
     )
   }
   implicit val writes: OWrites[VemployeedepartmenthistoryViewRow] = OWrites[VemployeedepartmenthistoryViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "title" -> Json.toJson(o.title),
-      "firstname" -> Json.toJson(o.firstname),
-      "middlename" -> Json.toJson(o.middlename),
-      "lastname" -> Json.toJson(o.lastname),
-      "suffix" -> Json.toJson(o.suffix),
-      "shift" -> Json.toJson(o.shift),
-      "department" -> Json.toJson(o.department),
-      "groupname" -> Json.toJson(o.groupname),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate)
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
+      "firstname" -> Writes.OptionWrites(Name.writes).writes(o.firstname),
+      "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
+      "lastname" -> Writes.OptionWrites(Name.writes).writes(o.lastname),
+      "suffix" -> Writes.OptionWrites(Writes.StringWrites).writes(o.suffix),
+      "shift" -> Writes.OptionWrites(Name.writes).writes(o.shift),
+      "department" -> Writes.OptionWrites(Name.writes).writes(o.department),
+      "groupname" -> Writes.OptionWrites(Name.writes).writes(o.groupname),
+      "startdate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.enddate)
     ))
   )
 }

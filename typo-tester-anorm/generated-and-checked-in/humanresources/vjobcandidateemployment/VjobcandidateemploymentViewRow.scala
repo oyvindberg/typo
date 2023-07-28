@@ -9,14 +9,15 @@ package vjobcandidateemployment
 
 import adventureworks.TypoLocalDate
 import adventureworks.humanresources.jobcandidate.JobcandidateId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,17 +40,17 @@ object VjobcandidateemploymentViewRow {
   implicit val reads: Reads[VjobcandidateemploymentViewRow] = Reads[VjobcandidateemploymentViewRow](json => JsResult.fromTry(
       Try(
         VjobcandidateemploymentViewRow(
-          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
-          `Emp.StartDate` = json.\("Emp.StartDate").toOption.map(_.as[TypoLocalDate]),
-          `Emp.EndDate` = json.\("Emp.EndDate").toOption.map(_.as[TypoLocalDate]),
-          `Emp.OrgName` = json.\("Emp.OrgName").toOption.map(_.as[/* max 100 chars */ String]),
-          `Emp.JobTitle` = json.\("Emp.JobTitle").toOption.map(_.as[/* max 100 chars */ String]),
-          `Emp.Responsibility` = json.\("Emp.Responsibility").toOption.map(_.as[String]),
-          `Emp.FunctionCategory` = json.\("Emp.FunctionCategory").toOption.map(_.as[String]),
-          `Emp.IndustryCategory` = json.\("Emp.IndustryCategory").toOption.map(_.as[String]),
-          `Emp.Loc.CountryRegion` = json.\("Emp.Loc.CountryRegion").toOption.map(_.as[String]),
-          `Emp.Loc.State` = json.\("Emp.Loc.State").toOption.map(_.as[String]),
-          `Emp.Loc.City` = json.\("Emp.Loc.City").toOption.map(_.as[String])
+          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as(JobcandidateId.reads)),
+          `Emp.StartDate` = json.\("Emp.StartDate").toOption.map(_.as(TypoLocalDate.reads)),
+          `Emp.EndDate` = json.\("Emp.EndDate").toOption.map(_.as(TypoLocalDate.reads)),
+          `Emp.OrgName` = json.\("Emp.OrgName").toOption.map(_.as(Reads.StringReads)),
+          `Emp.JobTitle` = json.\("Emp.JobTitle").toOption.map(_.as(Reads.StringReads)),
+          `Emp.Responsibility` = json.\("Emp.Responsibility").toOption.map(_.as(Reads.StringReads)),
+          `Emp.FunctionCategory` = json.\("Emp.FunctionCategory").toOption.map(_.as(Reads.StringReads)),
+          `Emp.IndustryCategory` = json.\("Emp.IndustryCategory").toOption.map(_.as(Reads.StringReads)),
+          `Emp.Loc.CountryRegion` = json.\("Emp.Loc.CountryRegion").toOption.map(_.as(Reads.StringReads)),
+          `Emp.Loc.State` = json.\("Emp.Loc.State").toOption.map(_.as(Reads.StringReads)),
+          `Emp.Loc.City` = json.\("Emp.Loc.City").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -57,33 +58,33 @@ object VjobcandidateemploymentViewRow {
   def rowParser(idx: Int): RowParser[VjobcandidateemploymentViewRow] = RowParser[VjobcandidateemploymentViewRow] { row =>
     Success(
       VjobcandidateemploymentViewRow(
-        jobcandidateid = row[Option[JobcandidateId]](idx + 0),
-        `Emp.StartDate` = row[Option[TypoLocalDate]](idx + 1),
-        `Emp.EndDate` = row[Option[TypoLocalDate]](idx + 2),
-        `Emp.OrgName` = row[Option[/* max 100 chars */ String]](idx + 3),
-        `Emp.JobTitle` = row[Option[/* max 100 chars */ String]](idx + 4),
-        `Emp.Responsibility` = row[Option[String]](idx + 5),
-        `Emp.FunctionCategory` = row[Option[String]](idx + 6),
-        `Emp.IndustryCategory` = row[Option[String]](idx + 7),
-        `Emp.Loc.CountryRegion` = row[Option[String]](idx + 8),
-        `Emp.Loc.State` = row[Option[String]](idx + 9),
-        `Emp.Loc.City` = row[Option[String]](idx + 10)
+        jobcandidateid = row(idx + 0)(Column.columnToOption(JobcandidateId.column)),
+        `Emp.StartDate` = row(idx + 1)(Column.columnToOption(TypoLocalDate.column)),
+        `Emp.EndDate` = row(idx + 2)(Column.columnToOption(TypoLocalDate.column)),
+        `Emp.OrgName` = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        `Emp.JobTitle` = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        `Emp.Responsibility` = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        `Emp.FunctionCategory` = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        `Emp.IndustryCategory` = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        `Emp.Loc.CountryRegion` = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        `Emp.Loc.State` = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        `Emp.Loc.City` = row(idx + 10)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[VjobcandidateemploymentViewRow] = OWrites[VjobcandidateemploymentViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "jobcandidateid" -> Json.toJson(o.jobcandidateid),
-      "Emp.StartDate" -> Json.toJson(o.`Emp.StartDate`),
-      "Emp.EndDate" -> Json.toJson(o.`Emp.EndDate`),
-      "Emp.OrgName" -> Json.toJson(o.`Emp.OrgName`),
-      "Emp.JobTitle" -> Json.toJson(o.`Emp.JobTitle`),
-      "Emp.Responsibility" -> Json.toJson(o.`Emp.Responsibility`),
-      "Emp.FunctionCategory" -> Json.toJson(o.`Emp.FunctionCategory`),
-      "Emp.IndustryCategory" -> Json.toJson(o.`Emp.IndustryCategory`),
-      "Emp.Loc.CountryRegion" -> Json.toJson(o.`Emp.Loc.CountryRegion`),
-      "Emp.Loc.State" -> Json.toJson(o.`Emp.Loc.State`),
-      "Emp.Loc.City" -> Json.toJson(o.`Emp.Loc.City`)
+      "jobcandidateid" -> Writes.OptionWrites(JobcandidateId.writes).writes(o.jobcandidateid),
+      "Emp.StartDate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.`Emp.StartDate`),
+      "Emp.EndDate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.`Emp.EndDate`),
+      "Emp.OrgName" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.OrgName`),
+      "Emp.JobTitle" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.JobTitle`),
+      "Emp.Responsibility" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.Responsibility`),
+      "Emp.FunctionCategory" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.FunctionCategory`),
+      "Emp.IndustryCategory" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.IndustryCategory`),
+      "Emp.Loc.CountryRegion" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.Loc.CountryRegion`),
+      "Emp.Loc.State" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.Loc.State`),
+      "Emp.Loc.City" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`Emp.Loc.City`)
     ))
   )
 }

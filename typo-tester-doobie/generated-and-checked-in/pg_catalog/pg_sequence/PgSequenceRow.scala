@@ -8,8 +8,8 @@ package pg_catalog
 package pg_sequence
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -26,28 +26,28 @@ case class PgSequenceRow(
 )
 
 object PgSequenceRow {
-  implicit val decoder: Decoder[PgSequenceRow] = Decoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(PgSequenceRow.apply)
-  implicit val encoder: Encoder[PgSequenceRow] = Encoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(x => (x.seqrelid, x.seqtypid, x.seqstart, x.seqincrement, x.seqmax, x.seqmin, x.seqcache, x.seqcycle))
+  implicit val decoder: Decoder[PgSequenceRow] = Decoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(PgSequenceRow.apply)(PgSequenceId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean)
+  implicit val encoder: Encoder[PgSequenceRow] = Encoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(x => (x.seqrelid, x.seqtypid, x.seqstart, x.seqincrement, x.seqmax, x.seqmin, x.seqcache, x.seqcycle))(PgSequenceId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean)
   implicit val read: Read[PgSequenceRow] = new Read[PgSequenceRow](
     gets = List(
-      (Get[PgSequenceId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Long], Nullability.NoNulls),
-      (Get[Long], Nullability.NoNulls),
-      (Get[Long], Nullability.NoNulls),
-      (Get[Long], Nullability.NoNulls),
-      (Get[Long], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls)
+      (PgSequenceId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgSequenceRow(
-      seqrelid = Get[PgSequenceId].unsafeGetNonNullable(rs, i + 0),
-      seqtypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      seqstart = Get[Long].unsafeGetNonNullable(rs, i + 2),
-      seqincrement = Get[Long].unsafeGetNonNullable(rs, i + 3),
-      seqmax = Get[Long].unsafeGetNonNullable(rs, i + 4),
-      seqmin = Get[Long].unsafeGetNonNullable(rs, i + 5),
-      seqcache = Get[Long].unsafeGetNonNullable(rs, i + 6),
-      seqcycle = Get[Boolean].unsafeGetNonNullable(rs, i + 7)
+      seqrelid = PgSequenceId.get.unsafeGetNonNullable(rs, i + 0),
+      seqtypid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      seqstart = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      seqincrement = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      seqmax = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      seqmin = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      seqcache = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      seqcycle = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

@@ -9,45 +9,51 @@ package salesorderdetail
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
+import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
 
 object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".update.run.map(_ > 0)
+    sql"delete from sales.salesorderdetail where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesorderdetailid = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
-          values (${unsaved.salesorderid}::int4, ${unsaved.salesorderdetailid}::int4, ${unsaved.carriertrackingnumber}, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.specialofferid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.unitpricediscount}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text
        """.query(SalesorderdetailRow.read).unique
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow] = {
     val fs = List(
-      Some((Fragment.const(s"salesorderid"), fr"${unsaved.salesorderid}::int4")),
-      Some((Fragment.const(s"carriertrackingnumber"), fr"${unsaved.carriertrackingnumber}")),
-      Some((Fragment.const(s"orderqty"), fr"${unsaved.orderqty}::int2")),
-      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
-      Some((Fragment.const(s"specialofferid"), fr"${unsaved.specialofferid}::int4")),
-      Some((Fragment.const(s"unitprice"), fr"${unsaved.unitprice}::numeric")),
+      Some((Fragment.const(s"salesorderid"), fr"${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4")),
+      Some((Fragment.const(s"carriertrackingnumber"), fr"${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"orderqty"), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s"productid"), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
+      Some((Fragment.const(s"specialofferid"), fr"${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4")),
+      Some((Fragment.const(s"unitprice"), fr"${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.salesorderdetailid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salesorderdetailid"), fr"${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salesorderdetailid"), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       },
       unsaved.unitpricediscount match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"unitpricediscount"), fr"${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"unitpricediscount"), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -69,20 +75,20 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text from sales.salesorderdetail".query(SalesorderdetailRow.read).stream
   }
   override def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]] = {
-    sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".query(SalesorderdetailRow.read).option
+    sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text from sales.salesorderdetail where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesorderdetailid = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}".query(SalesorderdetailRow.read).option
   }
   override def update(row: SalesorderdetailRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderdetail
-          set carriertrackingnumber = ${row.carriertrackingnumber},
-              orderqty = ${row.orderqty}::int2,
-              productid = ${row.productid}::int4,
-              specialofferid = ${row.specialofferid}::int4,
-              unitprice = ${row.unitprice}::numeric,
-              unitpricediscount = ${row.unitpricediscount}::numeric,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
+          set carriertrackingnumber = ${fromWrite(row.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))},
+              orderqty = ${fromWrite(row.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              productid = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
+              specialofferid = ${fromWrite(row.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
+              unitprice = ${fromWrite(row.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              unitpricediscount = ${fromWrite(row.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesorderdetailid = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}
        """
       .update
       .run
@@ -91,16 +97,16 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
           values (
-            ${unsaved.salesorderid}::int4,
-            ${unsaved.salesorderdetailid}::int4,
-            ${unsaved.carriertrackingnumber},
-            ${unsaved.orderqty}::int2,
-            ${unsaved.productid}::int4,
-            ${unsaved.specialofferid}::int4,
-            ${unsaved.unitprice}::numeric,
-            ${unsaved.unitpricediscount}::numeric,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4,
+            ${fromWrite(unsaved.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
+            ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
+            ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (salesorderid, salesorderdetailid)
           do update set

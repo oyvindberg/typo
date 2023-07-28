@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_stat_ssl
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,14 +34,14 @@ object PgStatSslViewRow {
   implicit val reads: Reads[PgStatSslViewRow] = Reads[PgStatSslViewRow](json => JsResult.fromTry(
       Try(
         PgStatSslViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          ssl = json.\("ssl").toOption.map(_.as[Boolean]),
-          version = json.\("version").toOption.map(_.as[String]),
-          cipher = json.\("cipher").toOption.map(_.as[String]),
-          bits = json.\("bits").toOption.map(_.as[Int]),
-          clientDn = json.\("client_dn").toOption.map(_.as[String]),
-          clientSerial = json.\("client_serial").toOption.map(_.as[BigDecimal]),
-          issuerDn = json.\("issuer_dn").toOption.map(_.as[String])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          ssl = json.\("ssl").toOption.map(_.as(Reads.BooleanReads)),
+          version = json.\("version").toOption.map(_.as(Reads.StringReads)),
+          cipher = json.\("cipher").toOption.map(_.as(Reads.StringReads)),
+          bits = json.\("bits").toOption.map(_.as(Reads.IntReads)),
+          clientDn = json.\("client_dn").toOption.map(_.as(Reads.StringReads)),
+          clientSerial = json.\("client_serial").toOption.map(_.as(Reads.bigDecReads)),
+          issuerDn = json.\("issuer_dn").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -48,27 +49,27 @@ object PgStatSslViewRow {
   def rowParser(idx: Int): RowParser[PgStatSslViewRow] = RowParser[PgStatSslViewRow] { row =>
     Success(
       PgStatSslViewRow(
-        pid = row[Option[Int]](idx + 0),
-        ssl = row[Option[Boolean]](idx + 1),
-        version = row[Option[String]](idx + 2),
-        cipher = row[Option[String]](idx + 3),
-        bits = row[Option[Int]](idx + 4),
-        clientDn = row[Option[String]](idx + 5),
-        clientSerial = row[Option[BigDecimal]](idx + 6),
-        issuerDn = row[Option[String]](idx + 7)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        ssl = row(idx + 1)(Column.columnToOption(Column.columnToBoolean)),
+        version = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        cipher = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        bits = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
+        clientDn = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        clientSerial = row(idx + 6)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        issuerDn = row(idx + 7)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgStatSslViewRow] = OWrites[PgStatSslViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "ssl" -> Json.toJson(o.ssl),
-      "version" -> Json.toJson(o.version),
-      "cipher" -> Json.toJson(o.cipher),
-      "bits" -> Json.toJson(o.bits),
-      "client_dn" -> Json.toJson(o.clientDn),
-      "client_serial" -> Json.toJson(o.clientSerial),
-      "issuer_dn" -> Json.toJson(o.issuerDn)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "ssl" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.ssl),
+      "version" -> Writes.OptionWrites(Writes.StringWrites).writes(o.version),
+      "cipher" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cipher),
+      "bits" -> Writes.OptionWrites(Writes.IntWrites).writes(o.bits),
+      "client_dn" -> Writes.OptionWrites(Writes.StringWrites).writes(o.clientDn),
+      "client_serial" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.clientSerial),
+      "issuer_dn" -> Writes.OptionWrites(Writes.StringWrites).writes(o.issuerDn)
     ))
   )
 }

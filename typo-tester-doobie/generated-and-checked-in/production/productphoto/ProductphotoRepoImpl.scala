@@ -10,33 +10,36 @@ package productphoto
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId): ConnectionIO[Boolean] = {
-    sql"delete from production.productphoto where productphotoid = ${productphotoid}".update.run.map(_ > 0)
+    sql"delete from production.productphoto where productphotoid = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
-          values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """.query(ProductphotoRow.read).unique
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow] = {
     val fs = List(
-      Some((Fragment.const(s"thumbnailphoto"), fr"${unsaved.thumbnailphoto}::bytea")),
-      Some((Fragment.const(s"thumbnailphotofilename"), fr"${unsaved.thumbnailphotofilename}")),
-      Some((Fragment.const(s"largephoto"), fr"${unsaved.largephoto}::bytea")),
-      Some((Fragment.const(s"largephotofilename"), fr"${unsaved.largephotofilename}")),
+      Some((Fragment.const(s"thumbnailphoto"), fr"${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea")),
+      Some((Fragment.const(s"thumbnailphotofilename"), fr"${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const(s"largephoto"), fr"${fromWrite(unsaved.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea")),
+      Some((Fragment.const(s"largephotofilename"), fr"${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.productphotoid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productphotoid"), fr"${value: ProductphotoId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productphotoid"), fr"${fromWrite(value: ProductphotoId)(Write.fromPut(ProductphotoId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -58,20 +61,20 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto".query(ProductphotoRow.read).stream
   }
   override def selectById(productphotoid: ProductphotoId): ConnectionIO[Option[ProductphotoRow]] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ${productphotoid}".query(ProductphotoRow.read).option
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}".query(ProductphotoRow.read).option
   }
   override def selectByIds(productphotoids: Array[ProductphotoId]): Stream[ConnectionIO, ProductphotoRow] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ANY(${productphotoids})".query(ProductphotoRow.read).stream
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ANY(${fromWrite(productphotoids)(Write.fromPut(ProductphotoId.arrayPut))})".query(ProductphotoRow.read).stream
   }
   override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
     val productphotoid = row.productphotoid
     sql"""update production.productphoto
-          set thumbnailphoto = ${row.thumbnailphoto}::bytea,
-              thumbnailphotofilename = ${row.thumbnailphotofilename},
-              largephoto = ${row.largephoto}::bytea,
-              largephotofilename = ${row.largephotofilename},
-              modifieddate = ${row.modifieddate}::timestamp
-          where productphotoid = ${productphotoid}
+          set thumbnailphoto = ${fromWrite(row.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+              thumbnailphotofilename = ${fromWrite(row.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
+              largephoto = ${fromWrite(row.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+              largephotofilename = ${fromWrite(row.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where productphotoid = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}
        """
       .update
       .run
@@ -80,12 +83,12 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def upsert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
           values (
-            ${unsaved.productphotoid}::int4,
-            ${unsaved.thumbnailphoto}::bytea,
-            ${unsaved.thumbnailphotofilename},
-            ${unsaved.largephoto}::bytea,
-            ${unsaved.largephotofilename},
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4,
+            ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+            ${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.largephoto)(Write.fromPutOption(Meta.ByteArrayMeta.put))}::bytea,
+            ${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (productphotoid)
           do update set

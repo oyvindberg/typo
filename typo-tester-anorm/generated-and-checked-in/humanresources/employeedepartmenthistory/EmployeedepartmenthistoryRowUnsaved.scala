@@ -16,9 +16,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -57,24 +57,24 @@ object EmployeedepartmenthistoryRowUnsaved {
   implicit val reads: Reads[EmployeedepartmenthistoryRowUnsaved] = Reads[EmployeedepartmenthistoryRowUnsaved](json => JsResult.fromTry(
       Try(
         EmployeedepartmenthistoryRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          departmentid = json.\("departmentid").as[DepartmentId],
-          shiftid = json.\("shiftid").as[ShiftId],
-          startdate = json.\("startdate").as[TypoLocalDate],
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate]),
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          departmentid = json.\("departmentid").as(DepartmentId.reads),
+          shiftid = json.\("shiftid").as(ShiftId.reads),
+          startdate = json.\("startdate").as(TypoLocalDate.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDate.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[EmployeedepartmenthistoryRowUnsaved] = OWrites[EmployeedepartmenthistoryRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "departmentid" -> Json.toJson(o.departmentid),
-      "shiftid" -> Json.toJson(o.shiftid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "departmentid" -> DepartmentId.writes.writes(o.departmentid),
+      "shiftid" -> ShiftId.writes.writes(o.shiftid),
+      "startdate" -> TypoLocalDate.writes.writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.enddate),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

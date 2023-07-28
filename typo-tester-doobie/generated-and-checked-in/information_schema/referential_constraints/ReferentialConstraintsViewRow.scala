@@ -10,7 +10,6 @@ package referential_constraints
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -29,30 +28,30 @@ case class ReferentialConstraintsViewRow(
 )
 
 object ReferentialConstraintsViewRow {
-  implicit val decoder: Decoder[ReferentialConstraintsViewRow] = Decoder.forProduct9[ReferentialConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(ReferentialConstraintsViewRow.apply)
-  implicit val encoder: Encoder[ReferentialConstraintsViewRow] = Encoder.forProduct9[ReferentialConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.uniqueConstraintCatalog, x.uniqueConstraintSchema, x.uniqueConstraintName, x.matchOption, x.updateRule, x.deleteRule))
+  implicit val decoder: Decoder[ReferentialConstraintsViewRow] = Decoder.forProduct9[ReferentialConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(ReferentialConstraintsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[ReferentialConstraintsViewRow] = Encoder.forProduct9[ReferentialConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "unique_constraint_catalog", "unique_constraint_schema", "unique_constraint_name", "match_option", "update_rule", "delete_rule")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.uniqueConstraintCatalog, x.uniqueConstraintSchema, x.uniqueConstraintName, x.matchOption, x.updateRule, x.deleteRule))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[ReferentialConstraintsViewRow] = new Read[ReferentialConstraintsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ReferentialConstraintsViewRow(
-      constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      uniqueConstraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      uniqueConstraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      uniqueConstraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-      matchOption = Get[CharacterData].unsafeGetNullable(rs, i + 6),
-      updateRule = Get[CharacterData].unsafeGetNullable(rs, i + 7),
-      deleteRule = Get[CharacterData].unsafeGetNullable(rs, i + 8)
+      constraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      constraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      constraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      uniqueConstraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      uniqueConstraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      uniqueConstraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
+      matchOption = CharacterData.get.unsafeGetNullable(rs, i + 6),
+      updateRule = CharacterData.get.unsafeGetNullable(rs, i + 7),
+      deleteRule = CharacterData.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

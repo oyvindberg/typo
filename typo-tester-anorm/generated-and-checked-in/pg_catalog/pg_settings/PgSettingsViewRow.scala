@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_settings
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,23 +43,23 @@ object PgSettingsViewRow {
   implicit val reads: Reads[PgSettingsViewRow] = Reads[PgSettingsViewRow](json => JsResult.fromTry(
       Try(
         PgSettingsViewRow(
-          name = json.\("name").toOption.map(_.as[String]),
-          setting = json.\("setting").toOption.map(_.as[String]),
-          unit = json.\("unit").toOption.map(_.as[String]),
-          category = json.\("category").toOption.map(_.as[String]),
-          shortDesc = json.\("short_desc").toOption.map(_.as[String]),
-          extraDesc = json.\("extra_desc").toOption.map(_.as[String]),
-          context = json.\("context").toOption.map(_.as[String]),
-          vartype = json.\("vartype").toOption.map(_.as[String]),
-          source = json.\("source").toOption.map(_.as[String]),
-          minVal = json.\("min_val").toOption.map(_.as[String]),
-          maxVal = json.\("max_val").toOption.map(_.as[String]),
-          enumvals = json.\("enumvals").toOption.map(_.as[Array[String]]),
-          bootVal = json.\("boot_val").toOption.map(_.as[String]),
-          resetVal = json.\("reset_val").toOption.map(_.as[String]),
-          sourcefile = json.\("sourcefile").toOption.map(_.as[String]),
-          sourceline = json.\("sourceline").toOption.map(_.as[Int]),
-          pendingRestart = json.\("pending_restart").toOption.map(_.as[Boolean])
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          setting = json.\("setting").toOption.map(_.as(Reads.StringReads)),
+          unit = json.\("unit").toOption.map(_.as(Reads.StringReads)),
+          category = json.\("category").toOption.map(_.as(Reads.StringReads)),
+          shortDesc = json.\("short_desc").toOption.map(_.as(Reads.StringReads)),
+          extraDesc = json.\("extra_desc").toOption.map(_.as(Reads.StringReads)),
+          context = json.\("context").toOption.map(_.as(Reads.StringReads)),
+          vartype = json.\("vartype").toOption.map(_.as(Reads.StringReads)),
+          source = json.\("source").toOption.map(_.as(Reads.StringReads)),
+          minVal = json.\("min_val").toOption.map(_.as(Reads.StringReads)),
+          maxVal = json.\("max_val").toOption.map(_.as(Reads.StringReads)),
+          enumvals = json.\("enumvals").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          bootVal = json.\("boot_val").toOption.map(_.as(Reads.StringReads)),
+          resetVal = json.\("reset_val").toOption.map(_.as(Reads.StringReads)),
+          sourcefile = json.\("sourcefile").toOption.map(_.as(Reads.StringReads)),
+          sourceline = json.\("sourceline").toOption.map(_.as(Reads.IntReads)),
+          pendingRestart = json.\("pending_restart").toOption.map(_.as(Reads.BooleanReads))
         )
       )
     ),
@@ -66,45 +67,45 @@ object PgSettingsViewRow {
   def rowParser(idx: Int): RowParser[PgSettingsViewRow] = RowParser[PgSettingsViewRow] { row =>
     Success(
       PgSettingsViewRow(
-        name = row[Option[String]](idx + 0),
-        setting = row[Option[String]](idx + 1),
-        unit = row[Option[String]](idx + 2),
-        category = row[Option[String]](idx + 3),
-        shortDesc = row[Option[String]](idx + 4),
-        extraDesc = row[Option[String]](idx + 5),
-        context = row[Option[String]](idx + 6),
-        vartype = row[Option[String]](idx + 7),
-        source = row[Option[String]](idx + 8),
-        minVal = row[Option[String]](idx + 9),
-        maxVal = row[Option[String]](idx + 10),
-        enumvals = row[Option[Array[String]]](idx + 11),
-        bootVal = row[Option[String]](idx + 12),
-        resetVal = row[Option[String]](idx + 13),
-        sourcefile = row[Option[String]](idx + 14),
-        sourceline = row[Option[Int]](idx + 15),
-        pendingRestart = row[Option[Boolean]](idx + 16)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        setting = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        unit = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        category = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        shortDesc = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        extraDesc = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        context = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        vartype = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        source = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        minVal = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        maxVal = row(idx + 10)(Column.columnToOption(Column.columnToString)),
+        enumvals = row(idx + 11)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        bootVal = row(idx + 12)(Column.columnToOption(Column.columnToString)),
+        resetVal = row(idx + 13)(Column.columnToOption(Column.columnToString)),
+        sourcefile = row(idx + 14)(Column.columnToOption(Column.columnToString)),
+        sourceline = row(idx + 15)(Column.columnToOption(Column.columnToInt)),
+        pendingRestart = row(idx + 16)(Column.columnToOption(Column.columnToBoolean))
       )
     )
   }
   implicit val writes: OWrites[PgSettingsViewRow] = OWrites[PgSettingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "setting" -> Json.toJson(o.setting),
-      "unit" -> Json.toJson(o.unit),
-      "category" -> Json.toJson(o.category),
-      "short_desc" -> Json.toJson(o.shortDesc),
-      "extra_desc" -> Json.toJson(o.extraDesc),
-      "context" -> Json.toJson(o.context),
-      "vartype" -> Json.toJson(o.vartype),
-      "source" -> Json.toJson(o.source),
-      "min_val" -> Json.toJson(o.minVal),
-      "max_val" -> Json.toJson(o.maxVal),
-      "enumvals" -> Json.toJson(o.enumvals),
-      "boot_val" -> Json.toJson(o.bootVal),
-      "reset_val" -> Json.toJson(o.resetVal),
-      "sourcefile" -> Json.toJson(o.sourcefile),
-      "sourceline" -> Json.toJson(o.sourceline),
-      "pending_restart" -> Json.toJson(o.pendingRestart)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "setting" -> Writes.OptionWrites(Writes.StringWrites).writes(o.setting),
+      "unit" -> Writes.OptionWrites(Writes.StringWrites).writes(o.unit),
+      "category" -> Writes.OptionWrites(Writes.StringWrites).writes(o.category),
+      "short_desc" -> Writes.OptionWrites(Writes.StringWrites).writes(o.shortDesc),
+      "extra_desc" -> Writes.OptionWrites(Writes.StringWrites).writes(o.extraDesc),
+      "context" -> Writes.OptionWrites(Writes.StringWrites).writes(o.context),
+      "vartype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.vartype),
+      "source" -> Writes.OptionWrites(Writes.StringWrites).writes(o.source),
+      "min_val" -> Writes.OptionWrites(Writes.StringWrites).writes(o.minVal),
+      "max_val" -> Writes.OptionWrites(Writes.StringWrites).writes(o.maxVal),
+      "enumvals" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.enumvals),
+      "boot_val" -> Writes.OptionWrites(Writes.StringWrites).writes(o.bootVal),
+      "reset_val" -> Writes.OptionWrites(Writes.StringWrites).writes(o.resetVal),
+      "sourcefile" -> Writes.OptionWrites(Writes.StringWrites).writes(o.sourcefile),
+      "sourceline" -> Writes.OptionWrites(Writes.IntWrites).writes(o.sourceline),
+      "pending_restart" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.pendingRestart)
     ))
   )
 }

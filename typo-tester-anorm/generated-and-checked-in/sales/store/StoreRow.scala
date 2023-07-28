@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,12 +43,12 @@ object StoreRow {
   implicit val reads: Reads[StoreRow] = Reads[StoreRow](json => JsResult.fromTry(
       Try(
         StoreRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          name = json.\("name").as[Name],
-          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          name = json.\("name").as(Name.reads),
+          salespersonid = json.\("salespersonid").toOption.map(_.as(BusinessentityId.reads)),
+          demographics = json.\("demographics").toOption.map(_.as(TypoXml.reads)),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -55,23 +56,23 @@ object StoreRow {
   def rowParser(idx: Int): RowParser[StoreRow] = RowParser[StoreRow] { row =>
     Success(
       StoreRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        name = row[Name](idx + 1),
-        salespersonid = row[Option[BusinessentityId]](idx + 2),
-        demographics = row[Option[TypoXml]](idx + 3),
-        rowguid = row[UUID](idx + 4),
-        modifieddate = row[TypoLocalDateTime](idx + 5)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        name = row(idx + 1)(Name.column),
+        salespersonid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
+        demographics = row(idx + 3)(Column.columnToOption(TypoXml.column)),
+        rowguid = row(idx + 4)(Column.columnToUUID),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[StoreRow] = OWrites[StoreRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "name" -> Json.toJson(o.name),
-      "salespersonid" -> Json.toJson(o.salespersonid),
-      "demographics" -> Json.toJson(o.demographics),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "name" -> Name.writes.writes(o.name),
+      "salespersonid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.salespersonid),
+      "demographics" -> Writes.OptionWrites(TypoXml.writes).writes(o.demographics),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

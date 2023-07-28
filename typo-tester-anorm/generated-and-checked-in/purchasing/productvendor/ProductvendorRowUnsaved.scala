@@ -15,9 +15,9 @@ import adventureworks.production.unitmeasure.UnitmeasureId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -71,34 +71,34 @@ object ProductvendorRowUnsaved {
   implicit val reads: Reads[ProductvendorRowUnsaved] = Reads[ProductvendorRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductvendorRowUnsaved(
-          productid = json.\("productid").as[ProductId],
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          averageleadtime = json.\("averageleadtime").as[Int],
-          standardprice = json.\("standardprice").as[BigDecimal],
-          lastreceiptcost = json.\("lastreceiptcost").toOption.map(_.as[BigDecimal]),
-          lastreceiptdate = json.\("lastreceiptdate").toOption.map(_.as[TypoLocalDateTime]),
-          minorderqty = json.\("minorderqty").as[Int],
-          maxorderqty = json.\("maxorderqty").as[Int],
-          onorderqty = json.\("onorderqty").toOption.map(_.as[Int]),
-          unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          productid = json.\("productid").as(ProductId.reads),
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          averageleadtime = json.\("averageleadtime").as(Reads.IntReads),
+          standardprice = json.\("standardprice").as(Reads.bigDecReads),
+          lastreceiptcost = json.\("lastreceiptcost").toOption.map(_.as(Reads.bigDecReads)),
+          lastreceiptdate = json.\("lastreceiptdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          minorderqty = json.\("minorderqty").as(Reads.IntReads),
+          maxorderqty = json.\("maxorderqty").as(Reads.IntReads),
+          onorderqty = json.\("onorderqty").toOption.map(_.as(Reads.IntReads)),
+          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductvendorRowUnsaved] = OWrites[ProductvendorRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "averageleadtime" -> Json.toJson(o.averageleadtime),
-      "standardprice" -> Json.toJson(o.standardprice),
-      "lastreceiptcost" -> Json.toJson(o.lastreceiptcost),
-      "lastreceiptdate" -> Json.toJson(o.lastreceiptdate),
-      "minorderqty" -> Json.toJson(o.minorderqty),
-      "maxorderqty" -> Json.toJson(o.maxorderqty),
-      "onorderqty" -> Json.toJson(o.onorderqty),
-      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "averageleadtime" -> Writes.IntWrites.writes(o.averageleadtime),
+      "standardprice" -> Writes.BigDecimalWrites.writes(o.standardprice),
+      "lastreceiptcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.lastreceiptcost),
+      "lastreceiptdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.lastreceiptdate),
+      "minorderqty" -> Writes.IntWrites.writes(o.minorderqty),
+      "maxorderqty" -> Writes.IntWrites.writes(o.maxorderqty),
+      "onorderqty" -> Writes.OptionWrites(Writes.IntWrites).writes(o.onorderqty),
+      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

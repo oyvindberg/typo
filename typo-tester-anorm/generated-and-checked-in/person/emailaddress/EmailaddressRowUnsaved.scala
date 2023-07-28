@@ -14,9 +14,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -57,22 +57,22 @@ object EmailaddressRowUnsaved {
   implicit val reads: Reads[EmailaddressRowUnsaved] = Reads[EmailaddressRowUnsaved](json => JsResult.fromTry(
       Try(
         EmailaddressRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
-          emailaddressid = json.\("emailaddressid").as[Defaulted[Int]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
+          emailaddressid = json.\("emailaddressid").as(Defaulted.reads(Reads.IntReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[EmailaddressRowUnsaved] = OWrites[EmailaddressRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "emailaddress" -> Json.toJson(o.emailaddress),
-      "emailaddressid" -> Json.toJson(o.emailaddressid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
+      "emailaddressid" -> Defaulted.writes(Writes.IntWrites).writes(o.emailaddressid),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

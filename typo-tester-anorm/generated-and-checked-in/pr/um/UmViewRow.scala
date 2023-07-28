@@ -10,14 +10,15 @@ package um
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,10 +36,10 @@ object UmViewRow {
   implicit val reads: Reads[UmViewRow] = Reads[UmViewRow](json => JsResult.fromTry(
       Try(
         UmViewRow(
-          id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
-          unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as[UnitmeasureId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.StringReads)),
+          unitmeasurecode = json.\("unitmeasurecode").toOption.map(_.as(UnitmeasureId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -46,19 +47,19 @@ object UmViewRow {
   def rowParser(idx: Int): RowParser[UmViewRow] = RowParser[UmViewRow] { row =>
     Success(
       UmViewRow(
-        id = row[Option[/* bpchar */ String]](idx + 0),
-        unitmeasurecode = row[Option[UnitmeasureId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        unitmeasurecode = row(idx + 1)(Column.columnToOption(UnitmeasureId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[UmViewRow] = OWrites[UmViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.StringWrites).writes(o.id),
+      "unitmeasurecode" -> Writes.OptionWrites(UnitmeasureId.writes).writes(o.unitmeasurecode),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

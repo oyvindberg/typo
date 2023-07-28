@@ -12,7 +12,6 @@ import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -36,22 +35,22 @@ case class BusinessentityaddressRow(
  }
 
 object BusinessentityaddressRow {
-  implicit val decoder: Decoder[BusinessentityaddressRow] = Decoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BusinessentityaddressRow.apply)
-  implicit val encoder: Encoder[BusinessentityaddressRow] = Encoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[BusinessentityaddressRow] = Decoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BusinessentityaddressRow.apply)(BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[BusinessentityaddressRow] = Encoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[BusinessentityaddressRow] = new Read[BusinessentityaddressRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[AddressId], Nullability.NoNulls),
-      (Get[AddresstypeId], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (AddressId.get, Nullability.NoNulls),
+      (AddresstypeId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BusinessentityaddressRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 1),
-      addresstypeid = Get[AddresstypeId].unsafeGetNonNullable(rs, i + 2),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      addressid = AddressId.get.unsafeGetNonNullable(rs, i + 1),
+      addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 2),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

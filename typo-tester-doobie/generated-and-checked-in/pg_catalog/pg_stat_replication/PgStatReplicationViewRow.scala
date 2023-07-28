@@ -12,8 +12,8 @@ import adventureworks.TypoInterval
 import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -42,52 +42,52 @@ case class PgStatReplicationViewRow(
 )
 
 object PgStatReplicationViewRow {
-  implicit val decoder: Decoder[PgStatReplicationViewRow] = Decoder.forProduct20[PgStatReplicationViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoXid], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[TypoInterval], Option[TypoInterval], Option[TypoInterval], Option[Int], Option[String], Option[TypoOffsetDateTime]]("pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "backend_xmin", "state", "sent_lsn", "write_lsn", "flush_lsn", "replay_lsn", "write_lag", "flush_lag", "replay_lag", "sync_priority", "sync_state", "reply_time")(PgStatReplicationViewRow.apply)
-  implicit val encoder: Encoder[PgStatReplicationViewRow] = Encoder.forProduct20[PgStatReplicationViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoXid], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[TypoInterval], Option[TypoInterval], Option[TypoInterval], Option[Int], Option[String], Option[TypoOffsetDateTime]]("pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "backend_xmin", "state", "sent_lsn", "write_lsn", "flush_lsn", "replay_lsn", "write_lag", "flush_lag", "replay_lag", "sync_priority", "sync_state", "reply_time")(x => (x.pid, x.usesysid, x.usename, x.applicationName, x.clientAddr, x.clientHostname, x.clientPort, x.backendStart, x.backendXmin, x.state, x.sentLsn, x.writeLsn, x.flushLsn, x.replayLsn, x.writeLag, x.flushLag, x.replayLag, x.syncPriority, x.syncState, x.replyTime))
+  implicit val decoder: Decoder[PgStatReplicationViewRow] = Decoder.forProduct20[PgStatReplicationViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoXid], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[TypoInterval], Option[TypoInterval], Option[TypoInterval], Option[Int], Option[String], Option[TypoOffsetDateTime]]("pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "backend_xmin", "state", "sent_lsn", "write_lsn", "flush_lsn", "replay_lsn", "write_lag", "flush_lag", "replay_lag", "sync_priority", "sync_state", "reply_time")(PgStatReplicationViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInet.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder))
+  implicit val encoder: Encoder[PgStatReplicationViewRow] = Encoder.forProduct20[PgStatReplicationViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoXid], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[TypoInterval], Option[TypoInterval], Option[TypoInterval], Option[Int], Option[String], Option[TypoOffsetDateTime]]("pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "backend_xmin", "state", "sent_lsn", "write_lsn", "flush_lsn", "replay_lsn", "write_lag", "flush_lag", "replay_lag", "sync_priority", "sync_state", "reply_time")(x => (x.pid, x.usesysid, x.usename, x.applicationName, x.clientAddr, x.clientHostname, x.clientPort, x.backendStart, x.backendXmin, x.state, x.sentLsn, x.writeLsn, x.flushLsn, x.replayLsn, x.writeLag, x.flushLag, x.replayLag, x.syncPriority, x.syncState, x.replyTime))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInet.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder))
   implicit val read: Read[PgStatReplicationViewRow] = new Read[PgStatReplicationViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoInet], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[TypoXid], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[TypoInterval], Nullability.Nullable),
-      (Get[TypoInterval], Nullability.Nullable),
-      (Get[TypoInterval], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoInet.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoXid.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (TypoInterval.get, Nullability.Nullable),
+      (TypoInterval.get, Nullability.Nullable),
+      (TypoInterval.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatReplicationViewRow(
-      pid = Get[Int].unsafeGetNullable(rs, i + 0),
-      usesysid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      usename = Get[String].unsafeGetNullable(rs, i + 2),
-      applicationName = Get[String].unsafeGetNullable(rs, i + 3),
-      clientAddr = Get[TypoInet].unsafeGetNullable(rs, i + 4),
-      clientHostname = Get[String].unsafeGetNullable(rs, i + 5),
-      clientPort = Get[Int].unsafeGetNullable(rs, i + 6),
-      backendStart = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 7),
-      backendXmin = Get[TypoXid].unsafeGetNullable(rs, i + 8),
-      state = Get[String].unsafeGetNullable(rs, i + 9),
-      sentLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 10),
-      writeLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 11),
-      flushLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 12),
-      replayLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 13),
-      writeLag = Get[TypoInterval].unsafeGetNullable(rs, i + 14),
-      flushLag = Get[TypoInterval].unsafeGetNullable(rs, i + 15),
-      replayLag = Get[TypoInterval].unsafeGetNullable(rs, i + 16),
-      syncPriority = Get[Int].unsafeGetNullable(rs, i + 17),
-      syncState = Get[String].unsafeGetNullable(rs, i + 18),
-      replyTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 19)
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      usesysid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      usename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      applicationName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      clientAddr = TypoInet.get.unsafeGetNullable(rs, i + 4),
+      clientHostname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      clientPort = Meta.IntMeta.get.unsafeGetNullable(rs, i + 6),
+      backendStart = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 7),
+      backendXmin = TypoXid.get.unsafeGetNullable(rs, i + 8),
+      state = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      sentLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10),
+      writeLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 11),
+      flushLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 12),
+      replayLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 13),
+      writeLag = TypoInterval.get.unsafeGetNullable(rs, i + 14),
+      flushLag = TypoInterval.get.unsafeGetNullable(rs, i + 15),
+      replayLag = TypoInterval.get.unsafeGetNullable(rs, i + 16),
+      syncPriority = Meta.IntMeta.get.unsafeGetNullable(rs, i + 17),
+      syncState = Meta.StringMeta.get.unsafeGetNullable(rs, i + 18),
+      replyTime = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 19)
     )
   )
 }

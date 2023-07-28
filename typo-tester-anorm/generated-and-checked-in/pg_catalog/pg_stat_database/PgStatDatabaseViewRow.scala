@@ -8,14 +8,15 @@ package pg_catalog
 package pg_stat_database
 
 import adventureworks.TypoOffsetDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,34 +55,34 @@ object PgStatDatabaseViewRow {
   implicit val reads: Reads[PgStatDatabaseViewRow] = Reads[PgStatDatabaseViewRow](json => JsResult.fromTry(
       Try(
         PgStatDatabaseViewRow(
-          datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
-          datname = json.\("datname").toOption.map(_.as[String]),
-          numbackends = json.\("numbackends").toOption.map(_.as[Int]),
-          xactCommit = json.\("xact_commit").toOption.map(_.as[Long]),
-          xactRollback = json.\("xact_rollback").toOption.map(_.as[Long]),
-          blksRead = json.\("blks_read").toOption.map(_.as[Long]),
-          blksHit = json.\("blks_hit").toOption.map(_.as[Long]),
-          tupReturned = json.\("tup_returned").toOption.map(_.as[Long]),
-          tupFetched = json.\("tup_fetched").toOption.map(_.as[Long]),
-          tupInserted = json.\("tup_inserted").toOption.map(_.as[Long]),
-          tupUpdated = json.\("tup_updated").toOption.map(_.as[Long]),
-          tupDeleted = json.\("tup_deleted").toOption.map(_.as[Long]),
-          conflicts = json.\("conflicts").toOption.map(_.as[Long]),
-          tempFiles = json.\("temp_files").toOption.map(_.as[Long]),
-          tempBytes = json.\("temp_bytes").toOption.map(_.as[Long]),
-          deadlocks = json.\("deadlocks").toOption.map(_.as[Long]),
-          checksumFailures = json.\("checksum_failures").toOption.map(_.as[Long]),
-          checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as[TypoOffsetDateTime]),
-          blkReadTime = json.\("blk_read_time").toOption.map(_.as[Double]),
-          blkWriteTime = json.\("blk_write_time").toOption.map(_.as[Double]),
-          sessionTime = json.\("session_time").toOption.map(_.as[Double]),
-          activeTime = json.\("active_time").toOption.map(_.as[Double]),
-          idleInTransactionTime = json.\("idle_in_transaction_time").toOption.map(_.as[Double]),
-          sessions = json.\("sessions").toOption.map(_.as[Long]),
-          sessionsAbandoned = json.\("sessions_abandoned").toOption.map(_.as[Long]),
-          sessionsFatal = json.\("sessions_fatal").toOption.map(_.as[Long]),
-          sessionsKilled = json.\("sessions_killed").toOption.map(_.as[Long]),
-          statsReset = json.\("stats_reset").toOption.map(_.as[TypoOffsetDateTime])
+          datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
+          datname = json.\("datname").toOption.map(_.as(Reads.StringReads)),
+          numbackends = json.\("numbackends").toOption.map(_.as(Reads.IntReads)),
+          xactCommit = json.\("xact_commit").toOption.map(_.as(Reads.LongReads)),
+          xactRollback = json.\("xact_rollback").toOption.map(_.as(Reads.LongReads)),
+          blksRead = json.\("blks_read").toOption.map(_.as(Reads.LongReads)),
+          blksHit = json.\("blks_hit").toOption.map(_.as(Reads.LongReads)),
+          tupReturned = json.\("tup_returned").toOption.map(_.as(Reads.LongReads)),
+          tupFetched = json.\("tup_fetched").toOption.map(_.as(Reads.LongReads)),
+          tupInserted = json.\("tup_inserted").toOption.map(_.as(Reads.LongReads)),
+          tupUpdated = json.\("tup_updated").toOption.map(_.as(Reads.LongReads)),
+          tupDeleted = json.\("tup_deleted").toOption.map(_.as(Reads.LongReads)),
+          conflicts = json.\("conflicts").toOption.map(_.as(Reads.LongReads)),
+          tempFiles = json.\("temp_files").toOption.map(_.as(Reads.LongReads)),
+          tempBytes = json.\("temp_bytes").toOption.map(_.as(Reads.LongReads)),
+          deadlocks = json.\("deadlocks").toOption.map(_.as(Reads.LongReads)),
+          checksumFailures = json.\("checksum_failures").toOption.map(_.as(Reads.LongReads)),
+          checksumLastFailure = json.\("checksum_last_failure").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          blkReadTime = json.\("blk_read_time").toOption.map(_.as(Reads.DoubleReads)),
+          blkWriteTime = json.\("blk_write_time").toOption.map(_.as(Reads.DoubleReads)),
+          sessionTime = json.\("session_time").toOption.map(_.as(Reads.DoubleReads)),
+          activeTime = json.\("active_time").toOption.map(_.as(Reads.DoubleReads)),
+          idleInTransactionTime = json.\("idle_in_transaction_time").toOption.map(_.as(Reads.DoubleReads)),
+          sessions = json.\("sessions").toOption.map(_.as(Reads.LongReads)),
+          sessionsAbandoned = json.\("sessions_abandoned").toOption.map(_.as(Reads.LongReads)),
+          sessionsFatal = json.\("sessions_fatal").toOption.map(_.as(Reads.LongReads)),
+          sessionsKilled = json.\("sessions_killed").toOption.map(_.as(Reads.LongReads)),
+          statsReset = json.\("stats_reset").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -89,67 +90,67 @@ object PgStatDatabaseViewRow {
   def rowParser(idx: Int): RowParser[PgStatDatabaseViewRow] = RowParser[PgStatDatabaseViewRow] { row =>
     Success(
       PgStatDatabaseViewRow(
-        datid = row[Option[/* oid */ Long]](idx + 0),
-        datname = row[Option[String]](idx + 1),
-        numbackends = row[Option[Int]](idx + 2),
-        xactCommit = row[Option[Long]](idx + 3),
-        xactRollback = row[Option[Long]](idx + 4),
-        blksRead = row[Option[Long]](idx + 5),
-        blksHit = row[Option[Long]](idx + 6),
-        tupReturned = row[Option[Long]](idx + 7),
-        tupFetched = row[Option[Long]](idx + 8),
-        tupInserted = row[Option[Long]](idx + 9),
-        tupUpdated = row[Option[Long]](idx + 10),
-        tupDeleted = row[Option[Long]](idx + 11),
-        conflicts = row[Option[Long]](idx + 12),
-        tempFiles = row[Option[Long]](idx + 13),
-        tempBytes = row[Option[Long]](idx + 14),
-        deadlocks = row[Option[Long]](idx + 15),
-        checksumFailures = row[Option[Long]](idx + 16),
-        checksumLastFailure = row[Option[TypoOffsetDateTime]](idx + 17),
-        blkReadTime = row[Option[Double]](idx + 18),
-        blkWriteTime = row[Option[Double]](idx + 19),
-        sessionTime = row[Option[Double]](idx + 20),
-        activeTime = row[Option[Double]](idx + 21),
-        idleInTransactionTime = row[Option[Double]](idx + 22),
-        sessions = row[Option[Long]](idx + 23),
-        sessionsAbandoned = row[Option[Long]](idx + 24),
-        sessionsFatal = row[Option[Long]](idx + 25),
-        sessionsKilled = row[Option[Long]](idx + 26),
-        statsReset = row[Option[TypoOffsetDateTime]](idx + 27)
+        datid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        datname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        numbackends = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
+        xactCommit = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        xactRollback = row(idx + 4)(Column.columnToOption(Column.columnToLong)),
+        blksRead = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        blksHit = row(idx + 6)(Column.columnToOption(Column.columnToLong)),
+        tupReturned = row(idx + 7)(Column.columnToOption(Column.columnToLong)),
+        tupFetched = row(idx + 8)(Column.columnToOption(Column.columnToLong)),
+        tupInserted = row(idx + 9)(Column.columnToOption(Column.columnToLong)),
+        tupUpdated = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
+        tupDeleted = row(idx + 11)(Column.columnToOption(Column.columnToLong)),
+        conflicts = row(idx + 12)(Column.columnToOption(Column.columnToLong)),
+        tempFiles = row(idx + 13)(Column.columnToOption(Column.columnToLong)),
+        tempBytes = row(idx + 14)(Column.columnToOption(Column.columnToLong)),
+        deadlocks = row(idx + 15)(Column.columnToOption(Column.columnToLong)),
+        checksumFailures = row(idx + 16)(Column.columnToOption(Column.columnToLong)),
+        checksumLastFailure = row(idx + 17)(Column.columnToOption(TypoOffsetDateTime.column)),
+        blkReadTime = row(idx + 18)(Column.columnToOption(Column.columnToDouble)),
+        blkWriteTime = row(idx + 19)(Column.columnToOption(Column.columnToDouble)),
+        sessionTime = row(idx + 20)(Column.columnToOption(Column.columnToDouble)),
+        activeTime = row(idx + 21)(Column.columnToOption(Column.columnToDouble)),
+        idleInTransactionTime = row(idx + 22)(Column.columnToOption(Column.columnToDouble)),
+        sessions = row(idx + 23)(Column.columnToOption(Column.columnToLong)),
+        sessionsAbandoned = row(idx + 24)(Column.columnToOption(Column.columnToLong)),
+        sessionsFatal = row(idx + 25)(Column.columnToOption(Column.columnToLong)),
+        sessionsKilled = row(idx + 26)(Column.columnToOption(Column.columnToLong)),
+        statsReset = row(idx + 27)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PgStatDatabaseViewRow] = OWrites[PgStatDatabaseViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "datid" -> Json.toJson(o.datid),
-      "datname" -> Json.toJson(o.datname),
-      "numbackends" -> Json.toJson(o.numbackends),
-      "xact_commit" -> Json.toJson(o.xactCommit),
-      "xact_rollback" -> Json.toJson(o.xactRollback),
-      "blks_read" -> Json.toJson(o.blksRead),
-      "blks_hit" -> Json.toJson(o.blksHit),
-      "tup_returned" -> Json.toJson(o.tupReturned),
-      "tup_fetched" -> Json.toJson(o.tupFetched),
-      "tup_inserted" -> Json.toJson(o.tupInserted),
-      "tup_updated" -> Json.toJson(o.tupUpdated),
-      "tup_deleted" -> Json.toJson(o.tupDeleted),
-      "conflicts" -> Json.toJson(o.conflicts),
-      "temp_files" -> Json.toJson(o.tempFiles),
-      "temp_bytes" -> Json.toJson(o.tempBytes),
-      "deadlocks" -> Json.toJson(o.deadlocks),
-      "checksum_failures" -> Json.toJson(o.checksumFailures),
-      "checksum_last_failure" -> Json.toJson(o.checksumLastFailure),
-      "blk_read_time" -> Json.toJson(o.blkReadTime),
-      "blk_write_time" -> Json.toJson(o.blkWriteTime),
-      "session_time" -> Json.toJson(o.sessionTime),
-      "active_time" -> Json.toJson(o.activeTime),
-      "idle_in_transaction_time" -> Json.toJson(o.idleInTransactionTime),
-      "sessions" -> Json.toJson(o.sessions),
-      "sessions_abandoned" -> Json.toJson(o.sessionsAbandoned),
-      "sessions_fatal" -> Json.toJson(o.sessionsFatal),
-      "sessions_killed" -> Json.toJson(o.sessionsKilled),
-      "stats_reset" -> Json.toJson(o.statsReset)
+      "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
+      "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),
+      "numbackends" -> Writes.OptionWrites(Writes.IntWrites).writes(o.numbackends),
+      "xact_commit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.xactCommit),
+      "xact_rollback" -> Writes.OptionWrites(Writes.LongWrites).writes(o.xactRollback),
+      "blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksRead),
+      "blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksHit),
+      "tup_returned" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tupReturned),
+      "tup_fetched" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tupFetched),
+      "tup_inserted" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tupInserted),
+      "tup_updated" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tupUpdated),
+      "tup_deleted" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tupDeleted),
+      "conflicts" -> Writes.OptionWrites(Writes.LongWrites).writes(o.conflicts),
+      "temp_files" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tempFiles),
+      "temp_bytes" -> Writes.OptionWrites(Writes.LongWrites).writes(o.tempBytes),
+      "deadlocks" -> Writes.OptionWrites(Writes.LongWrites).writes(o.deadlocks),
+      "checksum_failures" -> Writes.OptionWrites(Writes.LongWrites).writes(o.checksumFailures),
+      "checksum_last_failure" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.checksumLastFailure),
+      "blk_read_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.blkReadTime),
+      "blk_write_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.blkWriteTime),
+      "session_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.sessionTime),
+      "active_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.activeTime),
+      "idle_in_transaction_time" -> Writes.OptionWrites(Writes.DoubleWrites).writes(o.idleInTransactionTime),
+      "sessions" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sessions),
+      "sessions_abandoned" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sessionsAbandoned),
+      "sessions_fatal" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sessionsFatal),
+      "sessions_killed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sessionsKilled),
+      "stats_reset" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.statsReset)
     ))
   )
 }

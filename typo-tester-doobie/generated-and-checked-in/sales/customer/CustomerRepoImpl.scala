@@ -9,38 +9,42 @@ package customer
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
 
 object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId): ConnectionIO[Boolean] = {
-    sql"delete from sales.customer where customerid = ${customerid}".update.run.map(_ > 0)
+    sql"delete from sales.customer where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
-          values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4, ${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """.query(CustomerRow.read).unique
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
-      Some((Fragment.const(s"personid"), fr"${unsaved.personid}::int4")),
-      Some((Fragment.const(s"storeid"), fr"${unsaved.storeid}::int4")),
-      Some((Fragment.const(s"territoryid"), fr"${unsaved.territoryid}::int4")),
+      Some((Fragment.const(s"personid"), fr"${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s"storeid"), fr"${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const(s"territoryid"), fr"${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4")),
       unsaved.customerid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"customerid"), fr"${value: CustomerId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"customerid"), fr"${fromWrite(value: CustomerId)(Write.fromPut(CustomerId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -62,20 +66,20 @@ object CustomerRepoImpl extends CustomerRepo {
     sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer".query(CustomerRow.read).stream
   }
   override def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ${customerid}".query(CustomerRow.read).option
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}".query(CustomerRow.read).option
   }
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${customerids})".query(CustomerRow.read).stream
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${fromWrite(customerids)(Write.fromPut(CustomerId.arrayPut))})".query(CustomerRow.read).stream
   }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid
     sql"""update sales.customer
-          set personid = ${row.personid}::int4,
-              storeid = ${row.storeid}::int4,
-              territoryid = ${row.territoryid}::int4,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where customerid = ${customerid}
+          set personid = ${fromWrite(row.personid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+              storeid = ${fromWrite(row.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+              territoryid = ${fromWrite(row.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4,
+              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}
        """
       .update
       .run
@@ -84,12 +88,12 @@ object CustomerRepoImpl extends CustomerRepo {
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
           values (
-            ${unsaved.customerid}::int4,
-            ${unsaved.personid}::int4,
-            ${unsaved.storeid}::int4,
-            ${unsaved.territoryid}::int4,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4,
+            ${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4,
+            ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (customerid)
           do update set

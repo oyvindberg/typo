@@ -23,7 +23,7 @@ object CurrencyrateId {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[CurrencyrateId] = implicitly[Reads[Int]].map(CurrencyrateId.apply)
+  implicit val reads: Reads[CurrencyrateId] = Reads.IntReads.map(CurrencyrateId.apply)
   implicit val toStatement: ToStatement[CurrencyrateId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[CurrencyrateId] = implicitly[Writes[Int]].contramap(_.value)
+  implicit val writes: Writes[CurrencyrateId] = Writes.IntWrites.contramap(_.value)
 }

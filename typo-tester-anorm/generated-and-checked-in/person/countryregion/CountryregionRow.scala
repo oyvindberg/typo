@@ -14,7 +14,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -32,9 +31,9 @@ object CountryregionRow {
   implicit val reads: Reads[CountryregionRow] = Reads[CountryregionRow](json => JsResult.fromTry(
       Try(
         CountryregionRow(
-          countryregioncode = json.\("countryregioncode").as[CountryregionId],
-          name = json.\("name").as[Name],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -42,17 +41,17 @@ object CountryregionRow {
   def rowParser(idx: Int): RowParser[CountryregionRow] = RowParser[CountryregionRow] { row =>
     Success(
       CountryregionRow(
-        countryregioncode = row[CountryregionId](idx + 0),
-        name = row[Name](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        countryregioncode = row(idx + 0)(CountryregionId.column),
+        name = row(idx + 1)(Name.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[CountryregionRow] = OWrites[CountryregionRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

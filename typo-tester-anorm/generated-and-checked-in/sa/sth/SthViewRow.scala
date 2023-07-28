@@ -10,15 +10,16 @@ package sth
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,13 +43,13 @@ object SthViewRow {
   implicit val reads: Reads[SthViewRow] = Reads[SthViewRow](json => JsResult.fromTry(
       Try(
         SthViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDateTime]),
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          startdate = json.\("startdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -56,25 +57,25 @@ object SthViewRow {
   def rowParser(idx: Int): RowParser[SthViewRow] = RowParser[SthViewRow] { row =>
     Success(
       SthViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        territoryid = row[Option[SalesterritoryId]](idx + 2),
-        startdate = row[Option[TypoLocalDateTime]](idx + 3),
-        enddate = row[Option[TypoLocalDateTime]](idx + 4),
-        rowguid = row[Option[UUID]](idx + 5),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        territoryid = row(idx + 2)(Column.columnToOption(SalesterritoryId.column)),
+        startdate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column)),
+        enddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
+        rowguid = row(idx + 5)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SthViewRow] = OWrites[SthViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "startdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -10,8 +10,8 @@ package pa
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -32,24 +32,24 @@ case class PaViewRow(
 )
 
 object PaViewRow {
-  implicit val decoder: Decoder[PaViewRow] = Decoder.forProduct6[PaViewRow, Option[Int], Option[BusinessentityId], Option[/* max 128 chars */ String], Option[/* max 10 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PaViewRow.apply)
-  implicit val encoder: Encoder[PaViewRow] = Encoder.forProduct6[PaViewRow, Option[Int], Option[BusinessentityId], Option[/* max 128 chars */ String], Option[/* max 10 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[PaViewRow] = Decoder.forProduct6[PaViewRow, Option[Int], Option[BusinessentityId], Option[/* max 128 chars */ String], Option[/* max 10 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PaViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PaViewRow] = Encoder.forProduct6[PaViewRow, Option[Int], Option[BusinessentityId], Option[/* max 128 chars */ String], Option[/* max 10 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PaViewRow] = new Read[PaViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[/* max 128 chars */ String], Nullability.Nullable),
-      (Get[/* max 10 chars */ String], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PaViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      passwordhash = Get[/* max 128 chars */ String].unsafeGetNullable(rs, i + 2),
-      passwordsalt = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      passwordhash = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      passwordsalt = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

@@ -9,36 +9,39 @@ package productcategory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
 
 object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def delete(productcategoryid: ProductcategoryId): ConnectionIO[Boolean] = {
-    sql"delete from production.productcategory where productcategoryid = ${productcategoryid}".update.run.map(_ > 0)
+    sql"delete from production.productcategory where productcategoryid = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
-          values (${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning productcategoryid, "name", rowguid, modifieddate::text
        """.query(ProductcategoryRow.read).unique
   }
   override def insert(unsaved: ProductcategoryRowUnsaved): ConnectionIO[ProductcategoryRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
       unsaved.productcategoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"productcategoryid"), fr"${value: ProductcategoryId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"productcategoryid"), fr"${fromWrite(value: ProductcategoryId)(Write.fromPut(ProductcategoryId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -60,18 +63,18 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""select productcategoryid, "name", rowguid, modifieddate::text from production.productcategory""".query(ProductcategoryRow.read).stream
   }
   override def selectById(productcategoryid: ProductcategoryId): ConnectionIO[Option[ProductcategoryRow]] = {
-    sql"""select productcategoryid, "name", rowguid, modifieddate::text from production.productcategory where productcategoryid = ${productcategoryid}""".query(ProductcategoryRow.read).option
+    sql"""select productcategoryid, "name", rowguid, modifieddate::text from production.productcategory where productcategoryid = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}""".query(ProductcategoryRow.read).option
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): Stream[ConnectionIO, ProductcategoryRow] = {
-    sql"""select productcategoryid, "name", rowguid, modifieddate::text from production.productcategory where productcategoryid = ANY(${productcategoryids})""".query(ProductcategoryRow.read).stream
+    sql"""select productcategoryid, "name", rowguid, modifieddate::text from production.productcategory where productcategoryid = ANY(${fromWrite(productcategoryids)(Write.fromPut(ProductcategoryId.arrayPut))})""".query(ProductcategoryRow.read).stream
   }
   override def update(row: ProductcategoryRow): ConnectionIO[Boolean] = {
     val productcategoryid = row.productcategoryid
     sql"""update production.productcategory
-          set "name" = ${row.name}::"public"."Name",
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where productcategoryid = ${productcategoryid}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where productcategoryid = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}
        """
       .update
       .run
@@ -80,10 +83,10 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def upsert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
           values (
-            ${unsaved.productcategoryid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (productcategoryid)
           do update set

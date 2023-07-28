@@ -9,37 +9,42 @@ package purchaseorderdetail
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.production.product.ProductId
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId): ConnectionIO[Boolean] = {
-    sql"delete from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".update.run.map(_ > 0)
+    sql"delete from purchasing.purchaseorderdetail where purchaseorderid = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND purchaseorderdetailid = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
-          values (${unsaved.purchaseorderid}::int4, ${unsaved.purchaseorderdetailid}::int4, ${unsaved.duedate}::timestamp, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.receivedqty}::numeric, ${unsaved.rejectedqty}::numeric, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4, ${fromWrite(unsaved.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rejectedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
        """.query(PurchaseorderdetailRow.read).unique
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved): ConnectionIO[PurchaseorderdetailRow] = {
     val fs = List(
-      Some((Fragment.const(s"purchaseorderid"), fr"${unsaved.purchaseorderid}::int4")),
-      Some((Fragment.const(s"duedate"), fr"${unsaved.duedate}::timestamp")),
-      Some((Fragment.const(s"orderqty"), fr"${unsaved.orderqty}::int2")),
-      Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
-      Some((Fragment.const(s"unitprice"), fr"${unsaved.unitprice}::numeric")),
-      Some((Fragment.const(s"receivedqty"), fr"${unsaved.receivedqty}::numeric")),
-      Some((Fragment.const(s"rejectedqty"), fr"${unsaved.rejectedqty}::numeric")),
+      Some((Fragment.const(s"purchaseorderid"), fr"${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4")),
+      Some((Fragment.const(s"duedate"), fr"${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const(s"orderqty"), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2")),
+      Some((Fragment.const(s"productid"), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
+      Some((Fragment.const(s"unitprice"), fr"${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const(s"receivedqty"), fr"${fromWrite(unsaved.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const(s"rejectedqty"), fr"${fromWrite(unsaved.rejectedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.purchaseorderdetailid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"purchaseorderdetailid"), fr"${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"purchaseorderdetailid"), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -61,19 +66,19 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail".query(PurchaseorderdetailRow.read).stream
   }
   override def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]] = {
-    sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".query(PurchaseorderdetailRow.read).option
+    sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail where purchaseorderid = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND purchaseorderdetailid = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}".query(PurchaseorderdetailRow.read).option
   }
   override def update(row: PurchaseorderdetailRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update purchasing.purchaseorderdetail
-          set duedate = ${row.duedate}::timestamp,
-              orderqty = ${row.orderqty}::int2,
-              productid = ${row.productid}::int4,
-              unitprice = ${row.unitprice}::numeric,
-              receivedqty = ${row.receivedqty}::numeric,
-              rejectedqty = ${row.rejectedqty}::numeric,
-              modifieddate = ${row.modifieddate}::timestamp
-          where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
+          set duedate = ${fromWrite(row.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+              orderqty = ${fromWrite(row.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              productid = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
+              unitprice = ${fromWrite(row.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              receivedqty = ${fromWrite(row.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              rejectedqty = ${fromWrite(row.rejectedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where purchaseorderid = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND purchaseorderdetailid = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}
        """
       .update
       .run
@@ -82,15 +87,15 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def upsert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
           values (
-            ${unsaved.purchaseorderid}::int4,
-            ${unsaved.purchaseorderdetailid}::int4,
-            ${unsaved.duedate}::timestamp,
-            ${unsaved.orderqty}::int2,
-            ${unsaved.productid}::int4,
-            ${unsaved.unitprice}::numeric,
-            ${unsaved.receivedqty}::numeric,
-            ${unsaved.rejectedqty}::numeric,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4,
+            ${fromWrite(unsaved.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
+            ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.receivedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.rejectedqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (purchaseorderid, purchaseorderdetailid)
           do update set

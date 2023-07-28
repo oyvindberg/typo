@@ -10,8 +10,8 @@ package be
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,20 +28,20 @@ case class BeViewRow(
 )
 
 object BeViewRow {
-  implicit val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)
-  implicit val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[BeViewRow] = new Read[BeViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BeViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

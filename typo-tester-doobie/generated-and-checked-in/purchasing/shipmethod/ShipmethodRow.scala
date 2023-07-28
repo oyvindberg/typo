@@ -10,8 +10,8 @@ package shipmethod
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -31,24 +31,24 @@ case class ShipmethodRow(
 )
 
 object ShipmethodRow {
-  implicit val decoder: Decoder[ShipmethodRow] = Decoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRow.apply)
-  implicit val encoder: Encoder[ShipmethodRow] = Encoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[ShipmethodRow] = Decoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRow.apply)(ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ShipmethodRow] = Encoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[ShipmethodRow] = new Read[ShipmethodRow](
     gets = List(
-      (Get[ShipmethodId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[BigDecimal], Nullability.NoNulls),
-      (Get[BigDecimal], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ShipmethodId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ShipmethodRow(
-      shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      shipbase = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-      shiprate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
+      shiprate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

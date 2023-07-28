@@ -15,9 +15,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,9 +54,9 @@ object TypoLine {
   implicit val reads: Reads[TypoLine] = Reads[TypoLine](json => JsResult.fromTry(
       Try(
         TypoLine(
-          a = json.\("a").as[Double],
-          b = json.\("b").as[Double],
-          c = json.\("c").as[Double]
+          a = json.\("a").as(Reads.DoubleReads),
+          b = json.\("b").as(Reads.DoubleReads),
+          c = json.\("c").as(Reads.DoubleReads)
         )
       )
     ),
@@ -64,9 +64,9 @@ object TypoLine {
   implicit val toStatement: ToStatement[TypoLine] = ToStatement[TypoLine]((s, index, v) => s.setObject(index, new PGline(v.a, v.b, v.c)))
   implicit val writes: OWrites[TypoLine] = OWrites[TypoLine](o =>
     new JsObject(ListMap[String, JsValue](
-      "a" -> Json.toJson(o.a),
-      "b" -> Json.toJson(o.b),
-      "c" -> Json.toJson(o.c)
+      "a" -> Writes.DoubleWrites.writes(o.a),
+      "b" -> Writes.DoubleWrites.writes(o.b),
+      "c" -> Writes.DoubleWrites.writes(o.c)
     ))
   )
 }

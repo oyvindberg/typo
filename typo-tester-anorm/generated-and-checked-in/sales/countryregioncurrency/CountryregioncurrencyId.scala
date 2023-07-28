@@ -12,7 +12,6 @@ import adventureworks.sales.currency.CurrencyId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -25,16 +24,16 @@ object CountryregioncurrencyId {
   implicit val reads: Reads[CountryregioncurrencyId] = Reads[CountryregioncurrencyId](json => JsResult.fromTry(
       Try(
         CountryregioncurrencyId(
-          countryregioncode = json.\("countryregioncode").as[CountryregionId],
-          currencycode = json.\("currencycode").as[CurrencyId]
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          currencycode = json.\("currencycode").as(CurrencyId.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[CountryregioncurrencyId] = OWrites[CountryregioncurrencyId](o =>
     new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "currencycode" -> Json.toJson(o.currencycode)
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "currencycode" -> CurrencyId.writes.writes(o.currencycode)
     ))
   )
 }

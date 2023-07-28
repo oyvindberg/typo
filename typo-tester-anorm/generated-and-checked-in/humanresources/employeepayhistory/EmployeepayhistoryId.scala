@@ -12,7 +12,6 @@ import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -25,16 +24,16 @@ object EmployeepayhistoryId {
   implicit val reads: Reads[EmployeepayhistoryId] = Reads[EmployeepayhistoryId](json => JsResult.fromTry(
       Try(
         EmployeepayhistoryId(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          ratechangedate = json.\("ratechangedate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          ratechangedate = json.\("ratechangedate").as(TypoLocalDateTime.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[EmployeepayhistoryId] = OWrites[EmployeepayhistoryId](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "ratechangedate" -> Json.toJson(o.ratechangedate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate)
     ))
   )
 }

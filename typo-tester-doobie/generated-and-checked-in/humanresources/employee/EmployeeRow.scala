@@ -12,8 +12,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -52,42 +52,42 @@ case class EmployeeRow(
 )
 
 object EmployeeRow {
-  implicit val decoder: Decoder[EmployeeRow] = Decoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar */ String, /* bpchar */ String, TypoLocalDate, Flag, Int, Int, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRow.apply)
-  implicit val encoder: Encoder[EmployeeRow] = Encoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar */ String, /* bpchar */ String, TypoLocalDate, Flag, Int, Int, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))
+  implicit val decoder: Decoder[EmployeeRow] = Decoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar */ String, /* bpchar */ String, TypoLocalDate, Flag, Int, Int, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Flag.decoder, Decoder.decodeInt, Decoder.decodeInt, Flag.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder, Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[EmployeeRow] = Encoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar */ String, /* bpchar */ String, TypoLocalDate, Flag, Int, Int, Flag, UUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Flag.encoder, Encoder.encodeInt, Encoder.encodeInt, Flag.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder, Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[EmployeeRow] = new Read[EmployeeRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[/* max 15 chars */ String], Nullability.NoNulls),
-      (Get[/* max 256 chars */ String], Nullability.NoNulls),
-      (Get[/* max 50 chars */ String], Nullability.NoNulls),
-      (Get[TypoLocalDate], Nullability.NoNulls),
-      (Get[/* bpchar */ String], Nullability.NoNulls),
-      (Get[/* bpchar */ String], Nullability.NoNulls),
-      (Get[TypoLocalDate], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls),
-      (Get[String], Nullability.Nullable)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (TypoLocalDate.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (TypoLocalDate.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EmployeeRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      nationalidnumber = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 1),
-      loginid = Get[/* max 256 chars */ String].unsafeGetNonNullable(rs, i + 2),
-      jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 3),
-      birthdate = Get[TypoLocalDate].unsafeGetNonNullable(rs, i + 4),
-      maritalstatus = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-      gender = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 6),
-      hiredate = Get[TypoLocalDate].unsafeGetNonNullable(rs, i + 7),
-      salariedflag = Get[Flag].unsafeGetNonNullable(rs, i + 8),
-      vacationhours = Get[Int].unsafeGetNonNullable(rs, i + 9),
-      sickleavehours = Get[Int].unsafeGetNonNullable(rs, i + 10),
-      currentflag = Get[Flag].unsafeGetNonNullable(rs, i + 11),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 12),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 13),
-      organizationnode = Get[String].unsafeGetNullable(rs, i + 14)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      nationalidnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      loginid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      jobtitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      birthdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 4),
+      maritalstatus = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      gender = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+      hiredate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 7),
+      salariedflag = Flag.get.unsafeGetNonNullable(rs, i + 8),
+      vacationhours = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 9),
+      sickleavehours = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 10),
+      currentflag = Flag.get.unsafeGetNonNullable(rs, i + 11),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 12),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 13),
+      organizationnode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 14)
     )
   )
 }

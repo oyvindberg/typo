@@ -13,9 +13,9 @@ import adventureworks.production.product.ProductId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -64,24 +64,24 @@ object ShoppingcartitemRowUnsaved {
   implicit val reads: Reads[ShoppingcartitemRowUnsaved] = Reads[ShoppingcartitemRowUnsaved](json => JsResult.fromTry(
       Try(
         ShoppingcartitemRowUnsaved(
-          shoppingcartid = json.\("shoppingcartid").as[/* max 50 chars */ String],
-          productid = json.\("productid").as[ProductId],
-          shoppingcartitemid = json.\("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]],
-          quantity = json.\("quantity").as[Defaulted[Int]],
-          datecreated = json.\("datecreated").as[Defaulted[TypoLocalDateTime]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          shoppingcartid = json.\("shoppingcartid").as(Reads.StringReads),
+          productid = json.\("productid").as(ProductId.reads),
+          shoppingcartitemid = json.\("shoppingcartitemid").as(Defaulted.reads(ShoppingcartitemId.reads)),
+          quantity = json.\("quantity").as(Defaulted.reads(Reads.IntReads)),
+          datecreated = json.\("datecreated").as(Defaulted.reads(TypoLocalDateTime.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ShoppingcartitemRowUnsaved] = OWrites[ShoppingcartitemRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "shoppingcartid" -> Json.toJson(o.shoppingcartid),
-      "productid" -> Json.toJson(o.productid),
-      "shoppingcartitemid" -> Json.toJson(o.shoppingcartitemid),
-      "quantity" -> Json.toJson(o.quantity),
-      "datecreated" -> Json.toJson(o.datecreated),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "shoppingcartid" -> Writes.StringWrites.writes(o.shoppingcartid),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "shoppingcartitemid" -> Defaulted.writes(ShoppingcartitemId.writes).writes(o.shoppingcartitemid),
+      "quantity" -> Defaulted.writes(Writes.IntWrites).writes(o.quantity),
+      "datecreated" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.datecreated),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

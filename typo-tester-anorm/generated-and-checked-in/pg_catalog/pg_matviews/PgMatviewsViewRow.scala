@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_matviews
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,13 +33,13 @@ object PgMatviewsViewRow {
   implicit val reads: Reads[PgMatviewsViewRow] = Reads[PgMatviewsViewRow](json => JsResult.fromTry(
       Try(
         PgMatviewsViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          matviewname = json.\("matviewname").toOption.map(_.as[String]),
-          matviewowner = json.\("matviewowner").toOption.map(_.as[String]),
-          tablespace = json.\("tablespace").toOption.map(_.as[String]),
-          hasindexes = json.\("hasindexes").toOption.map(_.as[Boolean]),
-          ispopulated = json.\("ispopulated").toOption.map(_.as[Boolean]),
-          definition = json.\("definition").toOption.map(_.as[String])
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          matviewname = json.\("matviewname").toOption.map(_.as(Reads.StringReads)),
+          matviewowner = json.\("matviewowner").toOption.map(_.as(Reads.StringReads)),
+          tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
+          hasindexes = json.\("hasindexes").toOption.map(_.as(Reads.BooleanReads)),
+          ispopulated = json.\("ispopulated").toOption.map(_.as(Reads.BooleanReads)),
+          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -46,25 +47,25 @@ object PgMatviewsViewRow {
   def rowParser(idx: Int): RowParser[PgMatviewsViewRow] = RowParser[PgMatviewsViewRow] { row =>
     Success(
       PgMatviewsViewRow(
-        schemaname = row[Option[String]](idx + 0),
-        matviewname = row[Option[String]](idx + 1),
-        matviewowner = row[Option[String]](idx + 2),
-        tablespace = row[Option[String]](idx + 3),
-        hasindexes = row[Option[Boolean]](idx + 4),
-        ispopulated = row[Option[Boolean]](idx + 5),
-        definition = row[Option[String]](idx + 6)
+        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        matviewname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        matviewowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        hasindexes = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
+        ispopulated = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
+        definition = row(idx + 6)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgMatviewsViewRow] = OWrites[PgMatviewsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Json.toJson(o.schemaname),
-      "matviewname" -> Json.toJson(o.matviewname),
-      "matviewowner" -> Json.toJson(o.matviewowner),
-      "tablespace" -> Json.toJson(o.tablespace),
-      "hasindexes" -> Json.toJson(o.hasindexes),
-      "ispopulated" -> Json.toJson(o.ispopulated),
-      "definition" -> Json.toJson(o.definition)
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "matviewname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.matviewname),
+      "matviewowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.matviewowner),
+      "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
+      "hasindexes" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hasindexes),
+      "ispopulated" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.ispopulated),
+      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
     ))
   )
 }

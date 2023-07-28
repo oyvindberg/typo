@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -42,18 +41,18 @@ object CountryregionRowUnsaved {
   implicit val reads: Reads[CountryregionRowUnsaved] = Reads[CountryregionRowUnsaved](json => JsResult.fromTry(
       Try(
         CountryregionRowUnsaved(
-          countryregioncode = json.\("countryregioncode").as[CountryregionId],
-          name = json.\("name").as[Name],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[CountryregionRowUnsaved] = OWrites[CountryregionRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

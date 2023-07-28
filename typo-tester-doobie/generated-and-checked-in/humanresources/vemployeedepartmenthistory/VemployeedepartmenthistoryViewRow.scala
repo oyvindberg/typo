@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -41,34 +41,34 @@ case class VemployeedepartmenthistoryViewRow(
 )
 
 object VemployeedepartmenthistoryViewRow {
-  implicit val decoder: Decoder[VemployeedepartmenthistoryViewRow] = Decoder.forProduct11[VemployeedepartmenthistoryViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Name], Option[Name], Option[Name], Option[TypoLocalDate], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate", "enddate")(VemployeedepartmenthistoryViewRow.apply)
-  implicit val encoder: Encoder[VemployeedepartmenthistoryViewRow] = Encoder.forProduct11[VemployeedepartmenthistoryViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Name], Option[Name], Option[Name], Option[TypoLocalDate], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate", "enddate")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.shift, x.department, x.groupname, x.startdate, x.enddate))
+  implicit val decoder: Decoder[VemployeedepartmenthistoryViewRow] = Decoder.forProduct11[VemployeedepartmenthistoryViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Name], Option[Name], Option[Name], Option[TypoLocalDate], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate", "enddate")(VemployeedepartmenthistoryViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDate.decoder), Decoder.decodeOption(TypoLocalDate.decoder))
+  implicit val encoder: Encoder[VemployeedepartmenthistoryViewRow] = Encoder.forProduct11[VemployeedepartmenthistoryViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Name], Option[Name], Option[Name], Option[TypoLocalDate], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate", "enddate")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.shift, x.department, x.groupname, x.startdate, x.enddate))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDate.encoder), Encoder.encodeOption(TypoLocalDate.encoder))
   implicit val read: Read[VemployeedepartmenthistoryViewRow] = new Read[VemployeedepartmenthistoryViewRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[/* max 8 chars */ String], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[/* max 10 chars */ String], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[TypoLocalDate], Nullability.Nullable),
-      (Get[TypoLocalDate], Nullability.Nullable)
+      (BusinessentityId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (TypoLocalDate.get, Nullability.Nullable),
+      (TypoLocalDate.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmenthistoryViewRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-      firstname = Get[Name].unsafeGetNullable(rs, i + 2),
-      middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-      lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
-      shift = Get[Name].unsafeGetNullable(rs, i + 6),
-      department = Get[Name].unsafeGetNullable(rs, i + 7),
-      groupname = Get[Name].unsafeGetNullable(rs, i + 8),
-      startdate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 9),
-      enddate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 10)
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 0),
+      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      firstname = Name.get.unsafeGetNullable(rs, i + 2),
+      middlename = Name.get.unsafeGetNullable(rs, i + 3),
+      lastname = Name.get.unsafeGetNullable(rs, i + 4),
+      suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      shift = Name.get.unsafeGetNullable(rs, i + 6),
+      department = Name.get.unsafeGetNullable(rs, i + 7),
+      groupname = Name.get.unsafeGetNullable(rs, i + 8),
+      startdate = TypoLocalDate.get.unsafeGetNullable(rs, i + 9),
+      enddate = TypoLocalDate.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

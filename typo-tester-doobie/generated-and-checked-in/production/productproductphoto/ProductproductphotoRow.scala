@@ -12,7 +12,6 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -33,20 +32,20 @@ case class ProductproductphotoRow(
  }
 
 object ProductproductphotoRow {
-  implicit val decoder: Decoder[ProductproductphotoRow] = Decoder.forProduct4[ProductproductphotoRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(ProductproductphotoRow.apply)
-  implicit val encoder: Encoder[ProductproductphotoRow] = Encoder.forProduct4[ProductproductphotoRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))
+  implicit val decoder: Decoder[ProductproductphotoRow] = Decoder.forProduct4[ProductproductphotoRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(ProductproductphotoRow.apply)(ProductId.decoder, ProductphotoId.decoder, Flag.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ProductproductphotoRow] = Encoder.forProduct4[ProductproductphotoRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))(ProductId.encoder, ProductphotoId.encoder, Flag.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[ProductproductphotoRow] = new Read[ProductproductphotoRow](
     gets = List(
-      (Get[ProductId], Nullability.NoNulls),
-      (Get[ProductphotoId], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ProductId.get, Nullability.NoNulls),
+      (ProductphotoId.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductproductphotoRow(
-      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-      productphotoid = Get[ProductphotoId].unsafeGetNonNullable(rs, i + 1),
-      primary = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+      productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 1),
+      primary = Flag.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

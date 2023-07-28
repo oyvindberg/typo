@@ -10,8 +10,8 @@ package e
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -32,24 +32,24 @@ case class EViewRow(
 )
 
 object EViewRow {
-  implicit val decoder: Decoder[EViewRow] = Decoder.forProduct6[EViewRow, Option[Int], Option[BusinessentityId], Option[Int], Option[/* max 50 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EViewRow.apply)
-  implicit val encoder: Encoder[EViewRow] = Encoder.forProduct6[EViewRow, Option[Int], Option[BusinessentityId], Option[Int], Option[/* max 50 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[EViewRow] = Decoder.forProduct6[EViewRow, Option[Int], Option[BusinessentityId], Option[Int], Option[/* max 50 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[EViewRow] = Encoder.forProduct6[EViewRow, Option[Int], Option[BusinessentityId], Option[Int], Option[/* max 50 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[EViewRow] = new Read[EViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      emailaddressid = Get[Int].unsafeGetNullable(rs, i + 2),
-      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      emailaddressid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
+      emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

@@ -9,17 +9,18 @@ package pg_replication_origin
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_replication_origin` */
 case class PgReplicationOriginId(value: /* oid */ Long) extends AnyVal
 object PgReplicationOriginId {
-  implicit val arrayGet: Get[Array[PgReplicationOriginId]] = Get[Array[/* oid */ Long]].map(_.map(PgReplicationOriginId.apply))
-  implicit val arrayPut: Put[Array[PgReplicationOriginId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[PgReplicationOriginId] = Decoder[/* oid */ Long].map(PgReplicationOriginId.apply)
-  implicit val encoder: Encoder[PgReplicationOriginId] = Encoder[/* oid */ Long].contramap(_.value)
-  implicit val get: Get[PgReplicationOriginId] = Get[/* oid */ Long].map(PgReplicationOriginId.apply)
+  implicit val arrayGet: Get[Array[PgReplicationOriginId]] = adventureworks.LongArrayMeta.get.map(_.map(PgReplicationOriginId.apply))
+  implicit val arrayPut: Put[Array[PgReplicationOriginId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgReplicationOriginId] = Decoder.decodeLong.map(PgReplicationOriginId.apply)
+  implicit val encoder: Encoder[PgReplicationOriginId] = Encoder.encodeLong.contramap(_.value)
+  implicit val get: Get[PgReplicationOriginId] = Meta.LongMeta.get.map(PgReplicationOriginId.apply)
   implicit val ordering: Ordering[PgReplicationOriginId] = Ordering.by(_.value)
-  implicit val put: Put[PgReplicationOriginId] = Put[/* oid */ Long].contramap(_.value)
+  implicit val put: Put[PgReplicationOriginId] = Meta.LongMeta.put.contramap(_.value)
 }

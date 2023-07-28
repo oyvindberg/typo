@@ -8,14 +8,15 @@ package pg_catalog
 package pg_tablespace
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,11 +32,11 @@ object PgTablespaceRow {
   implicit val reads: Reads[PgTablespaceRow] = Reads[PgTablespaceRow](json => JsResult.fromTry(
       Try(
         PgTablespaceRow(
-          oid = json.\("oid").as[PgTablespaceId],
-          spcname = json.\("spcname").as[String],
-          spcowner = json.\("spcowner").as[/* oid */ Long],
-          spcacl = json.\("spcacl").toOption.map(_.as[Array[TypoAclItem]]),
-          spcoptions = json.\("spcoptions").toOption.map(_.as[Array[String]])
+          oid = json.\("oid").as(PgTablespaceId.reads),
+          spcname = json.\("spcname").as(Reads.StringReads),
+          spcowner = json.\("spcowner").as(Reads.LongReads),
+          spcacl = json.\("spcacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly))),
+          spcoptions = json.\("spcoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -43,21 +44,21 @@ object PgTablespaceRow {
   def rowParser(idx: Int): RowParser[PgTablespaceRow] = RowParser[PgTablespaceRow] { row =>
     Success(
       PgTablespaceRow(
-        oid = row[PgTablespaceId](idx + 0),
-        spcname = row[String](idx + 1),
-        spcowner = row[/* oid */ Long](idx + 2),
-        spcacl = row[Option[Array[TypoAclItem]]](idx + 3),
-        spcoptions = row[Option[Array[String]]](idx + 4)
+        oid = row(idx + 0)(PgTablespaceId.column),
+        spcname = row(idx + 1)(Column.columnToString),
+        spcowner = row(idx + 2)(Column.columnToLong),
+        spcacl = row(idx + 3)(Column.columnToOption(TypoAclItem.arrayColumn)),
+        spcoptions = row(idx + 4)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgTablespaceRow] = OWrites[PgTablespaceRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "spcname" -> Json.toJson(o.spcname),
-      "spcowner" -> Json.toJson(o.spcowner),
-      "spcacl" -> Json.toJson(o.spcacl),
-      "spcoptions" -> Json.toJson(o.spcoptions)
+      "oid" -> PgTablespaceId.writes.writes(o.oid),
+      "spcname" -> Writes.StringWrites.writes(o.spcname),
+      "spcowner" -> Writes.LongWrites.writes(o.spcowner),
+      "spcacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.spcacl),
+      "spcoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.spcoptions)
     ))
   )
 }

@@ -9,14 +9,15 @@ package foreign_servers
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -41,13 +42,13 @@ object ForeignServersViewRow {
   implicit val reads: Reads[ForeignServersViewRow] = Reads[ForeignServersViewRow](json => JsResult.fromTry(
       Try(
         ForeignServersViewRow(
-          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
-          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
-          foreignServerType = json.\("foreign_server_type").toOption.map(_.as[CharacterData]),
-          foreignServerVersion = json.\("foreign_server_version").toOption.map(_.as[CharacterData]),
-          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier])
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerType = json.\("foreign_server_type").toOption.map(_.as(CharacterData.reads)),
+          foreignServerVersion = json.\("foreign_server_version").toOption.map(_.as(CharacterData.reads)),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -55,25 +56,25 @@ object ForeignServersViewRow {
   def rowParser(idx: Int): RowParser[ForeignServersViewRow] = RowParser[ForeignServersViewRow] { row =>
     Success(
       ForeignServersViewRow(
-        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 0),
-        foreignServerName = row[Option[SqlIdentifier]](idx + 1),
-        foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 2),
-        foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 3),
-        foreignServerType = row[Option[CharacterData]](idx + 4),
-        foreignServerVersion = row[Option[CharacterData]](idx + 5),
-        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 6)
+        foreignServerCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerName = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        foreignDataWrapperCatalog = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        foreignDataWrapperName = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerType = row(idx + 4)(Column.columnToOption(CharacterData.column)),
+        foreignServerVersion = row(idx + 5)(Column.columnToOption(CharacterData.column)),
+        authorizationIdentifier = row(idx + 6)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[ForeignServersViewRow] = OWrites[ForeignServersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
-      "foreign_server_name" -> Json.toJson(o.foreignServerName),
-      "foreign_data_wrapper_catalog" -> Json.toJson(o.foreignDataWrapperCatalog),
-      "foreign_data_wrapper_name" -> Json.toJson(o.foreignDataWrapperName),
-      "foreign_server_type" -> Json.toJson(o.foreignServerType),
-      "foreign_server_version" -> Json.toJson(o.foreignServerVersion),
-      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier)
+      "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),
+      "foreign_server_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerName),
+      "foreign_data_wrapper_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperName),
+      "foreign_server_type" -> Writes.OptionWrites(CharacterData.writes).writes(o.foreignServerType),
+      "foreign_server_version" -> Writes.OptionWrites(CharacterData.writes).writes(o.foreignServerVersion),
+      "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier)
     ))
   )
 }

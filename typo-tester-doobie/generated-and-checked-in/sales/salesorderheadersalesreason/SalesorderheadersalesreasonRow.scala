@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,18 +29,18 @@ case class SalesorderheadersalesreasonRow(
  }
 
 object SalesorderheadersalesreasonRow {
-  implicit val decoder: Decoder[SalesorderheadersalesreasonRow] = Decoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(SalesorderheadersalesreasonRow.apply)
-  implicit val encoder: Encoder[SalesorderheadersalesreasonRow] = Encoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))
+  implicit val decoder: Decoder[SalesorderheadersalesreasonRow] = Decoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(SalesorderheadersalesreasonRow.apply)(SalesorderheaderId.decoder, SalesreasonId.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[SalesorderheadersalesreasonRow] = Encoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(SalesorderheaderId.encoder, SalesreasonId.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[SalesorderheadersalesreasonRow] = new Read[SalesorderheadersalesreasonRow](
     gets = List(
-      (Get[SalesorderheaderId], Nullability.NoNulls),
-      (Get[SalesreasonId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (SalesorderheaderId.get, Nullability.NoNulls),
+      (SalesreasonId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SalesorderheadersalesreasonRow(
-      salesorderid = Get[SalesorderheaderId].unsafeGetNonNullable(rs, i + 0),
-      salesreasonid = Get[SalesreasonId].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
+      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

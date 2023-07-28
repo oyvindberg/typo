@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_ts_config_map
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,10 +32,10 @@ object PgTsConfigMapRow {
   implicit val reads: Reads[PgTsConfigMapRow] = Reads[PgTsConfigMapRow](json => JsResult.fromTry(
       Try(
         PgTsConfigMapRow(
-          mapcfg = json.\("mapcfg").as[/* oid */ Long],
-          maptokentype = json.\("maptokentype").as[Int],
-          mapseqno = json.\("mapseqno").as[Int],
-          mapdict = json.\("mapdict").as[/* oid */ Long]
+          mapcfg = json.\("mapcfg").as(Reads.LongReads),
+          maptokentype = json.\("maptokentype").as(Reads.IntReads),
+          mapseqno = json.\("mapseqno").as(Reads.IntReads),
+          mapdict = json.\("mapdict").as(Reads.LongReads)
         )
       )
     ),
@@ -42,19 +43,19 @@ object PgTsConfigMapRow {
   def rowParser(idx: Int): RowParser[PgTsConfigMapRow] = RowParser[PgTsConfigMapRow] { row =>
     Success(
       PgTsConfigMapRow(
-        mapcfg = row[/* oid */ Long](idx + 0),
-        maptokentype = row[Int](idx + 1),
-        mapseqno = row[Int](idx + 2),
-        mapdict = row[/* oid */ Long](idx + 3)
+        mapcfg = row(idx + 0)(Column.columnToLong),
+        maptokentype = row(idx + 1)(Column.columnToInt),
+        mapseqno = row(idx + 2)(Column.columnToInt),
+        mapdict = row(idx + 3)(Column.columnToLong)
       )
     )
   }
   implicit val writes: OWrites[PgTsConfigMapRow] = OWrites[PgTsConfigMapRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "mapcfg" -> Json.toJson(o.mapcfg),
-      "maptokentype" -> Json.toJson(o.maptokentype),
-      "mapseqno" -> Json.toJson(o.mapseqno),
-      "mapdict" -> Json.toJson(o.mapdict)
+      "mapcfg" -> Writes.LongWrites.writes(o.mapcfg),
+      "maptokentype" -> Writes.IntWrites.writes(o.maptokentype),
+      "mapseqno" -> Writes.IntWrites.writes(o.mapseqno),
+      "mapdict" -> Writes.LongWrites.writes(o.mapdict)
     ))
   )
 }

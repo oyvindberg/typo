@@ -25,8 +25,8 @@ object TypoInt2Vector {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoInt2Vector] = Decoder.forProduct1[TypoInt2Vector, String]("value")(TypoInt2Vector.apply)
-  implicit val encoder: Encoder[TypoInt2Vector] = Encoder.forProduct1[TypoInt2Vector, String]("value")(x => (x.value))
+  implicit val decoder: Decoder[TypoInt2Vector] = Decoder.forProduct1[TypoInt2Vector, String]("value")(TypoInt2Vector.apply)(Decoder.decodeString)
+  implicit val encoder: Encoder[TypoInt2Vector] = Encoder.forProduct1[TypoInt2Vector, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoInt2Vector] = Get.Advanced.other[PGobject](NonEmptyList.one("int2vector"))
     .map(v => TypoInt2Vector(v.getValue))
   implicit val put: Put[TypoInt2Vector] = Put.Advanced.other[PGobject](NonEmptyList.one("int2vector")).contramap(v => {

@@ -10,14 +10,15 @@ package pcc
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,10 +36,10 @@ object PccViewRow {
   implicit val reads: Reads[PccViewRow] = Reads[PccViewRow](json => JsResult.fromTry(
       Try(
         PccViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -46,19 +47,19 @@ object PccViewRow {
   def rowParser(idx: Int): RowParser[PccViewRow] = RowParser[PccViewRow] { row =>
     Success(
       PccViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        creditcardid = row[Option[CreditcardId]](idx + 2),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        creditcardid = row(idx + 2)(Column.columnToOption(CreditcardId.column)),
+        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PccViewRow] = OWrites[PccViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

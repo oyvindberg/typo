@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_ts_config
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,11 +31,11 @@ object PgTsConfigRow {
   implicit val reads: Reads[PgTsConfigRow] = Reads[PgTsConfigRow](json => JsResult.fromTry(
       Try(
         PgTsConfigRow(
-          oid = json.\("oid").as[PgTsConfigId],
-          cfgname = json.\("cfgname").as[String],
-          cfgnamespace = json.\("cfgnamespace").as[/* oid */ Long],
-          cfgowner = json.\("cfgowner").as[/* oid */ Long],
-          cfgparser = json.\("cfgparser").as[/* oid */ Long]
+          oid = json.\("oid").as(PgTsConfigId.reads),
+          cfgname = json.\("cfgname").as(Reads.StringReads),
+          cfgnamespace = json.\("cfgnamespace").as(Reads.LongReads),
+          cfgowner = json.\("cfgowner").as(Reads.LongReads),
+          cfgparser = json.\("cfgparser").as(Reads.LongReads)
         )
       )
     ),
@@ -42,21 +43,21 @@ object PgTsConfigRow {
   def rowParser(idx: Int): RowParser[PgTsConfigRow] = RowParser[PgTsConfigRow] { row =>
     Success(
       PgTsConfigRow(
-        oid = row[PgTsConfigId](idx + 0),
-        cfgname = row[String](idx + 1),
-        cfgnamespace = row[/* oid */ Long](idx + 2),
-        cfgowner = row[/* oid */ Long](idx + 3),
-        cfgparser = row[/* oid */ Long](idx + 4)
+        oid = row(idx + 0)(PgTsConfigId.column),
+        cfgname = row(idx + 1)(Column.columnToString),
+        cfgnamespace = row(idx + 2)(Column.columnToLong),
+        cfgowner = row(idx + 3)(Column.columnToLong),
+        cfgparser = row(idx + 4)(Column.columnToLong)
       )
     )
   }
   implicit val writes: OWrites[PgTsConfigRow] = OWrites[PgTsConfigRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "cfgname" -> Json.toJson(o.cfgname),
-      "cfgnamespace" -> Json.toJson(o.cfgnamespace),
-      "cfgowner" -> Json.toJson(o.cfgowner),
-      "cfgparser" -> Json.toJson(o.cfgparser)
+      "oid" -> PgTsConfigId.writes.writes(o.oid),
+      "cfgname" -> Writes.StringWrites.writes(o.cfgname),
+      "cfgnamespace" -> Writes.LongWrites.writes(o.cfgnamespace),
+      "cfgowner" -> Writes.LongWrites.writes(o.cfgowner),
+      "cfgparser" -> Writes.LongWrites.writes(o.cfgparser)
     ))
   )
 }

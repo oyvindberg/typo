@@ -19,9 +19,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -62,7 +62,7 @@ object TypoOffsetDateTime {
   implicit val reads: Reads[TypoOffsetDateTime] = Reads[TypoOffsetDateTime](json => JsResult.fromTry(
       Try(
         TypoOffsetDateTime(
-          value = json.\("value").as[OffsetDateTime]
+          value = json.\("value").as(Reads.DefaultOffsetDateTimeReads)
         )
       )
     ),
@@ -70,7 +70,7 @@ object TypoOffsetDateTime {
   implicit val toStatement: ToStatement[TypoOffsetDateTime] = ToStatement[TypoOffsetDateTime]((s, index, v) => s.setObject(index, v.value.toString))
   implicit val writes: OWrites[TypoOffsetDateTime] = OWrites[TypoOffsetDateTime](o =>
     new JsObject(ListMap[String, JsValue](
-      "value" -> Json.toJson(o.value)
+      "value" -> Writes.DefaultOffsetDateTimeWrites.writes(o.value)
     ))
   )
 }

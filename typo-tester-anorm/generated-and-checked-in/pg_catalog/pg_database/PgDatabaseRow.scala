@@ -9,14 +9,15 @@ package pg_database
 
 import adventureworks.TypoAclItem
 import adventureworks.TypoXid
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -41,20 +42,20 @@ object PgDatabaseRow {
   implicit val reads: Reads[PgDatabaseRow] = Reads[PgDatabaseRow](json => JsResult.fromTry(
       Try(
         PgDatabaseRow(
-          oid = json.\("oid").as[PgDatabaseId],
-          datname = json.\("datname").as[String],
-          datdba = json.\("datdba").as[/* oid */ Long],
-          encoding = json.\("encoding").as[Int],
-          datcollate = json.\("datcollate").as[String],
-          datctype = json.\("datctype").as[String],
-          datistemplate = json.\("datistemplate").as[Boolean],
-          datallowconn = json.\("datallowconn").as[Boolean],
-          datconnlimit = json.\("datconnlimit").as[Int],
-          datlastsysoid = json.\("datlastsysoid").as[/* oid */ Long],
-          datfrozenxid = json.\("datfrozenxid").as[TypoXid],
-          datminmxid = json.\("datminmxid").as[TypoXid],
-          dattablespace = json.\("dattablespace").as[/* oid */ Long],
-          datacl = json.\("datacl").toOption.map(_.as[Array[TypoAclItem]])
+          oid = json.\("oid").as(PgDatabaseId.reads),
+          datname = json.\("datname").as(Reads.StringReads),
+          datdba = json.\("datdba").as(Reads.LongReads),
+          encoding = json.\("encoding").as(Reads.IntReads),
+          datcollate = json.\("datcollate").as(Reads.StringReads),
+          datctype = json.\("datctype").as(Reads.StringReads),
+          datistemplate = json.\("datistemplate").as(Reads.BooleanReads),
+          datallowconn = json.\("datallowconn").as(Reads.BooleanReads),
+          datconnlimit = json.\("datconnlimit").as(Reads.IntReads),
+          datlastsysoid = json.\("datlastsysoid").as(Reads.LongReads),
+          datfrozenxid = json.\("datfrozenxid").as(TypoXid.reads),
+          datminmxid = json.\("datminmxid").as(TypoXid.reads),
+          dattablespace = json.\("dattablespace").as(Reads.LongReads),
+          datacl = json.\("datacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly)))
         )
       )
     ),
@@ -62,39 +63,39 @@ object PgDatabaseRow {
   def rowParser(idx: Int): RowParser[PgDatabaseRow] = RowParser[PgDatabaseRow] { row =>
     Success(
       PgDatabaseRow(
-        oid = row[PgDatabaseId](idx + 0),
-        datname = row[String](idx + 1),
-        datdba = row[/* oid */ Long](idx + 2),
-        encoding = row[Int](idx + 3),
-        datcollate = row[String](idx + 4),
-        datctype = row[String](idx + 5),
-        datistemplate = row[Boolean](idx + 6),
-        datallowconn = row[Boolean](idx + 7),
-        datconnlimit = row[Int](idx + 8),
-        datlastsysoid = row[/* oid */ Long](idx + 9),
-        datfrozenxid = row[TypoXid](idx + 10),
-        datminmxid = row[TypoXid](idx + 11),
-        dattablespace = row[/* oid */ Long](idx + 12),
-        datacl = row[Option[Array[TypoAclItem]]](idx + 13)
+        oid = row(idx + 0)(PgDatabaseId.column),
+        datname = row(idx + 1)(Column.columnToString),
+        datdba = row(idx + 2)(Column.columnToLong),
+        encoding = row(idx + 3)(Column.columnToInt),
+        datcollate = row(idx + 4)(Column.columnToString),
+        datctype = row(idx + 5)(Column.columnToString),
+        datistemplate = row(idx + 6)(Column.columnToBoolean),
+        datallowconn = row(idx + 7)(Column.columnToBoolean),
+        datconnlimit = row(idx + 8)(Column.columnToInt),
+        datlastsysoid = row(idx + 9)(Column.columnToLong),
+        datfrozenxid = row(idx + 10)(TypoXid.column),
+        datminmxid = row(idx + 11)(TypoXid.column),
+        dattablespace = row(idx + 12)(Column.columnToLong),
+        datacl = row(idx + 13)(Column.columnToOption(TypoAclItem.arrayColumn))
       )
     )
   }
   implicit val writes: OWrites[PgDatabaseRow] = OWrites[PgDatabaseRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "datname" -> Json.toJson(o.datname),
-      "datdba" -> Json.toJson(o.datdba),
-      "encoding" -> Json.toJson(o.encoding),
-      "datcollate" -> Json.toJson(o.datcollate),
-      "datctype" -> Json.toJson(o.datctype),
-      "datistemplate" -> Json.toJson(o.datistemplate),
-      "datallowconn" -> Json.toJson(o.datallowconn),
-      "datconnlimit" -> Json.toJson(o.datconnlimit),
-      "datlastsysoid" -> Json.toJson(o.datlastsysoid),
-      "datfrozenxid" -> Json.toJson(o.datfrozenxid),
-      "datminmxid" -> Json.toJson(o.datminmxid),
-      "dattablespace" -> Json.toJson(o.dattablespace),
-      "datacl" -> Json.toJson(o.datacl)
+      "oid" -> PgDatabaseId.writes.writes(o.oid),
+      "datname" -> Writes.StringWrites.writes(o.datname),
+      "datdba" -> Writes.LongWrites.writes(o.datdba),
+      "encoding" -> Writes.IntWrites.writes(o.encoding),
+      "datcollate" -> Writes.StringWrites.writes(o.datcollate),
+      "datctype" -> Writes.StringWrites.writes(o.datctype),
+      "datistemplate" -> Writes.BooleanWrites.writes(o.datistemplate),
+      "datallowconn" -> Writes.BooleanWrites.writes(o.datallowconn),
+      "datconnlimit" -> Writes.IntWrites.writes(o.datconnlimit),
+      "datlastsysoid" -> Writes.LongWrites.writes(o.datlastsysoid),
+      "datfrozenxid" -> TypoXid.writes.writes(o.datfrozenxid),
+      "datminmxid" -> TypoXid.writes.writes(o.datminmxid),
+      "dattablespace" -> Writes.LongWrites.writes(o.dattablespace),
+      "datacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.datacl)
     ))
   )
 }

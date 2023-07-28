@@ -9,17 +9,18 @@ package countryregion
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `person.countryregion` */
 case class CountryregionId(value: /* max 3 chars */ String) extends AnyVal
 object CountryregionId {
-  implicit val arrayGet: Get[Array[CountryregionId]] = Get[Array[/* max 3 chars */ String]].map(_.map(CountryregionId.apply))
-  implicit val arrayPut: Put[Array[CountryregionId]] = Put[Array[/* max 3 chars */ String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[CountryregionId] = Decoder[/* max 3 chars */ String].map(CountryregionId.apply)
-  implicit val encoder: Encoder[CountryregionId] = Encoder[/* max 3 chars */ String].contramap(_.value)
-  implicit val get: Get[CountryregionId] = Get[/* max 3 chars */ String].map(CountryregionId.apply)
+  implicit val arrayGet: Get[Array[CountryregionId]] = adventureworks.StringArrayMeta.get.map(_.map(CountryregionId.apply))
+  implicit val arrayPut: Put[Array[CountryregionId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[CountryregionId] = Decoder.decodeString.map(CountryregionId.apply)
+  implicit val encoder: Encoder[CountryregionId] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[CountryregionId] = Meta.StringMeta.get.map(CountryregionId.apply)
   implicit val ordering: Ordering[CountryregionId] = Ordering.by(_.value)
-  implicit val put: Put[CountryregionId] = Put[/* max 3 chars */ String].contramap(_.value)
+  implicit val put: Put[CountryregionId] = Meta.StringMeta.put.contramap(_.value)
 }

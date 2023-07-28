@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_enum
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,10 +30,10 @@ object PgEnumRow {
   implicit val reads: Reads[PgEnumRow] = Reads[PgEnumRow](json => JsResult.fromTry(
       Try(
         PgEnumRow(
-          oid = json.\("oid").as[PgEnumId],
-          enumtypid = json.\("enumtypid").as[/* oid */ Long],
-          enumsortorder = json.\("enumsortorder").as[Float],
-          enumlabel = json.\("enumlabel").as[String]
+          oid = json.\("oid").as(PgEnumId.reads),
+          enumtypid = json.\("enumtypid").as(Reads.LongReads),
+          enumsortorder = json.\("enumsortorder").as(Reads.FloatReads),
+          enumlabel = json.\("enumlabel").as(Reads.StringReads)
         )
       )
     ),
@@ -40,19 +41,19 @@ object PgEnumRow {
   def rowParser(idx: Int): RowParser[PgEnumRow] = RowParser[PgEnumRow] { row =>
     Success(
       PgEnumRow(
-        oid = row[PgEnumId](idx + 0),
-        enumtypid = row[/* oid */ Long](idx + 1),
-        enumsortorder = row[Float](idx + 2),
-        enumlabel = row[String](idx + 3)
+        oid = row(idx + 0)(PgEnumId.column),
+        enumtypid = row(idx + 1)(Column.columnToLong),
+        enumsortorder = row(idx + 2)(Column.columnToFloat),
+        enumlabel = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgEnumRow] = OWrites[PgEnumRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "enumtypid" -> Json.toJson(o.enumtypid),
-      "enumsortorder" -> Json.toJson(o.enumsortorder),
-      "enumlabel" -> Json.toJson(o.enumlabel)
+      "oid" -> PgEnumId.writes.writes(o.oid),
+      "enumtypid" -> Writes.LongWrites.writes(o.enumtypid),
+      "enumsortorder" -> Writes.FloatWrites.writes(o.enumsortorder),
+      "enumlabel" -> Writes.StringWrites.writes(o.enumlabel)
     ))
   )
 }

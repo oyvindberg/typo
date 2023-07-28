@@ -9,8 +9,8 @@ package creditcard
 
 import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -30,24 +30,24 @@ case class CreditcardRow(
 )
 
 object CreditcardRow {
-  implicit val decoder: Decoder[CreditcardRow] = Decoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CreditcardRow.apply)
-  implicit val encoder: Encoder[CreditcardRow] = Encoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))
+  implicit val decoder: Decoder[CreditcardRow] = Decoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CreditcardRow.apply)(CreditcardId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[CreditcardRow] = Encoder.forProduct6[CreditcardRow, CreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(CreditcardId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder)
   implicit val read: Read[CreditcardRow] = new Read[CreditcardRow](
     gets = List(
-      (Get[CreditcardId], Nullability.NoNulls),
-      (Get[/* max 50 chars */ String], Nullability.NoNulls),
-      (Get[/* max 25 chars */ String], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (CreditcardId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
-      creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 0),
-      cardtype = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
-      cardnumber = Get[/* max 25 chars */ String].unsafeGetNonNullable(rs, i + 2),
-      expmonth = Get[Int].unsafeGetNonNullable(rs, i + 3),
-      expyear = Get[Int].unsafeGetNonNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      creditcardid = CreditcardId.get.unsafeGetNonNullable(rs, i + 0),
+      cardtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      cardnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      expmonth = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      expyear = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

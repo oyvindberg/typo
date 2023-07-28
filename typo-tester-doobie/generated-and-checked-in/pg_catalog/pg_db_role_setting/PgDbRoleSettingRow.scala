@@ -8,8 +8,8 @@ package pg_catalog
 package pg_db_role_setting
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -23,18 +23,18 @@ case class PgDbRoleSettingRow(
  }
 
 object PgDbRoleSettingRow {
-  implicit val decoder: Decoder[PgDbRoleSettingRow] = Decoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(PgDbRoleSettingRow.apply)
-  implicit val encoder: Encoder[PgDbRoleSettingRow] = Encoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(x => (x.setdatabase, x.setrole, x.setconfig))
+  implicit val decoder: Decoder[PgDbRoleSettingRow] = Decoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(PgDbRoleSettingRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgDbRoleSettingRow] = Encoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(x => (x.setdatabase, x.setrole, x.setconfig))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgDbRoleSettingRow] = new Read[PgDbRoleSettingRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Array[String]], Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgDbRoleSettingRow(
-      setdatabase = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      setrole = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      setconfig = Get[Array[String]].unsafeGetNullable(rs, i + 2)
+      setdatabase = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      setrole = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      setconfig = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

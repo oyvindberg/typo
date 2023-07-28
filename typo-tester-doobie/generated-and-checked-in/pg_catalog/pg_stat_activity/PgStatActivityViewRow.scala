@@ -11,8 +11,8 @@ import adventureworks.TypoInet
 import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -43,56 +43,56 @@ case class PgStatActivityViewRow(
 )
 
 object PgStatActivityViewRow {
-  implicit val decoder: Decoder[PgStatActivityViewRow] = Decoder.forProduct22[PgStatActivityViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[String], Option[String], Option[String], Option[TypoXid], Option[TypoXid], Option[Long], Option[String], Option[String]]("datid", "datname", "pid", "leader_pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "xact_start", "query_start", "state_change", "wait_event_type", "wait_event", "state", "backend_xid", "backend_xmin", "query_id", "query", "backend_type")(PgStatActivityViewRow.apply)
-  implicit val encoder: Encoder[PgStatActivityViewRow] = Encoder.forProduct22[PgStatActivityViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[String], Option[String], Option[String], Option[TypoXid], Option[TypoXid], Option[Long], Option[String], Option[String]]("datid", "datname", "pid", "leader_pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "xact_start", "query_start", "state_change", "wait_event_type", "wait_event", "state", "backend_xid", "backend_xmin", "query_id", "query", "backend_type")(x => (x.datid, x.datname, x.pid, x.leaderPid, x.usesysid, x.usename, x.applicationName, x.clientAddr, x.clientHostname, x.clientPort, x.backendStart, x.xactStart, x.queryStart, x.stateChange, x.waitEventType, x.waitEvent, x.state, x.backendXid, x.backendXmin, x.queryId, x.query, x.backendType))
+  implicit val decoder: Decoder[PgStatActivityViewRow] = Decoder.forProduct22[PgStatActivityViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[String], Option[String], Option[String], Option[TypoXid], Option[TypoXid], Option[Long], Option[String], Option[String]]("datid", "datname", "pid", "leader_pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "xact_start", "query_start", "state_change", "wait_event_type", "wait_event", "state", "backend_xid", "backend_xmin", "query_id", "query", "backend_type")(PgStatActivityViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInet.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgStatActivityViewRow] = Encoder.forProduct22[PgStatActivityViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[String], Option[String], Option[String], Option[TypoXid], Option[TypoXid], Option[Long], Option[String], Option[String]]("datid", "datname", "pid", "leader_pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "xact_start", "query_start", "state_change", "wait_event_type", "wait_event", "state", "backend_xid", "backend_xmin", "query_id", "query", "backend_type")(x => (x.datid, x.datname, x.pid, x.leaderPid, x.usesysid, x.usename, x.applicationName, x.clientAddr, x.clientHostname, x.clientPort, x.backendStart, x.xactStart, x.queryStart, x.stateChange, x.waitEventType, x.waitEvent, x.state, x.backendXid, x.backendXmin, x.queryId, x.query, x.backendType))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInet.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgStatActivityViewRow] = new Read[PgStatActivityViewRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoInet], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoXid], Nullability.Nullable),
-      (Get[TypoXid], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoInet.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoXid.get, Nullability.Nullable),
+      (TypoXid.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatActivityViewRow(
-      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-      datname = Get[String].unsafeGetNullable(rs, i + 1),
-      pid = Get[Int].unsafeGetNullable(rs, i + 2),
-      leaderPid = Get[Int].unsafeGetNullable(rs, i + 3),
-      usesysid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 4),
-      usename = Get[String].unsafeGetNullable(rs, i + 5),
-      applicationName = Get[String].unsafeGetNullable(rs, i + 6),
-      clientAddr = Get[TypoInet].unsafeGetNullable(rs, i + 7),
-      clientHostname = Get[String].unsafeGetNullable(rs, i + 8),
-      clientPort = Get[Int].unsafeGetNullable(rs, i + 9),
-      backendStart = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 10),
-      xactStart = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 11),
-      queryStart = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 12),
-      stateChange = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 13),
-      waitEventType = Get[String].unsafeGetNullable(rs, i + 14),
-      waitEvent = Get[String].unsafeGetNullable(rs, i + 15),
-      state = Get[String].unsafeGetNullable(rs, i + 16),
-      backendXid = Get[TypoXid].unsafeGetNullable(rs, i + 17),
-      backendXmin = Get[TypoXid].unsafeGetNullable(rs, i + 18),
-      queryId = Get[Long].unsafeGetNullable(rs, i + 19),
-      query = Get[String].unsafeGetNullable(rs, i + 20),
-      backendType = Get[String].unsafeGetNullable(rs, i + 21)
+      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
+      datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
+      leaderPid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
+      usesysid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
+      usename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      applicationName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      clientAddr = TypoInet.get.unsafeGetNullable(rs, i + 7),
+      clientHostname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      clientPort = Meta.IntMeta.get.unsafeGetNullable(rs, i + 9),
+      backendStart = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 10),
+      xactStart = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 11),
+      queryStart = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 12),
+      stateChange = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 13),
+      waitEventType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 14),
+      waitEvent = Meta.StringMeta.get.unsafeGetNullable(rs, i + 15),
+      state = Meta.StringMeta.get.unsafeGetNullable(rs, i + 16),
+      backendXid = TypoXid.get.unsafeGetNullable(rs, i + 17),
+      backendXmin = TypoXid.get.unsafeGetNullable(rs, i + 18),
+      queryId = Meta.LongMeta.get.unsafeGetNullable(rs, i + 19),
+      query = Meta.StringMeta.get.unsafeGetNullable(rs, i + 20),
+      backendType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 21)
     )
   )
 }

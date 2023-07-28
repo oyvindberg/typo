@@ -13,7 +13,6 @@ import adventureworks.production.productmodel.ProductmodelId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -26,18 +25,18 @@ object ProductmodelproductdescriptioncultureId {
   implicit val reads: Reads[ProductmodelproductdescriptioncultureId] = Reads[ProductmodelproductdescriptioncultureId](json => JsResult.fromTry(
       Try(
         ProductmodelproductdescriptioncultureId(
-          productmodelid = json.\("productmodelid").as[ProductmodelId],
-          productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
-          cultureid = json.\("cultureid").as[CultureId]
+          productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
+          productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
+          cultureid = json.\("cultureid").as(CultureId.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductmodelproductdescriptioncultureId] = OWrites[ProductmodelproductdescriptioncultureId](o =>
     new JsObject(ListMap[String, JsValue](
-      "productmodelid" -> Json.toJson(o.productmodelid),
-      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
-      "cultureid" -> Json.toJson(o.cultureid)
+      "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
+      "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
+      "cultureid" -> CultureId.writes.writes(o.cultureid)
     ))
   )
 }

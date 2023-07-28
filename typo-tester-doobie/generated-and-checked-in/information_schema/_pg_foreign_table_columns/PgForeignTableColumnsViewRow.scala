@@ -8,8 +8,8 @@ package information_schema
 package `_pg_foreign_table_columns`
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -22,20 +22,20 @@ case class PgForeignTableColumnsViewRow(
 )
 
 object PgForeignTableColumnsViewRow {
-  implicit val decoder: Decoder[PgForeignTableColumnsViewRow] = Decoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(PgForeignTableColumnsViewRow.apply)
-  implicit val encoder: Encoder[PgForeignTableColumnsViewRow] = Encoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(x => (x.nspname, x.relname, x.attname, x.attfdwoptions))
+  implicit val decoder: Decoder[PgForeignTableColumnsViewRow] = Decoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(PgForeignTableColumnsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgForeignTableColumnsViewRow] = Encoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(x => (x.nspname, x.relname, x.attname, x.attfdwoptions))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgForeignTableColumnsViewRow] = new Read[PgForeignTableColumnsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgForeignTableColumnsViewRow(
-      nspname = Get[String].unsafeGetNullable(rs, i + 0),
-      relname = Get[String].unsafeGetNullable(rs, i + 1),
-      attname = Get[String].unsafeGetNullable(rs, i + 2),
-      attfdwoptions = Get[Array[String]].unsafeGetNullable(rs, i + 3)
+      nspname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      attname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      attfdwoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

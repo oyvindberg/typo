@@ -8,8 +8,8 @@ package pg_catalog
 package pg_shmem_allocations
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -22,20 +22,20 @@ case class PgShmemAllocationsViewRow(
 )
 
 object PgShmemAllocationsViewRow {
-  implicit val decoder: Decoder[PgShmemAllocationsViewRow] = Decoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(PgShmemAllocationsViewRow.apply)
-  implicit val encoder: Encoder[PgShmemAllocationsViewRow] = Encoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(x => (x.name, x.off, x.size, x.allocatedSize))
+  implicit val decoder: Decoder[PgShmemAllocationsViewRow] = Decoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(PgShmemAllocationsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit val encoder: Encoder[PgShmemAllocationsViewRow] = Encoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(x => (x.name, x.off, x.size, x.allocatedSize))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit val read: Read[PgShmemAllocationsViewRow] = new Read[PgShmemAllocationsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgShmemAllocationsViewRow(
-      name = Get[String].unsafeGetNullable(rs, i + 0),
-      off = Get[Long].unsafeGetNullable(rs, i + 1),
-      size = Get[Long].unsafeGetNullable(rs, i + 2),
-      allocatedSize = Get[Long].unsafeGetNullable(rs, i + 3)
+      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      off = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      size = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
+      allocatedSize = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

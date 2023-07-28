@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -30,22 +30,22 @@ case class DViewRow(
 )
 
 object DViewRow {
-  implicit val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)
-  implicit val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))
+  implicit val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(DepartmentId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(DepartmentId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[DViewRow] = new Read[DViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[DepartmentId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (DepartmentId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      departmentid = Get[DepartmentId].unsafeGetNullable(rs, i + 1),
-      name = Get[Name].unsafeGetNullable(rs, i + 2),
-      groupname = Get[Name].unsafeGetNullable(rs, i + 3),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      departmentid = DepartmentId.get.unsafeGetNullable(rs, i + 1),
+      name = Name.get.unsafeGetNullable(rs, i + 2),
+      groupname = Name.get.unsafeGetNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

@@ -8,14 +8,15 @@ package information_schema
 package `_pg_foreign_tables`
 
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,13 +34,13 @@ object PgForeignTablesViewRow {
   implicit val reads: Reads[PgForeignTablesViewRow] = Reads[PgForeignTablesViewRow](json => JsResult.fromTry(
       Try(
         PgForeignTablesViewRow(
-          foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as[SqlIdentifier]),
-          foreignTableName = json.\("foreign_table_name").toOption.map(_.as[SqlIdentifier]),
-          ftoptions = json.\("ftoptions").toOption.map(_.as[Array[String]]),
-          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
-          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier])
+          foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignTableSchema = json.\("foreign_table_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignTableName = json.\("foreign_table_name").toOption.map(_.as(SqlIdentifier.reads)),
+          ftoptions = json.\("ftoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(SqlIdentifier.reads)),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -47,25 +48,25 @@ object PgForeignTablesViewRow {
   def rowParser(idx: Int): RowParser[PgForeignTablesViewRow] = RowParser[PgForeignTablesViewRow] { row =>
     Success(
       PgForeignTablesViewRow(
-        foreignTableCatalog = row[Option[SqlIdentifier]](idx + 0),
-        foreignTableSchema = row[Option[SqlIdentifier]](idx + 1),
-        foreignTableName = row[Option[SqlIdentifier]](idx + 2),
-        ftoptions = row[Option[Array[String]]](idx + 3),
-        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 4),
-        foreignServerName = row[Option[SqlIdentifier]](idx + 5),
-        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 6)
+        foreignTableCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        foreignTableSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        foreignTableName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        ftoptions = row(idx + 3)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        foreignServerCatalog = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
+        authorizationIdentifier = row(idx + 6)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[PgForeignTablesViewRow] = OWrites[PgForeignTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "foreign_table_catalog" -> Json.toJson(o.foreignTableCatalog),
-      "foreign_table_schema" -> Json.toJson(o.foreignTableSchema),
-      "foreign_table_name" -> Json.toJson(o.foreignTableName),
-      "ftoptions" -> Json.toJson(o.ftoptions),
-      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
-      "foreign_server_name" -> Json.toJson(o.foreignServerName),
-      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier)
+      "foreign_table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableCatalog),
+      "foreign_table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableSchema),
+      "foreign_table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableName),
+      "ftoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.ftoptions),
+      "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),
+      "foreign_server_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerName),
+      "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier)
     ))
   )
 }

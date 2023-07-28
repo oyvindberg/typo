@@ -10,8 +10,8 @@ package shoppingcartitem
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -32,24 +32,24 @@ case class ShoppingcartitemRow(
 )
 
 object ShoppingcartitemRow {
-  implicit val decoder: Decoder[ShoppingcartitemRow] = Decoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(ShoppingcartitemRow.apply)
-  implicit val encoder: Encoder[ShoppingcartitemRow] = Encoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))
+  implicit val decoder: Decoder[ShoppingcartitemRow] = Decoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(ShoppingcartitemRow.apply)(ShoppingcartitemId.decoder, Decoder.decodeString, Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ShoppingcartitemRow] = Encoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))(ShoppingcartitemId.encoder, Encoder.encodeString, Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[ShoppingcartitemRow] = new Read[ShoppingcartitemRow](
     gets = List(
-      (Get[ShoppingcartitemId], Nullability.NoNulls),
-      (Get[/* max 50 chars */ String], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[ProductId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ShoppingcartitemId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (ProductId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
-      shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNonNullable(rs, i + 0),
-      shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 1),
-      quantity = Get[Int].unsafeGetNonNullable(rs, i + 2),
-      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 3),
-      datecreated = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
+      shoppingcartitemid = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 0),
+      shoppingcartid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 3),
+      datecreated = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
     )
   )
 }

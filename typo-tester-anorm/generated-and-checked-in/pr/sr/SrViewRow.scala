@@ -10,14 +10,15 @@ package sr
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,10 +36,10 @@ object SrViewRow {
   implicit val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
       Try(
         SrViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          scrapreasonid = json.\("scrapreasonid").toOption.map(_.as(ScrapreasonId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -46,19 +47,19 @@ object SrViewRow {
   def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
     Success(
       SrViewRow(
-        id = row[Option[Int]](idx + 0),
-        scrapreasonid = row[Option[ScrapreasonId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        scrapreasonid = row(idx + 1)(Column.columnToOption(ScrapreasonId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "scrapreasonid" -> Writes.OptionWrites(ScrapreasonId.writes).writes(o.scrapreasonid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_namespace
 
+import adventureworks.TypoAclItem
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_namespace where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_namespace where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
     sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
-          values (${unsaved.oid}::oid, ${unsaved.nspname}::name, ${unsaved.nspowner}::oid, ${unsaved.nspacl}::_aclitem)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgNamespaceId.put))}::oid, ${fromWrite(unsaved.nspname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, nspname, nspowner, nspacl
        """.query(PgNamespaceRow.read).unique
   }
@@ -25,18 +29,18 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace".query(PgNamespaceRow.read).stream
   }
   override def selectById(oid: PgNamespaceId): ConnectionIO[Option[PgNamespaceRow]] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ${oid}".query(PgNamespaceRow.read).option
+    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}".query(PgNamespaceRow.read).option
   }
   override def selectByIds(oids: Array[PgNamespaceId]): Stream[ConnectionIO, PgNamespaceRow] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY(${oids})".query(PgNamespaceRow.read).stream
+    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY(${fromWrite(oids)(Write.fromPut(PgNamespaceId.arrayPut))})".query(PgNamespaceRow.read).stream
   }
   override def update(row: PgNamespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_namespace
-          set nspname = ${row.nspname}::name,
-              nspowner = ${row.nspowner}::oid,
-              nspacl = ${row.nspacl}::_aclitem
-          where oid = ${oid}
+          set nspname = ${fromWrite(row.nspname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              nspowner = ${fromWrite(row.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              nspacl = ${fromWrite(row.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
+          where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}
        """
       .update
       .run
@@ -45,10 +49,10 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def upsert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
     sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.nspname}::name,
-            ${unsaved.nspowner}::oid,
-            ${unsaved.nspacl}::_aclitem
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgNamespaceId.put))}::oid,
+            ${fromWrite(unsaved.nspname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
           )
           on conflict (oid)
           do update set

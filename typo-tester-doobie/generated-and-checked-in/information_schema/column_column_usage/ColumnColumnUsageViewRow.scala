@@ -9,7 +9,6 @@ package column_column_usage
 
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -24,22 +23,22 @@ case class ColumnColumnUsageViewRow(
 )
 
 object ColumnColumnUsageViewRow {
-  implicit val decoder: Decoder[ColumnColumnUsageViewRow] = Decoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(ColumnColumnUsageViewRow.apply)
-  implicit val encoder: Encoder[ColumnColumnUsageViewRow] = Encoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.dependentColumn))
+  implicit val decoder: Decoder[ColumnColumnUsageViewRow] = Decoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(ColumnColumnUsageViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit val encoder: Encoder[ColumnColumnUsageViewRow] = Encoder.forProduct5[ColumnColumnUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("table_catalog", "table_schema", "table_name", "column_name", "dependent_column")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.columnName, x.dependentColumn))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
   implicit val read: Read[ColumnColumnUsageViewRow] = new Read[ColumnColumnUsageViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ColumnColumnUsageViewRow(
-      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      columnName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      dependentColumn = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
+      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      columnName = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      dependentColumn = SqlIdentifier.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

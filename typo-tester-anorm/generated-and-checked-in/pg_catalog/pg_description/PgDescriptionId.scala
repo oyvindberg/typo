@@ -10,9 +10,9 @@ package pg_description
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,18 +23,18 @@ object PgDescriptionId {
   implicit val reads: Reads[PgDescriptionId] = Reads[PgDescriptionId](json => JsResult.fromTry(
       Try(
         PgDescriptionId(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long],
-          objsubid = json.\("objsubid").as[Int]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads),
+          objsubid = json.\("objsubid").as(Reads.IntReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgDescriptionId] = OWrites[PgDescriptionId](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "objsubid" -> Json.toJson(o.objsubid)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid),
+      "objsubid" -> Writes.IntWrites.writes(o.objsubid)
     ))
   )
 }

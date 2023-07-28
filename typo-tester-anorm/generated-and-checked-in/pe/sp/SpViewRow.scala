@@ -13,15 +13,16 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -49,15 +50,15 @@ object SpViewRow {
   implicit val reads: Reads[SpViewRow] = Reads[SpViewRow](json => JsResult.fromTry(
       Try(
         SpViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
-          stateprovincecode = json.\("stateprovincecode").toOption.map(_.as[/* bpchar */ String]),
-          countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
-          isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Flag],
-          name = json.\("name").toOption.map(_.as[Name]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as(StateprovinceId.reads)),
+          stateprovincecode = json.\("stateprovincecode").toOption.map(_.as(Reads.StringReads)),
+          countryregioncode = json.\("countryregioncode").toOption.map(_.as(CountryregionId.reads)),
+          isonlystateprovinceflag = json.\("isonlystateprovinceflag").as(Flag.reads),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -65,29 +66,29 @@ object SpViewRow {
   def rowParser(idx: Int): RowParser[SpViewRow] = RowParser[SpViewRow] { row =>
     Success(
       SpViewRow(
-        id = row[Option[Int]](idx + 0),
-        stateprovinceid = row[Option[StateprovinceId]](idx + 1),
-        stateprovincecode = row[Option[/* bpchar */ String]](idx + 2),
-        countryregioncode = row[Option[CountryregionId]](idx + 3),
-        isonlystateprovinceflag = row[Flag](idx + 4),
-        name = row[Option[Name]](idx + 5),
-        territoryid = row[Option[SalesterritoryId]](idx + 6),
-        rowguid = row[Option[UUID]](idx + 7),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 8)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        stateprovinceid = row(idx + 1)(Column.columnToOption(StateprovinceId.column)),
+        stateprovincecode = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        countryregioncode = row(idx + 3)(Column.columnToOption(CountryregionId.column)),
+        isonlystateprovinceflag = row(idx + 4)(Flag.column),
+        name = row(idx + 5)(Column.columnToOption(Name.column)),
+        territoryid = row(idx + 6)(Column.columnToOption(SalesterritoryId.column)),
+        rowguid = row(idx + 7)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SpViewRow] = OWrites[SpViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "stateprovincecode" -> Json.toJson(o.stateprovincecode),
-      "countryregioncode" -> Json.toJson(o.countryregioncode),
-      "isonlystateprovinceflag" -> Json.toJson(o.isonlystateprovinceflag),
-      "name" -> Json.toJson(o.name),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "stateprovinceid" -> Writes.OptionWrites(StateprovinceId.writes).writes(o.stateprovinceid),
+      "stateprovincecode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.stateprovincecode),
+      "countryregioncode" -> Writes.OptionWrites(CountryregionId.writes).writes(o.countryregioncode),
+      "isonlystateprovinceflag" -> Flag.writes.writes(o.isonlystateprovinceflag),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

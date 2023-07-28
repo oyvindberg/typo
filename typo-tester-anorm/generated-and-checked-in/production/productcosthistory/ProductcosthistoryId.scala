@@ -12,7 +12,6 @@ import adventureworks.production.product.ProductId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -25,16 +24,16 @@ object ProductcosthistoryId {
   implicit val reads: Reads[ProductcosthistoryId] = Reads[ProductcosthistoryId](json => JsResult.fromTry(
       Try(
         ProductcosthistoryId(
-          productid = json.\("productid").as[ProductId],
-          startdate = json.\("startdate").as[TypoLocalDateTime]
+          productid = json.\("productid").as(ProductId.reads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductcosthistoryId] = OWrites[ProductcosthistoryId](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "startdate" -> Json.toJson(o.startdate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate)
     ))
   )
 }

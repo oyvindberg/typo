@@ -11,14 +11,15 @@ import adventureworks.TypoInet
 import adventureworks.TypoInterval
 import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -49,26 +50,26 @@ object PgStatReplicationViewRow {
   implicit val reads: Reads[PgStatReplicationViewRow] = Reads[PgStatReplicationViewRow](json => JsResult.fromTry(
       Try(
         PgStatReplicationViewRow(
-          pid = json.\("pid").toOption.map(_.as[Int]),
-          usesysid = json.\("usesysid").toOption.map(_.as[/* oid */ Long]),
-          usename = json.\("usename").toOption.map(_.as[String]),
-          applicationName = json.\("application_name").toOption.map(_.as[String]),
-          clientAddr = json.\("client_addr").toOption.map(_.as[TypoInet]),
-          clientHostname = json.\("client_hostname").toOption.map(_.as[String]),
-          clientPort = json.\("client_port").toOption.map(_.as[Int]),
-          backendStart = json.\("backend_start").toOption.map(_.as[TypoOffsetDateTime]),
-          backendXmin = json.\("backend_xmin").toOption.map(_.as[TypoXid]),
-          state = json.\("state").toOption.map(_.as[String]),
-          sentLsn = json.\("sent_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          writeLsn = json.\("write_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          flushLsn = json.\("flush_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          replayLsn = json.\("replay_lsn").toOption.map(_.as[/* pg_lsn */ Long]),
-          writeLag = json.\("write_lag").toOption.map(_.as[TypoInterval]),
-          flushLag = json.\("flush_lag").toOption.map(_.as[TypoInterval]),
-          replayLag = json.\("replay_lag").toOption.map(_.as[TypoInterval]),
-          syncPriority = json.\("sync_priority").toOption.map(_.as[Int]),
-          syncState = json.\("sync_state").toOption.map(_.as[String]),
-          replyTime = json.\("reply_time").toOption.map(_.as[TypoOffsetDateTime])
+          pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
+          usesysid = json.\("usesysid").toOption.map(_.as(Reads.LongReads)),
+          usename = json.\("usename").toOption.map(_.as(Reads.StringReads)),
+          applicationName = json.\("application_name").toOption.map(_.as(Reads.StringReads)),
+          clientAddr = json.\("client_addr").toOption.map(_.as(TypoInet.reads)),
+          clientHostname = json.\("client_hostname").toOption.map(_.as(Reads.StringReads)),
+          clientPort = json.\("client_port").toOption.map(_.as(Reads.IntReads)),
+          backendStart = json.\("backend_start").toOption.map(_.as(TypoOffsetDateTime.reads)),
+          backendXmin = json.\("backend_xmin").toOption.map(_.as(TypoXid.reads)),
+          state = json.\("state").toOption.map(_.as(Reads.StringReads)),
+          sentLsn = json.\("sent_lsn").toOption.map(_.as(Reads.LongReads)),
+          writeLsn = json.\("write_lsn").toOption.map(_.as(Reads.LongReads)),
+          flushLsn = json.\("flush_lsn").toOption.map(_.as(Reads.LongReads)),
+          replayLsn = json.\("replay_lsn").toOption.map(_.as(Reads.LongReads)),
+          writeLag = json.\("write_lag").toOption.map(_.as(TypoInterval.reads)),
+          flushLag = json.\("flush_lag").toOption.map(_.as(TypoInterval.reads)),
+          replayLag = json.\("replay_lag").toOption.map(_.as(TypoInterval.reads)),
+          syncPriority = json.\("sync_priority").toOption.map(_.as(Reads.IntReads)),
+          syncState = json.\("sync_state").toOption.map(_.as(Reads.StringReads)),
+          replyTime = json.\("reply_time").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -76,51 +77,51 @@ object PgStatReplicationViewRow {
   def rowParser(idx: Int): RowParser[PgStatReplicationViewRow] = RowParser[PgStatReplicationViewRow] { row =>
     Success(
       PgStatReplicationViewRow(
-        pid = row[Option[Int]](idx + 0),
-        usesysid = row[Option[/* oid */ Long]](idx + 1),
-        usename = row[Option[String]](idx + 2),
-        applicationName = row[Option[String]](idx + 3),
-        clientAddr = row[Option[TypoInet]](idx + 4),
-        clientHostname = row[Option[String]](idx + 5),
-        clientPort = row[Option[Int]](idx + 6),
-        backendStart = row[Option[TypoOffsetDateTime]](idx + 7),
-        backendXmin = row[Option[TypoXid]](idx + 8),
-        state = row[Option[String]](idx + 9),
-        sentLsn = row[Option[/* pg_lsn */ Long]](idx + 10),
-        writeLsn = row[Option[/* pg_lsn */ Long]](idx + 11),
-        flushLsn = row[Option[/* pg_lsn */ Long]](idx + 12),
-        replayLsn = row[Option[/* pg_lsn */ Long]](idx + 13),
-        writeLag = row[Option[TypoInterval]](idx + 14),
-        flushLag = row[Option[TypoInterval]](idx + 15),
-        replayLag = row[Option[TypoInterval]](idx + 16),
-        syncPriority = row[Option[Int]](idx + 17),
-        syncState = row[Option[String]](idx + 18),
-        replyTime = row[Option[TypoOffsetDateTime]](idx + 19)
+        pid = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        usesysid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        usename = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        applicationName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        clientAddr = row(idx + 4)(Column.columnToOption(TypoInet.column)),
+        clientHostname = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        clientPort = row(idx + 6)(Column.columnToOption(Column.columnToInt)),
+        backendStart = row(idx + 7)(Column.columnToOption(TypoOffsetDateTime.column)),
+        backendXmin = row(idx + 8)(Column.columnToOption(TypoXid.column)),
+        state = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        sentLsn = row(idx + 10)(Column.columnToOption(Column.columnToLong)),
+        writeLsn = row(idx + 11)(Column.columnToOption(Column.columnToLong)),
+        flushLsn = row(idx + 12)(Column.columnToOption(Column.columnToLong)),
+        replayLsn = row(idx + 13)(Column.columnToOption(Column.columnToLong)),
+        writeLag = row(idx + 14)(Column.columnToOption(TypoInterval.column)),
+        flushLag = row(idx + 15)(Column.columnToOption(TypoInterval.column)),
+        replayLag = row(idx + 16)(Column.columnToOption(TypoInterval.column)),
+        syncPriority = row(idx + 17)(Column.columnToOption(Column.columnToInt)),
+        syncState = row(idx + 18)(Column.columnToOption(Column.columnToString)),
+        replyTime = row(idx + 19)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PgStatReplicationViewRow] = OWrites[PgStatReplicationViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "pid" -> Json.toJson(o.pid),
-      "usesysid" -> Json.toJson(o.usesysid),
-      "usename" -> Json.toJson(o.usename),
-      "application_name" -> Json.toJson(o.applicationName),
-      "client_addr" -> Json.toJson(o.clientAddr),
-      "client_hostname" -> Json.toJson(o.clientHostname),
-      "client_port" -> Json.toJson(o.clientPort),
-      "backend_start" -> Json.toJson(o.backendStart),
-      "backend_xmin" -> Json.toJson(o.backendXmin),
-      "state" -> Json.toJson(o.state),
-      "sent_lsn" -> Json.toJson(o.sentLsn),
-      "write_lsn" -> Json.toJson(o.writeLsn),
-      "flush_lsn" -> Json.toJson(o.flushLsn),
-      "replay_lsn" -> Json.toJson(o.replayLsn),
-      "write_lag" -> Json.toJson(o.writeLag),
-      "flush_lag" -> Json.toJson(o.flushLag),
-      "replay_lag" -> Json.toJson(o.replayLag),
-      "sync_priority" -> Json.toJson(o.syncPriority),
-      "sync_state" -> Json.toJson(o.syncState),
-      "reply_time" -> Json.toJson(o.replyTime)
+      "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
+      "usesysid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.usesysid),
+      "usename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.usename),
+      "application_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.applicationName),
+      "client_addr" -> Writes.OptionWrites(TypoInet.writes).writes(o.clientAddr),
+      "client_hostname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.clientHostname),
+      "client_port" -> Writes.OptionWrites(Writes.IntWrites).writes(o.clientPort),
+      "backend_start" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.backendStart),
+      "backend_xmin" -> Writes.OptionWrites(TypoXid.writes).writes(o.backendXmin),
+      "state" -> Writes.OptionWrites(Writes.StringWrites).writes(o.state),
+      "sent_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.sentLsn),
+      "write_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.writeLsn),
+      "flush_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.flushLsn),
+      "replay_lsn" -> Writes.OptionWrites(Writes.LongWrites).writes(o.replayLsn),
+      "write_lag" -> Writes.OptionWrites(TypoInterval.writes).writes(o.writeLag),
+      "flush_lag" -> Writes.OptionWrites(TypoInterval.writes).writes(o.flushLag),
+      "replay_lag" -> Writes.OptionWrites(TypoInterval.writes).writes(o.replayLag),
+      "sync_priority" -> Writes.OptionWrites(Writes.IntWrites).writes(o.syncPriority),
+      "sync_state" -> Writes.OptionWrites(Writes.StringWrites).writes(o.syncState),
+      "reply_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.replyTime)
     ))
   )
 }

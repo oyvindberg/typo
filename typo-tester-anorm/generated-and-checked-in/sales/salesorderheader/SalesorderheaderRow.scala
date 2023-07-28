@@ -18,15 +18,16 @@ import adventureworks.sales.creditcard.CreditcardId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -93,31 +94,31 @@ object SalesorderheaderRow {
   implicit val reads: Reads[SalesorderheaderRow] = Reads[SalesorderheaderRow](json => JsResult.fromTry(
       Try(
         SalesorderheaderRow(
-          salesorderid = json.\("salesorderid").as[SalesorderheaderId],
-          revisionnumber = json.\("revisionnumber").as[Int],
-          orderdate = json.\("orderdate").as[TypoLocalDateTime],
-          duedate = json.\("duedate").as[TypoLocalDateTime],
-          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
-          status = json.\("status").as[Int],
-          onlineorderflag = json.\("onlineorderflag").as[Flag],
-          purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as[OrderNumber]),
-          accountnumber = json.\("accountnumber").toOption.map(_.as[AccountNumber]),
-          customerid = json.\("customerid").as[CustomerId],
-          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          billtoaddressid = json.\("billtoaddressid").as[AddressId],
-          shiptoaddressid = json.\("shiptoaddressid").as[AddressId],
-          shipmethodid = json.\("shipmethodid").as[ShipmethodId],
-          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-          creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as[/* max 15 chars */ String]),
-          currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
-          subtotal = json.\("subtotal").as[BigDecimal],
-          taxamt = json.\("taxamt").as[BigDecimal],
-          freight = json.\("freight").as[BigDecimal],
-          totaldue = json.\("totaldue").toOption.map(_.as[BigDecimal]),
-          comment = json.\("comment").toOption.map(_.as[/* max 128 chars */ String]),
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
+          revisionnumber = json.\("revisionnumber").as(Reads.IntReads),
+          orderdate = json.\("orderdate").as(TypoLocalDateTime.reads),
+          duedate = json.\("duedate").as(TypoLocalDateTime.reads),
+          shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          status = json.\("status").as(Reads.IntReads),
+          onlineorderflag = json.\("onlineorderflag").as(Flag.reads),
+          purchaseordernumber = json.\("purchaseordernumber").toOption.map(_.as(OrderNumber.reads)),
+          accountnumber = json.\("accountnumber").toOption.map(_.as(AccountNumber.reads)),
+          customerid = json.\("customerid").as(CustomerId.reads),
+          salespersonid = json.\("salespersonid").toOption.map(_.as(BusinessentityId.reads)),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          billtoaddressid = json.\("billtoaddressid").as(AddressId.reads),
+          shiptoaddressid = json.\("shiptoaddressid").as(AddressId.reads),
+          shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
+          creditcardid = json.\("creditcardid").toOption.map(_.as(CreditcardId.reads)),
+          creditcardapprovalcode = json.\("creditcardapprovalcode").toOption.map(_.as(Reads.StringReads)),
+          currencyrateid = json.\("currencyrateid").toOption.map(_.as(CurrencyrateId.reads)),
+          subtotal = json.\("subtotal").as(Reads.bigDecReads),
+          taxamt = json.\("taxamt").as(Reads.bigDecReads),
+          freight = json.\("freight").as(Reads.bigDecReads),
+          totaldue = json.\("totaldue").toOption.map(_.as(Reads.bigDecReads)),
+          comment = json.\("comment").toOption.map(_.as(Reads.StringReads)),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -125,61 +126,61 @@ object SalesorderheaderRow {
   def rowParser(idx: Int): RowParser[SalesorderheaderRow] = RowParser[SalesorderheaderRow] { row =>
     Success(
       SalesorderheaderRow(
-        salesorderid = row[SalesorderheaderId](idx + 0),
-        revisionnumber = row[Int](idx + 1),
-        orderdate = row[TypoLocalDateTime](idx + 2),
-        duedate = row[TypoLocalDateTime](idx + 3),
-        shipdate = row[Option[TypoLocalDateTime]](idx + 4),
-        status = row[Int](idx + 5),
-        onlineorderflag = row[Flag](idx + 6),
-        purchaseordernumber = row[Option[OrderNumber]](idx + 7),
-        accountnumber = row[Option[AccountNumber]](idx + 8),
-        customerid = row[CustomerId](idx + 9),
-        salespersonid = row[Option[BusinessentityId]](idx + 10),
-        territoryid = row[Option[SalesterritoryId]](idx + 11),
-        billtoaddressid = row[AddressId](idx + 12),
-        shiptoaddressid = row[AddressId](idx + 13),
-        shipmethodid = row[ShipmethodId](idx + 14),
-        creditcardid = row[Option[CreditcardId]](idx + 15),
-        creditcardapprovalcode = row[Option[/* max 15 chars */ String]](idx + 16),
-        currencyrateid = row[Option[CurrencyrateId]](idx + 17),
-        subtotal = row[BigDecimal](idx + 18),
-        taxamt = row[BigDecimal](idx + 19),
-        freight = row[BigDecimal](idx + 20),
-        totaldue = row[Option[BigDecimal]](idx + 21),
-        comment = row[Option[/* max 128 chars */ String]](idx + 22),
-        rowguid = row[UUID](idx + 23),
-        modifieddate = row[TypoLocalDateTime](idx + 24)
+        salesorderid = row(idx + 0)(SalesorderheaderId.column),
+        revisionnumber = row(idx + 1)(Column.columnToInt),
+        orderdate = row(idx + 2)(TypoLocalDateTime.column),
+        duedate = row(idx + 3)(TypoLocalDateTime.column),
+        shipdate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
+        status = row(idx + 5)(Column.columnToInt),
+        onlineorderflag = row(idx + 6)(Flag.column),
+        purchaseordernumber = row(idx + 7)(Column.columnToOption(OrderNumber.column)),
+        accountnumber = row(idx + 8)(Column.columnToOption(AccountNumber.column)),
+        customerid = row(idx + 9)(CustomerId.column),
+        salespersonid = row(idx + 10)(Column.columnToOption(BusinessentityId.column)),
+        territoryid = row(idx + 11)(Column.columnToOption(SalesterritoryId.column)),
+        billtoaddressid = row(idx + 12)(AddressId.column),
+        shiptoaddressid = row(idx + 13)(AddressId.column),
+        shipmethodid = row(idx + 14)(ShipmethodId.column),
+        creditcardid = row(idx + 15)(Column.columnToOption(CreditcardId.column)),
+        creditcardapprovalcode = row(idx + 16)(Column.columnToOption(Column.columnToString)),
+        currencyrateid = row(idx + 17)(Column.columnToOption(CurrencyrateId.column)),
+        subtotal = row(idx + 18)(Column.columnToScalaBigDecimal),
+        taxamt = row(idx + 19)(Column.columnToScalaBigDecimal),
+        freight = row(idx + 20)(Column.columnToScalaBigDecimal),
+        totaldue = row(idx + 21)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        comment = row(idx + 22)(Column.columnToOption(Column.columnToString)),
+        rowguid = row(idx + 23)(Column.columnToUUID),
+        modifieddate = row(idx + 24)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[SalesorderheaderRow] = OWrites[SalesorderheaderRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "salesorderid" -> Json.toJson(o.salesorderid),
-      "revisionnumber" -> Json.toJson(o.revisionnumber),
-      "orderdate" -> Json.toJson(o.orderdate),
-      "duedate" -> Json.toJson(o.duedate),
-      "shipdate" -> Json.toJson(o.shipdate),
-      "status" -> Json.toJson(o.status),
-      "onlineorderflag" -> Json.toJson(o.onlineorderflag),
-      "purchaseordernumber" -> Json.toJson(o.purchaseordernumber),
-      "accountnumber" -> Json.toJson(o.accountnumber),
-      "customerid" -> Json.toJson(o.customerid),
-      "salespersonid" -> Json.toJson(o.salespersonid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "billtoaddressid" -> Json.toJson(o.billtoaddressid),
-      "shiptoaddressid" -> Json.toJson(o.shiptoaddressid),
-      "shipmethodid" -> Json.toJson(o.shipmethodid),
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "creditcardapprovalcode" -> Json.toJson(o.creditcardapprovalcode),
-      "currencyrateid" -> Json.toJson(o.currencyrateid),
-      "subtotal" -> Json.toJson(o.subtotal),
-      "taxamt" -> Json.toJson(o.taxamt),
-      "freight" -> Json.toJson(o.freight),
-      "totaldue" -> Json.toJson(o.totaldue),
-      "comment" -> Json.toJson(o.comment),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
+      "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),
+      "orderdate" -> TypoLocalDateTime.writes.writes(o.orderdate),
+      "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
+      "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
+      "status" -> Writes.IntWrites.writes(o.status),
+      "onlineorderflag" -> Flag.writes.writes(o.onlineorderflag),
+      "purchaseordernumber" -> Writes.OptionWrites(OrderNumber.writes).writes(o.purchaseordernumber),
+      "accountnumber" -> Writes.OptionWrites(AccountNumber.writes).writes(o.accountnumber),
+      "customerid" -> CustomerId.writes.writes(o.customerid),
+      "salespersonid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.salespersonid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "billtoaddressid" -> AddressId.writes.writes(o.billtoaddressid),
+      "shiptoaddressid" -> AddressId.writes.writes(o.shiptoaddressid),
+      "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
+      "creditcardid" -> Writes.OptionWrites(CreditcardId.writes).writes(o.creditcardid),
+      "creditcardapprovalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.creditcardapprovalcode),
+      "currencyrateid" -> Writes.OptionWrites(CurrencyrateId.writes).writes(o.currencyrateid),
+      "subtotal" -> Writes.BigDecimalWrites.writes(o.subtotal),
+      "taxamt" -> Writes.BigDecimalWrites.writes(o.taxamt),
+      "freight" -> Writes.BigDecimalWrites.writes(o.freight),
+      "totaldue" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.totaldue),
+      "comment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comment),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

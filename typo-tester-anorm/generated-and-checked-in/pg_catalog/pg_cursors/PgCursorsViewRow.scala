@@ -8,14 +8,15 @@ package pg_catalog
 package pg_cursors
 
 import adventureworks.TypoOffsetDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,12 +33,12 @@ object PgCursorsViewRow {
   implicit val reads: Reads[PgCursorsViewRow] = Reads[PgCursorsViewRow](json => JsResult.fromTry(
       Try(
         PgCursorsViewRow(
-          name = json.\("name").toOption.map(_.as[String]),
-          statement = json.\("statement").toOption.map(_.as[String]),
-          isHoldable = json.\("is_holdable").toOption.map(_.as[Boolean]),
-          isBinary = json.\("is_binary").toOption.map(_.as[Boolean]),
-          isScrollable = json.\("is_scrollable").toOption.map(_.as[Boolean]),
-          creationTime = json.\("creation_time").toOption.map(_.as[TypoOffsetDateTime])
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          statement = json.\("statement").toOption.map(_.as(Reads.StringReads)),
+          isHoldable = json.\("is_holdable").toOption.map(_.as(Reads.BooleanReads)),
+          isBinary = json.\("is_binary").toOption.map(_.as(Reads.BooleanReads)),
+          isScrollable = json.\("is_scrollable").toOption.map(_.as(Reads.BooleanReads)),
+          creationTime = json.\("creation_time").toOption.map(_.as(TypoOffsetDateTime.reads))
         )
       )
     ),
@@ -45,23 +46,23 @@ object PgCursorsViewRow {
   def rowParser(idx: Int): RowParser[PgCursorsViewRow] = RowParser[PgCursorsViewRow] { row =>
     Success(
       PgCursorsViewRow(
-        name = row[Option[String]](idx + 0),
-        statement = row[Option[String]](idx + 1),
-        isHoldable = row[Option[Boolean]](idx + 2),
-        isBinary = row[Option[Boolean]](idx + 3),
-        isScrollable = row[Option[Boolean]](idx + 4),
-        creationTime = row[Option[TypoOffsetDateTime]](idx + 5)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        statement = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        isHoldable = row(idx + 2)(Column.columnToOption(Column.columnToBoolean)),
+        isBinary = row(idx + 3)(Column.columnToOption(Column.columnToBoolean)),
+        isScrollable = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
+        creationTime = row(idx + 5)(Column.columnToOption(TypoOffsetDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PgCursorsViewRow] = OWrites[PgCursorsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "statement" -> Json.toJson(o.statement),
-      "is_holdable" -> Json.toJson(o.isHoldable),
-      "is_binary" -> Json.toJson(o.isBinary),
-      "is_scrollable" -> Json.toJson(o.isScrollable),
-      "creation_time" -> Json.toJson(o.creationTime)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "statement" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statement),
+      "is_holdable" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isHoldable),
+      "is_binary" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isBinary),
+      "is_scrollable" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.isScrollable),
+      "creation_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.creationTime)
     ))
   )
 }

@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_user_mappings
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,12 +32,12 @@ object PgUserMappingsViewRow {
   implicit val reads: Reads[PgUserMappingsViewRow] = Reads[PgUserMappingsViewRow](json => JsResult.fromTry(
       Try(
         PgUserMappingsViewRow(
-          umid = json.\("umid").toOption.map(_.as[/* oid */ Long]),
-          srvid = json.\("srvid").toOption.map(_.as[/* oid */ Long]),
-          srvname = json.\("srvname").toOption.map(_.as[String]),
-          umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
-          usename = json.\("usename").toOption.map(_.as[String]),
-          umoptions = json.\("umoptions").toOption.map(_.as[Array[String]])
+          umid = json.\("umid").toOption.map(_.as(Reads.LongReads)),
+          srvid = json.\("srvid").toOption.map(_.as(Reads.LongReads)),
+          srvname = json.\("srvname").toOption.map(_.as(Reads.StringReads)),
+          umuser = json.\("umuser").toOption.map(_.as(Reads.LongReads)),
+          usename = json.\("usename").toOption.map(_.as(Reads.StringReads)),
+          umoptions = json.\("umoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -44,23 +45,23 @@ object PgUserMappingsViewRow {
   def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] = RowParser[PgUserMappingsViewRow] { row =>
     Success(
       PgUserMappingsViewRow(
-        umid = row[Option[/* oid */ Long]](idx + 0),
-        srvid = row[Option[/* oid */ Long]](idx + 1),
-        srvname = row[Option[String]](idx + 2),
-        umuser = row[Option[/* oid */ Long]](idx + 3),
-        usename = row[Option[String]](idx + 4),
-        umoptions = row[Option[Array[String]]](idx + 5)
+        umid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        srvid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        srvname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        umuser = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        usename = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        umoptions = row(idx + 5)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgUserMappingsViewRow] = OWrites[PgUserMappingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "umid" -> Json.toJson(o.umid),
-      "srvid" -> Json.toJson(o.srvid),
-      "srvname" -> Json.toJson(o.srvname),
-      "umuser" -> Json.toJson(o.umuser),
-      "usename" -> Json.toJson(o.usename),
-      "umoptions" -> Json.toJson(o.umoptions)
+      "umid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.umid),
+      "srvid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.srvid),
+      "srvname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.srvname),
+      "umuser" -> Writes.OptionWrites(Writes.LongWrites).writes(o.umuser),
+      "usename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.usename),
+      "umoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.umoptions)
     ))
   )
 }

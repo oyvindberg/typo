@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_operator
 
+import adventureworks.TypoRegproc
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgOperatorRepoImpl extends PgOperatorRepo {
   override def delete(oid: PgOperatorId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_operator where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_operator where oid = ${fromWrite(oid)(Write.fromPut(PgOperatorId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgOperatorRow): ConnectionIO[PgOperatorRow] = {
     sql"""insert into pg_catalog.pg_operator(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)
-          values (${unsaved.oid}::oid, ${unsaved.oprname}::name, ${unsaved.oprnamespace}::oid, ${unsaved.oprowner}::oid, ${unsaved.oprkind}::char, ${unsaved.oprcanmerge}, ${unsaved.oprcanhash}, ${unsaved.oprleft}::oid, ${unsaved.oprright}::oid, ${unsaved.oprresult}::oid, ${unsaved.oprcom}::oid, ${unsaved.oprnegate}::oid, ${unsaved.oprcode}::regproc, ${unsaved.oprrest}::regproc, ${unsaved.oprjoin}::regproc)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgOperatorId.put))}::oid, ${fromWrite(unsaved.oprname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.oprnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.oprowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.oprkind)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.oprcanmerge)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.oprcanhash)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.oprleft)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.oprright)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.oprresult)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.oprcom)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.oprnegate)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.oprcode)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.oprrest)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.oprjoin)(Write.fromPut(TypoRegproc.put))}::regproc)
           returning oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
        """.query(PgOperatorRow.read).unique
   }
@@ -25,29 +29,29 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
     sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator".query(PgOperatorRow.read).stream
   }
   override def selectById(oid: PgOperatorId): ConnectionIO[Option[PgOperatorRow]] = {
-    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ${oid}".query(PgOperatorRow.read).option
+    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ${fromWrite(oid)(Write.fromPut(PgOperatorId.put))}".query(PgOperatorRow.read).option
   }
   override def selectByIds(oids: Array[PgOperatorId]): Stream[ConnectionIO, PgOperatorRow] = {
-    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ANY(${oids})".query(PgOperatorRow.read).stream
+    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ANY(${fromWrite(oids)(Write.fromPut(PgOperatorId.arrayPut))})".query(PgOperatorRow.read).stream
   }
   override def update(row: PgOperatorRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_operator
-          set oprname = ${row.oprname}::name,
-              oprnamespace = ${row.oprnamespace}::oid,
-              oprowner = ${row.oprowner}::oid,
-              oprkind = ${row.oprkind}::char,
-              oprcanmerge = ${row.oprcanmerge},
-              oprcanhash = ${row.oprcanhash},
-              oprleft = ${row.oprleft}::oid,
-              oprright = ${row.oprright}::oid,
-              oprresult = ${row.oprresult}::oid,
-              oprcom = ${row.oprcom}::oid,
-              oprnegate = ${row.oprnegate}::oid,
-              oprcode = ${row.oprcode}::regproc,
-              oprrest = ${row.oprrest}::regproc,
-              oprjoin = ${row.oprjoin}::regproc
-          where oid = ${oid}
+          set oprname = ${fromWrite(row.oprname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              oprnamespace = ${fromWrite(row.oprnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              oprowner = ${fromWrite(row.oprowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              oprkind = ${fromWrite(row.oprkind)(Write.fromPut(Meta.StringMeta.put))}::char,
+              oprcanmerge = ${fromWrite(row.oprcanmerge)(Write.fromPut(Meta.BooleanMeta.put))},
+              oprcanhash = ${fromWrite(row.oprcanhash)(Write.fromPut(Meta.BooleanMeta.put))},
+              oprleft = ${fromWrite(row.oprleft)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              oprright = ${fromWrite(row.oprright)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              oprresult = ${fromWrite(row.oprresult)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              oprcom = ${fromWrite(row.oprcom)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              oprnegate = ${fromWrite(row.oprnegate)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              oprcode = ${fromWrite(row.oprcode)(Write.fromPut(TypoRegproc.put))}::regproc,
+              oprrest = ${fromWrite(row.oprrest)(Write.fromPut(TypoRegproc.put))}::regproc,
+              oprjoin = ${fromWrite(row.oprjoin)(Write.fromPut(TypoRegproc.put))}::regproc
+          where oid = ${fromWrite(oid)(Write.fromPut(PgOperatorId.put))}
        """
       .update
       .run
@@ -56,21 +60,21 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
   override def upsert(unsaved: PgOperatorRow): ConnectionIO[PgOperatorRow] = {
     sql"""insert into pg_catalog.pg_operator(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.oprname}::name,
-            ${unsaved.oprnamespace}::oid,
-            ${unsaved.oprowner}::oid,
-            ${unsaved.oprkind}::char,
-            ${unsaved.oprcanmerge},
-            ${unsaved.oprcanhash},
-            ${unsaved.oprleft}::oid,
-            ${unsaved.oprright}::oid,
-            ${unsaved.oprresult}::oid,
-            ${unsaved.oprcom}::oid,
-            ${unsaved.oprnegate}::oid,
-            ${unsaved.oprcode}::regproc,
-            ${unsaved.oprrest}::regproc,
-            ${unsaved.oprjoin}::regproc
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgOperatorId.put))}::oid,
+            ${fromWrite(unsaved.oprname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.oprnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.oprowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.oprkind)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.oprcanmerge)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.oprcanhash)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.oprleft)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.oprright)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.oprresult)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.oprcom)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.oprnegate)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.oprcode)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.oprrest)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.oprjoin)(Write.fromPut(TypoRegproc.put))}::regproc
           )
           on conflict (oid)
           do update set

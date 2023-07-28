@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -48,38 +48,38 @@ case class DocumentRow(
 )
 
 object DocumentRow {
-  implicit val decoder: Decoder[DocumentRow] = Decoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar */ String, Int, Int, Option[String], Option[Array[Byte]], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DocumentRow.apply)
-  implicit val encoder: Encoder[DocumentRow] = Encoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar */ String, Int, Int, Option[String], Option[Array[Byte]], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))
+  implicit val decoder: Decoder[DocumentRow] = Decoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar */ String, Int, Int, Option[String], Option[Array[Byte]], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DocumentRow.apply)(Decoder.decodeString, BusinessentityId.decoder, Flag.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly)), Decoder.decodeUUID, TypoLocalDateTime.decoder, DocumentId.decoder)
+  implicit val encoder: Encoder[DocumentRow] = Encoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar */ String, Int, Int, Option[String], Option[Array[Byte]], UUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Flag.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly)), Encoder.encodeUUID, TypoLocalDateTime.encoder, DocumentId.encoder)
   implicit val read: Read[DocumentRow] = new Read[DocumentRow](
     gets = List(
-      (Get[/* max 50 chars */ String], Nullability.NoNulls),
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[Flag], Nullability.NoNulls),
-      (Get[/* max 400 chars */ String], Nullability.NoNulls),
-      (Get[/* max 8 chars */ String], Nullability.Nullable),
-      (Get[/* bpchar */ String], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[String], Nullability.Nullable),
-      (Get[Array[Byte]], Nullability.Nullable),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls),
-      (Get[DocumentId], Nullability.NoNulls)
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Flag.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ByteArrayMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (DocumentId.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DocumentRow(
-      title = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 0),
-      owner = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 1),
-      folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-      filename = Get[/* max 400 chars */ String].unsafeGetNonNullable(rs, i + 3),
-      fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
-      revision = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-      changenumber = Get[Int].unsafeGetNonNullable(rs, i + 6),
-      status = Get[Int].unsafeGetNonNullable(rs, i + 7),
-      documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
-      document = Get[Array[Byte]].unsafeGetNullable(rs, i + 9),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 10),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 11),
-      documentnode = Get[DocumentId].unsafeGetNonNullable(rs, i + 12)
+      title = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+      owner = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+      folderflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
+      filename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      fileextension = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      revision = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+      changenumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
+      status = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
+      documentsummary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      document = Meta.ByteArrayMeta.get.unsafeGetNullable(rs, i + 9),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 10),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11),
+      documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 12)
     )
   )
 }

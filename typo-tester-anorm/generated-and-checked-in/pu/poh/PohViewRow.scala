@@ -11,14 +11,15 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,19 +55,19 @@ object PohViewRow {
   implicit val reads: Reads[PohViewRow] = Reads[PohViewRow](json => JsResult.fromTry(
       Try(
         PohViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          purchaseorderid = json.\("purchaseorderid").toOption.map(_.as[PurchaseorderheaderId]),
-          revisionnumber = json.\("revisionnumber").toOption.map(_.as[Int]),
-          status = json.\("status").toOption.map(_.as[Int]),
-          employeeid = json.\("employeeid").toOption.map(_.as[BusinessentityId]),
-          vendorid = json.\("vendorid").toOption.map(_.as[BusinessentityId]),
-          shipmethodid = json.\("shipmethodid").toOption.map(_.as[ShipmethodId]),
-          orderdate = json.\("orderdate").toOption.map(_.as[TypoLocalDateTime]),
-          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
-          subtotal = json.\("subtotal").toOption.map(_.as[BigDecimal]),
-          taxamt = json.\("taxamt").toOption.map(_.as[BigDecimal]),
-          freight = json.\("freight").toOption.map(_.as[BigDecimal]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          purchaseorderid = json.\("purchaseorderid").toOption.map(_.as(PurchaseorderheaderId.reads)),
+          revisionnumber = json.\("revisionnumber").toOption.map(_.as(Reads.IntReads)),
+          status = json.\("status").toOption.map(_.as(Reads.IntReads)),
+          employeeid = json.\("employeeid").toOption.map(_.as(BusinessentityId.reads)),
+          vendorid = json.\("vendorid").toOption.map(_.as(BusinessentityId.reads)),
+          shipmethodid = json.\("shipmethodid").toOption.map(_.as(ShipmethodId.reads)),
+          orderdate = json.\("orderdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          subtotal = json.\("subtotal").toOption.map(_.as(Reads.bigDecReads)),
+          taxamt = json.\("taxamt").toOption.map(_.as(Reads.bigDecReads)),
+          freight = json.\("freight").toOption.map(_.as(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -74,37 +75,37 @@ object PohViewRow {
   def rowParser(idx: Int): RowParser[PohViewRow] = RowParser[PohViewRow] { row =>
     Success(
       PohViewRow(
-        id = row[Option[Int]](idx + 0),
-        purchaseorderid = row[Option[PurchaseorderheaderId]](idx + 1),
-        revisionnumber = row[Option[Int]](idx + 2),
-        status = row[Option[Int]](idx + 3),
-        employeeid = row[Option[BusinessentityId]](idx + 4),
-        vendorid = row[Option[BusinessentityId]](idx + 5),
-        shipmethodid = row[Option[ShipmethodId]](idx + 6),
-        orderdate = row[Option[TypoLocalDateTime]](idx + 7),
-        shipdate = row[Option[TypoLocalDateTime]](idx + 8),
-        subtotal = row[Option[BigDecimal]](idx + 9),
-        taxamt = row[Option[BigDecimal]](idx + 10),
-        freight = row[Option[BigDecimal]](idx + 11),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 12)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        purchaseorderid = row(idx + 1)(Column.columnToOption(PurchaseorderheaderId.column)),
+        revisionnumber = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
+        status = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
+        employeeid = row(idx + 4)(Column.columnToOption(BusinessentityId.column)),
+        vendorid = row(idx + 5)(Column.columnToOption(BusinessentityId.column)),
+        shipmethodid = row(idx + 6)(Column.columnToOption(ShipmethodId.column)),
+        orderdate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column)),
+        shipdate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column)),
+        subtotal = row(idx + 9)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        taxamt = row(idx + 10)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        freight = row(idx + 11)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        modifieddate = row(idx + 12)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PohViewRow] = OWrites[PohViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
-      "revisionnumber" -> Json.toJson(o.revisionnumber),
-      "status" -> Json.toJson(o.status),
-      "employeeid" -> Json.toJson(o.employeeid),
-      "vendorid" -> Json.toJson(o.vendorid),
-      "shipmethodid" -> Json.toJson(o.shipmethodid),
-      "orderdate" -> Json.toJson(o.orderdate),
-      "shipdate" -> Json.toJson(o.shipdate),
-      "subtotal" -> Json.toJson(o.subtotal),
-      "taxamt" -> Json.toJson(o.taxamt),
-      "freight" -> Json.toJson(o.freight),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "purchaseorderid" -> Writes.OptionWrites(PurchaseorderheaderId.writes).writes(o.purchaseorderid),
+      "revisionnumber" -> Writes.OptionWrites(Writes.IntWrites).writes(o.revisionnumber),
+      "status" -> Writes.OptionWrites(Writes.IntWrites).writes(o.status),
+      "employeeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.employeeid),
+      "vendorid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.vendorid),
+      "shipmethodid" -> Writes.OptionWrites(ShipmethodId.writes).writes(o.shipmethodid),
+      "orderdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.orderdate),
+      "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
+      "subtotal" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.subtotal),
+      "taxamt" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.taxamt),
+      "freight" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.freight),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

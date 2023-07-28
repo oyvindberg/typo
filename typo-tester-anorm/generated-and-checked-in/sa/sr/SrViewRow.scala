@@ -10,14 +10,15 @@ package sr
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -37,11 +38,11 @@ object SrViewRow {
   implicit val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
       Try(
         SrViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          salesreasonid = json.\("salesreasonid").toOption.map(_.as[SalesreasonId]),
-          name = json.\("name").toOption.map(_.as[Name]),
-          reasontype = json.\("reasontype").toOption.map(_.as[Name]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          salesreasonid = json.\("salesreasonid").toOption.map(_.as(SalesreasonId.reads)),
+          name = json.\("name").toOption.map(_.as(Name.reads)),
+          reasontype = json.\("reasontype").toOption.map(_.as(Name.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -49,21 +50,21 @@ object SrViewRow {
   def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
     Success(
       SrViewRow(
-        id = row[Option[Int]](idx + 0),
-        salesreasonid = row[Option[SalesreasonId]](idx + 1),
-        name = row[Option[Name]](idx + 2),
-        reasontype = row[Option[Name]](idx + 3),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        salesreasonid = row(idx + 1)(Column.columnToOption(SalesreasonId.column)),
+        name = row(idx + 2)(Column.columnToOption(Name.column)),
+        reasontype = row(idx + 3)(Column.columnToOption(Name.column)),
+        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "salesreasonid" -> Json.toJson(o.salesreasonid),
-      "name" -> Json.toJson(o.name),
-      "reasontype" -> Json.toJson(o.reasontype),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "salesreasonid" -> Writes.OptionWrites(SalesreasonId.writes).writes(o.salesreasonid),
+      "name" -> Writes.OptionWrites(Name.writes).writes(o.name),
+      "reasontype" -> Writes.OptionWrites(Name.writes).writes(o.reasontype),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

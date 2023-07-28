@@ -7,17 +7,24 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoOidVector
+import adventureworks.TypoPgNodeTree
+import adventureworks.TypoRegproc
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgProcRepoImpl extends PgProcRepo {
   override def delete(oid: PgProcId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_proc where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_proc where oid = ${fromWrite(oid)(Write.fromPut(PgProcId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgProcRow): ConnectionIO[PgProcRow] = {
     sql"""insert into pg_catalog.pg_proc(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)
-          values (${unsaved.oid}::oid, ${unsaved.proname}::name, ${unsaved.pronamespace}::oid, ${unsaved.proowner}::oid, ${unsaved.prolang}::oid, ${unsaved.procost}::float4, ${unsaved.prorows}::float4, ${unsaved.provariadic}::oid, ${unsaved.prosupport}::regproc, ${unsaved.prokind}::char, ${unsaved.prosecdef}, ${unsaved.proleakproof}, ${unsaved.proisstrict}, ${unsaved.proretset}, ${unsaved.provolatile}::char, ${unsaved.proparallel}::char, ${unsaved.pronargs}::int2, ${unsaved.pronargdefaults}::int2, ${unsaved.prorettype}::oid, ${unsaved.proargtypes}::oidvector, ${unsaved.proallargtypes}::_oid, ${unsaved.proargmodes}::_char, ${unsaved.proargnames}::_text, ${unsaved.proargdefaults}::pg_node_tree, ${unsaved.protrftypes}::_oid, ${unsaved.prosrc}, ${unsaved.probin}, ${unsaved.prosqlbody}::pg_node_tree, ${unsaved.proconfig}::_text, ${unsaved.proacl}::_aclitem)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgProcId.put))}::oid, ${fromWrite(unsaved.proname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.pronamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.proowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prolang)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.procost)(Write.fromPut(Meta.FloatMeta.put))}::float4, ${fromWrite(unsaved.prorows)(Write.fromPut(Meta.FloatMeta.put))}::float4, ${fromWrite(unsaved.provariadic)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prosupport)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prokind)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.prosecdef)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.proleakproof)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.proisstrict)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.proretset)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.provolatile)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.proparallel)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.pronargs)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.pronargdefaults)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.prorettype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.proargtypes)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.proallargtypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.proargmodes)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_char, ${fromWrite(unsaved.proargnames)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.proargdefaults)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.protrftypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.prosrc)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.probin)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.prosqlbody)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.proconfig)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.proacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
        """.query(PgProcRow.read).unique
   }
@@ -25,44 +32,44 @@ object PgProcRepoImpl extends PgProcRepo {
     sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc".query(PgProcRow.read).stream
   }
   override def selectById(oid: PgProcId): ConnectionIO[Option[PgProcRow]] = {
-    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ${oid}".query(PgProcRow.read).option
+    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ${fromWrite(oid)(Write.fromPut(PgProcId.put))}".query(PgProcRow.read).option
   }
   override def selectByIds(oids: Array[PgProcId]): Stream[ConnectionIO, PgProcRow] = {
-    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ANY(${oids})".query(PgProcRow.read).stream
+    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ANY(${fromWrite(oids)(Write.fromPut(PgProcId.arrayPut))})".query(PgProcRow.read).stream
   }
   override def update(row: PgProcRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_proc
-          set proname = ${row.proname}::name,
-              pronamespace = ${row.pronamespace}::oid,
-              proowner = ${row.proowner}::oid,
-              prolang = ${row.prolang}::oid,
-              procost = ${row.procost}::float4,
-              prorows = ${row.prorows}::float4,
-              provariadic = ${row.provariadic}::oid,
-              prosupport = ${row.prosupport}::regproc,
-              prokind = ${row.prokind}::char,
-              prosecdef = ${row.prosecdef},
-              proleakproof = ${row.proleakproof},
-              proisstrict = ${row.proisstrict},
-              proretset = ${row.proretset},
-              provolatile = ${row.provolatile}::char,
-              proparallel = ${row.proparallel}::char,
-              pronargs = ${row.pronargs}::int2,
-              pronargdefaults = ${row.pronargdefaults}::int2,
-              prorettype = ${row.prorettype}::oid,
-              proargtypes = ${row.proargtypes}::oidvector,
-              proallargtypes = ${row.proallargtypes}::_oid,
-              proargmodes = ${row.proargmodes}::_char,
-              proargnames = ${row.proargnames}::_text,
-              proargdefaults = ${row.proargdefaults}::pg_node_tree,
-              protrftypes = ${row.protrftypes}::_oid,
-              prosrc = ${row.prosrc},
-              probin = ${row.probin},
-              prosqlbody = ${row.prosqlbody}::pg_node_tree,
-              proconfig = ${row.proconfig}::_text,
-              proacl = ${row.proacl}::_aclitem
-          where oid = ${oid}
+          set proname = ${fromWrite(row.proname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              pronamespace = ${fromWrite(row.pronamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              proowner = ${fromWrite(row.proowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              prolang = ${fromWrite(row.prolang)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              procost = ${fromWrite(row.procost)(Write.fromPut(Meta.FloatMeta.put))}::float4,
+              prorows = ${fromWrite(row.prorows)(Write.fromPut(Meta.FloatMeta.put))}::float4,
+              provariadic = ${fromWrite(row.provariadic)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              prosupport = ${fromWrite(row.prosupport)(Write.fromPut(TypoRegproc.put))}::regproc,
+              prokind = ${fromWrite(row.prokind)(Write.fromPut(Meta.StringMeta.put))}::char,
+              prosecdef = ${fromWrite(row.prosecdef)(Write.fromPut(Meta.BooleanMeta.put))},
+              proleakproof = ${fromWrite(row.proleakproof)(Write.fromPut(Meta.BooleanMeta.put))},
+              proisstrict = ${fromWrite(row.proisstrict)(Write.fromPut(Meta.BooleanMeta.put))},
+              proretset = ${fromWrite(row.proretset)(Write.fromPut(Meta.BooleanMeta.put))},
+              provolatile = ${fromWrite(row.provolatile)(Write.fromPut(Meta.StringMeta.put))}::char,
+              proparallel = ${fromWrite(row.proparallel)(Write.fromPut(Meta.StringMeta.put))}::char,
+              pronargs = ${fromWrite(row.pronargs)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              pronargdefaults = ${fromWrite(row.pronargdefaults)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              prorettype = ${fromWrite(row.prorettype)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              proargtypes = ${fromWrite(row.proargtypes)(Write.fromPut(TypoOidVector.put))}::oidvector,
+              proallargtypes = ${fromWrite(row.proallargtypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
+              proargmodes = ${fromWrite(row.proargmodes)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_char,
+              proargnames = ${fromWrite(row.proargnames)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+              proargdefaults = ${fromWrite(row.proargdefaults)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
+              protrftypes = ${fromWrite(row.protrftypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
+              prosrc = ${fromWrite(row.prosrc)(Write.fromPut(Meta.StringMeta.put))},
+              probin = ${fromWrite(row.probin)(Write.fromPutOption(Meta.StringMeta.put))},
+              prosqlbody = ${fromWrite(row.prosqlbody)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
+              proconfig = ${fromWrite(row.proconfig)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+              proacl = ${fromWrite(row.proacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
+          where oid = ${fromWrite(oid)(Write.fromPut(PgProcId.put))}
        """
       .update
       .run
@@ -71,36 +78,36 @@ object PgProcRepoImpl extends PgProcRepo {
   override def upsert(unsaved: PgProcRow): ConnectionIO[PgProcRow] = {
     sql"""insert into pg_catalog.pg_proc(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.proname}::name,
-            ${unsaved.pronamespace}::oid,
-            ${unsaved.proowner}::oid,
-            ${unsaved.prolang}::oid,
-            ${unsaved.procost}::float4,
-            ${unsaved.prorows}::float4,
-            ${unsaved.provariadic}::oid,
-            ${unsaved.prosupport}::regproc,
-            ${unsaved.prokind}::char,
-            ${unsaved.prosecdef},
-            ${unsaved.proleakproof},
-            ${unsaved.proisstrict},
-            ${unsaved.proretset},
-            ${unsaved.provolatile}::char,
-            ${unsaved.proparallel}::char,
-            ${unsaved.pronargs}::int2,
-            ${unsaved.pronargdefaults}::int2,
-            ${unsaved.prorettype}::oid,
-            ${unsaved.proargtypes}::oidvector,
-            ${unsaved.proallargtypes}::_oid,
-            ${unsaved.proargmodes}::_char,
-            ${unsaved.proargnames}::_text,
-            ${unsaved.proargdefaults}::pg_node_tree,
-            ${unsaved.protrftypes}::_oid,
-            ${unsaved.prosrc},
-            ${unsaved.probin},
-            ${unsaved.prosqlbody}::pg_node_tree,
-            ${unsaved.proconfig}::_text,
-            ${unsaved.proacl}::_aclitem
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgProcId.put))}::oid,
+            ${fromWrite(unsaved.proname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.pronamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.proowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.prolang)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.procost)(Write.fromPut(Meta.FloatMeta.put))}::float4,
+            ${fromWrite(unsaved.prorows)(Write.fromPut(Meta.FloatMeta.put))}::float4,
+            ${fromWrite(unsaved.provariadic)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.prosupport)(Write.fromPut(TypoRegproc.put))}::regproc,
+            ${fromWrite(unsaved.prokind)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.prosecdef)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.proleakproof)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.proisstrict)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.proretset)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.provolatile)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.proparallel)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.pronargs)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.pronargdefaults)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.prorettype)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.proargtypes)(Write.fromPut(TypoOidVector.put))}::oidvector,
+            ${fromWrite(unsaved.proallargtypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
+            ${fromWrite(unsaved.proargmodes)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_char,
+            ${fromWrite(unsaved.proargnames)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+            ${fromWrite(unsaved.proargdefaults)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
+            ${fromWrite(unsaved.protrftypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid,
+            ${fromWrite(unsaved.prosrc)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.probin)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.prosqlbody)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
+            ${fromWrite(unsaved.proconfig)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+            ${fromWrite(unsaved.proacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem
           )
           on conflict (oid)
           do update set

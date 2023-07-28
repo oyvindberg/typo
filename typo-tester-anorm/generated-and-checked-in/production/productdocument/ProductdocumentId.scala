@@ -12,7 +12,6 @@ import adventureworks.production.product.ProductId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -25,16 +24,16 @@ object ProductdocumentId {
   implicit val reads: Reads[ProductdocumentId] = Reads[ProductdocumentId](json => JsResult.fromTry(
       Try(
         ProductdocumentId(
-          productid = json.\("productid").as[ProductId],
-          documentnode = json.\("documentnode").as[DocumentId]
+          productid = json.\("productid").as(ProductId.reads),
+          documentnode = json.\("documentnode").as(DocumentId.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductdocumentId] = OWrites[ProductdocumentId](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "documentnode" -> Json.toJson(o.documentnode)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "documentnode" -> DocumentId.writes.writes(o.documentnode)
     ))
   )
 }

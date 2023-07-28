@@ -8,14 +8,15 @@ package hardcoded
 package myschema
 package football_club
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -28,8 +29,8 @@ object FootballClubRow {
   implicit val reads: Reads[FootballClubRow] = Reads[FootballClubRow](json => JsResult.fromTry(
       Try(
         FootballClubRow(
-          id = json.\("id").as[FootballClubId],
-          name = json.\("name").as[/* max 100 chars */ String]
+          id = json.\("id").as(FootballClubId.reads),
+          name = json.\("name").as(Reads.StringReads)
         )
       )
     ),
@@ -37,15 +38,15 @@ object FootballClubRow {
   def rowParser(idx: Int): RowParser[FootballClubRow] = RowParser[FootballClubRow] { row =>
     Success(
       FootballClubRow(
-        id = row[FootballClubId](idx + 0),
-        name = row[/* max 100 chars */ String](idx + 1)
+        id = row(idx + 0)(FootballClubId.column),
+        name = row(idx + 1)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[FootballClubRow] = OWrites[FootballClubRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "name" -> Json.toJson(o.name)
+      "id" -> FootballClubId.writes.writes(o.id),
+      "name" -> Writes.StringWrites.writes(o.name)
     ))
   )
 }

@@ -8,14 +8,15 @@ package pg_catalog
 package pg_largeobject_metadata
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,9 +30,9 @@ object PgLargeobjectMetadataRow {
   implicit val reads: Reads[PgLargeobjectMetadataRow] = Reads[PgLargeobjectMetadataRow](json => JsResult.fromTry(
       Try(
         PgLargeobjectMetadataRow(
-          oid = json.\("oid").as[PgLargeobjectMetadataId],
-          lomowner = json.\("lomowner").as[/* oid */ Long],
-          lomacl = json.\("lomacl").toOption.map(_.as[Array[TypoAclItem]])
+          oid = json.\("oid").as(PgLargeobjectMetadataId.reads),
+          lomowner = json.\("lomowner").as(Reads.LongReads),
+          lomacl = json.\("lomacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly)))
         )
       )
     ),
@@ -39,17 +40,17 @@ object PgLargeobjectMetadataRow {
   def rowParser(idx: Int): RowParser[PgLargeobjectMetadataRow] = RowParser[PgLargeobjectMetadataRow] { row =>
     Success(
       PgLargeobjectMetadataRow(
-        oid = row[PgLargeobjectMetadataId](idx + 0),
-        lomowner = row[/* oid */ Long](idx + 1),
-        lomacl = row[Option[Array[TypoAclItem]]](idx + 2)
+        oid = row(idx + 0)(PgLargeobjectMetadataId.column),
+        lomowner = row(idx + 1)(Column.columnToLong),
+        lomacl = row(idx + 2)(Column.columnToOption(TypoAclItem.arrayColumn))
       )
     )
   }
   implicit val writes: OWrites[PgLargeobjectMetadataRow] = OWrites[PgLargeobjectMetadataRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "lomowner" -> Json.toJson(o.lomowner),
-      "lomacl" -> Json.toJson(o.lomacl)
+      "oid" -> PgLargeobjectMetadataId.writes.writes(o.oid),
+      "lomowner" -> Writes.LongWrites.writes(o.lomowner),
+      "lomacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.lomacl)
     ))
   )
 }

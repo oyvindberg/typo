@@ -12,8 +12,8 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -41,32 +41,32 @@ case class WViewRow(
 )
 
 object WViewRow {
-  implicit val decoder: Decoder[WViewRow] = Decoder.forProduct10[WViewRow, Option[Int], Option[WorkorderId], Option[ProductId], Option[Int], Option[Int], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[ScrapreasonId], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(WViewRow.apply)
-  implicit val encoder: Encoder[WViewRow] = Encoder.forProduct10[WViewRow, Option[Int], Option[WorkorderId], Option[ProductId], Option[Int], Option[Int], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[ScrapreasonId], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(x => (x.id, x.workorderid, x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.modifieddate))
+  implicit val decoder: Decoder[WViewRow] = Decoder.forProduct10[WViewRow, Option[Int], Option[WorkorderId], Option[ProductId], Option[Int], Option[Int], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[ScrapreasonId], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(WViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(WorkorderId.decoder), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(ScrapreasonId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[WViewRow] = Encoder.forProduct10[WViewRow, Option[Int], Option[WorkorderId], Option[ProductId], Option[Int], Option[Int], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[ScrapreasonId], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(x => (x.id, x.workorderid, x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(WorkorderId.encoder), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(ScrapreasonId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[WViewRow] = new Read[WViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[WorkorderId], Nullability.Nullable),
-      (Get[ProductId], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[ScrapreasonId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (WorkorderId.get, Nullability.Nullable),
+      (ProductId.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (ScrapreasonId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => WViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      workorderid = Get[WorkorderId].unsafeGetNullable(rs, i + 1),
-      productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-      orderqty = Get[Int].unsafeGetNullable(rs, i + 3),
-      scrappedqty = Get[Int].unsafeGetNullable(rs, i + 4),
-      startdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5),
-      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6),
-      duedate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7),
-      scrapreasonid = Get[ScrapreasonId].unsafeGetNullable(rs, i + 8),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 9)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      workorderid = WorkorderId.get.unsafeGetNullable(rs, i + 1),
+      productid = ProductId.get.unsafeGetNullable(rs, i + 2),
+      orderqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
+      scrappedqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      startdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
+      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
+      duedate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
+      scrapreasonid = ScrapreasonId.get.unsafeGetNullable(rs, i + 8),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

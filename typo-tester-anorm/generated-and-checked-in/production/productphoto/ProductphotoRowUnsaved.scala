@@ -12,9 +12,9 @@ import adventureworks.TypoLocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,24 +54,24 @@ object ProductphotoRowUnsaved {
   implicit val reads: Reads[ProductphotoRowUnsaved] = Reads[ProductphotoRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductphotoRowUnsaved(
-          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Array[Byte]]),
-          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-          largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
-          largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-          productphotoid = json.\("productphotoid").as[Defaulted[ProductphotoId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as(Reads.StringReads)),
+          largephoto = json.\("largephoto").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          largephotofilename = json.\("largephotofilename").toOption.map(_.as(Reads.StringReads)),
+          productphotoid = json.\("productphotoid").as(Defaulted.reads(ProductphotoId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductphotoRowUnsaved] = OWrites[ProductphotoRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "thumbnailphoto" -> Json.toJson(o.thumbnailphoto),
-      "thumbnailphotofilename" -> Json.toJson(o.thumbnailphotofilename),
-      "largephoto" -> Json.toJson(o.largephoto),
-      "largephotofilename" -> Json.toJson(o.largephotofilename),
-      "productphotoid" -> Json.toJson(o.productphotoid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "thumbnailphoto" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.thumbnailphoto),
+      "thumbnailphotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.thumbnailphotofilename),
+      "largephoto" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.largephoto),
+      "largephotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.largephotofilename),
+      "productphotoid" -> Defaulted.writes(ProductphotoId.writes).writes(o.productphotoid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

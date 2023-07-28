@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -30,18 +29,18 @@ case class ProductdocumentRow(
  }
 
 object ProductdocumentRow {
-  implicit val decoder: Decoder[ProductdocumentRow] = Decoder.forProduct3[ProductdocumentRow, ProductId, TypoLocalDateTime, DocumentId]("productid", "modifieddate", "documentnode")(ProductdocumentRow.apply)
-  implicit val encoder: Encoder[ProductdocumentRow] = Encoder.forProduct3[ProductdocumentRow, ProductId, TypoLocalDateTime, DocumentId]("productid", "modifieddate", "documentnode")(x => (x.productid, x.modifieddate, x.documentnode))
+  implicit val decoder: Decoder[ProductdocumentRow] = Decoder.forProduct3[ProductdocumentRow, ProductId, TypoLocalDateTime, DocumentId]("productid", "modifieddate", "documentnode")(ProductdocumentRow.apply)(ProductId.decoder, TypoLocalDateTime.decoder, DocumentId.decoder)
+  implicit val encoder: Encoder[ProductdocumentRow] = Encoder.forProduct3[ProductdocumentRow, ProductId, TypoLocalDateTime, DocumentId]("productid", "modifieddate", "documentnode")(x => (x.productid, x.modifieddate, x.documentnode))(ProductId.encoder, TypoLocalDateTime.encoder, DocumentId.encoder)
   implicit val read: Read[ProductdocumentRow] = new Read[ProductdocumentRow](
     gets = List(
-      (Get[ProductId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls),
-      (Get[DocumentId], Nullability.NoNulls)
+      (ProductId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (DocumentId.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductdocumentRow(
-      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 1),
-      documentnode = Get[DocumentId].unsafeGetNonNullable(rs, i + 2)
+      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
+      documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

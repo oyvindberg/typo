@@ -13,7 +13,6 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -46,18 +45,18 @@ object ScrapreasonRowUnsaved {
   implicit val reads: Reads[ScrapreasonRowUnsaved] = Reads[ScrapreasonRowUnsaved](json => JsResult.fromTry(
       Try(
         ScrapreasonRowUnsaved(
-          name = json.\("name").as[Name],
-          scrapreasonid = json.\("scrapreasonid").as[Defaulted[ScrapreasonId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          scrapreasonid = json.\("scrapreasonid").as(Defaulted.reads(ScrapreasonId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ScrapreasonRowUnsaved] = OWrites[ScrapreasonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "scrapreasonid" -> Defaulted.writes(ScrapreasonId.writes).writes(o.scrapreasonid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

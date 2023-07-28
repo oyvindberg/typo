@@ -8,6 +8,7 @@ package public
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -16,11 +17,11 @@ import io.circe.Encoder
   */
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
-  implicit val arrayGet: Get[Array[NameStyle]] = Get[Array[Boolean]].map(_.map(NameStyle.apply))
-  implicit val arrayPut: Put[Array[NameStyle]] = Put[Array[Boolean]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[NameStyle] = Decoder[Boolean].map(NameStyle.apply)
-  implicit val encoder: Encoder[NameStyle] = Encoder[Boolean].contramap(_.value)
-  implicit val get: Get[NameStyle] = Get[Boolean].map(NameStyle.apply)
+  implicit val arrayGet: Get[Array[NameStyle]] = adventureworks.BooleanArrayMeta.get.map(_.map(NameStyle.apply))
+  implicit val arrayPut: Put[Array[NameStyle]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[NameStyle] = Decoder.decodeBoolean.map(NameStyle.apply)
+  implicit val encoder: Encoder[NameStyle] = Encoder.encodeBoolean.contramap(_.value)
+  implicit val get: Get[NameStyle] = Meta.BooleanMeta.get.map(NameStyle.apply)
   implicit val ordering: Ordering[NameStyle] = Ordering.by(_.value)
-  implicit val put: Put[NameStyle] = Put[Boolean].contramap(_.value)
+  implicit val put: Put[NameStyle] = Meta.BooleanMeta.put.contramap(_.value)
 }

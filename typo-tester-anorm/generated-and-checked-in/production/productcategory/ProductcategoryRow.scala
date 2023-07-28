@@ -9,15 +9,16 @@ package productcategory
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,10 +35,10 @@ object ProductcategoryRow {
   implicit val reads: Reads[ProductcategoryRow] = Reads[ProductcategoryRow](json => JsResult.fromTry(
       Try(
         ProductcategoryRow(
-          productcategoryid = json.\("productcategoryid").as[ProductcategoryId],
-          name = json.\("name").as[Name],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productcategoryid = json.\("productcategoryid").as(ProductcategoryId.reads),
+          name = json.\("name").as(Name.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,19 +46,19 @@ object ProductcategoryRow {
   def rowParser(idx: Int): RowParser[ProductcategoryRow] = RowParser[ProductcategoryRow] { row =>
     Success(
       ProductcategoryRow(
-        productcategoryid = row[ProductcategoryId](idx + 0),
-        name = row[Name](idx + 1),
-        rowguid = row[UUID](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        productcategoryid = row(idx + 0)(ProductcategoryId.column),
+        name = row(idx + 1)(Name.column),
+        rowguid = row(idx + 2)(Column.columnToUUID),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductcategoryRow] = OWrites[ProductcategoryRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productcategoryid" -> Json.toJson(o.productcategoryid),
-      "name" -> Json.toJson(o.name),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productcategoryid" -> ProductcategoryId.writes.writes(o.productcategoryid),
+      "name" -> Name.writes.writes(o.name),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -13,7 +13,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `pg_catalog.pg_db_role_setting` */
 case class PgDbRoleSettingId(setdatabase: /* oid */ Long, setrole: /* oid */ Long)
 object PgDbRoleSettingId {
-  implicit val decoder: Decoder[PgDbRoleSettingId] = Decoder.forProduct2[PgDbRoleSettingId, /* oid */ Long, /* oid */ Long]("setdatabase", "setrole")(PgDbRoleSettingId.apply)
-  implicit val encoder: Encoder[PgDbRoleSettingId] = Encoder.forProduct2[PgDbRoleSettingId, /* oid */ Long, /* oid */ Long]("setdatabase", "setrole")(x => (x.setdatabase, x.setrole))
+  implicit val decoder: Decoder[PgDbRoleSettingId] = Decoder.forProduct2[PgDbRoleSettingId, /* oid */ Long, /* oid */ Long]("setdatabase", "setrole")(PgDbRoleSettingId.apply)(Decoder.decodeLong, Decoder.decodeLong)
+  implicit val encoder: Encoder[PgDbRoleSettingId] = Encoder.forProduct2[PgDbRoleSettingId, /* oid */ Long, /* oid */ Long]("setdatabase", "setrole")(x => (x.setdatabase, x.setrole))(Encoder.encodeLong, Encoder.encodeLong)
   implicit val ordering: Ordering[PgDbRoleSettingId] = Ordering.by(x => (x.setdatabase, x.setrole))
 }

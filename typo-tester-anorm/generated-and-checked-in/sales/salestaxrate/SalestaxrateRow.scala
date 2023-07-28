@@ -10,15 +10,16 @@ package salestaxrate
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -42,13 +43,13 @@ object SalestaxrateRow {
   implicit val reads: Reads[SalestaxrateRow] = Reads[SalestaxrateRow](json => JsResult.fromTry(
       Try(
         SalestaxrateRow(
-          salestaxrateid = json.\("salestaxrateid").as[SalestaxrateId],
-          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-          taxtype = json.\("taxtype").as[Int],
-          taxrate = json.\("taxrate").as[BigDecimal],
-          name = json.\("name").as[Name],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          salestaxrateid = json.\("salestaxrateid").as(SalestaxrateId.reads),
+          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+          taxtype = json.\("taxtype").as(Reads.IntReads),
+          taxrate = json.\("taxrate").as(Reads.bigDecReads),
+          name = json.\("name").as(Name.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -56,25 +57,25 @@ object SalestaxrateRow {
   def rowParser(idx: Int): RowParser[SalestaxrateRow] = RowParser[SalestaxrateRow] { row =>
     Success(
       SalestaxrateRow(
-        salestaxrateid = row[SalestaxrateId](idx + 0),
-        stateprovinceid = row[StateprovinceId](idx + 1),
-        taxtype = row[Int](idx + 2),
-        taxrate = row[BigDecimal](idx + 3),
-        name = row[Name](idx + 4),
-        rowguid = row[UUID](idx + 5),
-        modifieddate = row[TypoLocalDateTime](idx + 6)
+        salestaxrateid = row(idx + 0)(SalestaxrateId.column),
+        stateprovinceid = row(idx + 1)(StateprovinceId.column),
+        taxtype = row(idx + 2)(Column.columnToInt),
+        taxrate = row(idx + 3)(Column.columnToScalaBigDecimal),
+        name = row(idx + 4)(Name.column),
+        rowguid = row(idx + 5)(Column.columnToUUID),
+        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[SalestaxrateRow] = OWrites[SalestaxrateRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "salestaxrateid" -> Json.toJson(o.salestaxrateid),
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "taxtype" -> Json.toJson(o.taxtype),
-      "taxrate" -> Json.toJson(o.taxrate),
-      "name" -> Json.toJson(o.name),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "salestaxrateid" -> SalestaxrateId.writes.writes(o.salestaxrateid),
+      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+      "taxtype" -> Writes.IntWrites.writes(o.taxtype),
+      "taxrate" -> Writes.BigDecimalWrites.writes(o.taxrate),
+      "name" -> Name.writes.writes(o.name),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_shdepend
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,13 +33,13 @@ object PgShdependRow {
   implicit val reads: Reads[PgShdependRow] = Reads[PgShdependRow](json => JsResult.fromTry(
       Try(
         PgShdependRow(
-          dbid = json.\("dbid").as[/* oid */ Long],
-          classid = json.\("classid").as[/* oid */ Long],
-          objid = json.\("objid").as[/* oid */ Long],
-          objsubid = json.\("objsubid").as[Int],
-          refclassid = json.\("refclassid").as[/* oid */ Long],
-          refobjid = json.\("refobjid").as[/* oid */ Long],
-          deptype = json.\("deptype").as[String]
+          dbid = json.\("dbid").as(Reads.LongReads),
+          classid = json.\("classid").as(Reads.LongReads),
+          objid = json.\("objid").as(Reads.LongReads),
+          objsubid = json.\("objsubid").as(Reads.IntReads),
+          refclassid = json.\("refclassid").as(Reads.LongReads),
+          refobjid = json.\("refobjid").as(Reads.LongReads),
+          deptype = json.\("deptype").as(Reads.StringReads)
         )
       )
     ),
@@ -46,25 +47,25 @@ object PgShdependRow {
   def rowParser(idx: Int): RowParser[PgShdependRow] = RowParser[PgShdependRow] { row =>
     Success(
       PgShdependRow(
-        dbid = row[/* oid */ Long](idx + 0),
-        classid = row[/* oid */ Long](idx + 1),
-        objid = row[/* oid */ Long](idx + 2),
-        objsubid = row[Int](idx + 3),
-        refclassid = row[/* oid */ Long](idx + 4),
-        refobjid = row[/* oid */ Long](idx + 5),
-        deptype = row[String](idx + 6)
+        dbid = row(idx + 0)(Column.columnToLong),
+        classid = row(idx + 1)(Column.columnToLong),
+        objid = row(idx + 2)(Column.columnToLong),
+        objsubid = row(idx + 3)(Column.columnToInt),
+        refclassid = row(idx + 4)(Column.columnToLong),
+        refobjid = row(idx + 5)(Column.columnToLong),
+        deptype = row(idx + 6)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgShdependRow] = OWrites[PgShdependRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "dbid" -> Json.toJson(o.dbid),
-      "classid" -> Json.toJson(o.classid),
-      "objid" -> Json.toJson(o.objid),
-      "objsubid" -> Json.toJson(o.objsubid),
-      "refclassid" -> Json.toJson(o.refclassid),
-      "refobjid" -> Json.toJson(o.refobjid),
-      "deptype" -> Json.toJson(o.deptype)
+      "dbid" -> Writes.LongWrites.writes(o.dbid),
+      "classid" -> Writes.LongWrites.writes(o.classid),
+      "objid" -> Writes.LongWrites.writes(o.objid),
+      "objsubid" -> Writes.IntWrites.writes(o.objsubid),
+      "refclassid" -> Writes.LongWrites.writes(o.refclassid),
+      "refobjid" -> Writes.LongWrites.writes(o.refobjid),
+      "deptype" -> Writes.StringWrites.writes(o.deptype)
     ))
   )
 }

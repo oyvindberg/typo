@@ -12,7 +12,6 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -33,20 +32,20 @@ case class PersonphoneRow(
  }
 
 object PersonphoneRow {
-  implicit val decoder: Decoder[PersonphoneRow] = Decoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRow.apply)
-  implicit val encoder: Encoder[PersonphoneRow] = Encoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))
+  implicit val decoder: Decoder[PersonphoneRow] = Decoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRow.apply)(BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[PersonphoneRow] = Encoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[PersonphoneRow] = new Read[PersonphoneRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[Phone], Nullability.NoNulls),
-      (Get[PhonenumbertypeId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Phone.get, Nullability.NoNulls),
+      (PhonenumbertypeId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PersonphoneRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      phonenumber = Get[Phone].unsafeGetNonNullable(rs, i + 1),
-      phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      phonenumber = Phone.get.unsafeGetNonNullable(rs, i + 1),
+      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

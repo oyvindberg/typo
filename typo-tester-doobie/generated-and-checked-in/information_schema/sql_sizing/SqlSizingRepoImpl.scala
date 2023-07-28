@@ -7,14 +7,18 @@ package adventureworks
 package information_schema
 package sql_sizing
 
+import adventureworks.information_schema.CardinalNumber
+import adventureworks.information_schema.CharacterData
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import fs2.Stream
 
 object SqlSizingRepoImpl extends SqlSizingRepo {
   override def insert(unsaved: SqlSizingRow): ConnectionIO[SqlSizingRow] = {
     sql"""insert into information_schema.sql_sizing(sizing_id, sizing_name, supported_value, "comments")
-          values (${unsaved.sizingId}::information_schema.cardinal_number, ${unsaved.sizingName}::information_schema.character_data, ${unsaved.supportedValue}::information_schema.cardinal_number, ${unsaved.comments}::information_schema.character_data)
+          values (${fromWrite(unsaved.sizingId)(Write.fromPutOption(CardinalNumber.put))}::information_schema.cardinal_number, ${fromWrite(unsaved.sizingName)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.supportedValue)(Write.fromPutOption(CardinalNumber.put))}::information_schema.cardinal_number, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data)
           returning sizing_id, sizing_name, supported_value, "comments"
        """.query(SqlSizingRow.read).unique
   }

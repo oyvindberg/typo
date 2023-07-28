@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_largeobject
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,9 +31,9 @@ object PgLargeobjectRow {
   implicit val reads: Reads[PgLargeobjectRow] = Reads[PgLargeobjectRow](json => JsResult.fromTry(
       Try(
         PgLargeobjectRow(
-          loid = json.\("loid").as[/* oid */ Long],
-          pageno = json.\("pageno").as[Int],
-          data = json.\("data").as[Array[Byte]]
+          loid = json.\("loid").as(Reads.LongReads),
+          pageno = json.\("pageno").as(Reads.IntReads),
+          data = json.\("data").as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))
         )
       )
     ),
@@ -40,17 +41,17 @@ object PgLargeobjectRow {
   def rowParser(idx: Int): RowParser[PgLargeobjectRow] = RowParser[PgLargeobjectRow] { row =>
     Success(
       PgLargeobjectRow(
-        loid = row[/* oid */ Long](idx + 0),
-        pageno = row[Int](idx + 1),
-        data = row[Array[Byte]](idx + 2)
+        loid = row(idx + 0)(Column.columnToLong),
+        pageno = row(idx + 1)(Column.columnToInt),
+        data = row(idx + 2)(Column.columnToByteArray)
       )
     )
   }
   implicit val writes: OWrites[PgLargeobjectRow] = OWrites[PgLargeobjectRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "loid" -> Json.toJson(o.loid),
-      "pageno" -> Json.toJson(o.pageno),
-      "data" -> Json.toJson(o.data)
+      "loid" -> Writes.LongWrites.writes(o.loid),
+      "pageno" -> Writes.IntWrites.writes(o.pageno),
+      "data" -> Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites).writes(o.data)
     ))
   )
 }

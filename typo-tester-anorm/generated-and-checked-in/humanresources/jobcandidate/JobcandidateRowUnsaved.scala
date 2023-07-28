@@ -14,9 +14,9 @@ import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -51,20 +51,20 @@ object JobcandidateRowUnsaved {
   implicit val reads: Reads[JobcandidateRowUnsaved] = Reads[JobcandidateRowUnsaved](json => JsResult.fromTry(
       Try(
         JobcandidateRowUnsaved(
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          resume = json.\("resume").toOption.map(_.as[TypoXml]),
-          jobcandidateid = json.\("jobcandidateid").as[Defaulted[JobcandidateId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          resume = json.\("resume").toOption.map(_.as(TypoXml.reads)),
+          jobcandidateid = json.\("jobcandidateid").as(Defaulted.reads(JobcandidateId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[JobcandidateRowUnsaved] = OWrites[JobcandidateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "resume" -> Json.toJson(o.resume),
-      "jobcandidateid" -> Json.toJson(o.jobcandidateid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "resume" -> Writes.OptionWrites(TypoXml.writes).writes(o.resume),
+      "jobcandidateid" -> Defaulted.writes(JobcandidateId.writes).writes(o.jobcandidateid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

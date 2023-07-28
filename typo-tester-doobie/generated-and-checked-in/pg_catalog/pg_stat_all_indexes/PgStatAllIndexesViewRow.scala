@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stat_all_indexes
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -26,28 +26,28 @@ case class PgStatAllIndexesViewRow(
 )
 
 object PgStatAllIndexesViewRow {
-  implicit val decoder: Decoder[PgStatAllIndexesViewRow] = Decoder.forProduct8[PgStatAllIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(PgStatAllIndexesViewRow.apply)
-  implicit val encoder: Encoder[PgStatAllIndexesViewRow] = Encoder.forProduct8[PgStatAllIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxScan, x.idxTupRead, x.idxTupFetch))
+  implicit val decoder: Decoder[PgStatAllIndexesViewRow] = Decoder.forProduct8[PgStatAllIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(PgStatAllIndexesViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit val encoder: Encoder[PgStatAllIndexesViewRow] = Encoder.forProduct8[PgStatAllIndexesViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[String], Option[Long], Option[Long], Option[Long]]("relid", "indexrelid", "schemaname", "relname", "indexrelname", "idx_scan", "idx_tup_read", "idx_tup_fetch")(x => (x.relid, x.indexrelid, x.schemaname, x.relname, x.indexrelname, x.idxScan, x.idxTupRead, x.idxTupFetch))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit val read: Read[PgStatAllIndexesViewRow] = new Read[PgStatAllIndexesViewRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatAllIndexesViewRow(
-      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-      indexrelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      schemaname = Get[String].unsafeGetNullable(rs, i + 2),
-      relname = Get[String].unsafeGetNullable(rs, i + 3),
-      indexrelname = Get[String].unsafeGetNullable(rs, i + 4),
-      idxScan = Get[Long].unsafeGetNullable(rs, i + 5),
-      idxTupRead = Get[Long].unsafeGetNullable(rs, i + 6),
-      idxTupFetch = Get[Long].unsafeGetNullable(rs, i + 7)
+      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
+      indexrelid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      relname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      indexrelname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      idxScan = Meta.LongMeta.get.unsafeGetNullable(rs, i + 5),
+      idxTupRead = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      idxTupFetch = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

@@ -15,9 +15,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -68,26 +68,26 @@ object SalestaxrateRowUnsaved {
   implicit val reads: Reads[SalestaxrateRowUnsaved] = Reads[SalestaxrateRowUnsaved](json => JsResult.fromTry(
       Try(
         SalestaxrateRowUnsaved(
-          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-          taxtype = json.\("taxtype").as[Int],
-          name = json.\("name").as[Name],
-          salestaxrateid = json.\("salestaxrateid").as[Defaulted[SalestaxrateId]],
-          taxrate = json.\("taxrate").as[Defaulted[BigDecimal]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+          taxtype = json.\("taxtype").as(Reads.IntReads),
+          name = json.\("name").as(Name.reads),
+          salestaxrateid = json.\("salestaxrateid").as(Defaulted.reads(SalestaxrateId.reads)),
+          taxrate = json.\("taxrate").as(Defaulted.reads(Reads.bigDecReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[SalestaxrateRowUnsaved] = OWrites[SalestaxrateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "taxtype" -> Json.toJson(o.taxtype),
-      "name" -> Json.toJson(o.name),
-      "salestaxrateid" -> Json.toJson(o.salestaxrateid),
-      "taxrate" -> Json.toJson(o.taxrate),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+      "taxtype" -> Writes.IntWrites.writes(o.taxtype),
+      "name" -> Name.writes.writes(o.name),
+      "salestaxrateid" -> Defaulted.writes(SalestaxrateId.writes).writes(o.salestaxrateid),
+      "taxrate" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.taxrate),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

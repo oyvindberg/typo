@@ -23,7 +23,7 @@ object DocumentId {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[DocumentId] = implicitly[Reads[String]].map(DocumentId.apply)
+  implicit val reads: Reads[DocumentId] = Reads.StringReads.map(DocumentId.apply)
   implicit val toStatement: ToStatement[DocumentId] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[DocumentId] = implicitly[Writes[String]].contramap(_.value)
+  implicit val writes: Writes[DocumentId] = Writes.StringWrites.contramap(_.value)
 }

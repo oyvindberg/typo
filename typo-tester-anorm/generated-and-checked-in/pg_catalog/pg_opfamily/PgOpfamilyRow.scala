@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_opfamily
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,11 +31,11 @@ object PgOpfamilyRow {
   implicit val reads: Reads[PgOpfamilyRow] = Reads[PgOpfamilyRow](json => JsResult.fromTry(
       Try(
         PgOpfamilyRow(
-          oid = json.\("oid").as[PgOpfamilyId],
-          opfmethod = json.\("opfmethod").as[/* oid */ Long],
-          opfname = json.\("opfname").as[String],
-          opfnamespace = json.\("opfnamespace").as[/* oid */ Long],
-          opfowner = json.\("opfowner").as[/* oid */ Long]
+          oid = json.\("oid").as(PgOpfamilyId.reads),
+          opfmethod = json.\("opfmethod").as(Reads.LongReads),
+          opfname = json.\("opfname").as(Reads.StringReads),
+          opfnamespace = json.\("opfnamespace").as(Reads.LongReads),
+          opfowner = json.\("opfowner").as(Reads.LongReads)
         )
       )
     ),
@@ -42,21 +43,21 @@ object PgOpfamilyRow {
   def rowParser(idx: Int): RowParser[PgOpfamilyRow] = RowParser[PgOpfamilyRow] { row =>
     Success(
       PgOpfamilyRow(
-        oid = row[PgOpfamilyId](idx + 0),
-        opfmethod = row[/* oid */ Long](idx + 1),
-        opfname = row[String](idx + 2),
-        opfnamespace = row[/* oid */ Long](idx + 3),
-        opfowner = row[/* oid */ Long](idx + 4)
+        oid = row(idx + 0)(PgOpfamilyId.column),
+        opfmethod = row(idx + 1)(Column.columnToLong),
+        opfname = row(idx + 2)(Column.columnToString),
+        opfnamespace = row(idx + 3)(Column.columnToLong),
+        opfowner = row(idx + 4)(Column.columnToLong)
       )
     )
   }
   implicit val writes: OWrites[PgOpfamilyRow] = OWrites[PgOpfamilyRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "opfmethod" -> Json.toJson(o.opfmethod),
-      "opfname" -> Json.toJson(o.opfname),
-      "opfnamespace" -> Json.toJson(o.opfnamespace),
-      "opfowner" -> Json.toJson(o.opfowner)
+      "oid" -> PgOpfamilyId.writes.writes(o.oid),
+      "opfmethod" -> Writes.LongWrites.writes(o.opfmethod),
+      "opfname" -> Writes.StringWrites.writes(o.opfname),
+      "opfnamespace" -> Writes.LongWrites.writes(o.opfnamespace),
+      "opfowner" -> Writes.LongWrites.writes(o.opfowner)
     ))
   )
 }

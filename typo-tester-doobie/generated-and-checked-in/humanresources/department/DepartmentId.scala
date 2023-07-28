@@ -9,17 +9,18 @@ package department
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `humanresources.department` */
 case class DepartmentId(value: Int) extends AnyVal
 object DepartmentId {
-  implicit val arrayGet: Get[Array[DepartmentId]] = Get[Array[Int]].map(_.map(DepartmentId.apply))
-  implicit val arrayPut: Put[Array[DepartmentId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[DepartmentId] = Decoder[Int].map(DepartmentId.apply)
-  implicit val encoder: Encoder[DepartmentId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[DepartmentId] = Get[Int].map(DepartmentId.apply)
+  implicit val arrayGet: Get[Array[DepartmentId]] = adventureworks.IntegerArrayMeta.get.map(_.map(DepartmentId.apply))
+  implicit val arrayPut: Put[Array[DepartmentId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[DepartmentId] = Decoder.decodeInt.map(DepartmentId.apply)
+  implicit val encoder: Encoder[DepartmentId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[DepartmentId] = Meta.IntMeta.get.map(DepartmentId.apply)
   implicit val ordering: Ordering[DepartmentId] = Ordering.by(_.value)
-  implicit val put: Put[DepartmentId] = Put[Int].contramap(_.value)
+  implicit val put: Put[DepartmentId] = Meta.IntMeta.put.contramap(_.value)
 }

@@ -10,7 +10,6 @@ package phonenumbertype
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,18 +24,18 @@ case class PhonenumbertypeRow(
 )
 
 object PhonenumbertypeRow {
-  implicit val decoder: Decoder[PhonenumbertypeRow] = Decoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(PhonenumbertypeRow.apply)
-  implicit val encoder: Encoder[PhonenumbertypeRow] = Encoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(x => (x.phonenumbertypeid, x.name, x.modifieddate))
+  implicit val decoder: Decoder[PhonenumbertypeRow] = Decoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(PhonenumbertypeRow.apply)(PhonenumbertypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[PhonenumbertypeRow] = Encoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(x => (x.phonenumbertypeid, x.name, x.modifieddate))(PhonenumbertypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[PhonenumbertypeRow] = new Read[PhonenumbertypeRow](
     gets = List(
-      (Get[PhonenumbertypeId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (PhonenumbertypeId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PhonenumbertypeRow(
-      phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

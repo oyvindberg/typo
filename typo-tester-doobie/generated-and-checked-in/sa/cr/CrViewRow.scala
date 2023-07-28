@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -35,26 +35,26 @@ case class CrViewRow(
 )
 
 object CrViewRow {
-  implicit val decoder: Decoder[CrViewRow] = Decoder.forProduct7[CrViewRow, Option[CurrencyrateId], Option[TypoLocalDateTime], Option[CurrencyId], Option[CurrencyId], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(CrViewRow.apply)
-  implicit val encoder: Encoder[CrViewRow] = Encoder.forProduct7[CrViewRow, Option[CurrencyrateId], Option[TypoLocalDateTime], Option[CurrencyId], Option[CurrencyId], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(x => (x.currencyrateid, x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.modifieddate))
+  implicit val decoder: Decoder[CrViewRow] = Decoder.forProduct7[CrViewRow, Option[CurrencyrateId], Option[TypoLocalDateTime], Option[CurrencyId], Option[CurrencyId], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(CrViewRow.apply)(Decoder.decodeOption(CurrencyrateId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[CrViewRow] = Encoder.forProduct7[CrViewRow, Option[CurrencyrateId], Option[TypoLocalDateTime], Option[CurrencyId], Option[CurrencyId], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(x => (x.currencyrateid, x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.modifieddate))(Encoder.encodeOption(CurrencyrateId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[CrViewRow] = new Read[CrViewRow](
     gets = List(
-      (Get[CurrencyrateId], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[CurrencyId], Nullability.Nullable),
-      (Get[CurrencyId], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (CurrencyrateId.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (CurrencyId.get, Nullability.Nullable),
+      (CurrencyId.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CrViewRow(
-      currencyrateid = Get[CurrencyrateId].unsafeGetNullable(rs, i + 0),
-      currencyratedate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 1),
-      fromcurrencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 2),
-      tocurrencycode = Get[CurrencyId].unsafeGetNullable(rs, i + 3),
-      averagerate = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-      endofdayrate = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
+      currencyrateid = CurrencyrateId.get.unsafeGetNullable(rs, i + 0),
+      currencyratedate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 1),
+      fromcurrencycode = CurrencyId.get.unsafeGetNullable(rs, i + 2),
+      tocurrencycode = CurrencyId.get.unsafeGetNullable(rs, i + 3),
+      averagerate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+      endofdayrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

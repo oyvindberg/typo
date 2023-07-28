@@ -10,7 +10,6 @@ package salesreason
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,20 +26,20 @@ case class SalesreasonRow(
 )
 
 object SalesreasonRow {
-  implicit val decoder: Decoder[SalesreasonRow] = Decoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(SalesreasonRow.apply)
-  implicit val encoder: Encoder[SalesreasonRow] = Encoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(x => (x.salesreasonid, x.name, x.reasontype, x.modifieddate))
+  implicit val decoder: Decoder[SalesreasonRow] = Decoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(SalesreasonRow.apply)(SalesreasonId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[SalesreasonRow] = Encoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(x => (x.salesreasonid, x.name, x.reasontype, x.modifieddate))(SalesreasonId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[SalesreasonRow] = new Read[SalesreasonRow](
     gets = List(
-      (Get[SalesreasonId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (SalesreasonId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SalesreasonRow(
-      salesreasonid = Get[SalesreasonId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      reasontype = Get[Name].unsafeGetNonNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      reasontype = Name.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

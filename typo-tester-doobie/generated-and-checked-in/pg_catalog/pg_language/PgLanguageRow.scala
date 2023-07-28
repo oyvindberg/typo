@@ -9,8 +9,8 @@ package pg_language
 
 import adventureworks.TypoAclItem
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,30 +28,30 @@ case class PgLanguageRow(
 )
 
 object PgLanguageRow {
-  implicit val decoder: Decoder[PgLanguageRow] = Decoder.forProduct9[PgLanguageRow, PgLanguageId, String, /* oid */ Long, Boolean, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")(PgLanguageRow.apply)
-  implicit val encoder: Encoder[PgLanguageRow] = Encoder.forProduct9[PgLanguageRow, PgLanguageId, String, /* oid */ Long, Boolean, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")(x => (x.oid, x.lanname, x.lanowner, x.lanispl, x.lanpltrusted, x.lanplcallfoid, x.laninline, x.lanvalidator, x.lanacl))
+  implicit val decoder: Decoder[PgLanguageRow] = Decoder.forProduct9[PgLanguageRow, PgLanguageId, String, /* oid */ Long, Boolean, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")(PgLanguageRow.apply)(PgLanguageId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)))
+  implicit val encoder: Encoder[PgLanguageRow] = Encoder.forProduct9[PgLanguageRow, PgLanguageId, String, /* oid */ Long, Boolean, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lanname", "lanowner", "lanispl", "lanpltrusted", "lanplcallfoid", "laninline", "lanvalidator", "lanacl")(x => (x.oid, x.lanname, x.lanowner, x.lanispl, x.lanpltrusted, x.lanplcallfoid, x.laninline, x.lanvalidator, x.lanacl))(PgLanguageId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)))
   implicit val read: Read[PgLanguageRow] = new Read[PgLanguageRow](
     gets = List(
-      (Get[PgLanguageId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Array[TypoAclItem]], Nullability.Nullable)
+      (PgLanguageId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoAclItem.arrayGet, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgLanguageRow(
-      oid = Get[PgLanguageId].unsafeGetNonNullable(rs, i + 0),
-      lanname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      lanowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      lanispl = Get[Boolean].unsafeGetNonNullable(rs, i + 3),
-      lanpltrusted = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-      lanplcallfoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 5),
-      laninline = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 6),
-      lanvalidator = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
-      lanacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 8)
+      oid = PgLanguageId.get.unsafeGetNonNullable(rs, i + 0),
+      lanname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      lanowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      lanispl = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 3),
+      lanpltrusted = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
+      lanplcallfoid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      laninline = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 6),
+      lanvalidator = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 7),
+      lanacl = TypoAclItem.arrayGet.unsafeGetNullable(rs, i + 8)
     )
   )
 }

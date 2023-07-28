@@ -9,17 +9,18 @@ package currencyrate
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `sales.currencyrate` */
 case class CurrencyrateId(value: Int) extends AnyVal
 object CurrencyrateId {
-  implicit val arrayGet: Get[Array[CurrencyrateId]] = Get[Array[Int]].map(_.map(CurrencyrateId.apply))
-  implicit val arrayPut: Put[Array[CurrencyrateId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[CurrencyrateId] = Decoder[Int].map(CurrencyrateId.apply)
-  implicit val encoder: Encoder[CurrencyrateId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[CurrencyrateId] = Get[Int].map(CurrencyrateId.apply)
+  implicit val arrayGet: Get[Array[CurrencyrateId]] = adventureworks.IntegerArrayMeta.get.map(_.map(CurrencyrateId.apply))
+  implicit val arrayPut: Put[Array[CurrencyrateId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[CurrencyrateId] = Decoder.decodeInt.map(CurrencyrateId.apply)
+  implicit val encoder: Encoder[CurrencyrateId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[CurrencyrateId] = Meta.IntMeta.get.map(CurrencyrateId.apply)
   implicit val ordering: Ordering[CurrencyrateId] = Ordering.by(_.value)
-  implicit val put: Put[CurrencyrateId] = Put[Int].contramap(_.value)
+  implicit val put: Put[CurrencyrateId] = Meta.IntMeta.put.contramap(_.value)
 }

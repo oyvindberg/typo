@@ -23,7 +23,7 @@ object CultureId {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* bpchar */ String]].jdbcType
   }
-  implicit val reads: Reads[CultureId] = implicitly[Reads[/* bpchar */ String]].map(CultureId.apply)
+  implicit val reads: Reads[CultureId] = Reads.StringReads.map(CultureId.apply)
   implicit val toStatement: ToStatement[CultureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
-  implicit val writes: Writes[CultureId] = implicitly[Writes[/* bpchar */ String]].contramap(_.value)
+  implicit val writes: Writes[CultureId] = Writes.StringWrites.contramap(_.value)
 }

@@ -9,8 +9,8 @@ package pg_stats
 
 import adventureworks.TypoAnyArray
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -33,40 +33,40 @@ case class PgStatsViewRow(
 )
 
 object PgStatsViewRow {
-  implicit val decoder: Decoder[PgStatsViewRow] = Decoder.forProduct14[PgStatsViewRow, Option[String], Option[String], Option[String], Option[Boolean], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "attname", "inherited", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(PgStatsViewRow.apply)
-  implicit val encoder: Encoder[PgStatsViewRow] = Encoder.forProduct14[PgStatsViewRow, Option[String], Option[String], Option[String], Option[Boolean], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "attname", "inherited", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(x => (x.schemaname, x.tablename, x.attname, x.inherited, x.nullFrac, x.avgWidth, x.nDistinct, x.mostCommonVals, x.mostCommonFreqs, x.histogramBounds, x.correlation, x.mostCommonElems, x.mostCommonElemFreqs, x.elemCountHistogram))
+  implicit val decoder: Decoder[PgStatsViewRow] = Decoder.forProduct14[PgStatsViewRow, Option[String], Option[String], Option[String], Option[Boolean], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "attname", "inherited", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(PgStatsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeFloat), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeFloat), Decoder.decodeOption(TypoAnyArray.decoder), Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)), Decoder.decodeOption(TypoAnyArray.decoder), Decoder.decodeOption(Decoder.decodeFloat), Decoder.decodeOption(TypoAnyArray.decoder), Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)), Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)))
+  implicit val encoder: Encoder[PgStatsViewRow] = Encoder.forProduct14[PgStatsViewRow, Option[String], Option[String], Option[String], Option[Boolean], Option[Float], Option[Int], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[TypoAnyArray], Option[Float], Option[TypoAnyArray], Option[Array[Float]], Option[Array[Float]]]("schemaname", "tablename", "attname", "inherited", "null_frac", "avg_width", "n_distinct", "most_common_vals", "most_common_freqs", "histogram_bounds", "correlation", "most_common_elems", "most_common_elem_freqs", "elem_count_histogram")(x => (x.schemaname, x.tablename, x.attname, x.inherited, x.nullFrac, x.avgWidth, x.nDistinct, x.mostCommonVals, x.mostCommonFreqs, x.histogramBounds, x.correlation, x.mostCommonElems, x.mostCommonElemFreqs, x.elemCountHistogram))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeFloat), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeFloat), Encoder.encodeOption(TypoAnyArray.encoder), Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)), Encoder.encodeOption(TypoAnyArray.encoder), Encoder.encodeOption(Encoder.encodeFloat), Encoder.encodeOption(TypoAnyArray.encoder), Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)))
   implicit val read: Read[PgStatsViewRow] = new Read[PgStatsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Float], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Float], Nullability.Nullable),
-      (Get[TypoAnyArray], Nullability.Nullable),
-      (Get[Array[Float]], Nullability.Nullable),
-      (Get[TypoAnyArray], Nullability.Nullable),
-      (Get[Float], Nullability.Nullable),
-      (Get[TypoAnyArray], Nullability.Nullable),
-      (Get[Array[Float]], Nullability.Nullable),
-      (Get[Array[Float]], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.FloatMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.FloatMeta.get, Nullability.Nullable),
+      (TypoAnyArray.get, Nullability.Nullable),
+      (adventureworks.FloatArrayMeta.get, Nullability.Nullable),
+      (TypoAnyArray.get, Nullability.Nullable),
+      (Meta.FloatMeta.get, Nullability.Nullable),
+      (TypoAnyArray.get, Nullability.Nullable),
+      (adventureworks.FloatArrayMeta.get, Nullability.Nullable),
+      (adventureworks.FloatArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatsViewRow(
-      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-      tablename = Get[String].unsafeGetNullable(rs, i + 1),
-      attname = Get[String].unsafeGetNullable(rs, i + 2),
-      inherited = Get[Boolean].unsafeGetNullable(rs, i + 3),
-      nullFrac = Get[Float].unsafeGetNullable(rs, i + 4),
-      avgWidth = Get[Int].unsafeGetNullable(rs, i + 5),
-      nDistinct = Get[Float].unsafeGetNullable(rs, i + 6),
-      mostCommonVals = Get[TypoAnyArray].unsafeGetNullable(rs, i + 7),
-      mostCommonFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 8),
-      histogramBounds = Get[TypoAnyArray].unsafeGetNullable(rs, i + 9),
-      correlation = Get[Float].unsafeGetNullable(rs, i + 10),
-      mostCommonElems = Get[TypoAnyArray].unsafeGetNullable(rs, i + 11),
-      mostCommonElemFreqs = Get[Array[Float]].unsafeGetNullable(rs, i + 12),
-      elemCountHistogram = Get[Array[Float]].unsafeGetNullable(rs, i + 13)
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      tablename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      attname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      inherited = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 3),
+      nullFrac = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 4),
+      avgWidth = Meta.IntMeta.get.unsafeGetNullable(rs, i + 5),
+      nDistinct = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 6),
+      mostCommonVals = TypoAnyArray.get.unsafeGetNullable(rs, i + 7),
+      mostCommonFreqs = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 8),
+      histogramBounds = TypoAnyArray.get.unsafeGetNullable(rs, i + 9),
+      correlation = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 10),
+      mostCommonElems = TypoAnyArray.get.unsafeGetNullable(rs, i + 11),
+      mostCommonElemFreqs = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 12),
+      elemCountHistogram = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 13)
     )
   )
 }

@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_statio_all_sequences
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,11 +31,11 @@ object PgStatioAllSequencesViewRow {
   implicit val reads: Reads[PgStatioAllSequencesViewRow] = Reads[PgStatioAllSequencesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioAllSequencesViewRow(
-          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          relname = json.\("relname").toOption.map(_.as[String]),
-          blksRead = json.\("blks_read").toOption.map(_.as[Long]),
-          blksHit = json.\("blks_hit").toOption.map(_.as[Long])
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          relname = json.\("relname").toOption.map(_.as(Reads.StringReads)),
+          blksRead = json.\("blks_read").toOption.map(_.as(Reads.LongReads)),
+          blksHit = json.\("blks_hit").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -42,21 +43,21 @@ object PgStatioAllSequencesViewRow {
   def rowParser(idx: Int): RowParser[PgStatioAllSequencesViewRow] = RowParser[PgStatioAllSequencesViewRow] { row =>
     Success(
       PgStatioAllSequencesViewRow(
-        relid = row[Option[/* oid */ Long]](idx + 0),
-        schemaname = row[Option[String]](idx + 1),
-        relname = row[Option[String]](idx + 2),
-        blksRead = row[Option[Long]](idx + 3),
-        blksHit = row[Option[Long]](idx + 4)
+        relid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        schemaname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        relname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        blksRead = row(idx + 3)(Column.columnToOption(Column.columnToLong)),
+        blksHit = row(idx + 4)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgStatioAllSequencesViewRow] = OWrites[PgStatioAllSequencesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Json.toJson(o.relid),
-      "schemaname" -> Json.toJson(o.schemaname),
-      "relname" -> Json.toJson(o.relname),
-      "blks_read" -> Json.toJson(o.blksRead),
-      "blks_hit" -> Json.toJson(o.blksHit)
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),
+      "blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksRead),
+      "blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.blksHit)
     ))
   )
 }

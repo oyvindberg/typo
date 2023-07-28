@@ -12,8 +12,8 @@ import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -46,46 +46,46 @@ case class VadditionalcontactinfoViewRow(
 )
 
 object VadditionalcontactinfoViewRow {
-  implicit val decoder: Decoder[VadditionalcontactinfoViewRow] = Decoder.forProduct17[VadditionalcontactinfoViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[Name], Option[TypoXml], Option[String], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[String], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate")(VadditionalcontactinfoViewRow.apply)
-  implicit val encoder: Encoder[VadditionalcontactinfoViewRow] = Encoder.forProduct17[VadditionalcontactinfoViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[Name], Option[TypoXml], Option[String], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[String], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate")(x => (x.businessentityid, x.firstname, x.middlename, x.lastname, x.telephonenumber, x.telephonespecialinstructions, x.street, x.city, x.stateprovince, x.postalcode, x.countryregion, x.homeaddressspecialinstructions, x.emailaddress, x.emailspecialinstructions, x.emailtelephonenumber, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[VadditionalcontactinfoViewRow] = Decoder.forProduct17[VadditionalcontactinfoViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[Name], Option[TypoXml], Option[String], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[String], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate")(VadditionalcontactinfoViewRow.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[VadditionalcontactinfoViewRow] = Encoder.forProduct17[VadditionalcontactinfoViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[Name], Option[TypoXml], Option[String], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[TypoXml], Option[String], Option[TypoXml], Option[UUID], Option[TypoLocalDateTime]]("businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate")(x => (x.businessentityid, x.firstname, x.middlename, x.lastname, x.telephonenumber, x.telephonespecialinstructions, x.street, x.city, x.stateprovince, x.postalcode, x.countryregion, x.homeaddressspecialinstructions, x.emailaddress, x.emailspecialinstructions, x.emailtelephonenumber, x.rowguid, x.modifieddate))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[VadditionalcontactinfoViewRow] = new Read[VadditionalcontactinfoViewRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (BusinessentityId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => VadditionalcontactinfoViewRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-      firstname = Get[Name].unsafeGetNullable(rs, i + 1),
-      middlename = Get[Name].unsafeGetNullable(rs, i + 2),
-      lastname = Get[Name].unsafeGetNullable(rs, i + 3),
-      telephonenumber = Get[TypoXml].unsafeGetNullable(rs, i + 4),
-      telephonespecialinstructions = Get[String].unsafeGetNullable(rs, i + 5),
-      street = Get[TypoXml].unsafeGetNullable(rs, i + 6),
-      city = Get[TypoXml].unsafeGetNullable(rs, i + 7),
-      stateprovince = Get[TypoXml].unsafeGetNullable(rs, i + 8),
-      postalcode = Get[TypoXml].unsafeGetNullable(rs, i + 9),
-      countryregion = Get[TypoXml].unsafeGetNullable(rs, i + 10),
-      homeaddressspecialinstructions = Get[TypoXml].unsafeGetNullable(rs, i + 11),
-      emailaddress = Get[TypoXml].unsafeGetNullable(rs, i + 12),
-      emailspecialinstructions = Get[String].unsafeGetNullable(rs, i + 13),
-      emailtelephonenumber = Get[TypoXml].unsafeGetNullable(rs, i + 14),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 15),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 16)
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 0),
+      firstname = Name.get.unsafeGetNullable(rs, i + 1),
+      middlename = Name.get.unsafeGetNullable(rs, i + 2),
+      lastname = Name.get.unsafeGetNullable(rs, i + 3),
+      telephonenumber = TypoXml.get.unsafeGetNullable(rs, i + 4),
+      telephonespecialinstructions = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      street = TypoXml.get.unsafeGetNullable(rs, i + 6),
+      city = TypoXml.get.unsafeGetNullable(rs, i + 7),
+      stateprovince = TypoXml.get.unsafeGetNullable(rs, i + 8),
+      postalcode = TypoXml.get.unsafeGetNullable(rs, i + 9),
+      countryregion = TypoXml.get.unsafeGetNullable(rs, i + 10),
+      homeaddressspecialinstructions = TypoXml.get.unsafeGetNullable(rs, i + 11),
+      emailaddress = TypoXml.get.unsafeGetNullable(rs, i + 12),
+      emailspecialinstructions = Meta.StringMeta.get.unsafeGetNullable(rs, i + 13),
+      emailtelephonenumber = TypoXml.get.unsafeGetNullable(rs, i + 14),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 15),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 16)
     )
   )
 }

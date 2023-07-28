@@ -10,7 +10,6 @@ package productcategory
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,20 +26,20 @@ case class ProductcategoryRow(
 )
 
 object ProductcategoryRow {
-  implicit val decoder: Decoder[ProductcategoryRow] = Decoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(ProductcategoryRow.apply)
-  implicit val encoder: Encoder[ProductcategoryRow] = Encoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productcategoryid, x.name, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[ProductcategoryRow] = Decoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(ProductcategoryRow.apply)(ProductcategoryId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ProductcategoryRow] = Encoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductcategoryId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[ProductcategoryRow] = new Read[ProductcategoryRow](
     gets = List(
-      (Get[ProductcategoryId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ProductcategoryId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductcategoryRow(
-      productcategoryid = Get[ProductcategoryId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

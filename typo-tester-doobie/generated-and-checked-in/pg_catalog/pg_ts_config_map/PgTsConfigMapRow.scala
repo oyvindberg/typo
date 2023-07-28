@@ -8,8 +8,8 @@ package pg_catalog
 package pg_ts_config_map
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,20 +24,20 @@ case class PgTsConfigMapRow(
  }
 
 object PgTsConfigMapRow {
-  implicit val decoder: Decoder[PgTsConfigMapRow] = Decoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(PgTsConfigMapRow.apply)
-  implicit val encoder: Encoder[PgTsConfigMapRow] = Encoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(x => (x.mapcfg, x.maptokentype, x.mapseqno, x.mapdict))
+  implicit val decoder: Decoder[PgTsConfigMapRow] = Decoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(PgTsConfigMapRow.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeLong)
+  implicit val encoder: Encoder[PgTsConfigMapRow] = Encoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(x => (x.mapcfg, x.maptokentype, x.mapseqno, x.mapdict))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeLong)
   implicit val read: Read[PgTsConfigMapRow] = new Read[PgTsConfigMapRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTsConfigMapRow(
-      mapcfg = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      maptokentype = Get[Int].unsafeGetNonNullable(rs, i + 1),
-      mapseqno = Get[Int].unsafeGetNonNullable(rs, i + 2),
-      mapdict = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3)
+      mapcfg = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      maptokentype = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
+      mapseqno = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      mapdict = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

@@ -14,7 +14,6 @@ import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -53,22 +52,22 @@ object ShiftRowUnsaved {
   implicit val reads: Reads[ShiftRowUnsaved] = Reads[ShiftRowUnsaved](json => JsResult.fromTry(
       Try(
         ShiftRowUnsaved(
-          name = json.\("name").as[Name],
-          starttime = json.\("starttime").as[TypoLocalTime],
-          endtime = json.\("endtime").as[TypoLocalTime],
-          shiftid = json.\("shiftid").as[Defaulted[ShiftId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          starttime = json.\("starttime").as(TypoLocalTime.reads),
+          endtime = json.\("endtime").as(TypoLocalTime.reads),
+          shiftid = json.\("shiftid").as(Defaulted.reads(ShiftId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ShiftRowUnsaved] = OWrites[ShiftRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "starttime" -> Json.toJson(o.starttime),
-      "endtime" -> Json.toJson(o.endtime),
-      "shiftid" -> Json.toJson(o.shiftid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "starttime" -> TypoLocalTime.writes.writes(o.starttime),
+      "endtime" -> TypoLocalTime.writes.writes(o.endtime),
+      "shiftid" -> Defaulted.writes(ShiftId.writes).writes(o.shiftid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

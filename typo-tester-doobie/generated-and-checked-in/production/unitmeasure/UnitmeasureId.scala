@@ -9,17 +9,18 @@ package unitmeasure
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar */ String) extends AnyVal
 object UnitmeasureId {
-  implicit val arrayGet: Get[Array[UnitmeasureId]] = Get[Array[/* bpchar */ String]].map(_.map(UnitmeasureId.apply))
-  implicit val arrayPut: Put[Array[UnitmeasureId]] = Put[Array[/* bpchar */ String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[UnitmeasureId] = Decoder[/* bpchar */ String].map(UnitmeasureId.apply)
-  implicit val encoder: Encoder[UnitmeasureId] = Encoder[/* bpchar */ String].contramap(_.value)
-  implicit val get: Get[UnitmeasureId] = Get[/* bpchar */ String].map(UnitmeasureId.apply)
+  implicit val arrayGet: Get[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.get.map(_.map(UnitmeasureId.apply))
+  implicit val arrayPut: Put[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[UnitmeasureId] = Decoder.decodeString.map(UnitmeasureId.apply)
+  implicit val encoder: Encoder[UnitmeasureId] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[UnitmeasureId] = Meta.StringMeta.get.map(UnitmeasureId.apply)
   implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
-  implicit val put: Put[UnitmeasureId] = Put[/* bpchar */ String].contramap(_.value)
+  implicit val put: Put[UnitmeasureId] = Meta.StringMeta.put.contramap(_.value)
 }

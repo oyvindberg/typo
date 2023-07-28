@@ -12,7 +12,6 @@ import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -34,20 +33,20 @@ case class ProductmodelproductdescriptioncultureRow(
  }
 
 object ProductmodelproductdescriptioncultureRow {
-  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRow] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRow.apply)
-  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))
+  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRow] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRow.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[ProductmodelproductdescriptioncultureRow] = new Read[ProductmodelproductdescriptioncultureRow](
     gets = List(
-      (Get[ProductmodelId], Nullability.NoNulls),
-      (Get[ProductdescriptionId], Nullability.NoNulls),
-      (Get[CultureId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (ProductmodelId.get, Nullability.NoNulls),
+      (ProductdescriptionId.get, Nullability.NoNulls),
+      (CultureId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
-      productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
-      productdescriptionid = Get[ProductdescriptionId].unsafeGetNonNullable(rs, i + 1),
-      cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+      productdescriptionid = ProductdescriptionId.get.unsafeGetNonNullable(rs, i + 1),
+      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

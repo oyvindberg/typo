@@ -10,14 +10,15 @@ package wr
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -53,19 +54,19 @@ object WrViewRow {
   implicit val reads: Reads[WrViewRow] = Reads[WrViewRow](json => JsResult.fromTry(
       Try(
         WrViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          workorderid = json.\("workorderid").toOption.map(_.as[WorkorderId]),
-          productid = json.\("productid").toOption.map(_.as[Int]),
-          operationsequence = json.\("operationsequence").toOption.map(_.as[Int]),
-          locationid = json.\("locationid").toOption.map(_.as[LocationId]),
-          scheduledstartdate = json.\("scheduledstartdate").toOption.map(_.as[TypoLocalDateTime]),
-          scheduledenddate = json.\("scheduledenddate").toOption.map(_.as[TypoLocalDateTime]),
-          actualstartdate = json.\("actualstartdate").toOption.map(_.as[TypoLocalDateTime]),
-          actualenddate = json.\("actualenddate").toOption.map(_.as[TypoLocalDateTime]),
-          actualresourcehrs = json.\("actualresourcehrs").toOption.map(_.as[BigDecimal]),
-          plannedcost = json.\("plannedcost").toOption.map(_.as[BigDecimal]),
-          actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          workorderid = json.\("workorderid").toOption.map(_.as(WorkorderId.reads)),
+          productid = json.\("productid").toOption.map(_.as(Reads.IntReads)),
+          operationsequence = json.\("operationsequence").toOption.map(_.as(Reads.IntReads)),
+          locationid = json.\("locationid").toOption.map(_.as(LocationId.reads)),
+          scheduledstartdate = json.\("scheduledstartdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          scheduledenddate = json.\("scheduledenddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          actualstartdate = json.\("actualstartdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          actualenddate = json.\("actualenddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          actualresourcehrs = json.\("actualresourcehrs").toOption.map(_.as(Reads.bigDecReads)),
+          plannedcost = json.\("plannedcost").toOption.map(_.as(Reads.bigDecReads)),
+          actualcost = json.\("actualcost").toOption.map(_.as(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -73,37 +74,37 @@ object WrViewRow {
   def rowParser(idx: Int): RowParser[WrViewRow] = RowParser[WrViewRow] { row =>
     Success(
       WrViewRow(
-        id = row[Option[Int]](idx + 0),
-        workorderid = row[Option[WorkorderId]](idx + 1),
-        productid = row[Option[Int]](idx + 2),
-        operationsequence = row[Option[Int]](idx + 3),
-        locationid = row[Option[LocationId]](idx + 4),
-        scheduledstartdate = row[Option[TypoLocalDateTime]](idx + 5),
-        scheduledenddate = row[Option[TypoLocalDateTime]](idx + 6),
-        actualstartdate = row[Option[TypoLocalDateTime]](idx + 7),
-        actualenddate = row[Option[TypoLocalDateTime]](idx + 8),
-        actualresourcehrs = row[Option[BigDecimal]](idx + 9),
-        plannedcost = row[Option[BigDecimal]](idx + 10),
-        actualcost = row[Option[BigDecimal]](idx + 11),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 12)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        workorderid = row(idx + 1)(Column.columnToOption(WorkorderId.column)),
+        productid = row(idx + 2)(Column.columnToOption(Column.columnToInt)),
+        operationsequence = row(idx + 3)(Column.columnToOption(Column.columnToInt)),
+        locationid = row(idx + 4)(Column.columnToOption(LocationId.column)),
+        scheduledstartdate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column)),
+        scheduledenddate = row(idx + 6)(Column.columnToOption(TypoLocalDateTime.column)),
+        actualstartdate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column)),
+        actualenddate = row(idx + 8)(Column.columnToOption(TypoLocalDateTime.column)),
+        actualresourcehrs = row(idx + 9)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        plannedcost = row(idx + 10)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        actualcost = row(idx + 11)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        modifieddate = row(idx + 12)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[WrViewRow] = OWrites[WrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "workorderid" -> Json.toJson(o.workorderid),
-      "productid" -> Json.toJson(o.productid),
-      "operationsequence" -> Json.toJson(o.operationsequence),
-      "locationid" -> Json.toJson(o.locationid),
-      "scheduledstartdate" -> Json.toJson(o.scheduledstartdate),
-      "scheduledenddate" -> Json.toJson(o.scheduledenddate),
-      "actualstartdate" -> Json.toJson(o.actualstartdate),
-      "actualenddate" -> Json.toJson(o.actualenddate),
-      "actualresourcehrs" -> Json.toJson(o.actualresourcehrs),
-      "plannedcost" -> Json.toJson(o.plannedcost),
-      "actualcost" -> Json.toJson(o.actualcost),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "workorderid" -> Writes.OptionWrites(WorkorderId.writes).writes(o.workorderid),
+      "productid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.productid),
+      "operationsequence" -> Writes.OptionWrites(Writes.IntWrites).writes(o.operationsequence),
+      "locationid" -> Writes.OptionWrites(LocationId.writes).writes(o.locationid),
+      "scheduledstartdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.scheduledstartdate),
+      "scheduledenddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.scheduledenddate),
+      "actualstartdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.actualstartdate),
+      "actualenddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.actualenddate),
+      "actualresourcehrs" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.actualresourcehrs),
+      "plannedcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.plannedcost),
+      "actualcost" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.actualcost),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

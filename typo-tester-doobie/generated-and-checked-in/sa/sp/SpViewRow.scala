@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -41,32 +41,32 @@ case class SpViewRow(
 )
 
 object SpViewRow {
-  implicit val decoder: Decoder[SpViewRow] = Decoder.forProduct10[SpViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SpViewRow.apply)
-  implicit val encoder: Encoder[SpViewRow] = Encoder.forProduct10[SpViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[SpViewRow] = Decoder.forProduct10[SpViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SpViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[SpViewRow] = Encoder.forProduct10[SpViewRow, Option[Int], Option[BusinessentityId], Option[SalesterritoryId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[SpViewRow] = new Read[SpViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[BusinessentityId], Nullability.Nullable),
-      (Get[SalesterritoryId], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (BusinessentityId.get, Nullability.Nullable),
+      (SalesterritoryId.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 2),
-      salesquota = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-      bonus = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-      commissionpct = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-      salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-      saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 8),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 9)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
+      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 2),
+      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
+      bonus = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+      commissionpct = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
+      salesytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6),
+      saleslastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 7),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 8),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

@@ -9,14 +9,15 @@ package administrable_role_authorizations
 
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,9 +34,9 @@ object AdministrableRoleAuthorizationsViewRow {
   implicit val reads: Reads[AdministrableRoleAuthorizationsViewRow] = Reads[AdministrableRoleAuthorizationsViewRow](json => JsResult.fromTry(
       Try(
         AdministrableRoleAuthorizationsViewRow(
-          grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
-          roleName = json.\("role_name").toOption.map(_.as[SqlIdentifier]),
-          isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
+          grantee = json.\("grantee").toOption.map(_.as(SqlIdentifier.reads)),
+          roleName = json.\("role_name").toOption.map(_.as(SqlIdentifier.reads)),
+          isGrantable = json.\("is_grantable").toOption.map(_.as(YesOrNo.reads))
         )
       )
     ),
@@ -43,17 +44,17 @@ object AdministrableRoleAuthorizationsViewRow {
   def rowParser(idx: Int): RowParser[AdministrableRoleAuthorizationsViewRow] = RowParser[AdministrableRoleAuthorizationsViewRow] { row =>
     Success(
       AdministrableRoleAuthorizationsViewRow(
-        grantee = row[Option[SqlIdentifier]](idx + 0),
-        roleName = row[Option[SqlIdentifier]](idx + 1),
-        isGrantable = row[Option[YesOrNo]](idx + 2)
+        grantee = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        roleName = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        isGrantable = row(idx + 2)(Column.columnToOption(YesOrNo.column))
       )
     )
   }
   implicit val writes: OWrites[AdministrableRoleAuthorizationsViewRow] = OWrites[AdministrableRoleAuthorizationsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "grantee" -> Json.toJson(o.grantee),
-      "role_name" -> Json.toJson(o.roleName),
-      "is_grantable" -> Json.toJson(o.isGrantable)
+      "grantee" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantee),
+      "role_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.roleName),
+      "is_grantable" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isGrantable)
     ))
   )
 }

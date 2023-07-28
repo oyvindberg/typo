@@ -9,31 +9,34 @@ package compositepk
 package person
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 import testdb.hardcoded.Defaulted
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId): ConnectionIO[Boolean] = {
-    sql"""delete from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".update.run.map(_ > 0)
+    sql"""delete from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", two, "name")
-          values (${unsaved.one}::int8, ${unsaved.two}, ${unsaved.name})
+          values (${fromWrite(unsaved.one)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.two)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))})
           returning "one", two, "name"
        """.query(PersonRow.read).unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"${unsaved.name}")),
+      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.one match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""one""""), fr"${value: Long}::int8"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s""""one""""), fr"${fromWrite(value: Long)(Write.fromPut(Meta.LongMeta.put))}::int8"))
       },
       unsaved.two match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"two"), fr"${value: Option[String]}"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"two"), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
       }
     ).flatten
     
@@ -55,13 +58,13 @@ object PersonRepoImpl extends PersonRepo {
     sql"""select "one", two, "name" from compositepk.person""".query(PersonRow.read).stream
   }
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "one", two, "name" from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".query(PersonRow.read).option
+    sql"""select "one", two, "name" from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".query(PersonRow.read).option
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update compositepk.person
-          set "name" = ${row.name}
-          where "one" = ${compositeId.one} AND two = ${compositeId.two}
+          set "name" = ${fromWrite(row.name)(Write.fromPutOption(Meta.StringMeta.put))}
+          where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}
        """
       .update
       .run
@@ -70,9 +73,9 @@ object PersonRepoImpl extends PersonRepo {
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", two, "name")
           values (
-            ${unsaved.one}::int8,
-            ${unsaved.two},
-            ${unsaved.name}
+            ${fromWrite(unsaved.one)(Write.fromPut(Meta.LongMeta.put))}::int8,
+            ${fromWrite(unsaved.two)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))}
           )
           on conflict ("one", two)
           do update set

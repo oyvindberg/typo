@@ -10,15 +10,16 @@ package a
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -48,16 +49,16 @@ object AViewRow {
   implicit val reads: Reads[AViewRow] = Reads[AViewRow](json => JsResult.fromTry(
       Try(
         AViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          addressid = json.\("addressid").toOption.map(_.as[AddressId]),
-          addressline1 = json.\("addressline1").toOption.map(_.as[/* max 60 chars */ String]),
-          addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
-          city = json.\("city").toOption.map(_.as[/* max 30 chars */ String]),
-          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
-          postalcode = json.\("postalcode").toOption.map(_.as[/* max 15 chars */ String]),
-          spatiallocation = json.\("spatiallocation").toOption.map(_.as[Byte]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          addressid = json.\("addressid").toOption.map(_.as(AddressId.reads)),
+          addressline1 = json.\("addressline1").toOption.map(_.as(Reads.StringReads)),
+          addressline2 = json.\("addressline2").toOption.map(_.as(Reads.StringReads)),
+          city = json.\("city").toOption.map(_.as(Reads.StringReads)),
+          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as(StateprovinceId.reads)),
+          postalcode = json.\("postalcode").toOption.map(_.as(Reads.StringReads)),
+          spatiallocation = json.\("spatiallocation").toOption.map(_.as(Reads.ByteReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -65,31 +66,31 @@ object AViewRow {
   def rowParser(idx: Int): RowParser[AViewRow] = RowParser[AViewRow] { row =>
     Success(
       AViewRow(
-        id = row[Option[Int]](idx + 0),
-        addressid = row[Option[AddressId]](idx + 1),
-        addressline1 = row[Option[/* max 60 chars */ String]](idx + 2),
-        addressline2 = row[Option[/* max 60 chars */ String]](idx + 3),
-        city = row[Option[/* max 30 chars */ String]](idx + 4),
-        stateprovinceid = row[Option[StateprovinceId]](idx + 5),
-        postalcode = row[Option[/* max 15 chars */ String]](idx + 6),
-        spatiallocation = row[Option[Byte]](idx + 7),
-        rowguid = row[Option[UUID]](idx + 8),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 9)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        addressid = row(idx + 1)(Column.columnToOption(AddressId.column)),
+        addressline1 = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        addressline2 = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        city = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        stateprovinceid = row(idx + 5)(Column.columnToOption(StateprovinceId.column)),
+        postalcode = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        spatiallocation = row(idx + 7)(Column.columnToOption(Column.columnToByte)),
+        rowguid = row(idx + 8)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 9)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[AViewRow] = OWrites[AViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "addressid" -> Json.toJson(o.addressid),
-      "addressline1" -> Json.toJson(o.addressline1),
-      "addressline2" -> Json.toJson(o.addressline2),
-      "city" -> Json.toJson(o.city),
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "postalcode" -> Json.toJson(o.postalcode),
-      "spatiallocation" -> Json.toJson(o.spatiallocation),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "addressid" -> Writes.OptionWrites(AddressId.writes).writes(o.addressid),
+      "addressline1" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline1),
+      "addressline2" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline2),
+      "city" -> Writes.OptionWrites(Writes.StringWrites).writes(o.city),
+      "stateprovinceid" -> Writes.OptionWrites(StateprovinceId.writes).writes(o.stateprovinceid),
+      "postalcode" -> Writes.OptionWrites(Writes.StringWrites).writes(o.postalcode),
+      "spatiallocation" -> Writes.OptionWrites(Writes.ByteWrites).writes(o.spatiallocation),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

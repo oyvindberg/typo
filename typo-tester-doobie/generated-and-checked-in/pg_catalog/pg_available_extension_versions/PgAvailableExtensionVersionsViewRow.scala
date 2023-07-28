@@ -8,8 +8,8 @@ package pg_catalog
 package pg_available_extension_versions
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -27,30 +27,30 @@ case class PgAvailableExtensionVersionsViewRow(
 )
 
 object PgAvailableExtensionVersionsViewRow {
-  implicit val decoder: Decoder[PgAvailableExtensionVersionsViewRow] = Decoder.forProduct9[PgAvailableExtensionVersionsViewRow, Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean], Option[String], Option[Array[String]], Option[String]]("name", "version", "installed", "superuser", "trusted", "relocatable", "schema", "requires", "comment")(PgAvailableExtensionVersionsViewRow.apply)
-  implicit val encoder: Encoder[PgAvailableExtensionVersionsViewRow] = Encoder.forProduct9[PgAvailableExtensionVersionsViewRow, Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean], Option[String], Option[Array[String]], Option[String]]("name", "version", "installed", "superuser", "trusted", "relocatable", "schema", "requires", "comment")(x => (x.name, x.version, x.installed, x.superuser, x.trusted, x.relocatable, x.schema, x.requires, x.comment))
+  implicit val decoder: Decoder[PgAvailableExtensionVersionsViewRow] = Decoder.forProduct9[PgAvailableExtensionVersionsViewRow, Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean], Option[String], Option[Array[String]], Option[String]]("name", "version", "installed", "superuser", "trusted", "relocatable", "schema", "requires", "comment")(PgAvailableExtensionVersionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)), Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgAvailableExtensionVersionsViewRow] = Encoder.forProduct9[PgAvailableExtensionVersionsViewRow, Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean], Option[String], Option[Array[String]], Option[String]]("name", "version", "installed", "superuser", "trusted", "relocatable", "schema", "requires", "comment")(x => (x.name, x.version, x.installed, x.superuser, x.trusted, x.relocatable, x.schema, x.requires, x.comment))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)), Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgAvailableExtensionVersionsViewRow] = new Read[PgAvailableExtensionVersionsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable),
-      (Get[String], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgAvailableExtensionVersionsViewRow(
-      name = Get[String].unsafeGetNullable(rs, i + 0),
-      version = Get[String].unsafeGetNullable(rs, i + 1),
-      installed = Get[Boolean].unsafeGetNullable(rs, i + 2),
-      superuser = Get[Boolean].unsafeGetNullable(rs, i + 3),
-      trusted = Get[Boolean].unsafeGetNullable(rs, i + 4),
-      relocatable = Get[Boolean].unsafeGetNullable(rs, i + 5),
-      schema = Get[String].unsafeGetNullable(rs, i + 6),
-      requires = Get[Array[String]].unsafeGetNullable(rs, i + 7),
-      comment = Get[String].unsafeGetNullable(rs, i + 8)
+      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      version = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      installed = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 2),
+      superuser = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 3),
+      trusted = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 4),
+      relocatable = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 5),
+      schema = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      requires = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 7),
+      comment = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

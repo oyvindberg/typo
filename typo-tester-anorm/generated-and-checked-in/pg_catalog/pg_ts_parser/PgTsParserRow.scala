@@ -8,14 +8,15 @@ package pg_catalog
 package pg_ts_parser
 
 import adventureworks.TypoRegproc
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,14 +35,14 @@ object PgTsParserRow {
   implicit val reads: Reads[PgTsParserRow] = Reads[PgTsParserRow](json => JsResult.fromTry(
       Try(
         PgTsParserRow(
-          oid = json.\("oid").as[PgTsParserId],
-          prsname = json.\("prsname").as[String],
-          prsnamespace = json.\("prsnamespace").as[/* oid */ Long],
-          prsstart = json.\("prsstart").as[TypoRegproc],
-          prstoken = json.\("prstoken").as[TypoRegproc],
-          prsend = json.\("prsend").as[TypoRegproc],
-          prsheadline = json.\("prsheadline").as[TypoRegproc],
-          prslextype = json.\("prslextype").as[TypoRegproc]
+          oid = json.\("oid").as(PgTsParserId.reads),
+          prsname = json.\("prsname").as(Reads.StringReads),
+          prsnamespace = json.\("prsnamespace").as(Reads.LongReads),
+          prsstart = json.\("prsstart").as(TypoRegproc.reads),
+          prstoken = json.\("prstoken").as(TypoRegproc.reads),
+          prsend = json.\("prsend").as(TypoRegproc.reads),
+          prsheadline = json.\("prsheadline").as(TypoRegproc.reads),
+          prslextype = json.\("prslextype").as(TypoRegproc.reads)
         )
       )
     ),
@@ -49,27 +50,27 @@ object PgTsParserRow {
   def rowParser(idx: Int): RowParser[PgTsParserRow] = RowParser[PgTsParserRow] { row =>
     Success(
       PgTsParserRow(
-        oid = row[PgTsParserId](idx + 0),
-        prsname = row[String](idx + 1),
-        prsnamespace = row[/* oid */ Long](idx + 2),
-        prsstart = row[TypoRegproc](idx + 3),
-        prstoken = row[TypoRegproc](idx + 4),
-        prsend = row[TypoRegproc](idx + 5),
-        prsheadline = row[TypoRegproc](idx + 6),
-        prslextype = row[TypoRegproc](idx + 7)
+        oid = row(idx + 0)(PgTsParserId.column),
+        prsname = row(idx + 1)(Column.columnToString),
+        prsnamespace = row(idx + 2)(Column.columnToLong),
+        prsstart = row(idx + 3)(TypoRegproc.column),
+        prstoken = row(idx + 4)(TypoRegproc.column),
+        prsend = row(idx + 5)(TypoRegproc.column),
+        prsheadline = row(idx + 6)(TypoRegproc.column),
+        prslextype = row(idx + 7)(TypoRegproc.column)
       )
     )
   }
   implicit val writes: OWrites[PgTsParserRow] = OWrites[PgTsParserRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "prsname" -> Json.toJson(o.prsname),
-      "prsnamespace" -> Json.toJson(o.prsnamespace),
-      "prsstart" -> Json.toJson(o.prsstart),
-      "prstoken" -> Json.toJson(o.prstoken),
-      "prsend" -> Json.toJson(o.prsend),
-      "prsheadline" -> Json.toJson(o.prsheadline),
-      "prslextype" -> Json.toJson(o.prslextype)
+      "oid" -> PgTsParserId.writes.writes(o.oid),
+      "prsname" -> Writes.StringWrites.writes(o.prsname),
+      "prsnamespace" -> Writes.LongWrites.writes(o.prsnamespace),
+      "prsstart" -> TypoRegproc.writes.writes(o.prsstart),
+      "prstoken" -> TypoRegproc.writes.writes(o.prstoken),
+      "prsend" -> TypoRegproc.writes.writes(o.prsend),
+      "prsheadline" -> TypoRegproc.writes.writes(o.prsheadline),
+      "prslextype" -> TypoRegproc.writes.writes(o.prslextype)
     ))
   )
 }

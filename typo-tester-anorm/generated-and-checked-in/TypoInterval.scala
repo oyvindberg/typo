@@ -15,9 +15,9 @@ import org.postgresql.util.PGInterval
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,12 +54,12 @@ object TypoInterval {
   implicit val reads: Reads[TypoInterval] = Reads[TypoInterval](json => JsResult.fromTry(
       Try(
         TypoInterval(
-          years = json.\("years").as[Int],
-          months = json.\("months").as[Int],
-          days = json.\("days").as[Int],
-          hours = json.\("hours").as[Int],
-          minutes = json.\("minutes").as[Int],
-          seconds = json.\("seconds").as[Double]
+          years = json.\("years").as(Reads.IntReads),
+          months = json.\("months").as(Reads.IntReads),
+          days = json.\("days").as(Reads.IntReads),
+          hours = json.\("hours").as(Reads.IntReads),
+          minutes = json.\("minutes").as(Reads.IntReads),
+          seconds = json.\("seconds").as(Reads.DoubleReads)
         )
       )
     ),
@@ -67,12 +67,12 @@ object TypoInterval {
   implicit val toStatement: ToStatement[TypoInterval] = ToStatement[TypoInterval]((s, index, v) => s.setObject(index, new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))
   implicit val writes: OWrites[TypoInterval] = OWrites[TypoInterval](o =>
     new JsObject(ListMap[String, JsValue](
-      "years" -> Json.toJson(o.years),
-      "months" -> Json.toJson(o.months),
-      "days" -> Json.toJson(o.days),
-      "hours" -> Json.toJson(o.hours),
-      "minutes" -> Json.toJson(o.minutes),
-      "seconds" -> Json.toJson(o.seconds)
+      "years" -> Writes.IntWrites.writes(o.years),
+      "months" -> Writes.IntWrites.writes(o.months),
+      "days" -> Writes.IntWrites.writes(o.days),
+      "hours" -> Writes.IntWrites.writes(o.hours),
+      "minutes" -> Writes.IntWrites.writes(o.minutes),
+      "seconds" -> Writes.DoubleWrites.writes(o.seconds)
     ))
   )
 }

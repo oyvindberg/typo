@@ -8,14 +8,15 @@ package pg_catalog
 package pg_language
 
 import adventureworks.TypoAclItem
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,15 +36,15 @@ object PgLanguageRow {
   implicit val reads: Reads[PgLanguageRow] = Reads[PgLanguageRow](json => JsResult.fromTry(
       Try(
         PgLanguageRow(
-          oid = json.\("oid").as[PgLanguageId],
-          lanname = json.\("lanname").as[String],
-          lanowner = json.\("lanowner").as[/* oid */ Long],
-          lanispl = json.\("lanispl").as[Boolean],
-          lanpltrusted = json.\("lanpltrusted").as[Boolean],
-          lanplcallfoid = json.\("lanplcallfoid").as[/* oid */ Long],
-          laninline = json.\("laninline").as[/* oid */ Long],
-          lanvalidator = json.\("lanvalidator").as[/* oid */ Long],
-          lanacl = json.\("lanacl").toOption.map(_.as[Array[TypoAclItem]])
+          oid = json.\("oid").as(PgLanguageId.reads),
+          lanname = json.\("lanname").as(Reads.StringReads),
+          lanowner = json.\("lanowner").as(Reads.LongReads),
+          lanispl = json.\("lanispl").as(Reads.BooleanReads),
+          lanpltrusted = json.\("lanpltrusted").as(Reads.BooleanReads),
+          lanplcallfoid = json.\("lanplcallfoid").as(Reads.LongReads),
+          laninline = json.\("laninline").as(Reads.LongReads),
+          lanvalidator = json.\("lanvalidator").as(Reads.LongReads),
+          lanacl = json.\("lanacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly)))
         )
       )
     ),
@@ -51,29 +52,29 @@ object PgLanguageRow {
   def rowParser(idx: Int): RowParser[PgLanguageRow] = RowParser[PgLanguageRow] { row =>
     Success(
       PgLanguageRow(
-        oid = row[PgLanguageId](idx + 0),
-        lanname = row[String](idx + 1),
-        lanowner = row[/* oid */ Long](idx + 2),
-        lanispl = row[Boolean](idx + 3),
-        lanpltrusted = row[Boolean](idx + 4),
-        lanplcallfoid = row[/* oid */ Long](idx + 5),
-        laninline = row[/* oid */ Long](idx + 6),
-        lanvalidator = row[/* oid */ Long](idx + 7),
-        lanacl = row[Option[Array[TypoAclItem]]](idx + 8)
+        oid = row(idx + 0)(PgLanguageId.column),
+        lanname = row(idx + 1)(Column.columnToString),
+        lanowner = row(idx + 2)(Column.columnToLong),
+        lanispl = row(idx + 3)(Column.columnToBoolean),
+        lanpltrusted = row(idx + 4)(Column.columnToBoolean),
+        lanplcallfoid = row(idx + 5)(Column.columnToLong),
+        laninline = row(idx + 6)(Column.columnToLong),
+        lanvalidator = row(idx + 7)(Column.columnToLong),
+        lanacl = row(idx + 8)(Column.columnToOption(TypoAclItem.arrayColumn))
       )
     )
   }
   implicit val writes: OWrites[PgLanguageRow] = OWrites[PgLanguageRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "lanname" -> Json.toJson(o.lanname),
-      "lanowner" -> Json.toJson(o.lanowner),
-      "lanispl" -> Json.toJson(o.lanispl),
-      "lanpltrusted" -> Json.toJson(o.lanpltrusted),
-      "lanplcallfoid" -> Json.toJson(o.lanplcallfoid),
-      "laninline" -> Json.toJson(o.laninline),
-      "lanvalidator" -> Json.toJson(o.lanvalidator),
-      "lanacl" -> Json.toJson(o.lanacl)
+      "oid" -> PgLanguageId.writes.writes(o.oid),
+      "lanname" -> Writes.StringWrites.writes(o.lanname),
+      "lanowner" -> Writes.LongWrites.writes(o.lanowner),
+      "lanispl" -> Writes.BooleanWrites.writes(o.lanispl),
+      "lanpltrusted" -> Writes.BooleanWrites.writes(o.lanpltrusted),
+      "lanplcallfoid" -> Writes.LongWrites.writes(o.lanplcallfoid),
+      "laninline" -> Writes.LongWrites.writes(o.laninline),
+      "lanvalidator" -> Writes.LongWrites.writes(o.lanvalidator),
+      "lanacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.lanacl)
     ))
   )
 }

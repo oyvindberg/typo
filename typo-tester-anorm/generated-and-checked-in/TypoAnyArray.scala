@@ -15,9 +15,9 @@ import org.postgresql.util.PGobject
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -59,7 +59,7 @@ object TypoAnyArray {
   implicit val reads: Reads[TypoAnyArray] = Reads[TypoAnyArray](json => JsResult.fromTry(
       Try(
         TypoAnyArray(
-          value = json.\("value").as[String]
+          value = json.\("value").as(Reads.StringReads)
         )
       )
     ),
@@ -72,7 +72,7 @@ object TypoAnyArray {
                                                                 }))
   implicit val writes: OWrites[TypoAnyArray] = OWrites[TypoAnyArray](o =>
     new JsObject(ListMap[String, JsValue](
-      "value" -> Json.toJson(o.value)
+      "value" -> Writes.StringWrites.writes(o.value)
     ))
   )
 }

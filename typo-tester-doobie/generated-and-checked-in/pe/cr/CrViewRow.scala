@@ -11,7 +11,6 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,18 +26,18 @@ case class CrViewRow(
 )
 
 object CrViewRow {
-  implicit val decoder: Decoder[CrViewRow] = Decoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(CrViewRow.apply)
-  implicit val encoder: Encoder[CrViewRow] = Encoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))
+  implicit val decoder: Decoder[CrViewRow] = Decoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(CrViewRow.apply)(Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[CrViewRow] = Encoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[CrViewRow] = new Read[CrViewRow](
     gets = List(
-      (Get[CountryregionId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (CountryregionId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => CrViewRow(
-      countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2)
+      countryregioncode = CountryregionId.get.unsafeGetNullable(rs, i + 0),
+      name = Name.get.unsafeGetNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

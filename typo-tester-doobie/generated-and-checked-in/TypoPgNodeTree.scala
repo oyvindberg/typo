@@ -25,8 +25,8 @@ object TypoPgNodeTree {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoPgNodeTree] = Decoder.forProduct1[TypoPgNodeTree, String]("value")(TypoPgNodeTree.apply)
-  implicit val encoder: Encoder[TypoPgNodeTree] = Encoder.forProduct1[TypoPgNodeTree, String]("value")(x => (x.value))
+  implicit val decoder: Decoder[TypoPgNodeTree] = Decoder.forProduct1[TypoPgNodeTree, String]("value")(TypoPgNodeTree.apply)(Decoder.decodeString)
+  implicit val encoder: Encoder[TypoPgNodeTree] = Encoder.forProduct1[TypoPgNodeTree, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoPgNodeTree] = Get.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree"))
     .map(v => TypoPgNodeTree(v.getValue))
   implicit val put: Put[TypoPgNodeTree] = Put.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree")).contramap(v => {

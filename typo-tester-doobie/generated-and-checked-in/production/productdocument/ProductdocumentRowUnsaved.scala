@@ -40,6 +40,6 @@ case class ProductdocumentRowUnsaved(
     )
 }
 object ProductdocumentRowUnsaved {
-  implicit val decoder: Decoder[ProductdocumentRowUnsaved] = Decoder.forProduct3[ProductdocumentRowUnsaved, ProductId, Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("productid", "modifieddate", "documentnode")(ProductdocumentRowUnsaved.apply)
-  implicit val encoder: Encoder[ProductdocumentRowUnsaved] = Encoder.forProduct3[ProductdocumentRowUnsaved, ProductId, Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("productid", "modifieddate", "documentnode")(x => (x.productid, x.modifieddate, x.documentnode))
+  implicit val decoder: Decoder[ProductdocumentRowUnsaved] = Decoder.forProduct3[ProductdocumentRowUnsaved, ProductId, Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("productid", "modifieddate", "documentnode")(ProductdocumentRowUnsaved.apply)(ProductId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(DocumentId.decoder))
+  implicit val encoder: Encoder[ProductdocumentRowUnsaved] = Encoder.forProduct3[ProductdocumentRowUnsaved, ProductId, Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("productid", "modifieddate", "documentnode")(x => (x.productid, x.modifieddate, x.documentnode))(ProductId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(DocumentId.encoder))
 }

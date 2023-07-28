@@ -16,9 +16,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -55,8 +55,8 @@ object TypoPath {
   implicit val reads: Reads[TypoPath] = Reads[TypoPath](json => JsResult.fromTry(
       Try(
         TypoPath(
-          open = json.\("open").as[Boolean],
-          points = json.\("points").as[List[TypoPoint]]
+          open = json.\("open").as(Reads.BooleanReads),
+          points = json.\("points").as(implicitly[Reads[List[TypoPoint]]])
         )
       )
     ),
@@ -64,8 +64,8 @@ object TypoPath {
   implicit val toStatement: ToStatement[TypoPath] = ToStatement[TypoPath]((s, index, v) => s.setObject(index, new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
   implicit val writes: OWrites[TypoPath] = OWrites[TypoPath](o =>
     new JsObject(ListMap[String, JsValue](
-      "open" -> Json.toJson(o.open),
-      "points" -> Json.toJson(o.points)
+      "open" -> Writes.BooleanWrites.writes(o.open),
+      "points" -> implicitly[Writes[List[TypoPoint]]].writes(o.points)
     ))
   )
 }

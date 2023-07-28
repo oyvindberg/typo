@@ -8,8 +8,8 @@ package pg_catalog
 package pg_shdepend
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -25,26 +25,26 @@ case class PgShdependRow(
 )
 
 object PgShdependRow {
-  implicit val decoder: Decoder[PgShdependRow] = Decoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(PgShdependRow.apply)
-  implicit val encoder: Encoder[PgShdependRow] = Encoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(x => (x.dbid, x.classid, x.objid, x.objsubid, x.refclassid, x.refobjid, x.deptype))
+  implicit val decoder: Decoder[PgShdependRow] = Decoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(PgShdependRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString)
+  implicit val encoder: Encoder[PgShdependRow] = Encoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(x => (x.dbid, x.classid, x.objid, x.objsubid, x.refclassid, x.refobjid, x.deptype))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString)
   implicit val read: Read[PgShdependRow] = new Read[PgShdependRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgShdependRow(
-      dbid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      classid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      objid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      objsubid = Get[Int].unsafeGetNonNullable(rs, i + 3),
-      refclassid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-      refobjid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 5),
-      deptype = Get[String].unsafeGetNonNullable(rs, i + 6)
+      dbid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      classid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      objid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      objsubid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      refclassid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      refobjid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 5),
+      deptype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6)
     )
   )
 }

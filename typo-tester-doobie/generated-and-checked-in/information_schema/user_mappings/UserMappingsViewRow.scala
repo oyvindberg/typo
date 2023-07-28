@@ -9,7 +9,6 @@ package user_mappings
 
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -25,18 +24,18 @@ case class UserMappingsViewRow(
 )
 
 object UserMappingsViewRow {
-  implicit val decoder: Decoder[UserMappingsViewRow] = Decoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(UserMappingsViewRow.apply)
-  implicit val encoder: Encoder[UserMappingsViewRow] = Encoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName))
+  implicit val decoder: Decoder[UserMappingsViewRow] = Decoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(UserMappingsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit val encoder: Encoder[UserMappingsViewRow] = Encoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
   implicit val read: Read[UserMappingsViewRow] = new Read[UserMappingsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => UserMappingsViewRow(
-      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2)
+      authorizationIdentifier = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      foreignServerCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      foreignServerName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2)
     )
   )
 }

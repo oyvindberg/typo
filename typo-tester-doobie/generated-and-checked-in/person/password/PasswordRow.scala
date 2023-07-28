@@ -10,8 +10,8 @@ package password
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -29,22 +29,22 @@ case class PasswordRow(
 )
 
 object PasswordRow {
-  implicit val decoder: Decoder[PasswordRow] = Decoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PasswordRow.apply)
-  implicit val encoder: Encoder[PasswordRow] = Encoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[PasswordRow] = Decoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PasswordRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[PasswordRow] = Encoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[PasswordRow] = new Read[PasswordRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[/* max 128 chars */ String], Nullability.NoNulls),
-      (Get[/* max 10 chars */ String], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PasswordRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      passwordhash = Get[/* max 128 chars */ String].unsafeGetNonNullable(rs, i + 1),
-      passwordsalt = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      passwordhash = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      passwordsalt = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

@@ -9,28 +9,31 @@ package currency
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId): ConnectionIO[Boolean] = {
-    sql"delete from sales.currency where currencycode = ${currencycode}".update.run.map(_ > 0)
+    sql"delete from sales.currency where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
-          values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning currencycode, "name", modifieddate::text
        """.query(CurrencyRow.read).unique
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
-      Some((Fragment.const(s"currencycode"), fr"${unsaved.currencycode}::bpchar")),
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
+      Some((Fragment.const(s"currencycode"), fr"${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -52,17 +55,17 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""select currencycode, "name", modifieddate::text from sales.currency""".query(CurrencyRow.read).stream
   }
   override def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]] = {
-    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ${currencycode}""".query(CurrencyRow.read).option
+    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}""".query(CurrencyRow.read).option
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ANY(${currencycodes})""".query(CurrencyRow.read).stream
+    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ANY(${fromWrite(currencycodes)(Write.fromPut(CurrencyId.arrayPut))})""".query(CurrencyRow.read).stream
   }
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode
     sql"""update sales.currency
-          set "name" = ${row.name}::"public"."Name",
-              modifieddate = ${row.modifieddate}::timestamp
-          where currencycode = ${currencycode}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where currencycode = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}
        """
       .update
       .run
@@ -71,9 +74,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
           values (
-            ${unsaved.currencycode}::bpchar,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (currencycode)
           do update set

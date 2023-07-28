@@ -16,7 +16,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -40,10 +39,10 @@ object PersonphoneRow {
   implicit val reads: Reads[PersonphoneRow] = Reads[PersonphoneRow](json => JsResult.fromTry(
       Try(
         PersonphoneRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          phonenumber = json.\("phonenumber").as[Phone],
-          phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          phonenumber = json.\("phonenumber").as(Phone.reads),
+          phonenumbertypeid = json.\("phonenumbertypeid").as(PhonenumbertypeId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,19 +50,19 @@ object PersonphoneRow {
   def rowParser(idx: Int): RowParser[PersonphoneRow] = RowParser[PersonphoneRow] { row =>
     Success(
       PersonphoneRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        phonenumber = row[Phone](idx + 1),
-        phonenumbertypeid = row[PhonenumbertypeId](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        phonenumber = row(idx + 1)(Phone.column),
+        phonenumbertypeid = row(idx + 2)(PhonenumbertypeId.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[PersonphoneRow] = OWrites[PersonphoneRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "phonenumber" -> Json.toJson(o.phonenumber),
-      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "phonenumber" -> Phone.writes.writes(o.phonenumber),
+      "phonenumbertypeid" -> PhonenumbertypeId.writes.writes(o.phonenumbertypeid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

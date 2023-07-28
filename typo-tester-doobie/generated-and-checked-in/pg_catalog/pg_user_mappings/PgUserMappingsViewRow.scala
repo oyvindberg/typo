@@ -8,8 +8,8 @@ package pg_catalog
 package pg_user_mappings
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,24 +24,24 @@ case class PgUserMappingsViewRow(
 )
 
 object PgUserMappingsViewRow {
-  implicit val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct6[PgUserMappingsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(PgUserMappingsViewRow.apply)
-  implicit val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct6[PgUserMappingsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(x => (x.umid, x.srvid, x.srvname, x.umuser, x.usename, x.umoptions))
+  implicit val decoder: Decoder[PgUserMappingsViewRow] = Decoder.forProduct6[PgUserMappingsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(PgUserMappingsViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgUserMappingsViewRow] = Encoder.forProduct6[PgUserMappingsViewRow, Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Array[String]]]("umid", "srvid", "srvname", "umuser", "usename", "umoptions")(x => (x.umid, x.srvid, x.srvname, x.umuser, x.usename, x.umoptions))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgUserMappingsViewRow] = new Read[PgUserMappingsViewRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgUserMappingsViewRow(
-      umid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-      srvid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      srvname = Get[String].unsafeGetNullable(rs, i + 2),
-      umuser = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-      usename = Get[String].unsafeGetNullable(rs, i + 4),
-      umoptions = Get[Array[String]].unsafeGetNullable(rs, i + 5)
+      umid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
+      srvid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      srvname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      umuser = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      usename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      umoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 5)
     )
   )
 }

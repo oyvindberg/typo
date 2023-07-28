@@ -8,13 +8,16 @@ package pg_catalog
 package pg_shdepend
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgShdependRepoImpl extends PgShdependRepo {
   override def insert(unsaved: PgShdependRow): ConnectionIO[PgShdependRow] = {
     sql"""insert into pg_catalog.pg_shdepend(dbid, classid, objid, objsubid, refclassid, refobjid, deptype)
-          values (${unsaved.dbid}::oid, ${unsaved.classid}::oid, ${unsaved.objid}::oid, ${unsaved.objsubid}::int4, ${unsaved.refclassid}::oid, ${unsaved.refobjid}::oid, ${unsaved.deptype}::char)
+          values (${fromWrite(unsaved.dbid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.classid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.objsubid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.refclassid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.refobjid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.deptype)(Write.fromPut(Meta.StringMeta.put))}::char)
           returning dbid, classid, objid, objsubid, refclassid, refobjid, deptype
        """.query(PgShdependRow.read).unique
   }

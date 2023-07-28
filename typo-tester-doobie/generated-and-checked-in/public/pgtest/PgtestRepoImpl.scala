@@ -7,14 +7,35 @@ package adventureworks
 package public
 package pgtest
 
+import adventureworks.TypoBox
+import adventureworks.TypoCircle
+import adventureworks.TypoHStore
+import adventureworks.TypoInet
+import adventureworks.TypoInterval
+import adventureworks.TypoJson
+import adventureworks.TypoJsonb
+import adventureworks.TypoLine
+import adventureworks.TypoLineSegment
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
+import adventureworks.TypoMoney
+import adventureworks.TypoOffsetDateTime
+import adventureworks.TypoOffsetTime
+import adventureworks.TypoPath
+import adventureworks.TypoPoint
+import adventureworks.TypoPolygon
+import adventureworks.TypoXml
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import fs2.Stream
 
 object PgtestRepoImpl extends PgtestRepo {
   override def insert(unsaved: PgtestRow): ConnectionIO[PgtestRow] = {
     sql"""insert into "public".pgtest(box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, inet, "timestamp", timestampz, "time", timez, "date", uuid, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets, timestamps, timestampzs, times, timezs, dates, uuids)
-          values (${unsaved.box}::box, ${unsaved.circle}::circle, ${unsaved.line}::line, ${unsaved.lseg}::lseg, ${unsaved.path}::path, ${unsaved.point}::point, ${unsaved.polygon}::polygon, ${unsaved.interval}::interval, ${unsaved.money}::money, ${unsaved.xml}::xml, ${unsaved.json}::json, ${unsaved.jsonb}::jsonb, ${unsaved.hstore}::hstore, ${unsaved.inet}::inet, ${unsaved.timestamp}::timestamp, ${unsaved.timestampz}::timestamptz, ${unsaved.time}::time, ${unsaved.timez}::timetz, ${unsaved.date}::date, ${unsaved.uuid}::uuid, ${unsaved.boxes}::_box, ${unsaved.circlees}::_circle, ${unsaved.linees}::_line, ${unsaved.lseges}::_lseg, ${unsaved.pathes}::_path, ${unsaved.pointes}::_point, ${unsaved.polygones}::_polygon, ${unsaved.intervales}::_interval, ${unsaved.moneyes}::_money, ${unsaved.xmles}::_xml, ${unsaved.jsones}::_json, ${unsaved.jsonbes}::_jsonb, ${unsaved.hstores}::_hstore, ${unsaved.inets}::_inet, ${unsaved.timestamps}::_timestamp, ${unsaved.timestampzs}::_timestamptz, ${unsaved.times}::_time, ${unsaved.timezs}::_timetz, ${unsaved.dates}::_date, ${unsaved.uuids}::_uuid)
+          values (${fromWrite(unsaved.box)(Write.fromPut(TypoBox.put))}::box, ${fromWrite(unsaved.circle)(Write.fromPut(TypoCircle.put))}::circle, ${fromWrite(unsaved.line)(Write.fromPut(TypoLine.put))}::line, ${fromWrite(unsaved.lseg)(Write.fromPut(TypoLineSegment.put))}::lseg, ${fromWrite(unsaved.path)(Write.fromPut(TypoPath.put))}::path, ${fromWrite(unsaved.point)(Write.fromPut(TypoPoint.put))}::point, ${fromWrite(unsaved.polygon)(Write.fromPut(TypoPolygon.put))}::polygon, ${fromWrite(unsaved.interval)(Write.fromPut(TypoInterval.put))}::interval, ${fromWrite(unsaved.money)(Write.fromPut(TypoMoney.put))}::money, ${fromWrite(unsaved.xml)(Write.fromPut(TypoXml.put))}::xml, ${fromWrite(unsaved.json)(Write.fromPut(TypoJson.put))}::json, ${fromWrite(unsaved.jsonb)(Write.fromPut(TypoJsonb.put))}::jsonb, ${fromWrite(unsaved.hstore)(Write.fromPut(TypoHStore.put))}::hstore, ${fromWrite(unsaved.inet)(Write.fromPut(TypoInet.put))}::inet, ${fromWrite(unsaved.timestamp)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.timestampz)(Write.fromPut(TypoOffsetDateTime.put))}::timestamptz, ${fromWrite(unsaved.time)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.timez)(Write.fromPut(TypoOffsetTime.put))}::timetz, ${fromWrite(unsaved.date)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.uuid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.boxes)(Write.fromPut(TypoBox.arrayPut))}::_box, ${fromWrite(unsaved.circlees)(Write.fromPut(TypoCircle.arrayPut))}::_circle, ${fromWrite(unsaved.linees)(Write.fromPut(TypoLine.arrayPut))}::_line, ${fromWrite(unsaved.lseges)(Write.fromPut(TypoLineSegment.arrayPut))}::_lseg, ${fromWrite(unsaved.pathes)(Write.fromPut(TypoPath.arrayPut))}::_path, ${fromWrite(unsaved.pointes)(Write.fromPut(TypoPoint.arrayPut))}::_point, ${fromWrite(unsaved.polygones)(Write.fromPut(TypoPolygon.arrayPut))}::_polygon, ${fromWrite(unsaved.intervales)(Write.fromPut(TypoInterval.arrayPut))}::_interval, ${fromWrite(unsaved.moneyes)(Write.fromPut(TypoMoney.arrayPut))}::_money, ${fromWrite(unsaved.xmles)(Write.fromPut(TypoXml.arrayPut))}::_xml, ${fromWrite(unsaved.jsones)(Write.fromPut(TypoJson.arrayPut))}::_json, ${fromWrite(unsaved.jsonbes)(Write.fromPut(TypoJsonb.arrayPut))}::_jsonb, ${fromWrite(unsaved.hstores)(Write.fromPut(TypoHStore.arrayPut))}::_hstore, ${fromWrite(unsaved.inets)(Write.fromPut(TypoInet.arrayPut))}::_inet, ${fromWrite(unsaved.timestamps)(Write.fromPut(TypoLocalDateTime.arrayPut))}::_timestamp, ${fromWrite(unsaved.timestampzs)(Write.fromPut(TypoOffsetDateTime.arrayPut))}::_timestamptz, ${fromWrite(unsaved.times)(Write.fromPut(TypoLocalTime.arrayPut))}::_time, ${fromWrite(unsaved.timezs)(Write.fromPut(TypoOffsetTime.arrayPut))}::_timetz, ${fromWrite(unsaved.dates)(Write.fromPut(TypoLocalDate.arrayPut))}::_date, ${fromWrite(unsaved.uuids)(Write.fromPut(adventureworks.UUIDArrayMeta.put))}::_uuid)
           returning box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, "timestamp"::text, timestampz::text, "time"::text, timez::text, "date"::text, uuid, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets, timestamps::text[], timestampzs::text[], times::text[], timezs::text[], dates::text[], uuids
        """.query(PgtestRow.read).unique
   }

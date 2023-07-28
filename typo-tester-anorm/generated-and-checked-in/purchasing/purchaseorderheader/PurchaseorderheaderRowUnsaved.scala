@@ -14,9 +14,9 @@ import adventureworks.purchasing.shipmethod.ShipmethodId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -101,36 +101,36 @@ object PurchaseorderheaderRowUnsaved {
   implicit val reads: Reads[PurchaseorderheaderRowUnsaved] = Reads[PurchaseorderheaderRowUnsaved](json => JsResult.fromTry(
       Try(
         PurchaseorderheaderRowUnsaved(
-          employeeid = json.\("employeeid").as[BusinessentityId],
-          vendorid = json.\("vendorid").as[BusinessentityId],
-          shipmethodid = json.\("shipmethodid").as[ShipmethodId],
-          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
-          purchaseorderid = json.\("purchaseorderid").as[Defaulted[PurchaseorderheaderId]],
-          revisionnumber = json.\("revisionnumber").as[Defaulted[Int]],
-          status = json.\("status").as[Defaulted[Int]],
-          orderdate = json.\("orderdate").as[Defaulted[TypoLocalDateTime]],
-          subtotal = json.\("subtotal").as[Defaulted[BigDecimal]],
-          taxamt = json.\("taxamt").as[Defaulted[BigDecimal]],
-          freight = json.\("freight").as[Defaulted[BigDecimal]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          employeeid = json.\("employeeid").as(BusinessentityId.reads),
+          vendorid = json.\("vendorid").as(BusinessentityId.reads),
+          shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
+          shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          purchaseorderid = json.\("purchaseorderid").as(Defaulted.reads(PurchaseorderheaderId.reads)),
+          revisionnumber = json.\("revisionnumber").as(Defaulted.reads(Reads.IntReads)),
+          status = json.\("status").as(Defaulted.reads(Reads.IntReads)),
+          orderdate = json.\("orderdate").as(Defaulted.reads(TypoLocalDateTime.reads)),
+          subtotal = json.\("subtotal").as(Defaulted.reads(Reads.bigDecReads)),
+          taxamt = json.\("taxamt").as(Defaulted.reads(Reads.bigDecReads)),
+          freight = json.\("freight").as(Defaulted.reads(Reads.bigDecReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[PurchaseorderheaderRowUnsaved] = OWrites[PurchaseorderheaderRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "employeeid" -> Json.toJson(o.employeeid),
-      "vendorid" -> Json.toJson(o.vendorid),
-      "shipmethodid" -> Json.toJson(o.shipmethodid),
-      "shipdate" -> Json.toJson(o.shipdate),
-      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
-      "revisionnumber" -> Json.toJson(o.revisionnumber),
-      "status" -> Json.toJson(o.status),
-      "orderdate" -> Json.toJson(o.orderdate),
-      "subtotal" -> Json.toJson(o.subtotal),
-      "taxamt" -> Json.toJson(o.taxamt),
-      "freight" -> Json.toJson(o.freight),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "employeeid" -> BusinessentityId.writes.writes(o.employeeid),
+      "vendorid" -> BusinessentityId.writes.writes(o.vendorid),
+      "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
+      "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
+      "purchaseorderid" -> Defaulted.writes(PurchaseorderheaderId.writes).writes(o.purchaseorderid),
+      "revisionnumber" -> Defaulted.writes(Writes.IntWrites).writes(o.revisionnumber),
+      "status" -> Defaulted.writes(Writes.IntWrites).writes(o.status),
+      "orderdate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.orderdate),
+      "subtotal" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.subtotal),
+      "taxamt" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.taxamt),
+      "freight" -> Defaulted.writes(Writes.BigDecimalWrites).writes(o.freight),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -16,9 +16,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -105,42 +105,42 @@ object EmployeeRowUnsaved {
   implicit val reads: Reads[EmployeeRowUnsaved] = Reads[EmployeeRowUnsaved](json => JsResult.fromTry(
       Try(
         EmployeeRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          nationalidnumber = json.\("nationalidnumber").as[/* max 15 chars */ String],
-          loginid = json.\("loginid").as[/* max 256 chars */ String],
-          jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
-          birthdate = json.\("birthdate").as[TypoLocalDate],
-          maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
-          gender = json.\("gender").as[/* bpchar */ String],
-          hiredate = json.\("hiredate").as[TypoLocalDate],
-          salariedflag = json.\("salariedflag").as[Defaulted[Flag]],
-          vacationhours = json.\("vacationhours").as[Defaulted[Int]],
-          sickleavehours = json.\("sickleavehours").as[Defaulted[Int]],
-          currentflag = json.\("currentflag").as[Defaulted[Flag]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]],
-          organizationnode = json.\("organizationnode").as[Defaulted[Option[String]]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          nationalidnumber = json.\("nationalidnumber").as(Reads.StringReads),
+          loginid = json.\("loginid").as(Reads.StringReads),
+          jobtitle = json.\("jobtitle").as(Reads.StringReads),
+          birthdate = json.\("birthdate").as(TypoLocalDate.reads),
+          maritalstatus = json.\("maritalstatus").as(Reads.StringReads),
+          gender = json.\("gender").as(Reads.StringReads),
+          hiredate = json.\("hiredate").as(TypoLocalDate.reads),
+          salariedflag = json.\("salariedflag").as(Defaulted.reads(Flag.reads)),
+          vacationhours = json.\("vacationhours").as(Defaulted.reads(Reads.IntReads)),
+          sickleavehours = json.\("sickleavehours").as(Defaulted.reads(Reads.IntReads)),
+          currentflag = json.\("currentflag").as(Defaulted.reads(Flag.reads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads)),
+          organizationnode = json.\("organizationnode").as(Defaulted.readsOpt(Reads.StringReads))
         )
       )
     ),
   )
   implicit val writes: OWrites[EmployeeRowUnsaved] = OWrites[EmployeeRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "nationalidnumber" -> Json.toJson(o.nationalidnumber),
-      "loginid" -> Json.toJson(o.loginid),
-      "jobtitle" -> Json.toJson(o.jobtitle),
-      "birthdate" -> Json.toJson(o.birthdate),
-      "maritalstatus" -> Json.toJson(o.maritalstatus),
-      "gender" -> Json.toJson(o.gender),
-      "hiredate" -> Json.toJson(o.hiredate),
-      "salariedflag" -> Json.toJson(o.salariedflag),
-      "vacationhours" -> Json.toJson(o.vacationhours),
-      "sickleavehours" -> Json.toJson(o.sickleavehours),
-      "currentflag" -> Json.toJson(o.currentflag),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate),
-      "organizationnode" -> Json.toJson(o.organizationnode)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "nationalidnumber" -> Writes.StringWrites.writes(o.nationalidnumber),
+      "loginid" -> Writes.StringWrites.writes(o.loginid),
+      "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),
+      "birthdate" -> TypoLocalDate.writes.writes(o.birthdate),
+      "maritalstatus" -> Writes.StringWrites.writes(o.maritalstatus),
+      "gender" -> Writes.StringWrites.writes(o.gender),
+      "hiredate" -> TypoLocalDate.writes.writes(o.hiredate),
+      "salariedflag" -> Defaulted.writes(Flag.writes).writes(o.salariedflag),
+      "vacationhours" -> Defaulted.writes(Writes.IntWrites).writes(o.vacationhours),
+      "sickleavehours" -> Defaulted.writes(Writes.IntWrites).writes(o.sickleavehours),
+      "currentflag" -> Defaulted.writes(Flag.writes).writes(o.currentflag),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate),
+      "organizationnode" -> Defaulted.writes(Writes.OptionWrites(Writes.StringWrites)).writes(o.organizationnode)
     ))
   )
 }

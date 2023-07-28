@@ -8,14 +8,15 @@ package production
 package productphoto
 
 import adventureworks.TypoLocalDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -37,12 +38,12 @@ object ProductphotoRow {
   implicit val reads: Reads[ProductphotoRow] = Reads[ProductphotoRow](json => JsResult.fromTry(
       Try(
         ProductphotoRow(
-          productphotoid = json.\("productphotoid").as[ProductphotoId],
-          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Array[Byte]]),
-          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-          largephoto = json.\("largephoto").toOption.map(_.as[Array[Byte]]),
-          largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productphotoid = json.\("productphotoid").as(ProductphotoId.reads),
+          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as(Reads.StringReads)),
+          largephoto = json.\("largephoto").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          largephotofilename = json.\("largephotofilename").toOption.map(_.as(Reads.StringReads)),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -50,23 +51,23 @@ object ProductphotoRow {
   def rowParser(idx: Int): RowParser[ProductphotoRow] = RowParser[ProductphotoRow] { row =>
     Success(
       ProductphotoRow(
-        productphotoid = row[ProductphotoId](idx + 0),
-        thumbnailphoto = row[Option[Array[Byte]]](idx + 1),
-        thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 2),
-        largephoto = row[Option[Array[Byte]]](idx + 3),
-        largephotofilename = row[Option[/* max 50 chars */ String]](idx + 4),
-        modifieddate = row[TypoLocalDateTime](idx + 5)
+        productphotoid = row(idx + 0)(ProductphotoId.column),
+        thumbnailphoto = row(idx + 1)(Column.columnToOption(Column.columnToByteArray)),
+        thumbnailphotofilename = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        largephoto = row(idx + 3)(Column.columnToOption(Column.columnToByteArray)),
+        largephotofilename = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductphotoRow] = OWrites[ProductphotoRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productphotoid" -> Json.toJson(o.productphotoid),
-      "thumbnailphoto" -> Json.toJson(o.thumbnailphoto),
-      "thumbnailphotofilename" -> Json.toJson(o.thumbnailphotofilename),
-      "largephoto" -> Json.toJson(o.largephoto),
-      "largephotofilename" -> Json.toJson(o.largephotofilename),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productphotoid" -> ProductphotoId.writes.writes(o.productphotoid),
+      "thumbnailphoto" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.thumbnailphoto),
+      "thumbnailphotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.thumbnailphotofilename),
+      "largephoto" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.largephoto),
+      "largephotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.largephotofilename),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

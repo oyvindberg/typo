@@ -8,8 +8,8 @@ package pg_catalog
 package pg_enum
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -22,20 +22,20 @@ case class PgEnumRow(
 )
 
 object PgEnumRow {
-  implicit val decoder: Decoder[PgEnumRow] = Decoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(PgEnumRow.apply)
-  implicit val encoder: Encoder[PgEnumRow] = Encoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(x => (x.oid, x.enumtypid, x.enumsortorder, x.enumlabel))
+  implicit val decoder: Decoder[PgEnumRow] = Decoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(PgEnumRow.apply)(PgEnumId.decoder, Decoder.decodeLong, Decoder.decodeFloat, Decoder.decodeString)
+  implicit val encoder: Encoder[PgEnumRow] = Encoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(x => (x.oid, x.enumtypid, x.enumsortorder, x.enumlabel))(PgEnumId.encoder, Encoder.encodeLong, Encoder.encodeFloat, Encoder.encodeString)
   implicit val read: Read[PgEnumRow] = new Read[PgEnumRow](
     gets = List(
-      (Get[PgEnumId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Float], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls)
+      (PgEnumId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.FloatMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgEnumRow(
-      oid = Get[PgEnumId].unsafeGetNonNullable(rs, i + 0),
-      enumtypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      enumsortorder = Get[Float].unsafeGetNonNullable(rs, i + 2),
-      enumlabel = Get[String].unsafeGetNonNullable(rs, i + 3)
+      oid = PgEnumId.get.unsafeGetNonNullable(rs, i + 0),
+      enumtypid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      enumsortorder = Meta.FloatMeta.get.unsafeGetNonNullable(rs, i + 2),
+      enumlabel = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

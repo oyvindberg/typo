@@ -12,14 +12,15 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -46,12 +47,12 @@ object EmployeedepartmenthistoryRow {
   implicit val reads: Reads[EmployeedepartmenthistoryRow] = Reads[EmployeedepartmenthistoryRow](json => JsResult.fromTry(
       Try(
         EmployeedepartmenthistoryRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          departmentid = json.\("departmentid").as[DepartmentId],
-          shiftid = json.\("shiftid").as[ShiftId],
-          startdate = json.\("startdate").as[TypoLocalDate],
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate]),
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          departmentid = json.\("departmentid").as(DepartmentId.reads),
+          shiftid = json.\("shiftid").as(ShiftId.reads),
+          startdate = json.\("startdate").as(TypoLocalDate.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDate.reads)),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -59,23 +60,23 @@ object EmployeedepartmenthistoryRow {
   def rowParser(idx: Int): RowParser[EmployeedepartmenthistoryRow] = RowParser[EmployeedepartmenthistoryRow] { row =>
     Success(
       EmployeedepartmenthistoryRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        departmentid = row[DepartmentId](idx + 1),
-        shiftid = row[ShiftId](idx + 2),
-        startdate = row[TypoLocalDate](idx + 3),
-        enddate = row[Option[TypoLocalDate]](idx + 4),
-        modifieddate = row[TypoLocalDateTime](idx + 5)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        departmentid = row(idx + 1)(DepartmentId.column),
+        shiftid = row(idx + 2)(ShiftId.column),
+        startdate = row(idx + 3)(TypoLocalDate.column),
+        enddate = row(idx + 4)(Column.columnToOption(TypoLocalDate.column)),
+        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[EmployeedepartmenthistoryRow] = OWrites[EmployeedepartmenthistoryRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "departmentid" -> Json.toJson(o.departmentid),
-      "shiftid" -> Json.toJson(o.shiftid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "departmentid" -> DepartmentId.writes.writes(o.departmentid),
+      "shiftid" -> ShiftId.writes.writes(o.shiftid),
+      "startdate" -> TypoLocalDate.writes.writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.enddate),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -10,15 +10,16 @@ package salesperson
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -47,15 +48,15 @@ object SalespersonRow {
   implicit val reads: Reads[SalespersonRow] = Reads[SalespersonRow](json => JsResult.fromTry(
       Try(
         SalespersonRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-          salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
-          bonus = json.\("bonus").as[BigDecimal],
-          commissionpct = json.\("commissionpct").as[BigDecimal],
-          salesytd = json.\("salesytd").as[BigDecimal],
-          saleslastyear = json.\("saleslastyear").as[BigDecimal],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+          salesquota = json.\("salesquota").toOption.map(_.as(Reads.bigDecReads)),
+          bonus = json.\("bonus").as(Reads.bigDecReads),
+          commissionpct = json.\("commissionpct").as(Reads.bigDecReads),
+          salesytd = json.\("salesytd").as(Reads.bigDecReads),
+          saleslastyear = json.\("saleslastyear").as(Reads.bigDecReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -63,29 +64,29 @@ object SalespersonRow {
   def rowParser(idx: Int): RowParser[SalespersonRow] = RowParser[SalespersonRow] { row =>
     Success(
       SalespersonRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        territoryid = row[Option[SalesterritoryId]](idx + 1),
-        salesquota = row[Option[BigDecimal]](idx + 2),
-        bonus = row[BigDecimal](idx + 3),
-        commissionpct = row[BigDecimal](idx + 4),
-        salesytd = row[BigDecimal](idx + 5),
-        saleslastyear = row[BigDecimal](idx + 6),
-        rowguid = row[UUID](idx + 7),
-        modifieddate = row[TypoLocalDateTime](idx + 8)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        territoryid = row(idx + 1)(Column.columnToOption(SalesterritoryId.column)),
+        salesquota = row(idx + 2)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        bonus = row(idx + 3)(Column.columnToScalaBigDecimal),
+        commissionpct = row(idx + 4)(Column.columnToScalaBigDecimal),
+        salesytd = row(idx + 5)(Column.columnToScalaBigDecimal),
+        saleslastyear = row(idx + 6)(Column.columnToScalaBigDecimal),
+        rowguid = row(idx + 7)(Column.columnToUUID),
+        modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[SalespersonRow] = OWrites[SalespersonRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "territoryid" -> Json.toJson(o.territoryid),
-      "salesquota" -> Json.toJson(o.salesquota),
-      "bonus" -> Json.toJson(o.bonus),
-      "commissionpct" -> Json.toJson(o.commissionpct),
-      "salesytd" -> Json.toJson(o.salesytd),
-      "saleslastyear" -> Json.toJson(o.saleslastyear),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+      "salesquota" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.salesquota),
+      "bonus" -> Writes.BigDecimalWrites.writes(o.bonus),
+      "commissionpct" -> Writes.BigDecimalWrites.writes(o.commissionpct),
+      "salesytd" -> Writes.BigDecimalWrites.writes(o.salesytd),
+      "saleslastyear" -> Writes.BigDecimalWrites.writes(o.saleslastyear),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_statio_sys_indexes
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,13 +40,13 @@ object PgStatioSysIndexesViewRow {
   implicit val reads: Reads[PgStatioSysIndexesViewRow] = Reads[PgStatioSysIndexesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioSysIndexesViewRow(
-          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-          indexrelid = json.\("indexrelid").toOption.map(_.as[/* oid */ Long]),
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          relname = json.\("relname").toOption.map(_.as[String]),
-          indexrelname = json.\("indexrelname").toOption.map(_.as[String]),
-          idxBlksRead = json.\("idx_blks_read").toOption.map(_.as[Long]),
-          idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as[Long])
+          relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
+          indexrelid = json.\("indexrelid").toOption.map(_.as(Reads.LongReads)),
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          relname = json.\("relname").toOption.map(_.as(Reads.StringReads)),
+          indexrelname = json.\("indexrelname").toOption.map(_.as(Reads.StringReads)),
+          idxBlksRead = json.\("idx_blks_read").toOption.map(_.as(Reads.LongReads)),
+          idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -53,25 +54,25 @@ object PgStatioSysIndexesViewRow {
   def rowParser(idx: Int): RowParser[PgStatioSysIndexesViewRow] = RowParser[PgStatioSysIndexesViewRow] { row =>
     Success(
       PgStatioSysIndexesViewRow(
-        relid = row[Option[/* oid */ Long]](idx + 0),
-        indexrelid = row[Option[/* oid */ Long]](idx + 1),
-        schemaname = row[Option[String]](idx + 2),
-        relname = row[Option[String]](idx + 3),
-        indexrelname = row[Option[String]](idx + 4),
-        idxBlksRead = row[Option[Long]](idx + 5),
-        idxBlksHit = row[Option[Long]](idx + 6)
+        relid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        indexrelid = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        schemaname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        relname = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        indexrelname = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        idxBlksRead = row(idx + 5)(Column.columnToOption(Column.columnToLong)),
+        idxBlksHit = row(idx + 6)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgStatioSysIndexesViewRow] = OWrites[PgStatioSysIndexesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "relid" -> Json.toJson(o.relid),
-      "indexrelid" -> Json.toJson(o.indexrelid),
-      "schemaname" -> Json.toJson(o.schemaname),
-      "relname" -> Json.toJson(o.relname),
-      "indexrelname" -> Json.toJson(o.indexrelname),
-      "idx_blks_read" -> Json.toJson(o.idxBlksRead),
-      "idx_blks_hit" -> Json.toJson(o.idxBlksHit)
+      "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
+      "indexrelid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexrelid),
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),
+      "indexrelname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.indexrelname),
+      "idx_blks_read" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksRead),
+      "idx_blks_hit" -> Writes.OptionWrites(Writes.LongWrites).writes(o.idxBlksHit)
     ))
   )
 }

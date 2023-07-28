@@ -12,15 +12,16 @@ import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -58,20 +59,20 @@ object PViewRow {
   implicit val reads: Reads[PViewRow] = Reads[PViewRow](json => JsResult.fromTry(
       Try(
         PViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          persontype = json.\("persontype").toOption.map(_.as[/* bpchar */ String]),
-          namestyle = json.\("namestyle").as[NameStyle],
-          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-          firstname = json.\("firstname").toOption.map(_.as[Name]),
-          middlename = json.\("middlename").toOption.map(_.as[Name]),
-          lastname = json.\("lastname").toOption.map(_.as[Name]),
-          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-          emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
-          additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
-          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          persontype = json.\("persontype").toOption.map(_.as(Reads.StringReads)),
+          namestyle = json.\("namestyle").as(NameStyle.reads),
+          title = json.\("title").toOption.map(_.as(Reads.StringReads)),
+          firstname = json.\("firstname").toOption.map(_.as(Name.reads)),
+          middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
+          lastname = json.\("lastname").toOption.map(_.as(Name.reads)),
+          suffix = json.\("suffix").toOption.map(_.as(Reads.StringReads)),
+          emailpromotion = json.\("emailpromotion").toOption.map(_.as(Reads.IntReads)),
+          additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as(TypoXml.reads)),
+          demographics = json.\("demographics").toOption.map(_.as(TypoXml.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -79,39 +80,39 @@ object PViewRow {
   def rowParser(idx: Int): RowParser[PViewRow] = RowParser[PViewRow] { row =>
     Success(
       PViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        persontype = row[Option[/* bpchar */ String]](idx + 2),
-        namestyle = row[NameStyle](idx + 3),
-        title = row[Option[/* max 8 chars */ String]](idx + 4),
-        firstname = row[Option[Name]](idx + 5),
-        middlename = row[Option[Name]](idx + 6),
-        lastname = row[Option[Name]](idx + 7),
-        suffix = row[Option[/* max 10 chars */ String]](idx + 8),
-        emailpromotion = row[Option[Int]](idx + 9),
-        additionalcontactinfo = row[Option[TypoXml]](idx + 10),
-        demographics = row[Option[TypoXml]](idx + 11),
-        rowguid = row[Option[UUID]](idx + 12),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 13)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        persontype = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        namestyle = row(idx + 3)(NameStyle.column),
+        title = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        firstname = row(idx + 5)(Column.columnToOption(Name.column)),
+        middlename = row(idx + 6)(Column.columnToOption(Name.column)),
+        lastname = row(idx + 7)(Column.columnToOption(Name.column)),
+        suffix = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        emailpromotion = row(idx + 9)(Column.columnToOption(Column.columnToInt)),
+        additionalcontactinfo = row(idx + 10)(Column.columnToOption(TypoXml.column)),
+        demographics = row(idx + 11)(Column.columnToOption(TypoXml.column)),
+        rowguid = row(idx + 12)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 13)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PViewRow] = OWrites[PViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "persontype" -> Json.toJson(o.persontype),
-      "namestyle" -> Json.toJson(o.namestyle),
-      "title" -> Json.toJson(o.title),
-      "firstname" -> Json.toJson(o.firstname),
-      "middlename" -> Json.toJson(o.middlename),
-      "lastname" -> Json.toJson(o.lastname),
-      "suffix" -> Json.toJson(o.suffix),
-      "emailpromotion" -> Json.toJson(o.emailpromotion),
-      "additionalcontactinfo" -> Json.toJson(o.additionalcontactinfo),
-      "demographics" -> Json.toJson(o.demographics),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "persontype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.persontype),
+      "namestyle" -> NameStyle.writes.writes(o.namestyle),
+      "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
+      "firstname" -> Writes.OptionWrites(Name.writes).writes(o.firstname),
+      "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
+      "lastname" -> Writes.OptionWrites(Name.writes).writes(o.lastname),
+      "suffix" -> Writes.OptionWrites(Writes.StringWrites).writes(o.suffix),
+      "emailpromotion" -> Writes.OptionWrites(Writes.IntWrites).writes(o.emailpromotion),
+      "additionalcontactinfo" -> Writes.OptionWrites(TypoXml.writes).writes(o.additionalcontactinfo),
+      "demographics" -> Writes.OptionWrites(TypoXml.writes).writes(o.demographics),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

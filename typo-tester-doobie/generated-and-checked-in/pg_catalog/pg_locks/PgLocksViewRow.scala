@@ -10,8 +10,8 @@ package pg_locks
 import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -36,44 +36,44 @@ case class PgLocksViewRow(
 )
 
 object PgLocksViewRow {
-  implicit val decoder: Decoder[PgLocksViewRow] = Decoder.forProduct16[PgLocksViewRow, Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[Int], Option[String], Option[TypoXid], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[Int], Option[String], Option[Boolean], Option[Boolean], Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(PgLocksViewRow.apply)
-  implicit val encoder: Encoder[PgLocksViewRow] = Encoder.forProduct16[PgLocksViewRow, Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[Int], Option[String], Option[TypoXid], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[Int], Option[String], Option[Boolean], Option[Boolean], Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(x => (x.locktype, x.database, x.relation, x.page, x.tuple, x.virtualxid, x.transactionid, x.classid, x.objid, x.objsubid, x.virtualtransaction, x.pid, x.mode, x.granted, x.fastpath, x.waitstart))
+  implicit val decoder: Decoder[PgLocksViewRow] = Decoder.forProduct16[PgLocksViewRow, Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[Int], Option[String], Option[TypoXid], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[Int], Option[String], Option[Boolean], Option[Boolean], Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(PgLocksViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(TypoOffsetDateTime.decoder))
+  implicit val encoder: Encoder[PgLocksViewRow] = Encoder.forProduct16[PgLocksViewRow, Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[Int], Option[String], Option[TypoXid], Option[/* oid */ Long], Option[/* oid */ Long], Option[Int], Option[String], Option[Int], Option[String], Option[Boolean], Option[Boolean], Option[TypoOffsetDateTime]]("locktype", "database", "relation", "page", "tuple", "virtualxid", "transactionid", "classid", "objid", "objsubid", "virtualtransaction", "pid", "mode", "granted", "fastpath", "waitstart")(x => (x.locktype, x.database, x.relation, x.page, x.tuple, x.virtualxid, x.transactionid, x.classid, x.objid, x.objsubid, x.virtualtransaction, x.pid, x.mode, x.granted, x.fastpath, x.waitstart))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(TypoOffsetDateTime.encoder))
   implicit val read: Read[PgLocksViewRow] = new Read[PgLocksViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[TypoXid], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoXid.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgLocksViewRow(
-      locktype = Get[String].unsafeGetNullable(rs, i + 0),
-      database = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      relation = Get[/* oid */ Long].unsafeGetNullable(rs, i + 2),
-      page = Get[Int].unsafeGetNullable(rs, i + 3),
-      tuple = Get[Int].unsafeGetNullable(rs, i + 4),
-      virtualxid = Get[String].unsafeGetNullable(rs, i + 5),
-      transactionid = Get[TypoXid].unsafeGetNullable(rs, i + 6),
-      classid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 7),
-      objid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 8),
-      objsubid = Get[Int].unsafeGetNullable(rs, i + 9),
-      virtualtransaction = Get[String].unsafeGetNullable(rs, i + 10),
-      pid = Get[Int].unsafeGetNullable(rs, i + 11),
-      mode = Get[String].unsafeGetNullable(rs, i + 12),
-      granted = Get[Boolean].unsafeGetNullable(rs, i + 13),
-      fastpath = Get[Boolean].unsafeGetNullable(rs, i + 14),
-      waitstart = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 15)
+      locktype = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      database = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      relation = Meta.LongMeta.get.unsafeGetNullable(rs, i + 2),
+      page = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
+      tuple = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      virtualxid = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      transactionid = TypoXid.get.unsafeGetNullable(rs, i + 6),
+      classid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      objid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
+      objsubid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 9),
+      virtualtransaction = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 11),
+      mode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
+      granted = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 13),
+      fastpath = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 14),
+      waitstart = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 15)
     )
   )
 }

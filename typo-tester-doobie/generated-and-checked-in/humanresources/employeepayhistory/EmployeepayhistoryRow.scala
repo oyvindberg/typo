@@ -10,8 +10,8 @@ package employeepayhistory
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -32,22 +32,22 @@ case class EmployeepayhistoryRow(
  }
 
 object EmployeepayhistoryRow {
-  implicit val decoder: Decoder[EmployeepayhistoryRow] = Decoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRow.apply)
-  implicit val encoder: Encoder[EmployeepayhistoryRow] = Encoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))
+  implicit val decoder: Decoder[EmployeepayhistoryRow] = Decoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeInt, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[EmployeepayhistoryRow] = Encoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeInt, TypoLocalDateTime.encoder)
   implicit val read: Read[EmployeepayhistoryRow] = new Read[EmployeepayhistoryRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls),
-      (Get[BigDecimal], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => EmployeepayhistoryRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      ratechangedate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 1),
-      rate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-      payfrequency = Get[Int].unsafeGetNonNullable(rs, i + 3),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      ratechangedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
+      rate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
+      payfrequency = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

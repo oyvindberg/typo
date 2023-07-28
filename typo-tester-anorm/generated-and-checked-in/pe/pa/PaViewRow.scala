@@ -9,15 +9,16 @@ package pa
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,12 +40,12 @@ object PaViewRow {
   implicit val reads: Reads[PaViewRow] = Reads[PaViewRow](json => JsResult.fromTry(
       Try(
         PaViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          passwordhash = json.\("passwordhash").toOption.map(_.as[/* max 128 chars */ String]),
-          passwordsalt = json.\("passwordsalt").toOption.map(_.as[/* max 10 chars */ String]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          passwordhash = json.\("passwordhash").toOption.map(_.as(Reads.StringReads)),
+          passwordsalt = json.\("passwordsalt").toOption.map(_.as(Reads.StringReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -52,23 +53,23 @@ object PaViewRow {
   def rowParser(idx: Int): RowParser[PaViewRow] = RowParser[PaViewRow] { row =>
     Success(
       PaViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        passwordhash = row[Option[/* max 128 chars */ String]](idx + 2),
-        passwordsalt = row[Option[/* max 10 chars */ String]](idx + 3),
-        rowguid = row[Option[UUID]](idx + 4),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        passwordhash = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        passwordsalt = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        rowguid = row(idx + 4)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PaViewRow] = OWrites[PaViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "passwordhash" -> Json.toJson(o.passwordhash),
-      "passwordsalt" -> Json.toJson(o.passwordsalt),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "passwordhash" -> Writes.OptionWrites(Writes.StringWrites).writes(o.passwordhash),
+      "passwordsalt" -> Writes.OptionWrites(Writes.StringWrites).writes(o.passwordsalt),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

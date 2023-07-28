@@ -8,14 +8,15 @@ package production
 package transactionhistoryarchive
 
 import adventureworks.TypoLocalDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -43,15 +44,15 @@ object TransactionhistoryarchiveRow {
   implicit val reads: Reads[TransactionhistoryarchiveRow] = Reads[TransactionhistoryarchiveRow](json => JsResult.fromTry(
       Try(
         TransactionhistoryarchiveRow(
-          transactionid = json.\("transactionid").as[TransactionhistoryarchiveId],
-          productid = json.\("productid").as[Int],
-          referenceorderid = json.\("referenceorderid").as[Int],
-          referenceorderlineid = json.\("referenceorderlineid").as[Int],
-          transactiondate = json.\("transactiondate").as[TypoLocalDateTime],
-          transactiontype = json.\("transactiontype").as[/* bpchar */ String],
-          quantity = json.\("quantity").as[Int],
-          actualcost = json.\("actualcost").as[BigDecimal],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          transactionid = json.\("transactionid").as(TransactionhistoryarchiveId.reads),
+          productid = json.\("productid").as(Reads.IntReads),
+          referenceorderid = json.\("referenceorderid").as(Reads.IntReads),
+          referenceorderlineid = json.\("referenceorderlineid").as(Reads.IntReads),
+          transactiondate = json.\("transactiondate").as(TypoLocalDateTime.reads),
+          transactiontype = json.\("transactiontype").as(Reads.StringReads),
+          quantity = json.\("quantity").as(Reads.IntReads),
+          actualcost = json.\("actualcost").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -59,29 +60,29 @@ object TransactionhistoryarchiveRow {
   def rowParser(idx: Int): RowParser[TransactionhistoryarchiveRow] = RowParser[TransactionhistoryarchiveRow] { row =>
     Success(
       TransactionhistoryarchiveRow(
-        transactionid = row[TransactionhistoryarchiveId](idx + 0),
-        productid = row[Int](idx + 1),
-        referenceorderid = row[Int](idx + 2),
-        referenceorderlineid = row[Int](idx + 3),
-        transactiondate = row[TypoLocalDateTime](idx + 4),
-        transactiontype = row[/* bpchar */ String](idx + 5),
-        quantity = row[Int](idx + 6),
-        actualcost = row[BigDecimal](idx + 7),
-        modifieddate = row[TypoLocalDateTime](idx + 8)
+        transactionid = row(idx + 0)(TransactionhistoryarchiveId.column),
+        productid = row(idx + 1)(Column.columnToInt),
+        referenceorderid = row(idx + 2)(Column.columnToInt),
+        referenceorderlineid = row(idx + 3)(Column.columnToInt),
+        transactiondate = row(idx + 4)(TypoLocalDateTime.column),
+        transactiontype = row(idx + 5)(Column.columnToString),
+        quantity = row(idx + 6)(Column.columnToInt),
+        actualcost = row(idx + 7)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 8)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[TransactionhistoryarchiveRow] = OWrites[TransactionhistoryarchiveRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "transactionid" -> Json.toJson(o.transactionid),
-      "productid" -> Json.toJson(o.productid),
-      "referenceorderid" -> Json.toJson(o.referenceorderid),
-      "referenceorderlineid" -> Json.toJson(o.referenceorderlineid),
-      "transactiondate" -> Json.toJson(o.transactiondate),
-      "transactiontype" -> Json.toJson(o.transactiontype),
-      "quantity" -> Json.toJson(o.quantity),
-      "actualcost" -> Json.toJson(o.actualcost),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "transactionid" -> TransactionhistoryarchiveId.writes.writes(o.transactionid),
+      "productid" -> Writes.IntWrites.writes(o.productid),
+      "referenceorderid" -> Writes.IntWrites.writes(o.referenceorderid),
+      "referenceorderlineid" -> Writes.IntWrites.writes(o.referenceorderlineid),
+      "transactiondate" -> TypoLocalDateTime.writes.writes(o.transactiondate),
+      "transactiontype" -> Writes.StringWrites.writes(o.transactiontype),
+      "quantity" -> Writes.IntWrites.writes(o.quantity),
+      "actualcost" -> Writes.BigDecimalWrites.writes(o.actualcost),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

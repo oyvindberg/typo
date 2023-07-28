@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -35,26 +35,26 @@ case class SmViewRow(
 )
 
 object SmViewRow {
-  implicit val decoder: Decoder[SmViewRow] = Decoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(SmViewRow.apply)
-  implicit val encoder: Encoder[SmViewRow] = Encoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.id, x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[SmViewRow] = Decoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(SmViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ShipmethodId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[SmViewRow] = Encoder.forProduct7[SmViewRow, Option[Int], Option[ShipmethodId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.id, x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ShipmethodId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[SmViewRow] = new Read[SmViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[ShipmethodId], Nullability.Nullable),
-      (Get[Name], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (ShipmethodId.get, Nullability.Nullable),
+      (Name.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SmViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      shipmethodid = Get[ShipmethodId].unsafeGetNullable(rs, i + 1),
-      name = Get[Name].unsafeGetNullable(rs, i + 2),
-      shipbase = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-      shiprate = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      shipmethodid = ShipmethodId.get.unsafeGetNullable(rs, i + 1),
+      name = Name.get.unsafeGetNullable(rs, i + 2),
+      shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
+      shiprate = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 5),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

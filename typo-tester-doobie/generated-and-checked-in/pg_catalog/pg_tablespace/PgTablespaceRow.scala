@@ -9,8 +9,8 @@ package pg_tablespace
 
 import adventureworks.TypoAclItem
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,22 +24,22 @@ case class PgTablespaceRow(
 )
 
 object PgTablespaceRow {
-  implicit val decoder: Decoder[PgTablespaceRow] = Decoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(PgTablespaceRow.apply)
-  implicit val encoder: Encoder[PgTablespaceRow] = Encoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(x => (x.oid, x.spcname, x.spcowner, x.spcacl, x.spcoptions))
+  implicit val decoder: Decoder[PgTablespaceRow] = Decoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(PgTablespaceRow.apply)(PgTablespaceId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgTablespaceRow] = Encoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(x => (x.oid, x.spcname, x.spcowner, x.spcacl, x.spcoptions))(PgTablespaceId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgTablespaceRow] = new Read[PgTablespaceRow](
     gets = List(
-      (Get[PgTablespaceId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Array[TypoAclItem]], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable)
+      (PgTablespaceId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoAclItem.arrayGet, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTablespaceRow(
-      oid = Get[PgTablespaceId].unsafeGetNonNullable(rs, i + 0),
-      spcname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      spcowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      spcacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 3),
-      spcoptions = Get[Array[String]].unsafeGetNullable(rs, i + 4)
+      oid = PgTablespaceId.get.unsafeGetNonNullable(rs, i + 0),
+      spcname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      spcowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      spcacl = TypoAclItem.arrayGet.unsafeGetNullable(rs, i + 3),
+      spcoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 4)
     )
   )
 }

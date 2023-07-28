@@ -10,14 +10,15 @@ package sohsr
 import adventureworks.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,9 +35,9 @@ object SohsrViewRow {
   implicit val reads: Reads[SohsrViewRow] = Reads[SohsrViewRow](json => JsResult.fromTry(
       Try(
         SohsrViewRow(
-          salesorderid = json.\("salesorderid").toOption.map(_.as[SalesorderheaderId]),
-          salesreasonid = json.\("salesreasonid").toOption.map(_.as[SalesreasonId]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          salesorderid = json.\("salesorderid").toOption.map(_.as(SalesorderheaderId.reads)),
+          salesreasonid = json.\("salesreasonid").toOption.map(_.as(SalesreasonId.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -44,17 +45,17 @@ object SohsrViewRow {
   def rowParser(idx: Int): RowParser[SohsrViewRow] = RowParser[SohsrViewRow] { row =>
     Success(
       SohsrViewRow(
-        salesorderid = row[Option[SalesorderheaderId]](idx + 0),
-        salesreasonid = row[Option[SalesreasonId]](idx + 1),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 2)
+        salesorderid = row(idx + 0)(Column.columnToOption(SalesorderheaderId.column)),
+        salesreasonid = row(idx + 1)(Column.columnToOption(SalesreasonId.column)),
+        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SohsrViewRow] = OWrites[SohsrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "salesorderid" -> Json.toJson(o.salesorderid),
-      "salesreasonid" -> Json.toJson(o.salesreasonid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "salesorderid" -> Writes.OptionWrites(SalesorderheaderId.writes).writes(o.salesorderid),
+      "salesreasonid" -> Writes.OptionWrites(SalesreasonId.writes).writes(o.salesreasonid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

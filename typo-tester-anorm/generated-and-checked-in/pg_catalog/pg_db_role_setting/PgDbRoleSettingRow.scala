@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_db_role_setting
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -30,9 +31,9 @@ object PgDbRoleSettingRow {
   implicit val reads: Reads[PgDbRoleSettingRow] = Reads[PgDbRoleSettingRow](json => JsResult.fromTry(
       Try(
         PgDbRoleSettingRow(
-          setdatabase = json.\("setdatabase").as[/* oid */ Long],
-          setrole = json.\("setrole").as[/* oid */ Long],
-          setconfig = json.\("setconfig").toOption.map(_.as[Array[String]])
+          setdatabase = json.\("setdatabase").as(Reads.LongReads),
+          setrole = json.\("setrole").as(Reads.LongReads),
+          setconfig = json.\("setconfig").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -40,17 +41,17 @@ object PgDbRoleSettingRow {
   def rowParser(idx: Int): RowParser[PgDbRoleSettingRow] = RowParser[PgDbRoleSettingRow] { row =>
     Success(
       PgDbRoleSettingRow(
-        setdatabase = row[/* oid */ Long](idx + 0),
-        setrole = row[/* oid */ Long](idx + 1),
-        setconfig = row[Option[Array[String]]](idx + 2)
+        setdatabase = row(idx + 0)(Column.columnToLong),
+        setrole = row(idx + 1)(Column.columnToLong),
+        setconfig = row(idx + 2)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgDbRoleSettingRow] = OWrites[PgDbRoleSettingRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "setdatabase" -> Json.toJson(o.setdatabase),
-      "setrole" -> Json.toJson(o.setrole),
-      "setconfig" -> Json.toJson(o.setconfig)
+      "setdatabase" -> Writes.LongWrites.writes(o.setdatabase),
+      "setrole" -> Writes.LongWrites.writes(o.setrole),
+      "setconfig" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.setconfig)
     ))
   )
 }

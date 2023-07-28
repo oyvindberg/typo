@@ -7,14 +7,15 @@ package adventureworks
 package information_schema
 package `_pg_foreign_table_columns`
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,10 +30,10 @@ object PgForeignTableColumnsViewRow {
   implicit val reads: Reads[PgForeignTableColumnsViewRow] = Reads[PgForeignTableColumnsViewRow](json => JsResult.fromTry(
       Try(
         PgForeignTableColumnsViewRow(
-          nspname = json.\("nspname").toOption.map(_.as[String]),
-          relname = json.\("relname").toOption.map(_.as[String]),
-          attname = json.\("attname").toOption.map(_.as[String]),
-          attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]])
+          nspname = json.\("nspname").toOption.map(_.as(Reads.StringReads)),
+          relname = json.\("relname").toOption.map(_.as(Reads.StringReads)),
+          attname = json.\("attname").toOption.map(_.as(Reads.StringReads)),
+          attfdwoptions = json.\("attfdwoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly)))
         )
       )
     ),
@@ -40,19 +41,19 @@ object PgForeignTableColumnsViewRow {
   def rowParser(idx: Int): RowParser[PgForeignTableColumnsViewRow] = RowParser[PgForeignTableColumnsViewRow] { row =>
     Success(
       PgForeignTableColumnsViewRow(
-        nspname = row[Option[String]](idx + 0),
-        relname = row[Option[String]](idx + 1),
-        attname = row[Option[String]](idx + 2),
-        attfdwoptions = row[Option[Array[String]]](idx + 3)
+        nspname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        relname = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        attname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        attfdwoptions = row(idx + 3)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgForeignTableColumnsViewRow] = OWrites[PgForeignTableColumnsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "nspname" -> Json.toJson(o.nspname),
-      "relname" -> Json.toJson(o.relname),
-      "attname" -> Json.toJson(o.attname),
-      "attfdwoptions" -> Json.toJson(o.attfdwoptions)
+      "nspname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.nspname),
+      "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),
+      "attname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.attname),
+      "attfdwoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.attfdwoptions)
     ))
   )
 }

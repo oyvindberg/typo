@@ -14,7 +14,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -34,10 +33,10 @@ object DepartmentRow {
   implicit val reads: Reads[DepartmentRow] = Reads[DepartmentRow](json => JsResult.fromTry(
       Try(
         DepartmentRow(
-          departmentid = json.\("departmentid").as[DepartmentId],
-          name = json.\("name").as[Name],
-          groupname = json.\("groupname").as[Name],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          departmentid = json.\("departmentid").as(DepartmentId.reads),
+          name = json.\("name").as(Name.reads),
+          groupname = json.\("groupname").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -45,19 +44,19 @@ object DepartmentRow {
   def rowParser(idx: Int): RowParser[DepartmentRow] = RowParser[DepartmentRow] { row =>
     Success(
       DepartmentRow(
-        departmentid = row[DepartmentId](idx + 0),
-        name = row[Name](idx + 1),
-        groupname = row[Name](idx + 2),
-        modifieddate = row[TypoLocalDateTime](idx + 3)
+        departmentid = row(idx + 0)(DepartmentId.column),
+        name = row(idx + 1)(Name.column),
+        groupname = row(idx + 2)(Name.column),
+        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[DepartmentRow] = OWrites[DepartmentRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "departmentid" -> Json.toJson(o.departmentid),
-      "name" -> Json.toJson(o.name),
-      "groupname" -> Json.toJson(o.groupname),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "departmentid" -> DepartmentId.writes.writes(o.departmentid),
+      "name" -> Name.writes.writes(o.name),
+      "groupname" -> Name.writes.writes(o.groupname),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

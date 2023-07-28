@@ -14,9 +14,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -53,20 +53,20 @@ object AddresstypeRowUnsaved {
   implicit val reads: Reads[AddresstypeRowUnsaved] = Reads[AddresstypeRowUnsaved](json => JsResult.fromTry(
       Try(
         AddresstypeRowUnsaved(
-          name = json.\("name").as[Name],
-          addresstypeid = json.\("addresstypeid").as[Defaulted[AddresstypeId]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          name = json.\("name").as(Name.reads),
+          addresstypeid = json.\("addresstypeid").as(Defaulted.reads(AddresstypeId.reads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[AddresstypeRowUnsaved] = OWrites[AddresstypeRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "addresstypeid" -> Json.toJson(o.addresstypeid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "name" -> Name.writes.writes(o.name),
+      "addresstypeid" -> Defaulted.writes(AddresstypeId.writes).writes(o.addresstypeid),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

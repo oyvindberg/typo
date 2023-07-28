@@ -14,7 +14,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -32,9 +31,9 @@ object CultureRow {
   implicit val reads: Reads[CultureRow] = Reads[CultureRow](json => JsResult.fromTry(
       Try(
         CultureRow(
-          cultureid = json.\("cultureid").as[CultureId],
-          name = json.\("name").as[Name],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          cultureid = json.\("cultureid").as(CultureId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -42,17 +41,17 @@ object CultureRow {
   def rowParser(idx: Int): RowParser[CultureRow] = RowParser[CultureRow] { row =>
     Success(
       CultureRow(
-        cultureid = row[CultureId](idx + 0),
-        name = row[Name](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        cultureid = row(idx + 0)(CultureId.column),
+        name = row(idx + 1)(Name.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[CultureRow] = OWrites[CultureRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "cultureid" -> Json.toJson(o.cultureid),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "cultureid" -> CultureId.writes.writes(o.cultureid),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -9,8 +9,8 @@ package pg_ts_parser
 
 import adventureworks.TypoRegproc
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -27,28 +27,28 @@ case class PgTsParserRow(
 )
 
 object PgTsParserRow {
-  implicit val decoder: Decoder[PgTsParserRow] = Decoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(PgTsParserRow.apply)
-  implicit val encoder: Encoder[PgTsParserRow] = Encoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(x => (x.oid, x.prsname, x.prsnamespace, x.prsstart, x.prstoken, x.prsend, x.prsheadline, x.prslextype))
+  implicit val decoder: Decoder[PgTsParserRow] = Decoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(PgTsParserRow.apply)(PgTsParserId.decoder, Decoder.decodeString, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder)
+  implicit val encoder: Encoder[PgTsParserRow] = Encoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(x => (x.oid, x.prsname, x.prsnamespace, x.prsstart, x.prstoken, x.prsend, x.prsheadline, x.prslextype))(PgTsParserId.encoder, Encoder.encodeString, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder)
   implicit val read: Read[PgTsParserRow] = new Read[PgTsParserRow](
     gets = List(
-      (Get[PgTsParserId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[TypoRegproc], Nullability.NoNulls),
-      (Get[TypoRegproc], Nullability.NoNulls),
-      (Get[TypoRegproc], Nullability.NoNulls),
-      (Get[TypoRegproc], Nullability.NoNulls),
-      (Get[TypoRegproc], Nullability.NoNulls)
+      (PgTsParserId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoRegproc.get, Nullability.NoNulls),
+      (TypoRegproc.get, Nullability.NoNulls),
+      (TypoRegproc.get, Nullability.NoNulls),
+      (TypoRegproc.get, Nullability.NoNulls),
+      (TypoRegproc.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTsParserRow(
-      oid = Get[PgTsParserId].unsafeGetNonNullable(rs, i + 0),
-      prsname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      prsnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      prsstart = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
-      prstoken = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4),
-      prsend = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 5),
-      prsheadline = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 6),
-      prslextype = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 7)
+      oid = PgTsParserId.get.unsafeGetNonNullable(rs, i + 0),
+      prsname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      prsnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      prsstart = TypoRegproc.get.unsafeGetNonNullable(rs, i + 3),
+      prstoken = TypoRegproc.get.unsafeGetNonNullable(rs, i + 4),
+      prsend = TypoRegproc.get.unsafeGetNonNullable(rs, i + 5),
+      prsheadline = TypoRegproc.get.unsafeGetNonNullable(rs, i + 6),
+      prslextype = TypoRegproc.get.unsafeGetNonNullable(rs, i + 7)
     )
   )
 }

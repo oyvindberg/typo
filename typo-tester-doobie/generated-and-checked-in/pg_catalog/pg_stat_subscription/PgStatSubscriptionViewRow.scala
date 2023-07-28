@@ -9,8 +9,8 @@ package pg_stat_subscription
 
 import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,30 +28,30 @@ case class PgStatSubscriptionViewRow(
 )
 
 object PgStatSubscriptionViewRow {
-  implicit val decoder: Decoder[PgStatSubscriptionViewRow] = Decoder.forProduct9[PgStatSubscriptionViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[/* oid */ Long], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime]]("subid", "subname", "pid", "relid", "received_lsn", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time")(PgStatSubscriptionViewRow.apply)
-  implicit val encoder: Encoder[PgStatSubscriptionViewRow] = Encoder.forProduct9[PgStatSubscriptionViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[/* oid */ Long], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime]]("subid", "subname", "pid", "relid", "received_lsn", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time")(x => (x.subid, x.subname, x.pid, x.relid, x.receivedLsn, x.lastMsgSendTime, x.lastMsgReceiptTime, x.latestEndLsn, x.latestEndTime))
+  implicit val decoder: Decoder[PgStatSubscriptionViewRow] = Decoder.forProduct9[PgStatSubscriptionViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[/* oid */ Long], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime]]("subid", "subname", "pid", "relid", "received_lsn", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time")(PgStatSubscriptionViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(TypoOffsetDateTime.decoder))
+  implicit val encoder: Encoder[PgStatSubscriptionViewRow] = Encoder.forProduct9[PgStatSubscriptionViewRow, Option[/* oid */ Long], Option[String], Option[Int], Option[/* oid */ Long], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime], Option[TypoOffsetDateTime], Option[/* pg_lsn */ Long], Option[TypoOffsetDateTime]]("subid", "subname", "pid", "relid", "received_lsn", "last_msg_send_time", "last_msg_receipt_time", "latest_end_lsn", "latest_end_time")(x => (x.subid, x.subname, x.pid, x.relid, x.receivedLsn, x.lastMsgSendTime, x.lastMsgReceiptTime, x.latestEndLsn, x.latestEndTime))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(TypoOffsetDateTime.encoder))
   implicit val read: Read[PgStatSubscriptionViewRow] = new Read[PgStatSubscriptionViewRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable),
-      (Get[/* pg_lsn */ Long], Nullability.Nullable),
-      (Get[TypoOffsetDateTime], Nullability.Nullable)
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (TypoOffsetDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatSubscriptionViewRow(
-      subid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-      subname = Get[String].unsafeGetNullable(rs, i + 1),
-      pid = Get[Int].unsafeGetNullable(rs, i + 2),
-      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-      receivedLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 4),
-      lastMsgSendTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 5),
-      lastMsgReceiptTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 6),
-      latestEndLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 7),
-      latestEndTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 8)
+      subid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 0),
+      subname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
+      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      receivedLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 4),
+      lastMsgSendTime = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 5),
+      lastMsgReceiptTime = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 6),
+      latestEndLsn = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      latestEndTime = TypoOffsetDateTime.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

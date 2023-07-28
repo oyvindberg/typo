@@ -10,8 +10,8 @@ package pg_statistic_ext
 import adventureworks.TypoInt2Vector
 import adventureworks.TypoPgNodeTree
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -29,30 +29,30 @@ case class PgStatisticExtRow(
 )
 
 object PgStatisticExtRow {
-  implicit val decoder: Decoder[PgStatisticExtRow] = Decoder.forProduct9[PgStatisticExtRow, PgStatisticExtId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long, Int, TypoInt2Vector, Array[String], Option[TypoPgNodeTree]]("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")(PgStatisticExtRow.apply)
-  implicit val encoder: Encoder[PgStatisticExtRow] = Encoder.forProduct9[PgStatisticExtRow, PgStatisticExtId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long, Int, TypoInt2Vector, Array[String], Option[TypoPgNodeTree]]("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")(x => (x.oid, x.stxrelid, x.stxname, x.stxnamespace, x.stxowner, x.stxstattarget, x.stxkeys, x.stxkind, x.stxexprs))
+  implicit val decoder: Decoder[PgStatisticExtRow] = Decoder.forProduct9[PgStatisticExtRow, PgStatisticExtId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long, Int, TypoInt2Vector, Array[String], Option[TypoPgNodeTree]]("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")(PgStatisticExtRow.apply)(PgStatisticExtId.decoder, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, TypoInt2Vector.decoder, Decoder.decodeArray[String](Decoder.decodeString, implicitly), Decoder.decodeOption(TypoPgNodeTree.decoder))
+  implicit val encoder: Encoder[PgStatisticExtRow] = Encoder.forProduct9[PgStatisticExtRow, PgStatisticExtId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long, Int, TypoInt2Vector, Array[String], Option[TypoPgNodeTree]]("oid", "stxrelid", "stxname", "stxnamespace", "stxowner", "stxstattarget", "stxkeys", "stxkind", "stxexprs")(x => (x.oid, x.stxrelid, x.stxname, x.stxnamespace, x.stxowner, x.stxstattarget, x.stxkeys, x.stxkind, x.stxexprs))(PgStatisticExtId.encoder, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, TypoInt2Vector.encoder, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly), Encoder.encodeOption(TypoPgNodeTree.encoder))
   implicit val read: Read[PgStatisticExtRow] = new Read[PgStatisticExtRow](
     gets = List(
-      (Get[PgStatisticExtId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[TypoInt2Vector], Nullability.NoNulls),
-      (Get[Array[String]], Nullability.NoNulls),
-      (Get[TypoPgNodeTree], Nullability.Nullable)
+      (PgStatisticExtId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (TypoInt2Vector.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
+      (TypoPgNodeTree.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatisticExtRow(
-      oid = Get[PgStatisticExtId].unsafeGetNonNullable(rs, i + 0),
-      stxrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      stxname = Get[String].unsafeGetNonNullable(rs, i + 2),
-      stxnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      stxowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-      stxstattarget = Get[Int].unsafeGetNonNullable(rs, i + 5),
-      stxkeys = Get[TypoInt2Vector].unsafeGetNonNullable(rs, i + 6),
-      stxkind = Get[Array[String]].unsafeGetNonNullable(rs, i + 7),
-      stxexprs = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 8)
+      oid = PgStatisticExtId.get.unsafeGetNonNullable(rs, i + 0),
+      stxrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      stxname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      stxnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      stxowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4),
+      stxstattarget = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 5),
+      stxkeys = TypoInt2Vector.get.unsafeGetNonNullable(rs, i + 6),
+      stxkind = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 7),
+      stxexprs = TypoPgNodeTree.get.unsafeGetNullable(rs, i + 8)
     )
   )
 }

@@ -10,15 +10,16 @@ package pi
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -44,14 +45,14 @@ object PiViewRow {
   implicit val reads: Reads[PiViewRow] = Reads[PiViewRow](json => JsResult.fromTry(
       Try(
         PiViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          productid = json.\("productid").toOption.map(_.as[ProductId]),
-          locationid = json.\("locationid").toOption.map(_.as[LocationId]),
-          shelf = json.\("shelf").toOption.map(_.as[/* max 10 chars */ String]),
-          bin = json.\("bin").toOption.map(_.as[Int]),
-          quantity = json.\("quantity").toOption.map(_.as[Int]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
+          locationid = json.\("locationid").toOption.map(_.as(LocationId.reads)),
+          shelf = json.\("shelf").toOption.map(_.as(Reads.StringReads)),
+          bin = json.\("bin").toOption.map(_.as(Reads.IntReads)),
+          quantity = json.\("quantity").toOption.map(_.as(Reads.IntReads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -59,27 +60,27 @@ object PiViewRow {
   def rowParser(idx: Int): RowParser[PiViewRow] = RowParser[PiViewRow] { row =>
     Success(
       PiViewRow(
-        id = row[Option[Int]](idx + 0),
-        productid = row[Option[ProductId]](idx + 1),
-        locationid = row[Option[LocationId]](idx + 2),
-        shelf = row[Option[/* max 10 chars */ String]](idx + 3),
-        bin = row[Option[Int]](idx + 4),
-        quantity = row[Option[Int]](idx + 5),
-        rowguid = row[Option[UUID]](idx + 6),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 7)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        productid = row(idx + 1)(Column.columnToOption(ProductId.column)),
+        locationid = row(idx + 2)(Column.columnToOption(LocationId.column)),
+        shelf = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        bin = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
+        quantity = row(idx + 5)(Column.columnToOption(Column.columnToInt)),
+        rowguid = row(idx + 6)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PiViewRow] = OWrites[PiViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "productid" -> Json.toJson(o.productid),
-      "locationid" -> Json.toJson(o.locationid),
-      "shelf" -> Json.toJson(o.shelf),
-      "bin" -> Json.toJson(o.bin),
-      "quantity" -> Json.toJson(o.quantity),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
+      "locationid" -> Writes.OptionWrites(LocationId.writes).writes(o.locationid),
+      "shelf" -> Writes.OptionWrites(Writes.StringWrites).writes(o.shelf),
+      "bin" -> Writes.OptionWrites(Writes.IntWrites).writes(o.bin),
+      "quantity" -> Writes.OptionWrites(Writes.IntWrites).writes(o.quantity),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -8,8 +8,8 @@ package pg_catalog
 package pg_config
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -20,16 +20,16 @@ case class PgConfigViewRow(
 )
 
 object PgConfigViewRow {
-  implicit val decoder: Decoder[PgConfigViewRow] = Decoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(PgConfigViewRow.apply)
-  implicit val encoder: Encoder[PgConfigViewRow] = Encoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(x => (x.name, x.setting))
+  implicit val decoder: Decoder[PgConfigViewRow] = Decoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(PgConfigViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgConfigViewRow] = Encoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(x => (x.name, x.setting))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgConfigViewRow] = new Read[PgConfigViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgConfigViewRow(
-      name = Get[String].unsafeGetNullable(rs, i + 0),
-      setting = Get[String].unsafeGetNullable(rs, i + 1)
+      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      setting = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1)
     )
   )
 }

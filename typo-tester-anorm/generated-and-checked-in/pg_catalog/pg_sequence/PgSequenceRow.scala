@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_sequence
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,14 +34,14 @@ object PgSequenceRow {
   implicit val reads: Reads[PgSequenceRow] = Reads[PgSequenceRow](json => JsResult.fromTry(
       Try(
         PgSequenceRow(
-          seqrelid = json.\("seqrelid").as[PgSequenceId],
-          seqtypid = json.\("seqtypid").as[/* oid */ Long],
-          seqstart = json.\("seqstart").as[Long],
-          seqincrement = json.\("seqincrement").as[Long],
-          seqmax = json.\("seqmax").as[Long],
-          seqmin = json.\("seqmin").as[Long],
-          seqcache = json.\("seqcache").as[Long],
-          seqcycle = json.\("seqcycle").as[Boolean]
+          seqrelid = json.\("seqrelid").as(PgSequenceId.reads),
+          seqtypid = json.\("seqtypid").as(Reads.LongReads),
+          seqstart = json.\("seqstart").as(Reads.LongReads),
+          seqincrement = json.\("seqincrement").as(Reads.LongReads),
+          seqmax = json.\("seqmax").as(Reads.LongReads),
+          seqmin = json.\("seqmin").as(Reads.LongReads),
+          seqcache = json.\("seqcache").as(Reads.LongReads),
+          seqcycle = json.\("seqcycle").as(Reads.BooleanReads)
         )
       )
     ),
@@ -48,27 +49,27 @@ object PgSequenceRow {
   def rowParser(idx: Int): RowParser[PgSequenceRow] = RowParser[PgSequenceRow] { row =>
     Success(
       PgSequenceRow(
-        seqrelid = row[PgSequenceId](idx + 0),
-        seqtypid = row[/* oid */ Long](idx + 1),
-        seqstart = row[Long](idx + 2),
-        seqincrement = row[Long](idx + 3),
-        seqmax = row[Long](idx + 4),
-        seqmin = row[Long](idx + 5),
-        seqcache = row[Long](idx + 6),
-        seqcycle = row[Boolean](idx + 7)
+        seqrelid = row(idx + 0)(PgSequenceId.column),
+        seqtypid = row(idx + 1)(Column.columnToLong),
+        seqstart = row(idx + 2)(Column.columnToLong),
+        seqincrement = row(idx + 3)(Column.columnToLong),
+        seqmax = row(idx + 4)(Column.columnToLong),
+        seqmin = row(idx + 5)(Column.columnToLong),
+        seqcache = row(idx + 6)(Column.columnToLong),
+        seqcycle = row(idx + 7)(Column.columnToBoolean)
       )
     )
   }
   implicit val writes: OWrites[PgSequenceRow] = OWrites[PgSequenceRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "seqrelid" -> Json.toJson(o.seqrelid),
-      "seqtypid" -> Json.toJson(o.seqtypid),
-      "seqstart" -> Json.toJson(o.seqstart),
-      "seqincrement" -> Json.toJson(o.seqincrement),
-      "seqmax" -> Json.toJson(o.seqmax),
-      "seqmin" -> Json.toJson(o.seqmin),
-      "seqcache" -> Json.toJson(o.seqcache),
-      "seqcycle" -> Json.toJson(o.seqcycle)
+      "seqrelid" -> PgSequenceId.writes.writes(o.seqrelid),
+      "seqtypid" -> Writes.LongWrites.writes(o.seqtypid),
+      "seqstart" -> Writes.LongWrites.writes(o.seqstart),
+      "seqincrement" -> Writes.LongWrites.writes(o.seqincrement),
+      "seqmax" -> Writes.LongWrites.writes(o.seqmax),
+      "seqmin" -> Writes.LongWrites.writes(o.seqmin),
+      "seqcache" -> Writes.LongWrites.writes(o.seqcache),
+      "seqcycle" -> Writes.BooleanWrites.writes(o.seqcycle)
     ))
   )
 }

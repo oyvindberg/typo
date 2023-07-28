@@ -10,14 +10,15 @@ package pmi
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,9 +35,9 @@ object PmiViewRow {
   implicit val reads: Reads[PmiViewRow] = Reads[PmiViewRow](json => JsResult.fromTry(
       Try(
         PmiViewRow(
-          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-          illustrationid = json.\("illustrationid").toOption.map(_.as[IllustrationId]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          productmodelid = json.\("productmodelid").toOption.map(_.as(ProductmodelId.reads)),
+          illustrationid = json.\("illustrationid").toOption.map(_.as(IllustrationId.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -44,17 +45,17 @@ object PmiViewRow {
   def rowParser(idx: Int): RowParser[PmiViewRow] = RowParser[PmiViewRow] { row =>
     Success(
       PmiViewRow(
-        productmodelid = row[Option[ProductmodelId]](idx + 0),
-        illustrationid = row[Option[IllustrationId]](idx + 1),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 2)
+        productmodelid = row(idx + 0)(Column.columnToOption(ProductmodelId.column)),
+        illustrationid = row(idx + 1)(Column.columnToOption(IllustrationId.column)),
+        modifieddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[PmiViewRow] = OWrites[PmiViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productmodelid" -> Json.toJson(o.productmodelid),
-      "illustrationid" -> Json.toJson(o.illustrationid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productmodelid" -> Writes.OptionWrites(ProductmodelId.writes).writes(o.productmodelid),
+      "illustrationid" -> Writes.OptionWrites(IllustrationId.writes).writes(o.illustrationid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

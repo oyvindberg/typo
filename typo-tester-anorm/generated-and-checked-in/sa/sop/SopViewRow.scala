@@ -10,15 +10,16 @@ package sop
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -38,11 +39,11 @@ object SopViewRow {
   implicit val reads: Reads[SopViewRow] = Reads[SopViewRow](json => JsResult.fromTry(
       Try(
         SopViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),
-          productid = json.\("productid").toOption.map(_.as[ProductId]),
-          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          specialofferid = json.\("specialofferid").toOption.map(_.as(SpecialofferId.reads)),
+          productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
+          rowguid = json.\("rowguid").toOption.map(_.as(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -50,21 +51,21 @@ object SopViewRow {
   def rowParser(idx: Int): RowParser[SopViewRow] = RowParser[SopViewRow] { row =>
     Success(
       SopViewRow(
-        id = row[Option[Int]](idx + 0),
-        specialofferid = row[Option[SpecialofferId]](idx + 1),
-        productid = row[Option[ProductId]](idx + 2),
-        rowguid = row[Option[UUID]](idx + 3),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        specialofferid = row(idx + 1)(Column.columnToOption(SpecialofferId.column)),
+        productid = row(idx + 2)(Column.columnToOption(ProductId.column)),
+        rowguid = row(idx + 3)(Column.columnToOption(Column.columnToUUID)),
+        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[SopViewRow] = OWrites[SopViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "specialofferid" -> Json.toJson(o.specialofferid),
-      "productid" -> Json.toJson(o.productid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "specialofferid" -> Writes.OptionWrites(SpecialofferId.writes).writes(o.specialofferid),
+      "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
+      "rowguid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

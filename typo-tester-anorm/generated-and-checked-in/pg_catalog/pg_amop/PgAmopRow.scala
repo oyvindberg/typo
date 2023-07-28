@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_amop
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -34,15 +35,15 @@ object PgAmopRow {
   implicit val reads: Reads[PgAmopRow] = Reads[PgAmopRow](json => JsResult.fromTry(
       Try(
         PgAmopRow(
-          oid = json.\("oid").as[PgAmopId],
-          amopfamily = json.\("amopfamily").as[/* oid */ Long],
-          amoplefttype = json.\("amoplefttype").as[/* oid */ Long],
-          amoprighttype = json.\("amoprighttype").as[/* oid */ Long],
-          amopstrategy = json.\("amopstrategy").as[Int],
-          amoppurpose = json.\("amoppurpose").as[String],
-          amopopr = json.\("amopopr").as[/* oid */ Long],
-          amopmethod = json.\("amopmethod").as[/* oid */ Long],
-          amopsortfamily = json.\("amopsortfamily").as[/* oid */ Long]
+          oid = json.\("oid").as(PgAmopId.reads),
+          amopfamily = json.\("amopfamily").as(Reads.LongReads),
+          amoplefttype = json.\("amoplefttype").as(Reads.LongReads),
+          amoprighttype = json.\("amoprighttype").as(Reads.LongReads),
+          amopstrategy = json.\("amopstrategy").as(Reads.IntReads),
+          amoppurpose = json.\("amoppurpose").as(Reads.StringReads),
+          amopopr = json.\("amopopr").as(Reads.LongReads),
+          amopmethod = json.\("amopmethod").as(Reads.LongReads),
+          amopsortfamily = json.\("amopsortfamily").as(Reads.LongReads)
         )
       )
     ),
@@ -50,29 +51,29 @@ object PgAmopRow {
   def rowParser(idx: Int): RowParser[PgAmopRow] = RowParser[PgAmopRow] { row =>
     Success(
       PgAmopRow(
-        oid = row[PgAmopId](idx + 0),
-        amopfamily = row[/* oid */ Long](idx + 1),
-        amoplefttype = row[/* oid */ Long](idx + 2),
-        amoprighttype = row[/* oid */ Long](idx + 3),
-        amopstrategy = row[Int](idx + 4),
-        amoppurpose = row[String](idx + 5),
-        amopopr = row[/* oid */ Long](idx + 6),
-        amopmethod = row[/* oid */ Long](idx + 7),
-        amopsortfamily = row[/* oid */ Long](idx + 8)
+        oid = row(idx + 0)(PgAmopId.column),
+        amopfamily = row(idx + 1)(Column.columnToLong),
+        amoplefttype = row(idx + 2)(Column.columnToLong),
+        amoprighttype = row(idx + 3)(Column.columnToLong),
+        amopstrategy = row(idx + 4)(Column.columnToInt),
+        amoppurpose = row(idx + 5)(Column.columnToString),
+        amopopr = row(idx + 6)(Column.columnToLong),
+        amopmethod = row(idx + 7)(Column.columnToLong),
+        amopsortfamily = row(idx + 8)(Column.columnToLong)
       )
     )
   }
   implicit val writes: OWrites[PgAmopRow] = OWrites[PgAmopRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "amopfamily" -> Json.toJson(o.amopfamily),
-      "amoplefttype" -> Json.toJson(o.amoplefttype),
-      "amoprighttype" -> Json.toJson(o.amoprighttype),
-      "amopstrategy" -> Json.toJson(o.amopstrategy),
-      "amoppurpose" -> Json.toJson(o.amoppurpose),
-      "amopopr" -> Json.toJson(o.amopopr),
-      "amopmethod" -> Json.toJson(o.amopmethod),
-      "amopsortfamily" -> Json.toJson(o.amopsortfamily)
+      "oid" -> PgAmopId.writes.writes(o.oid),
+      "amopfamily" -> Writes.LongWrites.writes(o.amopfamily),
+      "amoplefttype" -> Writes.LongWrites.writes(o.amoplefttype),
+      "amoprighttype" -> Writes.LongWrites.writes(o.amoprighttype),
+      "amopstrategy" -> Writes.IntWrites.writes(o.amopstrategy),
+      "amoppurpose" -> Writes.StringWrites.writes(o.amoppurpose),
+      "amopopr" -> Writes.LongWrites.writes(o.amopopr),
+      "amopmethod" -> Writes.LongWrites.writes(o.amopmethod),
+      "amopsortfamily" -> Writes.LongWrites.writes(o.amopsortfamily)
     ))
   )
 }

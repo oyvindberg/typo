@@ -11,15 +11,16 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -43,11 +44,11 @@ object BusinessentityaddressRow {
   implicit val reads: Reads[BusinessentityaddressRow] = Reads[BusinessentityaddressRow](json => JsResult.fromTry(
       Try(
         BusinessentityaddressRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          addressid = json.\("addressid").as[AddressId],
-          addresstypeid = json.\("addresstypeid").as[AddresstypeId],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          addressid = json.\("addressid").as(AddressId.reads),
+          addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -55,21 +56,21 @@ object BusinessentityaddressRow {
   def rowParser(idx: Int): RowParser[BusinessentityaddressRow] = RowParser[BusinessentityaddressRow] { row =>
     Success(
       BusinessentityaddressRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        addressid = row[AddressId](idx + 1),
-        addresstypeid = row[AddresstypeId](idx + 2),
-        rowguid = row[UUID](idx + 3),
-        modifieddate = row[TypoLocalDateTime](idx + 4)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        addressid = row(idx + 1)(AddressId.column),
+        addresstypeid = row(idx + 2)(AddresstypeId.column),
+        rowguid = row(idx + 3)(Column.columnToUUID),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[BusinessentityaddressRow] = OWrites[BusinessentityaddressRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "addressid" -> Json.toJson(o.addressid),
-      "addresstypeid" -> Json.toJson(o.addresstypeid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "addressid" -> AddressId.writes.writes(o.addressid),
+      "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

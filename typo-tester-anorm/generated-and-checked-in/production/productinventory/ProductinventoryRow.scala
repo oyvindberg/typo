@@ -10,15 +10,16 @@ package productinventory
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -45,13 +46,13 @@ object ProductinventoryRow {
   implicit val reads: Reads[ProductinventoryRow] = Reads[ProductinventoryRow](json => JsResult.fromTry(
       Try(
         ProductinventoryRow(
-          productid = json.\("productid").as[ProductId],
-          locationid = json.\("locationid").as[LocationId],
-          shelf = json.\("shelf").as[/* max 10 chars */ String],
-          bin = json.\("bin").as[Int],
-          quantity = json.\("quantity").as[Int],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productid = json.\("productid").as(ProductId.reads),
+          locationid = json.\("locationid").as(LocationId.reads),
+          shelf = json.\("shelf").as(Reads.StringReads),
+          bin = json.\("bin").as(Reads.IntReads),
+          quantity = json.\("quantity").as(Reads.IntReads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -59,25 +60,25 @@ object ProductinventoryRow {
   def rowParser(idx: Int): RowParser[ProductinventoryRow] = RowParser[ProductinventoryRow] { row =>
     Success(
       ProductinventoryRow(
-        productid = row[ProductId](idx + 0),
-        locationid = row[LocationId](idx + 1),
-        shelf = row[/* max 10 chars */ String](idx + 2),
-        bin = row[Int](idx + 3),
-        quantity = row[Int](idx + 4),
-        rowguid = row[UUID](idx + 5),
-        modifieddate = row[TypoLocalDateTime](idx + 6)
+        productid = row(idx + 0)(ProductId.column),
+        locationid = row(idx + 1)(LocationId.column),
+        shelf = row(idx + 2)(Column.columnToString),
+        bin = row(idx + 3)(Column.columnToInt),
+        quantity = row(idx + 4)(Column.columnToInt),
+        rowguid = row(idx + 5)(Column.columnToUUID),
+        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductinventoryRow] = OWrites[ProductinventoryRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "locationid" -> Json.toJson(o.locationid),
-      "shelf" -> Json.toJson(o.shelf),
-      "bin" -> Json.toJson(o.bin),
-      "quantity" -> Json.toJson(o.quantity),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "locationid" -> LocationId.writes.writes(o.locationid),
+      "shelf" -> Writes.StringWrites.writes(o.shelf),
+      "bin" -> Writes.IntWrites.writes(o.bin),
+      "quantity" -> Writes.IntWrites.writes(o.quantity),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

@@ -8,14 +8,15 @@ package person_detail
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -44,15 +45,15 @@ object PersonDetailSqlRow {
   implicit val reads: Reads[PersonDetailSqlRow] = Reads[PersonDetailSqlRow](json => JsResult.fromTry(
       Try(
         PersonDetailSqlRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-          firstname = json.\("firstname").as[Name],
-          middlename = json.\("middlename").toOption.map(_.as[Name]),
-          lastname = json.\("lastname").as[Name],
-          jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
-          addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
-          city = json.\("city").as[/* max 30 chars */ String],
-          postalcode = json.\("postalcode").as[/* max 15 chars */ String]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          title = json.\("title").toOption.map(_.as(Reads.StringReads)),
+          firstname = json.\("firstname").as(Name.reads),
+          middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
+          lastname = json.\("lastname").as(Name.reads),
+          jobtitle = json.\("jobtitle").as(Reads.StringReads),
+          addressline1 = json.\("addressline1").as(Reads.StringReads),
+          city = json.\("city").as(Reads.StringReads),
+          postalcode = json.\("postalcode").as(Reads.StringReads)
         )
       )
     ),
@@ -60,29 +61,29 @@ object PersonDetailSqlRow {
   def rowParser(idx: Int): RowParser[PersonDetailSqlRow] = RowParser[PersonDetailSqlRow] { row =>
     Success(
       PersonDetailSqlRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        title = row[Option[/* max 8 chars */ String]](idx + 1),
-        firstname = row[Name](idx + 2),
-        middlename = row[Option[Name]](idx + 3),
-        lastname = row[Name](idx + 4),
-        jobtitle = row[/* max 50 chars */ String](idx + 5),
-        addressline1 = row[/* max 60 chars */ String](idx + 6),
-        city = row[/* max 30 chars */ String](idx + 7),
-        postalcode = row[/* max 15 chars */ String](idx + 8)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        title = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        firstname = row(idx + 2)(Name.column),
+        middlename = row(idx + 3)(Column.columnToOption(Name.column)),
+        lastname = row(idx + 4)(Name.column),
+        jobtitle = row(idx + 5)(Column.columnToString),
+        addressline1 = row(idx + 6)(Column.columnToString),
+        city = row(idx + 7)(Column.columnToString),
+        postalcode = row(idx + 8)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PersonDetailSqlRow] = OWrites[PersonDetailSqlRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "title" -> Json.toJson(o.title),
-      "firstname" -> Json.toJson(o.firstname),
-      "middlename" -> Json.toJson(o.middlename),
-      "lastname" -> Json.toJson(o.lastname),
-      "jobtitle" -> Json.toJson(o.jobtitle),
-      "addressline1" -> Json.toJson(o.addressline1),
-      "city" -> Json.toJson(o.city),
-      "postalcode" -> Json.toJson(o.postalcode)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
+      "firstname" -> Name.writes.writes(o.firstname),
+      "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
+      "lastname" -> Name.writes.writes(o.lastname),
+      "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),
+      "addressline1" -> Writes.StringWrites.writes(o.addressline1),
+      "city" -> Writes.StringWrites.writes(o.city),
+      "postalcode" -> Writes.StringWrites.writes(o.postalcode)
     ))
   )
 }

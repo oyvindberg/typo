@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_shmem_allocations
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,10 +30,10 @@ object PgShmemAllocationsViewRow {
   implicit val reads: Reads[PgShmemAllocationsViewRow] = Reads[PgShmemAllocationsViewRow](json => JsResult.fromTry(
       Try(
         PgShmemAllocationsViewRow(
-          name = json.\("name").toOption.map(_.as[String]),
-          off = json.\("off").toOption.map(_.as[Long]),
-          size = json.\("size").toOption.map(_.as[Long]),
-          allocatedSize = json.\("allocated_size").toOption.map(_.as[Long])
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          off = json.\("off").toOption.map(_.as(Reads.LongReads)),
+          size = json.\("size").toOption.map(_.as(Reads.LongReads)),
+          allocatedSize = json.\("allocated_size").toOption.map(_.as(Reads.LongReads))
         )
       )
     ),
@@ -40,19 +41,19 @@ object PgShmemAllocationsViewRow {
   def rowParser(idx: Int): RowParser[PgShmemAllocationsViewRow] = RowParser[PgShmemAllocationsViewRow] { row =>
     Success(
       PgShmemAllocationsViewRow(
-        name = row[Option[String]](idx + 0),
-        off = row[Option[Long]](idx + 1),
-        size = row[Option[Long]](idx + 2),
-        allocatedSize = row[Option[Long]](idx + 3)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        off = row(idx + 1)(Column.columnToOption(Column.columnToLong)),
+        size = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        allocatedSize = row(idx + 3)(Column.columnToOption(Column.columnToLong))
       )
     )
   }
   implicit val writes: OWrites[PgShmemAllocationsViewRow] = OWrites[PgShmemAllocationsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "off" -> Json.toJson(o.off),
-      "size" -> Json.toJson(o.size),
-      "allocated_size" -> Json.toJson(o.allocatedSize)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "off" -> Writes.OptionWrites(Writes.LongWrites).writes(o.off),
+      "size" -> Writes.OptionWrites(Writes.LongWrites).writes(o.size),
+      "allocated_size" -> Writes.OptionWrites(Writes.LongWrites).writes(o.allocatedSize)
     ))
   )
 }

@@ -15,9 +15,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -91,38 +91,38 @@ object DocumentRowUnsaved {
   implicit val reads: Reads[DocumentRowUnsaved] = Reads[DocumentRowUnsaved](json => JsResult.fromTry(
       Try(
         DocumentRowUnsaved(
-          title = json.\("title").as[/* max 50 chars */ String],
-          owner = json.\("owner").as[BusinessentityId],
-          filename = json.\("filename").as[/* max 400 chars */ String],
-          fileextension = json.\("fileextension").toOption.map(_.as[/* max 8 chars */ String]),
-          revision = json.\("revision").as[/* bpchar */ String],
-          status = json.\("status").as[Int],
-          documentsummary = json.\("documentsummary").toOption.map(_.as[String]),
-          document = json.\("document").toOption.map(_.as[Array[Byte]]),
-          folderflag = json.\("folderflag").as[Defaulted[Flag]],
-          changenumber = json.\("changenumber").as[Defaulted[Int]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]],
-          documentnode = json.\("documentnode").as[Defaulted[DocumentId]]
+          title = json.\("title").as(Reads.StringReads),
+          owner = json.\("owner").as(BusinessentityId.reads),
+          filename = json.\("filename").as(Reads.StringReads),
+          fileextension = json.\("fileextension").toOption.map(_.as(Reads.StringReads)),
+          revision = json.\("revision").as(Reads.StringReads),
+          status = json.\("status").as(Reads.IntReads),
+          documentsummary = json.\("documentsummary").toOption.map(_.as(Reads.StringReads)),
+          document = json.\("document").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          folderflag = json.\("folderflag").as(Defaulted.reads(Flag.reads)),
+          changenumber = json.\("changenumber").as(Defaulted.reads(Reads.IntReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads)),
+          documentnode = json.\("documentnode").as(Defaulted.reads(DocumentId.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[DocumentRowUnsaved] = OWrites[DocumentRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "title" -> Json.toJson(o.title),
-      "owner" -> Json.toJson(o.owner),
-      "filename" -> Json.toJson(o.filename),
-      "fileextension" -> Json.toJson(o.fileextension),
-      "revision" -> Json.toJson(o.revision),
-      "status" -> Json.toJson(o.status),
-      "documentsummary" -> Json.toJson(o.documentsummary),
-      "document" -> Json.toJson(o.document),
-      "folderflag" -> Json.toJson(o.folderflag),
-      "changenumber" -> Json.toJson(o.changenumber),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate),
-      "documentnode" -> Json.toJson(o.documentnode)
+      "title" -> Writes.StringWrites.writes(o.title),
+      "owner" -> BusinessentityId.writes.writes(o.owner),
+      "filename" -> Writes.StringWrites.writes(o.filename),
+      "fileextension" -> Writes.OptionWrites(Writes.StringWrites).writes(o.fileextension),
+      "revision" -> Writes.StringWrites.writes(o.revision),
+      "status" -> Writes.IntWrites.writes(o.status),
+      "documentsummary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.documentsummary),
+      "document" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.document),
+      "folderflag" -> Defaulted.writes(Flag.writes).writes(o.folderflag),
+      "changenumber" -> Defaulted.writes(Writes.IntWrites).writes(o.changenumber),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate),
+      "documentnode" -> Defaulted.writes(DocumentId.writes).writes(o.documentnode)
     ))
   )
 }

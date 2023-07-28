@@ -8,16 +8,19 @@ package pg_catalog
 package pg_enum
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgEnumRepoImpl extends PgEnumRepo {
   override def delete(oid: PgEnumId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_enum where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_enum where oid = ${fromWrite(oid)(Write.fromPut(PgEnumId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow] = {
     sql"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)
-          values (${unsaved.oid}::oid, ${unsaved.enumtypid}::oid, ${unsaved.enumsortorder}::float4, ${unsaved.enumlabel}::name)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgEnumId.put))}::oid, ${fromWrite(unsaved.enumtypid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.enumsortorder)(Write.fromPut(Meta.FloatMeta.put))}::float4, ${fromWrite(unsaved.enumlabel)(Write.fromPut(Meta.StringMeta.put))}::name)
           returning oid, enumtypid, enumsortorder, enumlabel
        """.query(PgEnumRow.read).unique
   }
@@ -25,18 +28,18 @@ object PgEnumRepoImpl extends PgEnumRepo {
     sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum".query(PgEnumRow.read).stream
   }
   override def selectById(oid: PgEnumId): ConnectionIO[Option[PgEnumRow]] = {
-    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ${oid}".query(PgEnumRow.read).option
+    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ${fromWrite(oid)(Write.fromPut(PgEnumId.put))}".query(PgEnumRow.read).option
   }
   override def selectByIds(oids: Array[PgEnumId]): Stream[ConnectionIO, PgEnumRow] = {
-    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ANY(${oids})".query(PgEnumRow.read).stream
+    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ANY(${fromWrite(oids)(Write.fromPut(PgEnumId.arrayPut))})".query(PgEnumRow.read).stream
   }
   override def update(row: PgEnumRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_enum
-          set enumtypid = ${row.enumtypid}::oid,
-              enumsortorder = ${row.enumsortorder}::float4,
-              enumlabel = ${row.enumlabel}::name
-          where oid = ${oid}
+          set enumtypid = ${fromWrite(row.enumtypid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              enumsortorder = ${fromWrite(row.enumsortorder)(Write.fromPut(Meta.FloatMeta.put))}::float4,
+              enumlabel = ${fromWrite(row.enumlabel)(Write.fromPut(Meta.StringMeta.put))}::name
+          where oid = ${fromWrite(oid)(Write.fromPut(PgEnumId.put))}
        """
       .update
       .run
@@ -45,10 +48,10 @@ object PgEnumRepoImpl extends PgEnumRepo {
   override def upsert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow] = {
     sql"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.enumtypid}::oid,
-            ${unsaved.enumsortorder}::float4,
-            ${unsaved.enumlabel}::name
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgEnumId.put))}::oid,
+            ${fromWrite(unsaved.enumtypid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.enumsortorder)(Write.fromPut(Meta.FloatMeta.put))}::float4,
+            ${fromWrite(unsaved.enumlabel)(Write.fromPut(Meta.StringMeta.put))}::name
           )
           on conflict (oid)
           do update set

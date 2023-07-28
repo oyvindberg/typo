@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_description
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,10 +32,10 @@ object PgDescriptionRow {
   implicit val reads: Reads[PgDescriptionRow] = Reads[PgDescriptionRow](json => JsResult.fromTry(
       Try(
         PgDescriptionRow(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long],
-          objsubid = json.\("objsubid").as[Int],
-          description = json.\("description").as[String]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads),
+          objsubid = json.\("objsubid").as(Reads.IntReads),
+          description = json.\("description").as(Reads.StringReads)
         )
       )
     ),
@@ -42,19 +43,19 @@ object PgDescriptionRow {
   def rowParser(idx: Int): RowParser[PgDescriptionRow] = RowParser[PgDescriptionRow] { row =>
     Success(
       PgDescriptionRow(
-        objoid = row[/* oid */ Long](idx + 0),
-        classoid = row[/* oid */ Long](idx + 1),
-        objsubid = row[Int](idx + 2),
-        description = row[String](idx + 3)
+        objoid = row(idx + 0)(Column.columnToLong),
+        classoid = row(idx + 1)(Column.columnToLong),
+        objsubid = row(idx + 2)(Column.columnToInt),
+        description = row(idx + 3)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgDescriptionRow] = OWrites[PgDescriptionRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "objsubid" -> Json.toJson(o.objsubid),
-      "description" -> Json.toJson(o.description)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid),
+      "objsubid" -> Writes.IntWrites.writes(o.objsubid),
+      "description" -> Writes.StringWrites.writes(o.description)
     ))
   )
 }

@@ -14,7 +14,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -32,9 +31,9 @@ object PhonenumbertypeRow {
   implicit val reads: Reads[PhonenumbertypeRow] = Reads[PhonenumbertypeRow](json => JsResult.fromTry(
       Try(
         PhonenumbertypeRow(
-          phonenumbertypeid = json.\("phonenumbertypeid").as[PhonenumbertypeId],
-          name = json.\("name").as[Name],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          phonenumbertypeid = json.\("phonenumbertypeid").as(PhonenumbertypeId.reads),
+          name = json.\("name").as(Name.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -42,17 +41,17 @@ object PhonenumbertypeRow {
   def rowParser(idx: Int): RowParser[PhonenumbertypeRow] = RowParser[PhonenumbertypeRow] { row =>
     Success(
       PhonenumbertypeRow(
-        phonenumbertypeid = row[PhonenumbertypeId](idx + 0),
-        name = row[Name](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        phonenumbertypeid = row(idx + 0)(PhonenumbertypeId.column),
+        name = row(idx + 1)(Name.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[PhonenumbertypeRow] = OWrites[PhonenumbertypeRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
-      "name" -> Json.toJson(o.name),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "phonenumbertypeid" -> PhonenumbertypeId.writes.writes(o.phonenumbertypeid),
+      "name" -> Name.writes.writes(o.name),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

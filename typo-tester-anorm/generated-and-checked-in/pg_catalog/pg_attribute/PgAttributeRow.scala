@@ -9,14 +9,15 @@ package pg_attribute
 
 import adventureworks.TypoAclItem
 import adventureworks.TypoAnyArray
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -55,32 +56,32 @@ object PgAttributeRow {
   implicit val reads: Reads[PgAttributeRow] = Reads[PgAttributeRow](json => JsResult.fromTry(
       Try(
         PgAttributeRow(
-          attrelid = json.\("attrelid").as[/* oid */ Long],
-          attname = json.\("attname").as[String],
-          atttypid = json.\("atttypid").as[/* oid */ Long],
-          attstattarget = json.\("attstattarget").as[Int],
-          attlen = json.\("attlen").as[Int],
-          attnum = json.\("attnum").as[Int],
-          attndims = json.\("attndims").as[Int],
-          attcacheoff = json.\("attcacheoff").as[Int],
-          atttypmod = json.\("atttypmod").as[Int],
-          attbyval = json.\("attbyval").as[Boolean],
-          attalign = json.\("attalign").as[String],
-          attstorage = json.\("attstorage").as[String],
-          attcompression = json.\("attcompression").as[String],
-          attnotnull = json.\("attnotnull").as[Boolean],
-          atthasdef = json.\("atthasdef").as[Boolean],
-          atthasmissing = json.\("atthasmissing").as[Boolean],
-          attidentity = json.\("attidentity").as[String],
-          attgenerated = json.\("attgenerated").as[String],
-          attisdropped = json.\("attisdropped").as[Boolean],
-          attislocal = json.\("attislocal").as[Boolean],
-          attinhcount = json.\("attinhcount").as[Int],
-          attcollation = json.\("attcollation").as[/* oid */ Long],
-          attacl = json.\("attacl").toOption.map(_.as[Array[TypoAclItem]]),
-          attoptions = json.\("attoptions").toOption.map(_.as[Array[String]]),
-          attfdwoptions = json.\("attfdwoptions").toOption.map(_.as[Array[String]]),
-          attmissingval = json.\("attmissingval").toOption.map(_.as[TypoAnyArray])
+          attrelid = json.\("attrelid").as(Reads.LongReads),
+          attname = json.\("attname").as(Reads.StringReads),
+          atttypid = json.\("atttypid").as(Reads.LongReads),
+          attstattarget = json.\("attstattarget").as(Reads.IntReads),
+          attlen = json.\("attlen").as(Reads.IntReads),
+          attnum = json.\("attnum").as(Reads.IntReads),
+          attndims = json.\("attndims").as(Reads.IntReads),
+          attcacheoff = json.\("attcacheoff").as(Reads.IntReads),
+          atttypmod = json.\("atttypmod").as(Reads.IntReads),
+          attbyval = json.\("attbyval").as(Reads.BooleanReads),
+          attalign = json.\("attalign").as(Reads.StringReads),
+          attstorage = json.\("attstorage").as(Reads.StringReads),
+          attcompression = json.\("attcompression").as(Reads.StringReads),
+          attnotnull = json.\("attnotnull").as(Reads.BooleanReads),
+          atthasdef = json.\("atthasdef").as(Reads.BooleanReads),
+          atthasmissing = json.\("atthasmissing").as(Reads.BooleanReads),
+          attidentity = json.\("attidentity").as(Reads.StringReads),
+          attgenerated = json.\("attgenerated").as(Reads.StringReads),
+          attisdropped = json.\("attisdropped").as(Reads.BooleanReads),
+          attislocal = json.\("attislocal").as(Reads.BooleanReads),
+          attinhcount = json.\("attinhcount").as(Reads.IntReads),
+          attcollation = json.\("attcollation").as(Reads.LongReads),
+          attacl = json.\("attacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly))),
+          attoptions = json.\("attoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          attfdwoptions = json.\("attfdwoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          attmissingval = json.\("attmissingval").toOption.map(_.as(TypoAnyArray.reads))
         )
       )
     ),
@@ -88,63 +89,63 @@ object PgAttributeRow {
   def rowParser(idx: Int): RowParser[PgAttributeRow] = RowParser[PgAttributeRow] { row =>
     Success(
       PgAttributeRow(
-        attrelid = row[/* oid */ Long](idx + 0),
-        attname = row[String](idx + 1),
-        atttypid = row[/* oid */ Long](idx + 2),
-        attstattarget = row[Int](idx + 3),
-        attlen = row[Int](idx + 4),
-        attnum = row[Int](idx + 5),
-        attndims = row[Int](idx + 6),
-        attcacheoff = row[Int](idx + 7),
-        atttypmod = row[Int](idx + 8),
-        attbyval = row[Boolean](idx + 9),
-        attalign = row[String](idx + 10),
-        attstorage = row[String](idx + 11),
-        attcompression = row[String](idx + 12),
-        attnotnull = row[Boolean](idx + 13),
-        atthasdef = row[Boolean](idx + 14),
-        atthasmissing = row[Boolean](idx + 15),
-        attidentity = row[String](idx + 16),
-        attgenerated = row[String](idx + 17),
-        attisdropped = row[Boolean](idx + 18),
-        attislocal = row[Boolean](idx + 19),
-        attinhcount = row[Int](idx + 20),
-        attcollation = row[/* oid */ Long](idx + 21),
-        attacl = row[Option[Array[TypoAclItem]]](idx + 22),
-        attoptions = row[Option[Array[String]]](idx + 23),
-        attfdwoptions = row[Option[Array[String]]](idx + 24),
-        attmissingval = row[Option[TypoAnyArray]](idx + 25)
+        attrelid = row(idx + 0)(Column.columnToLong),
+        attname = row(idx + 1)(Column.columnToString),
+        atttypid = row(idx + 2)(Column.columnToLong),
+        attstattarget = row(idx + 3)(Column.columnToInt),
+        attlen = row(idx + 4)(Column.columnToInt),
+        attnum = row(idx + 5)(Column.columnToInt),
+        attndims = row(idx + 6)(Column.columnToInt),
+        attcacheoff = row(idx + 7)(Column.columnToInt),
+        atttypmod = row(idx + 8)(Column.columnToInt),
+        attbyval = row(idx + 9)(Column.columnToBoolean),
+        attalign = row(idx + 10)(Column.columnToString),
+        attstorage = row(idx + 11)(Column.columnToString),
+        attcompression = row(idx + 12)(Column.columnToString),
+        attnotnull = row(idx + 13)(Column.columnToBoolean),
+        atthasdef = row(idx + 14)(Column.columnToBoolean),
+        atthasmissing = row(idx + 15)(Column.columnToBoolean),
+        attidentity = row(idx + 16)(Column.columnToString),
+        attgenerated = row(idx + 17)(Column.columnToString),
+        attisdropped = row(idx + 18)(Column.columnToBoolean),
+        attislocal = row(idx + 19)(Column.columnToBoolean),
+        attinhcount = row(idx + 20)(Column.columnToInt),
+        attcollation = row(idx + 21)(Column.columnToLong),
+        attacl = row(idx + 22)(Column.columnToOption(TypoAclItem.arrayColumn)),
+        attoptions = row(idx + 23)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        attfdwoptions = row(idx + 24)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        attmissingval = row(idx + 25)(Column.columnToOption(TypoAnyArray.column))
       )
     )
   }
   implicit val writes: OWrites[PgAttributeRow] = OWrites[PgAttributeRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "attrelid" -> Json.toJson(o.attrelid),
-      "attname" -> Json.toJson(o.attname),
-      "atttypid" -> Json.toJson(o.atttypid),
-      "attstattarget" -> Json.toJson(o.attstattarget),
-      "attlen" -> Json.toJson(o.attlen),
-      "attnum" -> Json.toJson(o.attnum),
-      "attndims" -> Json.toJson(o.attndims),
-      "attcacheoff" -> Json.toJson(o.attcacheoff),
-      "atttypmod" -> Json.toJson(o.atttypmod),
-      "attbyval" -> Json.toJson(o.attbyval),
-      "attalign" -> Json.toJson(o.attalign),
-      "attstorage" -> Json.toJson(o.attstorage),
-      "attcompression" -> Json.toJson(o.attcompression),
-      "attnotnull" -> Json.toJson(o.attnotnull),
-      "atthasdef" -> Json.toJson(o.atthasdef),
-      "atthasmissing" -> Json.toJson(o.atthasmissing),
-      "attidentity" -> Json.toJson(o.attidentity),
-      "attgenerated" -> Json.toJson(o.attgenerated),
-      "attisdropped" -> Json.toJson(o.attisdropped),
-      "attislocal" -> Json.toJson(o.attislocal),
-      "attinhcount" -> Json.toJson(o.attinhcount),
-      "attcollation" -> Json.toJson(o.attcollation),
-      "attacl" -> Json.toJson(o.attacl),
-      "attoptions" -> Json.toJson(o.attoptions),
-      "attfdwoptions" -> Json.toJson(o.attfdwoptions),
-      "attmissingval" -> Json.toJson(o.attmissingval)
+      "attrelid" -> Writes.LongWrites.writes(o.attrelid),
+      "attname" -> Writes.StringWrites.writes(o.attname),
+      "atttypid" -> Writes.LongWrites.writes(o.atttypid),
+      "attstattarget" -> Writes.IntWrites.writes(o.attstattarget),
+      "attlen" -> Writes.IntWrites.writes(o.attlen),
+      "attnum" -> Writes.IntWrites.writes(o.attnum),
+      "attndims" -> Writes.IntWrites.writes(o.attndims),
+      "attcacheoff" -> Writes.IntWrites.writes(o.attcacheoff),
+      "atttypmod" -> Writes.IntWrites.writes(o.atttypmod),
+      "attbyval" -> Writes.BooleanWrites.writes(o.attbyval),
+      "attalign" -> Writes.StringWrites.writes(o.attalign),
+      "attstorage" -> Writes.StringWrites.writes(o.attstorage),
+      "attcompression" -> Writes.StringWrites.writes(o.attcompression),
+      "attnotnull" -> Writes.BooleanWrites.writes(o.attnotnull),
+      "atthasdef" -> Writes.BooleanWrites.writes(o.atthasdef),
+      "atthasmissing" -> Writes.BooleanWrites.writes(o.atthasmissing),
+      "attidentity" -> Writes.StringWrites.writes(o.attidentity),
+      "attgenerated" -> Writes.StringWrites.writes(o.attgenerated),
+      "attisdropped" -> Writes.BooleanWrites.writes(o.attisdropped),
+      "attislocal" -> Writes.BooleanWrites.writes(o.attislocal),
+      "attinhcount" -> Writes.IntWrites.writes(o.attinhcount),
+      "attcollation" -> Writes.LongWrites.writes(o.attcollation),
+      "attacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.attacl),
+      "attoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.attoptions),
+      "attfdwoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.attfdwoptions),
+      "attmissingval" -> Writes.OptionWrites(TypoAnyArray.writes).writes(o.attmissingval)
     ))
   )
 }

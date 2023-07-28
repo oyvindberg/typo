@@ -12,7 +12,6 @@ import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -34,36 +33,36 @@ case class SequencesViewRow(
 )
 
 object SequencesViewRow {
-  implicit val decoder: Decoder[SequencesViewRow] = Decoder.forProduct12[SequencesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CardinalNumber], Option[CardinalNumber], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(SequencesViewRow.apply)
-  implicit val encoder: Encoder[SequencesViewRow] = Encoder.forProduct12[SequencesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CardinalNumber], Option[CardinalNumber], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(x => (x.sequenceCatalog, x.sequenceSchema, x.sequenceName, x.dataType, x.numericPrecision, x.numericPrecisionRadix, x.numericScale, x.startValue, x.minimumValue, x.maximumValue, x.increment, x.cycleOption))
+  implicit val decoder: Decoder[SequencesViewRow] = Decoder.forProduct12[SequencesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CardinalNumber], Option[CardinalNumber], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(SequencesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder))
+  implicit val encoder: Encoder[SequencesViewRow] = Encoder.forProduct12[SequencesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CardinalNumber], Option[CardinalNumber], Option[CardinalNumber], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[CharacterData], Option[YesOrNo]]("sequence_catalog", "sequence_schema", "sequence_name", "data_type", "numeric_precision", "numeric_precision_radix", "numeric_scale", "start_value", "minimum_value", "maximum_value", "increment", "cycle_option")(x => (x.sequenceCatalog, x.sequenceSchema, x.sequenceName, x.dataType, x.numericPrecision, x.numericPrecisionRadix, x.numericScale, x.startValue, x.minimumValue, x.maximumValue, x.increment, x.cycleOption))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder))
   implicit val read: Read[SequencesViewRow] = new Read[SequencesViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CardinalNumber], Nullability.Nullable),
-      (Get[CardinalNumber], Nullability.Nullable),
-      (Get[CardinalNumber], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CardinalNumber.get, Nullability.Nullable),
+      (CardinalNumber.get, Nullability.Nullable),
+      (CardinalNumber.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SequencesViewRow(
-      sequenceCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      sequenceSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      sequenceName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      dataType = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-      numericPrecision = Get[CardinalNumber].unsafeGetNullable(rs, i + 4),
-      numericPrecisionRadix = Get[CardinalNumber].unsafeGetNullable(rs, i + 5),
-      numericScale = Get[CardinalNumber].unsafeGetNullable(rs, i + 6),
-      startValue = Get[CharacterData].unsafeGetNullable(rs, i + 7),
-      minimumValue = Get[CharacterData].unsafeGetNullable(rs, i + 8),
-      maximumValue = Get[CharacterData].unsafeGetNullable(rs, i + 9),
-      increment = Get[CharacterData].unsafeGetNullable(rs, i + 10),
-      cycleOption = Get[YesOrNo].unsafeGetNullable(rs, i + 11)
+      sequenceCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      sequenceSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      sequenceName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      dataType = CharacterData.get.unsafeGetNullable(rs, i + 3),
+      numericPrecision = CardinalNumber.get.unsafeGetNullable(rs, i + 4),
+      numericPrecisionRadix = CardinalNumber.get.unsafeGetNullable(rs, i + 5),
+      numericScale = CardinalNumber.get.unsafeGetNullable(rs, i + 6),
+      startValue = CharacterData.get.unsafeGetNullable(rs, i + 7),
+      minimumValue = CharacterData.get.unsafeGetNullable(rs, i + 8),
+      maximumValue = CharacterData.get.unsafeGetNullable(rs, i + 9),
+      increment = CharacterData.get.unsafeGetNullable(rs, i + 10),
+      cycleOption = YesOrNo.get.unsafeGetNullable(rs, i + 11)
     )
   )
 }

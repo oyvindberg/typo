@@ -11,14 +11,15 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -38,11 +39,11 @@ object JcViewRow {
   implicit val reads: Reads[JcViewRow] = Reads[JcViewRow](json => JsResult.fromTry(
       Try(
         JcViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as[JobcandidateId]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          resume = json.\("resume").toOption.map(_.as[TypoXml]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          jobcandidateid = json.\("jobcandidateid").toOption.map(_.as(JobcandidateId.reads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          resume = json.\("resume").toOption.map(_.as(TypoXml.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -50,21 +51,21 @@ object JcViewRow {
   def rowParser(idx: Int): RowParser[JcViewRow] = RowParser[JcViewRow] { row =>
     Success(
       JcViewRow(
-        id = row[Option[Int]](idx + 0),
-        jobcandidateid = row[Option[JobcandidateId]](idx + 1),
-        businessentityid = row[Option[BusinessentityId]](idx + 2),
-        resume = row[Option[TypoXml]](idx + 3),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        jobcandidateid = row(idx + 1)(Column.columnToOption(JobcandidateId.column)),
+        businessentityid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
+        resume = row(idx + 3)(Column.columnToOption(TypoXml.column)),
+        modifieddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[JcViewRow] = OWrites[JcViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "jobcandidateid" -> Json.toJson(o.jobcandidateid),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "resume" -> Json.toJson(o.resume),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "jobcandidateid" -> Writes.OptionWrites(JobcandidateId.writes).writes(o.jobcandidateid),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "resume" -> Writes.OptionWrites(TypoXml.writes).writes(o.resume),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

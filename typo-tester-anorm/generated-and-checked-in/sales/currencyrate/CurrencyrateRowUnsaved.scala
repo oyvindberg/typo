@@ -13,9 +13,9 @@ import adventureworks.sales.currency.CurrencyId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -60,26 +60,26 @@ object CurrencyrateRowUnsaved {
   implicit val reads: Reads[CurrencyrateRowUnsaved] = Reads[CurrencyrateRowUnsaved](json => JsResult.fromTry(
       Try(
         CurrencyrateRowUnsaved(
-          currencyratedate = json.\("currencyratedate").as[TypoLocalDateTime],
-          fromcurrencycode = json.\("fromcurrencycode").as[CurrencyId],
-          tocurrencycode = json.\("tocurrencycode").as[CurrencyId],
-          averagerate = json.\("averagerate").as[BigDecimal],
-          endofdayrate = json.\("endofdayrate").as[BigDecimal],
-          currencyrateid = json.\("currencyrateid").as[Defaulted[CurrencyrateId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          currencyratedate = json.\("currencyratedate").as(TypoLocalDateTime.reads),
+          fromcurrencycode = json.\("fromcurrencycode").as(CurrencyId.reads),
+          tocurrencycode = json.\("tocurrencycode").as(CurrencyId.reads),
+          averagerate = json.\("averagerate").as(Reads.bigDecReads),
+          endofdayrate = json.\("endofdayrate").as(Reads.bigDecReads),
+          currencyrateid = json.\("currencyrateid").as(Defaulted.reads(CurrencyrateId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[CurrencyrateRowUnsaved] = OWrites[CurrencyrateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "currencyratedate" -> Json.toJson(o.currencyratedate),
-      "fromcurrencycode" -> Json.toJson(o.fromcurrencycode),
-      "tocurrencycode" -> Json.toJson(o.tocurrencycode),
-      "averagerate" -> Json.toJson(o.averagerate),
-      "endofdayrate" -> Json.toJson(o.endofdayrate),
-      "currencyrateid" -> Json.toJson(o.currencyrateid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "currencyratedate" -> TypoLocalDateTime.writes.writes(o.currencyratedate),
+      "fromcurrencycode" -> CurrencyId.writes.writes(o.fromcurrencycode),
+      "tocurrencycode" -> CurrencyId.writes.writes(o.tocurrencycode),
+      "averagerate" -> Writes.BigDecimalWrites.writes(o.averagerate),
+      "endofdayrate" -> Writes.BigDecimalWrites.writes(o.endofdayrate),
+      "currencyrateid" -> Defaulted.writes(CurrencyrateId.writes).writes(o.currencyrateid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

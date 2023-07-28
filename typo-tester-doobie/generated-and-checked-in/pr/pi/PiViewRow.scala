@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -37,28 +37,28 @@ case class PiViewRow(
 )
 
 object PiViewRow {
-  implicit val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)
-  implicit val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(LocationId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(LocationId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[PiViewRow] = new Read[PiViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[ProductId], Nullability.Nullable),
-      (Get[LocationId], Nullability.Nullable),
-      (Get[/* max 10 chars */ String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (ProductId.get, Nullability.Nullable),
+      (LocationId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-      locationid = Get[LocationId].unsafeGetNullable(rs, i + 2),
-      shelf = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
-      bin = Get[Int].unsafeGetNullable(rs, i + 4),
-      quantity = Get[Int].unsafeGetNullable(rs, i + 5),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 6),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      productid = ProductId.get.unsafeGetNullable(rs, i + 1),
+      locationid = LocationId.get.unsafeGetNullable(rs, i + 2),
+      shelf = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      bin = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      quantity = Meta.IntMeta.get.unsafeGetNullable(rs, i + 5),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 6),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

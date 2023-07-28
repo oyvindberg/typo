@@ -9,16 +9,19 @@ package myschema
 package football_club
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
-    sql"""delete from myschema.football_club where "id" = ${id}""".update.run.map(_ > 0)
+    sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
-          values (${unsaved.id}::int8, ${unsaved.name})
+          values (${fromWrite(unsaved.id)(Write.fromPut(FootballClubId.put))}::int8, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))})
           returning "id", "name"
        """.query(FootballClubRow.read).unique
   }
@@ -26,16 +29,16 @@ object FootballClubRepoImpl extends FootballClubRepo {
     sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.read).stream
   }
   override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${id}""".query(FootballClubRow.read).option
+    sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(FootballClubRow.read).option
   }
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(FootballClubRow.read).stream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".query(FootballClubRow.read).stream
   }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
     sql"""update myschema.football_club
-          set "name" = ${row.name}
-          where "id" = ${id}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Meta.StringMeta.put))}
+          where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}
        """
       .update
       .run
@@ -44,8 +47,8 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
           values (
-            ${unsaved.id}::int8,
-            ${unsaved.name}
+            ${fromWrite(unsaved.id)(Write.fromPut(FootballClubId.put))}::int8,
+            ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}
           )
           on conflict ("id")
           do update set

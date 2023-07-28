@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -28,20 +28,20 @@ case class IViewRow(
 )
 
 object IViewRow {
-  implicit val decoder: Decoder[IViewRow] = Decoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(IViewRow.apply)
-  implicit val encoder: Encoder[IViewRow] = Encoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(x => (x.id, x.illustrationid, x.diagram, x.modifieddate))
+  implicit val decoder: Decoder[IViewRow] = Decoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(IViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[IViewRow] = Encoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(x => (x.id, x.illustrationid, x.diagram, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[IViewRow] = new Read[IViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[IllustrationId], Nullability.Nullable),
-      (Get[TypoXml], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (IllustrationId.get, Nullability.Nullable),
+      (TypoXml.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => IViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
-      diagram = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      illustrationid = IllustrationId.get.unsafeGetNullable(rs, i + 1),
+      diagram = TypoXml.get.unsafeGetNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3)
     )
   )
 }

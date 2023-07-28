@@ -8,8 +8,8 @@ package pg_catalog
 package pg_tables
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -26,28 +26,28 @@ case class PgTablesViewRow(
 )
 
 object PgTablesViewRow {
-  implicit val decoder: Decoder[PgTablesViewRow] = Decoder.forProduct8[PgTablesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean]]("schemaname", "tablename", "tableowner", "tablespace", "hasindexes", "hasrules", "hastriggers", "rowsecurity")(PgTablesViewRow.apply)
-  implicit val encoder: Encoder[PgTablesViewRow] = Encoder.forProduct8[PgTablesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean]]("schemaname", "tablename", "tableowner", "tablespace", "hasindexes", "hasrules", "hastriggers", "rowsecurity")(x => (x.schemaname, x.tablename, x.tableowner, x.tablespace, x.hasindexes, x.hasrules, x.hastriggers, x.rowsecurity))
+  implicit val decoder: Decoder[PgTablesViewRow] = Decoder.forProduct8[PgTablesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean]]("schemaname", "tablename", "tableowner", "tablespace", "hasindexes", "hasrules", "hastriggers", "rowsecurity")(PgTablesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean))
+  implicit val encoder: Encoder[PgTablesViewRow] = Encoder.forProduct8[PgTablesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[Boolean], Option[Boolean]]("schemaname", "tablename", "tableowner", "tablespace", "hasindexes", "hasrules", "hastriggers", "rowsecurity")(x => (x.schemaname, x.tablename, x.tableowner, x.tablespace, x.hasindexes, x.hasrules, x.hastriggers, x.rowsecurity))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean))
   implicit val read: Read[PgTablesViewRow] = new Read[PgTablesViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTablesViewRow(
-      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-      tablename = Get[String].unsafeGetNullable(rs, i + 1),
-      tableowner = Get[String].unsafeGetNullable(rs, i + 2),
-      tablespace = Get[String].unsafeGetNullable(rs, i + 3),
-      hasindexes = Get[Boolean].unsafeGetNullable(rs, i + 4),
-      hasrules = Get[Boolean].unsafeGetNullable(rs, i + 5),
-      hastriggers = Get[Boolean].unsafeGetNullable(rs, i + 6),
-      rowsecurity = Get[Boolean].unsafeGetNullable(rs, i + 7)
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      tablename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      tableowner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      tablespace = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      hasindexes = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 4),
+      hasrules = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 5),
+      hastriggers = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 6),
+      rowsecurity = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

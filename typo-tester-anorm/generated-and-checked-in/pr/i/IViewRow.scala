@@ -10,14 +10,15 @@ package i
 import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,10 +36,10 @@ object IViewRow {
   implicit val reads: Reads[IViewRow] = Reads[IViewRow](json => JsResult.fromTry(
       Try(
         IViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          illustrationid = json.\("illustrationid").toOption.map(_.as[IllustrationId]),
-          diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          illustrationid = json.\("illustrationid").toOption.map(_.as(IllustrationId.reads)),
+          diagram = json.\("diagram").toOption.map(_.as(TypoXml.reads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -46,19 +47,19 @@ object IViewRow {
   def rowParser(idx: Int): RowParser[IViewRow] = RowParser[IViewRow] { row =>
     Success(
       IViewRow(
-        id = row[Option[Int]](idx + 0),
-        illustrationid = row[Option[IllustrationId]](idx + 1),
-        diagram = row[Option[TypoXml]](idx + 2),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        illustrationid = row(idx + 1)(Column.columnToOption(IllustrationId.column)),
+        diagram = row(idx + 2)(Column.columnToOption(TypoXml.column)),
+        modifieddate = row(idx + 3)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[IViewRow] = OWrites[IViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "illustrationid" -> Json.toJson(o.illustrationid),
-      "diagram" -> Json.toJson(o.diagram),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "illustrationid" -> Writes.OptionWrites(IllustrationId.writes).writes(o.illustrationid),
+      "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

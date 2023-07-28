@@ -10,8 +10,8 @@ package so
 import adventureworks.TypoLocalDateTime
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -44,36 +44,36 @@ case class SoViewRow(
 )
 
 object SoViewRow {
-  implicit val decoder: Decoder[SoViewRow] = Decoder.forProduct12[SoViewRow, Option[Int], Option[SpecialofferId], Option[/* max 255 chars */ String], Option[BigDecimal], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(SoViewRow.apply)
-  implicit val encoder: Encoder[SoViewRow] = Encoder.forProduct12[SoViewRow, Option[Int], Option[SpecialofferId], Option[/* max 255 chars */ String], Option[BigDecimal], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[SoViewRow] = Decoder.forProduct12[SoViewRow, Option[Int], Option[SpecialofferId], Option[/* max 255 chars */ String], Option[BigDecimal], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(SoViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SpecialofferId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[SoViewRow] = Encoder.forProduct12[SoViewRow, Option[Int], Option[SpecialofferId], Option[/* max 255 chars */ String], Option[BigDecimal], Option[/* max 50 chars */ String], Option[/* max 50 chars */ String], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SpecialofferId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[SoViewRow] = new Read[SoViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[SpecialofferId], Nullability.Nullable),
-      (Get[/* max 255 chars */ String], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[/* max 50 chars */ String], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (SpecialofferId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SoViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 1),
-      description = Get[/* max 255 chars */ String].unsafeGetNullable(rs, i + 2),
-      discountpct = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-      `type` = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-      category = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
-      startdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6),
-      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7),
-      minqty = Get[Int].unsafeGetNullable(rs, i + 8),
-      maxqty = Get[Int].unsafeGetNullable(rs, i + 9),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 10),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 11)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      specialofferid = SpecialofferId.get.unsafeGetNullable(rs, i + 1),
+      description = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      discountpct = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 3),
+      `type` = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      category = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      startdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
+      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
+      minqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 8),
+      maxqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 9),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 10),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 11)
     )
   )
 }

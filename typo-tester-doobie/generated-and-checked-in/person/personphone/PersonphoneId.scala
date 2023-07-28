@@ -16,7 +16,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `person.personphone` */
 case class PersonphoneId(businessentityid: BusinessentityId, phonenumber: Phone, phonenumbertypeid: PhonenumbertypeId)
 object PersonphoneId {
-  implicit val decoder: Decoder[PersonphoneId] = Decoder.forProduct3[PersonphoneId, BusinessentityId, Phone, PhonenumbertypeId]("businessentityid", "phonenumber", "phonenumbertypeid")(PersonphoneId.apply)
-  implicit val encoder: Encoder[PersonphoneId] = Encoder.forProduct3[PersonphoneId, BusinessentityId, Phone, PhonenumbertypeId]("businessentityid", "phonenumber", "phonenumbertypeid")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))
+  implicit val decoder: Decoder[PersonphoneId] = Decoder.forProduct3[PersonphoneId, BusinessentityId, Phone, PhonenumbertypeId]("businessentityid", "phonenumber", "phonenumbertypeid")(PersonphoneId.apply)(BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder)
+  implicit val encoder: Encoder[PersonphoneId] = Encoder.forProduct3[PersonphoneId, BusinessentityId, Phone, PhonenumbertypeId]("businessentityid", "phonenumber", "phonenumbertypeid")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))(BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder)
   implicit val ordering: Ordering[PersonphoneId] = Ordering.by(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))
 }

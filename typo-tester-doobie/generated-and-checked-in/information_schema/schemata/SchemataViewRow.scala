@@ -10,7 +10,6 @@ package schemata
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,26 +26,26 @@ case class SchemataViewRow(
 )
 
 object SchemataViewRow {
-  implicit val decoder: Decoder[SchemataViewRow] = Decoder.forProduct7[SchemataViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("catalog_name", "schema_name", "schema_owner", "default_character_set_catalog", "default_character_set_schema", "default_character_set_name", "sql_path")(SchemataViewRow.apply)
-  implicit val encoder: Encoder[SchemataViewRow] = Encoder.forProduct7[SchemataViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("catalog_name", "schema_name", "schema_owner", "default_character_set_catalog", "default_character_set_schema", "default_character_set_name", "sql_path")(x => (x.catalogName, x.schemaName, x.schemaOwner, x.defaultCharacterSetCatalog, x.defaultCharacterSetSchema, x.defaultCharacterSetName, x.sqlPath))
+  implicit val decoder: Decoder[SchemataViewRow] = Decoder.forProduct7[SchemataViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("catalog_name", "schema_name", "schema_owner", "default_character_set_catalog", "default_character_set_schema", "default_character_set_name", "sql_path")(SchemataViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit val encoder: Encoder[SchemataViewRow] = Encoder.forProduct7[SchemataViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("catalog_name", "schema_name", "schema_owner", "default_character_set_catalog", "default_character_set_schema", "default_character_set_name", "sql_path")(x => (x.catalogName, x.schemaName, x.schemaOwner, x.defaultCharacterSetCatalog, x.defaultCharacterSetSchema, x.defaultCharacterSetName, x.sqlPath))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
   implicit val read: Read[SchemataViewRow] = new Read[SchemataViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SchemataViewRow(
-      catalogName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      schemaName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      schemaOwner = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      defaultCharacterSetCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      defaultCharacterSetSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      defaultCharacterSetName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-      sqlPath = Get[CharacterData].unsafeGetNullable(rs, i + 6)
+      catalogName = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      schemaName = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      schemaOwner = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      defaultCharacterSetCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      defaultCharacterSetSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      defaultCharacterSetName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
+      sqlPath = CharacterData.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

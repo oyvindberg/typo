@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_foreign_server
 
+import adventureworks.TypoAclItem
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def delete(oid: PgForeignServerId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_foreign_server where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_foreign_server where oid = ${fromWrite(oid)(Write.fromPut(PgForeignServerId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgForeignServerRow): ConnectionIO[PgForeignServerRow] = {
     sql"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
-          values (${unsaved.oid}::oid, ${unsaved.srvname}::name, ${unsaved.srvowner}::oid, ${unsaved.srvfdw}::oid, ${unsaved.srvtype}, ${unsaved.srvversion}, ${unsaved.srvacl}::_aclitem, ${unsaved.srvoptions}::_text)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgForeignServerId.put))}::oid, ${fromWrite(unsaved.srvname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.srvowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srvfdw)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.srvtype)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.srvversion)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.srvacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem, ${fromWrite(unsaved.srvoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
           returning oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
        """.query(PgForeignServerRow.read).unique
   }
@@ -25,22 +29,22 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
     sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server".query(PgForeignServerRow.read).stream
   }
   override def selectById(oid: PgForeignServerId): ConnectionIO[Option[PgForeignServerRow]] = {
-    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ${oid}".query(PgForeignServerRow.read).option
+    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ${fromWrite(oid)(Write.fromPut(PgForeignServerId.put))}".query(PgForeignServerRow.read).option
   }
   override def selectByIds(oids: Array[PgForeignServerId]): Stream[ConnectionIO, PgForeignServerRow] = {
-    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ANY(${oids})".query(PgForeignServerRow.read).stream
+    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ANY(${fromWrite(oids)(Write.fromPut(PgForeignServerId.arrayPut))})".query(PgForeignServerRow.read).stream
   }
   override def update(row: PgForeignServerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_foreign_server
-          set srvname = ${row.srvname}::name,
-              srvowner = ${row.srvowner}::oid,
-              srvfdw = ${row.srvfdw}::oid,
-              srvtype = ${row.srvtype},
-              srvversion = ${row.srvversion},
-              srvacl = ${row.srvacl}::_aclitem,
-              srvoptions = ${row.srvoptions}::_text
-          where oid = ${oid}
+          set srvname = ${fromWrite(row.srvname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              srvowner = ${fromWrite(row.srvowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              srvfdw = ${fromWrite(row.srvfdw)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              srvtype = ${fromWrite(row.srvtype)(Write.fromPutOption(Meta.StringMeta.put))},
+              srvversion = ${fromWrite(row.srvversion)(Write.fromPutOption(Meta.StringMeta.put))},
+              srvacl = ${fromWrite(row.srvacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
+              srvoptions = ${fromWrite(row.srvoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
+          where oid = ${fromWrite(oid)(Write.fromPut(PgForeignServerId.put))}
        """
       .update
       .run
@@ -49,14 +53,14 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def upsert(unsaved: PgForeignServerRow): ConnectionIO[PgForeignServerRow] = {
     sql"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.srvname}::name,
-            ${unsaved.srvowner}::oid,
-            ${unsaved.srvfdw}::oid,
-            ${unsaved.srvtype},
-            ${unsaved.srvversion},
-            ${unsaved.srvacl}::_aclitem,
-            ${unsaved.srvoptions}::_text
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgForeignServerId.put))}::oid,
+            ${fromWrite(unsaved.srvname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.srvowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.srvfdw)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.srvtype)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.srvversion)(Write.fromPutOption(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.srvacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
+            ${fromWrite(unsaved.srvoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text
           )
           on conflict (oid)
           do update set

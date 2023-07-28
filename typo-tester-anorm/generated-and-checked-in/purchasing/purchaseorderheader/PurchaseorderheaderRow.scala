@@ -10,14 +10,15 @@ package purchaseorderheader
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,18 +55,18 @@ object PurchaseorderheaderRow {
   implicit val reads: Reads[PurchaseorderheaderRow] = Reads[PurchaseorderheaderRow](json => JsResult.fromTry(
       Try(
         PurchaseorderheaderRow(
-          purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
-          revisionnumber = json.\("revisionnumber").as[Int],
-          status = json.\("status").as[Int],
-          employeeid = json.\("employeeid").as[BusinessentityId],
-          vendorid = json.\("vendorid").as[BusinessentityId],
-          shipmethodid = json.\("shipmethodid").as[ShipmethodId],
-          orderdate = json.\("orderdate").as[TypoLocalDateTime],
-          shipdate = json.\("shipdate").toOption.map(_.as[TypoLocalDateTime]),
-          subtotal = json.\("subtotal").as[BigDecimal],
-          taxamt = json.\("taxamt").as[BigDecimal],
-          freight = json.\("freight").as[BigDecimal],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
+          revisionnumber = json.\("revisionnumber").as(Reads.IntReads),
+          status = json.\("status").as(Reads.IntReads),
+          employeeid = json.\("employeeid").as(BusinessentityId.reads),
+          vendorid = json.\("vendorid").as(BusinessentityId.reads),
+          shipmethodid = json.\("shipmethodid").as(ShipmethodId.reads),
+          orderdate = json.\("orderdate").as(TypoLocalDateTime.reads),
+          shipdate = json.\("shipdate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          subtotal = json.\("subtotal").as(Reads.bigDecReads),
+          taxamt = json.\("taxamt").as(Reads.bigDecReads),
+          freight = json.\("freight").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -73,35 +74,35 @@ object PurchaseorderheaderRow {
   def rowParser(idx: Int): RowParser[PurchaseorderheaderRow] = RowParser[PurchaseorderheaderRow] { row =>
     Success(
       PurchaseorderheaderRow(
-        purchaseorderid = row[PurchaseorderheaderId](idx + 0),
-        revisionnumber = row[Int](idx + 1),
-        status = row[Int](idx + 2),
-        employeeid = row[BusinessentityId](idx + 3),
-        vendorid = row[BusinessentityId](idx + 4),
-        shipmethodid = row[ShipmethodId](idx + 5),
-        orderdate = row[TypoLocalDateTime](idx + 6),
-        shipdate = row[Option[TypoLocalDateTime]](idx + 7),
-        subtotal = row[BigDecimal](idx + 8),
-        taxamt = row[BigDecimal](idx + 9),
-        freight = row[BigDecimal](idx + 10),
-        modifieddate = row[TypoLocalDateTime](idx + 11)
+        purchaseorderid = row(idx + 0)(PurchaseorderheaderId.column),
+        revisionnumber = row(idx + 1)(Column.columnToInt),
+        status = row(idx + 2)(Column.columnToInt),
+        employeeid = row(idx + 3)(BusinessentityId.column),
+        vendorid = row(idx + 4)(BusinessentityId.column),
+        shipmethodid = row(idx + 5)(ShipmethodId.column),
+        orderdate = row(idx + 6)(TypoLocalDateTime.column),
+        shipdate = row(idx + 7)(Column.columnToOption(TypoLocalDateTime.column)),
+        subtotal = row(idx + 8)(Column.columnToScalaBigDecimal),
+        taxamt = row(idx + 9)(Column.columnToScalaBigDecimal),
+        freight = row(idx + 10)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 11)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[PurchaseorderheaderRow] = OWrites[PurchaseorderheaderRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
-      "revisionnumber" -> Json.toJson(o.revisionnumber),
-      "status" -> Json.toJson(o.status),
-      "employeeid" -> Json.toJson(o.employeeid),
-      "vendorid" -> Json.toJson(o.vendorid),
-      "shipmethodid" -> Json.toJson(o.shipmethodid),
-      "orderdate" -> Json.toJson(o.orderdate),
-      "shipdate" -> Json.toJson(o.shipdate),
-      "subtotal" -> Json.toJson(o.subtotal),
-      "taxamt" -> Json.toJson(o.taxamt),
-      "freight" -> Json.toJson(o.freight),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
+      "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),
+      "status" -> Writes.IntWrites.writes(o.status),
+      "employeeid" -> BusinessentityId.writes.writes(o.employeeid),
+      "vendorid" -> BusinessentityId.writes.writes(o.vendorid),
+      "shipmethodid" -> ShipmethodId.writes.writes(o.shipmethodid),
+      "orderdate" -> TypoLocalDateTime.writes.writes(o.orderdate),
+      "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),
+      "subtotal" -> Writes.BigDecimalWrites.writes(o.subtotal),
+      "taxamt" -> Writes.BigDecimalWrites.writes(o.taxamt),
+      "freight" -> Writes.BigDecimalWrites.writes(o.freight),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

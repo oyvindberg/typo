@@ -9,54 +9,59 @@ package salesterritory
 
 import adventureworks.Defaulted
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.countryregion.CountryregionId
+import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
 
 object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId): ConnectionIO[Boolean] = {
-    sql"delete from sales.salesterritory where territoryid = ${territoryid}".update.run.map(_ > 0)
+    sql"delete from sales.salesterritory where territoryid = ${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
-          values (${unsaved.territoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.countryregioncode}, ${unsaved.group}, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.costytd}::numeric, ${unsaved.costlastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
+          values (${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name", ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.group)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.salesytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.saleslastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.costytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.costlastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
        """.query(SalesterritoryRow.read).unique
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"""${unsaved.name}::"public"."Name"""")),
-      Some((Fragment.const(s"countryregioncode"), fr"${unsaved.countryregioncode}")),
-      Some((Fragment.const(s""""group""""), fr"${unsaved.group}")),
+      Some((Fragment.const(s""""name""""), fr"""${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name"""")),
+      Some((Fragment.const(s"countryregioncode"), fr"${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}")),
+      Some((Fragment.const(s""""group""""), fr"${fromWrite(unsaved.group)(Write.fromPut(Meta.StringMeta.put))}")),
       unsaved.territoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"territoryid"), fr"${value: SalesterritoryId}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"territoryid"), fr"${fromWrite(value: SalesterritoryId)(Write.fromPut(SalesterritoryId.put))}::int4"))
       },
       unsaved.salesytd match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"salesytd"), fr"${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"salesytd"), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.saleslastyear match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"saleslastyear"), fr"${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"saleslastyear"), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.costytd match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"costytd"), fr"${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"costytd"), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.costlastyear match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"costlastyear"), fr"${value: BigDecimal}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"costlastyear"), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${value: UUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"rowguid"), fr"${fromWrite(value: UUID)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -78,24 +83,24 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory""".query(SalesterritoryRow.read).stream
   }
   override def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]] = {
-    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ${territoryid}""".query(SalesterritoryRow.read).option
+    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.put))}""".query(SalesterritoryRow.read).option
   }
   override def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow] = {
-    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ANY(${territoryids})""".query(SalesterritoryRow.read).stream
+    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ANY(${fromWrite(territoryids)(Write.fromPut(SalesterritoryId.arrayPut))})""".query(SalesterritoryRow.read).stream
   }
   override def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
     val territoryid = row.territoryid
     sql"""update sales.salesterritory
-          set "name" = ${row.name}::"public"."Name",
-              countryregioncode = ${row.countryregioncode},
-              "group" = ${row.group},
-              salesytd = ${row.salesytd}::numeric,
-              saleslastyear = ${row.saleslastyear}::numeric,
-              costytd = ${row.costytd}::numeric,
-              costlastyear = ${row.costlastyear}::numeric,
-              rowguid = ${row.rowguid}::uuid,
-              modifieddate = ${row.modifieddate}::timestamp
-          where territoryid = ${territoryid}
+          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::"public"."Name",
+              countryregioncode = ${fromWrite(row.countryregioncode)(Write.fromPut(CountryregionId.put))},
+              "group" = ${fromWrite(row.group)(Write.fromPut(Meta.StringMeta.put))},
+              salesytd = ${fromWrite(row.salesytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              saleslastyear = ${fromWrite(row.saleslastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              costytd = ${fromWrite(row.costytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              costlastyear = ${fromWrite(row.costlastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              rowguid = ${fromWrite(row.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+              modifieddate = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+          where territoryid = ${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.put))}
        """
       .update
       .run
@@ -104,16 +109,16 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
           values (
-            ${unsaved.territoryid}::int4,
-            ${unsaved.name}::"public"."Name",
-            ${unsaved.countryregioncode},
-            ${unsaved.group},
-            ${unsaved.salesytd}::numeric,
-            ${unsaved.saleslastyear}::numeric,
-            ${unsaved.costytd}::numeric,
-            ${unsaved.costlastyear}::numeric,
-            ${unsaved.rowguid}::uuid,
-            ${unsaved.modifieddate}::timestamp
+            ${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4,
+            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::"public"."Name",
+            ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))},
+            ${fromWrite(unsaved.group)(Write.fromPut(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.salesytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.saleslastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.costytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.costlastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.rowguid)(Write.fromPut(adventureworks.UUIDMeta.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           )
           on conflict (territoryid)
           do update set

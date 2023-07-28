@@ -9,17 +9,18 @@ package customer
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `sales.customer` */
 case class CustomerId(value: Int) extends AnyVal
 object CustomerId {
-  implicit val arrayGet: Get[Array[CustomerId]] = Get[Array[Int]].map(_.map(CustomerId.apply))
-  implicit val arrayPut: Put[Array[CustomerId]] = Put[Array[Int]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[CustomerId] = Decoder[Int].map(CustomerId.apply)
-  implicit val encoder: Encoder[CustomerId] = Encoder[Int].contramap(_.value)
-  implicit val get: Get[CustomerId] = Get[Int].map(CustomerId.apply)
+  implicit val arrayGet: Get[Array[CustomerId]] = adventureworks.IntegerArrayMeta.get.map(_.map(CustomerId.apply))
+  implicit val arrayPut: Put[Array[CustomerId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[CustomerId] = Decoder.decodeInt.map(CustomerId.apply)
+  implicit val encoder: Encoder[CustomerId] = Encoder.encodeInt.contramap(_.value)
+  implicit val get: Get[CustomerId] = Meta.IntMeta.get.map(CustomerId.apply)
   implicit val ordering: Ordering[CustomerId] = Ordering.by(_.value)
-  implicit val put: Put[CustomerId] = Put[Int].contramap(_.value)
+  implicit val put: Put[CustomerId] = Meta.IntMeta.put.contramap(_.value)
 }

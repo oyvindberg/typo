@@ -23,7 +23,7 @@ object WorkorderId {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[WorkorderId] = implicitly[Reads[Int]].map(WorkorderId.apply)
+  implicit val reads: Reads[WorkorderId] = Reads.IntReads.map(WorkorderId.apply)
   implicit val toStatement: ToStatement[WorkorderId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[WorkorderId] = implicitly[Writes[Int]].contramap(_.value)
+  implicit val writes: Writes[WorkorderId] = Writes.IntWrites.contramap(_.value)
 }

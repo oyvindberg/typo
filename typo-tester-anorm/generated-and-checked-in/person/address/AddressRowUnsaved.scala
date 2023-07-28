@@ -14,9 +14,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -69,30 +69,30 @@ object AddressRowUnsaved {
   implicit val reads: Reads[AddressRowUnsaved] = Reads[AddressRowUnsaved](json => JsResult.fromTry(
       Try(
         AddressRowUnsaved(
-          addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
-          addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
-          city = json.\("city").as[/* max 30 chars */ String],
-          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-          postalcode = json.\("postalcode").as[/* max 15 chars */ String],
-          spatiallocation = json.\("spatiallocation").toOption.map(_.as[Array[Byte]]),
-          addressid = json.\("addressid").as[Defaulted[AddressId]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          addressline1 = json.\("addressline1").as(Reads.StringReads),
+          addressline2 = json.\("addressline2").toOption.map(_.as(Reads.StringReads)),
+          city = json.\("city").as(Reads.StringReads),
+          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+          postalcode = json.\("postalcode").as(Reads.StringReads),
+          spatiallocation = json.\("spatiallocation").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
+          addressid = json.\("addressid").as(Defaulted.reads(AddressId.reads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[AddressRowUnsaved] = OWrites[AddressRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "addressline1" -> Json.toJson(o.addressline1),
-      "addressline2" -> Json.toJson(o.addressline2),
-      "city" -> Json.toJson(o.city),
-      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
-      "postalcode" -> Json.toJson(o.postalcode),
-      "spatiallocation" -> Json.toJson(o.spatiallocation),
-      "addressid" -> Json.toJson(o.addressid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "addressline1" -> Writes.StringWrites.writes(o.addressline1),
+      "addressline2" -> Writes.OptionWrites(Writes.StringWrites).writes(o.addressline2),
+      "city" -> Writes.StringWrites.writes(o.city),
+      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+      "postalcode" -> Writes.StringWrites.writes(o.postalcode),
+      "spatiallocation" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.spatiallocation),
+      "addressid" -> Defaulted.writes(AddressId.writes).writes(o.addressid),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

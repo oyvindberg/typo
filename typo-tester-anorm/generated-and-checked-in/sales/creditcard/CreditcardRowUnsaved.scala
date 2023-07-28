@@ -12,9 +12,9 @@ import adventureworks.TypoLocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,24 +54,24 @@ object CreditcardRowUnsaved {
   implicit val reads: Reads[CreditcardRowUnsaved] = Reads[CreditcardRowUnsaved](json => JsResult.fromTry(
       Try(
         CreditcardRowUnsaved(
-          cardtype = json.\("cardtype").as[/* max 50 chars */ String],
-          cardnumber = json.\("cardnumber").as[/* max 25 chars */ String],
-          expmonth = json.\("expmonth").as[Int],
-          expyear = json.\("expyear").as[Int],
-          creditcardid = json.\("creditcardid").as[Defaulted[CreditcardId]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          cardtype = json.\("cardtype").as(Reads.StringReads),
+          cardnumber = json.\("cardnumber").as(Reads.StringReads),
+          expmonth = json.\("expmonth").as(Reads.IntReads),
+          expyear = json.\("expyear").as(Reads.IntReads),
+          creditcardid = json.\("creditcardid").as(Defaulted.reads(CreditcardId.reads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[CreditcardRowUnsaved] = OWrites[CreditcardRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "cardtype" -> Json.toJson(o.cardtype),
-      "cardnumber" -> Json.toJson(o.cardnumber),
-      "expmonth" -> Json.toJson(o.expmonth),
-      "expyear" -> Json.toJson(o.expyear),
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "cardtype" -> Writes.StringWrites.writes(o.cardtype),
+      "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
+      "expmonth" -> Writes.IntWrites.writes(o.expmonth),
+      "expyear" -> Writes.IntWrites.writes(o.expyear),
+      "creditcardid" -> Defaulted.writes(CreditcardId.writes).writes(o.creditcardid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

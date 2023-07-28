@@ -10,9 +10,9 @@ package pg_auth_members
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,16 +23,16 @@ object PgAuthMembersId {
   implicit val reads: Reads[PgAuthMembersId] = Reads[PgAuthMembersId](json => JsResult.fromTry(
       Try(
         PgAuthMembersId(
-          roleid = json.\("roleid").as[/* oid */ Long],
-          member = json.\("member").as[/* oid */ Long]
+          roleid = json.\("roleid").as(Reads.LongReads),
+          member = json.\("member").as(Reads.LongReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgAuthMembersId] = OWrites[PgAuthMembersId](o =>
     new JsObject(ListMap[String, JsValue](
-      "roleid" -> Json.toJson(o.roleid),
-      "member" -> Json.toJson(o.member)
+      "roleid" -> Writes.LongWrites.writes(o.roleid),
+      "member" -> Writes.LongWrites.writes(o.member)
     ))
   )
 }

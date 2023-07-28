@@ -11,9 +11,9 @@ package person
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -24,16 +24,16 @@ object PersonId {
   implicit val reads: Reads[PersonId] = Reads[PersonId](json => JsResult.fromTry(
       Try(
         PersonId(
-          one = json.\("one").as[Long],
-          two = json.\("two").toOption.map(_.as[String])
+          one = json.\("one").as(Reads.LongReads),
+          two = json.\("two").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
   )
   implicit val writes: OWrites[PersonId] = OWrites[PersonId](o =>
     new JsObject(ListMap[String, JsValue](
-      "one" -> Json.toJson(o.one),
-      "two" -> Json.toJson(o.two)
+      "one" -> Writes.LongWrites.writes(o.one),
+      "two" -> Writes.OptionWrites(Writes.StringWrites).writes(o.two)
     ))
   )
 }

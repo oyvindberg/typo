@@ -25,8 +25,8 @@ object TypoJsonb {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoJsonb] = Decoder.forProduct1[TypoJsonb, String]("value")(TypoJsonb.apply)
-  implicit val encoder: Encoder[TypoJsonb] = Encoder.forProduct1[TypoJsonb, String]("value")(x => (x.value))
+  implicit val decoder: Decoder[TypoJsonb] = Decoder.forProduct1[TypoJsonb, String]("value")(TypoJsonb.apply)(Decoder.decodeString)
+  implicit val encoder: Encoder[TypoJsonb] = Encoder.forProduct1[TypoJsonb, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoJsonb] = Get.Advanced.other[PGobject](NonEmptyList.one("jsonb"))
     .map(v => TypoJsonb(v.getValue))
   implicit val put: Put[TypoJsonb] = Put.Advanced.other[PGobject](NonEmptyList.one("jsonb")).contramap(v => {

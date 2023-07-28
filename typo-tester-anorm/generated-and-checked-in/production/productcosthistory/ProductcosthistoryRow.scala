@@ -9,14 +9,15 @@ package productcosthistory
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -39,11 +40,11 @@ object ProductcosthistoryRow {
   implicit val reads: Reads[ProductcosthistoryRow] = Reads[ProductcosthistoryRow](json => JsResult.fromTry(
       Try(
         ProductcosthistoryRow(
-          productid = json.\("productid").as[ProductId],
-          startdate = json.\("startdate").as[TypoLocalDateTime],
-          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
-          standardcost = json.\("standardcost").as[BigDecimal],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          productid = json.\("productid").as(ProductId.reads),
+          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          standardcost = json.\("standardcost").as(Reads.bigDecReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -51,21 +52,21 @@ object ProductcosthistoryRow {
   def rowParser(idx: Int): RowParser[ProductcosthistoryRow] = RowParser[ProductcosthistoryRow] { row =>
     Success(
       ProductcosthistoryRow(
-        productid = row[ProductId](idx + 0),
-        startdate = row[TypoLocalDateTime](idx + 1),
-        enddate = row[Option[TypoLocalDateTime]](idx + 2),
-        standardcost = row[BigDecimal](idx + 3),
-        modifieddate = row[TypoLocalDateTime](idx + 4)
+        productid = row(idx + 0)(ProductId.column),
+        startdate = row(idx + 1)(TypoLocalDateTime.column),
+        enddate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
+        standardcost = row(idx + 3)(Column.columnToScalaBigDecimal),
+        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[ProductcosthistoryRow] = OWrites[ProductcosthistoryRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "productid" -> Json.toJson(o.productid),
-      "startdate" -> Json.toJson(o.startdate),
-      "enddate" -> Json.toJson(o.enddate),
-      "standardcost" -> Json.toJson(o.standardcost),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productid" -> ProductId.writes.writes(o.productid),
+      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+      "standardcost" -> Writes.BigDecimalWrites.writes(o.standardcost),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

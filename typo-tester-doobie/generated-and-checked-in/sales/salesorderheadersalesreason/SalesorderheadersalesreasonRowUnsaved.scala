@@ -36,6 +36,6 @@ case class SalesorderheadersalesreasonRowUnsaved(
     )
 }
 object SalesorderheadersalesreasonRowUnsaved {
-  implicit val decoder: Decoder[SalesorderheadersalesreasonRowUnsaved] = Decoder.forProduct3[SalesorderheadersalesreasonRowUnsaved, SalesorderheaderId, SalesreasonId, Defaulted[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(SalesorderheadersalesreasonRowUnsaved.apply)
-  implicit val encoder: Encoder[SalesorderheadersalesreasonRowUnsaved] = Encoder.forProduct3[SalesorderheadersalesreasonRowUnsaved, SalesorderheaderId, SalesreasonId, Defaulted[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))
+  implicit val decoder: Decoder[SalesorderheadersalesreasonRowUnsaved] = Decoder.forProduct3[SalesorderheadersalesreasonRowUnsaved, SalesorderheaderId, SalesreasonId, Defaulted[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(SalesorderheadersalesreasonRowUnsaved.apply)(SalesorderheaderId.decoder, SalesreasonId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[SalesorderheadersalesreasonRowUnsaved] = Encoder.forProduct3[SalesorderheadersalesreasonRowUnsaved, SalesorderheaderId, SalesreasonId, Defaulted[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(SalesorderheaderId.encoder, SalesreasonId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }

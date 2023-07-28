@@ -8,8 +8,8 @@ package pg_catalog
 package pg_stat_progress_cluster
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -30,36 +30,36 @@ case class PgStatProgressClusterViewRow(
 )
 
 object PgStatProgressClusterViewRow {
-  implicit val decoder: Decoder[PgStatProgressClusterViewRow] = Decoder.forProduct12[PgStatProgressClusterViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[/* oid */ Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(PgStatProgressClusterViewRow.apply)
-  implicit val encoder: Encoder[PgStatProgressClusterViewRow] = Encoder.forProduct12[PgStatProgressClusterViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[/* oid */ Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(x => (x.pid, x.datid, x.datname, x.relid, x.command, x.phase, x.clusterIndexRelid, x.heapTuplesScanned, x.heapTuplesWritten, x.heapBlksTotal, x.heapBlksScanned, x.indexRebuildCount))
+  implicit val decoder: Decoder[PgStatProgressClusterViewRow] = Decoder.forProduct12[PgStatProgressClusterViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[/* oid */ Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(PgStatProgressClusterViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit val encoder: Encoder[PgStatProgressClusterViewRow] = Encoder.forProduct12[PgStatProgressClusterViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[String], Option[/* oid */ Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "command", "phase", "cluster_index_relid", "heap_tuples_scanned", "heap_tuples_written", "heap_blks_total", "heap_blks_scanned", "index_rebuild_count")(x => (x.pid, x.datid, x.datname, x.relid, x.command, x.phase, x.clusterIndexRelid, x.heapTuplesScanned, x.heapTuplesWritten, x.heapBlksTotal, x.heapBlksScanned, x.indexRebuildCount))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
   implicit val read: Read[PgStatProgressClusterViewRow] = new Read[PgStatProgressClusterViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[/* oid */ Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable),
-      (Get[Long], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable),
+      (Meta.LongMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressClusterViewRow(
-      pid = Get[Int].unsafeGetNullable(rs, i + 0),
-      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-      datname = Get[String].unsafeGetNullable(rs, i + 2),
-      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-      command = Get[String].unsafeGetNullable(rs, i + 4),
-      phase = Get[String].unsafeGetNullable(rs, i + 5),
-      clusterIndexRelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 6),
-      heapTuplesScanned = Get[Long].unsafeGetNullable(rs, i + 7),
-      heapTuplesWritten = Get[Long].unsafeGetNullable(rs, i + 8),
-      heapBlksTotal = Get[Long].unsafeGetNullable(rs, i + 9),
-      heapBlksScanned = Get[Long].unsafeGetNullable(rs, i + 10),
-      indexRebuildCount = Get[Long].unsafeGetNullable(rs, i + 11)
+      pid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      datid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 1),
+      datname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      relid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 3),
+      command = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      phase = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      clusterIndexRelid = Meta.LongMeta.get.unsafeGetNullable(rs, i + 6),
+      heapTuplesScanned = Meta.LongMeta.get.unsafeGetNullable(rs, i + 7),
+      heapTuplesWritten = Meta.LongMeta.get.unsafeGetNullable(rs, i + 8),
+      heapBlksTotal = Meta.LongMeta.get.unsafeGetNullable(rs, i + 9),
+      heapBlksScanned = Meta.LongMeta.get.unsafeGetNullable(rs, i + 10),
+      indexRebuildCount = Meta.LongMeta.get.unsafeGetNullable(rs, i + 11)
     )
   )
 }

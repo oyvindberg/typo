@@ -15,7 +15,6 @@ import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -37,9 +36,9 @@ object PersoncreditcardRow {
   implicit val reads: Reads[PersoncreditcardRow] = Reads[PersoncreditcardRow](json => JsResult.fromTry(
       Try(
         PersoncreditcardRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          creditcardid = json.\("creditcardid").as[CreditcardId],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          creditcardid = json.\("creditcardid").as(CreditcardId.reads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -47,17 +46,17 @@ object PersoncreditcardRow {
   def rowParser(idx: Int): RowParser[PersoncreditcardRow] = RowParser[PersoncreditcardRow] { row =>
     Success(
       PersoncreditcardRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        creditcardid = row[CreditcardId](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        creditcardid = row(idx + 1)(CreditcardId.column),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[PersoncreditcardRow] = OWrites[PersoncreditcardRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "creditcardid" -> Json.toJson(o.creditcardid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "creditcardid" -> CreditcardId.writes.writes(o.creditcardid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

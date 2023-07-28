@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_rules
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,10 +30,10 @@ object PgRulesViewRow {
   implicit val reads: Reads[PgRulesViewRow] = Reads[PgRulesViewRow](json => JsResult.fromTry(
       Try(
         PgRulesViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          tablename = json.\("tablename").toOption.map(_.as[String]),
-          rulename = json.\("rulename").toOption.map(_.as[String]),
-          definition = json.\("definition").toOption.map(_.as[String])
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
+          rulename = json.\("rulename").toOption.map(_.as(Reads.StringReads)),
+          definition = json.\("definition").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -40,19 +41,19 @@ object PgRulesViewRow {
   def rowParser(idx: Int): RowParser[PgRulesViewRow] = RowParser[PgRulesViewRow] { row =>
     Success(
       PgRulesViewRow(
-        schemaname = row[Option[String]](idx + 0),
-        tablename = row[Option[String]](idx + 1),
-        rulename = row[Option[String]](idx + 2),
-        definition = row[Option[String]](idx + 3)
+        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        rulename = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        definition = row(idx + 3)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgRulesViewRow] = OWrites[PgRulesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Json.toJson(o.schemaname),
-      "tablename" -> Json.toJson(o.tablename),
-      "rulename" -> Json.toJson(o.rulename),
-      "definition" -> Json.toJson(o.definition)
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
+      "rulename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.rulename),
+      "definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.definition)
     ))
   )
 }

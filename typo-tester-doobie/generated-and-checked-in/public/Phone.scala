@@ -8,6 +8,7 @@ package public
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -16,11 +17,11 @@ import io.circe.Encoder
   */
 case class Phone(value: String) extends AnyVal
 object Phone {
-  implicit val arrayGet: Get[Array[Phone]] = Get[Array[String]].map(_.map(Phone.apply))
-  implicit val arrayPut: Put[Array[Phone]] = Put[Array[String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[Phone] = Decoder[String].map(Phone.apply)
-  implicit val encoder: Encoder[Phone] = Encoder[String].contramap(_.value)
-  implicit val get: Get[Phone] = Get[String].map(Phone.apply)
+  implicit val arrayGet: Get[Array[Phone]] = adventureworks.StringArrayMeta.get.map(_.map(Phone.apply))
+  implicit val arrayPut: Put[Array[Phone]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[Phone] = Decoder.decodeString.map(Phone.apply)
+  implicit val encoder: Encoder[Phone] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[Phone] = Meta.StringMeta.get.map(Phone.apply)
   implicit val ordering: Ordering[Phone] = Ordering.by(_.value)
-  implicit val put: Put[Phone] = Put[String].contramap(_.value)
+  implicit val put: Put[Phone] = Meta.StringMeta.put.contramap(_.value)
 }

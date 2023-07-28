@@ -8,8 +8,8 @@ package pg_catalog
 package pg_inherits
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,20 +24,20 @@ case class PgInheritsRow(
  }
 
 object PgInheritsRow {
-  implicit val decoder: Decoder[PgInheritsRow] = Decoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(PgInheritsRow.apply)
-  implicit val encoder: Encoder[PgInheritsRow] = Encoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(x => (x.inhrelid, x.inhparent, x.inhseqno, x.inhdetachpending))
+  implicit val decoder: Decoder[PgInheritsRow] = Decoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(PgInheritsRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeBoolean)
+  implicit val encoder: Encoder[PgInheritsRow] = Encoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(x => (x.inhrelid, x.inhparent, x.inhseqno, x.inhdetachpending))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeBoolean)
   implicit val read: Read[PgInheritsRow] = new Read[PgInheritsRow](
     gets = List(
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Int], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls)
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.IntMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgInheritsRow(
-      inhrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-      inhparent = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      inhseqno = Get[Int].unsafeGetNonNullable(rs, i + 2),
-      inhdetachpending = Get[Boolean].unsafeGetNonNullable(rs, i + 3)
+      inhrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
+      inhparent = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      inhseqno = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+      inhdetachpending = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

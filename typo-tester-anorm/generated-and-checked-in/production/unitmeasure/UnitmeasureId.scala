@@ -23,7 +23,7 @@ object UnitmeasureId {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* bpchar */ String]].jdbcType
   }
-  implicit val reads: Reads[UnitmeasureId] = implicitly[Reads[/* bpchar */ String]].map(UnitmeasureId.apply)
+  implicit val reads: Reads[UnitmeasureId] = Reads.StringReads.map(UnitmeasureId.apply)
   implicit val toStatement: ToStatement[UnitmeasureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
-  implicit val writes: Writes[UnitmeasureId] = implicitly[Writes[/* bpchar */ String]].contramap(_.value)
+  implicit val writes: Writes[UnitmeasureId] = Writes.StringWrites.contramap(_.value)
 }

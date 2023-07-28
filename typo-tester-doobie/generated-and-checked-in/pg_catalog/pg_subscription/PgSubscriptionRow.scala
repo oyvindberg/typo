@@ -8,8 +8,8 @@ package pg_catalog
 package pg_subscription
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -29,34 +29,34 @@ case class PgSubscriptionRow(
 )
 
 object PgSubscriptionRow {
-  implicit val decoder: Decoder[PgSubscriptionRow] = Decoder.forProduct11[PgSubscriptionRow, PgSubscriptionId, /* oid */ Long, String, /* oid */ Long, Boolean, Boolean, Boolean, String, Option[String], String, Array[String]]("oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications")(PgSubscriptionRow.apply)
-  implicit val encoder: Encoder[PgSubscriptionRow] = Encoder.forProduct11[PgSubscriptionRow, PgSubscriptionId, /* oid */ Long, String, /* oid */ Long, Boolean, Boolean, Boolean, String, Option[String], String, Array[String]]("oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications")(x => (x.oid, x.subdbid, x.subname, x.subowner, x.subenabled, x.subbinary, x.substream, x.subconninfo, x.subslotname, x.subsynccommit, x.subpublications))
+  implicit val decoder: Decoder[PgSubscriptionRow] = Decoder.forProduct11[PgSubscriptionRow, PgSubscriptionId, /* oid */ Long, String, /* oid */ Long, Boolean, Boolean, Boolean, String, Option[String], String, Array[String]]("oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications")(PgSubscriptionRow.apply)(PgSubscriptionId.decoder, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeBoolean, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeArray[String](Decoder.decodeString, implicitly))
+  implicit val encoder: Encoder[PgSubscriptionRow] = Encoder.forProduct11[PgSubscriptionRow, PgSubscriptionId, /* oid */ Long, String, /* oid */ Long, Boolean, Boolean, Boolean, String, Option[String], String, Array[String]]("oid", "subdbid", "subname", "subowner", "subenabled", "subbinary", "substream", "subconninfo", "subslotname", "subsynccommit", "subpublications")(x => (x.oid, x.subdbid, x.subname, x.subowner, x.subenabled, x.subbinary, x.substream, x.subconninfo, x.subslotname, x.subsynccommit, x.subpublications))(PgSubscriptionId.encoder, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeBoolean, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly))
   implicit val read: Read[PgSubscriptionRow] = new Read[PgSubscriptionRow](
     gets = List(
-      (Get[PgSubscriptionId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.NoNulls),
-      (Get[Array[String]], Nullability.NoNulls)
+      (PgSubscriptionId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (adventureworks.StringArrayMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgSubscriptionRow(
-      oid = Get[PgSubscriptionId].unsafeGetNonNullable(rs, i + 0),
-      subdbid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      subname = Get[String].unsafeGetNonNullable(rs, i + 2),
-      subowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      subenabled = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-      subbinary = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-      substream = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
-      subconninfo = Get[String].unsafeGetNonNullable(rs, i + 7),
-      subslotname = Get[String].unsafeGetNullable(rs, i + 8),
-      subsynccommit = Get[String].unsafeGetNonNullable(rs, i + 9),
-      subpublications = Get[Array[String]].unsafeGetNonNullable(rs, i + 10)
+      oid = PgSubscriptionId.get.unsafeGetNonNullable(rs, i + 0),
+      subdbid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      subname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      subowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      subenabled = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
+      subbinary = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 5),
+      substream = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 6),
+      subconninfo = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7),
+      subslotname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+      subsynccommit = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 9),
+      subpublications = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 10)
     )
   )
 }

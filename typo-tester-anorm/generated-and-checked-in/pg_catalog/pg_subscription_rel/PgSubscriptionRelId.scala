@@ -10,9 +10,9 @@ package pg_subscription_rel
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -23,16 +23,16 @@ object PgSubscriptionRelId {
   implicit val reads: Reads[PgSubscriptionRelId] = Reads[PgSubscriptionRelId](json => JsResult.fromTry(
       Try(
         PgSubscriptionRelId(
-          srrelid = json.\("srrelid").as[/* oid */ Long],
-          srsubid = json.\("srsubid").as[/* oid */ Long]
+          srrelid = json.\("srrelid").as(Reads.LongReads),
+          srsubid = json.\("srsubid").as(Reads.LongReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PgSubscriptionRelId] = OWrites[PgSubscriptionRelId](o =>
     new JsObject(ListMap[String, JsValue](
-      "srrelid" -> Json.toJson(o.srrelid),
-      "srsubid" -> Json.toJson(o.srsubid)
+      "srrelid" -> Writes.LongWrites.writes(o.srrelid),
+      "srsubid" -> Writes.LongWrites.writes(o.srsubid)
     ))
   )
 }

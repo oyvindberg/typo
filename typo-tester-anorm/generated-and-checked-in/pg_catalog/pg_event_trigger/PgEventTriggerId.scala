@@ -23,7 +23,7 @@ object PgEventTriggerId {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgEventTriggerId] = implicitly[Reads[/* oid */ Long]].map(PgEventTriggerId.apply)
+  implicit val reads: Reads[PgEventTriggerId] = Reads.LongReads.map(PgEventTriggerId.apply)
   implicit val toStatement: ToStatement[PgEventTriggerId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgEventTriggerId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgEventTriggerId] = Writes.LongWrites.contramap(_.value)
 }

@@ -12,8 +12,8 @@ import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -44,34 +44,34 @@ case class SodViewRow(
 )
 
 object SodViewRow {
-  implicit val decoder: Decoder[SodViewRow] = Decoder.forProduct11[SodViewRow, Option[Int], Option[SalesorderheaderId], Option[Int], Option[/* max 25 chars */ String], Option[Int], Option[ProductId], Option[SpecialofferId], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(SodViewRow.apply)
-  implicit val encoder: Encoder[SodViewRow] = Encoder.forProduct11[SodViewRow, Option[Int], Option[SalesorderheaderId], Option[Int], Option[/* max 25 chars */ String], Option[Int], Option[ProductId], Option[SpecialofferId], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(x => (x.id, x.salesorderid, x.salesorderdetailid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.unitpricediscount, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[SodViewRow] = Decoder.forProduct11[SodViewRow, Option[Int], Option[SalesorderheaderId], Option[Int], Option[/* max 25 chars */ String], Option[Int], Option[ProductId], Option[SpecialofferId], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(SodViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SalesorderheaderId.decoder), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(SpecialofferId.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[SodViewRow] = Encoder.forProduct11[SodViewRow, Option[Int], Option[SalesorderheaderId], Option[Int], Option[/* max 25 chars */ String], Option[Int], Option[ProductId], Option[SpecialofferId], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(x => (x.id, x.salesorderid, x.salesorderdetailid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.unitpricediscount, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SalesorderheaderId.encoder), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(SpecialofferId.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[SodViewRow] = new Read[SodViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[SalesorderheaderId], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[/* max 25 chars */ String], Nullability.Nullable),
-      (Get[Int], Nullability.Nullable),
-      (Get[ProductId], Nullability.Nullable),
-      (Get[SpecialofferId], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[BigDecimal], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (SalesorderheaderId.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (ProductId.get, Nullability.Nullable),
+      (SpecialofferId.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => SodViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      salesorderid = Get[SalesorderheaderId].unsafeGetNullable(rs, i + 1),
-      salesorderdetailid = Get[Int].unsafeGetNullable(rs, i + 2),
-      carriertrackingnumber = Get[/* max 25 chars */ String].unsafeGetNullable(rs, i + 3),
-      orderqty = Get[Int].unsafeGetNullable(rs, i + 4),
-      productid = Get[ProductId].unsafeGetNullable(rs, i + 5),
-      specialofferid = Get[SpecialofferId].unsafeGetNullable(rs, i + 6),
-      unitprice = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-      unitpricediscount = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 10)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      salesorderid = SalesorderheaderId.get.unsafeGetNullable(rs, i + 1),
+      salesorderdetailid = Meta.IntMeta.get.unsafeGetNullable(rs, i + 2),
+      carriertrackingnumber = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      orderqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 4),
+      productid = ProductId.get.unsafeGetNullable(rs, i + 5),
+      specialofferid = SpecialofferId.get.unsafeGetNullable(rs, i + 6),
+      unitprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 7),
+      unitpricediscount = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 8),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 9),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 10)
     )
   )
 }

@@ -15,7 +15,6 @@ import adventureworks.production.productmodel.ProductmodelId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -50,20 +49,20 @@ object ProductmodelproductdescriptioncultureRowUnsaved {
   implicit val reads: Reads[ProductmodelproductdescriptioncultureRowUnsaved] = Reads[ProductmodelproductdescriptioncultureRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductmodelproductdescriptioncultureRowUnsaved(
-          productmodelid = json.\("productmodelid").as[ProductmodelId],
-          productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
-          cultureid = json.\("cultureid").as[CultureId],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
+          productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
+          cultureid = json.\("cultureid").as(CultureId.reads),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[ProductmodelproductdescriptioncultureRowUnsaved] = OWrites[ProductmodelproductdescriptioncultureRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "productmodelid" -> Json.toJson(o.productmodelid),
-      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
-      "cultureid" -> Json.toJson(o.cultureid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
+      "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
+      "cultureid" -> CultureId.writes.writes(o.cultureid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -12,7 +12,6 @@ import adventureworks.person.contacttype.ContacttypeId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
@@ -25,18 +24,18 @@ object BusinessentitycontactId {
   implicit val reads: Reads[BusinessentitycontactId] = Reads[BusinessentitycontactId](json => JsResult.fromTry(
       Try(
         BusinessentitycontactId(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          personid = json.\("personid").as[BusinessentityId],
-          contacttypeid = json.\("contacttypeid").as[ContacttypeId]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          personid = json.\("personid").as(BusinessentityId.reads),
+          contacttypeid = json.\("contacttypeid").as(ContacttypeId.reads)
         )
       )
     ),
   )
   implicit val writes: OWrites[BusinessentitycontactId] = OWrites[BusinessentitycontactId](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "personid" -> Json.toJson(o.personid),
-      "contacttypeid" -> Json.toJson(o.contacttypeid)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "personid" -> BusinessentityId.writes.writes(o.personid),
+      "contacttypeid" -> ContacttypeId.writes.writes(o.contacttypeid)
     ))
   )
 }

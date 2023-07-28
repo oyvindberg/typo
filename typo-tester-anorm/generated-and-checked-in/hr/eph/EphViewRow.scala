@@ -9,14 +9,15 @@ package eph
 
 import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -38,12 +39,12 @@ object EphViewRow {
   implicit val reads: Reads[EphViewRow] = Reads[EphViewRow](json => JsResult.fromTry(
       Try(
         EphViewRow(
-          id = json.\("id").toOption.map(_.as[Int]),
-          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-          ratechangedate = json.\("ratechangedate").toOption.map(_.as[TypoLocalDateTime]),
-          rate = json.\("rate").toOption.map(_.as[BigDecimal]),
-          payfrequency = json.\("payfrequency").toOption.map(_.as[Int]),
-          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
+          id = json.\("id").toOption.map(_.as(Reads.IntReads)),
+          businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
+          ratechangedate = json.\("ratechangedate").toOption.map(_.as(TypoLocalDateTime.reads)),
+          rate = json.\("rate").toOption.map(_.as(Reads.bigDecReads)),
+          payfrequency = json.\("payfrequency").toOption.map(_.as(Reads.IntReads)),
+          modifieddate = json.\("modifieddate").toOption.map(_.as(TypoLocalDateTime.reads))
         )
       )
     ),
@@ -51,23 +52,23 @@ object EphViewRow {
   def rowParser(idx: Int): RowParser[EphViewRow] = RowParser[EphViewRow] { row =>
     Success(
       EphViewRow(
-        id = row[Option[Int]](idx + 0),
-        businessentityid = row[Option[BusinessentityId]](idx + 1),
-        ratechangedate = row[Option[TypoLocalDateTime]](idx + 2),
-        rate = row[Option[BigDecimal]](idx + 3),
-        payfrequency = row[Option[Int]](idx + 4),
-        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
+        id = row(idx + 0)(Column.columnToOption(Column.columnToInt)),
+        businessentityid = row(idx + 1)(Column.columnToOption(BusinessentityId.column)),
+        ratechangedate = row(idx + 2)(Column.columnToOption(TypoLocalDateTime.column)),
+        rate = row(idx + 3)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        payfrequency = row(idx + 4)(Column.columnToOption(Column.columnToInt)),
+        modifieddate = row(idx + 5)(Column.columnToOption(TypoLocalDateTime.column))
       )
     )
   }
   implicit val writes: OWrites[EphViewRow] = OWrites[EphViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "id" -> Json.toJson(o.id),
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "ratechangedate" -> Json.toJson(o.ratechangedate),
-      "rate" -> Json.toJson(o.rate),
-      "payfrequency" -> Json.toJson(o.payfrequency),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
+      "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
+      "ratechangedate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.ratechangedate),
+      "rate" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.rate),
+      "payfrequency" -> Writes.OptionWrites(Writes.IntWrites).writes(o.payfrequency),
+      "modifieddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

@@ -8,16 +8,19 @@ package pg_catalog
 package pg_publication_rel
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_publication_rel where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_publication_rel where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationRelId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgPublicationRelRow): ConnectionIO[PgPublicationRelRow] = {
     sql"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
-          values (${unsaved.oid}::oid, ${unsaved.prpubid}::oid, ${unsaved.prrelid}::oid)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgPublicationRelId.put))}::oid, ${fromWrite(unsaved.prpubid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prrelid)(Write.fromPut(Meta.LongMeta.put))}::oid)
           returning oid, prpubid, prrelid
        """.query(PgPublicationRelRow.read).unique
   }
@@ -25,17 +28,17 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel".query(PgPublicationRelRow.read).stream
   }
   override def selectById(oid: PgPublicationRelId): ConnectionIO[Option[PgPublicationRelRow]] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ${oid}".query(PgPublicationRelRow.read).option
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationRelId.put))}".query(PgPublicationRelRow.read).option
   }
   override def selectByIds(oids: Array[PgPublicationRelId]): Stream[ConnectionIO, PgPublicationRelRow] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY(${oids})".query(PgPublicationRelRow.read).stream
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY(${fromWrite(oids)(Write.fromPut(PgPublicationRelId.arrayPut))})".query(PgPublicationRelRow.read).stream
   }
   override def update(row: PgPublicationRelRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_publication_rel
-          set prpubid = ${row.prpubid}::oid,
-              prrelid = ${row.prrelid}::oid
-          where oid = ${oid}
+          set prpubid = ${fromWrite(row.prpubid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              prrelid = ${fromWrite(row.prrelid)(Write.fromPut(Meta.LongMeta.put))}::oid
+          where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationRelId.put))}
        """
       .update
       .run
@@ -44,9 +47,9 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def upsert(unsaved: PgPublicationRelRow): ConnectionIO[PgPublicationRelRow] = {
     sql"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.prpubid}::oid,
-            ${unsaved.prrelid}::oid
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgPublicationRelId.put))}::oid,
+            ${fromWrite(unsaved.prpubid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.prrelid)(Write.fromPut(Meta.LongMeta.put))}::oid
           )
           on conflict (oid)
           do update set

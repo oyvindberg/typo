@@ -11,9 +11,9 @@ import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -24,16 +24,16 @@ object PurchaseorderdetailId {
   implicit val reads: Reads[PurchaseorderdetailId] = Reads[PurchaseorderdetailId](json => JsResult.fromTry(
       Try(
         PurchaseorderdetailId(
-          purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
-          purchaseorderdetailid = json.\("purchaseorderdetailid").as[Int]
+          purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
+          purchaseorderdetailid = json.\("purchaseorderdetailid").as(Reads.IntReads)
         )
       )
     ),
   )
   implicit val writes: OWrites[PurchaseorderdetailId] = OWrites[PurchaseorderdetailId](o =>
     new JsObject(ListMap[String, JsValue](
-      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
-      "purchaseorderdetailid" -> Json.toJson(o.purchaseorderdetailid)
+      "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
+      "purchaseorderdetailid" -> Writes.IntWrites.writes(o.purchaseorderdetailid)
     ))
   )
 }

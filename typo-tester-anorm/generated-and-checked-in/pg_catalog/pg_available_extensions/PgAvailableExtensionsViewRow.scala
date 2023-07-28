@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_available_extensions
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -29,10 +30,10 @@ object PgAvailableExtensionsViewRow {
   implicit val reads: Reads[PgAvailableExtensionsViewRow] = Reads[PgAvailableExtensionsViewRow](json => JsResult.fromTry(
       Try(
         PgAvailableExtensionsViewRow(
-          name = json.\("name").toOption.map(_.as[String]),
-          defaultVersion = json.\("default_version").toOption.map(_.as[String]),
-          installedVersion = json.\("installed_version").toOption.map(_.as[String]),
-          comment = json.\("comment").toOption.map(_.as[String])
+          name = json.\("name").toOption.map(_.as(Reads.StringReads)),
+          defaultVersion = json.\("default_version").toOption.map(_.as(Reads.StringReads)),
+          installedVersion = json.\("installed_version").toOption.map(_.as(Reads.StringReads)),
+          comment = json.\("comment").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -40,19 +41,19 @@ object PgAvailableExtensionsViewRow {
   def rowParser(idx: Int): RowParser[PgAvailableExtensionsViewRow] = RowParser[PgAvailableExtensionsViewRow] { row =>
     Success(
       PgAvailableExtensionsViewRow(
-        name = row[Option[String]](idx + 0),
-        defaultVersion = row[Option[String]](idx + 1),
-        installedVersion = row[Option[String]](idx + 2),
-        comment = row[Option[String]](idx + 3)
+        name = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        defaultVersion = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        installedVersion = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        comment = row(idx + 3)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgAvailableExtensionsViewRow] = OWrites[PgAvailableExtensionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "name" -> Json.toJson(o.name),
-      "default_version" -> Json.toJson(o.defaultVersion),
-      "installed_version" -> Json.toJson(o.installedVersion),
-      "comment" -> Json.toJson(o.comment)
+      "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
+      "default_version" -> Writes.OptionWrites(Writes.StringWrites).writes(o.defaultVersion),
+      "installed_version" -> Writes.OptionWrites(Writes.StringWrites).writes(o.installedVersion),
+      "comment" -> Writes.OptionWrites(Writes.StringWrites).writes(o.comment)
     ))
   )
 }

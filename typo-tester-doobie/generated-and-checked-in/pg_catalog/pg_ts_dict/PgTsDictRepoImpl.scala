@@ -8,16 +8,19 @@ package pg_catalog
 package pg_ts_dict
 
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_dict where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_dict where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
     sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
-          values (${unsaved.oid}::oid, ${unsaved.dictname}::name, ${unsaved.dictnamespace}::oid, ${unsaved.dictowner}::oid, ${unsaved.dicttemplate}::oid, ${unsaved.dictinitoption})
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsDictId.put))}::oid, ${fromWrite(unsaved.dictname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.dictnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))})
           returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
        """.query(PgTsDictRow.read).unique
   }
@@ -25,20 +28,20 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
     sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict".query(PgTsDictRow.read).stream
   }
   override def selectById(oid: PgTsDictId): ConnectionIO[Option[PgTsDictRow]] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ${oid}".query(PgTsDictRow.read).option
+    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}".query(PgTsDictRow.read).option
   }
   override def selectByIds(oids: Array[PgTsDictId]): Stream[ConnectionIO, PgTsDictRow] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY(${oids})".query(PgTsDictRow.read).stream
+    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY(${fromWrite(oids)(Write.fromPut(PgTsDictId.arrayPut))})".query(PgTsDictRow.read).stream
   }
   override def update(row: PgTsDictRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_ts_dict
-          set dictname = ${row.dictname}::name,
-              dictnamespace = ${row.dictnamespace}::oid,
-              dictowner = ${row.dictowner}::oid,
-              dicttemplate = ${row.dicttemplate}::oid,
-              dictinitoption = ${row.dictinitoption}
-          where oid = ${oid}
+          set dictname = ${fromWrite(row.dictname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              dictnamespace = ${fromWrite(row.dictnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              dictowner = ${fromWrite(row.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              dicttemplate = ${fromWrite(row.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              dictinitoption = ${fromWrite(row.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))}
+          where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}
        """
       .update
       .run
@@ -47,12 +50,12 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
   override def upsert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
     sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.dictname}::name,
-            ${unsaved.dictnamespace}::oid,
-            ${unsaved.dictowner}::oid,
-            ${unsaved.dicttemplate}::oid,
-            ${unsaved.dictinitoption}
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgTsDictId.put))}::oid,
+            ${fromWrite(unsaved.dictname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.dictnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))}
           )
           on conflict (oid)
           do update set

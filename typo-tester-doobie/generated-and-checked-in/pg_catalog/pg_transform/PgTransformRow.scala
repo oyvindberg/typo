@@ -9,8 +9,8 @@ package pg_transform
 
 import adventureworks.TypoRegproc
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -24,22 +24,22 @@ case class PgTransformRow(
 )
 
 object PgTransformRow {
-  implicit val decoder: Decoder[PgTransformRow] = Decoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(PgTransformRow.apply)
-  implicit val encoder: Encoder[PgTransformRow] = Encoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(x => (x.oid, x.trftype, x.trflang, x.trffromsql, x.trftosql))
+  implicit val decoder: Decoder[PgTransformRow] = Decoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(PgTransformRow.apply)(PgTransformId.decoder, Decoder.decodeLong, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder)
+  implicit val encoder: Encoder[PgTransformRow] = Encoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(x => (x.oid, x.trftype, x.trflang, x.trffromsql, x.trftosql))(PgTransformId.encoder, Encoder.encodeLong, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder)
   implicit val read: Read[PgTransformRow] = new Read[PgTransformRow](
     gets = List(
-      (Get[PgTransformId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[TypoRegproc], Nullability.NoNulls),
-      (Get[TypoRegproc], Nullability.NoNulls)
+      (PgTransformId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (TypoRegproc.get, Nullability.NoNulls),
+      (TypoRegproc.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgTransformRow(
-      oid = Get[PgTransformId].unsafeGetNonNullable(rs, i + 0),
-      trftype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      trflang = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      trffromsql = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
-      trftosql = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4)
+      oid = PgTransformId.get.unsafeGetNonNullable(rs, i + 0),
+      trftype = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      trflang = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      trffromsql = TypoRegproc.get.unsafeGetNonNullable(rs, i + 3),
+      trftosql = TypoRegproc.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

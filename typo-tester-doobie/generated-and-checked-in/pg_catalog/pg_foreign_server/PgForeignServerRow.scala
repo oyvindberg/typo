@@ -9,8 +9,8 @@ package pg_foreign_server
 
 import adventureworks.TypoAclItem
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -27,28 +27,28 @@ case class PgForeignServerRow(
 )
 
 object PgForeignServerRow {
-  implicit val decoder: Decoder[PgForeignServerRow] = Decoder.forProduct8[PgForeignServerRow, PgForeignServerId, String, /* oid */ Long, /* oid */ Long, Option[String], Option[String], Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")(PgForeignServerRow.apply)
-  implicit val encoder: Encoder[PgForeignServerRow] = Encoder.forProduct8[PgForeignServerRow, PgForeignServerId, String, /* oid */ Long, /* oid */ Long, Option[String], Option[String], Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")(x => (x.oid, x.srvname, x.srvowner, x.srvfdw, x.srvtype, x.srvversion, x.srvacl, x.srvoptions))
+  implicit val decoder: Decoder[PgForeignServerRow] = Decoder.forProduct8[PgForeignServerRow, PgForeignServerId, String, /* oid */ Long, /* oid */ Long, Option[String], Option[String], Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")(PgForeignServerRow.apply)(PgForeignServerId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit val encoder: Encoder[PgForeignServerRow] = Encoder.forProduct8[PgForeignServerRow, PgForeignServerId, String, /* oid */ Long, /* oid */ Long, Option[String], Option[String], Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")(x => (x.oid, x.srvname, x.srvowner, x.srvfdw, x.srvtype, x.srvversion, x.srvacl, x.srvoptions))(PgForeignServerId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
   implicit val read: Read[PgForeignServerRow] = new Read[PgForeignServerRow](
     gets = List(
-      (Get[PgForeignServerId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Array[TypoAclItem]], Nullability.Nullable),
-      (Get[Array[String]], Nullability.Nullable)
+      (PgForeignServerId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (TypoAclItem.arrayGet, Nullability.Nullable),
+      (adventureworks.StringArrayMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgForeignServerRow(
-      oid = Get[PgForeignServerId].unsafeGetNonNullable(rs, i + 0),
-      srvname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      srvowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      srvfdw = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      srvtype = Get[String].unsafeGetNullable(rs, i + 4),
-      srvversion = Get[String].unsafeGetNullable(rs, i + 5),
-      srvacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 6),
-      srvoptions = Get[Array[String]].unsafeGetNullable(rs, i + 7)
+      oid = PgForeignServerId.get.unsafeGetNonNullable(rs, i + 0),
+      srvname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      srvowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      srvfdw = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      srvtype = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      srvversion = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      srvacl = TypoAclItem.arrayGet.unsafeGetNullable(rs, i + 6),
+      srvoptions = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

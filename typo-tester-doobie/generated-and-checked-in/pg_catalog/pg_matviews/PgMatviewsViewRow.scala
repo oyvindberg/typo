@@ -8,8 +8,8 @@ package pg_catalog
 package pg_matviews
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -25,26 +25,26 @@ case class PgMatviewsViewRow(
 )
 
 object PgMatviewsViewRow {
-  implicit val decoder: Decoder[PgMatviewsViewRow] = Decoder.forProduct7[PgMatviewsViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[String]]("schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition")(PgMatviewsViewRow.apply)
-  implicit val encoder: Encoder[PgMatviewsViewRow] = Encoder.forProduct7[PgMatviewsViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[String]]("schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition")(x => (x.schemaname, x.matviewname, x.matviewowner, x.tablespace, x.hasindexes, x.ispopulated, x.definition))
+  implicit val decoder: Decoder[PgMatviewsViewRow] = Decoder.forProduct7[PgMatviewsViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[String]]("schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition")(PgMatviewsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString))
+  implicit val encoder: Encoder[PgMatviewsViewRow] = Encoder.forProduct7[PgMatviewsViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[String]]("schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition")(x => (x.schemaname, x.matviewname, x.matviewowner, x.tablespace, x.hasindexes, x.ispopulated, x.definition))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString))
   implicit val read: Read[PgMatviewsViewRow] = new Read[PgMatviewsViewRow](
     gets = List(
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[String], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[Boolean], Nullability.Nullable),
-      (Get[String], Nullability.Nullable)
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.BooleanMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgMatviewsViewRow(
-      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-      matviewname = Get[String].unsafeGetNullable(rs, i + 1),
-      matviewowner = Get[String].unsafeGetNullable(rs, i + 2),
-      tablespace = Get[String].unsafeGetNullable(rs, i + 3),
-      hasindexes = Get[Boolean].unsafeGetNullable(rs, i + 4),
-      ispopulated = Get[Boolean].unsafeGetNullable(rs, i + 5),
-      definition = Get[String].unsafeGetNullable(rs, i + 6)
+      schemaname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 0),
+      matviewname = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
+      matviewowner = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      tablespace = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      hasindexes = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 4),
+      ispopulated = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 5),
+      definition = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6)
     )
   )
 }

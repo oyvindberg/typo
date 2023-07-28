@@ -8,14 +8,15 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.TypoRegproc
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -48,28 +49,28 @@ object PgAggregateRow {
   implicit val reads: Reads[PgAggregateRow] = Reads[PgAggregateRow](json => JsResult.fromTry(
       Try(
         PgAggregateRow(
-          aggfnoid = json.\("aggfnoid").as[PgAggregateId],
-          aggkind = json.\("aggkind").as[String],
-          aggnumdirectargs = json.\("aggnumdirectargs").as[Int],
-          aggtransfn = json.\("aggtransfn").as[TypoRegproc],
-          aggfinalfn = json.\("aggfinalfn").as[TypoRegproc],
-          aggcombinefn = json.\("aggcombinefn").as[TypoRegproc],
-          aggserialfn = json.\("aggserialfn").as[TypoRegproc],
-          aggdeserialfn = json.\("aggdeserialfn").as[TypoRegproc],
-          aggmtransfn = json.\("aggmtransfn").as[TypoRegproc],
-          aggminvtransfn = json.\("aggminvtransfn").as[TypoRegproc],
-          aggmfinalfn = json.\("aggmfinalfn").as[TypoRegproc],
-          aggfinalextra = json.\("aggfinalextra").as[Boolean],
-          aggmfinalextra = json.\("aggmfinalextra").as[Boolean],
-          aggfinalmodify = json.\("aggfinalmodify").as[String],
-          aggmfinalmodify = json.\("aggmfinalmodify").as[String],
-          aggsortop = json.\("aggsortop").as[/* oid */ Long],
-          aggtranstype = json.\("aggtranstype").as[/* oid */ Long],
-          aggtransspace = json.\("aggtransspace").as[Int],
-          aggmtranstype = json.\("aggmtranstype").as[/* oid */ Long],
-          aggmtransspace = json.\("aggmtransspace").as[Int],
-          agginitval = json.\("agginitval").toOption.map(_.as[String]),
-          aggminitval = json.\("aggminitval").toOption.map(_.as[String])
+          aggfnoid = json.\("aggfnoid").as(PgAggregateId.reads),
+          aggkind = json.\("aggkind").as(Reads.StringReads),
+          aggnumdirectargs = json.\("aggnumdirectargs").as(Reads.IntReads),
+          aggtransfn = json.\("aggtransfn").as(TypoRegproc.reads),
+          aggfinalfn = json.\("aggfinalfn").as(TypoRegproc.reads),
+          aggcombinefn = json.\("aggcombinefn").as(TypoRegproc.reads),
+          aggserialfn = json.\("aggserialfn").as(TypoRegproc.reads),
+          aggdeserialfn = json.\("aggdeserialfn").as(TypoRegproc.reads),
+          aggmtransfn = json.\("aggmtransfn").as(TypoRegproc.reads),
+          aggminvtransfn = json.\("aggminvtransfn").as(TypoRegproc.reads),
+          aggmfinalfn = json.\("aggmfinalfn").as(TypoRegproc.reads),
+          aggfinalextra = json.\("aggfinalextra").as(Reads.BooleanReads),
+          aggmfinalextra = json.\("aggmfinalextra").as(Reads.BooleanReads),
+          aggfinalmodify = json.\("aggfinalmodify").as(Reads.StringReads),
+          aggmfinalmodify = json.\("aggmfinalmodify").as(Reads.StringReads),
+          aggsortop = json.\("aggsortop").as(Reads.LongReads),
+          aggtranstype = json.\("aggtranstype").as(Reads.LongReads),
+          aggtransspace = json.\("aggtransspace").as(Reads.IntReads),
+          aggmtranstype = json.\("aggmtranstype").as(Reads.LongReads),
+          aggmtransspace = json.\("aggmtransspace").as(Reads.IntReads),
+          agginitval = json.\("agginitval").toOption.map(_.as(Reads.StringReads)),
+          aggminitval = json.\("aggminitval").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -77,55 +78,55 @@ object PgAggregateRow {
   def rowParser(idx: Int): RowParser[PgAggregateRow] = RowParser[PgAggregateRow] { row =>
     Success(
       PgAggregateRow(
-        aggfnoid = row[PgAggregateId](idx + 0),
-        aggkind = row[String](idx + 1),
-        aggnumdirectargs = row[Int](idx + 2),
-        aggtransfn = row[TypoRegproc](idx + 3),
-        aggfinalfn = row[TypoRegproc](idx + 4),
-        aggcombinefn = row[TypoRegproc](idx + 5),
-        aggserialfn = row[TypoRegproc](idx + 6),
-        aggdeserialfn = row[TypoRegproc](idx + 7),
-        aggmtransfn = row[TypoRegproc](idx + 8),
-        aggminvtransfn = row[TypoRegproc](idx + 9),
-        aggmfinalfn = row[TypoRegproc](idx + 10),
-        aggfinalextra = row[Boolean](idx + 11),
-        aggmfinalextra = row[Boolean](idx + 12),
-        aggfinalmodify = row[String](idx + 13),
-        aggmfinalmodify = row[String](idx + 14),
-        aggsortop = row[/* oid */ Long](idx + 15),
-        aggtranstype = row[/* oid */ Long](idx + 16),
-        aggtransspace = row[Int](idx + 17),
-        aggmtranstype = row[/* oid */ Long](idx + 18),
-        aggmtransspace = row[Int](idx + 19),
-        agginitval = row[Option[String]](idx + 20),
-        aggminitval = row[Option[String]](idx + 21)
+        aggfnoid = row(idx + 0)(PgAggregateId.column),
+        aggkind = row(idx + 1)(Column.columnToString),
+        aggnumdirectargs = row(idx + 2)(Column.columnToInt),
+        aggtransfn = row(idx + 3)(TypoRegproc.column),
+        aggfinalfn = row(idx + 4)(TypoRegproc.column),
+        aggcombinefn = row(idx + 5)(TypoRegproc.column),
+        aggserialfn = row(idx + 6)(TypoRegproc.column),
+        aggdeserialfn = row(idx + 7)(TypoRegproc.column),
+        aggmtransfn = row(idx + 8)(TypoRegproc.column),
+        aggminvtransfn = row(idx + 9)(TypoRegproc.column),
+        aggmfinalfn = row(idx + 10)(TypoRegproc.column),
+        aggfinalextra = row(idx + 11)(Column.columnToBoolean),
+        aggmfinalextra = row(idx + 12)(Column.columnToBoolean),
+        aggfinalmodify = row(idx + 13)(Column.columnToString),
+        aggmfinalmodify = row(idx + 14)(Column.columnToString),
+        aggsortop = row(idx + 15)(Column.columnToLong),
+        aggtranstype = row(idx + 16)(Column.columnToLong),
+        aggtransspace = row(idx + 17)(Column.columnToInt),
+        aggmtranstype = row(idx + 18)(Column.columnToLong),
+        aggmtransspace = row(idx + 19)(Column.columnToInt),
+        agginitval = row(idx + 20)(Column.columnToOption(Column.columnToString)),
+        aggminitval = row(idx + 21)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgAggregateRow] = OWrites[PgAggregateRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "aggfnoid" -> Json.toJson(o.aggfnoid),
-      "aggkind" -> Json.toJson(o.aggkind),
-      "aggnumdirectargs" -> Json.toJson(o.aggnumdirectargs),
-      "aggtransfn" -> Json.toJson(o.aggtransfn),
-      "aggfinalfn" -> Json.toJson(o.aggfinalfn),
-      "aggcombinefn" -> Json.toJson(o.aggcombinefn),
-      "aggserialfn" -> Json.toJson(o.aggserialfn),
-      "aggdeserialfn" -> Json.toJson(o.aggdeserialfn),
-      "aggmtransfn" -> Json.toJson(o.aggmtransfn),
-      "aggminvtransfn" -> Json.toJson(o.aggminvtransfn),
-      "aggmfinalfn" -> Json.toJson(o.aggmfinalfn),
-      "aggfinalextra" -> Json.toJson(o.aggfinalextra),
-      "aggmfinalextra" -> Json.toJson(o.aggmfinalextra),
-      "aggfinalmodify" -> Json.toJson(o.aggfinalmodify),
-      "aggmfinalmodify" -> Json.toJson(o.aggmfinalmodify),
-      "aggsortop" -> Json.toJson(o.aggsortop),
-      "aggtranstype" -> Json.toJson(o.aggtranstype),
-      "aggtransspace" -> Json.toJson(o.aggtransspace),
-      "aggmtranstype" -> Json.toJson(o.aggmtranstype),
-      "aggmtransspace" -> Json.toJson(o.aggmtransspace),
-      "agginitval" -> Json.toJson(o.agginitval),
-      "aggminitval" -> Json.toJson(o.aggminitval)
+      "aggfnoid" -> PgAggregateId.writes.writes(o.aggfnoid),
+      "aggkind" -> Writes.StringWrites.writes(o.aggkind),
+      "aggnumdirectargs" -> Writes.IntWrites.writes(o.aggnumdirectargs),
+      "aggtransfn" -> TypoRegproc.writes.writes(o.aggtransfn),
+      "aggfinalfn" -> TypoRegproc.writes.writes(o.aggfinalfn),
+      "aggcombinefn" -> TypoRegproc.writes.writes(o.aggcombinefn),
+      "aggserialfn" -> TypoRegproc.writes.writes(o.aggserialfn),
+      "aggdeserialfn" -> TypoRegproc.writes.writes(o.aggdeserialfn),
+      "aggmtransfn" -> TypoRegproc.writes.writes(o.aggmtransfn),
+      "aggminvtransfn" -> TypoRegproc.writes.writes(o.aggminvtransfn),
+      "aggmfinalfn" -> TypoRegproc.writes.writes(o.aggmfinalfn),
+      "aggfinalextra" -> Writes.BooleanWrites.writes(o.aggfinalextra),
+      "aggmfinalextra" -> Writes.BooleanWrites.writes(o.aggmfinalextra),
+      "aggfinalmodify" -> Writes.StringWrites.writes(o.aggfinalmodify),
+      "aggmfinalmodify" -> Writes.StringWrites.writes(o.aggmfinalmodify),
+      "aggsortop" -> Writes.LongWrites.writes(o.aggsortop),
+      "aggtranstype" -> Writes.LongWrites.writes(o.aggtranstype),
+      "aggtransspace" -> Writes.IntWrites.writes(o.aggtransspace),
+      "aggmtranstype" -> Writes.LongWrites.writes(o.aggmtranstype),
+      "aggmtransspace" -> Writes.IntWrites.writes(o.aggmtransspace),
+      "agginitval" -> Writes.OptionWrites(Writes.StringWrites).writes(o.agginitval),
+      "aggminitval" -> Writes.OptionWrites(Writes.StringWrites).writes(o.aggminitval)
     ))
   )
 }

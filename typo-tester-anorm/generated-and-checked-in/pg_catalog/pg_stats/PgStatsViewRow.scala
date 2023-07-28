@@ -8,14 +8,15 @@ package pg_catalog
 package pg_stats
 
 import adventureworks.TypoAnyArray
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -40,20 +41,20 @@ object PgStatsViewRow {
   implicit val reads: Reads[PgStatsViewRow] = Reads[PgStatsViewRow](json => JsResult.fromTry(
       Try(
         PgStatsViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          tablename = json.\("tablename").toOption.map(_.as[String]),
-          attname = json.\("attname").toOption.map(_.as[String]),
-          inherited = json.\("inherited").toOption.map(_.as[Boolean]),
-          nullFrac = json.\("null_frac").toOption.map(_.as[Float]),
-          avgWidth = json.\("avg_width").toOption.map(_.as[Int]),
-          nDistinct = json.\("n_distinct").toOption.map(_.as[Float]),
-          mostCommonVals = json.\("most_common_vals").toOption.map(_.as[TypoAnyArray]),
-          mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Float]]),
-          histogramBounds = json.\("histogram_bounds").toOption.map(_.as[TypoAnyArray]),
-          correlation = json.\("correlation").toOption.map(_.as[Float]),
-          mostCommonElems = json.\("most_common_elems").toOption.map(_.as[TypoAnyArray]),
-          mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as[Array[Float]]),
-          elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as[Array[Float]])
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
+          attname = json.\("attname").toOption.map(_.as(Reads.StringReads)),
+          inherited = json.\("inherited").toOption.map(_.as(Reads.BooleanReads)),
+          nullFrac = json.\("null_frac").toOption.map(_.as(Reads.FloatReads)),
+          avgWidth = json.\("avg_width").toOption.map(_.as(Reads.IntReads)),
+          nDistinct = json.\("n_distinct").toOption.map(_.as(Reads.FloatReads)),
+          mostCommonVals = json.\("most_common_vals").toOption.map(_.as(TypoAnyArray.reads)),
+          mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly))),
+          histogramBounds = json.\("histogram_bounds").toOption.map(_.as(TypoAnyArray.reads)),
+          correlation = json.\("correlation").toOption.map(_.as(Reads.FloatReads)),
+          mostCommonElems = json.\("most_common_elems").toOption.map(_.as(TypoAnyArray.reads)),
+          mostCommonElemFreqs = json.\("most_common_elem_freqs").toOption.map(_.as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly))),
+          elemCountHistogram = json.\("elem_count_histogram").toOption.map(_.as(Reads.ArrayReads[Float](Reads.FloatReads, implicitly)))
         )
       )
     ),
@@ -61,39 +62,39 @@ object PgStatsViewRow {
   def rowParser(idx: Int): RowParser[PgStatsViewRow] = RowParser[PgStatsViewRow] { row =>
     Success(
       PgStatsViewRow(
-        schemaname = row[Option[String]](idx + 0),
-        tablename = row[Option[String]](idx + 1),
-        attname = row[Option[String]](idx + 2),
-        inherited = row[Option[Boolean]](idx + 3),
-        nullFrac = row[Option[Float]](idx + 4),
-        avgWidth = row[Option[Int]](idx + 5),
-        nDistinct = row[Option[Float]](idx + 6),
-        mostCommonVals = row[Option[TypoAnyArray]](idx + 7),
-        mostCommonFreqs = row[Option[Array[Float]]](idx + 8),
-        histogramBounds = row[Option[TypoAnyArray]](idx + 9),
-        correlation = row[Option[Float]](idx + 10),
-        mostCommonElems = row[Option[TypoAnyArray]](idx + 11),
-        mostCommonElemFreqs = row[Option[Array[Float]]](idx + 12),
-        elemCountHistogram = row[Option[Array[Float]]](idx + 13)
+        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        attname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        inherited = row(idx + 3)(Column.columnToOption(Column.columnToBoolean)),
+        nullFrac = row(idx + 4)(Column.columnToOption(Column.columnToFloat)),
+        avgWidth = row(idx + 5)(Column.columnToOption(Column.columnToInt)),
+        nDistinct = row(idx + 6)(Column.columnToOption(Column.columnToFloat)),
+        mostCommonVals = row(idx + 7)(Column.columnToOption(TypoAnyArray.column)),
+        mostCommonFreqs = row(idx + 8)(Column.columnToOption(Column.columnToArray[Float](Column.columnToFloat, implicitly))),
+        histogramBounds = row(idx + 9)(Column.columnToOption(TypoAnyArray.column)),
+        correlation = row(idx + 10)(Column.columnToOption(Column.columnToFloat)),
+        mostCommonElems = row(idx + 11)(Column.columnToOption(TypoAnyArray.column)),
+        mostCommonElemFreqs = row(idx + 12)(Column.columnToOption(Column.columnToArray[Float](Column.columnToFloat, implicitly))),
+        elemCountHistogram = row(idx + 13)(Column.columnToOption(Column.columnToArray[Float](Column.columnToFloat, implicitly)))
       )
     )
   }
   implicit val writes: OWrites[PgStatsViewRow] = OWrites[PgStatsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Json.toJson(o.schemaname),
-      "tablename" -> Json.toJson(o.tablename),
-      "attname" -> Json.toJson(o.attname),
-      "inherited" -> Json.toJson(o.inherited),
-      "null_frac" -> Json.toJson(o.nullFrac),
-      "avg_width" -> Json.toJson(o.avgWidth),
-      "n_distinct" -> Json.toJson(o.nDistinct),
-      "most_common_vals" -> Json.toJson(o.mostCommonVals),
-      "most_common_freqs" -> Json.toJson(o.mostCommonFreqs),
-      "histogram_bounds" -> Json.toJson(o.histogramBounds),
-      "correlation" -> Json.toJson(o.correlation),
-      "most_common_elems" -> Json.toJson(o.mostCommonElems),
-      "most_common_elem_freqs" -> Json.toJson(o.mostCommonElemFreqs),
-      "elem_count_histogram" -> Json.toJson(o.elemCountHistogram)
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
+      "attname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.attname),
+      "inherited" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.inherited),
+      "null_frac" -> Writes.OptionWrites(Writes.FloatWrites).writes(o.nullFrac),
+      "avg_width" -> Writes.OptionWrites(Writes.IntWrites).writes(o.avgWidth),
+      "n_distinct" -> Writes.OptionWrites(Writes.FloatWrites).writes(o.nDistinct),
+      "most_common_vals" -> Writes.OptionWrites(TypoAnyArray.writes).writes(o.mostCommonVals),
+      "most_common_freqs" -> Writes.OptionWrites(Writes.arrayWrites[Float](implicitly, Writes.FloatWrites)).writes(o.mostCommonFreqs),
+      "histogram_bounds" -> Writes.OptionWrites(TypoAnyArray.writes).writes(o.histogramBounds),
+      "correlation" -> Writes.OptionWrites(Writes.FloatWrites).writes(o.correlation),
+      "most_common_elems" -> Writes.OptionWrites(TypoAnyArray.writes).writes(o.mostCommonElems),
+      "most_common_elem_freqs" -> Writes.OptionWrites(Writes.arrayWrites[Float](implicitly, Writes.FloatWrites)).writes(o.mostCommonElemFreqs),
+      "elem_count_histogram" -> Writes.OptionWrites(Writes.arrayWrites[Float](implicitly, Writes.FloatWrites)).writes(o.elemCountHistogram)
     ))
   )
 }

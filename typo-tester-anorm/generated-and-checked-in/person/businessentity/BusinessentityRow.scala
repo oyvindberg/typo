@@ -8,15 +8,16 @@ package person
 package businessentity
 
 import adventureworks.TypoLocalDateTime
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -31,9 +32,9 @@ object BusinessentityRow {
   implicit val reads: Reads[BusinessentityRow] = Reads[BusinessentityRow](json => JsResult.fromTry(
       Try(
         BusinessentityRow(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          rowguid = json.\("rowguid").as[UUID],
-          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          rowguid = json.\("rowguid").as(Reads.uuidReads),
+          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
         )
       )
     ),
@@ -41,17 +42,17 @@ object BusinessentityRow {
   def rowParser(idx: Int): RowParser[BusinessentityRow] = RowParser[BusinessentityRow] { row =>
     Success(
       BusinessentityRow(
-        businessentityid = row[BusinessentityId](idx + 0),
-        rowguid = row[UUID](idx + 1),
-        modifieddate = row[TypoLocalDateTime](idx + 2)
+        businessentityid = row(idx + 0)(BusinessentityId.column),
+        rowguid = row(idx + 1)(Column.columnToUUID),
+        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
       )
     )
   }
   implicit val writes: OWrites[BusinessentityRow] = OWrites[BusinessentityRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "rowguid" -> Writes.UuidWrites.writes(o.rowguid),
+      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
     ))
   )
 }

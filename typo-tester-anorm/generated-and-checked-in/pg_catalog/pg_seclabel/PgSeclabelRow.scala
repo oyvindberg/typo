@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_seclabel
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -32,11 +33,11 @@ object PgSeclabelRow {
   implicit val reads: Reads[PgSeclabelRow] = Reads[PgSeclabelRow](json => JsResult.fromTry(
       Try(
         PgSeclabelRow(
-          objoid = json.\("objoid").as[/* oid */ Long],
-          classoid = json.\("classoid").as[/* oid */ Long],
-          objsubid = json.\("objsubid").as[Int],
-          provider = json.\("provider").as[String],
-          label = json.\("label").as[String]
+          objoid = json.\("objoid").as(Reads.LongReads),
+          classoid = json.\("classoid").as(Reads.LongReads),
+          objsubid = json.\("objsubid").as(Reads.IntReads),
+          provider = json.\("provider").as(Reads.StringReads),
+          label = json.\("label").as(Reads.StringReads)
         )
       )
     ),
@@ -44,21 +45,21 @@ object PgSeclabelRow {
   def rowParser(idx: Int): RowParser[PgSeclabelRow] = RowParser[PgSeclabelRow] { row =>
     Success(
       PgSeclabelRow(
-        objoid = row[/* oid */ Long](idx + 0),
-        classoid = row[/* oid */ Long](idx + 1),
-        objsubid = row[Int](idx + 2),
-        provider = row[String](idx + 3),
-        label = row[String](idx + 4)
+        objoid = row(idx + 0)(Column.columnToLong),
+        classoid = row(idx + 1)(Column.columnToLong),
+        objsubid = row(idx + 2)(Column.columnToInt),
+        provider = row(idx + 3)(Column.columnToString),
+        label = row(idx + 4)(Column.columnToString)
       )
     )
   }
   implicit val writes: OWrites[PgSeclabelRow] = OWrites[PgSeclabelRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "objoid" -> Json.toJson(o.objoid),
-      "classoid" -> Json.toJson(o.classoid),
-      "objsubid" -> Json.toJson(o.objsubid),
-      "provider" -> Json.toJson(o.provider),
-      "label" -> Json.toJson(o.label)
+      "objoid" -> Writes.LongWrites.writes(o.objoid),
+      "classoid" -> Writes.LongWrites.writes(o.classoid),
+      "objsubid" -> Writes.IntWrites.writes(o.objsubid),
+      "provider" -> Writes.StringWrites.writes(o.provider),
+      "label" -> Writes.StringWrites.writes(o.label)
     ))
   )
 }

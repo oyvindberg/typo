@@ -10,7 +10,6 @@ package department
 import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -27,20 +26,20 @@ case class DepartmentRow(
 )
 
 object DepartmentRow {
-  implicit val decoder: Decoder[DepartmentRow] = Decoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(DepartmentRow.apply)
-  implicit val encoder: Encoder[DepartmentRow] = Encoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(x => (x.departmentid, x.name, x.groupname, x.modifieddate))
+  implicit val decoder: Decoder[DepartmentRow] = Decoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(DepartmentRow.apply)(DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[DepartmentRow] = Encoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(x => (x.departmentid, x.name, x.groupname, x.modifieddate))(DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
   implicit val read: Read[DepartmentRow] = new Read[DepartmentRow](
     gets = List(
-      (Get[DepartmentId], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[Name], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (DepartmentId.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (Name.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
-      departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 0),
-      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-      groupname = Get[Name].unsafeGetNonNullable(rs, i + 2),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
+      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 0),
+      name = Name.get.unsafeGetNonNullable(rs, i + 1),
+      groupname = Name.get.unsafeGetNonNullable(rs, i + 2),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
     )
   )
 }

@@ -44,6 +44,6 @@ case class ProductproductphotoRowUnsaved(
     )
 }
 object ProductproductphotoRowUnsaved {
-  implicit val decoder: Decoder[ProductproductphotoRowUnsaved] = Decoder.forProduct4[ProductproductphotoRowUnsaved, ProductId, ProductphotoId, Defaulted[Flag], Defaulted[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(ProductproductphotoRowUnsaved.apply)
-  implicit val encoder: Encoder[ProductproductphotoRowUnsaved] = Encoder.forProduct4[ProductproductphotoRowUnsaved, ProductId, ProductphotoId, Defaulted[Flag], Defaulted[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))
+  implicit val decoder: Decoder[ProductproductphotoRowUnsaved] = Decoder.forProduct4[ProductproductphotoRowUnsaved, ProductId, ProductphotoId, Defaulted[Flag], Defaulted[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(ProductproductphotoRowUnsaved.apply)(ProductId.decoder, ProductphotoId.decoder, Defaulted.decoder(Flag.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[ProductproductphotoRowUnsaved] = Encoder.forProduct4[ProductproductphotoRowUnsaved, ProductId, ProductphotoId, Defaulted[Flag], Defaulted[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))(ProductId.encoder, ProductphotoId.encoder, Defaulted.encoder(Flag.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

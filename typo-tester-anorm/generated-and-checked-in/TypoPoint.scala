@@ -15,9 +15,9 @@ import org.postgresql.jdbc.PgArray
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -54,8 +54,8 @@ object TypoPoint {
   implicit val reads: Reads[TypoPoint] = Reads[TypoPoint](json => JsResult.fromTry(
       Try(
         TypoPoint(
-          x = json.\("x").as[Double],
-          y = json.\("y").as[Double]
+          x = json.\("x").as(Reads.DoubleReads),
+          y = json.\("y").as(Reads.DoubleReads)
         )
       )
     ),
@@ -63,8 +63,8 @@ object TypoPoint {
   implicit val toStatement: ToStatement[TypoPoint] = ToStatement[TypoPoint]((s, index, v) => s.setObject(index, new PGpoint(v.x, v.y)))
   implicit val writes: OWrites[TypoPoint] = OWrites[TypoPoint](o =>
     new JsObject(ListMap[String, JsValue](
-      "x" -> Json.toJson(o.x),
-      "y" -> Json.toJson(o.y)
+      "x" -> Writes.DoubleWrites.writes(o.x),
+      "y" -> Writes.DoubleWrites.writes(o.y)
     ))
   )
 }

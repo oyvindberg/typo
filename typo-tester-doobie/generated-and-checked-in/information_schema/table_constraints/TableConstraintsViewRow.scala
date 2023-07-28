@@ -11,7 +11,6 @@ import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -31,32 +30,32 @@ case class TableConstraintsViewRow(
 )
 
 object TableConstraintsViewRow {
-  implicit val decoder: Decoder[TableConstraintsViewRow] = Decoder.forProduct10[TableConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(TableConstraintsViewRow.apply)
-  implicit val encoder: Encoder[TableConstraintsViewRow] = Encoder.forProduct10[TableConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.tableCatalog, x.tableSchema, x.tableName, x.constraintType, x.isDeferrable, x.initiallyDeferred, x.enforced))
+  implicit val decoder: Decoder[TableConstraintsViewRow] = Decoder.forProduct10[TableConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(TableConstraintsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(YesOrNo.decoder))
+  implicit val encoder: Encoder[TableConstraintsViewRow] = Encoder.forProduct10[TableConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("constraint_catalog", "constraint_schema", "constraint_name", "table_catalog", "table_schema", "table_name", "constraint_type", "is_deferrable", "initially_deferred", "enforced")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.tableCatalog, x.tableSchema, x.tableName, x.constraintType, x.isDeferrable, x.initiallyDeferred, x.enforced))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(YesOrNo.encoder))
   implicit val read: Read[TableConstraintsViewRow] = new Read[TableConstraintsViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => TableConstraintsViewRow(
-      constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-      constraintType = Get[CharacterData].unsafeGetNullable(rs, i + 6),
-      isDeferrable = Get[YesOrNo].unsafeGetNullable(rs, i + 7),
-      initiallyDeferred = Get[YesOrNo].unsafeGetNullable(rs, i + 8),
-      enforced = Get[YesOrNo].unsafeGetNullable(rs, i + 9)
+      constraintCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      constraintSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      constraintName = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      tableCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      tableSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      tableName = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
+      constraintType = CharacterData.get.unsafeGetNullable(rs, i + 6),
+      isDeferrable = YesOrNo.get.unsafeGetNullable(rs, i + 7),
+      initiallyDeferred = YesOrNo.get.unsafeGetNullable(rs, i + 8),
+      enforced = YesOrNo.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

@@ -7,17 +7,22 @@ package adventureworks
 package pg_catalog
 package pg_attribute
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoAnyArray
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_attribute where attrelid = ${fromWrite(compositeId.attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attnum = ${fromWrite(compositeId.attnum)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAttributeRow): ConnectionIO[PgAttributeRow] = {
     sql"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
-          values (${unsaved.attrelid}::oid, ${unsaved.attname}::name, ${unsaved.atttypid}::oid, ${unsaved.attstattarget}::int4, ${unsaved.attlen}::int2, ${unsaved.attnum}::int2, ${unsaved.attndims}::int4, ${unsaved.attcacheoff}::int4, ${unsaved.atttypmod}::int4, ${unsaved.attbyval}, ${unsaved.attalign}::char, ${unsaved.attstorage}::char, ${unsaved.attcompression}::char, ${unsaved.attnotnull}, ${unsaved.atthasdef}, ${unsaved.atthasmissing}, ${unsaved.attidentity}::char, ${unsaved.attgenerated}::char, ${unsaved.attisdropped}, ${unsaved.attislocal}, ${unsaved.attinhcount}::int4, ${unsaved.attcollation}::oid, ${unsaved.attacl}::_aclitem, ${unsaved.attoptions}::_text, ${unsaved.attfdwoptions}::_text, ${unsaved.attmissingval}::anyarray)
+          values (${fromWrite(unsaved.attrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.attname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.atttypid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.attstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attlen)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.attnum)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.attndims)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attcacheoff)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.atttypmod)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attbyval)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attalign)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attstorage)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attcompression)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attnotnull)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.atthasdef)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.atthasmissing)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attidentity)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attgenerated)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.attisdropped)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attislocal)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.attinhcount)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.attcollation)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.attacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem, ${fromWrite(unsaved.attoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.attfdwoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.attmissingval)(Write.fromPutOption(TypoAnyArray.put))}::anyarray)
           returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
        """.query(PgAttributeRow.read).unique
   }
@@ -25,36 +30,36 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute".query(PgAttributeRow.read).stream
   }
   override def selectById(compositeId: PgAttributeId): ConnectionIO[Option[PgAttributeRow]] = {
-    sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}".query(PgAttributeRow.read).option
+    sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${fromWrite(compositeId.attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attnum = ${fromWrite(compositeId.attnum)(Write.fromPut(Meta.IntMeta.put))}".query(PgAttributeRow.read).option
   }
   override def update(row: PgAttributeRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update pg_catalog.pg_attribute
-          set attname = ${row.attname}::name,
-              atttypid = ${row.atttypid}::oid,
-              attstattarget = ${row.attstattarget}::int4,
-              attlen = ${row.attlen}::int2,
-              attndims = ${row.attndims}::int4,
-              attcacheoff = ${row.attcacheoff}::int4,
-              atttypmod = ${row.atttypmod}::int4,
-              attbyval = ${row.attbyval},
-              attalign = ${row.attalign}::char,
-              attstorage = ${row.attstorage}::char,
-              attcompression = ${row.attcompression}::char,
-              attnotnull = ${row.attnotnull},
-              atthasdef = ${row.atthasdef},
-              atthasmissing = ${row.atthasmissing},
-              attidentity = ${row.attidentity}::char,
-              attgenerated = ${row.attgenerated}::char,
-              attisdropped = ${row.attisdropped},
-              attislocal = ${row.attislocal},
-              attinhcount = ${row.attinhcount}::int4,
-              attcollation = ${row.attcollation}::oid,
-              attacl = ${row.attacl}::_aclitem,
-              attoptions = ${row.attoptions}::_text,
-              attfdwoptions = ${row.attfdwoptions}::_text,
-              attmissingval = ${row.attmissingval}::anyarray
-          where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}
+          set attname = ${fromWrite(row.attname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              atttypid = ${fromWrite(row.atttypid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              attstattarget = ${fromWrite(row.attstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              attlen = ${fromWrite(row.attlen)(Write.fromPut(Meta.IntMeta.put))}::int2,
+              attndims = ${fromWrite(row.attndims)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              attcacheoff = ${fromWrite(row.attcacheoff)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              atttypmod = ${fromWrite(row.atttypmod)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              attbyval = ${fromWrite(row.attbyval)(Write.fromPut(Meta.BooleanMeta.put))},
+              attalign = ${fromWrite(row.attalign)(Write.fromPut(Meta.StringMeta.put))}::char,
+              attstorage = ${fromWrite(row.attstorage)(Write.fromPut(Meta.StringMeta.put))}::char,
+              attcompression = ${fromWrite(row.attcompression)(Write.fromPut(Meta.StringMeta.put))}::char,
+              attnotnull = ${fromWrite(row.attnotnull)(Write.fromPut(Meta.BooleanMeta.put))},
+              atthasdef = ${fromWrite(row.atthasdef)(Write.fromPut(Meta.BooleanMeta.put))},
+              atthasmissing = ${fromWrite(row.atthasmissing)(Write.fromPut(Meta.BooleanMeta.put))},
+              attidentity = ${fromWrite(row.attidentity)(Write.fromPut(Meta.StringMeta.put))}::char,
+              attgenerated = ${fromWrite(row.attgenerated)(Write.fromPut(Meta.StringMeta.put))}::char,
+              attisdropped = ${fromWrite(row.attisdropped)(Write.fromPut(Meta.BooleanMeta.put))},
+              attislocal = ${fromWrite(row.attislocal)(Write.fromPut(Meta.BooleanMeta.put))},
+              attinhcount = ${fromWrite(row.attinhcount)(Write.fromPut(Meta.IntMeta.put))}::int4,
+              attcollation = ${fromWrite(row.attcollation)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              attacl = ${fromWrite(row.attacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
+              attoptions = ${fromWrite(row.attoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+              attfdwoptions = ${fromWrite(row.attfdwoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+              attmissingval = ${fromWrite(row.attmissingval)(Write.fromPutOption(TypoAnyArray.put))}::anyarray
+          where attrelid = ${fromWrite(compositeId.attrelid)(Write.fromPut(Meta.LongMeta.put))} AND attnum = ${fromWrite(compositeId.attnum)(Write.fromPut(Meta.IntMeta.put))}
        """
       .update
       .run
@@ -63,32 +68,32 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
   override def upsert(unsaved: PgAttributeRow): ConnectionIO[PgAttributeRow] = {
     sql"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
           values (
-            ${unsaved.attrelid}::oid,
-            ${unsaved.attname}::name,
-            ${unsaved.atttypid}::oid,
-            ${unsaved.attstattarget}::int4,
-            ${unsaved.attlen}::int2,
-            ${unsaved.attnum}::int2,
-            ${unsaved.attndims}::int4,
-            ${unsaved.attcacheoff}::int4,
-            ${unsaved.atttypmod}::int4,
-            ${unsaved.attbyval},
-            ${unsaved.attalign}::char,
-            ${unsaved.attstorage}::char,
-            ${unsaved.attcompression}::char,
-            ${unsaved.attnotnull},
-            ${unsaved.atthasdef},
-            ${unsaved.atthasmissing},
-            ${unsaved.attidentity}::char,
-            ${unsaved.attgenerated}::char,
-            ${unsaved.attisdropped},
-            ${unsaved.attislocal},
-            ${unsaved.attinhcount}::int4,
-            ${unsaved.attcollation}::oid,
-            ${unsaved.attacl}::_aclitem,
-            ${unsaved.attoptions}::_text,
-            ${unsaved.attfdwoptions}::_text,
-            ${unsaved.attmissingval}::anyarray
+            ${fromWrite(unsaved.attrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.attname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.atttypid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.attstattarget)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.attlen)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.attnum)(Write.fromPut(Meta.IntMeta.put))}::int2,
+            ${fromWrite(unsaved.attndims)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.attcacheoff)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.atttypmod)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.attbyval)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.attalign)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.attstorage)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.attcompression)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.attnotnull)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.atthasdef)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.atthasmissing)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.attidentity)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.attgenerated)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.attisdropped)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.attislocal)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.attinhcount)(Write.fromPut(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.attcollation)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.attacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem,
+            ${fromWrite(unsaved.attoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+            ${fromWrite(unsaved.attfdwoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text,
+            ${fromWrite(unsaved.attmissingval)(Write.fromPutOption(TypoAnyArray.put))}::anyarray
           )
           on conflict (attrelid, attnum)
           do update set

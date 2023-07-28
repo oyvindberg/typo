@@ -8,6 +8,7 @@ package information_schema
 
 import doobie.util.Get
 import doobie.util.Put
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -16,11 +17,11 @@ import io.circe.Encoder
   */
 case class YesOrNo(value: String) extends AnyVal
 object YesOrNo {
-  implicit val arrayGet: Get[Array[YesOrNo]] = Get[Array[String]].map(_.map(YesOrNo.apply))
-  implicit val arrayPut: Put[Array[YesOrNo]] = Put[Array[String]].contramap(_.map(_.value))
-  implicit val decoder: Decoder[YesOrNo] = Decoder[String].map(YesOrNo.apply)
-  implicit val encoder: Encoder[YesOrNo] = Encoder[String].contramap(_.value)
-  implicit val get: Get[YesOrNo] = Get[String].map(YesOrNo.apply)
+  implicit val arrayGet: Get[Array[YesOrNo]] = adventureworks.StringArrayMeta.get.map(_.map(YesOrNo.apply))
+  implicit val arrayPut: Put[Array[YesOrNo]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val decoder: Decoder[YesOrNo] = Decoder.decodeString.map(YesOrNo.apply)
+  implicit val encoder: Encoder[YesOrNo] = Encoder.encodeString.contramap(_.value)
+  implicit val get: Get[YesOrNo] = Meta.StringMeta.get.map(YesOrNo.apply)
   implicit val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
-  implicit val put: Put[YesOrNo] = Put[String].contramap(_.value)
+  implicit val put: Put[YesOrNo] = Meta.StringMeta.put.contramap(_.value)
 }

@@ -11,8 +11,8 @@ import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -41,32 +41,32 @@ case class AViewRow(
 )
 
 object AViewRow {
-  implicit val decoder: Decoder[AViewRow] = Decoder.forProduct10[AViewRow, Option[Int], Option[AddressId], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[StateprovinceId], Option[/* max 15 chars */ String], Option[Byte], Option[UUID], Option[TypoLocalDateTime]]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AViewRow.apply)
-  implicit val encoder: Encoder[AViewRow] = Encoder.forProduct10[AViewRow, Option[Int], Option[AddressId], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[StateprovinceId], Option[/* max 15 chars */ String], Option[Byte], Option[UUID], Option[TypoLocalDateTime]]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.id, x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[AViewRow] = Decoder.forProduct10[AViewRow, Option[Int], Option[AddressId], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[StateprovinceId], Option[/* max 15 chars */ String], Option[Byte], Option[UUID], Option[TypoLocalDateTime]]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(AddressId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(StateprovinceId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeByte), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[AViewRow] = Encoder.forProduct10[AViewRow, Option[Int], Option[AddressId], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[StateprovinceId], Option[/* max 15 chars */ String], Option[Byte], Option[UUID], Option[TypoLocalDateTime]]("id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.id, x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(AddressId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(StateprovinceId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeByte), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
   implicit val read: Read[AViewRow] = new Read[AViewRow](
     gets = List(
-      (Get[Int], Nullability.Nullable),
-      (Get[AddressId], Nullability.Nullable),
-      (Get[/* max 60 chars */ String], Nullability.Nullable),
-      (Get[/* max 60 chars */ String], Nullability.Nullable),
-      (Get[/* max 30 chars */ String], Nullability.Nullable),
-      (Get[StateprovinceId], Nullability.Nullable),
-      (Get[/* max 15 chars */ String], Nullability.Nullable),
-      (Get[Byte], Nullability.Nullable),
-      (Get[UUID], Nullability.Nullable),
-      (Get[TypoLocalDateTime], Nullability.Nullable)
+      (Meta.IntMeta.get, Nullability.Nullable),
+      (AddressId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (StateprovinceId.get, Nullability.Nullable),
+      (Meta.StringMeta.get, Nullability.Nullable),
+      (Meta.ByteMeta.get, Nullability.Nullable),
+      (adventureworks.UUIDMeta.get, Nullability.Nullable),
+      (TypoLocalDateTime.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => AViewRow(
-      id = Get[Int].unsafeGetNullable(rs, i + 0),
-      addressid = Get[AddressId].unsafeGetNullable(rs, i + 1),
-      addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 2),
-      addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 3),
-      city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 4),
-      stateprovinceid = Get[StateprovinceId].unsafeGetNullable(rs, i + 5),
-      postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 6),
-      spatiallocation = Get[Byte].unsafeGetNullable(rs, i + 7),
-      rowguid = Get[UUID].unsafeGetNullable(rs, i + 8),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 9)
+      id = Meta.IntMeta.get.unsafeGetNullable(rs, i + 0),
+      addressid = AddressId.get.unsafeGetNullable(rs, i + 1),
+      addressline1 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
+      city = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      stateprovinceid = StateprovinceId.get.unsafeGetNullable(rs, i + 5),
+      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
+      spatiallocation = Meta.ByteMeta.get.unsafeGetNullable(rs, i + 7),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNullable(rs, i + 8),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

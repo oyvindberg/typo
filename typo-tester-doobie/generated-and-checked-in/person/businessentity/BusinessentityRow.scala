@@ -9,7 +9,6 @@ package businessentity
 
 import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -24,18 +23,18 @@ case class BusinessentityRow(
 )
 
 object BusinessentityRow {
-  implicit val decoder: Decoder[BusinessentityRow] = Decoder.forProduct3[BusinessentityRow, BusinessentityId, UUID, TypoLocalDateTime]("businessentityid", "rowguid", "modifieddate")(BusinessentityRow.apply)
-  implicit val encoder: Encoder[BusinessentityRow] = Encoder.forProduct3[BusinessentityRow, BusinessentityId, UUID, TypoLocalDateTime]("businessentityid", "rowguid", "modifieddate")(x => (x.businessentityid, x.rowguid, x.modifieddate))
+  implicit val decoder: Decoder[BusinessentityRow] = Decoder.forProduct3[BusinessentityRow, BusinessentityId, UUID, TypoLocalDateTime]("businessentityid", "rowguid", "modifieddate")(BusinessentityRow.apply)(BusinessentityId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit val encoder: Encoder[BusinessentityRow] = Encoder.forProduct3[BusinessentityRow, BusinessentityId, UUID, TypoLocalDateTime]("businessentityid", "rowguid", "modifieddate")(x => (x.businessentityid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit val read: Read[BusinessentityRow] = new Read[BusinessentityRow](
     gets = List(
-      (Get[BusinessentityId], Nullability.NoNulls),
-      (Get[UUID], Nullability.NoNulls),
-      (Get[TypoLocalDateTime], Nullability.NoNulls)
+      (BusinessentityId.get, Nullability.NoNulls),
+      (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (TypoLocalDateTime.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => BusinessentityRow(
-      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 1),
-      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
+      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+      rowguid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 1),
+      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
     )
   )
 }

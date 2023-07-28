@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_tables
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,14 +34,14 @@ object PgTablesViewRow {
   implicit val reads: Reads[PgTablesViewRow] = Reads[PgTablesViewRow](json => JsResult.fromTry(
       Try(
         PgTablesViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          tablename = json.\("tablename").toOption.map(_.as[String]),
-          tableowner = json.\("tableowner").toOption.map(_.as[String]),
-          tablespace = json.\("tablespace").toOption.map(_.as[String]),
-          hasindexes = json.\("hasindexes").toOption.map(_.as[Boolean]),
-          hasrules = json.\("hasrules").toOption.map(_.as[Boolean]),
-          hastriggers = json.\("hastriggers").toOption.map(_.as[Boolean]),
-          rowsecurity = json.\("rowsecurity").toOption.map(_.as[Boolean])
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
+          tableowner = json.\("tableowner").toOption.map(_.as(Reads.StringReads)),
+          tablespace = json.\("tablespace").toOption.map(_.as(Reads.StringReads)),
+          hasindexes = json.\("hasindexes").toOption.map(_.as(Reads.BooleanReads)),
+          hasrules = json.\("hasrules").toOption.map(_.as(Reads.BooleanReads)),
+          hastriggers = json.\("hastriggers").toOption.map(_.as(Reads.BooleanReads)),
+          rowsecurity = json.\("rowsecurity").toOption.map(_.as(Reads.BooleanReads))
         )
       )
     ),
@@ -48,27 +49,27 @@ object PgTablesViewRow {
   def rowParser(idx: Int): RowParser[PgTablesViewRow] = RowParser[PgTablesViewRow] { row =>
     Success(
       PgTablesViewRow(
-        schemaname = row[Option[String]](idx + 0),
-        tablename = row[Option[String]](idx + 1),
-        tableowner = row[Option[String]](idx + 2),
-        tablespace = row[Option[String]](idx + 3),
-        hasindexes = row[Option[Boolean]](idx + 4),
-        hasrules = row[Option[Boolean]](idx + 5),
-        hastriggers = row[Option[Boolean]](idx + 6),
-        rowsecurity = row[Option[Boolean]](idx + 7)
+        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableowner = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        tablespace = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        hasindexes = row(idx + 4)(Column.columnToOption(Column.columnToBoolean)),
+        hasrules = row(idx + 5)(Column.columnToOption(Column.columnToBoolean)),
+        hastriggers = row(idx + 6)(Column.columnToOption(Column.columnToBoolean)),
+        rowsecurity = row(idx + 7)(Column.columnToOption(Column.columnToBoolean))
       )
     )
   }
   implicit val writes: OWrites[PgTablesViewRow] = OWrites[PgTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Json.toJson(o.schemaname),
-      "tablename" -> Json.toJson(o.tablename),
-      "tableowner" -> Json.toJson(o.tableowner),
-      "tablespace" -> Json.toJson(o.tablespace),
-      "hasindexes" -> Json.toJson(o.hasindexes),
-      "hasrules" -> Json.toJson(o.hasrules),
-      "hastriggers" -> Json.toJson(o.hastriggers),
-      "rowsecurity" -> Json.toJson(o.rowsecurity)
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
+      "tableowner" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableowner),
+      "tablespace" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablespace),
+      "hasindexes" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hasindexes),
+      "hasrules" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hasrules),
+      "hastriggers" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.hastriggers),
+      "rowsecurity" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rowsecurity)
     ))
   )
 }

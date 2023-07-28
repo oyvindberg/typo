@@ -11,7 +11,6 @@ import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
@@ -31,32 +30,32 @@ case class RoutinePrivilegesViewRow(
 )
 
 object RoutinePrivilegesViewRow {
-  implicit val decoder: Decoder[RoutinePrivilegesViewRow] = Decoder.forProduct10[RoutinePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(RoutinePrivilegesViewRow.apply)
-  implicit val encoder: Encoder[RoutinePrivilegesViewRow] = Encoder.forProduct10[RoutinePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.specificCatalog, x.specificSchema, x.specificName, x.routineCatalog, x.routineSchema, x.routineName, x.privilegeType, x.isGrantable))
+  implicit val decoder: Decoder[RoutinePrivilegesViewRow] = Decoder.forProduct10[RoutinePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(RoutinePrivilegesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder))
+  implicit val encoder: Encoder[RoutinePrivilegesViewRow] = Encoder.forProduct10[RoutinePrivilegesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "specific_catalog", "specific_schema", "specific_name", "routine_catalog", "routine_schema", "routine_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.specificCatalog, x.specificSchema, x.specificName, x.routineCatalog, x.routineSchema, x.routineName, x.privilegeType, x.isGrantable))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder))
   implicit val read: Read[RoutinePrivilegesViewRow] = new Read[RoutinePrivilegesViewRow](
     gets = List(
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[SqlIdentifier], Nullability.Nullable),
-      (Get[CharacterData], Nullability.Nullable),
-      (Get[YesOrNo], Nullability.Nullable)
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (SqlIdentifier.get, Nullability.Nullable),
+      (CharacterData.get, Nullability.Nullable),
+      (YesOrNo.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => RoutinePrivilegesViewRow(
-      grantor = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-      grantee = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-      specificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-      specificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-      specificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-      routineCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-      routineSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
-      routineName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 7),
-      privilegeType = Get[CharacterData].unsafeGetNullable(rs, i + 8),
-      isGrantable = Get[YesOrNo].unsafeGetNullable(rs, i + 9)
+      grantor = SqlIdentifier.get.unsafeGetNullable(rs, i + 0),
+      grantee = SqlIdentifier.get.unsafeGetNullable(rs, i + 1),
+      specificCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 2),
+      specificSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 3),
+      specificName = SqlIdentifier.get.unsafeGetNullable(rs, i + 4),
+      routineCatalog = SqlIdentifier.get.unsafeGetNullable(rs, i + 5),
+      routineSchema = SqlIdentifier.get.unsafeGetNullable(rs, i + 6),
+      routineName = SqlIdentifier.get.unsafeGetNullable(rs, i + 7),
+      privilegeType = CharacterData.get.unsafeGetNullable(rs, i + 8),
+      isGrantable = YesOrNo.get.unsafeGetNullable(rs, i + 9)
     )
   )
 }

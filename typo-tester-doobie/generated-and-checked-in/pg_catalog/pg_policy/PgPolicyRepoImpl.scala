@@ -7,17 +7,21 @@ package adventureworks
 package pg_catalog
 package pg_policy
 
+import adventureworks.TypoPgNodeTree
 import doobie.free.connection.ConnectionIO
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Write
+import doobie.util.meta.Meta
 import fs2.Stream
 
 object PgPolicyRepoImpl extends PgPolicyRepo {
   override def delete(oid: PgPolicyId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_policy where oid = ${oid}".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_policy where oid = ${fromWrite(oid)(Write.fromPut(PgPolicyId.put))}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow] = {
     sql"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
-          values (${unsaved.oid}::oid, ${unsaved.polname}::name, ${unsaved.polrelid}::oid, ${unsaved.polcmd}::char, ${unsaved.polpermissive}, ${unsaved.polroles}::_oid, ${unsaved.polqual}::pg_node_tree, ${unsaved.polwithcheck}::pg_node_tree)
+          values (${fromWrite(unsaved.oid)(Write.fromPut(PgPolicyId.put))}::oid, ${fromWrite(unsaved.polname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.polrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.polcmd)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.polpermissive)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.polroles)(Write.fromPut(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.polqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.polwithcheck)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree)
           returning oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
        """.query(PgPolicyRow.read).unique
   }
@@ -25,22 +29,22 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
     sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy".query(PgPolicyRow.read).stream
   }
   override def selectById(oid: PgPolicyId): ConnectionIO[Option[PgPolicyRow]] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ${oid}".query(PgPolicyRow.read).option
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ${fromWrite(oid)(Write.fromPut(PgPolicyId.put))}".query(PgPolicyRow.read).option
   }
   override def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${oids})".query(PgPolicyRow.read).stream
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${fromWrite(oids)(Write.fromPut(PgPolicyId.arrayPut))})".query(PgPolicyRow.read).stream
   }
   override def update(row: PgPolicyRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_policy
-          set polname = ${row.polname}::name,
-              polrelid = ${row.polrelid}::oid,
-              polcmd = ${row.polcmd}::char,
-              polpermissive = ${row.polpermissive},
-              polroles = ${row.polroles}::_oid,
-              polqual = ${row.polqual}::pg_node_tree,
-              polwithcheck = ${row.polwithcheck}::pg_node_tree
-          where oid = ${oid}
+          set polname = ${fromWrite(row.polname)(Write.fromPut(Meta.StringMeta.put))}::name,
+              polrelid = ${fromWrite(row.polrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+              polcmd = ${fromWrite(row.polcmd)(Write.fromPut(Meta.StringMeta.put))}::char,
+              polpermissive = ${fromWrite(row.polpermissive)(Write.fromPut(Meta.BooleanMeta.put))},
+              polroles = ${fromWrite(row.polroles)(Write.fromPut(adventureworks.LongArrayMeta.put))}::_oid,
+              polqual = ${fromWrite(row.polqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
+              polwithcheck = ${fromWrite(row.polwithcheck)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
+          where oid = ${fromWrite(oid)(Write.fromPut(PgPolicyId.put))}
        """
       .update
       .run
@@ -49,14 +53,14 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
   override def upsert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow] = {
     sql"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
           values (
-            ${unsaved.oid}::oid,
-            ${unsaved.polname}::name,
-            ${unsaved.polrelid}::oid,
-            ${unsaved.polcmd}::char,
-            ${unsaved.polpermissive},
-            ${unsaved.polroles}::_oid,
-            ${unsaved.polqual}::pg_node_tree,
-            ${unsaved.polwithcheck}::pg_node_tree
+            ${fromWrite(unsaved.oid)(Write.fromPut(PgPolicyId.put))}::oid,
+            ${fromWrite(unsaved.polname)(Write.fromPut(Meta.StringMeta.put))}::name,
+            ${fromWrite(unsaved.polrelid)(Write.fromPut(Meta.LongMeta.put))}::oid,
+            ${fromWrite(unsaved.polcmd)(Write.fromPut(Meta.StringMeta.put))}::char,
+            ${fromWrite(unsaved.polpermissive)(Write.fromPut(Meta.BooleanMeta.put))},
+            ${fromWrite(unsaved.polroles)(Write.fromPut(adventureworks.LongArrayMeta.put))}::_oid,
+            ${fromWrite(unsaved.polqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree,
+            ${fromWrite(unsaved.polwithcheck)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree
           )
           on conflict (oid)
           do update set

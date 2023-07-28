@@ -7,14 +7,15 @@ package adventureworks
 package pg_catalog
 package pg_policies
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -33,14 +34,14 @@ object PgPoliciesViewRow {
   implicit val reads: Reads[PgPoliciesViewRow] = Reads[PgPoliciesViewRow](json => JsResult.fromTry(
       Try(
         PgPoliciesViewRow(
-          schemaname = json.\("schemaname").toOption.map(_.as[String]),
-          tablename = json.\("tablename").toOption.map(_.as[String]),
-          policyname = json.\("policyname").toOption.map(_.as[String]),
-          permissive = json.\("permissive").toOption.map(_.as[String]),
-          roles = json.\("roles").toOption.map(_.as[Array[String]]),
-          cmd = json.\("cmd").toOption.map(_.as[String]),
-          qual = json.\("qual").toOption.map(_.as[String]),
-          withCheck = json.\("with_check").toOption.map(_.as[String])
+          schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
+          tablename = json.\("tablename").toOption.map(_.as(Reads.StringReads)),
+          policyname = json.\("policyname").toOption.map(_.as(Reads.StringReads)),
+          permissive = json.\("permissive").toOption.map(_.as(Reads.StringReads)),
+          roles = json.\("roles").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          cmd = json.\("cmd").toOption.map(_.as(Reads.StringReads)),
+          qual = json.\("qual").toOption.map(_.as(Reads.StringReads)),
+          withCheck = json.\("with_check").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -48,27 +49,27 @@ object PgPoliciesViewRow {
   def rowParser(idx: Int): RowParser[PgPoliciesViewRow] = RowParser[PgPoliciesViewRow] { row =>
     Success(
       PgPoliciesViewRow(
-        schemaname = row[Option[String]](idx + 0),
-        tablename = row[Option[String]](idx + 1),
-        policyname = row[Option[String]](idx + 2),
-        permissive = row[Option[String]](idx + 3),
-        roles = row[Option[Array[String]]](idx + 4),
-        cmd = row[Option[String]](idx + 5),
-        qual = row[Option[String]](idx + 6),
-        withCheck = row[Option[String]](idx + 7)
+        schemaname = row(idx + 0)(Column.columnToOption(Column.columnToString)),
+        tablename = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        policyname = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        permissive = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        roles = row(idx + 4)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        cmd = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        qual = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        withCheck = row(idx + 7)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit val writes: OWrites[PgPoliciesViewRow] = OWrites[PgPoliciesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schemaname" -> Json.toJson(o.schemaname),
-      "tablename" -> Json.toJson(o.tablename),
-      "policyname" -> Json.toJson(o.policyname),
-      "permissive" -> Json.toJson(o.permissive),
-      "roles" -> Json.toJson(o.roles),
-      "cmd" -> Json.toJson(o.cmd),
-      "qual" -> Json.toJson(o.qual),
-      "with_check" -> Json.toJson(o.withCheck)
+      "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
+      "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),
+      "policyname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.policyname),
+      "permissive" -> Writes.OptionWrites(Writes.StringWrites).writes(o.permissive),
+      "roles" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.roles),
+      "cmd" -> Writes.OptionWrites(Writes.StringWrites).writes(o.cmd),
+      "qual" -> Writes.OptionWrites(Writes.StringWrites).writes(o.qual),
+      "with_check" -> Writes.OptionWrites(Writes.StringWrites).writes(o.withCheck)
     ))
   )
 }

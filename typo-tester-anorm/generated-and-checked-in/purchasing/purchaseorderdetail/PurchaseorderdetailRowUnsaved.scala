@@ -14,9 +14,9 @@ import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -67,30 +67,30 @@ object PurchaseorderdetailRowUnsaved {
   implicit val reads: Reads[PurchaseorderdetailRowUnsaved] = Reads[PurchaseorderdetailRowUnsaved](json => JsResult.fromTry(
       Try(
         PurchaseorderdetailRowUnsaved(
-          purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
-          duedate = json.\("duedate").as[TypoLocalDateTime],
-          orderqty = json.\("orderqty").as[Int],
-          productid = json.\("productid").as[ProductId],
-          unitprice = json.\("unitprice").as[BigDecimal],
-          receivedqty = json.\("receivedqty").as[BigDecimal],
-          rejectedqty = json.\("rejectedqty").as[BigDecimal],
-          purchaseorderdetailid = json.\("purchaseorderdetailid").as[Defaulted[Int]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          purchaseorderid = json.\("purchaseorderid").as(PurchaseorderheaderId.reads),
+          duedate = json.\("duedate").as(TypoLocalDateTime.reads),
+          orderqty = json.\("orderqty").as(Reads.IntReads),
+          productid = json.\("productid").as(ProductId.reads),
+          unitprice = json.\("unitprice").as(Reads.bigDecReads),
+          receivedqty = json.\("receivedqty").as(Reads.bigDecReads),
+          rejectedqty = json.\("rejectedqty").as(Reads.bigDecReads),
+          purchaseorderdetailid = json.\("purchaseorderdetailid").as(Defaulted.reads(Reads.IntReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[PurchaseorderdetailRowUnsaved] = OWrites[PurchaseorderdetailRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
-      "duedate" -> Json.toJson(o.duedate),
-      "orderqty" -> Json.toJson(o.orderqty),
-      "productid" -> Json.toJson(o.productid),
-      "unitprice" -> Json.toJson(o.unitprice),
-      "receivedqty" -> Json.toJson(o.receivedqty),
-      "rejectedqty" -> Json.toJson(o.rejectedqty),
-      "purchaseorderdetailid" -> Json.toJson(o.purchaseorderdetailid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "purchaseorderid" -> PurchaseorderheaderId.writes.writes(o.purchaseorderid),
+      "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
+      "orderqty" -> Writes.IntWrites.writes(o.orderqty),
+      "productid" -> ProductId.writes.writes(o.productid),
+      "unitprice" -> Writes.BigDecimalWrites.writes(o.unitprice),
+      "receivedqty" -> Writes.BigDecimalWrites.writes(o.receivedqty),
+      "rejectedqty" -> Writes.BigDecimalWrites.writes(o.rejectedqty),
+      "purchaseorderdetailid" -> Defaulted.writes(Writes.IntWrites).writes(o.purchaseorderdetailid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

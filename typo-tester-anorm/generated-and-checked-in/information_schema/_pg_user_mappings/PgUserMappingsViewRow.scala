@@ -8,14 +8,15 @@ package information_schema
 package `_pg_user_mappings`
 
 import adventureworks.information_schema.SqlIdentifier
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -37,13 +38,13 @@ object PgUserMappingsViewRow {
   implicit val reads: Reads[PgUserMappingsViewRow] = Reads[PgUserMappingsViewRow](json => JsResult.fromTry(
       Try(
         PgUserMappingsViewRow(
-          oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
-          umoptions = json.\("umoptions").toOption.map(_.as[Array[String]]),
-          umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
-          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
-          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
-          srvowner = json.\("srvowner").toOption.map(_.as[SqlIdentifier])
+          oid = json.\("oid").toOption.map(_.as(Reads.LongReads)),
+          umoptions = json.\("umoptions").toOption.map(_.as(Reads.ArrayReads[String](Reads.StringReads, implicitly))),
+          umuser = json.\("umuser").toOption.map(_.as(Reads.LongReads)),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as(SqlIdentifier.reads)),
+          srvowner = json.\("srvowner").toOption.map(_.as(SqlIdentifier.reads))
         )
       )
     ),
@@ -51,25 +52,25 @@ object PgUserMappingsViewRow {
   def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] = RowParser[PgUserMappingsViewRow] { row =>
     Success(
       PgUserMappingsViewRow(
-        oid = row[Option[/* oid */ Long]](idx + 0),
-        umoptions = row[Option[Array[String]]](idx + 1),
-        umuser = row[Option[/* oid */ Long]](idx + 2),
-        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 3),
-        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 4),
-        foreignServerName = row[Option[SqlIdentifier]](idx + 5),
-        srvowner = row[Option[SqlIdentifier]](idx + 6)
+        oid = row(idx + 0)(Column.columnToOption(Column.columnToLong)),
+        umoptions = row(idx + 1)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        umuser = row(idx + 2)(Column.columnToOption(Column.columnToLong)),
+        authorizationIdentifier = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerCatalog = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        foreignServerName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
+        srvowner = row(idx + 6)(Column.columnToOption(SqlIdentifier.column))
       )
     )
   }
   implicit val writes: OWrites[PgUserMappingsViewRow] = OWrites[PgUserMappingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "oid" -> Json.toJson(o.oid),
-      "umoptions" -> Json.toJson(o.umoptions),
-      "umuser" -> Json.toJson(o.umuser),
-      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier),
-      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
-      "foreign_server_name" -> Json.toJson(o.foreignServerName),
-      "srvowner" -> Json.toJson(o.srvowner)
+      "oid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.oid),
+      "umoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.umoptions),
+      "umuser" -> Writes.OptionWrites(Writes.LongWrites).writes(o.umuser),
+      "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier),
+      "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),
+      "foreign_server_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerName),
+      "srvowner" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.srvowner)
     ))
   )
 }

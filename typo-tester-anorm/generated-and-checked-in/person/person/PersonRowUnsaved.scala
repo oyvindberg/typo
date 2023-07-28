@@ -17,9 +17,9 @@ import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -88,38 +88,38 @@ object PersonRowUnsaved {
   implicit val reads: Reads[PersonRowUnsaved] = Reads[PersonRowUnsaved](json => JsResult.fromTry(
       Try(
         PersonRowUnsaved(
-          businessentityid = json.\("businessentityid").as[BusinessentityId],
-          persontype = json.\("persontype").as[/* bpchar */ String],
-          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-          firstname = json.\("firstname").as[Name],
-          middlename = json.\("middlename").toOption.map(_.as[Name]),
-          lastname = json.\("lastname").as[Name],
-          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-          additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
-          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-          namestyle = json.\("namestyle").as[Defaulted[NameStyle]],
-          emailpromotion = json.\("emailpromotion").as[Defaulted[Int]],
-          rowguid = json.\("rowguid").as[Defaulted[UUID]],
-          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
+          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+          persontype = json.\("persontype").as(Reads.StringReads),
+          title = json.\("title").toOption.map(_.as(Reads.StringReads)),
+          firstname = json.\("firstname").as(Name.reads),
+          middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
+          lastname = json.\("lastname").as(Name.reads),
+          suffix = json.\("suffix").toOption.map(_.as(Reads.StringReads)),
+          additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as(TypoXml.reads)),
+          demographics = json.\("demographics").toOption.map(_.as(TypoXml.reads)),
+          namestyle = json.\("namestyle").as(Defaulted.reads(NameStyle.reads)),
+          emailpromotion = json.\("emailpromotion").as(Defaulted.reads(Reads.IntReads)),
+          rowguid = json.\("rowguid").as(Defaulted.reads(Reads.uuidReads)),
+          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
         )
       )
     ),
   )
   implicit val writes: OWrites[PersonRowUnsaved] = OWrites[PersonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Json.toJson(o.businessentityid),
-      "persontype" -> Json.toJson(o.persontype),
-      "title" -> Json.toJson(o.title),
-      "firstname" -> Json.toJson(o.firstname),
-      "middlename" -> Json.toJson(o.middlename),
-      "lastname" -> Json.toJson(o.lastname),
-      "suffix" -> Json.toJson(o.suffix),
-      "additionalcontactinfo" -> Json.toJson(o.additionalcontactinfo),
-      "demographics" -> Json.toJson(o.demographics),
-      "namestyle" -> Json.toJson(o.namestyle),
-      "emailpromotion" -> Json.toJson(o.emailpromotion),
-      "rowguid" -> Json.toJson(o.rowguid),
-      "modifieddate" -> Json.toJson(o.modifieddate)
+      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+      "persontype" -> Writes.StringWrites.writes(o.persontype),
+      "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
+      "firstname" -> Name.writes.writes(o.firstname),
+      "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
+      "lastname" -> Name.writes.writes(o.lastname),
+      "suffix" -> Writes.OptionWrites(Writes.StringWrites).writes(o.suffix),
+      "additionalcontactinfo" -> Writes.OptionWrites(TypoXml.writes).writes(o.additionalcontactinfo),
+      "demographics" -> Writes.OptionWrites(TypoXml.writes).writes(o.demographics),
+      "namestyle" -> Defaulted.writes(NameStyle.writes).writes(o.namestyle),
+      "emailpromotion" -> Defaulted.writes(Writes.IntWrites).writes(o.emailpromotion),
+      "rowguid" -> Defaulted.writes(Writes.UuidWrites).writes(o.rowguid),
+      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
     ))
   )
 }

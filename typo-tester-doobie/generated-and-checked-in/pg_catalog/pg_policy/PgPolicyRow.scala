@@ -9,8 +9,8 @@ package pg_policy
 
 import adventureworks.TypoPgNodeTree
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -27,28 +27,28 @@ case class PgPolicyRow(
 )
 
 object PgPolicyRow {
-  implicit val decoder: Decoder[PgPolicyRow] = Decoder.forProduct8[PgPolicyRow, PgPolicyId, String, /* oid */ Long, String, Boolean, Array[/* oid */ Long], Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")(PgPolicyRow.apply)
-  implicit val encoder: Encoder[PgPolicyRow] = Encoder.forProduct8[PgPolicyRow, PgPolicyId, String, /* oid */ Long, String, Boolean, Array[/* oid */ Long], Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")(x => (x.oid, x.polname, x.polrelid, x.polcmd, x.polpermissive, x.polroles, x.polqual, x.polwithcheck))
+  implicit val decoder: Decoder[PgPolicyRow] = Decoder.forProduct8[PgPolicyRow, PgPolicyId, String, /* oid */ Long, String, Boolean, Array[/* oid */ Long], Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")(PgPolicyRow.apply)(PgPolicyId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeArray[Long](Decoder.decodeLong, implicitly), Decoder.decodeOption(TypoPgNodeTree.decoder), Decoder.decodeOption(TypoPgNodeTree.decoder))
+  implicit val encoder: Encoder[PgPolicyRow] = Encoder.forProduct8[PgPolicyRow, PgPolicyId, String, /* oid */ Long, String, Boolean, Array[/* oid */ Long], Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")(x => (x.oid, x.polname, x.polrelid, x.polcmd, x.polpermissive, x.polroles, x.polqual, x.polwithcheck))(PgPolicyId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly), Encoder.encodeOption(TypoPgNodeTree.encoder), Encoder.encodeOption(TypoPgNodeTree.encoder))
   implicit val read: Read[PgPolicyRow] = new Read[PgPolicyRow](
     gets = List(
-      (Get[PgPolicyId], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[Boolean], Nullability.NoNulls),
-      (Get[Array[/* oid */ Long]], Nullability.NoNulls),
-      (Get[TypoPgNodeTree], Nullability.Nullable),
-      (Get[TypoPgNodeTree], Nullability.Nullable)
+      (PgPolicyId.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.BooleanMeta.get, Nullability.NoNulls),
+      (adventureworks.LongArrayMeta.get, Nullability.NoNulls),
+      (TypoPgNodeTree.get, Nullability.Nullable),
+      (TypoPgNodeTree.get, Nullability.Nullable)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgPolicyRow(
-      oid = Get[PgPolicyId].unsafeGetNonNullable(rs, i + 0),
-      polname = Get[String].unsafeGetNonNullable(rs, i + 1),
-      polrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-      polcmd = Get[String].unsafeGetNonNullable(rs, i + 3),
-      polpermissive = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-      polroles = Get[Array[/* oid */ Long]].unsafeGetNonNullable(rs, i + 5),
-      polqual = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 6),
-      polwithcheck = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 7)
+      oid = PgPolicyId.get.unsafeGetNonNullable(rs, i + 0),
+      polname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+      polrelid = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 2),
+      polcmd = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+      polpermissive = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 4),
+      polroles = adventureworks.LongArrayMeta.get.unsafeGetNonNullable(rs, i + 5),
+      polqual = TypoPgNodeTree.get.unsafeGetNullable(rs, i + 6),
+      polwithcheck = TypoPgNodeTree.get.unsafeGetNullable(rs, i + 7)
     )
   )
 }

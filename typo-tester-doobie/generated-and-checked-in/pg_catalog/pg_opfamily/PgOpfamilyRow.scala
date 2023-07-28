@@ -8,8 +8,8 @@ package pg_catalog
 package pg_opfamily
 
 import doobie.enumerated.Nullability
-import doobie.util.Get
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -23,22 +23,22 @@ case class PgOpfamilyRow(
 )
 
 object PgOpfamilyRow {
-  implicit val decoder: Decoder[PgOpfamilyRow] = Decoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(PgOpfamilyRow.apply)
-  implicit val encoder: Encoder[PgOpfamilyRow] = Encoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(x => (x.oid, x.opfmethod, x.opfname, x.opfnamespace, x.opfowner))
+  implicit val decoder: Decoder[PgOpfamilyRow] = Decoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(PgOpfamilyRow.apply)(PgOpfamilyId.decoder, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong)
+  implicit val encoder: Encoder[PgOpfamilyRow] = Encoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(x => (x.oid, x.opfmethod, x.opfname, x.opfnamespace, x.opfowner))(PgOpfamilyId.encoder, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong)
   implicit val read: Read[PgOpfamilyRow] = new Read[PgOpfamilyRow](
     gets = List(
-      (Get[PgOpfamilyId], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[String], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls),
-      (Get[/* oid */ Long], Nullability.NoNulls)
+      (PgOpfamilyId.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.StringMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls),
+      (Meta.LongMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgOpfamilyRow(
-      oid = Get[PgOpfamilyId].unsafeGetNonNullable(rs, i + 0),
-      opfmethod = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-      opfname = Get[String].unsafeGetNonNullable(rs, i + 2),
-      opfnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-      opfowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4)
+      oid = PgOpfamilyId.get.unsafeGetNonNullable(rs, i + 0),
+      opfmethod = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 1),
+      opfname = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+      opfnamespace = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 3),
+      opfowner = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 4)
     )
   )
 }

@@ -36,12 +36,12 @@ package object hardcoded {
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
   }
   implicit val LongArrayToStatement: anorm.ToStatement[scala.Array[scala.Long]] = anorm.ToStatement[scala.Array[scala.Long]]((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf("int8", v.map(v => v: java.lang.Long))))
-  implicit val OffsetTimeReads: play.api.libs.json.Reads[java.time.OffsetTime] = implicitly[play.api.libs.json.Reads[java.lang.String]].flatMapResult { str =>
+  implicit val OffsetTimeReads: play.api.libs.json.Reads[java.time.OffsetTime] = play.api.libs.json.Reads.StringReads.flatMapResult { str =>
       try play.api.libs.json.JsSuccess(java.time.OffsetTime.parse(str)) catch {
         case x: java.time.format.DateTimeParseException => play.api.libs.json.JsError(s"must follow ${java.time.format.DateTimeFormatter.ISO_OFFSET_TIME}: ${x.getMessage}")
       }
     }
-  implicit val OffsetTimeWrites: play.api.libs.json.Writes[java.time.OffsetTime] = implicitly[play.api.libs.json.Writes[java.lang.String]].contramap(_.toString)
+  implicit val OffsetTimeWrites: play.api.libs.json.Writes[java.time.OffsetTime] = play.api.libs.json.Writes.StringWrites.contramap(_.toString)
   implicit val ShortArrayParameterMetaData: anorm.ParameterMetaData[scala.Array[scala.Short]] = new anorm.ParameterMetaData[scala.Array[scala.Short]] {
     override def sqlType: java.lang.String = "_int2"
     override def jdbcType: scala.Int = java.sql.Types.ARRAY

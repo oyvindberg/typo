@@ -9,14 +9,15 @@ package domain_constraints
 
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
@@ -35,14 +36,14 @@ object DomainConstraintsViewRow {
   implicit val reads: Reads[DomainConstraintsViewRow] = Reads[DomainConstraintsViewRow](json => JsResult.fromTry(
       Try(
         DomainConstraintsViewRow(
-          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-          constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
-          constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
-          domainCatalog = json.\("domain_catalog").toOption.map(_.as[SqlIdentifier]),
-          domainSchema = json.\("domain_schema").toOption.map(_.as[SqlIdentifier]),
-          domainName = json.\("domain_name").toOption.map(_.as[SqlIdentifier]),
-          isDeferrable = json.\("is_deferrable").toOption.map(_.as[YesOrNo]),
-          initiallyDeferred = json.\("initially_deferred").toOption.map(_.as[YesOrNo])
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          constraintName = json.\("constraint_name").toOption.map(_.as(SqlIdentifier.reads)),
+          domainCatalog = json.\("domain_catalog").toOption.map(_.as(SqlIdentifier.reads)),
+          domainSchema = json.\("domain_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          domainName = json.\("domain_name").toOption.map(_.as(SqlIdentifier.reads)),
+          isDeferrable = json.\("is_deferrable").toOption.map(_.as(YesOrNo.reads)),
+          initiallyDeferred = json.\("initially_deferred").toOption.map(_.as(YesOrNo.reads))
         )
       )
     ),
@@ -50,27 +51,27 @@ object DomainConstraintsViewRow {
   def rowParser(idx: Int): RowParser[DomainConstraintsViewRow] = RowParser[DomainConstraintsViewRow] { row =>
     Success(
       DomainConstraintsViewRow(
-        constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
-        constraintSchema = row[Option[SqlIdentifier]](idx + 1),
-        constraintName = row[Option[SqlIdentifier]](idx + 2),
-        domainCatalog = row[Option[SqlIdentifier]](idx + 3),
-        domainSchema = row[Option[SqlIdentifier]](idx + 4),
-        domainName = row[Option[SqlIdentifier]](idx + 5),
-        isDeferrable = row[Option[YesOrNo]](idx + 6),
-        initiallyDeferred = row[Option[YesOrNo]](idx + 7)
+        constraintCatalog = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        constraintSchema = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        constraintName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        domainCatalog = row(idx + 3)(Column.columnToOption(SqlIdentifier.column)),
+        domainSchema = row(idx + 4)(Column.columnToOption(SqlIdentifier.column)),
+        domainName = row(idx + 5)(Column.columnToOption(SqlIdentifier.column)),
+        isDeferrable = row(idx + 6)(Column.columnToOption(YesOrNo.column)),
+        initiallyDeferred = row(idx + 7)(Column.columnToOption(YesOrNo.column))
       )
     )
   }
   implicit val writes: OWrites[DomainConstraintsViewRow] = OWrites[DomainConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "constraint_catalog" -> Json.toJson(o.constraintCatalog),
-      "constraint_schema" -> Json.toJson(o.constraintSchema),
-      "constraint_name" -> Json.toJson(o.constraintName),
-      "domain_catalog" -> Json.toJson(o.domainCatalog),
-      "domain_schema" -> Json.toJson(o.domainSchema),
-      "domain_name" -> Json.toJson(o.domainName),
-      "is_deferrable" -> Json.toJson(o.isDeferrable),
-      "initially_deferred" -> Json.toJson(o.initiallyDeferred)
+      "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
+      "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),
+      "constraint_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintName),
+      "domain_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainCatalog),
+      "domain_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainSchema),
+      "domain_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainName),
+      "is_deferrable" -> Writes.OptionWrites(YesOrNo.writes).writes(o.isDeferrable),
+      "initially_deferred" -> Writes.OptionWrites(YesOrNo.writes).writes(o.initiallyDeferred)
     ))
   )
 }

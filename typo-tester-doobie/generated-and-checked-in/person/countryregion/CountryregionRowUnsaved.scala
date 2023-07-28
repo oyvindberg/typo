@@ -33,6 +33,6 @@ case class CountryregionRowUnsaved(
     )
 }
 object CountryregionRowUnsaved {
-  implicit val decoder: Decoder[CountryregionRowUnsaved] = Decoder.forProduct3[CountryregionRowUnsaved, CountryregionId, Name, Defaulted[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(CountryregionRowUnsaved.apply)
-  implicit val encoder: Encoder[CountryregionRowUnsaved] = Encoder.forProduct3[CountryregionRowUnsaved, CountryregionId, Name, Defaulted[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))
+  implicit val decoder: Decoder[CountryregionRowUnsaved] = Decoder.forProduct3[CountryregionRowUnsaved, CountryregionId, Name, Defaulted[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(CountryregionRowUnsaved.apply)(CountryregionId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit val encoder: Encoder[CountryregionRowUnsaved] = Encoder.forProduct3[CountryregionRowUnsaved, CountryregionId, Name, Defaulted[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(CountryregionId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }
