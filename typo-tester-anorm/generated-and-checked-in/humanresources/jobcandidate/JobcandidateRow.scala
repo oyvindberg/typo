@@ -7,16 +7,18 @@ package adventureworks
 package humanresources
 package jobcandidate
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class JobcandidateRow(
@@ -27,41 +29,37 @@ case class JobcandidateRow(
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
   resume: Option[TypoXml],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object JobcandidateRow {
-  def rowParser(idx: Int): RowParser[JobcandidateRow] =
-    RowParser[JobcandidateRow] { row =>
-      Success(
+  implicit val reads: Reads[JobcandidateRow] = Reads[JobcandidateRow](json => JsResult.fromTry(
+      Try(
         JobcandidateRow(
-          jobcandidateid = row[JobcandidateId](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          resume = row[Option[TypoXml]](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          jobcandidateid = json.\("jobcandidateid").as[JobcandidateId],
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          resume = json.\("resume").toOption.map(_.as[TypoXml]),
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[JobcandidateRow] = new OFormat[JobcandidateRow]{
-    override def writes(o: JobcandidateRow): JsObject =
-      Json.obj(
-        "jobcandidateid" -> o.jobcandidateid,
-        "businessentityid" -> o.businessentityid,
-        "resume" -> o.resume,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[JobcandidateRow] = RowParser[JobcandidateRow] { row =>
+    Success(
+      JobcandidateRow(
+        jobcandidateid = row[JobcandidateId](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        resume = row[Option[TypoXml]](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[JobcandidateRow] = {
-      JsResult.fromTry(
-        Try(
-          JobcandidateRow(
-            jobcandidateid = json.\("jobcandidateid").as[JobcandidateId],
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            resume = json.\("resume").toOption.map(_.as[TypoXml]),
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[JobcandidateRow] = OWrites[JobcandidateRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "jobcandidateid" -> Json.toJson(o.jobcandidateid),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "resume" -> Json.toJson(o.resume),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -7,16 +7,18 @@ package adventureworks
 package sa
 package cu
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CuViewRow(
@@ -26,41 +28,37 @@ case class CuViewRow(
   /** Points to [[sales.currency.CurrencyRow.name]] */
   name: Option[Name],
   /** Points to [[sales.currency.CurrencyRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CuViewRow {
-  def rowParser(idx: Int): RowParser[CuViewRow] =
-    RowParser[CuViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CuViewRow] = Reads[CuViewRow](json => JsResult.fromTry(
+      Try(
         CuViewRow(
-          id = row[Option[/* bpchar */ String]](idx + 0),
-          currencycode = row[Option[CurrencyId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
+          currencycode = json.\("currencycode").toOption.map(_.as[CurrencyId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[CuViewRow] = new OFormat[CuViewRow]{
-    override def writes(o: CuViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "currencycode" -> o.currencycode,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CuViewRow] = RowParser[CuViewRow] { row =>
+    Success(
+      CuViewRow(
+        id = row[Option[/* bpchar */ String]](idx + 0),
+        currencycode = row[Option[CurrencyId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[CuViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CuViewRow(
-            id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
-            currencycode = json.\("currencycode").toOption.map(_.as[CurrencyId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CuViewRow] = OWrites[CuViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "currencycode" -> Json.toJson(o.currencycode),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

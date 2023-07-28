@@ -8,13 +8,11 @@ package sales
 package countryregioncurrency
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.countryregioncurrency` which has not been persisted yet */
 case class CountryregioncurrencyRowUnsaved(
@@ -25,9 +23,9 @@ case class CountryregioncurrencyRowUnsaved(
       Points to [[currency.CurrencyRow.currencycode]] */
   currencycode: CurrencyId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): CountryregioncurrencyRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CountryregioncurrencyRow =
     CountryregioncurrencyRow(
       countryregioncode = countryregioncode,
       currencycode = currencycode,
@@ -38,19 +36,6 @@ case class CountryregioncurrencyRowUnsaved(
     )
 }
 object CountryregioncurrencyRowUnsaved {
-  implicit val decoder: Decoder[CountryregioncurrencyRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
-        currencycode <- c.downField("currencycode").as[CurrencyId]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield CountryregioncurrencyRowUnsaved(countryregioncode, currencycode, modifieddate)
-  implicit val encoder: Encoder[CountryregioncurrencyRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "countryregioncode" := row.countryregioncode,
-        "currencycode" := row.currencycode,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[CountryregioncurrencyRowUnsaved] = Decoder.forProduct3[CountryregioncurrencyRowUnsaved, CountryregionId, CurrencyId, Defaulted[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CountryregioncurrencyRowUnsaved.apply)
+  implicit val encoder: Encoder[CountryregioncurrencyRowUnsaved] = Encoder.forProduct3[CountryregioncurrencyRowUnsaved, CountryregionId, CurrencyId, Defaulted[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))
 }

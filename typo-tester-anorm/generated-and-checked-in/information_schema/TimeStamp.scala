@@ -6,25 +6,26 @@
 package adventureworks
 package information_schema
 
+import adventureworks.TypoOffsetDateTime
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import java.time.OffsetDateTime
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Domain `information_schema.time_stamp`
   * No constraint
   */
-case class TimeStamp(value: OffsetDateTime) extends AnyVal
+case class TimeStamp(value: TypoOffsetDateTime) extends AnyVal
 object TimeStamp {
-  implicit def ordering(implicit ev: Ordering[OffsetDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
-  implicit val format: Format[TimeStamp] = implicitly[Format[OffsetDateTime]].bimap(TimeStamp.apply, _.value)
-  implicit val toStatement: ToStatement[TimeStamp] = implicitly[ToStatement[OffsetDateTime]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[TimeStamp]] = implicitly[ToStatement[Array[OffsetDateTime]]].contramap(_.map(_.value))
-  implicit val column: Column[TimeStamp] = implicitly[Column[OffsetDateTime]].map(TimeStamp.apply)
+  implicit val arrayToStatement: ToStatement[Array[TimeStamp]] = implicitly[ToStatement[Array[TypoOffsetDateTime]]].contramap(_.map(_.value))
+  implicit val column: Column[TimeStamp] = implicitly[Column[TypoOffsetDateTime]].map(TimeStamp.apply)
+  implicit def ordering(implicit O0: Ordering[TypoOffsetDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TimeStamp] = new ParameterMetaData[TimeStamp] {
-    override def sqlType: String = implicitly[ParameterMetaData[OffsetDateTime]].sqlType
-    override def jdbcType: Int = implicitly[ParameterMetaData[OffsetDateTime]].jdbcType
+    override def sqlType: String = implicitly[ParameterMetaData[TypoOffsetDateTime]].sqlType
+    override def jdbcType: Int = implicitly[ParameterMetaData[TypoOffsetDateTime]].jdbcType
   }
-
+  implicit val reads: Reads[TimeStamp] = implicitly[Reads[TypoOffsetDateTime]].map(TimeStamp.apply)
+  implicit val toStatement: ToStatement[TimeStamp] = implicitly[ToStatement[TypoOffsetDateTime]].contramap(_.value)
+  implicit val writes: Writes[TimeStamp] = implicitly[Writes[TypoOffsetDateTime]].contramap(_.value)
 }

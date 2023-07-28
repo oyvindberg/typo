@@ -7,16 +7,14 @@ package adventureworks
 package humanresources
 package department
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class DepartmentRow(
   /** Primary key for Department records. */
@@ -25,42 +23,24 @@ case class DepartmentRow(
   name: Name,
   /** Name of the group to which the department belongs. */
   groupname: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object DepartmentRow {
-  implicit val decoder: Decoder[DepartmentRow] =
-    (c: HCursor) =>
-      for {
-        departmentid <- c.downField("departmentid").as[DepartmentId]
-        name <- c.downField("name").as[Name]
-        groupname <- c.downField("groupname").as[Name]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield DepartmentRow(departmentid, name, groupname, modifieddate)
-  implicit val encoder: Encoder[DepartmentRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "departmentid" := row.departmentid,
-        "name" := row.name,
-        "groupname" := row.groupname,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[DepartmentRow] =
-    new Read[DepartmentRow](
-      gets = List(
-        (Get[DepartmentId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
-        departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        groupname = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[DepartmentRow] = Decoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(DepartmentRow.apply)
+  implicit val encoder: Encoder[DepartmentRow] = Encoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(x => (x.departmentid, x.name, x.groupname, x.modifieddate))
+  implicit val read: Read[DepartmentRow] = new Read[DepartmentRow](
+    gets = List(
+      (Get[DepartmentId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
+      departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      groupname = Get[Name].unsafeGetNonNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

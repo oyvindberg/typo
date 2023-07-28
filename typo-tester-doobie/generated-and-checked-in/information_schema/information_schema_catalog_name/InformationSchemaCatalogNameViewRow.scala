@@ -8,13 +8,11 @@ package information_schema
 package information_schema_catalog_name
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class InformationSchemaCatalogNameViewRow(
@@ -22,26 +20,14 @@ case class InformationSchemaCatalogNameViewRow(
 )
 
 object InformationSchemaCatalogNameViewRow {
-  implicit val decoder: Decoder[InformationSchemaCatalogNameViewRow] =
-    (c: HCursor) =>
-      for {
-        catalogName <- c.downField("catalog_name").as[Option[SqlIdentifier]]
-      } yield InformationSchemaCatalogNameViewRow(catalogName)
-  implicit val encoder: Encoder[InformationSchemaCatalogNameViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "catalog_name" := row.catalogName
-      )}
-  implicit val read: Read[InformationSchemaCatalogNameViewRow] =
-    new Read[InformationSchemaCatalogNameViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => InformationSchemaCatalogNameViewRow(
-        catalogName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0)
-      )
+  implicit val decoder: Decoder[InformationSchemaCatalogNameViewRow] = Decoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(InformationSchemaCatalogNameViewRow.apply)
+  implicit val encoder: Encoder[InformationSchemaCatalogNameViewRow] = Encoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(x => (x.catalogName))
+  implicit val read: Read[InformationSchemaCatalogNameViewRow] = new Read[InformationSchemaCatalogNameViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => InformationSchemaCatalogNameViewRow(
+      catalogName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0)
     )
-  
-
+  )
 }

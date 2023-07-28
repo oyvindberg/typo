@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_basebackup
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatProgressBasebackupViewRow(
@@ -26,46 +24,24 @@ case class PgStatProgressBasebackupViewRow(
 )
 
 object PgStatProgressBasebackupViewRow {
-  implicit val decoder: Decoder[PgStatProgressBasebackupViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        phase <- c.downField("phase").as[Option[String]]
-        backupTotal <- c.downField("backup_total").as[Option[Long]]
-        backupStreamed <- c.downField("backup_streamed").as[Option[Long]]
-        tablespacesTotal <- c.downField("tablespaces_total").as[Option[Long]]
-        tablespacesStreamed <- c.downField("tablespaces_streamed").as[Option[Long]]
-      } yield PgStatProgressBasebackupViewRow(pid, phase, backupTotal, backupStreamed, tablespacesTotal, tablespacesStreamed)
-  implicit val encoder: Encoder[PgStatProgressBasebackupViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "phase" := row.phase,
-        "backup_total" := row.backupTotal,
-        "backup_streamed" := row.backupStreamed,
-        "tablespaces_total" := row.tablespacesTotal,
-        "tablespaces_streamed" := row.tablespacesStreamed
-      )}
-  implicit val read: Read[PgStatProgressBasebackupViewRow] =
-    new Read[PgStatProgressBasebackupViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressBasebackupViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        phase = Get[String].unsafeGetNullable(rs, i + 1),
-        backupTotal = Get[Long].unsafeGetNullable(rs, i + 2),
-        backupStreamed = Get[Long].unsafeGetNullable(rs, i + 3),
-        tablespacesTotal = Get[Long].unsafeGetNullable(rs, i + 4),
-        tablespacesStreamed = Get[Long].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PgStatProgressBasebackupViewRow] = Decoder.forProduct6[PgStatProgressBasebackupViewRow, Option[Int], Option[String], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "phase", "backup_total", "backup_streamed", "tablespaces_total", "tablespaces_streamed")(PgStatProgressBasebackupViewRow.apply)
+  implicit val encoder: Encoder[PgStatProgressBasebackupViewRow] = Encoder.forProduct6[PgStatProgressBasebackupViewRow, Option[Int], Option[String], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "phase", "backup_total", "backup_streamed", "tablespaces_total", "tablespaces_streamed")(x => (x.pid, x.phase, x.backupTotal, x.backupStreamed, x.tablespacesTotal, x.tablespacesStreamed))
+  implicit val read: Read[PgStatProgressBasebackupViewRow] = new Read[PgStatProgressBasebackupViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressBasebackupViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      phase = Get[String].unsafeGetNullable(rs, i + 1),
+      backupTotal = Get[Long].unsafeGetNullable(rs, i + 2),
+      backupStreamed = Get[Long].unsafeGetNullable(rs, i + 3),
+      tablespacesTotal = Get[Long].unsafeGetNullable(rs, i + 4),
+      tablespacesStreamed = Get[Long].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

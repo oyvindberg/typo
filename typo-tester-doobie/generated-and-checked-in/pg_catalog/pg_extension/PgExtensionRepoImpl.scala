@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgExtensionRepoImpl extends PgExtensionRepo {
   override def delete(oid: PgExtensionId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_extension where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_extension where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow] = {
     sql"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
@@ -25,10 +25,10 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
     sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension".query[PgExtensionRow].stream
   }
   override def selectById(oid: PgExtensionId): ConnectionIO[Option[PgExtensionRow]] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = $oid".query[PgExtensionRow].option
+    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ${oid}".query[PgExtensionRow].option
   }
   override def selectByIds(oids: Array[PgExtensionId]): Stream[ConnectionIO, PgExtensionRow] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ANY($oids)".query[PgExtensionRow].stream
+    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ANY(${oids})".query[PgExtensionRow].stream
   }
   override def update(row: PgExtensionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -40,7 +40,7 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
               extversion = ${row.extversion},
               extconfig = ${row.extconfig}::_oid,
               extcondition = ${row.extcondition}::_text
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

@@ -7,19 +7,21 @@ package adventureworks
 package person
 package stateprovince
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class StateprovinceRow(
@@ -38,53 +40,49 @@ case class StateprovinceRow(
       Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object StateprovinceRow {
-  def rowParser(idx: Int): RowParser[StateprovinceRow] =
-    RowParser[StateprovinceRow] { row =>
-      Success(
+  implicit val reads: Reads[StateprovinceRow] = Reads[StateprovinceRow](json => JsResult.fromTry(
+      Try(
         StateprovinceRow(
-          stateprovinceid = row[StateprovinceId](idx + 0),
-          stateprovincecode = row[/* bpchar */ String](idx + 1),
-          countryregioncode = row[CountryregionId](idx + 2),
-          isonlystateprovinceflag = row[Flag](idx + 3),
-          name = row[Name](idx + 4),
-          territoryid = row[SalesterritoryId](idx + 5),
-          rowguid = row[UUID](idx + 6),
-          modifieddate = row[LocalDateTime](idx + 7)
+          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
+          stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
+          countryregioncode = json.\("countryregioncode").as[CountryregionId],
+          isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Flag],
+          name = json.\("name").as[Name],
+          territoryid = json.\("territoryid").as[SalesterritoryId],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[StateprovinceRow] = new OFormat[StateprovinceRow]{
-    override def writes(o: StateprovinceRow): JsObject =
-      Json.obj(
-        "stateprovinceid" -> o.stateprovinceid,
-        "stateprovincecode" -> o.stateprovincecode,
-        "countryregioncode" -> o.countryregioncode,
-        "isonlystateprovinceflag" -> o.isonlystateprovinceflag,
-        "name" -> o.name,
-        "territoryid" -> o.territoryid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[StateprovinceRow] = RowParser[StateprovinceRow] { row =>
+    Success(
+      StateprovinceRow(
+        stateprovinceid = row[StateprovinceId](idx + 0),
+        stateprovincecode = row[/* bpchar */ String](idx + 1),
+        countryregioncode = row[CountryregionId](idx + 2),
+        isonlystateprovinceflag = row[Flag](idx + 3),
+        name = row[Name](idx + 4),
+        territoryid = row[SalesterritoryId](idx + 5),
+        rowguid = row[UUID](idx + 6),
+        modifieddate = row[TypoLocalDateTime](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[StateprovinceRow] = {
-      JsResult.fromTry(
-        Try(
-          StateprovinceRow(
-            stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-            stateprovincecode = json.\("stateprovincecode").as[/* bpchar */ String],
-            countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            isonlystateprovinceflag = json.\("isonlystateprovinceflag").as[Flag],
-            name = json.\("name").as[Name],
-            territoryid = json.\("territoryid").as[SalesterritoryId],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[StateprovinceRow] = OWrites[StateprovinceRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
+      "stateprovincecode" -> Json.toJson(o.stateprovincecode),
+      "countryregioncode" -> Json.toJson(o.countryregioncode),
+      "isonlystateprovinceflag" -> Json.toJson(o.isonlystateprovinceflag),
+      "name" -> Json.toJson(o.name),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

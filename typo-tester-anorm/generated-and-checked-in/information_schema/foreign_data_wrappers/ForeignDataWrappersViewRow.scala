@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignDataWrappersViewRow(
@@ -31,40 +33,36 @@ case class ForeignDataWrappersViewRow(
 )
 
 object ForeignDataWrappersViewRow {
-  def rowParser(idx: Int): RowParser[ForeignDataWrappersViewRow] =
-    RowParser[ForeignDataWrappersViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ForeignDataWrappersViewRow] = Reads[ForeignDataWrappersViewRow](json => JsResult.fromTry(
+      Try(
         ForeignDataWrappersViewRow(
-          foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 0),
-          foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 1),
-          authorizationIdentifier = row[Option[SqlIdentifier]](idx + 2),
-          libraryName = row[Option[CharacterData]](idx + 3),
-          foreignDataWrapperLanguage = row[Option[CharacterData]](idx + 4)
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
+          libraryName = json.\("library_name").toOption.map(_.as[CharacterData]),
+          foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[ForeignDataWrappersViewRow] = new OFormat[ForeignDataWrappersViewRow]{
-    override def writes(o: ForeignDataWrappersViewRow): JsObject =
-      Json.obj(
-        "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
-        "authorization_identifier" -> o.authorizationIdentifier,
-        "library_name" -> o.libraryName,
-        "foreign_data_wrapper_language" -> o.foreignDataWrapperLanguage
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ForeignDataWrappersViewRow] = RowParser[ForeignDataWrappersViewRow] { row =>
+    Success(
+      ForeignDataWrappersViewRow(
+        foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 0),
+        foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 1),
+        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 2),
+        libraryName = row[Option[CharacterData]](idx + 3),
+        foreignDataWrapperLanguage = row[Option[CharacterData]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[ForeignDataWrappersViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ForeignDataWrappersViewRow(
-            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
-            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
-            libraryName = json.\("library_name").toOption.map(_.as[CharacterData]),
-            foreignDataWrapperLanguage = json.\("foreign_data_wrapper_language").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ForeignDataWrappersViewRow] = OWrites[ForeignDataWrappersViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "foreign_data_wrapper_catalog" -> Json.toJson(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> Json.toJson(o.foreignDataWrapperName),
+      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier),
+      "library_name" -> Json.toJson(o.libraryName),
+      "foreign_data_wrapper_language" -> Json.toJson(o.foreignDataWrapperLanguage)
+    ))
+  )
 }

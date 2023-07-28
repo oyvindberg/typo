@@ -8,13 +8,11 @@ package information_schema
 package foreign_tables
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ForeignTablesViewRow(
@@ -31,42 +29,22 @@ case class ForeignTablesViewRow(
 )
 
 object ForeignTablesViewRow {
-  implicit val decoder: Decoder[ForeignTablesViewRow] =
-    (c: HCursor) =>
-      for {
-        foreignTableCatalog <- c.downField("foreign_table_catalog").as[Option[SqlIdentifier]]
-        foreignTableSchema <- c.downField("foreign_table_schema").as[Option[SqlIdentifier]]
-        foreignTableName <- c.downField("foreign_table_name").as[Option[SqlIdentifier]]
-        foreignServerCatalog <- c.downField("foreign_server_catalog").as[Option[SqlIdentifier]]
-        foreignServerName <- c.downField("foreign_server_name").as[Option[SqlIdentifier]]
-      } yield ForeignTablesViewRow(foreignTableCatalog, foreignTableSchema, foreignTableName, foreignServerCatalog, foreignServerName)
-  implicit val encoder: Encoder[ForeignTablesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "foreign_table_catalog" := row.foreignTableCatalog,
-        "foreign_table_schema" := row.foreignTableSchema,
-        "foreign_table_name" := row.foreignTableName,
-        "foreign_server_catalog" := row.foreignServerCatalog,
-        "foreign_server_name" := row.foreignServerName
-      )}
-  implicit val read: Read[ForeignTablesViewRow] =
-    new Read[ForeignTablesViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ForeignTablesViewRow(
-        foreignTableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        foreignTableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        foreignTableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[ForeignTablesViewRow] = Decoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(ForeignTablesViewRow.apply)
+  implicit val encoder: Encoder[ForeignTablesViewRow] = Encoder.forProduct5[ForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "foreign_server_catalog", "foreign_server_name")(x => (x.foreignTableCatalog, x.foreignTableSchema, x.foreignTableName, x.foreignServerCatalog, x.foreignServerName))
+  implicit val read: Read[ForeignTablesViewRow] = new Read[ForeignTablesViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ForeignTablesViewRow(
+      foreignTableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      foreignTableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      foreignTableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

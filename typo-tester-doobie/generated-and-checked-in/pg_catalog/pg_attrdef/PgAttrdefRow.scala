@@ -8,13 +8,11 @@ package pg_catalog
 package pg_attrdef
 
 import adventureworks.TypoPgNodeTree
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgAttrdefRow(
@@ -25,38 +23,20 @@ case class PgAttrdefRow(
 )
 
 object PgAttrdefRow {
-  implicit val decoder: Decoder[PgAttrdefRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgAttrdefId]
-        adrelid <- c.downField("adrelid").as[/* oid */ Long]
-        adnum <- c.downField("adnum").as[Int]
-        adbin <- c.downField("adbin").as[TypoPgNodeTree]
-      } yield PgAttrdefRow(oid, adrelid, adnum, adbin)
-  implicit val encoder: Encoder[PgAttrdefRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "adrelid" := row.adrelid,
-        "adnum" := row.adnum,
-        "adbin" := row.adbin
-      )}
-  implicit val read: Read[PgAttrdefRow] =
-    new Read[PgAttrdefRow](
-      gets = List(
-        (Get[PgAttrdefId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[TypoPgNodeTree], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAttrdefRow(
-        oid = Get[PgAttrdefId].unsafeGetNonNullable(rs, i + 0),
-        adrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        adnum = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        adbin = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgAttrdefRow] = Decoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(PgAttrdefRow.apply)
+  implicit val encoder: Encoder[PgAttrdefRow] = Encoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(x => (x.oid, x.adrelid, x.adnum, x.adbin))
+  implicit val read: Read[PgAttrdefRow] = new Read[PgAttrdefRow](
+    gets = List(
+      (Get[PgAttrdefId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoPgNodeTree], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAttrdefRow(
+      oid = Get[PgAttrdefId].unsafeGetNonNullable(rs, i + 0),
+      adrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      adnum = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      adbin = Get[TypoPgNodeTree].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

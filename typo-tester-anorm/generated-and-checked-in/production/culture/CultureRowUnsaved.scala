@@ -8,13 +8,15 @@ package production
 package culture
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.culture` which has not been persisted yet */
@@ -24,9 +26,9 @@ case class CultureRowUnsaved(
   /** Culture description. */
   name: Name,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): CultureRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CultureRow =
     CultureRow(
       cultureid = cultureid,
       name = name,
@@ -37,24 +39,21 @@ case class CultureRowUnsaved(
     )
 }
 object CultureRowUnsaved {
-  implicit val oFormat: OFormat[CultureRowUnsaved] = new OFormat[CultureRowUnsaved]{
-    override def writes(o: CultureRowUnsaved): JsObject =
-      Json.obj(
-        "cultureid" -> o.cultureid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[CultureRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          CultureRowUnsaved(
-            cultureid = json.\("cultureid").as[CultureId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[CultureRowUnsaved] = Reads[CultureRowUnsaved](json => JsResult.fromTry(
+      Try(
+        CultureRowUnsaved(
+          cultureid = json.\("cultureid").as[CultureId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[CultureRowUnsaved] = OWrites[CultureRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "cultureid" -> Json.toJson(o.cultureid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

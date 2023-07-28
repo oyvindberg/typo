@@ -7,18 +7,20 @@ package adventureworks
 package humanresources
 package employee
 
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EmployeeRow(
@@ -32,13 +34,13 @@ case class EmployeeRow(
   /** Work title such as Buyer or Sales Representative. */
   jobtitle: /* max 50 chars */ String,
   /** Date of birth. */
-  birthdate: LocalDate,
+  birthdate: TypoLocalDate,
   /** M = Married, S = Single */
   maritalstatus: /* bpchar */ String,
   /** M = Male, F = Female */
   gender: /* bpchar */ String,
   /** Employee hired on this date. */
-  hiredate: LocalDate,
+  hiredate: TypoLocalDate,
   /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
   salariedflag: Flag,
   /** Number of available vacation hours. */
@@ -48,76 +50,72 @@ case class EmployeeRow(
   /** 0 = Inactive, 1 = Active */
   currentflag: Flag,
   rowguid: UUID,
-  modifieddate: LocalDateTime,
+  modifieddate: TypoLocalDateTime,
   /** Where the employee is located in corporate hierarchy. */
   organizationnode: Option[String]
 )
 
 object EmployeeRow {
-  def rowParser(idx: Int): RowParser[EmployeeRow] =
-    RowParser[EmployeeRow] { row =>
-      Success(
+  implicit val reads: Reads[EmployeeRow] = Reads[EmployeeRow](json => JsResult.fromTry(
+      Try(
         EmployeeRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          nationalidnumber = row[/* max 15 chars */ String](idx + 1),
-          loginid = row[/* max 256 chars */ String](idx + 2),
-          jobtitle = row[/* max 50 chars */ String](idx + 3),
-          birthdate = row[LocalDate](idx + 4),
-          maritalstatus = row[/* bpchar */ String](idx + 5),
-          gender = row[/* bpchar */ String](idx + 6),
-          hiredate = row[LocalDate](idx + 7),
-          salariedflag = row[Flag](idx + 8),
-          vacationhours = row[Int](idx + 9),
-          sickleavehours = row[Int](idx + 10),
-          currentflag = row[Flag](idx + 11),
-          rowguid = row[UUID](idx + 12),
-          modifieddate = row[LocalDateTime](idx + 13),
-          organizationnode = row[Option[String]](idx + 14)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          nationalidnumber = json.\("nationalidnumber").as[/* max 15 chars */ String],
+          loginid = json.\("loginid").as[/* max 256 chars */ String],
+          jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
+          birthdate = json.\("birthdate").as[TypoLocalDate],
+          maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
+          gender = json.\("gender").as[/* bpchar */ String],
+          hiredate = json.\("hiredate").as[TypoLocalDate],
+          salariedflag = json.\("salariedflag").as[Flag],
+          vacationhours = json.\("vacationhours").as[Int],
+          sickleavehours = json.\("sickleavehours").as[Int],
+          currentflag = json.\("currentflag").as[Flag],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime],
+          organizationnode = json.\("organizationnode").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[EmployeeRow] = new OFormat[EmployeeRow]{
-    override def writes(o: EmployeeRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "nationalidnumber" -> o.nationalidnumber,
-        "loginid" -> o.loginid,
-        "jobtitle" -> o.jobtitle,
-        "birthdate" -> o.birthdate,
-        "maritalstatus" -> o.maritalstatus,
-        "gender" -> o.gender,
-        "hiredate" -> o.hiredate,
-        "salariedflag" -> o.salariedflag,
-        "vacationhours" -> o.vacationhours,
-        "sickleavehours" -> o.sickleavehours,
-        "currentflag" -> o.currentflag,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate,
-        "organizationnode" -> o.organizationnode
+    ),
+  )
+  def rowParser(idx: Int): RowParser[EmployeeRow] = RowParser[EmployeeRow] { row =>
+    Success(
+      EmployeeRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        nationalidnumber = row[/* max 15 chars */ String](idx + 1),
+        loginid = row[/* max 256 chars */ String](idx + 2),
+        jobtitle = row[/* max 50 chars */ String](idx + 3),
+        birthdate = row[TypoLocalDate](idx + 4),
+        maritalstatus = row[/* bpchar */ String](idx + 5),
+        gender = row[/* bpchar */ String](idx + 6),
+        hiredate = row[TypoLocalDate](idx + 7),
+        salariedflag = row[Flag](idx + 8),
+        vacationhours = row[Int](idx + 9),
+        sickleavehours = row[Int](idx + 10),
+        currentflag = row[Flag](idx + 11),
+        rowguid = row[UUID](idx + 12),
+        modifieddate = row[TypoLocalDateTime](idx + 13),
+        organizationnode = row[Option[String]](idx + 14)
       )
-  
-    override def reads(json: JsValue): JsResult[EmployeeRow] = {
-      JsResult.fromTry(
-        Try(
-          EmployeeRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            nationalidnumber = json.\("nationalidnumber").as[/* max 15 chars */ String],
-            loginid = json.\("loginid").as[/* max 256 chars */ String],
-            jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
-            birthdate = json.\("birthdate").as[LocalDate],
-            maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
-            gender = json.\("gender").as[/* bpchar */ String],
-            hiredate = json.\("hiredate").as[LocalDate],
-            salariedflag = json.\("salariedflag").as[Flag],
-            vacationhours = json.\("vacationhours").as[Int],
-            sickleavehours = json.\("sickleavehours").as[Int],
-            currentflag = json.\("currentflag").as[Flag],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime],
-            organizationnode = json.\("organizationnode").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[EmployeeRow] = OWrites[EmployeeRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "nationalidnumber" -> Json.toJson(o.nationalidnumber),
+      "loginid" -> Json.toJson(o.loginid),
+      "jobtitle" -> Json.toJson(o.jobtitle),
+      "birthdate" -> Json.toJson(o.birthdate),
+      "maritalstatus" -> Json.toJson(o.maritalstatus),
+      "gender" -> Json.toJson(o.gender),
+      "hiredate" -> Json.toJson(o.hiredate),
+      "salariedflag" -> Json.toJson(o.salariedflag),
+      "vacationhours" -> Json.toJson(o.vacationhours),
+      "sickleavehours" -> Json.toJson(o.sickleavehours),
+      "currentflag" -> Json.toJson(o.currentflag),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate),
+      "organizationnode" -> Json.toJson(o.organizationnode)
+    ))
+  )
 }

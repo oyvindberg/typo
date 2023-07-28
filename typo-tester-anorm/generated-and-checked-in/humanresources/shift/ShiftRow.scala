@@ -7,16 +7,18 @@ package adventureworks
 package humanresources
 package shift
 
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
-import java.time.LocalTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ShiftRow(
@@ -25,47 +27,43 @@ case class ShiftRow(
   /** Shift description. */
   name: Name,
   /** Shift start time. */
-  starttime: LocalTime,
+  starttime: TypoLocalTime,
   /** Shift end time. */
-  endtime: LocalTime,
-  modifieddate: LocalDateTime
+  endtime: TypoLocalTime,
+  modifieddate: TypoLocalDateTime
 )
 
 object ShiftRow {
-  def rowParser(idx: Int): RowParser[ShiftRow] =
-    RowParser[ShiftRow] { row =>
-      Success(
+  implicit val reads: Reads[ShiftRow] = Reads[ShiftRow](json => JsResult.fromTry(
+      Try(
         ShiftRow(
-          shiftid = row[ShiftId](idx + 0),
-          name = row[Name](idx + 1),
-          starttime = row[LocalTime](idx + 2),
-          endtime = row[LocalTime](idx + 3),
-          modifieddate = row[LocalDateTime](idx + 4)
+          shiftid = json.\("shiftid").as[ShiftId],
+          name = json.\("name").as[Name],
+          starttime = json.\("starttime").as[TypoLocalTime],
+          endtime = json.\("endtime").as[TypoLocalTime],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ShiftRow] = new OFormat[ShiftRow]{
-    override def writes(o: ShiftRow): JsObject =
-      Json.obj(
-        "shiftid" -> o.shiftid,
-        "name" -> o.name,
-        "starttime" -> o.starttime,
-        "endtime" -> o.endtime,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ShiftRow] = RowParser[ShiftRow] { row =>
+    Success(
+      ShiftRow(
+        shiftid = row[ShiftId](idx + 0),
+        name = row[Name](idx + 1),
+        starttime = row[TypoLocalTime](idx + 2),
+        endtime = row[TypoLocalTime](idx + 3),
+        modifieddate = row[TypoLocalDateTime](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[ShiftRow] = {
-      JsResult.fromTry(
-        Try(
-          ShiftRow(
-            shiftid = json.\("shiftid").as[ShiftId],
-            name = json.\("name").as[Name],
-            starttime = json.\("starttime").as[LocalTime],
-            endtime = json.\("endtime").as[LocalTime],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ShiftRow] = OWrites[ShiftRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "shiftid" -> Json.toJson(o.shiftid),
+      "name" -> Json.toJson(o.name),
+      "starttime" -> Json.toJson(o.starttime),
+      "endtime" -> Json.toJson(o.endtime),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

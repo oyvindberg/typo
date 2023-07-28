@@ -8,11 +8,11 @@ package production
 package location
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object LocationRepoImpl extends LocationRepo {
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
           values (${unsaved.locationid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.costrate}::numeric, ${unsaved.availability}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning locationid, "name", costrate, availability, modifieddate
+          returning locationid, "name", costrate, availability, modifieddate::text
        """
       .executeInsert(LocationRow.rowParser(1).single)
   
@@ -43,19 +43,19 @@ object LocationRepoImpl extends LocationRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production."location" default values
-            returning locationid, "name", costrate, availability, modifieddate
+            returning locationid, "name", costrate, availability, modifieddate::text
          """
         .executeInsert(LocationRow.rowParser(1).single)
     } else {
       val q = s"""insert into production."location"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning locationid, "name", costrate, availability, modifieddate
+                  returning locationid, "name", costrate, availability, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -66,18 +66,18 @@ object LocationRepoImpl extends LocationRepo {
   
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
-    SQL"""select locationid, "name", costrate, availability, modifieddate
+    SQL"""select locationid, "name", costrate, availability, modifieddate::text
           from production."location"
        """.as(LocationRow.rowParser(1).*)
   }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
-    SQL"""select locationid, "name", costrate, availability, modifieddate
+    SQL"""select locationid, "name", costrate, availability, modifieddate::text
           from production."location"
           where locationid = $locationid
        """.as(LocationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
-    SQL"""select locationid, "name", costrate, availability, modifieddate
+    SQL"""select locationid, "name", costrate, availability, modifieddate::text
           from production."location"
           where locationid = ANY($locationids)
        """.as(LocationRow.rowParser(1).*)
@@ -108,7 +108,7 @@ object LocationRepoImpl extends LocationRepo {
             costrate = EXCLUDED.costrate,
             availability = EXCLUDED.availability,
             modifieddate = EXCLUDED.modifieddate
-          returning locationid, "name", costrate, availability, modifieddate
+          returning locationid, "name", costrate, availability, modifieddate::text
        """
       .executeInsert(LocationRow.rowParser(1).single)
   

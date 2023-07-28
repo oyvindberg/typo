@@ -7,16 +7,18 @@ package adventureworks
 package pr
 package c
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CViewRow(
@@ -26,41 +28,37 @@ case class CViewRow(
   /** Points to [[production.culture.CultureRow.name]] */
   name: Option[Name],
   /** Points to [[production.culture.CultureRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CViewRow {
-  def rowParser(idx: Int): RowParser[CViewRow] =
-    RowParser[CViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CViewRow] = Reads[CViewRow](json => JsResult.fromTry(
+      Try(
         CViewRow(
-          id = row[Option[/* bpchar */ String]](idx + 0),
-          cultureid = row[Option[CultureId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
+          cultureid = json.\("cultureid").toOption.map(_.as[CultureId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[CViewRow] = new OFormat[CViewRow]{
-    override def writes(o: CViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "cultureid" -> o.cultureid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CViewRow] = RowParser[CViewRow] { row =>
+    Success(
+      CViewRow(
+        id = row[Option[/* bpchar */ String]](idx + 0),
+        cultureid = row[Option[CultureId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[CViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CViewRow(
-            id = json.\("id").toOption.map(_.as[/* bpchar */ String]),
-            cultureid = json.\("cultureid").toOption.map(_.as[CultureId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CViewRow] = OWrites[CViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "cultureid" -> Json.toJson(o.cultureid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

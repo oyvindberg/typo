@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object SoViewRepoImpl extends SoViewRepo {
   override def selectAll(implicit c: Connection): List[SoViewRow] = {
-    SQL"""select "id", specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
+    SQL"""select "id", specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
           from sa.so
        """.as(SoViewRow.rowParser(1).*)
   }

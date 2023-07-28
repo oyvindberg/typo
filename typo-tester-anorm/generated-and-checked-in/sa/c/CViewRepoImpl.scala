@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object CViewRepoImpl extends CViewRepo {
   override def selectAll(implicit c: Connection): List[CViewRow] = {
-    SQL"""select "id", customerid, personid, storeid, territoryid, rowguid, modifieddate
+    SQL"""select "id", customerid, personid, storeid, territoryid, rowguid, modifieddate::text
           from sa."c"
        """.as(CViewRow.rowParser(1).*)
   }

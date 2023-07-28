@@ -8,11 +8,11 @@ package person
 package personphone
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """
       .executeInsert(PersonphoneRow.rowParser(1).single)
   
@@ -33,19 +33,19 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       Some((NamedParameter("phonenumbertypeid", ParameterValue.from(unsaved.phonenumbertypeid)), "::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.personphone default values
-            returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+            returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
          """
         .executeInsert(PersonphoneRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.personphone(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+                  returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -56,12 +56,12 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
-    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
+    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
           from person.personphone
        """.as(PersonphoneRow.rowParser(1).*)
   }
   override def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow] = {
-    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
+    SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
           from person.personphone
           where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
        """.as(PersonphoneRow.rowParser(1).singleOpt)
@@ -84,7 +84,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           on conflict (businessentityid, phonenumber, phonenumbertypeid)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """
       .executeInsert(PersonphoneRow.rowParser(1).single)
   

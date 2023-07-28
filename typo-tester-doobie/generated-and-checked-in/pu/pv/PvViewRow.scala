@@ -7,18 +7,16 @@ package adventureworks
 package pu
 package pv
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PvViewRow(
   id: Option[Int],
@@ -33,7 +31,7 @@ case class PvViewRow(
   /** Points to [[purchasing.productvendor.ProductvendorRow.lastreceiptcost]] */
   lastreceiptcost: Option[BigDecimal],
   /** Points to [[purchasing.productvendor.ProductvendorRow.lastreceiptdate]] */
-  lastreceiptdate: Option[LocalDateTime],
+  lastreceiptdate: Option[TypoLocalDateTime],
   /** Points to [[purchasing.productvendor.ProductvendorRow.minorderqty]] */
   minorderqty: Option[Int],
   /** Points to [[purchasing.productvendor.ProductvendorRow.maxorderqty]] */
@@ -43,74 +41,40 @@ case class PvViewRow(
   /** Points to [[purchasing.productvendor.ProductvendorRow.unitmeasurecode]] */
   unitmeasurecode: Option[UnitmeasureId],
   /** Points to [[purchasing.productvendor.ProductvendorRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PvViewRow {
-  implicit val decoder: Decoder[PvViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        averageleadtime <- c.downField("averageleadtime").as[Option[Int]]
-        standardprice <- c.downField("standardprice").as[Option[BigDecimal]]
-        lastreceiptcost <- c.downField("lastreceiptcost").as[Option[BigDecimal]]
-        lastreceiptdate <- c.downField("lastreceiptdate").as[Option[LocalDateTime]]
-        minorderqty <- c.downField("minorderqty").as[Option[Int]]
-        maxorderqty <- c.downField("maxorderqty").as[Option[Int]]
-        onorderqty <- c.downField("onorderqty").as[Option[Int]]
-        unitmeasurecode <- c.downField("unitmeasurecode").as[Option[UnitmeasureId]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PvViewRow(id, productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
-  implicit val encoder: Encoder[PvViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productid" := row.productid,
-        "businessentityid" := row.businessentityid,
-        "averageleadtime" := row.averageleadtime,
-        "standardprice" := row.standardprice,
-        "lastreceiptcost" := row.lastreceiptcost,
-        "lastreceiptdate" := row.lastreceiptdate,
-        "minorderqty" := row.minorderqty,
-        "maxorderqty" := row.maxorderqty,
-        "onorderqty" := row.onorderqty,
-        "unitmeasurecode" := row.unitmeasurecode,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PvViewRow] =
-    new Read[PvViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PvViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        averageleadtime = Get[Int].unsafeGetNullable(rs, i + 3),
-        standardprice = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        lastreceiptcost = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        lastreceiptdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6),
-        minorderqty = Get[Int].unsafeGetNullable(rs, i + 7),
-        maxorderqty = Get[Int].unsafeGetNullable(rs, i + 8),
-        onorderqty = Get[Int].unsafeGetNullable(rs, i + 9),
-        unitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 10),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 11)
-      )
+  implicit val decoder: Decoder[PvViewRow] = Decoder.forProduct12[PvViewRow, Option[Int], Option[ProductId], Option[BusinessentityId], Option[Int], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime], Option[Int], Option[Int], Option[Int], Option[UnitmeasureId], Option[TypoLocalDateTime]]("id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(PvViewRow.apply)
+  implicit val encoder: Encoder[PvViewRow] = Encoder.forProduct12[PvViewRow, Option[Int], Option[ProductId], Option[BusinessentityId], Option[Int], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime], Option[Int], Option[Int], Option[Int], Option[UnitmeasureId], Option[TypoLocalDateTime]]("id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(x => (x.id, x.productid, x.businessentityid, x.averageleadtime, x.standardprice, x.lastreceiptcost, x.lastreceiptdate, x.minorderqty, x.maxorderqty, x.onorderqty, x.unitmeasurecode, x.modifieddate))
+  implicit val read: Read[PvViewRow] = new Read[PvViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[UnitmeasureId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PvViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
+      averageleadtime = Get[Int].unsafeGetNullable(rs, i + 3),
+      standardprice = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+      lastreceiptcost = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
+      lastreceiptdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6),
+      minorderqty = Get[Int].unsafeGetNullable(rs, i + 7),
+      maxorderqty = Get[Int].unsafeGetNullable(rs, i + 8),
+      onorderqty = Get[Int].unsafeGetNullable(rs, i + 9),
+      unitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 10),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 11)
     )
-  
-
+  )
 }

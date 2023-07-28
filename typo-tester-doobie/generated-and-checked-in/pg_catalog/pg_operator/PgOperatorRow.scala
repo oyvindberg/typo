@@ -8,13 +8,11 @@ package pg_catalog
 package pg_operator
 
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgOperatorRow(
@@ -36,82 +34,42 @@ case class PgOperatorRow(
 )
 
 object PgOperatorRow {
-  implicit val decoder: Decoder[PgOperatorRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgOperatorId]
-        oprname <- c.downField("oprname").as[String]
-        oprnamespace <- c.downField("oprnamespace").as[/* oid */ Long]
-        oprowner <- c.downField("oprowner").as[/* oid */ Long]
-        oprkind <- c.downField("oprkind").as[String]
-        oprcanmerge <- c.downField("oprcanmerge").as[Boolean]
-        oprcanhash <- c.downField("oprcanhash").as[Boolean]
-        oprleft <- c.downField("oprleft").as[/* oid */ Long]
-        oprright <- c.downField("oprright").as[/* oid */ Long]
-        oprresult <- c.downField("oprresult").as[/* oid */ Long]
-        oprcom <- c.downField("oprcom").as[/* oid */ Long]
-        oprnegate <- c.downField("oprnegate").as[/* oid */ Long]
-        oprcode <- c.downField("oprcode").as[TypoRegproc]
-        oprrest <- c.downField("oprrest").as[TypoRegproc]
-        oprjoin <- c.downField("oprjoin").as[TypoRegproc]
-      } yield PgOperatorRow(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)
-  implicit val encoder: Encoder[PgOperatorRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "oprname" := row.oprname,
-        "oprnamespace" := row.oprnamespace,
-        "oprowner" := row.oprowner,
-        "oprkind" := row.oprkind,
-        "oprcanmerge" := row.oprcanmerge,
-        "oprcanhash" := row.oprcanhash,
-        "oprleft" := row.oprleft,
-        "oprright" := row.oprright,
-        "oprresult" := row.oprresult,
-        "oprcom" := row.oprcom,
-        "oprnegate" := row.oprnegate,
-        "oprcode" := row.oprcode,
-        "oprrest" := row.oprrest,
-        "oprjoin" := row.oprjoin
-      )}
-  implicit val read: Read[PgOperatorRow] =
-    new Read[PgOperatorRow](
-      gets = List(
-        (Get[PgOperatorId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgOperatorRow(
-        oid = Get[PgOperatorId].unsafeGetNonNullable(rs, i + 0),
-        oprname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        oprnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        oprowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        oprkind = Get[String].unsafeGetNonNullable(rs, i + 4),
-        oprcanmerge = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-        oprcanhash = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
-        oprleft = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
-        oprright = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8),
-        oprresult = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 9),
-        oprcom = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 10),
-        oprnegate = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 11),
-        oprcode = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 12),
-        oprrest = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 13),
-        oprjoin = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 14)
-      )
+  implicit val decoder: Decoder[PgOperatorRow] = Decoder.forProduct15[PgOperatorRow, PgOperatorId, String, /* oid */ Long, /* oid */ Long, String, Boolean, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin")(PgOperatorRow.apply)
+  implicit val encoder: Encoder[PgOperatorRow] = Encoder.forProduct15[PgOperatorRow, PgOperatorId, String, /* oid */ Long, /* oid */ Long, String, Boolean, Boolean, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "oprname", "oprnamespace", "oprowner", "oprkind", "oprcanmerge", "oprcanhash", "oprleft", "oprright", "oprresult", "oprcom", "oprnegate", "oprcode", "oprrest", "oprjoin")(x => (x.oid, x.oprname, x.oprnamespace, x.oprowner, x.oprkind, x.oprcanmerge, x.oprcanhash, x.oprleft, x.oprright, x.oprresult, x.oprcom, x.oprnegate, x.oprcode, x.oprrest, x.oprjoin))
+  implicit val read: Read[PgOperatorRow] = new Read[PgOperatorRow](
+    gets = List(
+      (Get[PgOperatorId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgOperatorRow(
+      oid = Get[PgOperatorId].unsafeGetNonNullable(rs, i + 0),
+      oprname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      oprnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      oprowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      oprkind = Get[String].unsafeGetNonNullable(rs, i + 4),
+      oprcanmerge = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
+      oprcanhash = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
+      oprleft = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 7),
+      oprright = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 8),
+      oprresult = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 9),
+      oprcom = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 10),
+      oprnegate = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 11),
+      oprcode = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 12),
+      oprrest = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 13),
+      oprjoin = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 14)
     )
-  
-
+  )
 }

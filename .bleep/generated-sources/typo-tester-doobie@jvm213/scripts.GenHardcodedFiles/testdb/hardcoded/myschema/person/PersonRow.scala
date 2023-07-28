@@ -8,13 +8,11 @@ package hardcoded
 package myschema
 package person
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
@@ -37,66 +35,34 @@ case class PersonRow(
 )
 
 object PersonRow {
-  implicit val decoder: Decoder[PersonRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[PersonId]
-        favouriteFootballClubId <- c.downField("favourite_football_club_id").as[FootballClubId]
-        name <- c.downField("name").as[/* max 100 chars */ String]
-        nickName <- c.downField("nick_name").as[Option[/* max 30 chars */ String]]
-        blogUrl <- c.downField("blog_url").as[Option[/* max 100 chars */ String]]
-        email <- c.downField("email").as[/* max 254 chars */ String]
-        phone <- c.downField("phone").as[/* max 8 chars */ String]
-        likesPizza <- c.downField("likes_pizza").as[Boolean]
-        maritalStatusId <- c.downField("marital_status_id").as[MaritalStatusId]
-        workEmail <- c.downField("work_email").as[Option[/* max 254 chars */ String]]
-        sector <- c.downField("sector").as[Sector]
-      } yield PersonRow(id, favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, maritalStatusId, workEmail, sector)
-  implicit val encoder: Encoder[PersonRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "favourite_football_club_id" := row.favouriteFootballClubId,
-        "name" := row.name,
-        "nick_name" := row.nickName,
-        "blog_url" := row.blogUrl,
-        "email" := row.email,
-        "phone" := row.phone,
-        "likes_pizza" := row.likesPizza,
-        "marital_status_id" := row.maritalStatusId,
-        "work_email" := row.workEmail,
-        "sector" := row.sector
-      )}
-  implicit val read: Read[PersonRow] =
-    new Read[PersonRow](
-      gets = List(
-        (Get[PersonId], Nullability.NoNulls),
-        (Get[FootballClubId], Nullability.NoNulls),
-        (Get[/* max 100 chars */ String], Nullability.NoNulls),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 100 chars */ String], Nullability.Nullable),
-        (Get[/* max 254 chars */ String], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[MaritalStatusId], Nullability.NoNulls),
-        (Get[/* max 254 chars */ String], Nullability.Nullable),
-        (Get[Sector], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-        id = Get[PersonId].unsafeGetNonNullable(rs, i + 0),
-        favouriteFootballClubId = Get[FootballClubId].unsafeGetNonNullable(rs, i + 1),
-        name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        nickName = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 3),
-        blogUrl = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
-        email = Get[/* max 254 chars */ String].unsafeGetNonNullable(rs, i + 5),
-        phone = Get[/* max 8 chars */ String].unsafeGetNonNullable(rs, i + 6),
-        likesPizza = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-        maritalStatusId = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 8),
-        workEmail = Get[/* max 254 chars */ String].unsafeGetNullable(rs, i + 9),
-        sector = Get[Sector].unsafeGetNonNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[PersonRow] = Decoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(PersonRow.apply)
+  implicit val encoder: Encoder[PersonRow] = Encoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(x => (x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.sector))
+  implicit val read: Read[PersonRow] = new Read[PersonRow](
+    gets = List(
+      (Get[PersonId], Nullability.NoNulls),
+      (Get[FootballClubId], Nullability.NoNulls),
+      (Get[/* max 100 chars */ String], Nullability.NoNulls),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[/* max 100 chars */ String], Nullability.Nullable),
+      (Get[/* max 254 chars */ String], Nullability.NoNulls),
+      (Get[/* max 8 chars */ String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[MaritalStatusId], Nullability.NoNulls),
+      (Get[/* max 254 chars */ String], Nullability.Nullable),
+      (Get[Sector], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
+      id = Get[PersonId].unsafeGetNonNullable(rs, i + 0),
+      favouriteFootballClubId = Get[FootballClubId].unsafeGetNonNullable(rs, i + 1),
+      name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 2),
+      nickName = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 3),
+      blogUrl = Get[/* max 100 chars */ String].unsafeGetNullable(rs, i + 4),
+      email = Get[/* max 254 chars */ String].unsafeGetNonNullable(rs, i + 5),
+      phone = Get[/* max 8 chars */ String].unsafeGetNonNullable(rs, i + 6),
+      likesPizza = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
+      maritalStatusId = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 8),
+      workEmail = Get[/* max 254 chars */ String].unsafeGetNullable(rs, i + 9),
+      sector = Get[Sector].unsafeGetNonNullable(rs, i + 10)
     )
-  
-
+  )
 }

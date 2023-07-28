@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgRolesViewRepoImpl extends PgRolesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgRolesViewRow] = {
-    sql"select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil, rolbypassrls, rolconfig, oid from pg_catalog.pg_roles".query[PgRolesViewRow].stream
+    sql"select rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolconnlimit, rolpassword, rolvaliduntil::text, rolbypassrls, rolconfig, oid from pg_catalog.pg_roles".query[PgRolesViewRow].stream
   }
 }

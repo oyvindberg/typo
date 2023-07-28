@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PodViewRepoImpl extends PodViewRepo {
   override def selectAll: Stream[ConnectionIO, PodViewRow] = {
-    sql"""select "id", purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from pu.pod""".query[PodViewRow].stream
+    sql"""select "id", purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from pu.pod""".query[PodViewRow].stream
   }
 }

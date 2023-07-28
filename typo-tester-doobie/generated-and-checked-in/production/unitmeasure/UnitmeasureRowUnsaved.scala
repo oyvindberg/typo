@@ -8,12 +8,10 @@ package production
 package unitmeasure
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.unitmeasure` which has not been persisted yet */
 case class UnitmeasureRowUnsaved(
@@ -22,9 +20,9 @@ case class UnitmeasureRowUnsaved(
   /** Unit of measure description. */
   name: Name,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): UnitmeasureRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): UnitmeasureRow =
     UnitmeasureRow(
       unitmeasurecode = unitmeasurecode,
       name = name,
@@ -35,19 +33,6 @@ case class UnitmeasureRowUnsaved(
     )
 }
 object UnitmeasureRowUnsaved {
-  implicit val decoder: Decoder[UnitmeasureRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        unitmeasurecode <- c.downField("unitmeasurecode").as[UnitmeasureId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield UnitmeasureRowUnsaved(unitmeasurecode, name, modifieddate)
-  implicit val encoder: Encoder[UnitmeasureRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "unitmeasurecode" := row.unitmeasurecode,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[UnitmeasureRowUnsaved] = Decoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRowUnsaved.apply)
+  implicit val encoder: Encoder[UnitmeasureRowUnsaved] = Encoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))
 }

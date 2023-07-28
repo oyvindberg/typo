@@ -8,13 +8,15 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `humanresources.employeepayhistory` which has not been persisted yet */
@@ -23,15 +25,15 @@ case class EmployeepayhistoryRowUnsaved(
       Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Date the change in pay is effective */
-  ratechangedate: LocalDateTime,
+  ratechangedate: TypoLocalDateTime,
   /** Salary hourly rate. */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly */
   payfrequency: Int,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): EmployeepayhistoryRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): EmployeepayhistoryRow =
     EmployeepayhistoryRow(
       businessentityid = businessentityid,
       ratechangedate = ratechangedate,
@@ -44,28 +46,25 @@ case class EmployeepayhistoryRowUnsaved(
     )
 }
 object EmployeepayhistoryRowUnsaved {
-  implicit val oFormat: OFormat[EmployeepayhistoryRowUnsaved] = new OFormat[EmployeepayhistoryRowUnsaved]{
-    override def writes(o: EmployeepayhistoryRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "ratechangedate" -> o.ratechangedate,
-        "rate" -> o.rate,
-        "payfrequency" -> o.payfrequency,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[EmployeepayhistoryRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          EmployeepayhistoryRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            ratechangedate = json.\("ratechangedate").as[LocalDateTime],
-            rate = json.\("rate").as[BigDecimal],
-            payfrequency = json.\("payfrequency").as[Int],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[EmployeepayhistoryRowUnsaved] = Reads[EmployeepayhistoryRowUnsaved](json => JsResult.fromTry(
+      Try(
+        EmployeepayhistoryRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          ratechangedate = json.\("ratechangedate").as[TypoLocalDateTime],
+          rate = json.\("rate").as[BigDecimal],
+          payfrequency = json.\("payfrequency").as[Int],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[EmployeepayhistoryRowUnsaved] = OWrites[EmployeepayhistoryRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "ratechangedate" -> Json.toJson(o.ratechangedate),
+      "rate" -> Json.toJson(o.rate),
+      "payfrequency" -> Json.toJson(o.payfrequency),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PersonDetailSqlRow(
@@ -39,52 +41,48 @@ case class PersonDetailSqlRow(
 )
 
 object PersonDetailSqlRow {
-  def rowParser(idx: Int): RowParser[PersonDetailSqlRow] =
-    RowParser[PersonDetailSqlRow] { row =>
-      Success(
+  implicit val reads: Reads[PersonDetailSqlRow] = Reads[PersonDetailSqlRow](json => JsResult.fromTry(
+      Try(
         PersonDetailSqlRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          title = row[Option[/* max 8 chars */ String]](idx + 1),
-          firstname = row[Name](idx + 2),
-          middlename = row[Option[Name]](idx + 3),
-          lastname = row[Name](idx + 4),
-          jobtitle = row[/* max 50 chars */ String](idx + 5),
-          addressline1 = row[/* max 60 chars */ String](idx + 6),
-          city = row[/* max 30 chars */ String](idx + 7),
-          postalcode = row[/* max 15 chars */ String](idx + 8)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
+          firstname = json.\("firstname").as[Name],
+          middlename = json.\("middlename").toOption.map(_.as[Name]),
+          lastname = json.\("lastname").as[Name],
+          jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
+          addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
+          city = json.\("city").as[/* max 30 chars */ String],
+          postalcode = json.\("postalcode").as[/* max 15 chars */ String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PersonDetailSqlRow] = new OFormat[PersonDetailSqlRow]{
-    override def writes(o: PersonDetailSqlRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "title" -> o.title,
-        "firstname" -> o.firstname,
-        "middlename" -> o.middlename,
-        "lastname" -> o.lastname,
-        "jobtitle" -> o.jobtitle,
-        "addressline1" -> o.addressline1,
-        "city" -> o.city,
-        "postalcode" -> o.postalcode
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PersonDetailSqlRow] = RowParser[PersonDetailSqlRow] { row =>
+    Success(
+      PersonDetailSqlRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        title = row[Option[/* max 8 chars */ String]](idx + 1),
+        firstname = row[Name](idx + 2),
+        middlename = row[Option[Name]](idx + 3),
+        lastname = row[Name](idx + 4),
+        jobtitle = row[/* max 50 chars */ String](idx + 5),
+        addressline1 = row[/* max 60 chars */ String](idx + 6),
+        city = row[/* max 30 chars */ String](idx + 7),
+        postalcode = row[/* max 15 chars */ String](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PersonDetailSqlRow] = {
-      JsResult.fromTry(
-        Try(
-          PersonDetailSqlRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-            firstname = json.\("firstname").as[Name],
-            middlename = json.\("middlename").toOption.map(_.as[Name]),
-            lastname = json.\("lastname").as[Name],
-            jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
-            addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
-            city = json.\("city").as[/* max 30 chars */ String],
-            postalcode = json.\("postalcode").as[/* max 15 chars */ String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PersonDetailSqlRow] = OWrites[PersonDetailSqlRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "title" -> Json.toJson(o.title),
+      "firstname" -> Json.toJson(o.firstname),
+      "middlename" -> Json.toJson(o.middlename),
+      "lastname" -> Json.toJson(o.lastname),
+      "jobtitle" -> Json.toJson(o.jobtitle),
+      "addressline1" -> Json.toJson(o.addressline1),
+      "city" -> Json.toJson(o.city),
+      "postalcode" -> Json.toJson(o.postalcode)
+    ))
+  )
 }

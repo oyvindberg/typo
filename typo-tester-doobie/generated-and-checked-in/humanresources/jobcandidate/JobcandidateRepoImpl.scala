@@ -8,20 +8,20 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
-    sql"delete from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".update.run.map(_ > 0)
+    sql"delete from humanresources.jobcandidate where jobcandidateid = ${jobcandidateid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
           values (${unsaved.jobcandidateid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.resume}::xml, ${unsaved.modifieddate}::timestamp)
-          returning jobcandidateid, businessentityid, resume, modifieddate
+          returning jobcandidateid, businessentityid, resume, modifieddate::text
        """.query[JobcandidateRow].unique
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
@@ -34,32 +34,32 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into humanresources.jobcandidate default values
-            returning jobcandidateid, businessentityid, resume, modifieddate
+            returning jobcandidateid, businessentityid, resume, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into humanresources.jobcandidate(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning jobcandidateid, businessentityid, resume, modifieddate
+            returning jobcandidateid, businessentityid, resume, modifieddate::text
          """
     }
     q.query[JobcandidateRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate".query[JobcandidateRow].stream
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate".query[JobcandidateRow].stream
   }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".query[JobcandidateRow].option
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ${jobcandidateid}".query[JobcandidateRow].option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = ANY($jobcandidateids)".query[JobcandidateRow].stream
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ANY(${jobcandidateids})".query[JobcandidateRow].stream
   }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid
@@ -67,7 +67,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           set businessentityid = ${row.businessentityid}::int4,
               resume = ${row.resume}::xml,
               modifieddate = ${row.modifieddate}::timestamp
-          where jobcandidateid = $jobcandidateid
+          where jobcandidateid = ${jobcandidateid}
        """
       .update
       .run
@@ -86,7 +86,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
             businessentityid = EXCLUDED.businessentityid,
             resume = EXCLUDED.resume,
             modifieddate = EXCLUDED.modifieddate
-          returning jobcandidateid, businessentityid, resume, modifieddate
+          returning jobcandidateid, businessentityid, resume, modifieddate::text
        """.query[JobcandidateRow].unique
   }
 }

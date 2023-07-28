@@ -8,20 +8,20 @@ package sales
 package currencyrate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId): ConnectionIO[Boolean] = {
-    sql"delete from sales.currencyrate where currencyrateid = $currencyrateid".update.run.map(_ > 0)
+    sql"delete from sales.currencyrate where currencyrateid = ${currencyrateid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
           values (${unsaved.currencyrateid}::int4, ${unsaved.currencyratedate}::timestamp, ${unsaved.fromcurrencycode}::bpchar, ${unsaved.tocurrencycode}::bpchar, ${unsaved.averagerate}::numeric, ${unsaved.endofdayrate}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+          returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
        """.query[CurrencyrateRow].unique
   }
   override def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow] = {
@@ -37,32 +37,32 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.currencyrate default values
-            returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+            returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.currencyrate(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+            returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
          """
     }
     q.query[CurrencyrateRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
-    sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate".query[CurrencyrateRow].stream
+    sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate".query[CurrencyrateRow].stream
   }
   override def selectById(currencyrateid: CurrencyrateId): ConnectionIO[Option[CurrencyrateRow]] = {
-    sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid".query[CurrencyrateRow].option
+    sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate where currencyrateid = ${currencyrateid}".query[CurrencyrateRow].option
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow] = {
-    sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = ANY($currencyrateids)".query[CurrencyrateRow].stream
+    sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate where currencyrateid = ANY(${currencyrateids})".query[CurrencyrateRow].stream
   }
   override def update(row: CurrencyrateRow): ConnectionIO[Boolean] = {
     val currencyrateid = row.currencyrateid
@@ -73,7 +73,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
               averagerate = ${row.averagerate}::numeric,
               endofdayrate = ${row.endofdayrate}::numeric,
               modifieddate = ${row.modifieddate}::timestamp
-          where currencyrateid = $currencyrateid
+          where currencyrateid = ${currencyrateid}
        """
       .update
       .run
@@ -98,7 +98,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
             averagerate = EXCLUDED.averagerate,
             endofdayrate = EXCLUDED.endofdayrate,
             modifieddate = EXCLUDED.modifieddate
-          returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+          returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
        """.query[CurrencyrateRow].unique
   }
 }

@@ -8,20 +8,20 @@ package purchasing
 package purchaseorderheader
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Boolean] = {
-    sql"delete from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".update.run.map(_ > 0)
+    sql"delete from purchasing.purchaseorderheader where purchaseorderid = ${purchaseorderid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
           values (${unsaved.purchaseorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.status}::int2, ${unsaved.employeeid}::int4, ${unsaved.vendorid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.orderdate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+          returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
        """.query[PurchaseorderheaderRow].unique
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved): ConnectionIO[PurchaseorderheaderRow] = {
@@ -44,7 +44,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"orderdate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"orderdate"), fr"${value: TypoLocalDateTime}::timestamp"))
       },
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
@@ -60,32 +60,32 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into purchasing.purchaseorderheader default values
-            returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+            returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.purchaseorderheader(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+            returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
          """
     }
     q.query[PurchaseorderheaderRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader".query[PurchaseorderheaderRow].stream
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader".query[PurchaseorderheaderRow].stream
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Option[PurchaseorderheaderRow]] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".query[PurchaseorderheaderRow].option
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ${purchaseorderid}".query[PurchaseorderheaderRow].option
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = ANY($purchaseorderids)".query[PurchaseorderheaderRow].stream
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ANY(${purchaseorderids})".query[PurchaseorderheaderRow].stream
   }
   override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
     val purchaseorderid = row.purchaseorderid
@@ -101,7 +101,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               taxamt = ${row.taxamt}::numeric,
               freight = ${row.freight}::numeric,
               modifieddate = ${row.modifieddate}::timestamp
-          where purchaseorderid = $purchaseorderid
+          where purchaseorderid = ${purchaseorderid}
        """
       .update
       .run
@@ -136,7 +136,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
             taxamt = EXCLUDED.taxamt,
             freight = EXCLUDED.freight,
             modifieddate = EXCLUDED.modifieddate
-          returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
+          returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
        """.query[PurchaseorderheaderRow].unique
   }
 }

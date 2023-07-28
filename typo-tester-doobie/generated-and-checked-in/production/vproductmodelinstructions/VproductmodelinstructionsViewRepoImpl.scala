@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
-    sql"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate from production.vproductmodelinstructions""".query[VproductmodelinstructionsViewRow].stream
+    sql"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate::text from production.vproductmodelinstructions""".query[VproductmodelinstructionsViewRow].stream
   }
 }

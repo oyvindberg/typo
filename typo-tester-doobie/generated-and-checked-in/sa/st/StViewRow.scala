@@ -7,18 +7,16 @@ package adventureworks
 package sa
 package st
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class StViewRow(
@@ -42,70 +40,38 @@ case class StViewRow(
   /** Points to [[sales.salesterritory.SalesterritoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesterritory.SalesterritoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object StViewRow {
-  implicit val decoder: Decoder[StViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        name <- c.downField("name").as[Option[Name]]
-        countryregioncode <- c.downField("countryregioncode").as[Option[CountryregionId]]
-        group <- c.downField("group").as[Option[/* max 50 chars */ String]]
-        salesytd <- c.downField("salesytd").as[Option[BigDecimal]]
-        saleslastyear <- c.downField("saleslastyear").as[Option[BigDecimal]]
-        costytd <- c.downField("costytd").as[Option[BigDecimal]]
-        costlastyear <- c.downField("costlastyear").as[Option[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield StViewRow(id, territoryid, name, countryregioncode, group, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
-  implicit val encoder: Encoder[StViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "territoryid" := row.territoryid,
-        "name" := row.name,
-        "countryregioncode" := row.countryregioncode,
-        "group" := row.group,
-        "salesytd" := row.salesytd,
-        "saleslastyear" := row.saleslastyear,
-        "costytd" := row.costytd,
-        "costlastyear" := row.costlastyear,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[StViewRow] =
-    new Read[StViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[CountryregionId], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => StViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 3),
-        group = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
-        saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        costytd = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-        costlastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[StViewRow] = Decoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(StViewRow.apply)
+  implicit val encoder: Encoder[StViewRow] = Encoder.forProduct11[StViewRow, Option[Int], Option[SalesterritoryId], Option[Name], Option[CountryregionId], Option[/* max 50 chars */ String], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[UUID], Option[TypoLocalDateTime]]("id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.id, x.territoryid, x.name, x.countryregioncode, x.group, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))
+  implicit val read: Read[StViewRow] = new Read[StViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[SalesterritoryId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[CountryregionId], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => StViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      countryregioncode = Get[CountryregionId].unsafeGetNullable(rs, i + 3),
+      group = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
+      salesytd = Get[BigDecimal].unsafeGetNullable(rs, i + 5),
+      saleslastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
+      costytd = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
+      costlastyear = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 9),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

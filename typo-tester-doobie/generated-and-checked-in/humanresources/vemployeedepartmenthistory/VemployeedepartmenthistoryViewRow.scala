@@ -7,17 +7,15 @@ package adventureworks
 package humanresources
 package vemployeedepartmenthistory
 
+import adventureworks.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDate
 
 case class VemployeedepartmenthistoryViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
@@ -37,72 +35,40 @@ case class VemployeedepartmenthistoryViewRow(
   /** Points to [[department.DepartmentRow.groupname]] */
   groupname: Option[Name],
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[LocalDate],
+  startdate: Option[TypoLocalDate],
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
-  enddate: Option[LocalDate]
+  enddate: Option[TypoLocalDate]
 )
 
 object VemployeedepartmenthistoryViewRow {
-  implicit val decoder: Decoder[VemployeedepartmenthistoryViewRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Option[Name]]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
-        shift <- c.downField("shift").as[Option[Name]]
-        department <- c.downField("department").as[Option[Name]]
-        groupname <- c.downField("groupname").as[Option[Name]]
-        startdate <- c.downField("startdate").as[Option[LocalDate]]
-        enddate <- c.downField("enddate").as[Option[LocalDate]]
-      } yield VemployeedepartmenthistoryViewRow(businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate)
-  implicit val encoder: Encoder[VemployeedepartmenthistoryViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "suffix" := row.suffix,
-        "shift" := row.shift,
-        "department" := row.department,
-        "groupname" := row.groupname,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate
-      )}
-  implicit val read: Read[VemployeedepartmenthistoryViewRow] =
-    new Read[VemployeedepartmenthistoryViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmenthistoryViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-        firstname = Get[Name].unsafeGetNullable(rs, i + 2),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-        lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
-        shift = Get[Name].unsafeGetNullable(rs, i + 6),
-        department = Get[Name].unsafeGetNullable(rs, i + 7),
-        groupname = Get[Name].unsafeGetNullable(rs, i + 8),
-        startdate = Get[LocalDate].unsafeGetNullable(rs, i + 9),
-        enddate = Get[LocalDate].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[VemployeedepartmenthistoryViewRow] = Decoder.forProduct11[VemployeedepartmenthistoryViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Name], Option[Name], Option[Name], Option[TypoLocalDate], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate", "enddate")(VemployeedepartmenthistoryViewRow.apply)
+  implicit val encoder: Encoder[VemployeedepartmenthistoryViewRow] = Encoder.forProduct11[VemployeedepartmenthistoryViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Name], Option[Name], Option[Name], Option[TypoLocalDate], Option[TypoLocalDate]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate", "enddate")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.shift, x.department, x.groupname, x.startdate, x.enddate))
+  implicit val read: Read[VemployeedepartmenthistoryViewRow] = new Read[VemployeedepartmenthistoryViewRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VemployeedepartmenthistoryViewRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
+      firstname = Get[Name].unsafeGetNullable(rs, i + 2),
+      middlename = Get[Name].unsafeGetNullable(rs, i + 3),
+      lastname = Get[Name].unsafeGetNullable(rs, i + 4),
+      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
+      shift = Get[Name].unsafeGetNullable(rs, i + 6),
+      department = Get[Name].unsafeGetNullable(rs, i + 7),
+      groupname = Get[Name].unsafeGetNullable(rs, i + 8),
+      startdate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 9),
+      enddate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

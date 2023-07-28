@@ -7,16 +7,14 @@ package adventureworks
 package person
 package address
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class AddressRow(
@@ -36,62 +34,34 @@ case class AddressRow(
   /** Latitude and longitude of this address. */
   spatiallocation: Option[Array[Byte]],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object AddressRow {
-  implicit val decoder: Decoder[AddressRow] =
-    (c: HCursor) =>
-      for {
-        addressid <- c.downField("addressid").as[AddressId]
-        addressline1 <- c.downField("addressline1").as[/* max 60 chars */ String]
-        addressline2 <- c.downField("addressline2").as[Option[/* max 60 chars */ String]]
-        city <- c.downField("city").as[/* max 30 chars */ String]
-        stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
-        postalcode <- c.downField("postalcode").as[/* max 15 chars */ String]
-        spatiallocation <- c.downField("spatiallocation").as[Option[Array[Byte]]]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield AddressRow(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)
-  implicit val encoder: Encoder[AddressRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "addressid" := row.addressid,
-        "addressline1" := row.addressline1,
-        "addressline2" := row.addressline2,
-        "city" := row.city,
-        "stateprovinceid" := row.stateprovinceid,
-        "postalcode" := row.postalcode,
-        "spatiallocation" := row.spatiallocation,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[AddressRow] =
-    new Read[AddressRow](
-      gets = List(
-        (Get[AddressId], Nullability.NoNulls),
-        (Get[/* max 60 chars */ String], Nullability.NoNulls),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.NoNulls),
-        (Get[StateprovinceId], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.NoNulls),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => AddressRow(
-        addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 0),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 2),
-        city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 3),
-        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 4),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 5),
-        spatiallocation = Get[Array[Byte]].unsafeGetNullable(rs, i + 6),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[AddressRow] = Decoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], UUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AddressRow.apply)
+  implicit val encoder: Encoder[AddressRow] = Encoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], UUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))
+  implicit val read: Read[AddressRow] = new Read[AddressRow](
+    gets = List(
+      (Get[AddressId], Nullability.NoNulls),
+      (Get[/* max 60 chars */ String], Nullability.NoNulls),
+      (Get[/* max 60 chars */ String], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.NoNulls),
+      (Get[StateprovinceId], Nullability.NoNulls),
+      (Get[/* max 15 chars */ String], Nullability.NoNulls),
+      (Get[Array[Byte]], Nullability.Nullable),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => AddressRow(
+      addressid = Get[AddressId].unsafeGetNonNullable(rs, i + 0),
+      addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 1),
+      addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 2),
+      city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 3),
+      stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 4),
+      postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 5),
+      spatiallocation = Get[Array[Byte]].unsafeGetNullable(rs, i + 6),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 7),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

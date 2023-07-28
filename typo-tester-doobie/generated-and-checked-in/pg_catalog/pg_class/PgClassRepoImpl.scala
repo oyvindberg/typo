@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgClassRepoImpl extends PgClassRepo {
   override def delete(oid: PgClassId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_class where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_class where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgClassRow): ConnectionIO[PgClassRow] = {
     sql"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
@@ -25,10 +25,10 @@ object PgClassRepoImpl extends PgClassRepo {
     sql"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class".query[PgClassRow].stream
   }
   override def selectById(oid: PgClassId): ConnectionIO[Option[PgClassRow]] = {
-    sql"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = $oid".query[PgClassRow].option
+    sql"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = ${oid}".query[PgClassRow].option
   }
   override def selectByIds(oids: Array[PgClassId]): Stream[ConnectionIO, PgClassRow] = {
-    sql"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = ANY($oids)".query[PgClassRow].stream
+    sql"select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound from pg_catalog.pg_class where oid = ANY(${oids})".query[PgClassRow].stream
   }
   override def update(row: PgClassRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -65,7 +65,7 @@ object PgClassRepoImpl extends PgClassRepo {
               relacl = ${row.relacl}::_aclitem,
               reloptions = ${row.reloptions}::_text,
               relpartbound = ${row.relpartbound}::pg_node_tree
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

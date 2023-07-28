@@ -7,18 +7,16 @@ package adventureworks
 package sa
 package c
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class CViewRow(
@@ -34,54 +32,30 @@ case class CViewRow(
   /** Points to [[sales.customer.CustomerRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.customer.CustomerRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CViewRow {
-  implicit val decoder: Decoder[CViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        customerid <- c.downField("customerid").as[Option[CustomerId]]
-        personid <- c.downField("personid").as[Option[BusinessentityId]]
-        storeid <- c.downField("storeid").as[Option[BusinessentityId]]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield CViewRow(id, customerid, personid, storeid, territoryid, rowguid, modifieddate)
-  implicit val encoder: Encoder[CViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "customerid" := row.customerid,
-        "personid" := row.personid,
-        "storeid" := row.storeid,
-        "territoryid" := row.territoryid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CViewRow] =
-    new Read[CViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[CustomerId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[SalesterritoryId], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        customerid = Get[CustomerId].unsafeGetNullable(rs, i + 1),
-        personid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        storeid = Get[BusinessentityId].unsafeGetNullable(rs, i + 3),
-        territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[CViewRow] = Decoder.forProduct7[CViewRow, Option[Int], Option[CustomerId], Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Option[UUID], Option[TypoLocalDateTime]]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CViewRow.apply)
+  implicit val encoder: Encoder[CViewRow] = Encoder.forProduct7[CViewRow, Option[Int], Option[CustomerId], Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Option[UUID], Option[TypoLocalDateTime]]("id", "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))
+  implicit val read: Read[CViewRow] = new Read[CViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[CustomerId], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[SalesterritoryId], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      customerid = Get[CustomerId].unsafeGetNullable(rs, i + 1),
+      personid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
+      storeid = Get[BusinessentityId].unsafeGetNullable(rs, i + 3),
+      territoryid = Get[SalesterritoryId].unsafeGetNullable(rs, i + 4),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

@@ -7,18 +7,20 @@ package adventureworks
 package hr
 package edh
 
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDate
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class EdhViewRow(
@@ -30,54 +32,50 @@ case class EdhViewRow(
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.shiftid]] */
   shiftid: Option[ShiftId],
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[LocalDate],
+  startdate: Option[TypoLocalDate],
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
-  enddate: Option[LocalDate],
+  enddate: Option[TypoLocalDate],
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object EdhViewRow {
-  def rowParser(idx: Int): RowParser[EdhViewRow] =
-    RowParser[EdhViewRow] { row =>
-      Success(
+  implicit val reads: Reads[EdhViewRow] = Reads[EdhViewRow](json => JsResult.fromTry(
+      Try(
         EdhViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          departmentid = row[Option[DepartmentId]](idx + 2),
-          shiftid = row[Option[ShiftId]](idx + 3),
-          startdate = row[Option[LocalDate]](idx + 4),
-          enddate = row[Option[LocalDate]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
+          shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
+          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDate]),
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[EdhViewRow] = new OFormat[EdhViewRow]{
-    override def writes(o: EdhViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "departmentid" -> o.departmentid,
-        "shiftid" -> o.shiftid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[EdhViewRow] = RowParser[EdhViewRow] { row =>
+    Success(
+      EdhViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        departmentid = row[Option[DepartmentId]](idx + 2),
+        shiftid = row[Option[ShiftId]](idx + 3),
+        startdate = row[Option[TypoLocalDate]](idx + 4),
+        enddate = row[Option[TypoLocalDate]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[EdhViewRow] = {
-      JsResult.fromTry(
-        Try(
-          EdhViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
-            shiftid = json.\("shiftid").toOption.map(_.as[ShiftId]),
-            startdate = json.\("startdate").toOption.map(_.as[LocalDate]),
-            enddate = json.\("enddate").toOption.map(_.as[LocalDate]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[EdhViewRow] = OWrites[EdhViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "departmentid" -> Json.toJson(o.departmentid),
+      "shiftid" -> Json.toJson(o.shiftid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

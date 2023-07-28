@@ -7,16 +7,18 @@ package adventureworks
 package humanresources
 package vemployeedepartmenthistory
 
+import adventureworks.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VemployeedepartmenthistoryViewRow(
@@ -37,64 +39,60 @@ case class VemployeedepartmenthistoryViewRow(
   /** Points to [[department.DepartmentRow.groupname]] */
   groupname: Option[Name],
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[LocalDate],
+  startdate: Option[TypoLocalDate],
   /** Points to [[employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
-  enddate: Option[LocalDate]
+  enddate: Option[TypoLocalDate]
 )
 
 object VemployeedepartmenthistoryViewRow {
-  def rowParser(idx: Int): RowParser[VemployeedepartmenthistoryViewRow] =
-    RowParser[VemployeedepartmenthistoryViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VemployeedepartmenthistoryViewRow] = Reads[VemployeedepartmenthistoryViewRow](json => JsResult.fromTry(
+      Try(
         VemployeedepartmenthistoryViewRow(
-          businessentityid = row[Option[BusinessentityId]](idx + 0),
-          title = row[Option[/* max 8 chars */ String]](idx + 1),
-          firstname = row[Option[Name]](idx + 2),
-          middlename = row[Option[Name]](idx + 3),
-          lastname = row[Option[Name]](idx + 4),
-          suffix = row[Option[/* max 10 chars */ String]](idx + 5),
-          shift = row[Option[Name]](idx + 6),
-          department = row[Option[Name]](idx + 7),
-          groupname = row[Option[Name]](idx + 8),
-          startdate = row[Option[LocalDate]](idx + 9),
-          enddate = row[Option[LocalDate]](idx + 10)
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
+          firstname = json.\("firstname").toOption.map(_.as[Name]),
+          middlename = json.\("middlename").toOption.map(_.as[Name]),
+          lastname = json.\("lastname").toOption.map(_.as[Name]),
+          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
+          shift = json.\("shift").toOption.map(_.as[Name]),
+          department = json.\("department").toOption.map(_.as[Name]),
+          groupname = json.\("groupname").toOption.map(_.as[Name]),
+          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDate]),
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate])
         )
       )
-    }
-  implicit val oFormat: OFormat[VemployeedepartmenthistoryViewRow] = new OFormat[VemployeedepartmenthistoryViewRow]{
-    override def writes(o: VemployeedepartmenthistoryViewRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "title" -> o.title,
-        "firstname" -> o.firstname,
-        "middlename" -> o.middlename,
-        "lastname" -> o.lastname,
-        "suffix" -> o.suffix,
-        "shift" -> o.shift,
-        "department" -> o.department,
-        "groupname" -> o.groupname,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VemployeedepartmenthistoryViewRow] = RowParser[VemployeedepartmenthistoryViewRow] { row =>
+    Success(
+      VemployeedepartmenthistoryViewRow(
+        businessentityid = row[Option[BusinessentityId]](idx + 0),
+        title = row[Option[/* max 8 chars */ String]](idx + 1),
+        firstname = row[Option[Name]](idx + 2),
+        middlename = row[Option[Name]](idx + 3),
+        lastname = row[Option[Name]](idx + 4),
+        suffix = row[Option[/* max 10 chars */ String]](idx + 5),
+        shift = row[Option[Name]](idx + 6),
+        department = row[Option[Name]](idx + 7),
+        groupname = row[Option[Name]](idx + 8),
+        startdate = row[Option[TypoLocalDate]](idx + 9),
+        enddate = row[Option[TypoLocalDate]](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[VemployeedepartmenthistoryViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VemployeedepartmenthistoryViewRow(
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-            firstname = json.\("firstname").toOption.map(_.as[Name]),
-            middlename = json.\("middlename").toOption.map(_.as[Name]),
-            lastname = json.\("lastname").toOption.map(_.as[Name]),
-            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-            shift = json.\("shift").toOption.map(_.as[Name]),
-            department = json.\("department").toOption.map(_.as[Name]),
-            groupname = json.\("groupname").toOption.map(_.as[Name]),
-            startdate = json.\("startdate").toOption.map(_.as[LocalDate]),
-            enddate = json.\("enddate").toOption.map(_.as[LocalDate])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VemployeedepartmenthistoryViewRow] = OWrites[VemployeedepartmenthistoryViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "title" -> Json.toJson(o.title),
+      "firstname" -> Json.toJson(o.firstname),
+      "middlename" -> Json.toJson(o.middlename),
+      "lastname" -> Json.toJson(o.lastname),
+      "suffix" -> Json.toJson(o.suffix),
+      "shift" -> Json.toJson(o.shift),
+      "department" -> Json.toJson(o.department),
+      "groupname" -> Json.toJson(o.groupname),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate)
+    ))
+  )
 }

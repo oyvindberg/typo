@@ -8,20 +8,20 @@ package production
 package billofmaterials
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId): ConnectionIO[Boolean] = {
-    sql"delete from production.billofmaterials where billofmaterialsid = $billofmaterialsid".update.run.map(_ > 0)
+    sql"delete from production.billofmaterials where billofmaterialsid = ${billofmaterialsid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
           values (${unsaved.billofmaterialsid}::int4, ${unsaved.productassemblyid}::int4, ${unsaved.componentid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.bomlevel}::int2, ${unsaved.perassemblyqty}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+          returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
        """.query[BillofmaterialsRow].unique
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
@@ -37,7 +37,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       },
       unsaved.startdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"startdate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"startdate"), fr"${value: TypoLocalDateTime}::timestamp"))
       },
       unsaved.perassemblyqty match {
         case Defaulted.UseDefault => None
@@ -45,32 +45,32 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.billofmaterials default values
-            returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+            returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.billofmaterials(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+            returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
          """
     }
     q.query[BillofmaterialsRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
-    sql"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials".query[BillofmaterialsRow].stream
+    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials".query[BillofmaterialsRow].stream
   }
   override def selectById(billofmaterialsid: BillofmaterialsId): ConnectionIO[Option[BillofmaterialsRow]] = {
-    sql"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = $billofmaterialsid".query[BillofmaterialsRow].option
+    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials where billofmaterialsid = ${billofmaterialsid}".query[BillofmaterialsRow].option
   }
   override def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): Stream[ConnectionIO, BillofmaterialsRow] = {
-    sql"select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from production.billofmaterials where billofmaterialsid = ANY($billofmaterialsids)".query[BillofmaterialsRow].stream
+    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials where billofmaterialsid = ANY(${billofmaterialsids})".query[BillofmaterialsRow].stream
   }
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
     val billofmaterialsid = row.billofmaterialsid
@@ -83,7 +83,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               bomlevel = ${row.bomlevel}::int2,
               perassemblyqty = ${row.perassemblyqty}::numeric,
               modifieddate = ${row.modifieddate}::timestamp
-          where billofmaterialsid = $billofmaterialsid
+          where billofmaterialsid = ${billofmaterialsid}
        """
       .update
       .run
@@ -112,7 +112,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             bomlevel = EXCLUDED.bomlevel,
             perassemblyqty = EXCLUDED.perassemblyqty,
             modifieddate = EXCLUDED.modifieddate
-          returning billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
+          returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
        """.query[BillofmaterialsRow].unique
   }
 }

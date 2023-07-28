@@ -8,11 +8,11 @@ package sales
 package currencyrate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     SQL"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
           values (${unsaved.currencyrateid}::int4, ${unsaved.currencyratedate}::timestamp, ${unsaved.fromcurrencycode}::bpchar, ${unsaved.tocurrencycode}::bpchar, ${unsaved.averagerate}::numeric, ${unsaved.endofdayrate}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+          returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
   
@@ -39,19 +39,19 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.currencyrate default values
-            returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+            returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
          """
         .executeInsert(CurrencyrateRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.currencyrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+                  returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -62,18 +62,18 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   
   }
   override def selectAll(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+    SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
           from sales.currencyrate
        """.as(CurrencyrateRow.rowParser(1).*)
   }
   override def selectById(currencyrateid: CurrencyrateId)(implicit c: Connection): Option[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+    SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
           from sales.currencyrate
           where currencyrateid = $currencyrateid
        """.as(CurrencyrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): List[CurrencyrateRow] = {
-    SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+    SQL"""select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
           from sales.currencyrate
           where currencyrateid = ANY($currencyrateids)
        """.as(CurrencyrateRow.rowParser(1).*)
@@ -110,7 +110,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
             averagerate = EXCLUDED.averagerate,
             endofdayrate = EXCLUDED.endofdayrate,
             modifieddate = EXCLUDED.modifieddate
-          returning currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
+          returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
   

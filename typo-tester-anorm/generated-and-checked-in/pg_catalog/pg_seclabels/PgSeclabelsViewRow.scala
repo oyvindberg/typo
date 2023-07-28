@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgSeclabelsViewRow(
@@ -28,49 +30,45 @@ case class PgSeclabelsViewRow(
 )
 
 object PgSeclabelsViewRow {
-  def rowParser(idx: Int): RowParser[PgSeclabelsViewRow] =
-    RowParser[PgSeclabelsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgSeclabelsViewRow] = Reads[PgSeclabelsViewRow](json => JsResult.fromTry(
+      Try(
         PgSeclabelsViewRow(
-          objoid = row[Option[/* oid */ Long]](idx + 0),
-          classoid = row[Option[/* oid */ Long]](idx + 1),
-          objsubid = row[Option[Int]](idx + 2),
-          objtype = row[Option[String]](idx + 3),
-          objnamespace = row[Option[/* oid */ Long]](idx + 4),
-          objname = row[Option[String]](idx + 5),
-          provider = row[Option[String]](idx + 6),
-          label = row[Option[String]](idx + 7)
+          objoid = json.\("objoid").toOption.map(_.as[/* oid */ Long]),
+          classoid = json.\("classoid").toOption.map(_.as[/* oid */ Long]),
+          objsubid = json.\("objsubid").toOption.map(_.as[Int]),
+          objtype = json.\("objtype").toOption.map(_.as[String]),
+          objnamespace = json.\("objnamespace").toOption.map(_.as[/* oid */ Long]),
+          objname = json.\("objname").toOption.map(_.as[String]),
+          provider = json.\("provider").toOption.map(_.as[String]),
+          label = json.\("label").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgSeclabelsViewRow] = new OFormat[PgSeclabelsViewRow]{
-    override def writes(o: PgSeclabelsViewRow): JsObject =
-      Json.obj(
-        "objoid" -> o.objoid,
-        "classoid" -> o.classoid,
-        "objsubid" -> o.objsubid,
-        "objtype" -> o.objtype,
-        "objnamespace" -> o.objnamespace,
-        "objname" -> o.objname,
-        "provider" -> o.provider,
-        "label" -> o.label
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgSeclabelsViewRow] = RowParser[PgSeclabelsViewRow] { row =>
+    Success(
+      PgSeclabelsViewRow(
+        objoid = row[Option[/* oid */ Long]](idx + 0),
+        classoid = row[Option[/* oid */ Long]](idx + 1),
+        objsubid = row[Option[Int]](idx + 2),
+        objtype = row[Option[String]](idx + 3),
+        objnamespace = row[Option[/* oid */ Long]](idx + 4),
+        objname = row[Option[String]](idx + 5),
+        provider = row[Option[String]](idx + 6),
+        label = row[Option[String]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgSeclabelsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgSeclabelsViewRow(
-            objoid = json.\("objoid").toOption.map(_.as[/* oid */ Long]),
-            classoid = json.\("classoid").toOption.map(_.as[/* oid */ Long]),
-            objsubid = json.\("objsubid").toOption.map(_.as[Int]),
-            objtype = json.\("objtype").toOption.map(_.as[String]),
-            objnamespace = json.\("objnamespace").toOption.map(_.as[/* oid */ Long]),
-            objname = json.\("objname").toOption.map(_.as[String]),
-            provider = json.\("provider").toOption.map(_.as[String]),
-            label = json.\("label").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgSeclabelsViewRow] = OWrites[PgSeclabelsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "objoid" -> Json.toJson(o.objoid),
+      "classoid" -> Json.toJson(o.classoid),
+      "objsubid" -> Json.toJson(o.objsubid),
+      "objtype" -> Json.toJson(o.objtype),
+      "objnamespace" -> Json.toJson(o.objnamespace),
+      "objname" -> Json.toJson(o.objname),
+      "provider" -> Json.toJson(o.provider),
+      "label" -> Json.toJson(o.label)
+    ))
+  )
 }

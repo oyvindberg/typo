@@ -11,29 +11,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `pg_catalog.pg_largeobject` */
 case class PgLargeobjectId(loid: /* oid */ Long, pageno: Int)
 object PgLargeobjectId {
   implicit val ordering: Ordering[PgLargeobjectId] = Ordering.by(x => (x.loid, x.pageno))
-  implicit val oFormat: OFormat[PgLargeobjectId] = new OFormat[PgLargeobjectId]{
-    override def writes(o: PgLargeobjectId): JsObject =
-      Json.obj(
-        "loid" -> o.loid,
-        "pageno" -> o.pageno
-      )
-  
-    override def reads(json: JsValue): JsResult[PgLargeobjectId] = {
-      JsResult.fromTry(
-        Try(
-          PgLargeobjectId(
-            loid = json.\("loid").as[/* oid */ Long],
-            pageno = json.\("pageno").as[Int]
-          )
+  implicit val reads: Reads[PgLargeobjectId] = Reads[PgLargeobjectId](json => JsResult.fromTry(
+      Try(
+        PgLargeobjectId(
+          loid = json.\("loid").as[/* oid */ Long],
+          pageno = json.\("pageno").as[Int]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PgLargeobjectId] = OWrites[PgLargeobjectId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "loid" -> Json.toJson(o.loid),
+      "pageno" -> Json.toJson(o.pageno)
+    ))
+  )
 }

@@ -8,13 +8,11 @@ package hardcoded
 package myschema
 package football_club
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class FootballClubRow(
@@ -23,30 +21,16 @@ case class FootballClubRow(
 )
 
 object FootballClubRow {
-  implicit val decoder: Decoder[FootballClubRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[FootballClubId]
-        name <- c.downField("name").as[/* max 100 chars */ String]
-      } yield FootballClubRow(id, name)
-  implicit val encoder: Encoder[FootballClubRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "name" := row.name
-      )}
-  implicit val read: Read[FootballClubRow] =
-    new Read[FootballClubRow](
-      gets = List(
-        (Get[FootballClubId], Nullability.NoNulls),
-        (Get[/* max 100 chars */ String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => FootballClubRow(
-        id = Get[FootballClubId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 1)
-      )
+  implicit val decoder: Decoder[FootballClubRow] = Decoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(FootballClubRow.apply)
+  implicit val encoder: Encoder[FootballClubRow] = Encoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(x => (x.id, x.name))
+  implicit val read: Read[FootballClubRow] = new Read[FootballClubRow](
+    gets = List(
+      (Get[FootballClubId], Nullability.NoNulls),
+      (Get[/* max 100 chars */ String], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => FootballClubRow(
+      id = Get[FootballClubId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[/* max 100 chars */ String].unsafeGetNonNullable(rs, i + 1)
     )
-  
-
+  )
 }

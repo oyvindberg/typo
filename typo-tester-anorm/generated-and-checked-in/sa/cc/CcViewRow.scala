@@ -7,15 +7,17 @@ package adventureworks
 package sa
 package cc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.creditcard.CreditcardId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CcViewRow(
@@ -31,50 +33,46 @@ case class CcViewRow(
   /** Points to [[sales.creditcard.CreditcardRow.expyear]] */
   expyear: Option[Int],
   /** Points to [[sales.creditcard.CreditcardRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CcViewRow {
-  def rowParser(idx: Int): RowParser[CcViewRow] =
-    RowParser[CcViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CcViewRow] = Reads[CcViewRow](json => JsResult.fromTry(
+      Try(
         CcViewRow(
-          id = row[Option[Int]](idx + 0),
-          creditcardid = row[Option[CreditcardId]](idx + 1),
-          cardtype = row[Option[/* max 50 chars */ String]](idx + 2),
-          cardnumber = row[Option[/* max 25 chars */ String]](idx + 3),
-          expmonth = row[Option[Int]](idx + 4),
-          expyear = row[Option[Int]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
+          cardtype = json.\("cardtype").toOption.map(_.as[/* max 50 chars */ String]),
+          cardnumber = json.\("cardnumber").toOption.map(_.as[/* max 25 chars */ String]),
+          expmonth = json.\("expmonth").toOption.map(_.as[Int]),
+          expyear = json.\("expyear").toOption.map(_.as[Int]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[CcViewRow] = new OFormat[CcViewRow]{
-    override def writes(o: CcViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "creditcardid" -> o.creditcardid,
-        "cardtype" -> o.cardtype,
-        "cardnumber" -> o.cardnumber,
-        "expmonth" -> o.expmonth,
-        "expyear" -> o.expyear,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CcViewRow] = RowParser[CcViewRow] { row =>
+    Success(
+      CcViewRow(
+        id = row[Option[Int]](idx + 0),
+        creditcardid = row[Option[CreditcardId]](idx + 1),
+        cardtype = row[Option[/* max 50 chars */ String]](idx + 2),
+        cardnumber = row[Option[/* max 25 chars */ String]](idx + 3),
+        expmonth = row[Option[Int]](idx + 4),
+        expyear = row[Option[Int]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[CcViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CcViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            creditcardid = json.\("creditcardid").toOption.map(_.as[CreditcardId]),
-            cardtype = json.\("cardtype").toOption.map(_.as[/* max 50 chars */ String]),
-            cardnumber = json.\("cardnumber").toOption.map(_.as[/* max 25 chars */ String]),
-            expmonth = json.\("expmonth").toOption.map(_.as[Int]),
-            expyear = json.\("expyear").toOption.map(_.as[Int]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CcViewRow] = OWrites[CcViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "creditcardid" -> Json.toJson(o.creditcardid),
+      "cardtype" -> Json.toJson(o.cardtype),
+      "cardnumber" -> Json.toJson(o.cardnumber),
+      "expmonth" -> Json.toJson(o.expmonth),
+      "expyear" -> Json.toJson(o.expyear),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

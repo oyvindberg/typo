@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgCastRow(
@@ -26,43 +28,39 @@ case class PgCastRow(
 )
 
 object PgCastRow {
-  def rowParser(idx: Int): RowParser[PgCastRow] =
-    RowParser[PgCastRow] { row =>
-      Success(
+  implicit val reads: Reads[PgCastRow] = Reads[PgCastRow](json => JsResult.fromTry(
+      Try(
         PgCastRow(
-          oid = row[PgCastId](idx + 0),
-          castsource = row[/* oid */ Long](idx + 1),
-          casttarget = row[/* oid */ Long](idx + 2),
-          castfunc = row[/* oid */ Long](idx + 3),
-          castcontext = row[String](idx + 4),
-          castmethod = row[String](idx + 5)
+          oid = json.\("oid").as[PgCastId],
+          castsource = json.\("castsource").as[/* oid */ Long],
+          casttarget = json.\("casttarget").as[/* oid */ Long],
+          castfunc = json.\("castfunc").as[/* oid */ Long],
+          castcontext = json.\("castcontext").as[String],
+          castmethod = json.\("castmethod").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgCastRow] = new OFormat[PgCastRow]{
-    override def writes(o: PgCastRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "castsource" -> o.castsource,
-        "casttarget" -> o.casttarget,
-        "castfunc" -> o.castfunc,
-        "castcontext" -> o.castcontext,
-        "castmethod" -> o.castmethod
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgCastRow] = RowParser[PgCastRow] { row =>
+    Success(
+      PgCastRow(
+        oid = row[PgCastId](idx + 0),
+        castsource = row[/* oid */ Long](idx + 1),
+        casttarget = row[/* oid */ Long](idx + 2),
+        castfunc = row[/* oid */ Long](idx + 3),
+        castcontext = row[String](idx + 4),
+        castmethod = row[String](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PgCastRow] = {
-      JsResult.fromTry(
-        Try(
-          PgCastRow(
-            oid = json.\("oid").as[PgCastId],
-            castsource = json.\("castsource").as[/* oid */ Long],
-            casttarget = json.\("casttarget").as[/* oid */ Long],
-            castfunc = json.\("castfunc").as[/* oid */ Long],
-            castcontext = json.\("castcontext").as[String],
-            castmethod = json.\("castmethod").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgCastRow] = OWrites[PgCastRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "castsource" -> Json.toJson(o.castsource),
+      "casttarget" -> Json.toJson(o.casttarget),
+      "castfunc" -> Json.toJson(o.castfunc),
+      "castcontext" -> Json.toJson(o.castcontext),
+      "castmethod" -> Json.toJson(o.castmethod)
+    ))
+  )
 }

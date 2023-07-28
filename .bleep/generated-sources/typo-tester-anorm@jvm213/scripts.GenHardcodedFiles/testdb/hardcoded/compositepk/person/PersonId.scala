@@ -12,29 +12,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `compositepk.person` */
 case class PersonId(one: Long, two: Option[String])
 object PersonId {
   implicit def ordering(implicit O0: Ordering[Option[String]]): Ordering[PersonId] = Ordering.by(x => (x.one, x.two))
-  implicit val oFormat: OFormat[PersonId] = new OFormat[PersonId]{
-    override def writes(o: PersonId): JsObject =
-      Json.obj(
-        "one" -> o.one,
-        "two" -> o.two
-      )
-  
-    override def reads(json: JsValue): JsResult[PersonId] = {
-      JsResult.fromTry(
-        Try(
-          PersonId(
-            one = json.\("one").as[Long],
-            two = json.\("two").toOption.map(_.as[String])
-          )
+  implicit val reads: Reads[PersonId] = Reads[PersonId](json => JsResult.fromTry(
+      Try(
+        PersonId(
+          one = json.\("one").as[Long],
+          two = json.\("two").toOption.map(_.as[String])
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PersonId] = OWrites[PersonId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "one" -> Json.toJson(o.one),
+      "two" -> Json.toJson(o.two)
+    ))
+  )
 }

@@ -7,16 +7,18 @@ package adventureworks
 package sa
 package crc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CrcViewRow(
@@ -25,38 +27,34 @@ case class CrcViewRow(
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.currencycode]] */
   currencycode: Option[CurrencyId],
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CrcViewRow {
-  def rowParser(idx: Int): RowParser[CrcViewRow] =
-    RowParser[CrcViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CrcViewRow] = Reads[CrcViewRow](json => JsResult.fromTry(
+      Try(
         CrcViewRow(
-          countryregioncode = row[Option[CountryregionId]](idx + 0),
-          currencycode = row[Option[CurrencyId]](idx + 1),
-          modifieddate = row[Option[LocalDateTime]](idx + 2)
+          countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
+          currencycode = json.\("currencycode").toOption.map(_.as[CurrencyId]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[CrcViewRow] = new OFormat[CrcViewRow]{
-    override def writes(o: CrcViewRow): JsObject =
-      Json.obj(
-        "countryregioncode" -> o.countryregioncode,
-        "currencycode" -> o.currencycode,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CrcViewRow] = RowParser[CrcViewRow] { row =>
+    Success(
+      CrcViewRow(
+        countryregioncode = row[Option[CountryregionId]](idx + 0),
+        currencycode = row[Option[CurrencyId]](idx + 1),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[CrcViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CrcViewRow(
-            countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
-            currencycode = json.\("currencycode").toOption.map(_.as[CurrencyId]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CrcViewRow] = OWrites[CrcViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "countryregioncode" -> Json.toJson(o.countryregioncode),
+      "currencycode" -> Json.toJson(o.currencycode),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

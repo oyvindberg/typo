@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PmViewRepoImpl extends PmViewRepo {
   override def selectAll: Stream[ConnectionIO, PmViewRow] = {
-    sql"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate from pr.pm""".query[PmViewRow].stream
+    sql"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from pr.pm""".query[PmViewRow].stream
   }
 }

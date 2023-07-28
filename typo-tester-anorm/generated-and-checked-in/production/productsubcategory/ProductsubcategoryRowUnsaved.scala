@@ -8,15 +8,17 @@ package production
 package productsubcategory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.productsubcategory` which has not been persisted yet */
@@ -32,9 +34,9 @@ case class ProductsubcategoryRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productsubcategoryidDefault: => ProductsubcategoryId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductsubcategoryRow =
+  def toRow(productsubcategoryidDefault: => ProductsubcategoryId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductsubcategoryRow =
     ProductsubcategoryRow(
       productcategoryid = productcategoryid,
       name = name,
@@ -53,28 +55,25 @@ case class ProductsubcategoryRowUnsaved(
     )
 }
 object ProductsubcategoryRowUnsaved {
-  implicit val oFormat: OFormat[ProductsubcategoryRowUnsaved] = new OFormat[ProductsubcategoryRowUnsaved]{
-    override def writes(o: ProductsubcategoryRowUnsaved): JsObject =
-      Json.obj(
-        "productcategoryid" -> o.productcategoryid,
-        "name" -> o.name,
-        "productsubcategoryid" -> o.productsubcategoryid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductsubcategoryRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ProductsubcategoryRowUnsaved(
-            productcategoryid = json.\("productcategoryid").as[ProductcategoryId],
-            name = json.\("name").as[Name],
-            productsubcategoryid = json.\("productsubcategoryid").as[Defaulted[ProductsubcategoryId]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ProductsubcategoryRowUnsaved] = Reads[ProductsubcategoryRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ProductsubcategoryRowUnsaved(
+          productcategoryid = json.\("productcategoryid").as[ProductcategoryId],
+          name = json.\("name").as[Name],
+          productsubcategoryid = json.\("productsubcategoryid").as[Defaulted[ProductsubcategoryId]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductsubcategoryRowUnsaved] = OWrites[ProductsubcategoryRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productcategoryid" -> Json.toJson(o.productcategoryid),
+      "name" -> Json.toJson(o.name),
+      "productsubcategoryid" -> Json.toJson(o.productsubcategoryid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

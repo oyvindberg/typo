@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PscViewRepoImpl extends PscViewRepo {
   override def selectAll: Stream[ConnectionIO, PscViewRow] = {
-    sql"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate from pr.psc""".query[PscViewRow].stream
+    sql"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from pr.psc""".query[PscViewRow].stream
   }
 }

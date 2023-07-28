@@ -3,13 +3,10 @@ package internal
 package codegen
 
 object JsonLibPlay extends JsonLib {
-  def Format(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("play.api.libs.json.Format"), List(t))
-  val ReadsName = sc.Type.Qualified("play.api.libs.json.Reads")
-  def Reads(t: sc.Type) = sc.Type.TApply(ReadsName, List(t))
-  val WritesName = "play.api.libs.json.Writes"
-  def Writes(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified(WritesName), List(t))
+  val Reads = sc.Type.Qualified("play.api.libs.json.Reads")
+  val Writes = sc.Type.Qualified("play.api.libs.json.Writes")
+  val OWrites = sc.Type.Qualified("play.api.libs.json.OWrites")
   val Json = sc.Type.Qualified("play.api.libs.json.Json")
-  def OFormat(t: sc.Type) = sc.Type.TApply(sc.Type.Qualified("play.api.libs.json.OFormat"), List(t))
   val JsString = sc.Type.Qualified("play.api.libs.json.JsString")
   val JsError = sc.Type.Qualified("play.api.libs.json.JsError")
   val JsSuccess = sc.Type.Qualified("play.api.libs.json.JsSuccess")
@@ -18,115 +15,170 @@ object JsonLibPlay extends JsonLib {
   val JsObject = sc.Type.Qualified("play.api.libs.json.JsObject")
   val JsResult = sc.Type.Qualified("play.api.libs.json.JsResult")
 
-  override def defaultedInstance(d: ComputedDefault): List[sc.Code] = {
-    val T = sc.Type.Abstract(sc.Ident("T"))
-    val defaultOfT = d.Defaulted.of(T)
-    val defaultOfOptT = d.Defaulted.of(sc.Type.Option.of(T))
-    val reader =
-      code"""|implicit def reads[$T: $ReadsName]: ${Reads(defaultOfT)} = {
-             |  case $JsString("defaulted") =>
-             |    $JsSuccess(${d.Defaulted}.${d.UseDefault})
-             |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
-             |    $Json.fromJson[T](providedJson).map(${d.Defaulted}.${d.Provided}.apply)
-             |  case _ =>
-             |    $JsError(s"Expected `${d.Defaulted}` json object structure")
-             |}
-             |""".stripMargin
-    val readerOpt =
-      code"""|implicit def readsOpt[$T: $ReadsName]: ${Reads(defaultOfOptT)} = {
-             |  case $JsString("defaulted") =>
-             |    $JsSuccess(${d.Defaulted}.${d.UseDefault})
-             |  case $JsObject(Seq(("provided", $JsNull))) =>
-             |    $JsSuccess(${d.Defaulted}.${d.Provided}(${sc.Type.None}))
-             |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
-             |    $Json.fromJson[T](providedJson).map(x => ${d.Defaulted}.${d.Provided}(${sc.Type.Some}(x)))
-             |  case _ =>
-             |    $JsError(s"Expected `${d.Defaulted}` json object structure")
-             |}
-             |""".stripMargin
+  val readsName: sc.Ident = sc.Ident("reads")
+  val readsOptName = sc.Ident("readsOpt")
+  val writesName: sc.Ident = sc.Ident("writes")
 
-    val writer =
-      code"""|implicit def writes[$T: $WritesName]: ${Writes(defaultOfT)} = {
-             |  case ${d.Defaulted}.${d.Provided}(value) => $Json.obj("provided" -> implicitly[${Writes(T)}].writes(value))
-             |  case ${d.Defaulted}.${d.UseDefault}      => $JsString("defaulted")
-             |}
-             |""".stripMargin
+  def readsFor(tpe: sc.Type): sc.Code =
+    sc.Summon(Reads.of(tpe)).code
+
+  def writesFor(tpe: sc.Type): sc.Code =
+    sc.Summon(Writes.of(tpe)).code
+
+  override def defaultedInstance(d: ComputedDefault): List[sc.Given] = {
+    val T = sc.Type.Abstract(sc.Ident("T"))
+    val reader = sc.Given(
+      tparams = List(T),
+      name = readsName,
+      implicitParams = List(sc.Param(sc.Ident("T"), Reads.of(T), None)),
+      tpe = Reads.of(d.Defaulted.of(T)),
+      body = code"""|{
+                    |  case $JsString("defaulted") =>
+                    |    $JsSuccess(${d.Defaulted}.${d.UseDefault})
+                    |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
+                    |    $Json.fromJson[T](providedJson).map(${d.Defaulted}.${d.Provided}.apply)
+                    |  case _ =>
+                    |    $JsError(s"Expected `${d.Defaulted}` json object structure")
+                    |}""".stripMargin
+    )
+
+    val readerOpt = sc.Given(
+      tparams = List(T),
+      name = readsOptName,
+      implicitParams = List(sc.Param(sc.Ident("T"), Reads.of(T), None)),
+      tpe = Reads.of(d.Defaulted.of(sc.Type.Option.of(T))),
+      body = code"""|{
+                    |  case $JsString("defaulted") =>
+                    |    $JsSuccess(${d.Defaulted}.${d.UseDefault})
+                    |  case $JsObject(Seq(("provided", $JsNull))) =>
+                    |    $JsSuccess(${d.Defaulted}.${d.Provided}(${sc.Type.None}))
+                    |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
+                    |    $Json.fromJson[T](providedJson).map(x => ${d.Defaulted}.${d.Provided}(${sc.Type.Some}(x)))
+                    |  case _ =>
+                    |    $JsError(s"Expected `${d.Defaulted}` json object structure")
+                    |}
+                    |""".stripMargin
+    )
+
+    val writer = sc.Given(
+      tparams = List(T),
+      name = writesName,
+      implicitParams = List(sc.Param(sc.Ident("T"), Writes.of(T), None)),
+      tpe = Writes.of(d.Defaulted.of(T)),
+      body = code"""|{
+                    |  case ${d.Defaulted}.${d.Provided}(value) => $Json.obj("provided" -> $T.writes(value))
+                    |  case ${d.Defaulted}.${d.UseDefault}      => $JsString("defaulted")
+                    |}""".stripMargin
+    )
 
     List(reader, readerOpt, writer)
   }
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Code] = {
-    val reader =
-      code"""|implicit val reads: ${Reads(wrapperType)} = (value: $JsValue) =>
-             |  value.validate[${sc.Type.String}].flatMap { str =>
-             |    $lookup.get(str) match {
-             |      case Some(value) => $JsSuccess(value)
-             |      case None => $JsError(s"'$$str' does not match any of the following legal values: $$Names")
-             |    }
-             |  }
-             |""".stripMargin
-    val writer = code"""implicit val writes: ${Writes(wrapperType)} = value => implicitly[${Writes(underlying)}].writes(value.value)"""
-
-    List(reader, writer)
-  }
-
-  override def instances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
-    def as(col: ComputedColumn): sc.Code =
-      col.tpe match {
-        case sc.Type.Optional(of) => code"""json.\\(${sc.StrLit(col.dbName.value)}).toOption.map(_.as[$of])"""
-        case _                    => code"""json.\\(${sc.StrLit(col.dbName.value)}).as[${col.tpe}]"""
-      }
-
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Given] =
     List(
-      code"""|implicit val oFormat: ${OFormat(tpe)} = new ${OFormat(tpe)}{
-             |  override def writes(o: $tpe): $JsObject =
-             |    $Json.obj(
-             |      ${cols.map(col => code"""${sc.StrLit(col.dbName.value)} -> o.${col.name}""").mkCode(",\n")}
-             |    )
-             |
-             |  override def reads(json: $JsValue): ${JsResult.of(tpe)} = {
-             |    $JsResult.fromTry(
-             |      ${sc.Type.Try}(
-             |        $tpe(
-             |          ${cols.map(col => code"""${col.name} = ${as(col)}""").mkCode(",\n")}
-             |        )
-             |      )
-             |    )
-             |  }
-             |}"""
-    )
-  }
-
-  def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Code] =
-    List(
-      code"""implicit val format: ${Format(wrapperType)} = implicitly[${Format(underlying)}].bimap(${wrapperType.value.name}.apply, _.value)"""
+      sc.Given(
+        tparams = Nil,
+        name = readsName,
+        implicitParams = Nil,
+        tpe = Reads.of(wrapperType),
+        body = code"""|${Reads.of(wrapperType)}((value: $JsValue) =>
+                      |  value.validate(${readsFor(underlying)}).flatMap { str =>
+                      |    $lookup.get(str) match {
+                      |      case Some(value) => $JsSuccess(value)
+                      |      case None => $JsError(s"'$$str' does not match any of the following legal values: $$Names")
+                      |    }
+                      |  }
+                      |)""".stripMargin
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = writesName,
+        implicitParams = Nil,
+        tpe = Writes.of(wrapperType),
+        body = code"${Writes.of(wrapperType)}(value => ${writesFor(underlying)}.writes(value.value))"
+      )
     )
 
-  override def customTypeInstances(ct: CustomType): List[sc.Code] = {
-    val tpe = ct.typoType
-    def as(param: sc.Param): sc.Code =
-      param.tpe match {
-        case sc.Type.Optional(of) => code"""json.\\(${sc.StrLit(param.name.value)}).toOption.map(_.as[$of])"""
-        case _                    => code"""json.\\(${sc.StrLit(param.name.value)}).as[${param.tpe}]"""
-      }
+  override def productInstances(tpe: sc.Type, fields: NonEmptyList[JsonLib.Field]): List[sc.Given] =
+    List(
+      sc.Given(
+        tparams = Nil,
+        name = readsName,
+        implicitParams = Nil,
+        tpe = Reads.of(tpe),
+        body = {
+          val newFields = fields.map { f =>
+            val value = f.tpe match {
+              case sc.Type.Optional(of) => code"""json.\\(${f.jsonName}).toOption.map(_.as[$of])"""
+              case _                    => code"""json.\\(${f.jsonName}).as[${f.tpe}]"""
+            }
 
-    val format =
-      code"""|implicit val oFormat: ${OFormat(tpe)} = new ${OFormat(tpe)}{
-             |  override def writes(o: $tpe): $JsObject =
-             |    $Json.obj(
-             |      ${ct.params.map(param => code"""${sc.StrLit(param.name.value)} -> o.${param.name}""").mkCode(",\n")}
-             |    )
-             |
-             |  override def reads(json: $JsValue): ${JsResult.of(tpe)} = {
-             |    $JsResult.fromTry(
-             |      ${sc.Type.Try}(
-             |        $tpe(
-             |          ${ct.params.map(param => code"""${param.name} = ${as(param)}""").mkCode(",\n")}
-             |        )
-             |      )
-             |    )
-             |  }
-             |}"""
+            code"""${f.scalaName} = $value"""
+          }
+          code"""|${Reads.of(tpe)}(json => $JsResult.fromTry(
+                 |    ${sc.Type.Try}(
+                 |      $tpe(
+                 |        ${newFields.mkCode(",\n")}
+                 |      )
+                 |    )
+                 |  ),
+                 |)""".stripMargin
+        }
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = writesName,
+        implicitParams = Nil,
+        tpe = OWrites.of(tpe),
+        body = {
+          val newFields = fields.map { f =>
+            code"""${f.jsonName} -> $Json.toJson(o.${f.scalaName})"""
+          }
+          code"""|${OWrites.of(tpe)}(o =>
+                 |  new $JsObject(${sc.Type.ListMap.of(sc.Type.String, JsValue)}(
+                 |    ${newFields.mkCode(",\n")}
+                 |  ))
+                 |)""".stripMargin
+        }
+      )
+    )
 
-    List(format)
-  }
+  def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
+    List(
+      sc.Given(
+        tparams = Nil,
+        name = readsName,
+        implicitParams = Nil,
+        tpe = Reads.of(wrapperType),
+        body = code"${readsFor(underlying)}.map(${wrapperType.value.name}.apply)"
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = writesName,
+        implicitParams = Nil,
+        tpe = Writes.of(wrapperType),
+        body = code"${writesFor(underlying)}.contramap(_.value)"
+      )
+    )
+
+  override val missingInstances: List[sc.ClassMember] =
+    List(
+      sc.Given(
+        tparams = Nil,
+        name = sc.Ident("OffsetTimeReads"),
+        implicitParams = Nil,
+        tpe = Reads.of(sc.Type.OffsetTime),
+        body = code"""|${readsFor(sc.Type.String)}.flatMapResult { str =>
+                      |    try $JsSuccess(${sc.Type.OffsetTime}.parse(str)) catch {
+                      |      case x: ${sc.Type.DateTimeParseException} => $JsError(s"must follow $${${sc.Type.DateTimeFormatter}.ISO_OFFSET_TIME}: $${x.getMessage}")
+                      |    }
+                      |  }""".stripMargin
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = sc.Ident("OffsetTimeWrites"),
+        implicitParams = Nil,
+        tpe = Writes.of(sc.Type.OffsetTime),
+        body = code"${writesFor(sc.Type.String)}.contramap(_.toString)"
+      )
+    )
 }

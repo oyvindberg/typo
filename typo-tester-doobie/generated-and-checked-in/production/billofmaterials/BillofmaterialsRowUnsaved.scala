@@ -8,13 +8,11 @@ package production
 package billofmaterials
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.billofmaterials` which has not been persisted yet */
 case class BillofmaterialsRowUnsaved(
@@ -25,7 +23,7 @@ case class BillofmaterialsRowUnsaved(
       Points to [[product.ProductRow.productid]] */
   componentid: ProductId,
   /** Date the component stopped being used in the assembly item. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Standard code identifying the unit of measure for the quantity.
       Points to [[unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
@@ -36,14 +34,14 @@ case class BillofmaterialsRowUnsaved(
   billofmaterialsid: Defaulted[BillofmaterialsId] = Defaulted.UseDefault,
   /** Default: now()
       Date the component started being used in the assembly item. */
-  startdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  startdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: 1.00
       Quantity of the component needed to create the assembly. */
   perassemblyqty: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(billofmaterialsidDefault: => BillofmaterialsId, startdateDefault: => LocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): BillofmaterialsRow =
+  def toRow(billofmaterialsidDefault: => BillofmaterialsId, startdateDefault: => TypoLocalDateTime, perassemblyqtyDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): BillofmaterialsRow =
     BillofmaterialsRow(
       productassemblyid = productassemblyid,
       componentid = componentid,
@@ -69,31 +67,6 @@ case class BillofmaterialsRowUnsaved(
     )
 }
 object BillofmaterialsRowUnsaved {
-  implicit val decoder: Decoder[BillofmaterialsRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productassemblyid <- c.downField("productassemblyid").as[Option[ProductId]]
-        componentid <- c.downField("componentid").as[ProductId]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        unitmeasurecode <- c.downField("unitmeasurecode").as[UnitmeasureId]
-        bomlevel <- c.downField("bomlevel").as[Int]
-        billofmaterialsid <- c.downField("billofmaterialsid").as[Defaulted[BillofmaterialsId]]
-        startdate <- c.downField("startdate").as[Defaulted[LocalDateTime]]
-        perassemblyqty <- c.downField("perassemblyqty").as[Defaulted[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield BillofmaterialsRowUnsaved(productassemblyid, componentid, enddate, unitmeasurecode, bomlevel, billofmaterialsid, startdate, perassemblyqty, modifieddate)
-  implicit val encoder: Encoder[BillofmaterialsRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productassemblyid" := row.productassemblyid,
-        "componentid" := row.componentid,
-        "enddate" := row.enddate,
-        "unitmeasurecode" := row.unitmeasurecode,
-        "bomlevel" := row.bomlevel,
-        "billofmaterialsid" := row.billofmaterialsid,
-        "startdate" := row.startdate,
-        "perassemblyqty" := row.perassemblyqty,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[BillofmaterialsRowUnsaved] = Decoder.forProduct9[BillofmaterialsRowUnsaved, Option[ProductId], ProductId, Option[TypoLocalDateTime], UnitmeasureId, Int, Defaulted[BillofmaterialsId], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate")(BillofmaterialsRowUnsaved.apply)
+  implicit val encoder: Encoder[BillofmaterialsRowUnsaved] = Encoder.forProduct9[BillofmaterialsRowUnsaved, Option[ProductId], ProductId, Option[TypoLocalDateTime], UnitmeasureId, Int, Defaulted[BillofmaterialsId], Defaulted[TypoLocalDateTime], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate")(x => (x.productassemblyid, x.componentid, x.enddate, x.unitmeasurecode, x.bomlevel, x.billofmaterialsid, x.startdate, x.perassemblyqty, x.modifieddate))
 }

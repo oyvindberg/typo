@@ -7,16 +7,18 @@ package adventureworks
 package hr
 package d
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class DViewRow(
@@ -28,44 +30,40 @@ case class DViewRow(
   /** Points to [[humanresources.department.DepartmentRow.groupname]] */
   groupname: Option[Name],
   /** Points to [[humanresources.department.DepartmentRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object DViewRow {
-  def rowParser(idx: Int): RowParser[DViewRow] =
-    RowParser[DViewRow] { row =>
-      Success(
+  implicit val reads: Reads[DViewRow] = Reads[DViewRow](json => JsResult.fromTry(
+      Try(
         DViewRow(
-          id = row[Option[Int]](idx + 0),
-          departmentid = row[Option[DepartmentId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          groupname = row[Option[Name]](idx + 3),
-          modifieddate = row[Option[LocalDateTime]](idx + 4)
+          id = json.\("id").toOption.map(_.as[Int]),
+          departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          groupname = json.\("groupname").toOption.map(_.as[Name]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[DViewRow] = new OFormat[DViewRow]{
-    override def writes(o: DViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "departmentid" -> o.departmentid,
-        "name" -> o.name,
-        "groupname" -> o.groupname,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[DViewRow] = RowParser[DViewRow] { row =>
+    Success(
+      DViewRow(
+        id = row[Option[Int]](idx + 0),
+        departmentid = row[Option[DepartmentId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        groupname = row[Option[Name]](idx + 3),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[DViewRow] = {
-      JsResult.fromTry(
-        Try(
-          DViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            departmentid = json.\("departmentid").toOption.map(_.as[DepartmentId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            groupname = json.\("groupname").toOption.map(_.as[Name]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[DViewRow] = OWrites[DViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "departmentid" -> Json.toJson(o.departmentid),
+      "name" -> Json.toJson(o.name),
+      "groupname" -> Json.toJson(o.groupname),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

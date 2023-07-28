@@ -8,12 +8,10 @@ package production
 package scrapreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.scrapreason` which has not been persisted yet */
 case class ScrapreasonRowUnsaved(
@@ -23,9 +21,9 @@ case class ScrapreasonRowUnsaved(
       Primary key for ScrapReason records. */
   scrapreasonid: Defaulted[ScrapreasonId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(scrapreasonidDefault: => ScrapreasonId, modifieddateDefault: => LocalDateTime): ScrapreasonRow =
+  def toRow(scrapreasonidDefault: => ScrapreasonId, modifieddateDefault: => TypoLocalDateTime): ScrapreasonRow =
     ScrapreasonRow(
       name = name,
       scrapreasonid = scrapreasonid match {
@@ -39,19 +37,6 @@ case class ScrapreasonRowUnsaved(
     )
 }
 object ScrapreasonRowUnsaved {
-  implicit val decoder: Decoder[ScrapreasonRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        scrapreasonid <- c.downField("scrapreasonid").as[Defaulted[ScrapreasonId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ScrapreasonRowUnsaved(name, scrapreasonid, modifieddate)
-  implicit val encoder: Encoder[ScrapreasonRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "scrapreasonid" := row.scrapreasonid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ScrapreasonRowUnsaved] = Decoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(ScrapreasonRowUnsaved.apply)
+  implicit val encoder: Encoder[ScrapreasonRowUnsaved] = Encoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(x => (x.name, x.scrapreasonid, x.modifieddate))
 }

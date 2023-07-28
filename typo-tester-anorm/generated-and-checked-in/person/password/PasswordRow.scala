@@ -7,16 +7,18 @@ package adventureworks
 package person
 package password
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PasswordRow(
@@ -27,44 +29,40 @@ case class PasswordRow(
   /** Random value concatenated with the password string before the password is hashed. */
   passwordsalt: /* max 10 chars */ String,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object PasswordRow {
-  def rowParser(idx: Int): RowParser[PasswordRow] =
-    RowParser[PasswordRow] { row =>
-      Success(
+  implicit val reads: Reads[PasswordRow] = Reads[PasswordRow](json => JsResult.fromTry(
+      Try(
         PasswordRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          passwordhash = row[/* max 128 chars */ String](idx + 1),
-          passwordsalt = row[/* max 10 chars */ String](idx + 2),
-          rowguid = row[UUID](idx + 3),
-          modifieddate = row[LocalDateTime](idx + 4)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          passwordhash = json.\("passwordhash").as[/* max 128 chars */ String],
+          passwordsalt = json.\("passwordsalt").as[/* max 10 chars */ String],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[PasswordRow] = new OFormat[PasswordRow]{
-    override def writes(o: PasswordRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "passwordhash" -> o.passwordhash,
-        "passwordsalt" -> o.passwordsalt,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PasswordRow] = RowParser[PasswordRow] { row =>
+    Success(
+      PasswordRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        passwordhash = row[/* max 128 chars */ String](idx + 1),
+        passwordsalt = row[/* max 10 chars */ String](idx + 2),
+        rowguid = row[UUID](idx + 3),
+        modifieddate = row[TypoLocalDateTime](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PasswordRow] = {
-      JsResult.fromTry(
-        Try(
-          PasswordRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            passwordhash = json.\("passwordhash").as[/* max 128 chars */ String],
-            passwordsalt = json.\("passwordsalt").as[/* max 10 chars */ String],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PasswordRow] = OWrites[PasswordRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "passwordhash" -> Json.toJson(o.passwordhash),
+      "passwordsalt" -> Json.toJson(o.passwordsalt),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

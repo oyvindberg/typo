@@ -7,16 +7,18 @@ package adventureworks
 package pe
 package be
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BeViewRow(
@@ -26,41 +28,37 @@ case class BeViewRow(
   /** Points to [[person.businessentity.BusinessentityRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.businessentity.BusinessentityRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object BeViewRow {
-  def rowParser(idx: Int): RowParser[BeViewRow] =
-    RowParser[BeViewRow] { row =>
-      Success(
+  implicit val reads: Reads[BeViewRow] = Reads[BeViewRow](json => JsResult.fromTry(
+      Try(
         BeViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          rowguid = row[Option[UUID]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[BeViewRow] = new OFormat[BeViewRow]{
-    override def writes(o: BeViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[BeViewRow] = RowParser[BeViewRow] { row =>
+    Success(
+      BeViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        rowguid = row[Option[UUID]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[BeViewRow] = {
-      JsResult.fromTry(
-        Try(
-          BeViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[BeViewRow] = OWrites[BeViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

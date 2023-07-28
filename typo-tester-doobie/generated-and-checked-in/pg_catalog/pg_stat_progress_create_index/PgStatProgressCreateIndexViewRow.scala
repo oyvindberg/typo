@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_create_index
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatProgressCreateIndexViewRow(
@@ -36,86 +34,44 @@ case class PgStatProgressCreateIndexViewRow(
 )
 
 object PgStatProgressCreateIndexViewRow {
-  implicit val decoder: Decoder[PgStatProgressCreateIndexViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        datid <- c.downField("datid").as[Option[/* oid */ Long]]
-        datname <- c.downField("datname").as[Option[String]]
-        relid <- c.downField("relid").as[Option[/* oid */ Long]]
-        indexRelid <- c.downField("index_relid").as[Option[/* oid */ Long]]
-        command <- c.downField("command").as[Option[String]]
-        phase <- c.downField("phase").as[Option[String]]
-        lockersTotal <- c.downField("lockers_total").as[Option[Long]]
-        lockersDone <- c.downField("lockers_done").as[Option[Long]]
-        currentLockerPid <- c.downField("current_locker_pid").as[Option[Long]]
-        blocksTotal <- c.downField("blocks_total").as[Option[Long]]
-        blocksDone <- c.downField("blocks_done").as[Option[Long]]
-        tuplesTotal <- c.downField("tuples_total").as[Option[Long]]
-        tuplesDone <- c.downField("tuples_done").as[Option[Long]]
-        partitionsTotal <- c.downField("partitions_total").as[Option[Long]]
-        partitionsDone <- c.downField("partitions_done").as[Option[Long]]
-      } yield PgStatProgressCreateIndexViewRow(pid, datid, datname, relid, indexRelid, command, phase, lockersTotal, lockersDone, currentLockerPid, blocksTotal, blocksDone, tuplesTotal, tuplesDone, partitionsTotal, partitionsDone)
-  implicit val encoder: Encoder[PgStatProgressCreateIndexViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "datid" := row.datid,
-        "datname" := row.datname,
-        "relid" := row.relid,
-        "index_relid" := row.indexRelid,
-        "command" := row.command,
-        "phase" := row.phase,
-        "lockers_total" := row.lockersTotal,
-        "lockers_done" := row.lockersDone,
-        "current_locker_pid" := row.currentLockerPid,
-        "blocks_total" := row.blocksTotal,
-        "blocks_done" := row.blocksDone,
-        "tuples_total" := row.tuplesTotal,
-        "tuples_done" := row.tuplesDone,
-        "partitions_total" := row.partitionsTotal,
-        "partitions_done" := row.partitionsDone
-      )}
-  implicit val read: Read[PgStatProgressCreateIndexViewRow] =
-    new Read[PgStatProgressCreateIndexViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressCreateIndexViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        datname = Get[String].unsafeGetNullable(rs, i + 2),
-        relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-        indexRelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 4),
-        command = Get[String].unsafeGetNullable(rs, i + 5),
-        phase = Get[String].unsafeGetNullable(rs, i + 6),
-        lockersTotal = Get[Long].unsafeGetNullable(rs, i + 7),
-        lockersDone = Get[Long].unsafeGetNullable(rs, i + 8),
-        currentLockerPid = Get[Long].unsafeGetNullable(rs, i + 9),
-        blocksTotal = Get[Long].unsafeGetNullable(rs, i + 10),
-        blocksDone = Get[Long].unsafeGetNullable(rs, i + 11),
-        tuplesTotal = Get[Long].unsafeGetNullable(rs, i + 12),
-        tuplesDone = Get[Long].unsafeGetNullable(rs, i + 13),
-        partitionsTotal = Get[Long].unsafeGetNullable(rs, i + 14),
-        partitionsDone = Get[Long].unsafeGetNullable(rs, i + 15)
-      )
+  implicit val decoder: Decoder[PgStatProgressCreateIndexViewRow] = Decoder.forProduct16[PgStatProgressCreateIndexViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "index_relid", "command", "phase", "lockers_total", "lockers_done", "current_locker_pid", "blocks_total", "blocks_done", "tuples_total", "tuples_done", "partitions_total", "partitions_done")(PgStatProgressCreateIndexViewRow.apply)
+  implicit val encoder: Encoder[PgStatProgressCreateIndexViewRow] = Encoder.forProduct16[PgStatProgressCreateIndexViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "index_relid", "command", "phase", "lockers_total", "lockers_done", "current_locker_pid", "blocks_total", "blocks_done", "tuples_total", "tuples_done", "partitions_total", "partitions_done")(x => (x.pid, x.datid, x.datname, x.relid, x.indexRelid, x.command, x.phase, x.lockersTotal, x.lockersDone, x.currentLockerPid, x.blocksTotal, x.blocksDone, x.tuplesTotal, x.tuplesDone, x.partitionsTotal, x.partitionsDone))
+  implicit val read: Read[PgStatProgressCreateIndexViewRow] = new Read[PgStatProgressCreateIndexViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressCreateIndexViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      datname = Get[String].unsafeGetNullable(rs, i + 2),
+      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
+      indexRelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 4),
+      command = Get[String].unsafeGetNullable(rs, i + 5),
+      phase = Get[String].unsafeGetNullable(rs, i + 6),
+      lockersTotal = Get[Long].unsafeGetNullable(rs, i + 7),
+      lockersDone = Get[Long].unsafeGetNullable(rs, i + 8),
+      currentLockerPid = Get[Long].unsafeGetNullable(rs, i + 9),
+      blocksTotal = Get[Long].unsafeGetNullable(rs, i + 10),
+      blocksDone = Get[Long].unsafeGetNullable(rs, i + 11),
+      tuplesTotal = Get[Long].unsafeGetNullable(rs, i + 12),
+      tuplesDone = Get[Long].unsafeGetNullable(rs, i + 13),
+      partitionsTotal = Get[Long].unsafeGetNullable(rs, i + 14),
+      partitionsDone = Get[Long].unsafeGetNullable(rs, i + 15)
     )
-  
-
+  )
 }

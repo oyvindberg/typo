@@ -9,16 +9,14 @@ package pg_stat_replication
 
 import adventureworks.TypoInet
 import adventureworks.TypoInterval
+import adventureworks.TypoOffsetDateTime
 import adventureworks.TypoXid
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatReplicationViewRow(
   pid: Option[Int],
@@ -28,7 +26,7 @@ case class PgStatReplicationViewRow(
   clientAddr: Option[TypoInet],
   clientHostname: Option[String],
   clientPort: Option[Int],
-  backendStart: Option[OffsetDateTime],
+  backendStart: Option[TypoOffsetDateTime],
   backendXmin: Option[TypoXid],
   state: Option[String],
   sentLsn: Option[/* pg_lsn */ Long],
@@ -40,106 +38,56 @@ case class PgStatReplicationViewRow(
   replayLag: Option[TypoInterval],
   syncPriority: Option[Int],
   syncState: Option[String],
-  replyTime: Option[OffsetDateTime]
+  replyTime: Option[TypoOffsetDateTime]
 )
 
 object PgStatReplicationViewRow {
-  implicit val decoder: Decoder[PgStatReplicationViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        usesysid <- c.downField("usesysid").as[Option[/* oid */ Long]]
-        usename <- c.downField("usename").as[Option[String]]
-        applicationName <- c.downField("application_name").as[Option[String]]
-        clientAddr <- c.downField("client_addr").as[Option[TypoInet]]
-        clientHostname <- c.downField("client_hostname").as[Option[String]]
-        clientPort <- c.downField("client_port").as[Option[Int]]
-        backendStart <- c.downField("backend_start").as[Option[OffsetDateTime]]
-        backendXmin <- c.downField("backend_xmin").as[Option[TypoXid]]
-        state <- c.downField("state").as[Option[String]]
-        sentLsn <- c.downField("sent_lsn").as[Option[/* pg_lsn */ Long]]
-        writeLsn <- c.downField("write_lsn").as[Option[/* pg_lsn */ Long]]
-        flushLsn <- c.downField("flush_lsn").as[Option[/* pg_lsn */ Long]]
-        replayLsn <- c.downField("replay_lsn").as[Option[/* pg_lsn */ Long]]
-        writeLag <- c.downField("write_lag").as[Option[TypoInterval]]
-        flushLag <- c.downField("flush_lag").as[Option[TypoInterval]]
-        replayLag <- c.downField("replay_lag").as[Option[TypoInterval]]
-        syncPriority <- c.downField("sync_priority").as[Option[Int]]
-        syncState <- c.downField("sync_state").as[Option[String]]
-        replyTime <- c.downField("reply_time").as[Option[OffsetDateTime]]
-      } yield PgStatReplicationViewRow(pid, usesysid, usename, applicationName, clientAddr, clientHostname, clientPort, backendStart, backendXmin, state, sentLsn, writeLsn, flushLsn, replayLsn, writeLag, flushLag, replayLag, syncPriority, syncState, replyTime)
-  implicit val encoder: Encoder[PgStatReplicationViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "usesysid" := row.usesysid,
-        "usename" := row.usename,
-        "application_name" := row.applicationName,
-        "client_addr" := row.clientAddr,
-        "client_hostname" := row.clientHostname,
-        "client_port" := row.clientPort,
-        "backend_start" := row.backendStart,
-        "backend_xmin" := row.backendXmin,
-        "state" := row.state,
-        "sent_lsn" := row.sentLsn,
-        "write_lsn" := row.writeLsn,
-        "flush_lsn" := row.flushLsn,
-        "replay_lsn" := row.replayLsn,
-        "write_lag" := row.writeLag,
-        "flush_lag" := row.flushLag,
-        "replay_lag" := row.replayLag,
-        "sync_priority" := row.syncPriority,
-        "sync_state" := row.syncState,
-        "reply_time" := row.replyTime
-      )}
-  implicit val read: Read[PgStatReplicationViewRow] =
-    new Read[PgStatReplicationViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[TypoInet], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[TypoXid], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[/* pg_lsn */ Long], Nullability.Nullable),
-        (Get[TypoInterval], Nullability.Nullable),
-        (Get[TypoInterval], Nullability.Nullable),
-        (Get[TypoInterval], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatReplicationViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        usesysid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        usename = Get[String].unsafeGetNullable(rs, i + 2),
-        applicationName = Get[String].unsafeGetNullable(rs, i + 3),
-        clientAddr = Get[TypoInet].unsafeGetNullable(rs, i + 4),
-        clientHostname = Get[String].unsafeGetNullable(rs, i + 5),
-        clientPort = Get[Int].unsafeGetNullable(rs, i + 6),
-        backendStart = Get[OffsetDateTime].unsafeGetNullable(rs, i + 7),
-        backendXmin = Get[TypoXid].unsafeGetNullable(rs, i + 8),
-        state = Get[String].unsafeGetNullable(rs, i + 9),
-        sentLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 10),
-        writeLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 11),
-        flushLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 12),
-        replayLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 13),
-        writeLag = Get[TypoInterval].unsafeGetNullable(rs, i + 14),
-        flushLag = Get[TypoInterval].unsafeGetNullable(rs, i + 15),
-        replayLag = Get[TypoInterval].unsafeGetNullable(rs, i + 16),
-        syncPriority = Get[Int].unsafeGetNullable(rs, i + 17),
-        syncState = Get[String].unsafeGetNullable(rs, i + 18),
-        replyTime = Get[OffsetDateTime].unsafeGetNullable(rs, i + 19)
-      )
+  implicit val decoder: Decoder[PgStatReplicationViewRow] = Decoder.forProduct20[PgStatReplicationViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoXid], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[TypoInterval], Option[TypoInterval], Option[TypoInterval], Option[Int], Option[String], Option[TypoOffsetDateTime]]("pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "backend_xmin", "state", "sent_lsn", "write_lsn", "flush_lsn", "replay_lsn", "write_lag", "flush_lag", "replay_lag", "sync_priority", "sync_state", "reply_time")(PgStatReplicationViewRow.apply)
+  implicit val encoder: Encoder[PgStatReplicationViewRow] = Encoder.forProduct20[PgStatReplicationViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[String], Option[TypoInet], Option[String], Option[Int], Option[TypoOffsetDateTime], Option[TypoXid], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long], Option[TypoInterval], Option[TypoInterval], Option[TypoInterval], Option[Int], Option[String], Option[TypoOffsetDateTime]]("pid", "usesysid", "usename", "application_name", "client_addr", "client_hostname", "client_port", "backend_start", "backend_xmin", "state", "sent_lsn", "write_lsn", "flush_lsn", "replay_lsn", "write_lag", "flush_lag", "replay_lag", "sync_priority", "sync_state", "reply_time")(x => (x.pid, x.usesysid, x.usename, x.applicationName, x.clientAddr, x.clientHostname, x.clientPort, x.backendStart, x.backendXmin, x.state, x.sentLsn, x.writeLsn, x.flushLsn, x.replayLsn, x.writeLag, x.flushLag, x.replayLag, x.syncPriority, x.syncState, x.replyTime))
+  implicit val read: Read[PgStatReplicationViewRow] = new Read[PgStatReplicationViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoInet], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[TypoXid], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[/* pg_lsn */ Long], Nullability.Nullable),
+      (Get[TypoInterval], Nullability.Nullable),
+      (Get[TypoInterval], Nullability.Nullable),
+      (Get[TypoInterval], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatReplicationViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      usesysid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      usename = Get[String].unsafeGetNullable(rs, i + 2),
+      applicationName = Get[String].unsafeGetNullable(rs, i + 3),
+      clientAddr = Get[TypoInet].unsafeGetNullable(rs, i + 4),
+      clientHostname = Get[String].unsafeGetNullable(rs, i + 5),
+      clientPort = Get[Int].unsafeGetNullable(rs, i + 6),
+      backendStart = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 7),
+      backendXmin = Get[TypoXid].unsafeGetNullable(rs, i + 8),
+      state = Get[String].unsafeGetNullable(rs, i + 9),
+      sentLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 10),
+      writeLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 11),
+      flushLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 12),
+      replayLsn = Get[/* pg_lsn */ Long].unsafeGetNullable(rs, i + 13),
+      writeLag = Get[TypoInterval].unsafeGetNullable(rs, i + 14),
+      flushLag = Get[TypoInterval].unsafeGetNullable(rs, i + 15),
+      replayLag = Get[TypoInterval].unsafeGetNullable(rs, i + 16),
+      syncPriority = Get[Int].unsafeGetNullable(rs, i + 17),
+      syncState = Get[String].unsafeGetNullable(rs, i + 18),
+      replyTime = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 19)
     )
-  
-
+  )
 }

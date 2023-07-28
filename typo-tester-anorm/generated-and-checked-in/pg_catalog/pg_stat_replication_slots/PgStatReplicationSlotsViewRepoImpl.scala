@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgStatReplicationSlotsViewRepoImpl extends PgStatReplicationSlotsViewRepo {
   override def selectAll(implicit c: Connection): List[PgStatReplicationSlotsViewRow] = {
-    SQL"""select slot_name, spill_txns, spill_count, spill_bytes, stream_txns, stream_count, stream_bytes, total_txns, total_bytes, stats_reset
+    SQL"""select slot_name, spill_txns, spill_count, spill_bytes, stream_txns, stream_count, stream_bytes, total_txns, total_bytes, stats_reset::text
           from pg_catalog.pg_stat_replication_slots
        """.as(PgStatReplicationSlotsViewRow.rowParser(1).*)
   }

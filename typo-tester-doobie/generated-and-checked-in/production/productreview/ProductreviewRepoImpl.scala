@@ -8,20 +8,20 @@ package production
 package productreview
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId): ConnectionIO[Boolean] = {
-    sql"delete from production.productreview where productreviewid = $productreviewid".update.run.map(_ > 0)
+    sql"delete from production.productreview where productreviewid = ${productreviewid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
           values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
-          returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+          returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
        """.query[ProductreviewRow].unique
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
@@ -37,36 +37,36 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       },
       unsaved.reviewdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"reviewdate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"reviewdate"), fr"${value: TypoLocalDateTime}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productreview default values
-            returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+            returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productreview(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+            returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
          """
     }
     q.query[ProductreviewRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview""".query[ProductreviewRow].stream
+    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview""".query[ProductreviewRow].stream
   }
   override def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview where productreviewid = $productreviewid""".query[ProductreviewRow].option
+    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ${productreviewid}""".query[ProductreviewRow].option
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview where productreviewid = ANY($productreviewids)""".query[ProductreviewRow].stream
+    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ANY(${productreviewids})""".query[ProductreviewRow].stream
   }
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     val productreviewid = row.productreviewid
@@ -78,7 +78,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
               rating = ${row.rating}::int4,
               "comments" = ${row.comments},
               modifieddate = ${row.modifieddate}::timestamp
-          where productreviewid = $productreviewid
+          where productreviewid = ${productreviewid}
        """
       .update
       .run
@@ -105,7 +105,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             rating = EXCLUDED.rating,
             "comments" = EXCLUDED."comments",
             modifieddate = EXCLUDED.modifieddate
-          returning productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
+          returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
        """.query[ProductreviewRow].unique
   }
 }

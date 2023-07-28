@@ -7,16 +7,18 @@ package adventureworks
 package sa
 package spqh
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpqhViewRow(
@@ -24,53 +26,49 @@ case class SpqhViewRow(
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.quotadate]] */
-  quotadate: Option[LocalDateTime],
+  quotadate: Option[TypoLocalDateTime],
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.salesquota]] */
   salesquota: Option[BigDecimal],
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SpqhViewRow {
-  def rowParser(idx: Int): RowParser[SpqhViewRow] =
-    RowParser[SpqhViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SpqhViewRow] = Reads[SpqhViewRow](json => JsResult.fromTry(
+      Try(
         SpqhViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          quotadate = row[Option[LocalDateTime]](idx + 2),
-          salesquota = row[Option[BigDecimal]](idx + 3),
-          rowguid = row[Option[UUID]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          quotadate = json.\("quotadate").toOption.map(_.as[TypoLocalDateTime]),
+          salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SpqhViewRow] = new OFormat[SpqhViewRow]{
-    override def writes(o: SpqhViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "quotadate" -> o.quotadate,
-        "salesquota" -> o.salesquota,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SpqhViewRow] = RowParser[SpqhViewRow] { row =>
+    Success(
+      SpqhViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        quotadate = row[Option[TypoLocalDateTime]](idx + 2),
+        salesquota = row[Option[BigDecimal]](idx + 3),
+        rowguid = row[Option[UUID]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[SpqhViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SpqhViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            quotadate = json.\("quotadate").toOption.map(_.as[LocalDateTime]),
-            salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SpqhViewRow] = OWrites[SpqhViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "quotadate" -> Json.toJson(o.quotadate),
+      "salesquota" -> Json.toJson(o.salesquota),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

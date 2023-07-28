@@ -7,16 +7,18 @@ package adventureworks
 package sales
 package countryregioncurrency
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CountryregioncurrencyRow(
@@ -26,40 +28,36 @@ case class CountryregioncurrencyRow(
   /** ISO standard currency code. Foreign key to Currency.CurrencyCode.
       Points to [[currency.CurrencyRow.currencycode]] */
   currencycode: CurrencyId,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: CountryregioncurrencyId = CountryregioncurrencyId(countryregioncode, currencycode)
  }
 
 object CountryregioncurrencyRow {
-  def rowParser(idx: Int): RowParser[CountryregioncurrencyRow] =
-    RowParser[CountryregioncurrencyRow] { row =>
-      Success(
+  implicit val reads: Reads[CountryregioncurrencyRow] = Reads[CountryregioncurrencyRow](json => JsResult.fromTry(
+      Try(
         CountryregioncurrencyRow(
-          countryregioncode = row[CountryregionId](idx + 0),
-          currencycode = row[CurrencyId](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          countryregioncode = json.\("countryregioncode").as[CountryregionId],
+          currencycode = json.\("currencycode").as[CurrencyId],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[CountryregioncurrencyRow] = new OFormat[CountryregioncurrencyRow]{
-    override def writes(o: CountryregioncurrencyRow): JsObject =
-      Json.obj(
-        "countryregioncode" -> o.countryregioncode,
-        "currencycode" -> o.currencycode,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CountryregioncurrencyRow] = RowParser[CountryregioncurrencyRow] { row =>
+    Success(
+      CountryregioncurrencyRow(
+        countryregioncode = row[CountryregionId](idx + 0),
+        currencycode = row[CurrencyId](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[CountryregioncurrencyRow] = {
-      JsResult.fromTry(
-        Try(
-          CountryregioncurrencyRow(
-            countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            currencycode = json.\("currencycode").as[CurrencyId],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CountryregioncurrencyRow] = OWrites[CountryregioncurrencyRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "countryregioncode" -> Json.toJson(o.countryregioncode),
+      "currencycode" -> Json.toJson(o.currencycode),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

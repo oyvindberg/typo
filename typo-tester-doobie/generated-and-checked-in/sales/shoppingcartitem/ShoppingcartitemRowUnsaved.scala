@@ -8,12 +8,10 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.shoppingcartitem` which has not been persisted yet */
 case class ShoppingcartitemRowUnsaved(
@@ -30,11 +28,11 @@ case class ShoppingcartitemRowUnsaved(
   quantity: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date the time the record was created. */
-  datecreated: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  datecreated: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(shoppingcartitemidDefault: => ShoppingcartitemId, quantityDefault: => Int, datecreatedDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): ShoppingcartitemRow =
+  def toRow(shoppingcartitemidDefault: => ShoppingcartitemId, quantityDefault: => Int, datecreatedDefault: => TypoLocalDateTime, modifieddateDefault: => TypoLocalDateTime): ShoppingcartitemRow =
     ShoppingcartitemRow(
       shoppingcartid = shoppingcartid,
       productid = productid,
@@ -57,25 +55,6 @@ case class ShoppingcartitemRowUnsaved(
     )
 }
 object ShoppingcartitemRowUnsaved {
-  implicit val decoder: Decoder[ShoppingcartitemRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        shoppingcartid <- c.downField("shoppingcartid").as[/* max 50 chars */ String]
-        productid <- c.downField("productid").as[ProductId]
-        shoppingcartitemid <- c.downField("shoppingcartitemid").as[Defaulted[ShoppingcartitemId]]
-        quantity <- c.downField("quantity").as[Defaulted[Int]]
-        datecreated <- c.downField("datecreated").as[Defaulted[LocalDateTime]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ShoppingcartitemRowUnsaved(shoppingcartid, productid, shoppingcartitemid, quantity, datecreated, modifieddate)
-  implicit val encoder: Encoder[ShoppingcartitemRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "shoppingcartid" := row.shoppingcartid,
-        "productid" := row.productid,
-        "shoppingcartitemid" := row.shoppingcartitemid,
-        "quantity" := row.quantity,
-        "datecreated" := row.datecreated,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ShoppingcartitemRowUnsaved] = Decoder.forProduct6[ShoppingcartitemRowUnsaved, /* max 50 chars */ String, ProductId, Defaulted[ShoppingcartitemId], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate")(ShoppingcartitemRowUnsaved.apply)
+  implicit val encoder: Encoder[ShoppingcartitemRowUnsaved] = Encoder.forProduct6[ShoppingcartitemRowUnsaved, /* max 50 chars */ String, ProductId, Defaulted[ShoppingcartitemId], Defaulted[Int], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate")(x => (x.shoppingcartid, x.productid, x.shoppingcartitemid, x.quantity, x.datecreated, x.modifieddate))
 }

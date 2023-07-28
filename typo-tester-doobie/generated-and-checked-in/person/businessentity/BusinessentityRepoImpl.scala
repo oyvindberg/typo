@@ -8,21 +8,21 @@ package person
 package businessentity
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from person.businessentity where businessentityid = $businessentityid".update.run.map(_ > 0)
+    sql"delete from person.businessentity where businessentityid = ${businessentityid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity(businessentityid, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, rowguid, modifieddate
+          returning businessentityid, rowguid, modifieddate::text
        """.query[BusinessentityRow].unique
   }
   override def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow] = {
@@ -37,39 +37,39 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.businessentity default values
-            returning businessentityid, rowguid, modifieddate
+            returning businessentityid, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.businessentity(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, rowguid, modifieddate
+            returning businessentityid, rowguid, modifieddate::text
          """
     }
     q.query[BusinessentityRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
-    sql"select businessentityid, rowguid, modifieddate from person.businessentity".query[BusinessentityRow].stream
+    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity".query[BusinessentityRow].stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[BusinessentityRow]] = {
-    sql"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = $businessentityid".query[BusinessentityRow].option
+    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ${businessentityid}".query[BusinessentityRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
-    sql"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = ANY($businessentityids)".query[BusinessentityRow].stream
+    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ANY(${businessentityids})".query[BusinessentityRow].stream
   }
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update person.businessentity
           set rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          where businessentityid = ${businessentityid}
        """
       .update
       .run
@@ -86,7 +86,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
           do update set
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, rowguid, modifieddate
+          returning businessentityid, rowguid, modifieddate::text
        """.query[BusinessentityRow].unique
   }
 }

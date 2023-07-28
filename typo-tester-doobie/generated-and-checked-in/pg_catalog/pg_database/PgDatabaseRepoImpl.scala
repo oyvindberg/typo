@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def delete(oid: PgDatabaseId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_database where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_database where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgDatabaseRow): ConnectionIO[PgDatabaseRow] = {
     sql"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)
@@ -25,10 +25,10 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
     sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database""".query[PgDatabaseRow].stream
   }
   override def selectById(oid: PgDatabaseId): ConnectionIO[Option[PgDatabaseRow]] = {
-    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = $oid""".query[PgDatabaseRow].option
+    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ${oid}""".query[PgDatabaseRow].option
   }
   override def selectByIds(oids: Array[PgDatabaseId]): Stream[ConnectionIO, PgDatabaseRow] = {
-    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ANY($oids)""".query[PgDatabaseRow].stream
+    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ANY(${oids})""".query[PgDatabaseRow].stream
   }
   override def update(row: PgDatabaseRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -46,7 +46,7 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
               datminmxid = ${row.datminmxid}::xid,
               dattablespace = ${row.dattablespace}::oid,
               datacl = ${row.datacl}::_aclitem
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

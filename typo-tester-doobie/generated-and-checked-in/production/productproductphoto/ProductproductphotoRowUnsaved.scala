@@ -8,14 +8,12 @@ package production
 package productproductphoto
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productproductphoto` which has not been persisted yet */
 case class ProductproductphotoRowUnsaved(
@@ -29,9 +27,9 @@ case class ProductproductphotoRowUnsaved(
       0 = Photo is not the principal image. 1 = Photo is the principal image. */
   primary: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(primaryDefault: => Flag, modifieddateDefault: => LocalDateTime): ProductproductphotoRow =
+  def toRow(primaryDefault: => Flag, modifieddateDefault: => TypoLocalDateTime): ProductproductphotoRow =
     ProductproductphotoRow(
       productid = productid,
       productphotoid = productphotoid,
@@ -46,21 +44,6 @@ case class ProductproductphotoRowUnsaved(
     )
 }
 object ProductproductphotoRowUnsaved {
-  implicit val decoder: Decoder[ProductproductphotoRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        productphotoid <- c.downField("productphotoid").as[ProductphotoId]
-        primary <- c.downField("primary").as[Defaulted[Flag]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductproductphotoRowUnsaved(productid, productphotoid, primary, modifieddate)
-  implicit val encoder: Encoder[ProductproductphotoRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "productphotoid" := row.productphotoid,
-        "primary" := row.primary,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductproductphotoRowUnsaved] = Decoder.forProduct4[ProductproductphotoRowUnsaved, ProductId, ProductphotoId, Defaulted[Flag], Defaulted[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(ProductproductphotoRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductproductphotoRowUnsaved] = Encoder.forProduct4[ProductproductphotoRowUnsaved, ProductId, ProductphotoId, Defaulted[Flag], Defaulted[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))
 }

@@ -37,20 +37,20 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
 
       code"$comment${col.param.code}"
     }
-    val jsonInstances = options.jsonLibs.flatMap(_.instances(names.RowName, names.cols))
-    val dbInstances = options.dbLib.toList.flatMap(_.rowInstances(names.maybeId, names.RowName, names.cols))
-    val instances = (jsonInstances ++ dbInstances).sortBy(_.code)
+    val instances =
+      options.jsonLibs.flatMap(_.instances(names.RowName, names.cols)) ++
+        options.dbLib.toList.flatMap(_.rowInstances(names.RowName, names.cols))
+
     val str =
       code"""case class ${names.RowName.name}(
             |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |
-            |${obj(names.RowName.name, instances)}
+            |${genObject(names.RowName.value, instances)}
             |""".stripMargin
 
     sc.File(names.RowName, str, secondaryTypes = Nil)
   }
-
   val FieldValueFile: Option[sc.File] =
     for {
       fieldOrIdValueName <- names.FieldOrIdValueName
@@ -66,7 +66,7 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
         code"""sealed abstract class ${fieldOrIdValueName.name}[T](val name: String, val value: T)
               |sealed abstract class ${fieldValueName.name}[T](name: String, value: T) extends ${fieldOrIdValueName.name}(name, value)
               |
-              |${obj(fieldValueName.name, members.toList)}
+              |${sc.Obj(fieldValueName.value, Nil, Some(members.mkCode("\n")))}
               |""".stripMargin
 
       sc.File(fieldValueName, str, secondaryTypes = List(fieldOrIdValueName))

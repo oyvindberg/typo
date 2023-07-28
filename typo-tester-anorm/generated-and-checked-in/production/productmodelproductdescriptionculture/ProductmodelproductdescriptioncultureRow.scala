@@ -7,17 +7,19 @@ package adventureworks
 package production
 package productmodelproductdescriptionculture
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ProductmodelproductdescriptioncultureRow(
@@ -30,43 +32,39 @@ case class ProductmodelproductdescriptioncultureRow(
   /** Culture identification number. Foreign key to Culture.CultureID.
       Points to [[culture.CultureRow.cultureid]] */
   cultureid: CultureId,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductmodelproductdescriptioncultureId = ProductmodelproductdescriptioncultureId(productmodelid, productdescriptionid, cultureid)
  }
 
 object ProductmodelproductdescriptioncultureRow {
-  def rowParser(idx: Int): RowParser[ProductmodelproductdescriptioncultureRow] =
-    RowParser[ProductmodelproductdescriptioncultureRow] { row =>
-      Success(
+  implicit val reads: Reads[ProductmodelproductdescriptioncultureRow] = Reads[ProductmodelproductdescriptioncultureRow](json => JsResult.fromTry(
+      Try(
         ProductmodelproductdescriptioncultureRow(
-          productmodelid = row[ProductmodelId](idx + 0),
-          productdescriptionid = row[ProductdescriptionId](idx + 1),
-          cultureid = row[CultureId](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          productmodelid = json.\("productmodelid").as[ProductmodelId],
+          productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
+          cultureid = json.\("cultureid").as[CultureId],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ProductmodelproductdescriptioncultureRow] = new OFormat[ProductmodelproductdescriptioncultureRow]{
-    override def writes(o: ProductmodelproductdescriptioncultureRow): JsObject =
-      Json.obj(
-        "productmodelid" -> o.productmodelid,
-        "productdescriptionid" -> o.productdescriptionid,
-        "cultureid" -> o.cultureid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ProductmodelproductdescriptioncultureRow] = RowParser[ProductmodelproductdescriptioncultureRow] { row =>
+    Success(
+      ProductmodelproductdescriptioncultureRow(
+        productmodelid = row[ProductmodelId](idx + 0),
+        productdescriptionid = row[ProductdescriptionId](idx + 1),
+        cultureid = row[CultureId](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[ProductmodelproductdescriptioncultureRow] = {
-      JsResult.fromTry(
-        Try(
-          ProductmodelproductdescriptioncultureRow(
-            productmodelid = json.\("productmodelid").as[ProductmodelId],
-            productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
-            cultureid = json.\("cultureid").as[CultureId],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ProductmodelproductdescriptioncultureRow] = OWrites[ProductmodelproductdescriptioncultureRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
+      "cultureid" -> Json.toJson(o.cultureid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

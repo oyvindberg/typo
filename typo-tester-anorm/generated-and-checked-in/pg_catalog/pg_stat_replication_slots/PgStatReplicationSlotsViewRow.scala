@@ -7,14 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication_slots
 
+import adventureworks.TypoOffsetDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatReplicationSlotsViewRow(
@@ -28,59 +30,55 @@ case class PgStatReplicationSlotsViewRow(
   streamBytes: Option[Long],
   totalTxns: Option[Long],
   totalBytes: Option[Long],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatReplicationSlotsViewRow {
-  def rowParser(idx: Int): RowParser[PgStatReplicationSlotsViewRow] =
-    RowParser[PgStatReplicationSlotsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatReplicationSlotsViewRow] = Reads[PgStatReplicationSlotsViewRow](json => JsResult.fromTry(
+      Try(
         PgStatReplicationSlotsViewRow(
-          slotName = row[Option[String]](idx + 0),
-          spillTxns = row[Option[Long]](idx + 1),
-          spillCount = row[Option[Long]](idx + 2),
-          spillBytes = row[Option[Long]](idx + 3),
-          streamTxns = row[Option[Long]](idx + 4),
-          streamCount = row[Option[Long]](idx + 5),
-          streamBytes = row[Option[Long]](idx + 6),
-          totalTxns = row[Option[Long]](idx + 7),
-          totalBytes = row[Option[Long]](idx + 8),
-          statsReset = row[Option[OffsetDateTime]](idx + 9)
+          slotName = json.\("slot_name").toOption.map(_.as[String]),
+          spillTxns = json.\("spill_txns").toOption.map(_.as[Long]),
+          spillCount = json.\("spill_count").toOption.map(_.as[Long]),
+          spillBytes = json.\("spill_bytes").toOption.map(_.as[Long]),
+          streamTxns = json.\("stream_txns").toOption.map(_.as[Long]),
+          streamCount = json.\("stream_count").toOption.map(_.as[Long]),
+          streamBytes = json.\("stream_bytes").toOption.map(_.as[Long]),
+          totalTxns = json.\("total_txns").toOption.map(_.as[Long]),
+          totalBytes = json.\("total_bytes").toOption.map(_.as[Long]),
+          statsReset = json.\("stats_reset").toOption.map(_.as[TypoOffsetDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatReplicationSlotsViewRow] = new OFormat[PgStatReplicationSlotsViewRow]{
-    override def writes(o: PgStatReplicationSlotsViewRow): JsObject =
-      Json.obj(
-        "slot_name" -> o.slotName,
-        "spill_txns" -> o.spillTxns,
-        "spill_count" -> o.spillCount,
-        "spill_bytes" -> o.spillBytes,
-        "stream_txns" -> o.streamTxns,
-        "stream_count" -> o.streamCount,
-        "stream_bytes" -> o.streamBytes,
-        "total_txns" -> o.totalTxns,
-        "total_bytes" -> o.totalBytes,
-        "stats_reset" -> o.statsReset
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatReplicationSlotsViewRow] = RowParser[PgStatReplicationSlotsViewRow] { row =>
+    Success(
+      PgStatReplicationSlotsViewRow(
+        slotName = row[Option[String]](idx + 0),
+        spillTxns = row[Option[Long]](idx + 1),
+        spillCount = row[Option[Long]](idx + 2),
+        spillBytes = row[Option[Long]](idx + 3),
+        streamTxns = row[Option[Long]](idx + 4),
+        streamCount = row[Option[Long]](idx + 5),
+        streamBytes = row[Option[Long]](idx + 6),
+        totalTxns = row[Option[Long]](idx + 7),
+        totalBytes = row[Option[Long]](idx + 8),
+        statsReset = row[Option[TypoOffsetDateTime]](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatReplicationSlotsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatReplicationSlotsViewRow(
-            slotName = json.\("slot_name").toOption.map(_.as[String]),
-            spillTxns = json.\("spill_txns").toOption.map(_.as[Long]),
-            spillCount = json.\("spill_count").toOption.map(_.as[Long]),
-            spillBytes = json.\("spill_bytes").toOption.map(_.as[Long]),
-            streamTxns = json.\("stream_txns").toOption.map(_.as[Long]),
-            streamCount = json.\("stream_count").toOption.map(_.as[Long]),
-            streamBytes = json.\("stream_bytes").toOption.map(_.as[Long]),
-            totalTxns = json.\("total_txns").toOption.map(_.as[Long]),
-            totalBytes = json.\("total_bytes").toOption.map(_.as[Long]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[OffsetDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatReplicationSlotsViewRow] = OWrites[PgStatReplicationSlotsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "slot_name" -> Json.toJson(o.slotName),
+      "spill_txns" -> Json.toJson(o.spillTxns),
+      "spill_count" -> Json.toJson(o.spillCount),
+      "spill_bytes" -> Json.toJson(o.spillBytes),
+      "stream_txns" -> Json.toJson(o.streamTxns),
+      "stream_count" -> Json.toJson(o.streamCount),
+      "stream_bytes" -> Json.toJson(o.streamBytes),
+      "total_txns" -> Json.toJson(o.totalTxns),
+      "total_bytes" -> Json.toJson(o.totalBytes),
+      "stats_reset" -> Json.toJson(o.statsReset)
+    ))
+  )
 }

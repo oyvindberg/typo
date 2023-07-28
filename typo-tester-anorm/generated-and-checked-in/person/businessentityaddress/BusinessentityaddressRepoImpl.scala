@@ -8,11 +8,11 @@ package person
 package businessentityaddress
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
@@ -22,7 +22,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def insert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow = {
     SQL"""insert into person.businessentityaddress(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.addressid}::int4, ${unsaved.addresstypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
+          returning businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
        """
       .executeInsert(BusinessentityaddressRow.rowParser(1).single)
   
@@ -38,19 +38,19 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.businessentityaddress default values
-            returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
+            returning businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
          """
         .executeInsert(BusinessentityaddressRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.businessentityaddress(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
+                  returning businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -61,12 +61,12 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityaddressRow] = {
-    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate
+    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
           from person.businessentityaddress
        """.as(BusinessentityaddressRow.rowParser(1).*)
   }
   override def selectById(compositeId: BusinessentityaddressId)(implicit c: Connection): Option[BusinessentityaddressRow] = {
-    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate
+    SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
           from person.businessentityaddress
           where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
        """.as(BusinessentityaddressRow.rowParser(1).singleOpt)
@@ -92,7 +92,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           do update set
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
+          returning businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
        """
       .executeInsert(BusinessentityaddressRow.rowParser(1).single)
   

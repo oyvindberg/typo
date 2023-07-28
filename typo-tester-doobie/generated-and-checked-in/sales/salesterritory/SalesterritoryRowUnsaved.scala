@@ -8,13 +8,11 @@ package sales
 package salesterritory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `sales.salesterritory` which has not been persisted yet */
@@ -44,9 +42,9 @@ case class SalesterritoryRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(territoryidDefault: => SalesterritoryId, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, costytdDefault: => BigDecimal, costlastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesterritoryRow =
+  def toRow(territoryidDefault: => SalesterritoryId, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, costytdDefault: => BigDecimal, costlastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesterritoryRow =
     SalesterritoryRow(
       name = name,
       countryregioncode = countryregioncode,
@@ -82,33 +80,6 @@ case class SalesterritoryRowUnsaved(
     )
 }
 object SalesterritoryRowUnsaved {
-  implicit val decoder: Decoder[SalesterritoryRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
-        group <- c.downField("group").as[/* max 50 chars */ String]
-        territoryid <- c.downField("territoryid").as[Defaulted[SalesterritoryId]]
-        salesytd <- c.downField("salesytd").as[Defaulted[BigDecimal]]
-        saleslastyear <- c.downField("saleslastyear").as[Defaulted[BigDecimal]]
-        costytd <- c.downField("costytd").as[Defaulted[BigDecimal]]
-        costlastyear <- c.downField("costlastyear").as[Defaulted[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SalesterritoryRowUnsaved(name, countryregioncode, group, territoryid, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalesterritoryRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "countryregioncode" := row.countryregioncode,
-        "group" := row.group,
-        "territoryid" := row.territoryid,
-        "salesytd" := row.salesytd,
-        "saleslastyear" := row.saleslastyear,
-        "costytd" := row.costytd,
-        "costlastyear" := row.costlastyear,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SalesterritoryRowUnsaved] = Decoder.forProduct10[SalesterritoryRowUnsaved, Name, CountryregionId, /* max 50 chars */ String, Defaulted[SalesterritoryId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(SalesterritoryRowUnsaved.apply)
+  implicit val encoder: Encoder[SalesterritoryRowUnsaved] = Encoder.forProduct10[SalesterritoryRowUnsaved, Name, CountryregionId, /* max 50 chars */ String, Defaulted[SalesterritoryId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(x => (x.name, x.countryregioncode, x.group, x.territoryid, x.salesytd, x.saleslastyear, x.costytd, x.costlastyear, x.rowguid, x.modifieddate))
 }

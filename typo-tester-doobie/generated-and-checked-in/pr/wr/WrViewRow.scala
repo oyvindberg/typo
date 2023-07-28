@@ -7,17 +7,15 @@ package adventureworks
 package pr
 package wr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class WrViewRow(
   id: Option[Int],
@@ -30,13 +28,13 @@ case class WrViewRow(
   /** Points to [[production.workorderrouting.WorkorderroutingRow.locationid]] */
   locationid: Option[LocationId],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.scheduledstartdate]] */
-  scheduledstartdate: Option[LocalDateTime],
+  scheduledstartdate: Option[TypoLocalDateTime],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.scheduledenddate]] */
-  scheduledenddate: Option[LocalDateTime],
+  scheduledenddate: Option[TypoLocalDateTime],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualstartdate]] */
-  actualstartdate: Option[LocalDateTime],
+  actualstartdate: Option[TypoLocalDateTime],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualenddate]] */
-  actualenddate: Option[LocalDateTime],
+  actualenddate: Option[TypoLocalDateTime],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualresourcehrs]] */
   actualresourcehrs: Option[BigDecimal],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.plannedcost]] */
@@ -44,78 +42,42 @@ case class WrViewRow(
   /** Points to [[production.workorderrouting.WorkorderroutingRow.actualcost]] */
   actualcost: Option[BigDecimal],
   /** Points to [[production.workorderrouting.WorkorderroutingRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object WrViewRow {
-  implicit val decoder: Decoder[WrViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        workorderid <- c.downField("workorderid").as[Option[WorkorderId]]
-        productid <- c.downField("productid").as[Option[Int]]
-        operationsequence <- c.downField("operationsequence").as[Option[Int]]
-        locationid <- c.downField("locationid").as[Option[LocationId]]
-        scheduledstartdate <- c.downField("scheduledstartdate").as[Option[LocalDateTime]]
-        scheduledenddate <- c.downField("scheduledenddate").as[Option[LocalDateTime]]
-        actualstartdate <- c.downField("actualstartdate").as[Option[LocalDateTime]]
-        actualenddate <- c.downField("actualenddate").as[Option[LocalDateTime]]
-        actualresourcehrs <- c.downField("actualresourcehrs").as[Option[BigDecimal]]
-        plannedcost <- c.downField("plannedcost").as[Option[BigDecimal]]
-        actualcost <- c.downField("actualcost").as[Option[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield WrViewRow(id, workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
-  implicit val encoder: Encoder[WrViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "workorderid" := row.workorderid,
-        "productid" := row.productid,
-        "operationsequence" := row.operationsequence,
-        "locationid" := row.locationid,
-        "scheduledstartdate" := row.scheduledstartdate,
-        "scheduledenddate" := row.scheduledenddate,
-        "actualstartdate" := row.actualstartdate,
-        "actualenddate" := row.actualenddate,
-        "actualresourcehrs" := row.actualresourcehrs,
-        "plannedcost" := row.plannedcost,
-        "actualcost" := row.actualcost,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[WrViewRow] =
-    new Read[WrViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[WorkorderId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocationId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => WrViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        workorderid = Get[WorkorderId].unsafeGetNullable(rs, i + 1),
-        productid = Get[Int].unsafeGetNullable(rs, i + 2),
-        operationsequence = Get[Int].unsafeGetNullable(rs, i + 3),
-        locationid = Get[LocationId].unsafeGetNullable(rs, i + 4),
-        scheduledstartdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        scheduledenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6),
-        actualstartdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7),
-        actualenddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8),
-        actualresourcehrs = Get[BigDecimal].unsafeGetNullable(rs, i + 9),
-        plannedcost = Get[BigDecimal].unsafeGetNullable(rs, i + 10),
-        actualcost = Get[BigDecimal].unsafeGetNullable(rs, i + 11),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 12)
-      )
+  implicit val decoder: Decoder[WrViewRow] = Decoder.forProduct13[WrViewRow, Option[Int], Option[WorkorderId], Option[Int], Option[Int], Option[LocationId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(WrViewRow.apply)
+  implicit val encoder: Encoder[WrViewRow] = Encoder.forProduct13[WrViewRow, Option[Int], Option[WorkorderId], Option[Int], Option[Int], Option[LocationId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(x => (x.id, x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate))
+  implicit val read: Read[WrViewRow] = new Read[WrViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[WorkorderId], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[LocationId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => WrViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      workorderid = Get[WorkorderId].unsafeGetNullable(rs, i + 1),
+      productid = Get[Int].unsafeGetNullable(rs, i + 2),
+      operationsequence = Get[Int].unsafeGetNullable(rs, i + 3),
+      locationid = Get[LocationId].unsafeGetNullable(rs, i + 4),
+      scheduledstartdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5),
+      scheduledenddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6),
+      actualstartdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7),
+      actualenddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 8),
+      actualresourcehrs = Get[BigDecimal].unsafeGetNullable(rs, i + 9),
+      plannedcost = Get[BigDecimal].unsafeGetNullable(rs, i + 10),
+      actualcost = Get[BigDecimal].unsafeGetNullable(rs, i + 11),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 12)
     )
-  
-
+  )
 }

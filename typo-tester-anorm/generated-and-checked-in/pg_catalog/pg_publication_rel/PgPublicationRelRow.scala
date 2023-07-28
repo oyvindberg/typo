@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPublicationRelRow(
@@ -23,34 +25,30 @@ case class PgPublicationRelRow(
 )
 
 object PgPublicationRelRow {
-  def rowParser(idx: Int): RowParser[PgPublicationRelRow] =
-    RowParser[PgPublicationRelRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPublicationRelRow] = Reads[PgPublicationRelRow](json => JsResult.fromTry(
+      Try(
         PgPublicationRelRow(
-          oid = row[PgPublicationRelId](idx + 0),
-          prpubid = row[/* oid */ Long](idx + 1),
-          prrelid = row[/* oid */ Long](idx + 2)
+          oid = json.\("oid").as[PgPublicationRelId],
+          prpubid = json.\("prpubid").as[/* oid */ Long],
+          prrelid = json.\("prrelid").as[/* oid */ Long]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPublicationRelRow] = new OFormat[PgPublicationRelRow]{
-    override def writes(o: PgPublicationRelRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "prpubid" -> o.prpubid,
-        "prrelid" -> o.prrelid
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPublicationRelRow] = RowParser[PgPublicationRelRow] { row =>
+    Success(
+      PgPublicationRelRow(
+        oid = row[PgPublicationRelId](idx + 0),
+        prpubid = row[/* oid */ Long](idx + 1),
+        prrelid = row[/* oid */ Long](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPublicationRelRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPublicationRelRow(
-            oid = json.\("oid").as[PgPublicationRelId],
-            prpubid = json.\("prpubid").as[/* oid */ Long],
-            prrelid = json.\("prrelid").as[/* oid */ Long]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPublicationRelRow] = OWrites[PgPublicationRelRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "prpubid" -> Json.toJson(o.prpubid),
+      "prrelid" -> Json.toJson(o.prrelid)
+    ))
+  )
 }

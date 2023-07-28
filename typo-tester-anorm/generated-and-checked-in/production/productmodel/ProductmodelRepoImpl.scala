@@ -8,11 +8,11 @@ package production
 package productmodel
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object ProductmodelRepoImpl extends ProductmodelRepo {
@@ -22,7 +22,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.catalogdescription}::xml, ${unsaved.instructions}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+          returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
        """
       .executeInsert(ProductmodelRow.rowParser(1).single)
   
@@ -42,19 +42,19 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productmodel default values
-            returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+            returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
          """
         .executeInsert(ProductmodelRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productmodel(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+                  returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -65,18 +65,18 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
-    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from production.productmodel
        """.as(ProductmodelRow.rowParser(1).*)
   }
   override def selectById(productmodelid: ProductmodelId)(implicit c: Connection): Option[ProductmodelRow] = {
-    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from production.productmodel
           where productmodelid = $productmodelid
        """.as(ProductmodelRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): List[ProductmodelRow] = {
-    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from production.productmodel
           where productmodelid = ANY($productmodelids)
        """.as(ProductmodelRow.rowParser(1).*)
@@ -110,7 +110,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
             instructions = EXCLUDED.instructions,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+          returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
        """
       .executeInsert(ProductmodelRow.rowParser(1).single)
   

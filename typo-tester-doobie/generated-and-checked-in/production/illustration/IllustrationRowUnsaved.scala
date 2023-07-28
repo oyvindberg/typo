@@ -8,12 +8,10 @@ package production
 package illustration
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.illustration` which has not been persisted yet */
 case class IllustrationRowUnsaved(
@@ -23,9 +21,9 @@ case class IllustrationRowUnsaved(
       Primary key for Illustration records. */
   illustrationid: Defaulted[IllustrationId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(illustrationidDefault: => IllustrationId, modifieddateDefault: => LocalDateTime): IllustrationRow =
+  def toRow(illustrationidDefault: => IllustrationId, modifieddateDefault: => TypoLocalDateTime): IllustrationRow =
     IllustrationRow(
       diagram = diagram,
       illustrationid = illustrationid match {
@@ -39,19 +37,6 @@ case class IllustrationRowUnsaved(
     )
 }
 object IllustrationRowUnsaved {
-  implicit val decoder: Decoder[IllustrationRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        diagram <- c.downField("diagram").as[Option[TypoXml]]
-        illustrationid <- c.downField("illustrationid").as[Defaulted[IllustrationId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield IllustrationRowUnsaved(diagram, illustrationid, modifieddate)
-  implicit val encoder: Encoder[IllustrationRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "diagram" := row.diagram,
-        "illustrationid" := row.illustrationid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[IllustrationRowUnsaved] = Decoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(IllustrationRowUnsaved.apply)
+  implicit val encoder: Encoder[IllustrationRowUnsaved] = Encoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(x => (x.diagram, x.illustrationid, x.modifieddate))
 }

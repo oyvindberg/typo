@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAmRow(
@@ -25,37 +27,33 @@ case class PgAmRow(
 )
 
 object PgAmRow {
-  def rowParser(idx: Int): RowParser[PgAmRow] =
-    RowParser[PgAmRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAmRow] = Reads[PgAmRow](json => JsResult.fromTry(
+      Try(
         PgAmRow(
-          oid = row[PgAmId](idx + 0),
-          amname = row[String](idx + 1),
-          amhandler = row[TypoRegproc](idx + 2),
-          amtype = row[String](idx + 3)
+          oid = json.\("oid").as[PgAmId],
+          amname = json.\("amname").as[String],
+          amhandler = json.\("amhandler").as[TypoRegproc],
+          amtype = json.\("amtype").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAmRow] = new OFormat[PgAmRow]{
-    override def writes(o: PgAmRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "amname" -> o.amname,
-        "amhandler" -> o.amhandler,
-        "amtype" -> o.amtype
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAmRow] = RowParser[PgAmRow] { row =>
+    Success(
+      PgAmRow(
+        oid = row[PgAmId](idx + 0),
+        amname = row[String](idx + 1),
+        amhandler = row[TypoRegproc](idx + 2),
+        amtype = row[String](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAmRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAmRow(
-            oid = json.\("oid").as[PgAmId],
-            amname = json.\("amname").as[String],
-            amhandler = json.\("amhandler").as[TypoRegproc],
-            amtype = json.\("amtype").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAmRow] = OWrites[PgAmRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "amname" -> Json.toJson(o.amname),
+      "amhandler" -> Json.toJson(o.amhandler),
+      "amtype" -> Json.toJson(o.amtype)
+    ))
+  )
 }

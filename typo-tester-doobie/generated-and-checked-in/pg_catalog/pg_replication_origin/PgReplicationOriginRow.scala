@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_replication_origin
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgReplicationOriginRow(
@@ -22,30 +20,16 @@ case class PgReplicationOriginRow(
 )
 
 object PgReplicationOriginRow {
-  implicit val decoder: Decoder[PgReplicationOriginRow] =
-    (c: HCursor) =>
-      for {
-        roident <- c.downField("roident").as[PgReplicationOriginId]
-        roname <- c.downField("roname").as[String]
-      } yield PgReplicationOriginRow(roident, roname)
-  implicit val encoder: Encoder[PgReplicationOriginRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "roident" := row.roident,
-        "roname" := row.roname
-      )}
-  implicit val read: Read[PgReplicationOriginRow] =
-    new Read[PgReplicationOriginRow](
-      gets = List(
-        (Get[PgReplicationOriginId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgReplicationOriginRow(
-        roident = Get[PgReplicationOriginId].unsafeGetNonNullable(rs, i + 0),
-        roname = Get[String].unsafeGetNonNullable(rs, i + 1)
-      )
+  implicit val decoder: Decoder[PgReplicationOriginRow] = Decoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(PgReplicationOriginRow.apply)
+  implicit val encoder: Encoder[PgReplicationOriginRow] = Encoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(x => (x.roident, x.roname))
+  implicit val read: Read[PgReplicationOriginRow] = new Read[PgReplicationOriginRow](
+    gets = List(
+      (Get[PgReplicationOriginId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgReplicationOriginRow(
+      roident = Get[PgReplicationOriginId].unsafeGetNonNullable(rs, i + 0),
+      roname = Get[String].unsafeGetNonNullable(rs, i + 1)
     )
-  
-
+  )
 }

@@ -9,24 +9,11 @@ package pg_shdescription
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `pg_catalog.pg_shdescription` */
 case class PgShdescriptionId(objoid: /* oid */ Long, classoid: /* oid */ Long)
 object PgShdescriptionId {
+  implicit val decoder: Decoder[PgShdescriptionId] = Decoder.forProduct2[PgShdescriptionId, /* oid */ Long, /* oid */ Long]("objoid", "classoid")(PgShdescriptionId.apply)
+  implicit val encoder: Encoder[PgShdescriptionId] = Encoder.forProduct2[PgShdescriptionId, /* oid */ Long, /* oid */ Long]("objoid", "classoid")(x => (x.objoid, x.classoid))
   implicit val ordering: Ordering[PgShdescriptionId] = Ordering.by(x => (x.objoid, x.classoid))
-  implicit val decoder: Decoder[PgShdescriptionId] =
-    (c: HCursor) =>
-      for {
-        objoid <- c.downField("objoid").as[/* oid */ Long]
-        classoid <- c.downField("classoid").as[/* oid */ Long]
-      } yield PgShdescriptionId(objoid, classoid)
-  implicit val encoder: Encoder[PgShdescriptionId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "objoid" := row.objoid,
-        "classoid" := row.classoid
-      )}
 }

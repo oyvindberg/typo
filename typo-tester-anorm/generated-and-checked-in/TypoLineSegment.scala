@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.geometric.PGlseg
 import org.postgresql.geometric.PGpoint
@@ -20,57 +17,55 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This implements a line represented by the linear equation Ax + By + C = 0 */
 case class TypoLineSegment(p1: TypoPoint, p2: TypoPoint)
+
 object TypoLineSegment {
-  implicit val oFormat: OFormat[TypoLineSegment] = new OFormat[TypoLineSegment]{
-    override def writes(o: TypoLineSegment): JsObject =
-      Json.obj(
-        "p1" -> o.p1,
-        "p2" -> o.p2
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoLineSegment] = {
-      JsResult.fromTry(
-        Try(
-          TypoLineSegment(
-            p1 = json.\("p1").as[TypoPoint],
-            p2 = json.\("p2").as[TypoPoint]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoLineSegmentDb: ToStatement[TypoLineSegment] with ParameterMetaData[TypoLineSegment] with Column[TypoLineSegment] = new ToStatement[TypoLineSegment] with ParameterMetaData[TypoLineSegment] with Column[TypoLineSegment] {
-    override def sqlType: String = "lseg"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoLineSegment): Unit =
-      s.setObject(index, new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y)))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoLineSegment] =
-      v match {
-        case v: PGlseg => Right(TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGlseg from JDBC to produce a TypoLineSegment, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoLineSegmentDbArray: ToStatement[Array[TypoLineSegment]] with ParameterMetaData[Array[TypoLineSegment]] with Column[Array[TypoLineSegment]] = new ToStatement[Array[TypoLineSegment]] with ParameterMetaData[Array[TypoLineSegment]] with Column[Array[TypoLineSegment]] {
-    override def sqlType: String = "_lseg"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoLineSegment]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("lseg", v.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y)))))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoLineSegment]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoLineSegment]] = Column.nonNull[Array[TypoLineSegment]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoLineSegment(TypoPoint(v.asInstanceOf[PGlseg].point(0).x, v.asInstanceOf[PGlseg].point(0).y), TypoPoint(v.asInstanceOf[PGlseg].point(1).x, v.asInstanceOf[PGlseg].point(1).y))))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoLineSegment, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoLineSegment, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLineSegment]] = new ParameterMetaData[Array[TypoLineSegment]] {
+    override def sqlType: String = "_lseg"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoLineSegment]] = ToStatement[Array[TypoLineSegment]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("lseg", v.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))))
+  implicit val column: Column[TypoLineSegment] = Column.nonNull[TypoLineSegment]((v1: Any, _) =>
+    v1 match {
+      case v: PGlseg => Right(TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGlseg, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoLineSegment] = new ParameterMetaData[TypoLineSegment] {
+    override def sqlType: String = "lseg"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoLineSegment] = Reads[TypoLineSegment](json => JsResult.fromTry(
+      Try(
+        TypoLineSegment(
+          p1 = json.\("p1").as[TypoPoint],
+          p2 = json.\("p2").as[TypoPoint]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoLineSegment] = ToStatement[TypoLineSegment]((s, index, v) => s.setObject(index, new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
+  implicit val writes: OWrites[TypoLineSegment] = OWrites[TypoLineSegment](o =>
+    new JsObject(ListMap[String, JsValue](
+      "p1" -> Json.toJson(o.p1),
+      "p2" -> Json.toJson(o.p2)
+    ))
+  )
 }

@@ -8,11 +8,11 @@ package production
 package workorder
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.orderqty}::int4, ${unsaved.scrappedqty}::int2, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.scrapreasonid}::int2, ${unsaved.modifieddate}::timestamp)
-          returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
   
@@ -41,19 +41,19 @@ object WorkorderRepoImpl extends WorkorderRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.workorder default values
-            returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+            returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
          """
         .executeInsert(WorkorderRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.workorder(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+                  returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -64,18 +64,18 @@ object WorkorderRepoImpl extends WorkorderRepo {
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
           from production.workorder
        """.as(WorkorderRow.rowParser(1).*)
   }
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
           from production.workorder
           where workorderid = $workorderid
        """.as(WorkorderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
-    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+    SQL"""select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
           from production.workorder
           where workorderid = ANY($workorderids)
        """.as(WorkorderRow.rowParser(1).*)
@@ -118,7 +118,7 @@ object WorkorderRepoImpl extends WorkorderRepo {
             duedate = EXCLUDED.duedate,
             scrapreasonid = EXCLUDED.scrapreasonid,
             modifieddate = EXCLUDED.modifieddate
-          returning workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
+          returning workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
   

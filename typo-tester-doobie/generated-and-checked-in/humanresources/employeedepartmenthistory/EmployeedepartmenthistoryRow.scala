@@ -7,19 +7,17 @@ package adventureworks
 package humanresources
 package employeedepartmenthistory
 
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 case class EmployeedepartmenthistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
@@ -32,55 +30,33 @@ case class EmployeedepartmenthistoryRow(
       Points to [[shift.ShiftRow.shiftid]] */
   shiftid: ShiftId,
   /** Date the employee started work in the department. */
-  startdate: LocalDate,
+  startdate: TypoLocalDate,
   /** Date the employee left the department. NULL = Current department. */
-  enddate: Option[LocalDate],
-  modifieddate: LocalDateTime
+  enddate: Option[TypoLocalDate],
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeedepartmenthistoryId = EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)
  }
 
 object EmployeedepartmenthistoryRow {
-  implicit val decoder: Decoder[EmployeedepartmenthistoryRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        departmentid <- c.downField("departmentid").as[DepartmentId]
-        shiftid <- c.downField("shiftid").as[ShiftId]
-        startdate <- c.downField("startdate").as[LocalDate]
-        enddate <- c.downField("enddate").as[Option[LocalDate]]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield EmployeedepartmenthistoryRow(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
-  implicit val encoder: Encoder[EmployeedepartmenthistoryRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "departmentid" := row.departmentid,
-        "shiftid" := row.shiftid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[EmployeedepartmenthistoryRow] =
-    new Read[EmployeedepartmenthistoryRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[DepartmentId], Nullability.NoNulls),
-        (Get[ShiftId], Nullability.NoNulls),
-        (Get[LocalDate], Nullability.NoNulls),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EmployeedepartmenthistoryRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 1),
-        shiftid = Get[ShiftId].unsafeGetNonNullable(rs, i + 2),
-        startdate = Get[LocalDate].unsafeGetNonNullable(rs, i + 3),
-        enddate = Get[LocalDate].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[EmployeedepartmenthistoryRow] = Decoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EmployeedepartmenthistoryRow.apply)
+  implicit val encoder: Encoder[EmployeedepartmenthistoryRow] = Encoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))
+  implicit val read: Read[EmployeedepartmenthistoryRow] = new Read[EmployeedepartmenthistoryRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[DepartmentId], Nullability.NoNulls),
+      (Get[ShiftId], Nullability.NoNulls),
+      (Get[TypoLocalDate], Nullability.NoNulls),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => EmployeedepartmenthistoryRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      departmentid = Get[DepartmentId].unsafeGetNonNullable(rs, i + 1),
+      shiftid = Get[ShiftId].unsafeGetNonNullable(rs, i + 2),
+      startdate = Get[TypoLocalDate].unsafeGetNonNullable(rs, i + 3),
+      enddate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

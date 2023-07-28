@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object SthViewRepoImpl extends SthViewRepo {
   override def selectAll(implicit c: Connection): List[SthViewRow] = {
-    SQL"""select "id", businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+    SQL"""select "id", businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
           from sa.sth
        """.as(SthViewRow.rowParser(1).*)
   }

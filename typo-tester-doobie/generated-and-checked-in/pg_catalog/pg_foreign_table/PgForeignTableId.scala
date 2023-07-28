@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_foreign_table
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_foreign_table` */
 case class PgForeignTableId(value: /* oid */ Long) extends AnyVal
 object PgForeignTableId {
+  implicit val arrayGet: Get[Array[PgForeignTableId]] = Get[Array[/* oid */ Long]].map(_.map(PgForeignTableId.apply))
+  implicit val arrayPut: Put[Array[PgForeignTableId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgForeignTableId] = Decoder[/* oid */ Long].map(PgForeignTableId.apply)
+  implicit val encoder: Encoder[PgForeignTableId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgForeignTableId] = Get[/* oid */ Long].map(PgForeignTableId.apply)
   implicit val ordering: Ordering[PgForeignTableId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgForeignTableId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgForeignTableId] =
-    Decoder[/* oid */ Long].map(PgForeignTableId(_))
-  implicit val meta: Meta[PgForeignTableId] = Meta[/* oid */ Long].imap(PgForeignTableId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgForeignTableId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgForeignTableId.apply))(_.map(_.value))
+  implicit val put: Put[PgForeignTableId] = Put[/* oid */ Long].contramap(_.value)
 }

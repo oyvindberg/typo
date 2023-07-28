@@ -7,19 +7,21 @@ package adventureworks
 package pe
 package p
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PViewRow(
@@ -49,71 +51,67 @@ case class PViewRow(
   /** Points to [[person.person.PersonRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.person.PersonRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PViewRow {
-  def rowParser(idx: Int): RowParser[PViewRow] =
-    RowParser[PViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PViewRow] = Reads[PViewRow](json => JsResult.fromTry(
+      Try(
         PViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          persontype = row[Option[/* bpchar */ String]](idx + 2),
-          namestyle = row[NameStyle](idx + 3),
-          title = row[Option[/* max 8 chars */ String]](idx + 4),
-          firstname = row[Option[Name]](idx + 5),
-          middlename = row[Option[Name]](idx + 6),
-          lastname = row[Option[Name]](idx + 7),
-          suffix = row[Option[/* max 10 chars */ String]](idx + 8),
-          emailpromotion = row[Option[Int]](idx + 9),
-          additionalcontactinfo = row[Option[TypoXml]](idx + 10),
-          demographics = row[Option[TypoXml]](idx + 11),
-          rowguid = row[Option[UUID]](idx + 12),
-          modifieddate = row[Option[LocalDateTime]](idx + 13)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          persontype = json.\("persontype").toOption.map(_.as[/* bpchar */ String]),
+          namestyle = json.\("namestyle").as[NameStyle],
+          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
+          firstname = json.\("firstname").toOption.map(_.as[Name]),
+          middlename = json.\("middlename").toOption.map(_.as[Name]),
+          lastname = json.\("lastname").toOption.map(_.as[Name]),
+          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
+          emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
+          additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
+          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PViewRow] = new OFormat[PViewRow]{
-    override def writes(o: PViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "persontype" -> o.persontype,
-        "namestyle" -> o.namestyle,
-        "title" -> o.title,
-        "firstname" -> o.firstname,
-        "middlename" -> o.middlename,
-        "lastname" -> o.lastname,
-        "suffix" -> o.suffix,
-        "emailpromotion" -> o.emailpromotion,
-        "additionalcontactinfo" -> o.additionalcontactinfo,
-        "demographics" -> o.demographics,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PViewRow] = RowParser[PViewRow] { row =>
+    Success(
+      PViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        persontype = row[Option[/* bpchar */ String]](idx + 2),
+        namestyle = row[NameStyle](idx + 3),
+        title = row[Option[/* max 8 chars */ String]](idx + 4),
+        firstname = row[Option[Name]](idx + 5),
+        middlename = row[Option[Name]](idx + 6),
+        lastname = row[Option[Name]](idx + 7),
+        suffix = row[Option[/* max 10 chars */ String]](idx + 8),
+        emailpromotion = row[Option[Int]](idx + 9),
+        additionalcontactinfo = row[Option[TypoXml]](idx + 10),
+        demographics = row[Option[TypoXml]](idx + 11),
+        rowguid = row[Option[UUID]](idx + 12),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 13)
       )
-  
-    override def reads(json: JsValue): JsResult[PViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            persontype = json.\("persontype").toOption.map(_.as[/* bpchar */ String]),
-            namestyle = json.\("namestyle").as[NameStyle],
-            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-            firstname = json.\("firstname").toOption.map(_.as[Name]),
-            middlename = json.\("middlename").toOption.map(_.as[Name]),
-            lastname = json.\("lastname").toOption.map(_.as[Name]),
-            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-            emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
-            demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PViewRow] = OWrites[PViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "persontype" -> Json.toJson(o.persontype),
+      "namestyle" -> Json.toJson(o.namestyle),
+      "title" -> Json.toJson(o.title),
+      "firstname" -> Json.toJson(o.firstname),
+      "middlename" -> Json.toJson(o.middlename),
+      "lastname" -> Json.toJson(o.lastname),
+      "suffix" -> Json.toJson(o.suffix),
+      "emailpromotion" -> Json.toJson(o.emailpromotion),
+      "additionalcontactinfo" -> Json.toJson(o.additionalcontactinfo),
+      "demographics" -> Json.toJson(o.demographics),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgInheritsRow(
@@ -26,37 +28,33 @@ case class PgInheritsRow(
  }
 
 object PgInheritsRow {
-  def rowParser(idx: Int): RowParser[PgInheritsRow] =
-    RowParser[PgInheritsRow] { row =>
-      Success(
+  implicit val reads: Reads[PgInheritsRow] = Reads[PgInheritsRow](json => JsResult.fromTry(
+      Try(
         PgInheritsRow(
-          inhrelid = row[/* oid */ Long](idx + 0),
-          inhparent = row[/* oid */ Long](idx + 1),
-          inhseqno = row[Int](idx + 2),
-          inhdetachpending = row[Boolean](idx + 3)
+          inhrelid = json.\("inhrelid").as[/* oid */ Long],
+          inhparent = json.\("inhparent").as[/* oid */ Long],
+          inhseqno = json.\("inhseqno").as[Int],
+          inhdetachpending = json.\("inhdetachpending").as[Boolean]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgInheritsRow] = new OFormat[PgInheritsRow]{
-    override def writes(o: PgInheritsRow): JsObject =
-      Json.obj(
-        "inhrelid" -> o.inhrelid,
-        "inhparent" -> o.inhparent,
-        "inhseqno" -> o.inhseqno,
-        "inhdetachpending" -> o.inhdetachpending
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgInheritsRow] = RowParser[PgInheritsRow] { row =>
+    Success(
+      PgInheritsRow(
+        inhrelid = row[/* oid */ Long](idx + 0),
+        inhparent = row[/* oid */ Long](idx + 1),
+        inhseqno = row[Int](idx + 2),
+        inhdetachpending = row[Boolean](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgInheritsRow] = {
-      JsResult.fromTry(
-        Try(
-          PgInheritsRow(
-            inhrelid = json.\("inhrelid").as[/* oid */ Long],
-            inhparent = json.\("inhparent").as[/* oid */ Long],
-            inhseqno = json.\("inhseqno").as[Int],
-            inhdetachpending = json.\("inhdetachpending").as[Boolean]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgInheritsRow] = OWrites[PgInheritsRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "inhrelid" -> Json.toJson(o.inhrelid),
+      "inhparent" -> Json.toJson(o.inhparent),
+      "inhseqno" -> Json.toJson(o.inhseqno),
+      "inhdetachpending" -> Json.toJson(o.inhdetachpending)
+    ))
+  )
 }

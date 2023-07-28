@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
   override def delete(partrelid: PgPartitionedTableId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_partitioned_table where partrelid = $partrelid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_partitioned_table where partrelid = ${partrelid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow] = {
     sql"""insert into pg_catalog.pg_partitioned_table(partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs)
@@ -25,10 +25,10 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table".query[PgPartitionedTableRow].stream
   }
   override def selectById(partrelid: PgPartitionedTableId): ConnectionIO[Option[PgPartitionedTableRow]] = {
-    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = $partrelid".query[PgPartitionedTableRow].option
+    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ${partrelid}".query[PgPartitionedTableRow].option
   }
   override def selectByIds(partrelids: Array[PgPartitionedTableId]): Stream[ConnectionIO, PgPartitionedTableRow] = {
-    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ANY($partrelids)".query[PgPartitionedTableRow].stream
+    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ANY(${partrelids})".query[PgPartitionedTableRow].stream
   }
   override def update(row: PgPartitionedTableRow): ConnectionIO[Boolean] = {
     val partrelid = row.partrelid
@@ -40,7 +40,7 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
               partclass = ${row.partclass}::oidvector,
               partcollation = ${row.partcollation}::oidvector,
               partexprs = ${row.partexprs}::pg_node_tree
-          where partrelid = $partrelid
+          where partrelid = ${partrelid}
        """
       .update
       .run

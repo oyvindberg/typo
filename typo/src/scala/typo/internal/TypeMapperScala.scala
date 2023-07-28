@@ -67,7 +67,7 @@ case class TypeMapperScala(
       case db.Type.Bytea           => sc.Type.Array.of(sc.Type.Byte)
       case db.Type.Bpchar          => sc.Type.String.withComment("bpchar")
       case db.Type.Char            => sc.Type.String
-      case db.Type.Date            => sc.Type.LocalDate
+      case db.Type.Date            => customTypes.TypoLocalDate.typoType
       case db.Type.DomainRef(name) => sc.Type.Qualified(naming.domainName(name))
       case db.Type.Float4          => sc.Type.Float
       case db.Type.Float8          => sc.Type.Double
@@ -109,10 +109,10 @@ case class TypeMapperScala(
       case db.Type.xid             => customTypes.TypoXid.typoType
       case db.Type.EnumRef(name)   => sc.Type.Qualified(naming.enumName(name))
       case db.Type.Text            => sc.Type.String
-      case db.Type.Time            => sc.Type.LocalTime
-      case db.Type.Timez           => sc.Type.OffsetTime
-      case db.Type.Timestamp       => sc.Type.LocalDateTime
-      case db.Type.TimestampTz     => sc.Type.OffsetDateTime
+      case db.Type.Time            => customTypes.TypoLocalTime.typoType
+      case db.Type.TimeTz          => customTypes.TypoOffsetTime.typoType
+      case db.Type.Timestamp       => customTypes.TypoLocalDateTime.typoType
+      case db.Type.TimestampTz     => customTypes.TypoOffsetDateTime.typoType
       case db.Type.UUID            => sc.Type.UUID
       case db.Type.Xml             => customTypes.TypoXml.typoType
       case db.Type.VarChar(maybeN) =>

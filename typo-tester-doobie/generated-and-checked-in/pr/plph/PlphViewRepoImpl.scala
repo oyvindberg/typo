@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PlphViewRepoImpl extends PlphViewRepo {
   override def selectAll: Stream[ConnectionIO, PlphViewRow] = {
-    sql"""select "id", productid, startdate, enddate, listprice, modifieddate from pr.plph""".query[PlphViewRow].stream
+    sql"""select "id", productid, startdate::text, enddate::text, listprice, modifieddate::text from pr.plph""".query[PlphViewRow].stream
   }
 }

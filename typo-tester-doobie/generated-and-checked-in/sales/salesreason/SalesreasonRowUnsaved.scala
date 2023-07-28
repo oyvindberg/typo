@@ -8,12 +8,10 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.salesreason` which has not been persisted yet */
 case class SalesreasonRowUnsaved(
@@ -25,9 +23,9 @@ case class SalesreasonRowUnsaved(
       Primary key for SalesReason records. */
   salesreasonid: Defaulted[SalesreasonId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesreasonidDefault: => SalesreasonId, modifieddateDefault: => LocalDateTime): SalesreasonRow =
+  def toRow(salesreasonidDefault: => SalesreasonId, modifieddateDefault: => TypoLocalDateTime): SalesreasonRow =
     SalesreasonRow(
       name = name,
       reasontype = reasontype,
@@ -42,21 +40,6 @@ case class SalesreasonRowUnsaved(
     )
 }
 object SalesreasonRowUnsaved {
-  implicit val decoder: Decoder[SalesreasonRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        reasontype <- c.downField("reasontype").as[Name]
-        salesreasonid <- c.downField("salesreasonid").as[Defaulted[SalesreasonId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SalesreasonRowUnsaved(name, reasontype, salesreasonid, modifieddate)
-  implicit val encoder: Encoder[SalesreasonRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "reasontype" := row.reasontype,
-        "salesreasonid" := row.salesreasonid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SalesreasonRowUnsaved] = Decoder.forProduct4[SalesreasonRowUnsaved, Name, Name, Defaulted[SalesreasonId], Defaulted[TypoLocalDateTime]]("name", "reasontype", "salesreasonid", "modifieddate")(SalesreasonRowUnsaved.apply)
+  implicit val encoder: Encoder[SalesreasonRowUnsaved] = Encoder.forProduct4[SalesreasonRowUnsaved, Name, Name, Defaulted[SalesreasonId], Defaulted[TypoLocalDateTime]]("name", "reasontype", "salesreasonid", "modifieddate")(x => (x.name, x.reasontype, x.salesreasonid, x.modifieddate))
 }

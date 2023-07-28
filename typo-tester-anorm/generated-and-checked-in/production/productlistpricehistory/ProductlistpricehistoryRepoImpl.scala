@@ -8,11 +8,11 @@ package production
 package productlistpricehistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def delete(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def insert(unsaved: ProductlistpricehistoryRow)(implicit c: Connection): ProductlistpricehistoryRow = {
     SQL"""insert into production.productlistpricehistory(productid, startdate, enddate, listprice, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.listprice}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning productid, startdate, enddate, listprice, modifieddate
+          returning productid, startdate::text, enddate::text, listprice, modifieddate::text
        """
       .executeInsert(ProductlistpricehistoryRow.rowParser(1).single)
   
@@ -34,19 +34,19 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
       Some((NamedParameter("listprice", ParameterValue.from(unsaved.listprice)), "::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productlistpricehistory default values
-            returning productid, startdate, enddate, listprice, modifieddate
+            returning productid, startdate::text, enddate::text, listprice, modifieddate::text
          """
         .executeInsert(ProductlistpricehistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productlistpricehistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productid, startdate, enddate, listprice, modifieddate
+                  returning productid, startdate::text, enddate::text, listprice, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -57,12 +57,12 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductlistpricehistoryRow] = {
-    SQL"""select productid, startdate, enddate, listprice, modifieddate
+    SQL"""select productid, startdate::text, enddate::text, listprice, modifieddate::text
           from production.productlistpricehistory
        """.as(ProductlistpricehistoryRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow] = {
-    SQL"""select productid, startdate, enddate, listprice, modifieddate
+    SQL"""select productid, startdate::text, enddate::text, listprice, modifieddate::text
           from production.productlistpricehistory
           where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
        """.as(ProductlistpricehistoryRow.rowParser(1).singleOpt)
@@ -90,7 +90,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
             enddate = EXCLUDED.enddate,
             listprice = EXCLUDED.listprice,
             modifieddate = EXCLUDED.modifieddate
-          returning productid, startdate, enddate, listprice, modifieddate
+          returning productid, startdate::text, enddate::text, listprice, modifieddate::text
        """
       .executeInsert(ProductlistpricehistoryRow.rowParser(1).single)
   

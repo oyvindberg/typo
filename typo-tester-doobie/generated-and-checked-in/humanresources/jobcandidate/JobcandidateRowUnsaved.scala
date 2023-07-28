@@ -8,13 +8,11 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `humanresources.jobcandidate` which has not been persisted yet */
 case class JobcandidateRowUnsaved(
@@ -27,9 +25,9 @@ case class JobcandidateRowUnsaved(
       Primary key for JobCandidate records. */
   jobcandidateid: Defaulted[JobcandidateId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(jobcandidateidDefault: => JobcandidateId, modifieddateDefault: => LocalDateTime): JobcandidateRow =
+  def toRow(jobcandidateidDefault: => JobcandidateId, modifieddateDefault: => TypoLocalDateTime): JobcandidateRow =
     JobcandidateRow(
       businessentityid = businessentityid,
       resume = resume,
@@ -44,21 +42,6 @@ case class JobcandidateRowUnsaved(
     )
 }
 object JobcandidateRowUnsaved {
-  implicit val decoder: Decoder[JobcandidateRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        resume <- c.downField("resume").as[Option[TypoXml]]
-        jobcandidateid <- c.downField("jobcandidateid").as[Defaulted[JobcandidateId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield JobcandidateRowUnsaved(businessentityid, resume, jobcandidateid, modifieddate)
-  implicit val encoder: Encoder[JobcandidateRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "resume" := row.resume,
-        "jobcandidateid" := row.jobcandidateid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[JobcandidateRowUnsaved] = Decoder.forProduct4[JobcandidateRowUnsaved, Option[BusinessentityId], Option[TypoXml], Defaulted[JobcandidateId], Defaulted[TypoLocalDateTime]]("businessentityid", "resume", "jobcandidateid", "modifieddate")(JobcandidateRowUnsaved.apply)
+  implicit val encoder: Encoder[JobcandidateRowUnsaved] = Encoder.forProduct4[JobcandidateRowUnsaved, Option[BusinessentityId], Option[TypoXml], Defaulted[JobcandidateId], Defaulted[TypoLocalDateTime]]("businessentityid", "resume", "jobcandidateid", "modifieddate")(x => (x.businessentityid, x.resume, x.jobcandidateid, x.modifieddate))
 }

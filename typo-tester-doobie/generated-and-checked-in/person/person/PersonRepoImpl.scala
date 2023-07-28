@@ -8,23 +8,23 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.NameStyle
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from person.person where businessentityid = $businessentityid".update.run.map(_ > 0)
+    sql"delete from person.person where businessentityid = ${businessentityid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.persontype}::bpchar, ${unsaved.namestyle}::"public".NameStyle, ${unsaved.title}, ${unsaved.firstname}::"public"."Name", ${unsaved.middlename}::"public"."Name", ${unsaved.lastname}::"public"."Name", ${unsaved.suffix}, ${unsaved.emailpromotion}::int4, ${unsaved.additionalcontactinfo}::xml, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+          returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
        """.query[PersonRow].unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
@@ -52,32 +52,32 @@ object PersonRepoImpl extends PersonRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.person default values
-            returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+            returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+            returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
          """
     }
     q.query[PersonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person".query[PersonRow].stream
+    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person".query[PersonRow].stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PersonRow]] = {
-    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = $businessentityid".query[PersonRow].option
+    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person where businessentityid = ${businessentityid}".query[PersonRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PersonRow] = {
-    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = ANY($businessentityids)".query[PersonRow].stream
+    sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text from person.person where businessentityid = ANY(${businessentityids})".query[PersonRow].stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -94,7 +94,7 @@ object PersonRepoImpl extends PersonRepo {
               demographics = ${row.demographics}::xml,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          where businessentityid = ${businessentityid}
        """
       .update
       .run
@@ -131,7 +131,7 @@ object PersonRepoImpl extends PersonRepo {
             demographics = EXCLUDED.demographics,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
+          returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
        """.query[PersonRow].unique
   }
 }

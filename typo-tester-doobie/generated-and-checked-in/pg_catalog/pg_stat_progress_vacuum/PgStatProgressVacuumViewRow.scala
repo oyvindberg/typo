@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_vacuum
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatProgressVacuumViewRow(
@@ -31,66 +29,34 @@ case class PgStatProgressVacuumViewRow(
 )
 
 object PgStatProgressVacuumViewRow {
-  implicit val decoder: Decoder[PgStatProgressVacuumViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        datid <- c.downField("datid").as[Option[/* oid */ Long]]
-        datname <- c.downField("datname").as[Option[String]]
-        relid <- c.downField("relid").as[Option[/* oid */ Long]]
-        phase <- c.downField("phase").as[Option[String]]
-        heapBlksTotal <- c.downField("heap_blks_total").as[Option[Long]]
-        heapBlksScanned <- c.downField("heap_blks_scanned").as[Option[Long]]
-        heapBlksVacuumed <- c.downField("heap_blks_vacuumed").as[Option[Long]]
-        indexVacuumCount <- c.downField("index_vacuum_count").as[Option[Long]]
-        maxDeadTuples <- c.downField("max_dead_tuples").as[Option[Long]]
-        numDeadTuples <- c.downField("num_dead_tuples").as[Option[Long]]
-      } yield PgStatProgressVacuumViewRow(pid, datid, datname, relid, phase, heapBlksTotal, heapBlksScanned, heapBlksVacuumed, indexVacuumCount, maxDeadTuples, numDeadTuples)
-  implicit val encoder: Encoder[PgStatProgressVacuumViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "datid" := row.datid,
-        "datname" := row.datname,
-        "relid" := row.relid,
-        "phase" := row.phase,
-        "heap_blks_total" := row.heapBlksTotal,
-        "heap_blks_scanned" := row.heapBlksScanned,
-        "heap_blks_vacuumed" := row.heapBlksVacuumed,
-        "index_vacuum_count" := row.indexVacuumCount,
-        "max_dead_tuples" := row.maxDeadTuples,
-        "num_dead_tuples" := row.numDeadTuples
-      )}
-  implicit val read: Read[PgStatProgressVacuumViewRow] =
-    new Read[PgStatProgressVacuumViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressVacuumViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        datname = Get[String].unsafeGetNullable(rs, i + 2),
-        relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-        phase = Get[String].unsafeGetNullable(rs, i + 4),
-        heapBlksTotal = Get[Long].unsafeGetNullable(rs, i + 5),
-        heapBlksScanned = Get[Long].unsafeGetNullable(rs, i + 6),
-        heapBlksVacuumed = Get[Long].unsafeGetNullable(rs, i + 7),
-        indexVacuumCount = Get[Long].unsafeGetNullable(rs, i + 8),
-        maxDeadTuples = Get[Long].unsafeGetNullable(rs, i + 9),
-        numDeadTuples = Get[Long].unsafeGetNullable(rs, i + 10)
-      )
+  implicit val decoder: Decoder[PgStatProgressVacuumViewRow] = Decoder.forProduct11[PgStatProgressVacuumViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples")(PgStatProgressVacuumViewRow.apply)
+  implicit val encoder: Encoder[PgStatProgressVacuumViewRow] = Encoder.forProduct11[PgStatProgressVacuumViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long]]("pid", "datid", "datname", "relid", "phase", "heap_blks_total", "heap_blks_scanned", "heap_blks_vacuumed", "index_vacuum_count", "max_dead_tuples", "num_dead_tuples")(x => (x.pid, x.datid, x.datname, x.relid, x.phase, x.heapBlksTotal, x.heapBlksScanned, x.heapBlksVacuumed, x.indexVacuumCount, x.maxDeadTuples, x.numDeadTuples))
+  implicit val read: Read[PgStatProgressVacuumViewRow] = new Read[PgStatProgressVacuumViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressVacuumViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      datname = Get[String].unsafeGetNullable(rs, i + 2),
+      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
+      phase = Get[String].unsafeGetNullable(rs, i + 4),
+      heapBlksTotal = Get[Long].unsafeGetNullable(rs, i + 5),
+      heapBlksScanned = Get[Long].unsafeGetNullable(rs, i + 6),
+      heapBlksVacuumed = Get[Long].unsafeGetNullable(rs, i + 7),
+      indexVacuumCount = Get[Long].unsafeGetNullable(rs, i + 8),
+      maxDeadTuples = Get[Long].unsafeGetNullable(rs, i + 9),
+      numDeadTuples = Get[Long].unsafeGetNullable(rs, i + 10)
     )
-  
-
+  )
 }

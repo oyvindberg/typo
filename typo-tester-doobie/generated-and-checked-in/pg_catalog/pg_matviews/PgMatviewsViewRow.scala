@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_matviews
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgMatviewsViewRow(
@@ -27,50 +25,26 @@ case class PgMatviewsViewRow(
 )
 
 object PgMatviewsViewRow {
-  implicit val decoder: Decoder[PgMatviewsViewRow] =
-    (c: HCursor) =>
-      for {
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        matviewname <- c.downField("matviewname").as[Option[String]]
-        matviewowner <- c.downField("matviewowner").as[Option[String]]
-        tablespace <- c.downField("tablespace").as[Option[String]]
-        hasindexes <- c.downField("hasindexes").as[Option[Boolean]]
-        ispopulated <- c.downField("ispopulated").as[Option[Boolean]]
-        definition <- c.downField("definition").as[Option[String]]
-      } yield PgMatviewsViewRow(schemaname, matviewname, matviewowner, tablespace, hasindexes, ispopulated, definition)
-  implicit val encoder: Encoder[PgMatviewsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "schemaname" := row.schemaname,
-        "matviewname" := row.matviewname,
-        "matviewowner" := row.matviewowner,
-        "tablespace" := row.tablespace,
-        "hasindexes" := row.hasindexes,
-        "ispopulated" := row.ispopulated,
-        "definition" := row.definition
-      )}
-  implicit val read: Read[PgMatviewsViewRow] =
-    new Read[PgMatviewsViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgMatviewsViewRow(
-        schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-        matviewname = Get[String].unsafeGetNullable(rs, i + 1),
-        matviewowner = Get[String].unsafeGetNullable(rs, i + 2),
-        tablespace = Get[String].unsafeGetNullable(rs, i + 3),
-        hasindexes = Get[Boolean].unsafeGetNullable(rs, i + 4),
-        ispopulated = Get[Boolean].unsafeGetNullable(rs, i + 5),
-        definition = Get[String].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgMatviewsViewRow] = Decoder.forProduct7[PgMatviewsViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[String]]("schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition")(PgMatviewsViewRow.apply)
+  implicit val encoder: Encoder[PgMatviewsViewRow] = Encoder.forProduct7[PgMatviewsViewRow, Option[String], Option[String], Option[String], Option[String], Option[Boolean], Option[Boolean], Option[String]]("schemaname", "matviewname", "matviewowner", "tablespace", "hasindexes", "ispopulated", "definition")(x => (x.schemaname, x.matviewname, x.matviewowner, x.tablespace, x.hasindexes, x.ispopulated, x.definition))
+  implicit val read: Read[PgMatviewsViewRow] = new Read[PgMatviewsViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgMatviewsViewRow(
+      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
+      matviewname = Get[String].unsafeGetNullable(rs, i + 1),
+      matviewowner = Get[String].unsafeGetNullable(rs, i + 2),
+      tablespace = Get[String].unsafeGetNullable(rs, i + 3),
+      hasindexes = Get[Boolean].unsafeGetNullable(rs, i + 4),
+      ispopulated = Get[Boolean].unsafeGetNullable(rs, i + 5),
+      definition = Get[String].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

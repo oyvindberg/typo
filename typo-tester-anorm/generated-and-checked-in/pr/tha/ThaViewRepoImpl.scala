@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object ThaViewRepoImpl extends ThaViewRepo {
   override def selectAll(implicit c: Connection): List[ThaViewRow] = {
-    SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
+    SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
           from pr.tha
        """.as(ThaViewRow.rowParser(1).*)
   }

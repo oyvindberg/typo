@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgAggregateRepoImpl extends PgAggregateRepo {
   override def delete(aggfnoid: PgAggregateId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_aggregate where aggfnoid = $aggfnoid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_aggregate where aggfnoid = ${aggfnoid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAggregateRow): ConnectionIO[PgAggregateRow] = {
     sql"""insert into pg_catalog.pg_aggregate(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)
@@ -25,10 +25,10 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
     sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate".query[PgAggregateRow].stream
   }
   override def selectById(aggfnoid: PgAggregateId): ConnectionIO[Option[PgAggregateRow]] = {
-    sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = $aggfnoid".query[PgAggregateRow].option
+    sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = ${aggfnoid}".query[PgAggregateRow].option
   }
   override def selectByIds(aggfnoids: Array[PgAggregateId]): Stream[ConnectionIO, PgAggregateRow] = {
-    sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = ANY($aggfnoids)".query[PgAggregateRow].stream
+    sql"select aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval from pg_catalog.pg_aggregate where aggfnoid = ANY(${aggfnoids})".query[PgAggregateRow].stream
   }
   override def update(row: PgAggregateRow): ConnectionIO[Boolean] = {
     val aggfnoid = row.aggfnoid
@@ -54,7 +54,7 @@ object PgAggregateRepoImpl extends PgAggregateRepo {
               aggmtransspace = ${row.aggmtransspace}::int4,
               agginitval = ${row.agginitval},
               aggminitval = ${row.aggminitval}
-          where aggfnoid = $aggfnoid
+          where aggfnoid = ${aggfnoid}
        """
       .update
       .run

@@ -8,12 +8,10 @@ package person
 package emailaddress
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `person.emailaddress` which has not been persisted yet */
@@ -29,9 +27,9 @@ case class EmailaddressRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(emailaddressidDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): EmailaddressRow =
+  def toRow(emailaddressidDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): EmailaddressRow =
     EmailaddressRow(
       businessentityid = businessentityid,
       emailaddress = emailaddress,
@@ -50,23 +48,6 @@ case class EmailaddressRowUnsaved(
     )
 }
 object EmailaddressRowUnsaved {
-  implicit val decoder: Decoder[EmailaddressRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
-        emailaddressid <- c.downField("emailaddressid").as[Defaulted[Int]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield EmailaddressRowUnsaved(businessentityid, emailaddress, emailaddressid, rowguid, modifieddate)
-  implicit val encoder: Encoder[EmailaddressRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "emailaddress" := row.emailaddress,
-        "emailaddressid" := row.emailaddressid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[EmailaddressRowUnsaved] = Decoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(EmailaddressRowUnsaved.apply)
+  implicit val encoder: Encoder[EmailaddressRowUnsaved] = Encoder.forProduct5[EmailaddressRowUnsaved, BusinessentityId, Option[/* max 50 chars */ String], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate")(x => (x.businessentityid, x.emailaddress, x.emailaddressid, x.rowguid, x.modifieddate))
 }

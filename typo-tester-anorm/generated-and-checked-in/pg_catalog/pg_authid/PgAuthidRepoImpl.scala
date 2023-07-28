@@ -17,24 +17,24 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
   override def insert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
     SQL"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
           values (${unsaved.oid}::oid, ${unsaved.rolname}::name, ${unsaved.rolsuper}, ${unsaved.rolinherit}, ${unsaved.rolcreaterole}, ${unsaved.rolcreatedb}, ${unsaved.rolcanlogin}, ${unsaved.rolreplication}, ${unsaved.rolbypassrls}, ${unsaved.rolconnlimit}::int4, ${unsaved.rolpassword}, ${unsaved.rolvaliduntil}::timestamptz)
-          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil
+          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """
       .executeInsert(PgAuthidRow.rowParser(1).single)
   
   }
   override def selectAll(implicit c: Connection): List[PgAuthidRow] = {
-    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil
+    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
           from pg_catalog.pg_authid
        """.as(PgAuthidRow.rowParser(1).*)
   }
   override def selectById(oid: PgAuthidId)(implicit c: Connection): Option[PgAuthidRow] = {
-    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil
+    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
           from pg_catalog.pg_authid
           where oid = $oid
        """.as(PgAuthidRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgAuthidId])(implicit c: Connection): List[PgAuthidRow] = {
-    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil
+    SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
           from pg_catalog.pg_authid
           where oid = ANY($oids)
        """.as(PgAuthidRow.rowParser(1).*)
@@ -86,7 +86,7 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
             rolconnlimit = EXCLUDED.rolconnlimit,
             rolpassword = EXCLUDED.rolpassword,
             rolvaliduntil = EXCLUDED.rolvaliduntil
-          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil
+          returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """
       .executeInsert(PgAuthidRow.rowParser(1).single)
   

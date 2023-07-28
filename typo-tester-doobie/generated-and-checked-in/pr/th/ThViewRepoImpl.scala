@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ThViewRepoImpl extends ThViewRepo {
   override def selectAll: Stream[ConnectionIO, ThViewRow] = {
-    sql"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from pr.th""".query[ThViewRow].stream
+    sql"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from pr.th""".query[ThViewRow].stream
   }
 }

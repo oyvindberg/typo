@@ -8,13 +8,15 @@ package person
 package contacttype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `person.contacttype` which has not been persisted yet */
@@ -25,9 +27,9 @@ case class ContacttypeRowUnsaved(
       Primary key for ContactType records. */
   contacttypeid: Defaulted[ContacttypeId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(contacttypeidDefault: => ContacttypeId, modifieddateDefault: => LocalDateTime): ContacttypeRow =
+  def toRow(contacttypeidDefault: => ContacttypeId, modifieddateDefault: => TypoLocalDateTime): ContacttypeRow =
     ContacttypeRow(
       name = name,
       contacttypeid = contacttypeid match {
@@ -41,24 +43,21 @@ case class ContacttypeRowUnsaved(
     )
 }
 object ContacttypeRowUnsaved {
-  implicit val oFormat: OFormat[ContacttypeRowUnsaved] = new OFormat[ContacttypeRowUnsaved]{
-    override def writes(o: ContacttypeRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "contacttypeid" -> o.contacttypeid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ContacttypeRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ContacttypeRowUnsaved(
-            name = json.\("name").as[Name],
-            contacttypeid = json.\("contacttypeid").as[Defaulted[ContacttypeId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ContacttypeRowUnsaved] = Reads[ContacttypeRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ContacttypeRowUnsaved(
+          name = json.\("name").as[Name],
+          contacttypeid = json.\("contacttypeid").as[Defaulted[ContacttypeId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ContacttypeRowUnsaved] = OWrites[ContacttypeRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "contacttypeid" -> Json.toJson(o.contacttypeid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

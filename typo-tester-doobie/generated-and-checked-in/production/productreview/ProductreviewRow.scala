@@ -7,17 +7,15 @@ package adventureworks
 package production
 package productreview
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class ProductreviewRow(
   /** Primary key for ProductReview records. */
@@ -28,65 +26,39 @@ case class ProductreviewRow(
   /** Name of the reviewer. */
   reviewername: Name,
   /** Date review was submitted. */
-  reviewdate: LocalDateTime,
+  reviewdate: TypoLocalDateTime,
   /** Reviewer's e-mail address. */
   emailaddress: /* max 50 chars */ String,
   /** Product rating given by the reviewer. Scale is 1 to 5 with 5 as the highest rating. */
   rating: Int,
   /** Reviewer's comments */
   comments: Option[/* max 3850 chars */ String],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductreviewRow {
-  implicit val decoder: Decoder[ProductreviewRow] =
-    (c: HCursor) =>
-      for {
-        productreviewid <- c.downField("productreviewid").as[ProductreviewId]
-        productid <- c.downField("productid").as[ProductId]
-        reviewername <- c.downField("reviewername").as[Name]
-        reviewdate <- c.downField("reviewdate").as[LocalDateTime]
-        emailaddress <- c.downField("emailaddress").as[/* max 50 chars */ String]
-        rating <- c.downField("rating").as[Int]
-        comments <- c.downField("comments").as[Option[/* max 3850 chars */ String]]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductreviewRow(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate)
-  implicit val encoder: Encoder[ProductreviewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productreviewid" := row.productreviewid,
-        "productid" := row.productid,
-        "reviewername" := row.reviewername,
-        "reviewdate" := row.reviewdate,
-        "emailaddress" := row.emailaddress,
-        "rating" := row.rating,
-        "comments" := row.comments,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductreviewRow] =
-    new Read[ProductreviewRow](
-      gets = List(
-        (Get[ProductreviewId], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* max 3850 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductreviewRow(
-        productreviewid = Get[ProductreviewId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
-        reviewername = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        reviewdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
-        rating = Get[Int].unsafeGetNonNullable(rs, i + 5),
-        comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 6),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[ProductreviewRow] = Decoder.forProduct8[ProductreviewRow, ProductreviewId, ProductId, Name, TypoLocalDateTime, /* max 50 chars */ String, Int, Option[/* max 3850 chars */ String], TypoLocalDateTime]("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(ProductreviewRow.apply)
+  implicit val encoder: Encoder[ProductreviewRow] = Encoder.forProduct8[ProductreviewRow, ProductreviewId, ProductId, Name, TypoLocalDateTime, /* max 50 chars */ String, Int, Option[/* max 3850 chars */ String], TypoLocalDateTime]("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(x => (x.productreviewid, x.productid, x.reviewername, x.reviewdate, x.emailaddress, x.rating, x.comments, x.modifieddate))
+  implicit val read: Read[ProductreviewRow] = new Read[ProductreviewRow](
+    gets = List(
+      (Get[ProductreviewId], Nullability.NoNulls),
+      (Get[ProductId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[/* max 50 chars */ String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* max 3850 chars */ String], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductreviewRow(
+      productreviewid = Get[ProductreviewId].unsafeGetNonNullable(rs, i + 0),
+      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
+      reviewername = Get[Name].unsafeGetNonNullable(rs, i + 2),
+      reviewdate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3),
+      emailaddress = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 4),
+      rating = Get[Int].unsafeGetNonNullable(rs, i + 5),
+      comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 6),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 7)
     )
-  
-
+  )
 }

@@ -8,11 +8,11 @@ package person
 package personphone
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
@@ -21,7 +21,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """.query[PersonphoneRow].unique
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
@@ -31,29 +31,29 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       Some((Fragment.const(s"phonenumbertypeid"), fr"${unsaved.phonenumbertypeid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.personphone default values
-            returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+            returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.personphone(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+            returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
          """
     }
     q.query[PersonphoneRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
-    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone".query[PersonphoneRow].stream
+    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone".query[PersonphoneRow].stream
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
-    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".query[PersonphoneRow].option
+    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".query[PersonphoneRow].option
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -76,7 +76,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           on conflict (businessentityid, phonenumber, phonenumbertypeid)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate
+          returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
        """.query[PersonphoneRow].unique
   }
 }

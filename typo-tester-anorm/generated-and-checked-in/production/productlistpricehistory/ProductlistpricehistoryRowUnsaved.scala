@@ -8,13 +8,15 @@ package production
 package productlistpricehistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.productlistpricehistory` which has not been persisted yet */
@@ -23,15 +25,15 @@ case class ProductlistpricehistoryRowUnsaved(
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** List price start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** List price end date */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Product list price. */
   listprice: BigDecimal,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): ProductlistpricehistoryRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductlistpricehistoryRow =
     ProductlistpricehistoryRow(
       productid = productid,
       startdate = startdate,
@@ -44,28 +46,25 @@ case class ProductlistpricehistoryRowUnsaved(
     )
 }
 object ProductlistpricehistoryRowUnsaved {
-  implicit val oFormat: OFormat[ProductlistpricehistoryRowUnsaved] = new OFormat[ProductlistpricehistoryRowUnsaved]{
-    override def writes(o: ProductlistpricehistoryRowUnsaved): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "listprice" -> o.listprice,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductlistpricehistoryRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ProductlistpricehistoryRowUnsaved(
-            productid = json.\("productid").as[ProductId],
-            startdate = json.\("startdate").as[LocalDateTime],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            listprice = json.\("listprice").as[BigDecimal],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ProductlistpricehistoryRowUnsaved] = Reads[ProductlistpricehistoryRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ProductlistpricehistoryRowUnsaved(
+          productid = json.\("productid").as[ProductId],
+          startdate = json.\("startdate").as[TypoLocalDateTime],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          listprice = json.\("listprice").as[BigDecimal],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductlistpricehistoryRowUnsaved] = OWrites[ProductlistpricehistoryRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "listprice" -> Json.toJson(o.listprice),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

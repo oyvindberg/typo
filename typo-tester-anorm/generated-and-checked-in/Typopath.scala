@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.geometric.PGpath
 import org.postgresql.geometric.PGpoint
@@ -20,57 +17,55 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This implements a path (a multiple segmented line, which may be closed) */
 case class TypoPath(open: Boolean, points: List[TypoPoint])
+
 object TypoPath {
-  implicit val oFormat: OFormat[TypoPath] = new OFormat[TypoPath]{
-    override def writes(o: TypoPath): JsObject =
-      Json.obj(
-        "open" -> o.open,
-        "points" -> o.points
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoPath] = {
-      JsResult.fromTry(
-        Try(
-          TypoPath(
-            open = json.\("open").as[Boolean],
-            points = json.\("points").as[List[TypoPoint]]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoPathDb: ToStatement[TypoPath] with ParameterMetaData[TypoPath] with Column[TypoPath] = new ToStatement[TypoPath] with ParameterMetaData[TypoPath] with Column[TypoPath] {
-    override def sqlType: String = "path"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoPath): Unit =
-      s.setObject(index, new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoPath] =
-      v match {
-        case v: PGpath => Right(TypoPath(v.isOpen, v.points.map(p => TypoPoint(p.x, p.y)).toList))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGpath from JDBC to produce a TypoPath, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoPathDbArray: ToStatement[Array[TypoPath]] with ParameterMetaData[Array[TypoPath]] with Column[Array[TypoPath]] = new ToStatement[Array[TypoPath]] with ParameterMetaData[Array[TypoPath]] with Column[Array[TypoPath]] {
-    override def sqlType: String = "_path"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoPath]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("path", v.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open))))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoPath]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoPath]] = Column.nonNull[Array[TypoPath]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoPath(v.asInstanceOf[PGpath].isOpen, v.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList)))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoPath, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoPath, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoPath]] = new ParameterMetaData[Array[TypoPath]] {
+    override def sqlType: String = "_path"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoPath]] = ToStatement[Array[TypoPath]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("path", v.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))))
+  implicit val column: Column[TypoPath] = Column.nonNull[TypoPath]((v1: Any, _) =>
+    v1 match {
+      case v: PGpath => Right(TypoPath(v.isOpen, v.points.map(p => TypoPoint(p.x, p.y)).toList))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGpath, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoPath] = new ParameterMetaData[TypoPath] {
+    override def sqlType: String = "path"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoPath] = Reads[TypoPath](json => JsResult.fromTry(
+      Try(
+        TypoPath(
+          open = json.\("open").as[Boolean],
+          points = json.\("points").as[List[TypoPoint]]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoPath] = ToStatement[TypoPath]((s, index, v) => s.setObject(index, new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
+  implicit val writes: OWrites[TypoPath] = OWrites[TypoPath](o =>
+    new JsObject(ListMap[String, JsValue](
+      "open" -> Json.toJson(o.open),
+      "points" -> Json.toJson(o.points)
+    ))
+  )
 }

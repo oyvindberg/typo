@@ -9,14 +9,16 @@ package pg_attribute
 
 import adventureworks.TypoAclItem
 import adventureworks.TypoAnyArray
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import scala.util.Try
 
 case class PgAttributeRow(
   attrelid: /* oid */ Long,
@@ -50,126 +52,128 @@ case class PgAttributeRow(
  }
 
 object PgAttributeRow {
-  implicit val decoder: Decoder[PgAttributeRow] =
-    (c: HCursor) =>
-      for {
-        attrelid <- c.downField("attrelid").as[/* oid */ Long]
-        attname <- c.downField("attname").as[String]
-        atttypid <- c.downField("atttypid").as[/* oid */ Long]
-        attstattarget <- c.downField("attstattarget").as[Int]
-        attlen <- c.downField("attlen").as[Int]
-        attnum <- c.downField("attnum").as[Int]
-        attndims <- c.downField("attndims").as[Int]
-        attcacheoff <- c.downField("attcacheoff").as[Int]
-        atttypmod <- c.downField("atttypmod").as[Int]
-        attbyval <- c.downField("attbyval").as[Boolean]
-        attalign <- c.downField("attalign").as[String]
-        attstorage <- c.downField("attstorage").as[String]
-        attcompression <- c.downField("attcompression").as[String]
-        attnotnull <- c.downField("attnotnull").as[Boolean]
-        atthasdef <- c.downField("atthasdef").as[Boolean]
-        atthasmissing <- c.downField("atthasmissing").as[Boolean]
-        attidentity <- c.downField("attidentity").as[String]
-        attgenerated <- c.downField("attgenerated").as[String]
-        attisdropped <- c.downField("attisdropped").as[Boolean]
-        attislocal <- c.downField("attislocal").as[Boolean]
-        attinhcount <- c.downField("attinhcount").as[Int]
-        attcollation <- c.downField("attcollation").as[/* oid */ Long]
-        attacl <- c.downField("attacl").as[Option[Array[TypoAclItem]]]
-        attoptions <- c.downField("attoptions").as[Option[Array[String]]]
-        attfdwoptions <- c.downField("attfdwoptions").as[Option[Array[String]]]
-        attmissingval <- c.downField("attmissingval").as[Option[TypoAnyArray]]
-      } yield PgAttributeRow(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
-  implicit val encoder: Encoder[PgAttributeRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "attrelid" := row.attrelid,
-        "attname" := row.attname,
-        "atttypid" := row.atttypid,
-        "attstattarget" := row.attstattarget,
-        "attlen" := row.attlen,
-        "attnum" := row.attnum,
-        "attndims" := row.attndims,
-        "attcacheoff" := row.attcacheoff,
-        "atttypmod" := row.atttypmod,
-        "attbyval" := row.attbyval,
-        "attalign" := row.attalign,
-        "attstorage" := row.attstorage,
-        "attcompression" := row.attcompression,
-        "attnotnull" := row.attnotnull,
-        "atthasdef" := row.atthasdef,
-        "atthasmissing" := row.atthasmissing,
-        "attidentity" := row.attidentity,
-        "attgenerated" := row.attgenerated,
-        "attisdropped" := row.attisdropped,
-        "attislocal" := row.attislocal,
-        "attinhcount" := row.attinhcount,
-        "attcollation" := row.attcollation,
-        "attacl" := row.attacl,
-        "attoptions" := row.attoptions,
-        "attfdwoptions" := row.attfdwoptions,
-        "attmissingval" := row.attmissingval
-      )}
-  implicit val read: Read[PgAttributeRow] =
-    new Read[PgAttributeRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Array[TypoAclItem]], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[TypoAnyArray], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAttributeRow(
-        attrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        attname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        atttypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        attstattarget = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        attlen = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        attnum = Get[Int].unsafeGetNonNullable(rs, i + 5),
-        attndims = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        attcacheoff = Get[Int].unsafeGetNonNullable(rs, i + 7),
-        atttypmod = Get[Int].unsafeGetNonNullable(rs, i + 8),
-        attbyval = Get[Boolean].unsafeGetNonNullable(rs, i + 9),
-        attalign = Get[String].unsafeGetNonNullable(rs, i + 10),
-        attstorage = Get[String].unsafeGetNonNullable(rs, i + 11),
-        attcompression = Get[String].unsafeGetNonNullable(rs, i + 12),
-        attnotnull = Get[Boolean].unsafeGetNonNullable(rs, i + 13),
-        atthasdef = Get[Boolean].unsafeGetNonNullable(rs, i + 14),
-        atthasmissing = Get[Boolean].unsafeGetNonNullable(rs, i + 15),
-        attidentity = Get[String].unsafeGetNonNullable(rs, i + 16),
-        attgenerated = Get[String].unsafeGetNonNullable(rs, i + 17),
-        attisdropped = Get[Boolean].unsafeGetNonNullable(rs, i + 18),
-        attislocal = Get[Boolean].unsafeGetNonNullable(rs, i + 19),
-        attinhcount = Get[Int].unsafeGetNonNullable(rs, i + 20),
-        attcollation = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 21),
-        attacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 22),
-        attoptions = Get[Array[String]].unsafeGetNullable(rs, i + 23),
-        attfdwoptions = Get[Array[String]].unsafeGetNullable(rs, i + 24),
-        attmissingval = Get[TypoAnyArray].unsafeGetNullable(rs, i + 25)
+  implicit val decoder: Decoder[PgAttributeRow] = Decoder.instanceTry[PgAttributeRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      PgAttributeRow(
+        attrelid = orThrow(c.get("attrelid")(Decoder[/* oid */ Long])),
+        attname = orThrow(c.get("attname")(Decoder[String])),
+        atttypid = orThrow(c.get("atttypid")(Decoder[/* oid */ Long])),
+        attstattarget = orThrow(c.get("attstattarget")(Decoder[Int])),
+        attlen = orThrow(c.get("attlen")(Decoder[Int])),
+        attnum = orThrow(c.get("attnum")(Decoder[Int])),
+        attndims = orThrow(c.get("attndims")(Decoder[Int])),
+        attcacheoff = orThrow(c.get("attcacheoff")(Decoder[Int])),
+        atttypmod = orThrow(c.get("atttypmod")(Decoder[Int])),
+        attbyval = orThrow(c.get("attbyval")(Decoder[Boolean])),
+        attalign = orThrow(c.get("attalign")(Decoder[String])),
+        attstorage = orThrow(c.get("attstorage")(Decoder[String])),
+        attcompression = orThrow(c.get("attcompression")(Decoder[String])),
+        attnotnull = orThrow(c.get("attnotnull")(Decoder[Boolean])),
+        atthasdef = orThrow(c.get("atthasdef")(Decoder[Boolean])),
+        atthasmissing = orThrow(c.get("atthasmissing")(Decoder[Boolean])),
+        attidentity = orThrow(c.get("attidentity")(Decoder[String])),
+        attgenerated = orThrow(c.get("attgenerated")(Decoder[String])),
+        attisdropped = orThrow(c.get("attisdropped")(Decoder[Boolean])),
+        attislocal = orThrow(c.get("attislocal")(Decoder[Boolean])),
+        attinhcount = orThrow(c.get("attinhcount")(Decoder[Int])),
+        attcollation = orThrow(c.get("attcollation")(Decoder[/* oid */ Long])),
+        attacl = orThrow(c.get("attacl")(Decoder[Option[Array[TypoAclItem]]])),
+        attoptions = orThrow(c.get("attoptions")(Decoder[Option[Array[String]]])),
+        attfdwoptions = orThrow(c.get("attfdwoptions")(Decoder[Option[Array[String]]])),
+        attmissingval = orThrow(c.get("attmissingval")(Decoder[Option[TypoAnyArray]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[PgAttributeRow] = Encoder[PgAttributeRow](row =>
+    Json.obj(
+      "attrelid" -> Encoder[/* oid */ Long].apply(row.attrelid),
+      "attname" -> Encoder[String].apply(row.attname),
+      "atttypid" -> Encoder[/* oid */ Long].apply(row.atttypid),
+      "attstattarget" -> Encoder[Int].apply(row.attstattarget),
+      "attlen" -> Encoder[Int].apply(row.attlen),
+      "attnum" -> Encoder[Int].apply(row.attnum),
+      "attndims" -> Encoder[Int].apply(row.attndims),
+      "attcacheoff" -> Encoder[Int].apply(row.attcacheoff),
+      "atttypmod" -> Encoder[Int].apply(row.atttypmod),
+      "attbyval" -> Encoder[Boolean].apply(row.attbyval),
+      "attalign" -> Encoder[String].apply(row.attalign),
+      "attstorage" -> Encoder[String].apply(row.attstorage),
+      "attcompression" -> Encoder[String].apply(row.attcompression),
+      "attnotnull" -> Encoder[Boolean].apply(row.attnotnull),
+      "atthasdef" -> Encoder[Boolean].apply(row.atthasdef),
+      "atthasmissing" -> Encoder[Boolean].apply(row.atthasmissing),
+      "attidentity" -> Encoder[String].apply(row.attidentity),
+      "attgenerated" -> Encoder[String].apply(row.attgenerated),
+      "attisdropped" -> Encoder[Boolean].apply(row.attisdropped),
+      "attislocal" -> Encoder[Boolean].apply(row.attislocal),
+      "attinhcount" -> Encoder[Int].apply(row.attinhcount),
+      "attcollation" -> Encoder[/* oid */ Long].apply(row.attcollation),
+      "attacl" -> Encoder[Option[Array[TypoAclItem]]].apply(row.attacl),
+      "attoptions" -> Encoder[Option[Array[String]]].apply(row.attoptions),
+      "attfdwoptions" -> Encoder[Option[Array[String]]].apply(row.attfdwoptions),
+      "attmissingval" -> Encoder[Option[TypoAnyArray]].apply(row.attmissingval)
     )
-  
-
+  )
+  implicit val read: Read[PgAttributeRow] = new Read[PgAttributeRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Array[TypoAclItem]], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[TypoAnyArray], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAttributeRow(
+      attrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      attname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      atttypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      attstattarget = Get[Int].unsafeGetNonNullable(rs, i + 3),
+      attlen = Get[Int].unsafeGetNonNullable(rs, i + 4),
+      attnum = Get[Int].unsafeGetNonNullable(rs, i + 5),
+      attndims = Get[Int].unsafeGetNonNullable(rs, i + 6),
+      attcacheoff = Get[Int].unsafeGetNonNullable(rs, i + 7),
+      atttypmod = Get[Int].unsafeGetNonNullable(rs, i + 8),
+      attbyval = Get[Boolean].unsafeGetNonNullable(rs, i + 9),
+      attalign = Get[String].unsafeGetNonNullable(rs, i + 10),
+      attstorage = Get[String].unsafeGetNonNullable(rs, i + 11),
+      attcompression = Get[String].unsafeGetNonNullable(rs, i + 12),
+      attnotnull = Get[Boolean].unsafeGetNonNullable(rs, i + 13),
+      atthasdef = Get[Boolean].unsafeGetNonNullable(rs, i + 14),
+      atthasmissing = Get[Boolean].unsafeGetNonNullable(rs, i + 15),
+      attidentity = Get[String].unsafeGetNonNullable(rs, i + 16),
+      attgenerated = Get[String].unsafeGetNonNullable(rs, i + 17),
+      attisdropped = Get[Boolean].unsafeGetNonNullable(rs, i + 18),
+      attislocal = Get[Boolean].unsafeGetNonNullable(rs, i + 19),
+      attinhcount = Get[Int].unsafeGetNonNullable(rs, i + 20),
+      attcollation = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 21),
+      attacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 22),
+      attoptions = Get[Array[String]].unsafeGetNullable(rs, i + 23),
+      attfdwoptions = Get[Array[String]].unsafeGetNullable(rs, i + 24),
+      attmissingval = Get[TypoAnyArray].unsafeGetNullable(rs, i + 25)
+    )
+  )
 }

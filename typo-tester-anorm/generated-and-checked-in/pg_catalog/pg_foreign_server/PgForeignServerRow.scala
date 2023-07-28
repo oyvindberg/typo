@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgForeignServerRow(
@@ -29,49 +31,45 @@ case class PgForeignServerRow(
 )
 
 object PgForeignServerRow {
-  def rowParser(idx: Int): RowParser[PgForeignServerRow] =
-    RowParser[PgForeignServerRow] { row =>
-      Success(
+  implicit val reads: Reads[PgForeignServerRow] = Reads[PgForeignServerRow](json => JsResult.fromTry(
+      Try(
         PgForeignServerRow(
-          oid = row[PgForeignServerId](idx + 0),
-          srvname = row[String](idx + 1),
-          srvowner = row[/* oid */ Long](idx + 2),
-          srvfdw = row[/* oid */ Long](idx + 3),
-          srvtype = row[Option[String]](idx + 4),
-          srvversion = row[Option[String]](idx + 5),
-          srvacl = row[Option[Array[TypoAclItem]]](idx + 6),
-          srvoptions = row[Option[Array[String]]](idx + 7)
+          oid = json.\("oid").as[PgForeignServerId],
+          srvname = json.\("srvname").as[String],
+          srvowner = json.\("srvowner").as[/* oid */ Long],
+          srvfdw = json.\("srvfdw").as[/* oid */ Long],
+          srvtype = json.\("srvtype").toOption.map(_.as[String]),
+          srvversion = json.\("srvversion").toOption.map(_.as[String]),
+          srvacl = json.\("srvacl").toOption.map(_.as[Array[TypoAclItem]]),
+          srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgForeignServerRow] = new OFormat[PgForeignServerRow]{
-    override def writes(o: PgForeignServerRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "srvname" -> o.srvname,
-        "srvowner" -> o.srvowner,
-        "srvfdw" -> o.srvfdw,
-        "srvtype" -> o.srvtype,
-        "srvversion" -> o.srvversion,
-        "srvacl" -> o.srvacl,
-        "srvoptions" -> o.srvoptions
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgForeignServerRow] = RowParser[PgForeignServerRow] { row =>
+    Success(
+      PgForeignServerRow(
+        oid = row[PgForeignServerId](idx + 0),
+        srvname = row[String](idx + 1),
+        srvowner = row[/* oid */ Long](idx + 2),
+        srvfdw = row[/* oid */ Long](idx + 3),
+        srvtype = row[Option[String]](idx + 4),
+        srvversion = row[Option[String]](idx + 5),
+        srvacl = row[Option[Array[TypoAclItem]]](idx + 6),
+        srvoptions = row[Option[Array[String]]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgForeignServerRow] = {
-      JsResult.fromTry(
-        Try(
-          PgForeignServerRow(
-            oid = json.\("oid").as[PgForeignServerId],
-            srvname = json.\("srvname").as[String],
-            srvowner = json.\("srvowner").as[/* oid */ Long],
-            srvfdw = json.\("srvfdw").as[/* oid */ Long],
-            srvtype = json.\("srvtype").toOption.map(_.as[String]),
-            srvversion = json.\("srvversion").toOption.map(_.as[String]),
-            srvacl = json.\("srvacl").toOption.map(_.as[Array[TypoAclItem]]),
-            srvoptions = json.\("srvoptions").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgForeignServerRow] = OWrites[PgForeignServerRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "srvname" -> Json.toJson(o.srvname),
+      "srvowner" -> Json.toJson(o.srvowner),
+      "srvfdw" -> Json.toJson(o.srvfdw),
+      "srvtype" -> Json.toJson(o.srvtype),
+      "srvversion" -> Json.toJson(o.srvversion),
+      "srvacl" -> Json.toJson(o.srvacl),
+      "srvoptions" -> Json.toJson(o.srvoptions)
+    ))
+  )
 }

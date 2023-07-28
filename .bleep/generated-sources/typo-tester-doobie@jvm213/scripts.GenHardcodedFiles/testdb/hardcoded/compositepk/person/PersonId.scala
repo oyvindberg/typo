@@ -10,24 +10,11 @@ package person
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `compositepk.person` */
 case class PersonId(one: Long, two: Option[String])
 object PersonId {
+  implicit val decoder: Decoder[PersonId] = Decoder.forProduct2[PersonId, Long, Option[String]]("one", "two")(PersonId.apply)
+  implicit val encoder: Encoder[PersonId] = Encoder.forProduct2[PersonId, Long, Option[String]]("one", "two")(x => (x.one, x.two))
   implicit def ordering(implicit O0: Ordering[Option[String]]): Ordering[PersonId] = Ordering.by(x => (x.one, x.two))
-  implicit val decoder: Decoder[PersonId] =
-    (c: HCursor) =>
-      for {
-        one <- c.downField("one").as[Long]
-        two <- c.downField("two").as[Option[String]]
-      } yield PersonId(one, two)
-  implicit val encoder: Encoder[PersonId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "one" := row.one,
-        "two" := row.two
-      )}
 }

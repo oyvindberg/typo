@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_publication_rel where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_publication_rel where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgPublicationRelRow): ConnectionIO[PgPublicationRelRow] = {
     sql"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
@@ -25,17 +25,17 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel".query[PgPublicationRelRow].stream
   }
   override def selectById(oid: PgPublicationRelId): ConnectionIO[Option[PgPublicationRelRow]] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = $oid".query[PgPublicationRelRow].option
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ${oid}".query[PgPublicationRelRow].option
   }
   override def selectByIds(oids: Array[PgPublicationRelId]): Stream[ConnectionIO, PgPublicationRelRow] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY($oids)".query[PgPublicationRelRow].stream
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY(${oids})".query[PgPublicationRelRow].stream
   }
   override def update(row: PgPublicationRelRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_publication_rel
           set prpubid = ${row.prpubid}::oid,
               prrelid = ${row.prrelid}::oid
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

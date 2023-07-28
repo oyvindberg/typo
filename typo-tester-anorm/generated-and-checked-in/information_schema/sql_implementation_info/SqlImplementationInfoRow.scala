@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SqlImplementationInfoRow(
@@ -27,40 +29,36 @@ case class SqlImplementationInfoRow(
 )
 
 object SqlImplementationInfoRow {
-  def rowParser(idx: Int): RowParser[SqlImplementationInfoRow] =
-    RowParser[SqlImplementationInfoRow] { row =>
-      Success(
+  implicit val reads: Reads[SqlImplementationInfoRow] = Reads[SqlImplementationInfoRow](json => JsResult.fromTry(
+      Try(
         SqlImplementationInfoRow(
-          implementationInfoId = row[Option[CharacterData]](idx + 0),
-          implementationInfoName = row[Option[CharacterData]](idx + 1),
-          integerValue = row[Option[CardinalNumber]](idx + 2),
-          characterValue = row[Option[CharacterData]](idx + 3),
-          comments = row[Option[CharacterData]](idx + 4)
+          implementationInfoId = json.\("implementation_info_id").toOption.map(_.as[CharacterData]),
+          implementationInfoName = json.\("implementation_info_name").toOption.map(_.as[CharacterData]),
+          integerValue = json.\("integer_value").toOption.map(_.as[CardinalNumber]),
+          characterValue = json.\("character_value").toOption.map(_.as[CharacterData]),
+          comments = json.\("comments").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[SqlImplementationInfoRow] = new OFormat[SqlImplementationInfoRow]{
-    override def writes(o: SqlImplementationInfoRow): JsObject =
-      Json.obj(
-        "implementation_info_id" -> o.implementationInfoId,
-        "implementation_info_name" -> o.implementationInfoName,
-        "integer_value" -> o.integerValue,
-        "character_value" -> o.characterValue,
-        "comments" -> o.comments
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SqlImplementationInfoRow] = RowParser[SqlImplementationInfoRow] { row =>
+    Success(
+      SqlImplementationInfoRow(
+        implementationInfoId = row[Option[CharacterData]](idx + 0),
+        implementationInfoName = row[Option[CharacterData]](idx + 1),
+        integerValue = row[Option[CardinalNumber]](idx + 2),
+        characterValue = row[Option[CharacterData]](idx + 3),
+        comments = row[Option[CharacterData]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[SqlImplementationInfoRow] = {
-      JsResult.fromTry(
-        Try(
-          SqlImplementationInfoRow(
-            implementationInfoId = json.\("implementation_info_id").toOption.map(_.as[CharacterData]),
-            implementationInfoName = json.\("implementation_info_name").toOption.map(_.as[CharacterData]),
-            integerValue = json.\("integer_value").toOption.map(_.as[CardinalNumber]),
-            characterValue = json.\("character_value").toOption.map(_.as[CharacterData]),
-            comments = json.\("comments").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SqlImplementationInfoRow] = OWrites[SqlImplementationInfoRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "implementation_info_id" -> Json.toJson(o.implementationInfoId),
+      "implementation_info_name" -> Json.toJson(o.implementationInfoName),
+      "integer_value" -> Json.toJson(o.integerValue),
+      "character_value" -> Json.toJson(o.characterValue),
+      "comments" -> Json.toJson(o.comments)
+    ))
+  )
 }

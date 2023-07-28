@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatProgressBasebackupViewRow(
@@ -26,43 +28,39 @@ case class PgStatProgressBasebackupViewRow(
 )
 
 object PgStatProgressBasebackupViewRow {
-  def rowParser(idx: Int): RowParser[PgStatProgressBasebackupViewRow] =
-    RowParser[PgStatProgressBasebackupViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatProgressBasebackupViewRow] = Reads[PgStatProgressBasebackupViewRow](json => JsResult.fromTry(
+      Try(
         PgStatProgressBasebackupViewRow(
-          pid = row[Option[Int]](idx + 0),
-          phase = row[Option[String]](idx + 1),
-          backupTotal = row[Option[Long]](idx + 2),
-          backupStreamed = row[Option[Long]](idx + 3),
-          tablespacesTotal = row[Option[Long]](idx + 4),
-          tablespacesStreamed = row[Option[Long]](idx + 5)
+          pid = json.\("pid").toOption.map(_.as[Int]),
+          phase = json.\("phase").toOption.map(_.as[String]),
+          backupTotal = json.\("backup_total").toOption.map(_.as[Long]),
+          backupStreamed = json.\("backup_streamed").toOption.map(_.as[Long]),
+          tablespacesTotal = json.\("tablespaces_total").toOption.map(_.as[Long]),
+          tablespacesStreamed = json.\("tablespaces_streamed").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatProgressBasebackupViewRow] = new OFormat[PgStatProgressBasebackupViewRow]{
-    override def writes(o: PgStatProgressBasebackupViewRow): JsObject =
-      Json.obj(
-        "pid" -> o.pid,
-        "phase" -> o.phase,
-        "backup_total" -> o.backupTotal,
-        "backup_streamed" -> o.backupStreamed,
-        "tablespaces_total" -> o.tablespacesTotal,
-        "tablespaces_streamed" -> o.tablespacesStreamed
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatProgressBasebackupViewRow] = RowParser[PgStatProgressBasebackupViewRow] { row =>
+    Success(
+      PgStatProgressBasebackupViewRow(
+        pid = row[Option[Int]](idx + 0),
+        phase = row[Option[String]](idx + 1),
+        backupTotal = row[Option[Long]](idx + 2),
+        backupStreamed = row[Option[Long]](idx + 3),
+        tablespacesTotal = row[Option[Long]](idx + 4),
+        tablespacesStreamed = row[Option[Long]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatProgressBasebackupViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatProgressBasebackupViewRow(
-            pid = json.\("pid").toOption.map(_.as[Int]),
-            phase = json.\("phase").toOption.map(_.as[String]),
-            backupTotal = json.\("backup_total").toOption.map(_.as[Long]),
-            backupStreamed = json.\("backup_streamed").toOption.map(_.as[Long]),
-            tablespacesTotal = json.\("tablespaces_total").toOption.map(_.as[Long]),
-            tablespacesStreamed = json.\("tablespaces_streamed").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatProgressBasebackupViewRow] = OWrites[PgStatProgressBasebackupViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "pid" -> Json.toJson(o.pid),
+      "phase" -> Json.toJson(o.phase),
+      "backup_total" -> Json.toJson(o.backupTotal),
+      "backup_streamed" -> Json.toJson(o.backupStreamed),
+      "tablespaces_total" -> Json.toJson(o.tablespacesTotal),
+      "tablespaces_streamed" -> Json.toJson(o.tablespacesStreamed)
+    ))
+  )
 }

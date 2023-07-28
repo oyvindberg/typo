@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgLocksViewRepoImpl extends PgLocksViewRepo {
   override def selectAll(implicit c: Connection): List[PgLocksViewRow] = {
-    SQL"""select locktype, "database", relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, "mode", "granted", fastpath, waitstart
+    SQL"""select locktype, "database", relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, "mode", "granted", fastpath, waitstart::text
           from pg_catalog.pg_locks
        """.as(PgLocksViewRow.rowParser(1).*)
   }

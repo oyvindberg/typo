@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgShdescriptionRow(
@@ -25,34 +27,30 @@ case class PgShdescriptionRow(
  }
 
 object PgShdescriptionRow {
-  def rowParser(idx: Int): RowParser[PgShdescriptionRow] =
-    RowParser[PgShdescriptionRow] { row =>
-      Success(
+  implicit val reads: Reads[PgShdescriptionRow] = Reads[PgShdescriptionRow](json => JsResult.fromTry(
+      Try(
         PgShdescriptionRow(
-          objoid = row[/* oid */ Long](idx + 0),
-          classoid = row[/* oid */ Long](idx + 1),
-          description = row[String](idx + 2)
+          objoid = json.\("objoid").as[/* oid */ Long],
+          classoid = json.\("classoid").as[/* oid */ Long],
+          description = json.\("description").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgShdescriptionRow] = new OFormat[PgShdescriptionRow]{
-    override def writes(o: PgShdescriptionRow): JsObject =
-      Json.obj(
-        "objoid" -> o.objoid,
-        "classoid" -> o.classoid,
-        "description" -> o.description
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgShdescriptionRow] = RowParser[PgShdescriptionRow] { row =>
+    Success(
+      PgShdescriptionRow(
+        objoid = row[/* oid */ Long](idx + 0),
+        classoid = row[/* oid */ Long](idx + 1),
+        description = row[String](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PgShdescriptionRow] = {
-      JsResult.fromTry(
-        Try(
-          PgShdescriptionRow(
-            objoid = json.\("objoid").as[/* oid */ Long],
-            classoid = json.\("classoid").as[/* oid */ Long],
-            description = json.\("description").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgShdescriptionRow] = OWrites[PgShdescriptionRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "objoid" -> Json.toJson(o.objoid),
+      "classoid" -> Json.toJson(o.classoid),
+      "description" -> Json.toJson(o.description)
+    ))
+  )
 }

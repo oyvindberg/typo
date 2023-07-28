@@ -8,12 +8,10 @@ package production
 package location
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.location` which has not been persisted yet */
 case class LocationRowUnsaved(
@@ -29,9 +27,9 @@ case class LocationRowUnsaved(
       Work capacity (in hours) of the manufacturing location. */
   availability: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(locationidDefault: => LocationId, costrateDefault: => BigDecimal, availabilityDefault: => BigDecimal, modifieddateDefault: => LocalDateTime): LocationRow =
+  def toRow(locationidDefault: => LocationId, costrateDefault: => BigDecimal, availabilityDefault: => BigDecimal, modifieddateDefault: => TypoLocalDateTime): LocationRow =
     LocationRow(
       name = name,
       locationid = locationid match {
@@ -53,23 +51,6 @@ case class LocationRowUnsaved(
     )
 }
 object LocationRowUnsaved {
-  implicit val decoder: Decoder[LocationRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        locationid <- c.downField("locationid").as[Defaulted[LocationId]]
-        costrate <- c.downField("costrate").as[Defaulted[BigDecimal]]
-        availability <- c.downField("availability").as[Defaulted[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield LocationRowUnsaved(name, locationid, costrate, availability, modifieddate)
-  implicit val encoder: Encoder[LocationRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "locationid" := row.locationid,
-        "costrate" := row.costrate,
-        "availability" := row.availability,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[LocationRowUnsaved] = Decoder.forProduct5[LocationRowUnsaved, Name, Defaulted[LocationId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("name", "locationid", "costrate", "availability", "modifieddate")(LocationRowUnsaved.apply)
+  implicit val encoder: Encoder[LocationRowUnsaved] = Encoder.forProduct5[LocationRowUnsaved, Name, Defaulted[LocationId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[TypoLocalDateTime]]("name", "locationid", "costrate", "availability", "modifieddate")(x => (x.name, x.locationid, x.costrate, x.availability, x.modifieddate))
 }

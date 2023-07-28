@@ -8,14 +8,16 @@ package person
 package addresstype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `person.addresstype` which has not been persisted yet */
@@ -28,9 +30,9 @@ case class AddresstypeRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(addresstypeidDefault: => AddresstypeId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): AddresstypeRow =
+  def toRow(addresstypeidDefault: => AddresstypeId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): AddresstypeRow =
     AddresstypeRow(
       name = name,
       addresstypeid = addresstypeid match {
@@ -48,26 +50,23 @@ case class AddresstypeRowUnsaved(
     )
 }
 object AddresstypeRowUnsaved {
-  implicit val oFormat: OFormat[AddresstypeRowUnsaved] = new OFormat[AddresstypeRowUnsaved]{
-    override def writes(o: AddresstypeRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "addresstypeid" -> o.addresstypeid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[AddresstypeRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          AddresstypeRowUnsaved(
-            name = json.\("name").as[Name],
-            addresstypeid = json.\("addresstypeid").as[Defaulted[AddresstypeId]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[AddresstypeRowUnsaved] = Reads[AddresstypeRowUnsaved](json => JsResult.fromTry(
+      Try(
+        AddresstypeRowUnsaved(
+          name = json.\("name").as[Name],
+          addresstypeid = json.\("addresstypeid").as[Defaulted[AddresstypeId]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[AddresstypeRowUnsaved] = OWrites[AddresstypeRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "addresstypeid" -> Json.toJson(o.addresstypeid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

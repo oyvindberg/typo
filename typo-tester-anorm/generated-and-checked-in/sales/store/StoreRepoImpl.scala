@@ -8,12 +8,12 @@ package sales
 package store
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object StoreRepoImpl extends StoreRepo {
@@ -23,7 +23,7 @@ object StoreRepoImpl extends StoreRepo {
   override def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """
       .executeInsert(StoreRow.rowParser(1).single)
   
@@ -40,19 +40,19 @@ object StoreRepoImpl extends StoreRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.store default values
-            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+            returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
          """
         .executeInsert(StoreRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.store(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+                  returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -63,18 +63,18 @@ object StoreRepoImpl extends StoreRepo {
   
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
-    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
           from sales.store
        """.as(StoreRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
-    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
           from sales.store
           where businessentityid = $businessentityid
        """.as(StoreRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
-    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+    SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
           from sales.store
           where businessentityid = ANY($businessentityids)
        """.as(StoreRow.rowParser(1).*)
@@ -108,7 +108,7 @@ object StoreRepoImpl extends StoreRepo {
             demographics = EXCLUDED.demographics,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
+          returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
        """
       .executeInsert(StoreRow.rowParser(1).single)
   

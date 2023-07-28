@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_progress_analyze
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatProgressAnalyzeViewRow(
@@ -32,70 +30,36 @@ case class PgStatProgressAnalyzeViewRow(
 )
 
 object PgStatProgressAnalyzeViewRow {
-  implicit val decoder: Decoder[PgStatProgressAnalyzeViewRow] =
-    (c: HCursor) =>
-      for {
-        pid <- c.downField("pid").as[Option[Int]]
-        datid <- c.downField("datid").as[Option[/* oid */ Long]]
-        datname <- c.downField("datname").as[Option[String]]
-        relid <- c.downField("relid").as[Option[/* oid */ Long]]
-        phase <- c.downField("phase").as[Option[String]]
-        sampleBlksTotal <- c.downField("sample_blks_total").as[Option[Long]]
-        sampleBlksScanned <- c.downField("sample_blks_scanned").as[Option[Long]]
-        extStatsTotal <- c.downField("ext_stats_total").as[Option[Long]]
-        extStatsComputed <- c.downField("ext_stats_computed").as[Option[Long]]
-        childTablesTotal <- c.downField("child_tables_total").as[Option[Long]]
-        childTablesDone <- c.downField("child_tables_done").as[Option[Long]]
-        currentChildTableRelid <- c.downField("current_child_table_relid").as[Option[/* oid */ Long]]
-      } yield PgStatProgressAnalyzeViewRow(pid, datid, datname, relid, phase, sampleBlksTotal, sampleBlksScanned, extStatsTotal, extStatsComputed, childTablesTotal, childTablesDone, currentChildTableRelid)
-  implicit val encoder: Encoder[PgStatProgressAnalyzeViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pid" := row.pid,
-        "datid" := row.datid,
-        "datname" := row.datname,
-        "relid" := row.relid,
-        "phase" := row.phase,
-        "sample_blks_total" := row.sampleBlksTotal,
-        "sample_blks_scanned" := row.sampleBlksScanned,
-        "ext_stats_total" := row.extStatsTotal,
-        "ext_stats_computed" := row.extStatsComputed,
-        "child_tables_total" := row.childTablesTotal,
-        "child_tables_done" := row.childTablesDone,
-        "current_child_table_relid" := row.currentChildTableRelid
-      )}
-  implicit val read: Read[PgStatProgressAnalyzeViewRow] =
-    new Read[PgStatProgressAnalyzeViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[/* oid */ Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressAnalyzeViewRow(
-        pid = Get[Int].unsafeGetNullable(rs, i + 0),
-        datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
-        datname = Get[String].unsafeGetNullable(rs, i + 2),
-        relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
-        phase = Get[String].unsafeGetNullable(rs, i + 4),
-        sampleBlksTotal = Get[Long].unsafeGetNullable(rs, i + 5),
-        sampleBlksScanned = Get[Long].unsafeGetNullable(rs, i + 6),
-        extStatsTotal = Get[Long].unsafeGetNullable(rs, i + 7),
-        extStatsComputed = Get[Long].unsafeGetNullable(rs, i + 8),
-        childTablesTotal = Get[Long].unsafeGetNullable(rs, i + 9),
-        childTablesDone = Get[Long].unsafeGetNullable(rs, i + 10),
-        currentChildTableRelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 11)
-      )
+  implicit val decoder: Decoder[PgStatProgressAnalyzeViewRow] = Decoder.forProduct12[PgStatProgressAnalyzeViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[/* oid */ Long]]("pid", "datid", "datname", "relid", "phase", "sample_blks_total", "sample_blks_scanned", "ext_stats_total", "ext_stats_computed", "child_tables_total", "child_tables_done", "current_child_table_relid")(PgStatProgressAnalyzeViewRow.apply)
+  implicit val encoder: Encoder[PgStatProgressAnalyzeViewRow] = Encoder.forProduct12[PgStatProgressAnalyzeViewRow, Option[Int], Option[/* oid */ Long], Option[String], Option[/* oid */ Long], Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[/* oid */ Long]]("pid", "datid", "datname", "relid", "phase", "sample_blks_total", "sample_blks_scanned", "ext_stats_total", "ext_stats_computed", "child_tables_total", "child_tables_done", "current_child_table_relid")(x => (x.pid, x.datid, x.datname, x.relid, x.phase, x.sampleBlksTotal, x.sampleBlksScanned, x.extStatsTotal, x.extStatsComputed, x.childTablesTotal, x.childTablesDone, x.currentChildTableRelid))
+  implicit val read: Read[PgStatProgressAnalyzeViewRow] = new Read[PgStatProgressAnalyzeViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[/* oid */ Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatProgressAnalyzeViewRow(
+      pid = Get[Int].unsafeGetNullable(rs, i + 0),
+      datid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 1),
+      datname = Get[String].unsafeGetNullable(rs, i + 2),
+      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 3),
+      phase = Get[String].unsafeGetNullable(rs, i + 4),
+      sampleBlksTotal = Get[Long].unsafeGetNullable(rs, i + 5),
+      sampleBlksScanned = Get[Long].unsafeGetNullable(rs, i + 6),
+      extStatsTotal = Get[Long].unsafeGetNullable(rs, i + 7),
+      extStatsComputed = Get[Long].unsafeGetNullable(rs, i + 8),
+      childTablesTotal = Get[Long].unsafeGetNullable(rs, i + 9),
+      childTablesDone = Get[Long].unsafeGetNullable(rs, i + 10),
+      currentChildTableRelid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 11)
     )
-  
-
+  )
 }

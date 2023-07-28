@@ -8,13 +8,15 @@ package humanresources
 package department
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `humanresources.department` which has not been persisted yet */
@@ -27,9 +29,9 @@ case class DepartmentRowUnsaved(
       Primary key for Department records. */
   departmentid: Defaulted[DepartmentId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(departmentidDefault: => DepartmentId, modifieddateDefault: => LocalDateTime): DepartmentRow =
+  def toRow(departmentidDefault: => DepartmentId, modifieddateDefault: => TypoLocalDateTime): DepartmentRow =
     DepartmentRow(
       name = name,
       groupname = groupname,
@@ -44,26 +46,23 @@ case class DepartmentRowUnsaved(
     )
 }
 object DepartmentRowUnsaved {
-  implicit val oFormat: OFormat[DepartmentRowUnsaved] = new OFormat[DepartmentRowUnsaved]{
-    override def writes(o: DepartmentRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "groupname" -> o.groupname,
-        "departmentid" -> o.departmentid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[DepartmentRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          DepartmentRowUnsaved(
-            name = json.\("name").as[Name],
-            groupname = json.\("groupname").as[Name],
-            departmentid = json.\("departmentid").as[Defaulted[DepartmentId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[DepartmentRowUnsaved] = Reads[DepartmentRowUnsaved](json => JsResult.fromTry(
+      Try(
+        DepartmentRowUnsaved(
+          name = json.\("name").as[Name],
+          groupname = json.\("groupname").as[Name],
+          departmentid = json.\("departmentid").as[Defaulted[DepartmentId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[DepartmentRowUnsaved] = OWrites[DepartmentRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "groupname" -> Json.toJson(o.groupname),
+      "departmentid" -> Json.toJson(o.departmentid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

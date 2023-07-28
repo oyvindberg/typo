@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object UmViewRepoImpl extends UmViewRepo {
   override def selectAll(implicit c: Connection): List[UmViewRow] = {
-    SQL"""select "id", unitmeasurecode, "name", modifieddate
+    SQL"""select "id", unitmeasurecode, "name", modifieddate::text
           from pr.um
        """.as(UmViewRow.rowParser(1).*)
   }

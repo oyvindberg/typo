@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgOperatorRow(
@@ -36,70 +38,66 @@ case class PgOperatorRow(
 )
 
 object PgOperatorRow {
-  def rowParser(idx: Int): RowParser[PgOperatorRow] =
-    RowParser[PgOperatorRow] { row =>
-      Success(
+  implicit val reads: Reads[PgOperatorRow] = Reads[PgOperatorRow](json => JsResult.fromTry(
+      Try(
         PgOperatorRow(
-          oid = row[PgOperatorId](idx + 0),
-          oprname = row[String](idx + 1),
-          oprnamespace = row[/* oid */ Long](idx + 2),
-          oprowner = row[/* oid */ Long](idx + 3),
-          oprkind = row[String](idx + 4),
-          oprcanmerge = row[Boolean](idx + 5),
-          oprcanhash = row[Boolean](idx + 6),
-          oprleft = row[/* oid */ Long](idx + 7),
-          oprright = row[/* oid */ Long](idx + 8),
-          oprresult = row[/* oid */ Long](idx + 9),
-          oprcom = row[/* oid */ Long](idx + 10),
-          oprnegate = row[/* oid */ Long](idx + 11),
-          oprcode = row[TypoRegproc](idx + 12),
-          oprrest = row[TypoRegproc](idx + 13),
-          oprjoin = row[TypoRegproc](idx + 14)
+          oid = json.\("oid").as[PgOperatorId],
+          oprname = json.\("oprname").as[String],
+          oprnamespace = json.\("oprnamespace").as[/* oid */ Long],
+          oprowner = json.\("oprowner").as[/* oid */ Long],
+          oprkind = json.\("oprkind").as[String],
+          oprcanmerge = json.\("oprcanmerge").as[Boolean],
+          oprcanhash = json.\("oprcanhash").as[Boolean],
+          oprleft = json.\("oprleft").as[/* oid */ Long],
+          oprright = json.\("oprright").as[/* oid */ Long],
+          oprresult = json.\("oprresult").as[/* oid */ Long],
+          oprcom = json.\("oprcom").as[/* oid */ Long],
+          oprnegate = json.\("oprnegate").as[/* oid */ Long],
+          oprcode = json.\("oprcode").as[TypoRegproc],
+          oprrest = json.\("oprrest").as[TypoRegproc],
+          oprjoin = json.\("oprjoin").as[TypoRegproc]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgOperatorRow] = new OFormat[PgOperatorRow]{
-    override def writes(o: PgOperatorRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "oprname" -> o.oprname,
-        "oprnamespace" -> o.oprnamespace,
-        "oprowner" -> o.oprowner,
-        "oprkind" -> o.oprkind,
-        "oprcanmerge" -> o.oprcanmerge,
-        "oprcanhash" -> o.oprcanhash,
-        "oprleft" -> o.oprleft,
-        "oprright" -> o.oprright,
-        "oprresult" -> o.oprresult,
-        "oprcom" -> o.oprcom,
-        "oprnegate" -> o.oprnegate,
-        "oprcode" -> o.oprcode,
-        "oprrest" -> o.oprrest,
-        "oprjoin" -> o.oprjoin
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgOperatorRow] = RowParser[PgOperatorRow] { row =>
+    Success(
+      PgOperatorRow(
+        oid = row[PgOperatorId](idx + 0),
+        oprname = row[String](idx + 1),
+        oprnamespace = row[/* oid */ Long](idx + 2),
+        oprowner = row[/* oid */ Long](idx + 3),
+        oprkind = row[String](idx + 4),
+        oprcanmerge = row[Boolean](idx + 5),
+        oprcanhash = row[Boolean](idx + 6),
+        oprleft = row[/* oid */ Long](idx + 7),
+        oprright = row[/* oid */ Long](idx + 8),
+        oprresult = row[/* oid */ Long](idx + 9),
+        oprcom = row[/* oid */ Long](idx + 10),
+        oprnegate = row[/* oid */ Long](idx + 11),
+        oprcode = row[TypoRegproc](idx + 12),
+        oprrest = row[TypoRegproc](idx + 13),
+        oprjoin = row[TypoRegproc](idx + 14)
       )
-  
-    override def reads(json: JsValue): JsResult[PgOperatorRow] = {
-      JsResult.fromTry(
-        Try(
-          PgOperatorRow(
-            oid = json.\("oid").as[PgOperatorId],
-            oprname = json.\("oprname").as[String],
-            oprnamespace = json.\("oprnamespace").as[/* oid */ Long],
-            oprowner = json.\("oprowner").as[/* oid */ Long],
-            oprkind = json.\("oprkind").as[String],
-            oprcanmerge = json.\("oprcanmerge").as[Boolean],
-            oprcanhash = json.\("oprcanhash").as[Boolean],
-            oprleft = json.\("oprleft").as[/* oid */ Long],
-            oprright = json.\("oprright").as[/* oid */ Long],
-            oprresult = json.\("oprresult").as[/* oid */ Long],
-            oprcom = json.\("oprcom").as[/* oid */ Long],
-            oprnegate = json.\("oprnegate").as[/* oid */ Long],
-            oprcode = json.\("oprcode").as[TypoRegproc],
-            oprrest = json.\("oprrest").as[TypoRegproc],
-            oprjoin = json.\("oprjoin").as[TypoRegproc]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgOperatorRow] = OWrites[PgOperatorRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "oprname" -> Json.toJson(o.oprname),
+      "oprnamespace" -> Json.toJson(o.oprnamespace),
+      "oprowner" -> Json.toJson(o.oprowner),
+      "oprkind" -> Json.toJson(o.oprkind),
+      "oprcanmerge" -> Json.toJson(o.oprcanmerge),
+      "oprcanhash" -> Json.toJson(o.oprcanhash),
+      "oprleft" -> Json.toJson(o.oprleft),
+      "oprright" -> Json.toJson(o.oprright),
+      "oprresult" -> Json.toJson(o.oprresult),
+      "oprcom" -> Json.toJson(o.oprcom),
+      "oprnegate" -> Json.toJson(o.oprnegate),
+      "oprcode" -> Json.toJson(o.oprcode),
+      "oprrest" -> Json.toJson(o.oprrest),
+      "oprjoin" -> Json.toJson(o.oprjoin)
+    ))
+  )
 }

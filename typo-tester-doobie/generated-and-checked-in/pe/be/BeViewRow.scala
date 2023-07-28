@@ -7,16 +7,14 @@ package adventureworks
 package pe
 package be
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class BeViewRow(
@@ -26,42 +24,24 @@ case class BeViewRow(
   /** Points to [[person.businessentity.BusinessentityRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.businessentity.BusinessentityRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object BeViewRow {
-  implicit val decoder: Decoder[BeViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield BeViewRow(id, businessentityid, rowguid, modifieddate)
-  implicit val encoder: Encoder[BeViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[BeViewRow] =
-    new Read[BeViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BeViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)
+  implicit val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))
+  implicit val read: Read[BeViewRow] = new Read[BeViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => BeViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

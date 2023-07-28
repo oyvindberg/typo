@@ -9,13 +9,11 @@ package foreign_table_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ForeignTableOptionsViewRow(
@@ -30,42 +28,22 @@ case class ForeignTableOptionsViewRow(
 )
 
 object ForeignTableOptionsViewRow {
-  implicit val decoder: Decoder[ForeignTableOptionsViewRow] =
-    (c: HCursor) =>
-      for {
-        foreignTableCatalog <- c.downField("foreign_table_catalog").as[Option[SqlIdentifier]]
-        foreignTableSchema <- c.downField("foreign_table_schema").as[Option[SqlIdentifier]]
-        foreignTableName <- c.downField("foreign_table_name").as[Option[SqlIdentifier]]
-        optionName <- c.downField("option_name").as[Option[SqlIdentifier]]
-        optionValue <- c.downField("option_value").as[Option[CharacterData]]
-      } yield ForeignTableOptionsViewRow(foreignTableCatalog, foreignTableSchema, foreignTableName, optionName, optionValue)
-  implicit val encoder: Encoder[ForeignTableOptionsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "foreign_table_catalog" := row.foreignTableCatalog,
-        "foreign_table_schema" := row.foreignTableSchema,
-        "foreign_table_name" := row.foreignTableName,
-        "option_name" := row.optionName,
-        "option_value" := row.optionValue
-      )}
-  implicit val read: Read[ForeignTableOptionsViewRow] =
-    new Read[ForeignTableOptionsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ForeignTableOptionsViewRow(
-        foreignTableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        foreignTableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        foreignTableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[ForeignTableOptionsViewRow] = Decoder.forProduct5[ForeignTableOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "option_name", "option_value")(ForeignTableOptionsViewRow.apply)
+  implicit val encoder: Encoder[ForeignTableOptionsViewRow] = Encoder.forProduct5[ForeignTableOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "option_name", "option_value")(x => (x.foreignTableCatalog, x.foreignTableSchema, x.foreignTableName, x.optionName, x.optionValue))
+  implicit val read: Read[ForeignTableOptionsViewRow] = new Read[ForeignTableOptionsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ForeignTableOptionsViewRow(
+      foreignTableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      foreignTableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      foreignTableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

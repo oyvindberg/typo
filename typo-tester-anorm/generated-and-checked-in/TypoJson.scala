@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
@@ -19,65 +16,63 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** json (via PGObject) */
 case class TypoJson(value: String)
+
 object TypoJson {
-  implicit val oFormat: OFormat[TypoJson] = new OFormat[TypoJson]{
-    override def writes(o: TypoJson): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoJson] = {
-      JsResult.fromTry(
-        Try(
-          TypoJson(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoJsonDb: ToStatement[TypoJson] with ParameterMetaData[TypoJson] with Column[TypoJson] = new ToStatement[TypoJson] with ParameterMetaData[TypoJson] with Column[TypoJson] {
-    override def sqlType: String = "json"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoJson): Unit =
-      s.setObject(index, {
-                           val obj = new PGobject
-                           obj.setType("json")
-                           obj.setValue(v.value)
-                           obj
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoJson] =
-      v match {
-        case v: PGobject => Right(TypoJson(v.getValue))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGobject from JDBC to produce a TypoJson, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoJsonDbArray: ToStatement[Array[TypoJson]] with ParameterMetaData[Array[TypoJson]] with Column[Array[TypoJson]] = new ToStatement[Array[TypoJson]] with ParameterMetaData[Array[TypoJson]] with Column[Array[TypoJson]] {
-    override def sqlType: String = "_json"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoJson]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("json", v.map(v => {
-                                                                           val obj = new PGobject
-                                                                           obj.setType("json")
-                                                                           obj.setValue(v.value)
-                                                                           obj
-                                                                         })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoJson]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoJson]] = Column.nonNull[Array[TypoJson]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoJson(v.asInstanceOf[String])))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoJson, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoJson, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoJson]] = new ParameterMetaData[Array[TypoJson]] {
+    override def sqlType: String = "_json"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoJson]] = ToStatement[Array[TypoJson]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("json", v.map(v => {
+                                                                                                                     val obj = new PGobject
+                                                                                                                     obj.setType("json")
+                                                                                                                     obj.setValue(v.value)
+                                                                                                                     obj
+                                                                                                                   }))))
+  implicit val column: Column[TypoJson] = Column.nonNull[TypoJson]((v1: Any, _) =>
+    v1 match {
+      case v: PGobject => Right(TypoJson(v.getValue))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoJson] = new ParameterMetaData[TypoJson] {
+    override def sqlType: String = "json"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoJson] = Reads[TypoJson](json => JsResult.fromTry(
+      Try(
+        TypoJson(
+          value = json.\("value").as[String]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoJson] = ToStatement[TypoJson]((s, index, v) => s.setObject(index, {
+                                                              val obj = new PGobject
+                                                              obj.setType("json")
+                                                              obj.setValue(v.value)
+                                                              obj
+                                                            }))
+  implicit val writes: OWrites[TypoJson] = OWrites[TypoJson](o =>
+    new JsObject(ListMap[String, JsValue](
+      "value" -> Json.toJson(o.value)
+    ))
+  )
 }

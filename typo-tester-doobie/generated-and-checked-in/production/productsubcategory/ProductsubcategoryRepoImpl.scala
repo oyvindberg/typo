@@ -8,21 +8,21 @@ package production
 package productsubcategory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Boolean] = {
-    sql"delete from production.productsubcategory where productsubcategoryid = $productsubcategoryid".update.run.map(_ > 0)
+    sql"delete from production.productsubcategory where productsubcategoryid = ${productsubcategoryid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
           values (${unsaved.productsubcategoryid}::int4, ${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
        """.query[ProductsubcategoryRow].unique
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved): ConnectionIO[ProductsubcategoryRow] = {
@@ -39,32 +39,32 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productsubcategory default values
-            returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+            returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productsubcategory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+            returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
          """
     }
     q.query[ProductsubcategoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
-    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate from production.productsubcategory""".query[ProductsubcategoryRow].stream
+    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory""".query[ProductsubcategoryRow].stream
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Option[ProductsubcategoryRow]] = {
-    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate from production.productsubcategory where productsubcategoryid = $productsubcategoryid""".query[ProductsubcategoryRow].option
+    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ${productsubcategoryid}""".query[ProductsubcategoryRow].option
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow] = {
-    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate from production.productsubcategory where productsubcategoryid = ANY($productsubcategoryids)""".query[ProductsubcategoryRow].stream
+    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ANY(${productsubcategoryids})""".query[ProductsubcategoryRow].stream
   }
   override def update(row: ProductsubcategoryRow): ConnectionIO[Boolean] = {
     val productsubcategoryid = row.productsubcategoryid
@@ -73,7 +73,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
               "name" = ${row.name}::"public"."Name",
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where productsubcategoryid = $productsubcategoryid
+          where productsubcategoryid = ${productsubcategoryid}
        """
       .update
       .run
@@ -94,7 +94,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             "name" = EXCLUDED."name",
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
        """.query[ProductsubcategoryRow].unique
   }
 }

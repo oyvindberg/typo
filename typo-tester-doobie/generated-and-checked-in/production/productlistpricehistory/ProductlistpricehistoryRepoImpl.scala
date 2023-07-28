@@ -8,11 +8,11 @@ package production
 package productlistpricehistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def delete(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean] = {
@@ -21,7 +21,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into production.productlistpricehistory(productid, startdate, enddate, listprice, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.listprice}::numeric, ${unsaved.modifieddate}::timestamp)
-          returning productid, startdate, enddate, listprice, modifieddate
+          returning productid, startdate::text, enddate::text, listprice, modifieddate::text
        """.query[ProductlistpricehistoryRow].unique
   }
   override def insert(unsaved: ProductlistpricehistoryRowUnsaved): ConnectionIO[ProductlistpricehistoryRow] = {
@@ -32,29 +32,29 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
       Some((Fragment.const(s"listprice"), fr"${unsaved.listprice}::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productlistpricehistory default values
-            returning productid, startdate, enddate, listprice, modifieddate
+            returning productid, startdate::text, enddate::text, listprice, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productlistpricehistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productid, startdate, enddate, listprice, modifieddate
+            returning productid, startdate::text, enddate::text, listprice, modifieddate::text
          """
     }
     q.query[ProductlistpricehistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow] = {
-    sql"select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory".query[ProductlistpricehistoryRow].stream
+    sql"select productid, startdate::text, enddate::text, listprice, modifieddate::text from production.productlistpricehistory".query[ProductlistpricehistoryRow].stream
   }
   override def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]] = {
-    sql"select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query[ProductlistpricehistoryRow].option
+    sql"select productid, startdate::text, enddate::text, listprice, modifieddate::text from production.productlistpricehistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query[ProductlistpricehistoryRow].option
   }
   override def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -82,7 +82,7 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
             enddate = EXCLUDED.enddate,
             listprice = EXCLUDED.listprice,
             modifieddate = EXCLUDED.modifieddate
-          returning productid, startdate, enddate, listprice, modifieddate
+          returning productid, startdate::text, enddate::text, listprice, modifieddate::text
        """.query[ProductlistpricehistoryRow].unique
   }
 }

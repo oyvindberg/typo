@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VsalespersonsalesbyfiscalyearsdataViewRow(
@@ -30,43 +32,39 @@ case class VsalespersonsalesbyfiscalyearsdataViewRow(
 )
 
 object VsalespersonsalesbyfiscalyearsdataViewRow {
-  def rowParser(idx: Int): RowParser[VsalespersonsalesbyfiscalyearsdataViewRow] =
-    RowParser[VsalespersonsalesbyfiscalyearsdataViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VsalespersonsalesbyfiscalyearsdataViewRow] = Reads[VsalespersonsalesbyfiscalyearsdataViewRow](json => JsResult.fromTry(
+      Try(
         VsalespersonsalesbyfiscalyearsdataViewRow(
-          salespersonid = row[Option[BusinessentityId]](idx + 0),
-          fullname = row[Option[String]](idx + 1),
-          jobtitle = row[Option[/* max 50 chars */ String]](idx + 2),
-          salesterritory = row[Option[Name]](idx + 3),
-          salestotal = row[Option[BigDecimal]](idx + 4),
-          fiscalyear = row[Option[BigDecimal]](idx + 5)
+          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
+          fullname = json.\("fullname").toOption.map(_.as[String]),
+          jobtitle = json.\("jobtitle").toOption.map(_.as[/* max 50 chars */ String]),
+          salesterritory = json.\("salesterritory").toOption.map(_.as[Name]),
+          salestotal = json.\("salestotal").toOption.map(_.as[BigDecimal]),
+          fiscalyear = json.\("fiscalyear").toOption.map(_.as[BigDecimal])
         )
       )
-    }
-  implicit val oFormat: OFormat[VsalespersonsalesbyfiscalyearsdataViewRow] = new OFormat[VsalespersonsalesbyfiscalyearsdataViewRow]{
-    override def writes(o: VsalespersonsalesbyfiscalyearsdataViewRow): JsObject =
-      Json.obj(
-        "salespersonid" -> o.salespersonid,
-        "fullname" -> o.fullname,
-        "jobtitle" -> o.jobtitle,
-        "salesterritory" -> o.salesterritory,
-        "salestotal" -> o.salestotal,
-        "fiscalyear" -> o.fiscalyear
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VsalespersonsalesbyfiscalyearsdataViewRow] = RowParser[VsalespersonsalesbyfiscalyearsdataViewRow] { row =>
+    Success(
+      VsalespersonsalesbyfiscalyearsdataViewRow(
+        salespersonid = row[Option[BusinessentityId]](idx + 0),
+        fullname = row[Option[String]](idx + 1),
+        jobtitle = row[Option[/* max 50 chars */ String]](idx + 2),
+        salesterritory = row[Option[Name]](idx + 3),
+        salestotal = row[Option[BigDecimal]](idx + 4),
+        fiscalyear = row[Option[BigDecimal]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[VsalespersonsalesbyfiscalyearsdataViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VsalespersonsalesbyfiscalyearsdataViewRow(
-            salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            fullname = json.\("fullname").toOption.map(_.as[String]),
-            jobtitle = json.\("jobtitle").toOption.map(_.as[/* max 50 chars */ String]),
-            salesterritory = json.\("salesterritory").toOption.map(_.as[Name]),
-            salestotal = json.\("salestotal").toOption.map(_.as[BigDecimal]),
-            fiscalyear = json.\("fiscalyear").toOption.map(_.as[BigDecimal])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VsalespersonsalesbyfiscalyearsdataViewRow] = OWrites[VsalespersonsalesbyfiscalyearsdataViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "salespersonid" -> Json.toJson(o.salespersonid),
+      "fullname" -> Json.toJson(o.fullname),
+      "jobtitle" -> Json.toJson(o.jobtitle),
+      "salesterritory" -> Json.toJson(o.salesterritory),
+      "salestotal" -> Json.toJson(o.salestotal),
+      "fiscalyear" -> Json.toJson(o.fiscalyear)
+    ))
+  )
 }

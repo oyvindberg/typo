@@ -8,13 +8,11 @@ package pg_catalog
 package pg_init_privs
 
 import adventureworks.TypoAclItem
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgInitPrivsRow(
@@ -28,42 +26,22 @@ case class PgInitPrivsRow(
  }
 
 object PgInitPrivsRow {
-  implicit val decoder: Decoder[PgInitPrivsRow] =
-    (c: HCursor) =>
-      for {
-        objoid <- c.downField("objoid").as[/* oid */ Long]
-        classoid <- c.downField("classoid").as[/* oid */ Long]
-        objsubid <- c.downField("objsubid").as[Int]
-        privtype <- c.downField("privtype").as[String]
-        initprivs <- c.downField("initprivs").as[Array[TypoAclItem]]
-      } yield PgInitPrivsRow(objoid, classoid, objsubid, privtype, initprivs)
-  implicit val encoder: Encoder[PgInitPrivsRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "objoid" := row.objoid,
-        "classoid" := row.classoid,
-        "objsubid" := row.objsubid,
-        "privtype" := row.privtype,
-        "initprivs" := row.initprivs
-      )}
-  implicit val read: Read[PgInitPrivsRow] =
-    new Read[PgInitPrivsRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Array[TypoAclItem]], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgInitPrivsRow(
-        objoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        classoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        objsubid = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        privtype = Get[String].unsafeGetNonNullable(rs, i + 3),
-        initprivs = Get[Array[TypoAclItem]].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[PgInitPrivsRow] = Decoder.forProduct5[PgInitPrivsRow, /* oid */ Long, /* oid */ Long, Int, String, Array[TypoAclItem]]("objoid", "classoid", "objsubid", "privtype", "initprivs")(PgInitPrivsRow.apply)
+  implicit val encoder: Encoder[PgInitPrivsRow] = Encoder.forProduct5[PgInitPrivsRow, /* oid */ Long, /* oid */ Long, Int, String, Array[TypoAclItem]]("objoid", "classoid", "objsubid", "privtype", "initprivs")(x => (x.objoid, x.classoid, x.objsubid, x.privtype, x.initprivs))
+  implicit val read: Read[PgInitPrivsRow] = new Read[PgInitPrivsRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Array[TypoAclItem]], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgInitPrivsRow(
+      objoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      classoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      objsubid = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      privtype = Get[String].unsafeGetNonNullable(rs, i + 3),
+      initprivs = Get[Array[TypoAclItem]].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

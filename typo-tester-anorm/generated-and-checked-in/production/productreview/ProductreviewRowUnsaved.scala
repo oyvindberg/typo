@@ -8,14 +8,16 @@ package production
 package productreview
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.productreview` which has not been persisted yet */
@@ -36,11 +38,11 @@ case class ProductreviewRowUnsaved(
   productreviewid: Defaulted[ProductreviewId] = Defaulted.UseDefault,
   /** Default: now()
       Date review was submitted. */
-  reviewdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  reviewdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productreviewidDefault: => ProductreviewId, reviewdateDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): ProductreviewRow =
+  def toRow(productreviewidDefault: => ProductreviewId, reviewdateDefault: => TypoLocalDateTime, modifieddateDefault: => TypoLocalDateTime): ProductreviewRow =
     ProductreviewRow(
       productid = productid,
       reviewername = reviewername,
@@ -62,34 +64,31 @@ case class ProductreviewRowUnsaved(
     )
 }
 object ProductreviewRowUnsaved {
-  implicit val oFormat: OFormat[ProductreviewRowUnsaved] = new OFormat[ProductreviewRowUnsaved]{
-    override def writes(o: ProductreviewRowUnsaved): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "reviewername" -> o.reviewername,
-        "emailaddress" -> o.emailaddress,
-        "rating" -> o.rating,
-        "comments" -> o.comments,
-        "productreviewid" -> o.productreviewid,
-        "reviewdate" -> o.reviewdate,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductreviewRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ProductreviewRowUnsaved(
-            productid = json.\("productid").as[ProductId],
-            reviewername = json.\("reviewername").as[Name],
-            emailaddress = json.\("emailaddress").as[/* max 50 chars */ String],
-            rating = json.\("rating").as[Int],
-            comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
-            productreviewid = json.\("productreviewid").as[Defaulted[ProductreviewId]],
-            reviewdate = json.\("reviewdate").as[Defaulted[LocalDateTime]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ProductreviewRowUnsaved] = Reads[ProductreviewRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ProductreviewRowUnsaved(
+          productid = json.\("productid").as[ProductId],
+          reviewername = json.\("reviewername").as[Name],
+          emailaddress = json.\("emailaddress").as[/* max 50 chars */ String],
+          rating = json.\("rating").as[Int],
+          comments = json.\("comments").toOption.map(_.as[/* max 3850 chars */ String]),
+          productreviewid = json.\("productreviewid").as[Defaulted[ProductreviewId]],
+          reviewdate = json.\("reviewdate").as[Defaulted[TypoLocalDateTime]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductreviewRowUnsaved] = OWrites[ProductreviewRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "reviewername" -> Json.toJson(o.reviewername),
+      "emailaddress" -> Json.toJson(o.emailaddress),
+      "rating" -> Json.toJson(o.rating),
+      "comments" -> Json.toJson(o.comments),
+      "productreviewid" -> Json.toJson(o.productreviewid),
+      "reviewdate" -> Json.toJson(o.reviewdate),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

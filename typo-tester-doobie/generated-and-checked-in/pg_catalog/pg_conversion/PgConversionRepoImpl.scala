@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_conversion where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_conversion where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
     sql"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
@@ -25,10 +25,10 @@ object PgConversionRepoImpl extends PgConversionRepo {
     sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion".query[PgConversionRow].stream
   }
   override def selectById(oid: PgConversionId): ConnectionIO[Option[PgConversionRow]] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = $oid".query[PgConversionRow].option
+    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ${oid}".query[PgConversionRow].option
   }
   override def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY($oids)".query[PgConversionRow].stream
+    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY(${oids})".query[PgConversionRow].stream
   }
   override def update(row: PgConversionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -40,7 +40,7 @@ object PgConversionRepoImpl extends PgConversionRepo {
               contoencoding = ${row.contoencoding}::int4,
               conproc = ${row.conproc}::regproc,
               condefault = ${row.condefault}
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

@@ -7,16 +7,14 @@ package adventureworks
 package sales
 package salespersonquotahistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SalespersonquotahistoryRow(
@@ -24,52 +22,32 @@ case class SalespersonquotahistoryRow(
       Points to [[salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Sales quota date. */
-  quotadate: LocalDateTime,
+  quotadate: TypoLocalDateTime,
   /** Sales quota amount. */
   salesquota: BigDecimal,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalespersonquotahistoryId = SalespersonquotahistoryId(businessentityid, quotadate)
  }
 
 object SalespersonquotahistoryRow {
-  implicit val decoder: Decoder[SalespersonquotahistoryRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        quotadate <- c.downField("quotadate").as[LocalDateTime]
-        salesquota <- c.downField("salesquota").as[BigDecimal]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield SalespersonquotahistoryRow(businessentityid, quotadate, salesquota, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalespersonquotahistoryRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "quotadate" := row.quotadate,
-        "salesquota" := row.salesquota,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SalespersonquotahistoryRow] =
-    new Read[SalespersonquotahistoryRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalespersonquotahistoryRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        quotadate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        salesquota = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[SalespersonquotahistoryRow] = Decoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SalespersonquotahistoryRow.apply)
+  implicit val encoder: Encoder[SalespersonquotahistoryRow] = Encoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))
+  implicit val read: Read[SalespersonquotahistoryRow] = new Read[SalespersonquotahistoryRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SalespersonquotahistoryRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      quotadate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 1),
+      salesquota = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

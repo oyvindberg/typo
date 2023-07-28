@@ -9,13 +9,11 @@ package transforms
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class TransformsViewRow(
@@ -30,54 +28,28 @@ case class TransformsViewRow(
 )
 
 object TransformsViewRow {
-  implicit val decoder: Decoder[TransformsViewRow] =
-    (c: HCursor) =>
-      for {
-        udtCatalog <- c.downField("udt_catalog").as[Option[SqlIdentifier]]
-        udtSchema <- c.downField("udt_schema").as[Option[SqlIdentifier]]
-        udtName <- c.downField("udt_name").as[Option[SqlIdentifier]]
-        specificCatalog <- c.downField("specific_catalog").as[Option[SqlIdentifier]]
-        specificSchema <- c.downField("specific_schema").as[Option[SqlIdentifier]]
-        specificName <- c.downField("specific_name").as[Option[SqlIdentifier]]
-        groupName <- c.downField("group_name").as[Option[SqlIdentifier]]
-        transformType <- c.downField("transform_type").as[Option[CharacterData]]
-      } yield TransformsViewRow(udtCatalog, udtSchema, udtName, specificCatalog, specificSchema, specificName, groupName, transformType)
-  implicit val encoder: Encoder[TransformsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "udt_catalog" := row.udtCatalog,
-        "udt_schema" := row.udtSchema,
-        "udt_name" := row.udtName,
-        "specific_catalog" := row.specificCatalog,
-        "specific_schema" := row.specificSchema,
-        "specific_name" := row.specificName,
-        "group_name" := row.groupName,
-        "transform_type" := row.transformType
-      )}
-  implicit val read: Read[TransformsViewRow] =
-    new Read[TransformsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => TransformsViewRow(
-        udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        specificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        specificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        specificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        groupName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
-        transformType = Get[CharacterData].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[TransformsViewRow] = Decoder.forProduct8[TransformsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("udt_catalog", "udt_schema", "udt_name", "specific_catalog", "specific_schema", "specific_name", "group_name", "transform_type")(TransformsViewRow.apply)
+  implicit val encoder: Encoder[TransformsViewRow] = Encoder.forProduct8[TransformsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("udt_catalog", "udt_schema", "udt_name", "specific_catalog", "specific_schema", "specific_name", "group_name", "transform_type")(x => (x.udtCatalog, x.udtSchema, x.udtName, x.specificCatalog, x.specificSchema, x.specificName, x.groupName, x.transformType))
+  implicit val read: Read[TransformsViewRow] = new Read[TransformsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => TransformsViewRow(
+      udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      specificCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      specificSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      specificName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      groupName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6),
+      transformType = Get[CharacterData].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

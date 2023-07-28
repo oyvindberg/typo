@@ -7,23 +7,25 @@ package adventureworks
 package sa
 package cr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CrViewRow(
   /** Points to [[sales.currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: Option[CurrencyrateId],
   /** Points to [[sales.currencyrate.CurrencyrateRow.currencyratedate]] */
-  currencyratedate: Option[LocalDateTime],
+  currencyratedate: Option[TypoLocalDateTime],
   /** Points to [[sales.currencyrate.CurrencyrateRow.fromcurrencycode]] */
   fromcurrencycode: Option[CurrencyId],
   /** Points to [[sales.currencyrate.CurrencyrateRow.tocurrencycode]] */
@@ -33,50 +35,46 @@ case class CrViewRow(
   /** Points to [[sales.currencyrate.CurrencyrateRow.endofdayrate]] */
   endofdayrate: Option[BigDecimal],
   /** Points to [[sales.currencyrate.CurrencyrateRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object CrViewRow {
-  def rowParser(idx: Int): RowParser[CrViewRow] =
-    RowParser[CrViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CrViewRow] = Reads[CrViewRow](json => JsResult.fromTry(
+      Try(
         CrViewRow(
-          currencyrateid = row[Option[CurrencyrateId]](idx + 0),
-          currencyratedate = row[Option[LocalDateTime]](idx + 1),
-          fromcurrencycode = row[Option[CurrencyId]](idx + 2),
-          tocurrencycode = row[Option[CurrencyId]](idx + 3),
-          averagerate = row[Option[BigDecimal]](idx + 4),
-          endofdayrate = row[Option[BigDecimal]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
+          currencyratedate = json.\("currencyratedate").toOption.map(_.as[TypoLocalDateTime]),
+          fromcurrencycode = json.\("fromcurrencycode").toOption.map(_.as[CurrencyId]),
+          tocurrencycode = json.\("tocurrencycode").toOption.map(_.as[CurrencyId]),
+          averagerate = json.\("averagerate").toOption.map(_.as[BigDecimal]),
+          endofdayrate = json.\("endofdayrate").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[CrViewRow] = new OFormat[CrViewRow]{
-    override def writes(o: CrViewRow): JsObject =
-      Json.obj(
-        "currencyrateid" -> o.currencyrateid,
-        "currencyratedate" -> o.currencyratedate,
-        "fromcurrencycode" -> o.fromcurrencycode,
-        "tocurrencycode" -> o.tocurrencycode,
-        "averagerate" -> o.averagerate,
-        "endofdayrate" -> o.endofdayrate,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CrViewRow] = RowParser[CrViewRow] { row =>
+    Success(
+      CrViewRow(
+        currencyrateid = row[Option[CurrencyrateId]](idx + 0),
+        currencyratedate = row[Option[TypoLocalDateTime]](idx + 1),
+        fromcurrencycode = row[Option[CurrencyId]](idx + 2),
+        tocurrencycode = row[Option[CurrencyId]](idx + 3),
+        averagerate = row[Option[BigDecimal]](idx + 4),
+        endofdayrate = row[Option[BigDecimal]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[CrViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CrViewRow(
-            currencyrateid = json.\("currencyrateid").toOption.map(_.as[CurrencyrateId]),
-            currencyratedate = json.\("currencyratedate").toOption.map(_.as[LocalDateTime]),
-            fromcurrencycode = json.\("fromcurrencycode").toOption.map(_.as[CurrencyId]),
-            tocurrencycode = json.\("tocurrencycode").toOption.map(_.as[CurrencyId]),
-            averagerate = json.\("averagerate").toOption.map(_.as[BigDecimal]),
-            endofdayrate = json.\("endofdayrate").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CrViewRow] = OWrites[CrViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "currencyrateid" -> Json.toJson(o.currencyrateid),
+      "currencyratedate" -> Json.toJson(o.currencyratedate),
+      "fromcurrencycode" -> Json.toJson(o.fromcurrencycode),
+      "tocurrencycode" -> Json.toJson(o.tocurrencycode),
+      "averagerate" -> Json.toJson(o.averagerate),
+      "endofdayrate" -> Json.toJson(o.endofdayrate),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

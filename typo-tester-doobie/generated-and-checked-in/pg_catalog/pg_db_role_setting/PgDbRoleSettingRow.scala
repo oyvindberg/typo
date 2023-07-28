@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_db_role_setting
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgDbRoleSettingRow(
@@ -25,34 +23,18 @@ case class PgDbRoleSettingRow(
  }
 
 object PgDbRoleSettingRow {
-  implicit val decoder: Decoder[PgDbRoleSettingRow] =
-    (c: HCursor) =>
-      for {
-        setdatabase <- c.downField("setdatabase").as[/* oid */ Long]
-        setrole <- c.downField("setrole").as[/* oid */ Long]
-        setconfig <- c.downField("setconfig").as[Option[Array[String]]]
-      } yield PgDbRoleSettingRow(setdatabase, setrole, setconfig)
-  implicit val encoder: Encoder[PgDbRoleSettingRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "setdatabase" := row.setdatabase,
-        "setrole" := row.setrole,
-        "setconfig" := row.setconfig
-      )}
-  implicit val read: Read[PgDbRoleSettingRow] =
-    new Read[PgDbRoleSettingRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Array[String]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgDbRoleSettingRow(
-        setdatabase = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        setrole = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        setconfig = Get[Array[String]].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PgDbRoleSettingRow] = Decoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(PgDbRoleSettingRow.apply)
+  implicit val encoder: Encoder[PgDbRoleSettingRow] = Encoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(x => (x.setdatabase, x.setrole, x.setconfig))
+  implicit val read: Read[PgDbRoleSettingRow] = new Read[PgDbRoleSettingRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Array[String]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgDbRoleSettingRow(
+      setdatabase = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      setrole = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      setconfig = Get[Array[String]].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

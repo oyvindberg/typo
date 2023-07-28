@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UserMappingsViewRow(
@@ -27,34 +29,30 @@ case class UserMappingsViewRow(
 )
 
 object UserMappingsViewRow {
-  def rowParser(idx: Int): RowParser[UserMappingsViewRow] =
-    RowParser[UserMappingsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[UserMappingsViewRow] = Reads[UserMappingsViewRow](json => JsResult.fromTry(
+      Try(
         UserMappingsViewRow(
-          authorizationIdentifier = row[Option[SqlIdentifier]](idx + 0),
-          foreignServerCatalog = row[Option[SqlIdentifier]](idx + 1),
-          foreignServerName = row[Option[SqlIdentifier]](idx + 2)
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[UserMappingsViewRow] = new OFormat[UserMappingsViewRow]{
-    override def writes(o: UserMappingsViewRow): JsObject =
-      Json.obj(
-        "authorization_identifier" -> o.authorizationIdentifier,
-        "foreign_server_catalog" -> o.foreignServerCatalog,
-        "foreign_server_name" -> o.foreignServerName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[UserMappingsViewRow] = RowParser[UserMappingsViewRow] { row =>
+    Success(
+      UserMappingsViewRow(
+        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 0),
+        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 1),
+        foreignServerName = row[Option[SqlIdentifier]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[UserMappingsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          UserMappingsViewRow(
-            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
-            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[UserMappingsViewRow] = OWrites[UserMappingsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier),
+      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
+      "foreign_server_name" -> Json.toJson(o.foreignServerName)
+    ))
+  )
 }

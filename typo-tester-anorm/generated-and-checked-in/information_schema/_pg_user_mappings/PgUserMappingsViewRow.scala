@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgUserMappingsViewRow(
@@ -32,46 +34,42 @@ case class PgUserMappingsViewRow(
 )
 
 object PgUserMappingsViewRow {
-  def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] =
-    RowParser[PgUserMappingsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgUserMappingsViewRow] = Reads[PgUserMappingsViewRow](json => JsResult.fromTry(
+      Try(
         PgUserMappingsViewRow(
-          oid = row[Option[/* oid */ Long]](idx + 0),
-          umoptions = row[Option[Array[String]]](idx + 1),
-          umuser = row[Option[/* oid */ Long]](idx + 2),
-          authorizationIdentifier = row[Option[SqlIdentifier]](idx + 3),
-          foreignServerCatalog = row[Option[SqlIdentifier]](idx + 4),
-          foreignServerName = row[Option[SqlIdentifier]](idx + 5),
-          srvowner = row[Option[SqlIdentifier]](idx + 6)
+          oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
+          umoptions = json.\("umoptions").toOption.map(_.as[Array[String]]),
+          umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
+          srvowner = json.\("srvowner").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgUserMappingsViewRow] = new OFormat[PgUserMappingsViewRow]{
-    override def writes(o: PgUserMappingsViewRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "umoptions" -> o.umoptions,
-        "umuser" -> o.umuser,
-        "authorization_identifier" -> o.authorizationIdentifier,
-        "foreign_server_catalog" -> o.foreignServerCatalog,
-        "foreign_server_name" -> o.foreignServerName,
-        "srvowner" -> o.srvowner
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgUserMappingsViewRow] = RowParser[PgUserMappingsViewRow] { row =>
+    Success(
+      PgUserMappingsViewRow(
+        oid = row[Option[/* oid */ Long]](idx + 0),
+        umoptions = row[Option[Array[String]]](idx + 1),
+        umuser = row[Option[/* oid */ Long]](idx + 2),
+        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 3),
+        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 4),
+        foreignServerName = row[Option[SqlIdentifier]](idx + 5),
+        srvowner = row[Option[SqlIdentifier]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgUserMappingsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgUserMappingsViewRow(
-            oid = json.\("oid").toOption.map(_.as[/* oid */ Long]),
-            umoptions = json.\("umoptions").toOption.map(_.as[Array[String]]),
-            umuser = json.\("umuser").toOption.map(_.as[/* oid */ Long]),
-            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier]),
-            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
-            srvowner = json.\("srvowner").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgUserMappingsViewRow] = OWrites[PgUserMappingsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "umoptions" -> Json.toJson(o.umoptions),
+      "umuser" -> Json.toJson(o.umuser),
+      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier),
+      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
+      "foreign_server_name" -> Json.toJson(o.foreignServerName),
+      "srvowner" -> Json.toJson(o.srvowner)
+    ))
+  )
 }

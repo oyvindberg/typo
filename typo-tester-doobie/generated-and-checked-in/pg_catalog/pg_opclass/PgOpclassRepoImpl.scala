@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_opclass where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_opclass where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgOpclassRow): ConnectionIO[PgOpclassRow] = {
     sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
@@ -25,10 +25,10 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass".query[PgOpclassRow].stream
   }
   override def selectById(oid: PgOpclassId): ConnectionIO[Option[PgOpclassRow]] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = $oid".query[PgOpclassRow].option
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ${oid}".query[PgOpclassRow].option
   }
   override def selectByIds(oids: Array[PgOpclassId]): Stream[ConnectionIO, PgOpclassRow] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY($oids)".query[PgOpclassRow].stream
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${oids})".query[PgOpclassRow].stream
   }
   override def update(row: PgOpclassRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -41,7 +41,7 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
               opcintype = ${row.opcintype}::oid,
               opcdefault = ${row.opcdefault},
               opckeytype = ${row.opckeytype}::oid
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

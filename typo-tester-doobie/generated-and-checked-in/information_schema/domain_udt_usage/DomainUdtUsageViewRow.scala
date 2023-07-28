@@ -8,13 +8,11 @@ package information_schema
 package domain_udt_usage
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class DomainUdtUsageViewRow(
@@ -27,46 +25,24 @@ case class DomainUdtUsageViewRow(
 )
 
 object DomainUdtUsageViewRow {
-  implicit val decoder: Decoder[DomainUdtUsageViewRow] =
-    (c: HCursor) =>
-      for {
-        udtCatalog <- c.downField("udt_catalog").as[Option[SqlIdentifier]]
-        udtSchema <- c.downField("udt_schema").as[Option[SqlIdentifier]]
-        udtName <- c.downField("udt_name").as[Option[SqlIdentifier]]
-        domainCatalog <- c.downField("domain_catalog").as[Option[SqlIdentifier]]
-        domainSchema <- c.downField("domain_schema").as[Option[SqlIdentifier]]
-        domainName <- c.downField("domain_name").as[Option[SqlIdentifier]]
-      } yield DomainUdtUsageViewRow(udtCatalog, udtSchema, udtName, domainCatalog, domainSchema, domainName)
-  implicit val encoder: Encoder[DomainUdtUsageViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "udt_catalog" := row.udtCatalog,
-        "udt_schema" := row.udtSchema,
-        "udt_name" := row.udtName,
-        "domain_catalog" := row.domainCatalog,
-        "domain_schema" := row.domainSchema,
-        "domain_name" := row.domainName
-      )}
-  implicit val read: Read[DomainUdtUsageViewRow] =
-    new Read[DomainUdtUsageViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DomainUdtUsageViewRow(
-        udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        domainCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        domainSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        domainName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[DomainUdtUsageViewRow] = Decoder.forProduct6[DomainUdtUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("udt_catalog", "udt_schema", "udt_name", "domain_catalog", "domain_schema", "domain_name")(DomainUdtUsageViewRow.apply)
+  implicit val encoder: Encoder[DomainUdtUsageViewRow] = Encoder.forProduct6[DomainUdtUsageViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("udt_catalog", "udt_schema", "udt_name", "domain_catalog", "domain_schema", "domain_name")(x => (x.udtCatalog, x.udtSchema, x.udtName, x.domainCatalog, x.domainSchema, x.domainName))
+  implicit val read: Read[DomainUdtUsageViewRow] = new Read[DomainUdtUsageViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => DomainUdtUsageViewRow(
+      udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      domainCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      domainSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      domainName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

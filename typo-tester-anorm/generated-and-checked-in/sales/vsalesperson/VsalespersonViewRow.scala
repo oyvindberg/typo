@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VsalespersonViewRow(
@@ -62,91 +64,87 @@ case class VsalespersonViewRow(
 )
 
 object VsalespersonViewRow {
-  def rowParser(idx: Int): RowParser[VsalespersonViewRow] =
-    RowParser[VsalespersonViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VsalespersonViewRow] = Reads[VsalespersonViewRow](json => JsResult.fromTry(
+      Try(
         VsalespersonViewRow(
-          businessentityid = row[Option[BusinessentityId]](idx + 0),
-          title = row[Option[/* max 8 chars */ String]](idx + 1),
-          firstname = row[Option[Name]](idx + 2),
-          middlename = row[Option[Name]](idx + 3),
-          lastname = row[Option[Name]](idx + 4),
-          suffix = row[Option[/* max 10 chars */ String]](idx + 5),
-          jobtitle = row[Option[/* max 50 chars */ String]](idx + 6),
-          phonenumber = row[Option[Phone]](idx + 7),
-          phonenumbertype = row[Option[Name]](idx + 8),
-          emailaddress = row[Option[/* max 50 chars */ String]](idx + 9),
-          emailpromotion = row[Option[Int]](idx + 10),
-          addressline1 = row[Option[/* max 60 chars */ String]](idx + 11),
-          addressline2 = row[Option[/* max 60 chars */ String]](idx + 12),
-          city = row[Option[/* max 30 chars */ String]](idx + 13),
-          stateprovincename = row[Option[Name]](idx + 14),
-          postalcode = row[Option[/* max 15 chars */ String]](idx + 15),
-          countryregionname = row[Option[Name]](idx + 16),
-          territoryname = row[Option[Name]](idx + 17),
-          territorygroup = row[Option[/* max 50 chars */ String]](idx + 18),
-          salesquota = row[Option[BigDecimal]](idx + 19),
-          salesytd = row[Option[BigDecimal]](idx + 20),
-          saleslastyear = row[Option[BigDecimal]](idx + 21)
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
+          firstname = json.\("firstname").toOption.map(_.as[Name]),
+          middlename = json.\("middlename").toOption.map(_.as[Name]),
+          lastname = json.\("lastname").toOption.map(_.as[Name]),
+          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
+          jobtitle = json.\("jobtitle").toOption.map(_.as[/* max 50 chars */ String]),
+          phonenumber = json.\("phonenumber").toOption.map(_.as[Phone]),
+          phonenumbertype = json.\("phonenumbertype").toOption.map(_.as[Name]),
+          emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
+          emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
+          addressline1 = json.\("addressline1").toOption.map(_.as[/* max 60 chars */ String]),
+          addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
+          city = json.\("city").toOption.map(_.as[/* max 30 chars */ String]),
+          stateprovincename = json.\("stateprovincename").toOption.map(_.as[Name]),
+          postalcode = json.\("postalcode").toOption.map(_.as[/* max 15 chars */ String]),
+          countryregionname = json.\("countryregionname").toOption.map(_.as[Name]),
+          territoryname = json.\("territoryname").toOption.map(_.as[Name]),
+          territorygroup = json.\("territorygroup").toOption.map(_.as[/* max 50 chars */ String]),
+          salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
+          salesytd = json.\("salesytd").toOption.map(_.as[BigDecimal]),
+          saleslastyear = json.\("saleslastyear").toOption.map(_.as[BigDecimal])
         )
       )
-    }
-  implicit val oFormat: OFormat[VsalespersonViewRow] = new OFormat[VsalespersonViewRow]{
-    override def writes(o: VsalespersonViewRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "title" -> o.title,
-        "firstname" -> o.firstname,
-        "middlename" -> o.middlename,
-        "lastname" -> o.lastname,
-        "suffix" -> o.suffix,
-        "jobtitle" -> o.jobtitle,
-        "phonenumber" -> o.phonenumber,
-        "phonenumbertype" -> o.phonenumbertype,
-        "emailaddress" -> o.emailaddress,
-        "emailpromotion" -> o.emailpromotion,
-        "addressline1" -> o.addressline1,
-        "addressline2" -> o.addressline2,
-        "city" -> o.city,
-        "stateprovincename" -> o.stateprovincename,
-        "postalcode" -> o.postalcode,
-        "countryregionname" -> o.countryregionname,
-        "territoryname" -> o.territoryname,
-        "territorygroup" -> o.territorygroup,
-        "salesquota" -> o.salesquota,
-        "salesytd" -> o.salesytd,
-        "saleslastyear" -> o.saleslastyear
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VsalespersonViewRow] = RowParser[VsalespersonViewRow] { row =>
+    Success(
+      VsalespersonViewRow(
+        businessentityid = row[Option[BusinessentityId]](idx + 0),
+        title = row[Option[/* max 8 chars */ String]](idx + 1),
+        firstname = row[Option[Name]](idx + 2),
+        middlename = row[Option[Name]](idx + 3),
+        lastname = row[Option[Name]](idx + 4),
+        suffix = row[Option[/* max 10 chars */ String]](idx + 5),
+        jobtitle = row[Option[/* max 50 chars */ String]](idx + 6),
+        phonenumber = row[Option[Phone]](idx + 7),
+        phonenumbertype = row[Option[Name]](idx + 8),
+        emailaddress = row[Option[/* max 50 chars */ String]](idx + 9),
+        emailpromotion = row[Option[Int]](idx + 10),
+        addressline1 = row[Option[/* max 60 chars */ String]](idx + 11),
+        addressline2 = row[Option[/* max 60 chars */ String]](idx + 12),
+        city = row[Option[/* max 30 chars */ String]](idx + 13),
+        stateprovincename = row[Option[Name]](idx + 14),
+        postalcode = row[Option[/* max 15 chars */ String]](idx + 15),
+        countryregionname = row[Option[Name]](idx + 16),
+        territoryname = row[Option[Name]](idx + 17),
+        territorygroup = row[Option[/* max 50 chars */ String]](idx + 18),
+        salesquota = row[Option[BigDecimal]](idx + 19),
+        salesytd = row[Option[BigDecimal]](idx + 20),
+        saleslastyear = row[Option[BigDecimal]](idx + 21)
       )
-  
-    override def reads(json: JsValue): JsResult[VsalespersonViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VsalespersonViewRow(
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-            firstname = json.\("firstname").toOption.map(_.as[Name]),
-            middlename = json.\("middlename").toOption.map(_.as[Name]),
-            lastname = json.\("lastname").toOption.map(_.as[Name]),
-            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-            jobtitle = json.\("jobtitle").toOption.map(_.as[/* max 50 chars */ String]),
-            phonenumber = json.\("phonenumber").toOption.map(_.as[Phone]),
-            phonenumbertype = json.\("phonenumbertype").toOption.map(_.as[Name]),
-            emailaddress = json.\("emailaddress").toOption.map(_.as[/* max 50 chars */ String]),
-            emailpromotion = json.\("emailpromotion").toOption.map(_.as[Int]),
-            addressline1 = json.\("addressline1").toOption.map(_.as[/* max 60 chars */ String]),
-            addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
-            city = json.\("city").toOption.map(_.as[/* max 30 chars */ String]),
-            stateprovincename = json.\("stateprovincename").toOption.map(_.as[Name]),
-            postalcode = json.\("postalcode").toOption.map(_.as[/* max 15 chars */ String]),
-            countryregionname = json.\("countryregionname").toOption.map(_.as[Name]),
-            territoryname = json.\("territoryname").toOption.map(_.as[Name]),
-            territorygroup = json.\("territorygroup").toOption.map(_.as[/* max 50 chars */ String]),
-            salesquota = json.\("salesquota").toOption.map(_.as[BigDecimal]),
-            salesytd = json.\("salesytd").toOption.map(_.as[BigDecimal]),
-            saleslastyear = json.\("saleslastyear").toOption.map(_.as[BigDecimal])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VsalespersonViewRow] = OWrites[VsalespersonViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "title" -> Json.toJson(o.title),
+      "firstname" -> Json.toJson(o.firstname),
+      "middlename" -> Json.toJson(o.middlename),
+      "lastname" -> Json.toJson(o.lastname),
+      "suffix" -> Json.toJson(o.suffix),
+      "jobtitle" -> Json.toJson(o.jobtitle),
+      "phonenumber" -> Json.toJson(o.phonenumber),
+      "phonenumbertype" -> Json.toJson(o.phonenumbertype),
+      "emailaddress" -> Json.toJson(o.emailaddress),
+      "emailpromotion" -> Json.toJson(o.emailpromotion),
+      "addressline1" -> Json.toJson(o.addressline1),
+      "addressline2" -> Json.toJson(o.addressline2),
+      "city" -> Json.toJson(o.city),
+      "stateprovincename" -> Json.toJson(o.stateprovincename),
+      "postalcode" -> Json.toJson(o.postalcode),
+      "countryregionname" -> Json.toJson(o.countryregionname),
+      "territoryname" -> Json.toJson(o.territoryname),
+      "territorygroup" -> Json.toJson(o.territorygroup),
+      "salesquota" -> Json.toJson(o.salesquota),
+      "salesytd" -> Json.toJson(o.salesytd),
+      "saleslastyear" -> Json.toJson(o.saleslastyear)
+    ))
+  )
 }

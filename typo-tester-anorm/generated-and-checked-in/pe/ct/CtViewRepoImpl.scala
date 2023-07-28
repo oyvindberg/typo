@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object CtViewRepoImpl extends CtViewRepo {
   override def selectAll(implicit c: Connection): List[CtViewRow] = {
-    SQL"""select "id", contacttypeid, "name", modifieddate
+    SQL"""select "id", contacttypeid, "name", modifieddate::text
           from pe.ct
        """.as(CtViewRow.rowParser(1).*)
   }

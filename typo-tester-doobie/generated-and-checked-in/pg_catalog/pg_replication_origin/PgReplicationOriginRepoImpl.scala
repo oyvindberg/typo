@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_replication_origin where roident = $roident".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_replication_origin where roident = ${roident}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     sql"""insert into pg_catalog.pg_replication_origin(roident, roname)
@@ -25,16 +25,16 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     sql"select roident, roname from pg_catalog.pg_replication_origin".query[PgReplicationOriginRow].stream
   }
   override def selectById(roident: PgReplicationOriginId): ConnectionIO[Option[PgReplicationOriginRow]] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = $roident".query[PgReplicationOriginRow].option
+    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ${roident}".query[PgReplicationOriginRow].option
   }
   override def selectByIds(roidents: Array[PgReplicationOriginId]): Stream[ConnectionIO, PgReplicationOriginRow] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY($roidents)".query[PgReplicationOriginRow].stream
+    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY(${roidents})".query[PgReplicationOriginRow].stream
   }
   override def update(row: PgReplicationOriginRow): ConnectionIO[Boolean] = {
     val roident = row.roident
     sql"""update pg_catalog.pg_replication_origin
           set roname = ${row.roname}
-          where roident = $roident
+          where roident = ${roident}
        """
       .update
       .run

@@ -8,11 +8,11 @@ package person
 package businessentitycontact
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
@@ -22,7 +22,7 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def insert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow] = {
     sql"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.personid}::int4, ${unsaved.contacttypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, personid, contacttypeid, rowguid, modifieddate
+          returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
        """.query[BusinessentitycontactRow].unique
   }
   override def insert(unsaved: BusinessentitycontactRowUnsaved): ConnectionIO[BusinessentitycontactRow] = {
@@ -36,29 +36,29 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.businessentitycontact default values
-            returning businessentityid, personid, contacttypeid, rowguid, modifieddate
+            returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.businessentitycontact(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, personid, contacttypeid, rowguid, modifieddate
+            returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
          """
     }
     q.query[BusinessentitycontactRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, BusinessentitycontactRow] = {
-    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact".query[BusinessentitycontactRow].stream
+    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate::text from person.businessentitycontact".query[BusinessentitycontactRow].stream
   }
   override def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]] = {
-    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact where businessentityid = ${compositeId.businessentityid} AND personid = ${compositeId.personid} AND contacttypeid = ${compositeId.contacttypeid}".query[BusinessentitycontactRow].option
+    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate::text from person.businessentitycontact where businessentityid = ${compositeId.businessentityid} AND personid = ${compositeId.personid} AND contacttypeid = ${compositeId.contacttypeid}".query[BusinessentitycontactRow].option
   }
   override def update(row: BusinessentitycontactRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -84,7 +84,7 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
           do update set
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, personid, contacttypeid, rowguid, modifieddate
+          returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
        """.query[BusinessentitycontactRow].unique
   }
 }

@@ -7,15 +7,17 @@ package adventureworks
 package production
 package culture
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CultureRow(
@@ -23,38 +25,34 @@ case class CultureRow(
   cultureid: CultureId,
   /** Culture description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CultureRow {
-  def rowParser(idx: Int): RowParser[CultureRow] =
-    RowParser[CultureRow] { row =>
-      Success(
+  implicit val reads: Reads[CultureRow] = Reads[CultureRow](json => JsResult.fromTry(
+      Try(
         CultureRow(
-          cultureid = row[CultureId](idx + 0),
-          name = row[Name](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          cultureid = json.\("cultureid").as[CultureId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[CultureRow] = new OFormat[CultureRow]{
-    override def writes(o: CultureRow): JsObject =
-      Json.obj(
-        "cultureid" -> o.cultureid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CultureRow] = RowParser[CultureRow] { row =>
+    Success(
+      CultureRow(
+        cultureid = row[CultureId](idx + 0),
+        name = row[Name](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[CultureRow] = {
-      JsResult.fromTry(
-        Try(
-          CultureRow(
-            cultureid = json.\("cultureid").as[CultureId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CultureRow] = OWrites[CultureRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "cultureid" -> Json.toJson(o.cultureid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

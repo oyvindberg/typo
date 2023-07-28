@@ -7,17 +7,19 @@ package adventureworks
 package sales
 package specialofferproduct
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SpecialofferproductRow(
@@ -28,43 +30,39 @@ case class SpecialofferproductRow(
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: SpecialofferproductId = SpecialofferproductId(specialofferid, productid)
  }
 
 object SpecialofferproductRow {
-  def rowParser(idx: Int): RowParser[SpecialofferproductRow] =
-    RowParser[SpecialofferproductRow] { row =>
-      Success(
+  implicit val reads: Reads[SpecialofferproductRow] = Reads[SpecialofferproductRow](json => JsResult.fromTry(
+      Try(
         SpecialofferproductRow(
-          specialofferid = row[SpecialofferId](idx + 0),
-          productid = row[ProductId](idx + 1),
-          rowguid = row[UUID](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          specialofferid = json.\("specialofferid").as[SpecialofferId],
+          productid = json.\("productid").as[ProductId],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[SpecialofferproductRow] = new OFormat[SpecialofferproductRow]{
-    override def writes(o: SpecialofferproductRow): JsObject =
-      Json.obj(
-        "specialofferid" -> o.specialofferid,
-        "productid" -> o.productid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SpecialofferproductRow] = RowParser[SpecialofferproductRow] { row =>
+    Success(
+      SpecialofferproductRow(
+        specialofferid = row[SpecialofferId](idx + 0),
+        productid = row[ProductId](idx + 1),
+        rowguid = row[UUID](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[SpecialofferproductRow] = {
-      JsResult.fromTry(
-        Try(
-          SpecialofferproductRow(
-            specialofferid = json.\("specialofferid").as[SpecialofferId],
-            productid = json.\("productid").as[ProductId],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SpecialofferproductRow] = OWrites[SpecialofferproductRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "specialofferid" -> Json.toJson(o.specialofferid),
+      "productid" -> Json.toJson(o.productid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

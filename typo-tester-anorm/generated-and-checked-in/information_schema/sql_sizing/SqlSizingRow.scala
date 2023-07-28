@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SqlSizingRow(
@@ -26,37 +28,33 @@ case class SqlSizingRow(
 )
 
 object SqlSizingRow {
-  def rowParser(idx: Int): RowParser[SqlSizingRow] =
-    RowParser[SqlSizingRow] { row =>
-      Success(
+  implicit val reads: Reads[SqlSizingRow] = Reads[SqlSizingRow](json => JsResult.fromTry(
+      Try(
         SqlSizingRow(
-          sizingId = row[Option[CardinalNumber]](idx + 0),
-          sizingName = row[Option[CharacterData]](idx + 1),
-          supportedValue = row[Option[CardinalNumber]](idx + 2),
-          comments = row[Option[CharacterData]](idx + 3)
+          sizingId = json.\("sizing_id").toOption.map(_.as[CardinalNumber]),
+          sizingName = json.\("sizing_name").toOption.map(_.as[CharacterData]),
+          supportedValue = json.\("supported_value").toOption.map(_.as[CardinalNumber]),
+          comments = json.\("comments").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[SqlSizingRow] = new OFormat[SqlSizingRow]{
-    override def writes(o: SqlSizingRow): JsObject =
-      Json.obj(
-        "sizing_id" -> o.sizingId,
-        "sizing_name" -> o.sizingName,
-        "supported_value" -> o.supportedValue,
-        "comments" -> o.comments
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SqlSizingRow] = RowParser[SqlSizingRow] { row =>
+    Success(
+      SqlSizingRow(
+        sizingId = row[Option[CardinalNumber]](idx + 0),
+        sizingName = row[Option[CharacterData]](idx + 1),
+        supportedValue = row[Option[CardinalNumber]](idx + 2),
+        comments = row[Option[CharacterData]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[SqlSizingRow] = {
-      JsResult.fromTry(
-        Try(
-          SqlSizingRow(
-            sizingId = json.\("sizing_id").toOption.map(_.as[CardinalNumber]),
-            sizingName = json.\("sizing_name").toOption.map(_.as[CharacterData]),
-            supportedValue = json.\("supported_value").toOption.map(_.as[CardinalNumber]),
-            comments = json.\("comments").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SqlSizingRow] = OWrites[SqlSizingRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "sizing_id" -> Json.toJson(o.sizingId),
+      "sizing_name" -> Json.toJson(o.sizingName),
+      "supported_value" -> Json.toJson(o.supportedValue),
+      "comments" -> Json.toJson(o.comments)
+    ))
+  )
 }

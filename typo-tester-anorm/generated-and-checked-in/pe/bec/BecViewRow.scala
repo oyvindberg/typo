@@ -7,17 +7,19 @@ package adventureworks
 package pe
 package bec
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BecViewRow(
@@ -31,47 +33,43 @@ case class BecViewRow(
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object BecViewRow {
-  def rowParser(idx: Int): RowParser[BecViewRow] =
-    RowParser[BecViewRow] { row =>
-      Success(
+  implicit val reads: Reads[BecViewRow] = Reads[BecViewRow](json => JsResult.fromTry(
+      Try(
         BecViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          personid = row[Option[BusinessentityId]](idx + 2),
-          contacttypeid = row[Option[ContacttypeId]](idx + 3),
-          rowguid = row[Option[UUID]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          personid = json.\("personid").toOption.map(_.as[BusinessentityId]),
+          contacttypeid = json.\("contacttypeid").toOption.map(_.as[ContacttypeId]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[BecViewRow] = new OFormat[BecViewRow]{
-    override def writes(o: BecViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "personid" -> o.personid,
-        "contacttypeid" -> o.contacttypeid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[BecViewRow] = RowParser[BecViewRow] { row =>
+    Success(
+      BecViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        personid = row[Option[BusinessentityId]](idx + 2),
+        contacttypeid = row[Option[ContacttypeId]](idx + 3),
+        rowguid = row[Option[UUID]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[BecViewRow] = {
-      JsResult.fromTry(
-        Try(
-          BecViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            personid = json.\("personid").toOption.map(_.as[BusinessentityId]),
-            contacttypeid = json.\("contacttypeid").toOption.map(_.as[ContacttypeId]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[BecViewRow] = OWrites[BecViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "personid" -> Json.toJson(o.personid),
+      "contacttypeid" -> Json.toJson(o.contacttypeid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_event_trigger
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_event_trigger` */
 case class PgEventTriggerId(value: /* oid */ Long) extends AnyVal
 object PgEventTriggerId {
+  implicit val arrayGet: Get[Array[PgEventTriggerId]] = Get[Array[/* oid */ Long]].map(_.map(PgEventTriggerId.apply))
+  implicit val arrayPut: Put[Array[PgEventTriggerId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgEventTriggerId] = Decoder[/* oid */ Long].map(PgEventTriggerId.apply)
+  implicit val encoder: Encoder[PgEventTriggerId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgEventTriggerId] = Get[/* oid */ Long].map(PgEventTriggerId.apply)
   implicit val ordering: Ordering[PgEventTriggerId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgEventTriggerId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgEventTriggerId] =
-    Decoder[/* oid */ Long].map(PgEventTriggerId(_))
-  implicit val meta: Meta[PgEventTriggerId] = Meta[/* oid */ Long].imap(PgEventTriggerId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgEventTriggerId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgEventTriggerId.apply))(_.map(_.value))
+  implicit val put: Put[PgEventTriggerId] = Put[/* oid */ Long].contramap(_.value)
 }

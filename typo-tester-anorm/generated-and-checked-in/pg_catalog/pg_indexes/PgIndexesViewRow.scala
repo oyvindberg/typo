@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgIndexesViewRow(
@@ -25,40 +27,36 @@ case class PgIndexesViewRow(
 )
 
 object PgIndexesViewRow {
-  def rowParser(idx: Int): RowParser[PgIndexesViewRow] =
-    RowParser[PgIndexesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgIndexesViewRow] = Reads[PgIndexesViewRow](json => JsResult.fromTry(
+      Try(
         PgIndexesViewRow(
-          schemaname = row[Option[String]](idx + 0),
-          tablename = row[Option[String]](idx + 1),
-          indexname = row[Option[String]](idx + 2),
-          tablespace = row[Option[String]](idx + 3),
-          indexdef = row[Option[String]](idx + 4)
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          tablename = json.\("tablename").toOption.map(_.as[String]),
+          indexname = json.\("indexname").toOption.map(_.as[String]),
+          tablespace = json.\("tablespace").toOption.map(_.as[String]),
+          indexdef = json.\("indexdef").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgIndexesViewRow] = new OFormat[PgIndexesViewRow]{
-    override def writes(o: PgIndexesViewRow): JsObject =
-      Json.obj(
-        "schemaname" -> o.schemaname,
-        "tablename" -> o.tablename,
-        "indexname" -> o.indexname,
-        "tablespace" -> o.tablespace,
-        "indexdef" -> o.indexdef
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgIndexesViewRow] = RowParser[PgIndexesViewRow] { row =>
+    Success(
+      PgIndexesViewRow(
+        schemaname = row[Option[String]](idx + 0),
+        tablename = row[Option[String]](idx + 1),
+        indexname = row[Option[String]](idx + 2),
+        tablespace = row[Option[String]](idx + 3),
+        indexdef = row[Option[String]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgIndexesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgIndexesViewRow(
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            tablename = json.\("tablename").toOption.map(_.as[String]),
-            indexname = json.\("indexname").toOption.map(_.as[String]),
-            tablespace = json.\("tablespace").toOption.map(_.as[String]),
-            indexdef = json.\("indexdef").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgIndexesViewRow] = OWrites[PgIndexesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "schemaname" -> Json.toJson(o.schemaname),
+      "tablename" -> Json.toJson(o.tablename),
+      "indexname" -> Json.toJson(o.indexname),
+      "tablespace" -> Json.toJson(o.tablespace),
+      "indexdef" -> Json.toJson(o.indexdef)
+    ))
+  )
 }

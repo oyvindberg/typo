@@ -8,11 +8,9 @@ package sales
 package specialoffer
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `sales.specialoffer` which has not been persisted yet */
@@ -24,9 +22,9 @@ case class SpecialofferRowUnsaved(
   /** Group the discount applies to such as Reseller or Customer. */
   category: /* max 50 chars */ String,
   /** Discount start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Discount end date. */
-  enddate: LocalDateTime,
+  enddate: TypoLocalDateTime,
   /** Maximum discount percent allowed. */
   maxqty: Option[Int],
   /** Default: nextval('sales.specialoffer_specialofferid_seq'::regclass)
@@ -41,9 +39,9 @@ case class SpecialofferRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(specialofferidDefault: => SpecialofferId, discountpctDefault: => BigDecimal, minqtyDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SpecialofferRow =
+  def toRow(specialofferidDefault: => SpecialofferId, discountpctDefault: => BigDecimal, minqtyDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SpecialofferRow =
     SpecialofferRow(
       description = description,
       `type` = `type`,
@@ -74,35 +72,6 @@ case class SpecialofferRowUnsaved(
     )
 }
 object SpecialofferRowUnsaved {
-  implicit val decoder: Decoder[SpecialofferRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        description <- c.downField("description").as[/* max 255 chars */ String]
-        `type` <- c.downField("type").as[/* max 50 chars */ String]
-        category <- c.downField("category").as[/* max 50 chars */ String]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        enddate <- c.downField("enddate").as[LocalDateTime]
-        maxqty <- c.downField("maxqty").as[Option[Int]]
-        specialofferid <- c.downField("specialofferid").as[Defaulted[SpecialofferId]]
-        discountpct <- c.downField("discountpct").as[Defaulted[BigDecimal]]
-        minqty <- c.downField("minqty").as[Defaulted[Int]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SpecialofferRowUnsaved(description, `type`, category, startdate, enddate, maxqty, specialofferid, discountpct, minqty, rowguid, modifieddate)
-  implicit val encoder: Encoder[SpecialofferRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "description" := row.description,
-        "type" := row.`type`,
-        "category" := row.category,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "maxqty" := row.maxqty,
-        "specialofferid" := row.specialofferid,
-        "discountpct" := row.discountpct,
-        "minqty" := row.minqty,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SpecialofferRowUnsaved] = Decoder.forProduct11[SpecialofferRowUnsaved, /* max 255 chars */ String, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Option[Int], Defaulted[SpecialofferId], Defaulted[BigDecimal], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate")(SpecialofferRowUnsaved.apply)
+  implicit val encoder: Encoder[SpecialofferRowUnsaved] = Encoder.forProduct11[SpecialofferRowUnsaved, /* max 255 chars */ String, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Option[Int], Defaulted[SpecialofferId], Defaulted[BigDecimal], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate")(x => (x.description, x.`type`, x.category, x.startdate, x.enddate, x.maxqty, x.specialofferid, x.discountpct, x.minqty, x.rowguid, x.modifieddate))
 }

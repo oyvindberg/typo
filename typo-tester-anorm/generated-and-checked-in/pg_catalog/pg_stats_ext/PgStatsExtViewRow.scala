@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatsExtViewRow(
@@ -34,67 +36,63 @@ case class PgStatsExtViewRow(
 )
 
 object PgStatsExtViewRow {
-  def rowParser(idx: Int): RowParser[PgStatsExtViewRow] =
-    RowParser[PgStatsExtViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatsExtViewRow] = Reads[PgStatsExtViewRow](json => JsResult.fromTry(
+      Try(
         PgStatsExtViewRow(
-          schemaname = row[Option[String]](idx + 0),
-          tablename = row[Option[String]](idx + 1),
-          statisticsSchemaname = row[Option[String]](idx + 2),
-          statisticsName = row[Option[String]](idx + 3),
-          statisticsOwner = row[Option[String]](idx + 4),
-          attnames = row[Option[Array[String]]](idx + 5),
-          exprs = row[Option[Array[String]]](idx + 6),
-          kinds = row[Option[Array[String]]](idx + 7),
-          nDistinct = row[Option[String]](idx + 8),
-          dependencies = row[Option[String]](idx + 9),
-          mostCommonVals = row[Option[Array[String]]](idx + 10),
-          mostCommonValNulls = row[Option[Array[Boolean]]](idx + 11),
-          mostCommonFreqs = row[Option[Array[Double]]](idx + 12),
-          mostCommonBaseFreqs = row[Option[Array[Double]]](idx + 13)
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          tablename = json.\("tablename").toOption.map(_.as[String]),
+          statisticsSchemaname = json.\("statistics_schemaname").toOption.map(_.as[String]),
+          statisticsName = json.\("statistics_name").toOption.map(_.as[String]),
+          statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
+          attnames = json.\("attnames").toOption.map(_.as[Array[String]]),
+          exprs = json.\("exprs").toOption.map(_.as[Array[String]]),
+          kinds = json.\("kinds").toOption.map(_.as[Array[String]]),
+          nDistinct = json.\("n_distinct").toOption.map(_.as[String]),
+          dependencies = json.\("dependencies").toOption.map(_.as[String]),
+          mostCommonVals = json.\("most_common_vals").toOption.map(_.as[Array[String]]),
+          mostCommonValNulls = json.\("most_common_val_nulls").toOption.map(_.as[Array[Boolean]]),
+          mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Double]]),
+          mostCommonBaseFreqs = json.\("most_common_base_freqs").toOption.map(_.as[Array[Double]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatsExtViewRow] = new OFormat[PgStatsExtViewRow]{
-    override def writes(o: PgStatsExtViewRow): JsObject =
-      Json.obj(
-        "schemaname" -> o.schemaname,
-        "tablename" -> o.tablename,
-        "statistics_schemaname" -> o.statisticsSchemaname,
-        "statistics_name" -> o.statisticsName,
-        "statistics_owner" -> o.statisticsOwner,
-        "attnames" -> o.attnames,
-        "exprs" -> o.exprs,
-        "kinds" -> o.kinds,
-        "n_distinct" -> o.nDistinct,
-        "dependencies" -> o.dependencies,
-        "most_common_vals" -> o.mostCommonVals,
-        "most_common_val_nulls" -> o.mostCommonValNulls,
-        "most_common_freqs" -> o.mostCommonFreqs,
-        "most_common_base_freqs" -> o.mostCommonBaseFreqs
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatsExtViewRow] = RowParser[PgStatsExtViewRow] { row =>
+    Success(
+      PgStatsExtViewRow(
+        schemaname = row[Option[String]](idx + 0),
+        tablename = row[Option[String]](idx + 1),
+        statisticsSchemaname = row[Option[String]](idx + 2),
+        statisticsName = row[Option[String]](idx + 3),
+        statisticsOwner = row[Option[String]](idx + 4),
+        attnames = row[Option[Array[String]]](idx + 5),
+        exprs = row[Option[Array[String]]](idx + 6),
+        kinds = row[Option[Array[String]]](idx + 7),
+        nDistinct = row[Option[String]](idx + 8),
+        dependencies = row[Option[String]](idx + 9),
+        mostCommonVals = row[Option[Array[String]]](idx + 10),
+        mostCommonValNulls = row[Option[Array[Boolean]]](idx + 11),
+        mostCommonFreqs = row[Option[Array[Double]]](idx + 12),
+        mostCommonBaseFreqs = row[Option[Array[Double]]](idx + 13)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatsExtViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatsExtViewRow(
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            tablename = json.\("tablename").toOption.map(_.as[String]),
-            statisticsSchemaname = json.\("statistics_schemaname").toOption.map(_.as[String]),
-            statisticsName = json.\("statistics_name").toOption.map(_.as[String]),
-            statisticsOwner = json.\("statistics_owner").toOption.map(_.as[String]),
-            attnames = json.\("attnames").toOption.map(_.as[Array[String]]),
-            exprs = json.\("exprs").toOption.map(_.as[Array[String]]),
-            kinds = json.\("kinds").toOption.map(_.as[Array[String]]),
-            nDistinct = json.\("n_distinct").toOption.map(_.as[String]),
-            dependencies = json.\("dependencies").toOption.map(_.as[String]),
-            mostCommonVals = json.\("most_common_vals").toOption.map(_.as[Array[String]]),
-            mostCommonValNulls = json.\("most_common_val_nulls").toOption.map(_.as[Array[Boolean]]),
-            mostCommonFreqs = json.\("most_common_freqs").toOption.map(_.as[Array[Double]]),
-            mostCommonBaseFreqs = json.\("most_common_base_freqs").toOption.map(_.as[Array[Double]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatsExtViewRow] = OWrites[PgStatsExtViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "schemaname" -> Json.toJson(o.schemaname),
+      "tablename" -> Json.toJson(o.tablename),
+      "statistics_schemaname" -> Json.toJson(o.statisticsSchemaname),
+      "statistics_name" -> Json.toJson(o.statisticsName),
+      "statistics_owner" -> Json.toJson(o.statisticsOwner),
+      "attnames" -> Json.toJson(o.attnames),
+      "exprs" -> Json.toJson(o.exprs),
+      "kinds" -> Json.toJson(o.kinds),
+      "n_distinct" -> Json.toJson(o.nDistinct),
+      "dependencies" -> Json.toJson(o.dependencies),
+      "most_common_vals" -> Json.toJson(o.mostCommonVals),
+      "most_common_val_nulls" -> Json.toJson(o.mostCommonValNulls),
+      "most_common_freqs" -> Json.toJson(o.mostCommonFreqs),
+      "most_common_base_freqs" -> Json.toJson(o.mostCommonBaseFreqs)
+    ))
+  )
 }

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatisticExtDataRow(
@@ -25,40 +27,36 @@ case class PgStatisticExtDataRow(
 )
 
 object PgStatisticExtDataRow {
-  def rowParser(idx: Int): RowParser[PgStatisticExtDataRow] =
-    RowParser[PgStatisticExtDataRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatisticExtDataRow] = Reads[PgStatisticExtDataRow](json => JsResult.fromTry(
+      Try(
         PgStatisticExtDataRow(
-          stxoid = row[PgStatisticExtDataId](idx + 0),
-          stxdndistinct = row[Option[String]](idx + 1),
-          stxddependencies = row[Option[String]](idx + 2),
-          stxdmcv = row[Option[String]](idx + 3),
-          stxdexpr = row[Option[String]](idx + 4)
+          stxoid = json.\("stxoid").as[PgStatisticExtDataId],
+          stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
+          stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
+          stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),
+          stxdexpr = json.\("stxdexpr").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatisticExtDataRow] = new OFormat[PgStatisticExtDataRow]{
-    override def writes(o: PgStatisticExtDataRow): JsObject =
-      Json.obj(
-        "stxoid" -> o.stxoid,
-        "stxdndistinct" -> o.stxdndistinct,
-        "stxddependencies" -> o.stxddependencies,
-        "stxdmcv" -> o.stxdmcv,
-        "stxdexpr" -> o.stxdexpr
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatisticExtDataRow] = RowParser[PgStatisticExtDataRow] { row =>
+    Success(
+      PgStatisticExtDataRow(
+        stxoid = row[PgStatisticExtDataId](idx + 0),
+        stxdndistinct = row[Option[String]](idx + 1),
+        stxddependencies = row[Option[String]](idx + 2),
+        stxdmcv = row[Option[String]](idx + 3),
+        stxdexpr = row[Option[String]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatisticExtDataRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatisticExtDataRow(
-            stxoid = json.\("stxoid").as[PgStatisticExtDataId],
-            stxdndistinct = json.\("stxdndistinct").toOption.map(_.as[String]),
-            stxddependencies = json.\("stxddependencies").toOption.map(_.as[String]),
-            stxdmcv = json.\("stxdmcv").toOption.map(_.as[String]),
-            stxdexpr = json.\("stxdexpr").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatisticExtDataRow] = OWrites[PgStatisticExtDataRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "stxoid" -> Json.toJson(o.stxoid),
+      "stxdndistinct" -> Json.toJson(o.stxdndistinct),
+      "stxddependencies" -> Json.toJson(o.stxddependencies),
+      "stxdmcv" -> Json.toJson(o.stxdmcv),
+      "stxdexpr" -> Json.toJson(o.stxdexpr)
+    ))
+  )
 }

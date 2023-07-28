@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTypeRow(
@@ -55,121 +57,117 @@ case class PgTypeRow(
 )
 
 object PgTypeRow {
-  def rowParser(idx: Int): RowParser[PgTypeRow] =
-    RowParser[PgTypeRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTypeRow] = Reads[PgTypeRow](json => JsResult.fromTry(
+      Try(
         PgTypeRow(
-          oid = row[PgTypeId](idx + 0),
-          typname = row[String](idx + 1),
-          typnamespace = row[/* oid */ Long](idx + 2),
-          typowner = row[/* oid */ Long](idx + 3),
-          typlen = row[Int](idx + 4),
-          typbyval = row[Boolean](idx + 5),
-          typtype = row[String](idx + 6),
-          typcategory = row[String](idx + 7),
-          typispreferred = row[Boolean](idx + 8),
-          typisdefined = row[Boolean](idx + 9),
-          typdelim = row[String](idx + 10),
-          typrelid = row[/* oid */ Long](idx + 11),
-          typsubscript = row[TypoRegproc](idx + 12),
-          typelem = row[/* oid */ Long](idx + 13),
-          typarray = row[/* oid */ Long](idx + 14),
-          typinput = row[TypoRegproc](idx + 15),
-          typoutput = row[TypoRegproc](idx + 16),
-          typreceive = row[TypoRegproc](idx + 17),
-          typsend = row[TypoRegproc](idx + 18),
-          typmodin = row[TypoRegproc](idx + 19),
-          typmodout = row[TypoRegproc](idx + 20),
-          typanalyze = row[TypoRegproc](idx + 21),
-          typalign = row[String](idx + 22),
-          typstorage = row[String](idx + 23),
-          typnotnull = row[Boolean](idx + 24),
-          typbasetype = row[/* oid */ Long](idx + 25),
-          typtypmod = row[Int](idx + 26),
-          typndims = row[Int](idx + 27),
-          typcollation = row[/* oid */ Long](idx + 28),
-          typdefaultbin = row[Option[TypoPgNodeTree]](idx + 29),
-          typdefault = row[Option[String]](idx + 30),
-          typacl = row[Option[Array[TypoAclItem]]](idx + 31)
+          oid = json.\("oid").as[PgTypeId],
+          typname = json.\("typname").as[String],
+          typnamespace = json.\("typnamespace").as[/* oid */ Long],
+          typowner = json.\("typowner").as[/* oid */ Long],
+          typlen = json.\("typlen").as[Int],
+          typbyval = json.\("typbyval").as[Boolean],
+          typtype = json.\("typtype").as[String],
+          typcategory = json.\("typcategory").as[String],
+          typispreferred = json.\("typispreferred").as[Boolean],
+          typisdefined = json.\("typisdefined").as[Boolean],
+          typdelim = json.\("typdelim").as[String],
+          typrelid = json.\("typrelid").as[/* oid */ Long],
+          typsubscript = json.\("typsubscript").as[TypoRegproc],
+          typelem = json.\("typelem").as[/* oid */ Long],
+          typarray = json.\("typarray").as[/* oid */ Long],
+          typinput = json.\("typinput").as[TypoRegproc],
+          typoutput = json.\("typoutput").as[TypoRegproc],
+          typreceive = json.\("typreceive").as[TypoRegproc],
+          typsend = json.\("typsend").as[TypoRegproc],
+          typmodin = json.\("typmodin").as[TypoRegproc],
+          typmodout = json.\("typmodout").as[TypoRegproc],
+          typanalyze = json.\("typanalyze").as[TypoRegproc],
+          typalign = json.\("typalign").as[String],
+          typstorage = json.\("typstorage").as[String],
+          typnotnull = json.\("typnotnull").as[Boolean],
+          typbasetype = json.\("typbasetype").as[/* oid */ Long],
+          typtypmod = json.\("typtypmod").as[Int],
+          typndims = json.\("typndims").as[Int],
+          typcollation = json.\("typcollation").as[/* oid */ Long],
+          typdefaultbin = json.\("typdefaultbin").toOption.map(_.as[TypoPgNodeTree]),
+          typdefault = json.\("typdefault").toOption.map(_.as[String]),
+          typacl = json.\("typacl").toOption.map(_.as[Array[TypoAclItem]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTypeRow] = new OFormat[PgTypeRow]{
-    override def writes(o: PgTypeRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "typname" -> o.typname,
-        "typnamespace" -> o.typnamespace,
-        "typowner" -> o.typowner,
-        "typlen" -> o.typlen,
-        "typbyval" -> o.typbyval,
-        "typtype" -> o.typtype,
-        "typcategory" -> o.typcategory,
-        "typispreferred" -> o.typispreferred,
-        "typisdefined" -> o.typisdefined,
-        "typdelim" -> o.typdelim,
-        "typrelid" -> o.typrelid,
-        "typsubscript" -> o.typsubscript,
-        "typelem" -> o.typelem,
-        "typarray" -> o.typarray,
-        "typinput" -> o.typinput,
-        "typoutput" -> o.typoutput,
-        "typreceive" -> o.typreceive,
-        "typsend" -> o.typsend,
-        "typmodin" -> o.typmodin,
-        "typmodout" -> o.typmodout,
-        "typanalyze" -> o.typanalyze,
-        "typalign" -> o.typalign,
-        "typstorage" -> o.typstorage,
-        "typnotnull" -> o.typnotnull,
-        "typbasetype" -> o.typbasetype,
-        "typtypmod" -> o.typtypmod,
-        "typndims" -> o.typndims,
-        "typcollation" -> o.typcollation,
-        "typdefaultbin" -> o.typdefaultbin,
-        "typdefault" -> o.typdefault,
-        "typacl" -> o.typacl
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTypeRow] = RowParser[PgTypeRow] { row =>
+    Success(
+      PgTypeRow(
+        oid = row[PgTypeId](idx + 0),
+        typname = row[String](idx + 1),
+        typnamespace = row[/* oid */ Long](idx + 2),
+        typowner = row[/* oid */ Long](idx + 3),
+        typlen = row[Int](idx + 4),
+        typbyval = row[Boolean](idx + 5),
+        typtype = row[String](idx + 6),
+        typcategory = row[String](idx + 7),
+        typispreferred = row[Boolean](idx + 8),
+        typisdefined = row[Boolean](idx + 9),
+        typdelim = row[String](idx + 10),
+        typrelid = row[/* oid */ Long](idx + 11),
+        typsubscript = row[TypoRegproc](idx + 12),
+        typelem = row[/* oid */ Long](idx + 13),
+        typarray = row[/* oid */ Long](idx + 14),
+        typinput = row[TypoRegproc](idx + 15),
+        typoutput = row[TypoRegproc](idx + 16),
+        typreceive = row[TypoRegproc](idx + 17),
+        typsend = row[TypoRegproc](idx + 18),
+        typmodin = row[TypoRegproc](idx + 19),
+        typmodout = row[TypoRegproc](idx + 20),
+        typanalyze = row[TypoRegproc](idx + 21),
+        typalign = row[String](idx + 22),
+        typstorage = row[String](idx + 23),
+        typnotnull = row[Boolean](idx + 24),
+        typbasetype = row[/* oid */ Long](idx + 25),
+        typtypmod = row[Int](idx + 26),
+        typndims = row[Int](idx + 27),
+        typcollation = row[/* oid */ Long](idx + 28),
+        typdefaultbin = row[Option[TypoPgNodeTree]](idx + 29),
+        typdefault = row[Option[String]](idx + 30),
+        typacl = row[Option[Array[TypoAclItem]]](idx + 31)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTypeRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTypeRow(
-            oid = json.\("oid").as[PgTypeId],
-            typname = json.\("typname").as[String],
-            typnamespace = json.\("typnamespace").as[/* oid */ Long],
-            typowner = json.\("typowner").as[/* oid */ Long],
-            typlen = json.\("typlen").as[Int],
-            typbyval = json.\("typbyval").as[Boolean],
-            typtype = json.\("typtype").as[String],
-            typcategory = json.\("typcategory").as[String],
-            typispreferred = json.\("typispreferred").as[Boolean],
-            typisdefined = json.\("typisdefined").as[Boolean],
-            typdelim = json.\("typdelim").as[String],
-            typrelid = json.\("typrelid").as[/* oid */ Long],
-            typsubscript = json.\("typsubscript").as[TypoRegproc],
-            typelem = json.\("typelem").as[/* oid */ Long],
-            typarray = json.\("typarray").as[/* oid */ Long],
-            typinput = json.\("typinput").as[TypoRegproc],
-            typoutput = json.\("typoutput").as[TypoRegproc],
-            typreceive = json.\("typreceive").as[TypoRegproc],
-            typsend = json.\("typsend").as[TypoRegproc],
-            typmodin = json.\("typmodin").as[TypoRegproc],
-            typmodout = json.\("typmodout").as[TypoRegproc],
-            typanalyze = json.\("typanalyze").as[TypoRegproc],
-            typalign = json.\("typalign").as[String],
-            typstorage = json.\("typstorage").as[String],
-            typnotnull = json.\("typnotnull").as[Boolean],
-            typbasetype = json.\("typbasetype").as[/* oid */ Long],
-            typtypmod = json.\("typtypmod").as[Int],
-            typndims = json.\("typndims").as[Int],
-            typcollation = json.\("typcollation").as[/* oid */ Long],
-            typdefaultbin = json.\("typdefaultbin").toOption.map(_.as[TypoPgNodeTree]),
-            typdefault = json.\("typdefault").toOption.map(_.as[String]),
-            typacl = json.\("typacl").toOption.map(_.as[Array[TypoAclItem]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTypeRow] = OWrites[PgTypeRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "typname" -> Json.toJson(o.typname),
+      "typnamespace" -> Json.toJson(o.typnamespace),
+      "typowner" -> Json.toJson(o.typowner),
+      "typlen" -> Json.toJson(o.typlen),
+      "typbyval" -> Json.toJson(o.typbyval),
+      "typtype" -> Json.toJson(o.typtype),
+      "typcategory" -> Json.toJson(o.typcategory),
+      "typispreferred" -> Json.toJson(o.typispreferred),
+      "typisdefined" -> Json.toJson(o.typisdefined),
+      "typdelim" -> Json.toJson(o.typdelim),
+      "typrelid" -> Json.toJson(o.typrelid),
+      "typsubscript" -> Json.toJson(o.typsubscript),
+      "typelem" -> Json.toJson(o.typelem),
+      "typarray" -> Json.toJson(o.typarray),
+      "typinput" -> Json.toJson(o.typinput),
+      "typoutput" -> Json.toJson(o.typoutput),
+      "typreceive" -> Json.toJson(o.typreceive),
+      "typsend" -> Json.toJson(o.typsend),
+      "typmodin" -> Json.toJson(o.typmodin),
+      "typmodout" -> Json.toJson(o.typmodout),
+      "typanalyze" -> Json.toJson(o.typanalyze),
+      "typalign" -> Json.toJson(o.typalign),
+      "typstorage" -> Json.toJson(o.typstorage),
+      "typnotnull" -> Json.toJson(o.typnotnull),
+      "typbasetype" -> Json.toJson(o.typbasetype),
+      "typtypmod" -> Json.toJson(o.typtypmod),
+      "typndims" -> Json.toJson(o.typndims),
+      "typcollation" -> Json.toJson(o.typcollation),
+      "typdefaultbin" -> Json.toJson(o.typdefaultbin),
+      "typdefault" -> Json.toJson(o.typdefault),
+      "typacl" -> Json.toJson(o.typacl)
+    ))
+  )
 }

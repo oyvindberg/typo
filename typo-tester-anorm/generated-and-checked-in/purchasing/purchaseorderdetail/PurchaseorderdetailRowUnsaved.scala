@@ -8,14 +8,16 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.purchaseorderdetail` which has not been persisted yet */
@@ -24,7 +26,7 @@ case class PurchaseorderdetailRowUnsaved(
       Points to [[purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
   purchaseorderid: PurchaseorderheaderId,
   /** Date the product is expected to be received. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Quantity ordered. */
   orderqty: Int,
   /** Product identification number. Foreign key to Product.ProductID.
@@ -40,9 +42,9 @@ case class PurchaseorderdetailRowUnsaved(
       Primary key. One line number per purchased product. */
   purchaseorderdetailid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(purchaseorderdetailidDefault: => Int, modifieddateDefault: => LocalDateTime): PurchaseorderdetailRow =
+  def toRow(purchaseorderdetailidDefault: => Int, modifieddateDefault: => TypoLocalDateTime): PurchaseorderdetailRow =
     PurchaseorderdetailRow(
       purchaseorderid = purchaseorderid,
       duedate = duedate,
@@ -62,36 +64,33 @@ case class PurchaseorderdetailRowUnsaved(
     )
 }
 object PurchaseorderdetailRowUnsaved {
-  implicit val oFormat: OFormat[PurchaseorderdetailRowUnsaved] = new OFormat[PurchaseorderdetailRowUnsaved]{
-    override def writes(o: PurchaseorderdetailRowUnsaved): JsObject =
-      Json.obj(
-        "purchaseorderid" -> o.purchaseorderid,
-        "duedate" -> o.duedate,
-        "orderqty" -> o.orderqty,
-        "productid" -> o.productid,
-        "unitprice" -> o.unitprice,
-        "receivedqty" -> o.receivedqty,
-        "rejectedqty" -> o.rejectedqty,
-        "purchaseorderdetailid" -> o.purchaseorderdetailid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[PurchaseorderdetailRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          PurchaseorderdetailRowUnsaved(
-            purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
-            duedate = json.\("duedate").as[LocalDateTime],
-            orderqty = json.\("orderqty").as[Int],
-            productid = json.\("productid").as[ProductId],
-            unitprice = json.\("unitprice").as[BigDecimal],
-            receivedqty = json.\("receivedqty").as[BigDecimal],
-            rejectedqty = json.\("rejectedqty").as[BigDecimal],
-            purchaseorderdetailid = json.\("purchaseorderdetailid").as[Defaulted[Int]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[PurchaseorderdetailRowUnsaved] = Reads[PurchaseorderdetailRowUnsaved](json => JsResult.fromTry(
+      Try(
+        PurchaseorderdetailRowUnsaved(
+          purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
+          duedate = json.\("duedate").as[TypoLocalDateTime],
+          orderqty = json.\("orderqty").as[Int],
+          productid = json.\("productid").as[ProductId],
+          unitprice = json.\("unitprice").as[BigDecimal],
+          receivedqty = json.\("receivedqty").as[BigDecimal],
+          rejectedqty = json.\("rejectedqty").as[BigDecimal],
+          purchaseorderdetailid = json.\("purchaseorderdetailid").as[Defaulted[Int]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PurchaseorderdetailRowUnsaved] = OWrites[PurchaseorderdetailRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
+      "duedate" -> Json.toJson(o.duedate),
+      "orderqty" -> Json.toJson(o.orderqty),
+      "productid" -> Json.toJson(o.productid),
+      "unitprice" -> Json.toJson(o.unitprice),
+      "receivedqty" -> Json.toJson(o.receivedqty),
+      "rejectedqty" -> Json.toJson(o.rejectedqty),
+      "purchaseorderdetailid" -> Json.toJson(o.purchaseorderdetailid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

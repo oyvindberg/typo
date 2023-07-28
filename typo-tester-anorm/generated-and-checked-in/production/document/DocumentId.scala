@@ -10,19 +10,20 @@ package document
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `production.document` */
 case class DocumentId(value: String) extends AnyVal
 object DocumentId {
-  implicit val ordering: Ordering[DocumentId] = Ordering.by(_.value)
-  implicit val format: Format[DocumentId] = implicitly[Format[String]].bimap(DocumentId.apply, _.value)
-  implicit val toStatement: ToStatement[DocumentId] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[DocumentId]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[DocumentId]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit val column: Column[DocumentId] = implicitly[Column[String]].map(DocumentId.apply)
+  implicit val ordering: Ordering[DocumentId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[DocumentId] = new ParameterMetaData[DocumentId] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-
+  implicit val reads: Reads[DocumentId] = implicitly[Reads[String]].map(DocumentId.apply)
+  implicit val toStatement: ToStatement[DocumentId] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit val writes: Writes[DocumentId] = implicitly[Writes[String]].contramap(_.value)
 }

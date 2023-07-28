@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
   override def selectAll(implicit c: Connection): List[VemployeedepartmentViewRow] = {
-    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate
+    SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate::text
           from humanresources.vemployeedepartment
        """.as(VemployeedepartmentViewRow.rowParser(1).*)
   }

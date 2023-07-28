@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_foreign_data_wrapper
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_foreign_data_wrapper` */
 case class PgForeignDataWrapperId(value: /* oid */ Long) extends AnyVal
 object PgForeignDataWrapperId {
+  implicit val arrayGet: Get[Array[PgForeignDataWrapperId]] = Get[Array[/* oid */ Long]].map(_.map(PgForeignDataWrapperId.apply))
+  implicit val arrayPut: Put[Array[PgForeignDataWrapperId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgForeignDataWrapperId] = Decoder[/* oid */ Long].map(PgForeignDataWrapperId.apply)
+  implicit val encoder: Encoder[PgForeignDataWrapperId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgForeignDataWrapperId] = Get[/* oid */ Long].map(PgForeignDataWrapperId.apply)
   implicit val ordering: Ordering[PgForeignDataWrapperId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgForeignDataWrapperId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgForeignDataWrapperId] =
-    Decoder[/* oid */ Long].map(PgForeignDataWrapperId(_))
-  implicit val meta: Meta[PgForeignDataWrapperId] = Meta[/* oid */ Long].imap(PgForeignDataWrapperId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgForeignDataWrapperId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgForeignDataWrapperId.apply))(_.map(_.value))
+  implicit val put: Put[PgForeignDataWrapperId] = Put[/* oid */ Long].contramap(_.value)
 }

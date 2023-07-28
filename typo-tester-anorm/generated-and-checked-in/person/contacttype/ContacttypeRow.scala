@@ -7,15 +7,17 @@ package adventureworks
 package person
 package contacttype
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ContacttypeRow(
@@ -23,38 +25,34 @@ case class ContacttypeRow(
   contacttypeid: ContacttypeId,
   /** Contact type description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ContacttypeRow {
-  def rowParser(idx: Int): RowParser[ContacttypeRow] =
-    RowParser[ContacttypeRow] { row =>
-      Success(
+  implicit val reads: Reads[ContacttypeRow] = Reads[ContacttypeRow](json => JsResult.fromTry(
+      Try(
         ContacttypeRow(
-          contacttypeid = row[ContacttypeId](idx + 0),
-          name = row[Name](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          contacttypeid = json.\("contacttypeid").as[ContacttypeId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ContacttypeRow] = new OFormat[ContacttypeRow]{
-    override def writes(o: ContacttypeRow): JsObject =
-      Json.obj(
-        "contacttypeid" -> o.contacttypeid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ContacttypeRow] = RowParser[ContacttypeRow] { row =>
+    Success(
+      ContacttypeRow(
+        contacttypeid = row[ContacttypeId](idx + 0),
+        name = row[Name](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[ContacttypeRow] = {
-      JsResult.fromTry(
-        Try(
-          ContacttypeRow(
-            contacttypeid = json.\("contacttypeid").as[ContacttypeId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ContacttypeRow] = OWrites[ContacttypeRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "contacttypeid" -> Json.toJson(o.contacttypeid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

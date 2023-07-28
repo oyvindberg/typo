@@ -8,19 +8,21 @@ package sales
 package currencyrate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.currencyrate` which has not been persisted yet */
 case class CurrencyrateRowUnsaved(
   /** Date and time the exchange rate was obtained. */
-  currencyratedate: LocalDateTime,
+  currencyratedate: TypoLocalDateTime,
   /** Exchange rate was converted from this currency code.
       Points to [[currency.CurrencyRow.currencycode]] */
   fromcurrencycode: CurrencyId,
@@ -35,9 +37,9 @@ case class CurrencyrateRowUnsaved(
       Primary key for CurrencyRate records. */
   currencyrateid: Defaulted[CurrencyrateId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(currencyrateidDefault: => CurrencyrateId, modifieddateDefault: => LocalDateTime): CurrencyrateRow =
+  def toRow(currencyrateidDefault: => CurrencyrateId, modifieddateDefault: => TypoLocalDateTime): CurrencyrateRow =
     CurrencyrateRow(
       currencyratedate = currencyratedate,
       fromcurrencycode = fromcurrencycode,
@@ -55,32 +57,29 @@ case class CurrencyrateRowUnsaved(
     )
 }
 object CurrencyrateRowUnsaved {
-  implicit val oFormat: OFormat[CurrencyrateRowUnsaved] = new OFormat[CurrencyrateRowUnsaved]{
-    override def writes(o: CurrencyrateRowUnsaved): JsObject =
-      Json.obj(
-        "currencyratedate" -> o.currencyratedate,
-        "fromcurrencycode" -> o.fromcurrencycode,
-        "tocurrencycode" -> o.tocurrencycode,
-        "averagerate" -> o.averagerate,
-        "endofdayrate" -> o.endofdayrate,
-        "currencyrateid" -> o.currencyrateid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[CurrencyrateRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          CurrencyrateRowUnsaved(
-            currencyratedate = json.\("currencyratedate").as[LocalDateTime],
-            fromcurrencycode = json.\("fromcurrencycode").as[CurrencyId],
-            tocurrencycode = json.\("tocurrencycode").as[CurrencyId],
-            averagerate = json.\("averagerate").as[BigDecimal],
-            endofdayrate = json.\("endofdayrate").as[BigDecimal],
-            currencyrateid = json.\("currencyrateid").as[Defaulted[CurrencyrateId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[CurrencyrateRowUnsaved] = Reads[CurrencyrateRowUnsaved](json => JsResult.fromTry(
+      Try(
+        CurrencyrateRowUnsaved(
+          currencyratedate = json.\("currencyratedate").as[TypoLocalDateTime],
+          fromcurrencycode = json.\("fromcurrencycode").as[CurrencyId],
+          tocurrencycode = json.\("tocurrencycode").as[CurrencyId],
+          averagerate = json.\("averagerate").as[BigDecimal],
+          endofdayrate = json.\("endofdayrate").as[BigDecimal],
+          currencyrateid = json.\("currencyrateid").as[Defaulted[CurrencyrateId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[CurrencyrateRowUnsaved] = OWrites[CurrencyrateRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "currencyratedate" -> Json.toJson(o.currencyratedate),
+      "fromcurrencycode" -> Json.toJson(o.fromcurrencycode),
+      "tocurrencycode" -> Json.toJson(o.tocurrencycode),
+      "averagerate" -> Json.toJson(o.averagerate),
+      "endofdayrate" -> Json.toJson(o.endofdayrate),
+      "currencyrateid" -> Json.toJson(o.currencyrateid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

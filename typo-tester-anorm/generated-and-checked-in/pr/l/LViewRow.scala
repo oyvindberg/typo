@@ -7,16 +7,18 @@ package adventureworks
 package pr
 package l
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class LViewRow(
@@ -30,47 +32,43 @@ case class LViewRow(
   /** Points to [[production.location.LocationRow.availability]] */
   availability: Option[BigDecimal],
   /** Points to [[production.location.LocationRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object LViewRow {
-  def rowParser(idx: Int): RowParser[LViewRow] =
-    RowParser[LViewRow] { row =>
-      Success(
+  implicit val reads: Reads[LViewRow] = Reads[LViewRow](json => JsResult.fromTry(
+      Try(
         LViewRow(
-          id = row[Option[Int]](idx + 0),
-          locationid = row[Option[LocationId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          costrate = row[Option[BigDecimal]](idx + 3),
-          availability = row[Option[BigDecimal]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          locationid = json.\("locationid").toOption.map(_.as[LocationId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          costrate = json.\("costrate").toOption.map(_.as[BigDecimal]),
+          availability = json.\("availability").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[LViewRow] = new OFormat[LViewRow]{
-    override def writes(o: LViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "locationid" -> o.locationid,
-        "name" -> o.name,
-        "costrate" -> o.costrate,
-        "availability" -> o.availability,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[LViewRow] = RowParser[LViewRow] { row =>
+    Success(
+      LViewRow(
+        id = row[Option[Int]](idx + 0),
+        locationid = row[Option[LocationId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        costrate = row[Option[BigDecimal]](idx + 3),
+        availability = row[Option[BigDecimal]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[LViewRow] = {
-      JsResult.fromTry(
-        Try(
-          LViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            locationid = json.\("locationid").toOption.map(_.as[LocationId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            costrate = json.\("costrate").toOption.map(_.as[BigDecimal]),
-            availability = json.\("availability").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[LViewRow] = OWrites[LViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "locationid" -> Json.toJson(o.locationid),
+      "name" -> Json.toJson(o.name),
+      "costrate" -> Json.toJson(o.costrate),
+      "availability" -> Json.toJson(o.availability),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

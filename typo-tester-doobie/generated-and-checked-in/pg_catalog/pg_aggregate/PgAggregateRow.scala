@@ -8,13 +8,11 @@ package pg_catalog
 package pg_aggregate
 
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgAggregateRow(
@@ -43,110 +41,56 @@ case class PgAggregateRow(
 )
 
 object PgAggregateRow {
-  implicit val decoder: Decoder[PgAggregateRow] =
-    (c: HCursor) =>
-      for {
-        aggfnoid <- c.downField("aggfnoid").as[PgAggregateId]
-        aggkind <- c.downField("aggkind").as[String]
-        aggnumdirectargs <- c.downField("aggnumdirectargs").as[Int]
-        aggtransfn <- c.downField("aggtransfn").as[TypoRegproc]
-        aggfinalfn <- c.downField("aggfinalfn").as[TypoRegproc]
-        aggcombinefn <- c.downField("aggcombinefn").as[TypoRegproc]
-        aggserialfn <- c.downField("aggserialfn").as[TypoRegproc]
-        aggdeserialfn <- c.downField("aggdeserialfn").as[TypoRegproc]
-        aggmtransfn <- c.downField("aggmtransfn").as[TypoRegproc]
-        aggminvtransfn <- c.downField("aggminvtransfn").as[TypoRegproc]
-        aggmfinalfn <- c.downField("aggmfinalfn").as[TypoRegproc]
-        aggfinalextra <- c.downField("aggfinalextra").as[Boolean]
-        aggmfinalextra <- c.downField("aggmfinalextra").as[Boolean]
-        aggfinalmodify <- c.downField("aggfinalmodify").as[String]
-        aggmfinalmodify <- c.downField("aggmfinalmodify").as[String]
-        aggsortop <- c.downField("aggsortop").as[/* oid */ Long]
-        aggtranstype <- c.downField("aggtranstype").as[/* oid */ Long]
-        aggtransspace <- c.downField("aggtransspace").as[Int]
-        aggmtranstype <- c.downField("aggmtranstype").as[/* oid */ Long]
-        aggmtransspace <- c.downField("aggmtransspace").as[Int]
-        agginitval <- c.downField("agginitval").as[Option[String]]
-        aggminitval <- c.downField("aggminitval").as[Option[String]]
-      } yield PgAggregateRow(aggfnoid, aggkind, aggnumdirectargs, aggtransfn, aggfinalfn, aggcombinefn, aggserialfn, aggdeserialfn, aggmtransfn, aggminvtransfn, aggmfinalfn, aggfinalextra, aggmfinalextra, aggfinalmodify, aggmfinalmodify, aggsortop, aggtranstype, aggtransspace, aggmtranstype, aggmtransspace, agginitval, aggminitval)
-  implicit val encoder: Encoder[PgAggregateRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "aggfnoid" := row.aggfnoid,
-        "aggkind" := row.aggkind,
-        "aggnumdirectargs" := row.aggnumdirectargs,
-        "aggtransfn" := row.aggtransfn,
-        "aggfinalfn" := row.aggfinalfn,
-        "aggcombinefn" := row.aggcombinefn,
-        "aggserialfn" := row.aggserialfn,
-        "aggdeserialfn" := row.aggdeserialfn,
-        "aggmtransfn" := row.aggmtransfn,
-        "aggminvtransfn" := row.aggminvtransfn,
-        "aggmfinalfn" := row.aggmfinalfn,
-        "aggfinalextra" := row.aggfinalextra,
-        "aggmfinalextra" := row.aggmfinalextra,
-        "aggfinalmodify" := row.aggfinalmodify,
-        "aggmfinalmodify" := row.aggmfinalmodify,
-        "aggsortop" := row.aggsortop,
-        "aggtranstype" := row.aggtranstype,
-        "aggtransspace" := row.aggtransspace,
-        "aggmtranstype" := row.aggmtranstype,
-        "aggmtransspace" := row.aggmtransspace,
-        "agginitval" := row.agginitval,
-        "aggminitval" := row.aggminitval
-      )}
-  implicit val read: Read[PgAggregateRow] =
-    new Read[PgAggregateRow](
-      gets = List(
-        (Get[PgAggregateId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAggregateRow(
-        aggfnoid = Get[PgAggregateId].unsafeGetNonNullable(rs, i + 0),
-        aggkind = Get[String].unsafeGetNonNullable(rs, i + 1),
-        aggnumdirectargs = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        aggtransfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
-        aggfinalfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4),
-        aggcombinefn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 5),
-        aggserialfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 6),
-        aggdeserialfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 7),
-        aggmtransfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 8),
-        aggminvtransfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 9),
-        aggmfinalfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 10),
-        aggfinalextra = Get[Boolean].unsafeGetNonNullable(rs, i + 11),
-        aggmfinalextra = Get[Boolean].unsafeGetNonNullable(rs, i + 12),
-        aggfinalmodify = Get[String].unsafeGetNonNullable(rs, i + 13),
-        aggmfinalmodify = Get[String].unsafeGetNonNullable(rs, i + 14),
-        aggsortop = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 15),
-        aggtranstype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 16),
-        aggtransspace = Get[Int].unsafeGetNonNullable(rs, i + 17),
-        aggmtranstype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 18),
-        aggmtransspace = Get[Int].unsafeGetNonNullable(rs, i + 19),
-        agginitval = Get[String].unsafeGetNullable(rs, i + 20),
-        aggminitval = Get[String].unsafeGetNullable(rs, i + 21)
-      )
+  implicit val decoder: Decoder[PgAggregateRow] = Decoder.forProduct22[PgAggregateRow, PgAggregateId, String, Int, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, Boolean, Boolean, String, String, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, Int, Option[String], Option[String]]("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")(PgAggregateRow.apply)
+  implicit val encoder: Encoder[PgAggregateRow] = Encoder.forProduct22[PgAggregateRow, PgAggregateId, String, Int, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, Boolean, Boolean, String, String, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, Int, Option[String], Option[String]]("aggfnoid", "aggkind", "aggnumdirectargs", "aggtransfn", "aggfinalfn", "aggcombinefn", "aggserialfn", "aggdeserialfn", "aggmtransfn", "aggminvtransfn", "aggmfinalfn", "aggfinalextra", "aggmfinalextra", "aggfinalmodify", "aggmfinalmodify", "aggsortop", "aggtranstype", "aggtransspace", "aggmtranstype", "aggmtransspace", "agginitval", "aggminitval")(x => (x.aggfnoid, x.aggkind, x.aggnumdirectargs, x.aggtransfn, x.aggfinalfn, x.aggcombinefn, x.aggserialfn, x.aggdeserialfn, x.aggmtransfn, x.aggminvtransfn, x.aggmfinalfn, x.aggfinalextra, x.aggmfinalextra, x.aggfinalmodify, x.aggmfinalmodify, x.aggsortop, x.aggtranstype, x.aggtransspace, x.aggmtranstype, x.aggmtransspace, x.agginitval, x.aggminitval))
+  implicit val read: Read[PgAggregateRow] = new Read[PgAggregateRow](
+    gets = List(
+      (Get[PgAggregateId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAggregateRow(
+      aggfnoid = Get[PgAggregateId].unsafeGetNonNullable(rs, i + 0),
+      aggkind = Get[String].unsafeGetNonNullable(rs, i + 1),
+      aggnumdirectargs = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      aggtransfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
+      aggfinalfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4),
+      aggcombinefn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 5),
+      aggserialfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 6),
+      aggdeserialfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 7),
+      aggmtransfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 8),
+      aggminvtransfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 9),
+      aggmfinalfn = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 10),
+      aggfinalextra = Get[Boolean].unsafeGetNonNullable(rs, i + 11),
+      aggmfinalextra = Get[Boolean].unsafeGetNonNullable(rs, i + 12),
+      aggfinalmodify = Get[String].unsafeGetNonNullable(rs, i + 13),
+      aggmfinalmodify = Get[String].unsafeGetNonNullable(rs, i + 14),
+      aggsortop = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 15),
+      aggtranstype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 16),
+      aggtransspace = Get[Int].unsafeGetNonNullable(rs, i + 17),
+      aggmtranstype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 18),
+      aggmtransspace = Get[Int].unsafeGetNonNullable(rs, i + 19),
+      agginitval = Get[String].unsafeGetNullable(rs, i + 20),
+      aggminitval = Get[String].unsafeGetNullable(rs, i + 21)
     )
-  
-
+  )
 }

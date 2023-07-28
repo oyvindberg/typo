@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_default_acl where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_default_acl where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow] = {
     sql"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
@@ -25,10 +25,10 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
     sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl".query[PgDefaultAclRow].stream
   }
   override def selectById(oid: PgDefaultAclId): ConnectionIO[Option[PgDefaultAclRow]] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = $oid".query[PgDefaultAclRow].option
+    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ${oid}".query[PgDefaultAclRow].option
   }
   override def selectByIds(oids: Array[PgDefaultAclId]): Stream[ConnectionIO, PgDefaultAclRow] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ANY($oids)".query[PgDefaultAclRow].stream
+    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ANY(${oids})".query[PgDefaultAclRow].stream
   }
   override def update(row: PgDefaultAclRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -37,7 +37,7 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
               defaclnamespace = ${row.defaclnamespace}::oid,
               defaclobjtype = ${row.defaclobjtype}::char,
               defaclacl = ${row.defaclacl}::_aclitem
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

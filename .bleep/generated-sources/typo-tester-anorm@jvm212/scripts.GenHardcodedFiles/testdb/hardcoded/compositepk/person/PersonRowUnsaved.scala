@@ -12,7 +12,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 import testdb.hardcoded.Defaulted
 
@@ -38,24 +40,21 @@ case class PersonRowUnsaved(
     )
 }
 object PersonRowUnsaved {
-  implicit val oFormat: OFormat[PersonRowUnsaved] = new OFormat[PersonRowUnsaved]{
-    override def writes(o: PersonRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "one" -> o.one,
-        "two" -> o.two
-      )
-  
-    override def reads(json: JsValue): JsResult[PersonRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          PersonRowUnsaved(
-            name = json.\("name").toOption.map(_.as[String]),
-            one = json.\("one").as[Defaulted[Long]],
-            two = json.\("two").as[Defaulted[Option[String]]]
-          )
+  implicit val reads: Reads[PersonRowUnsaved] = Reads[PersonRowUnsaved](json => JsResult.fromTry(
+      Try(
+        PersonRowUnsaved(
+          name = json.\("name").toOption.map(_.as[String]),
+          one = json.\("one").as[Defaulted[Long]],
+          two = json.\("two").as[Defaulted[Option[String]]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PersonRowUnsaved] = OWrites[PersonRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "one" -> Json.toJson(o.one),
+      "two" -> Json.toJson(o.two)
+    ))
+  )
 }

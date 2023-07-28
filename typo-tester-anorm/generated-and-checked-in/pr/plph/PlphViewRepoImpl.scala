@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PlphViewRepoImpl extends PlphViewRepo {
   override def selectAll(implicit c: Connection): List[PlphViewRow] = {
-    SQL"""select "id", productid, startdate, enddate, listprice, modifieddate
+    SQL"""select "id", productid, startdate::text, enddate::text, listprice, modifieddate::text
           from pr.plph
        """.as(PlphViewRow.rowParser(1).*)
   }

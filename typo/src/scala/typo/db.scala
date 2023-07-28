@@ -55,7 +55,7 @@ object db {
     case class EnumRef(name: RelationName) extends Type
     case object Text extends Type
     case object Time extends Type
-    case object Timez extends Type
+    case object TimeTz extends Type
     case object Timestamp extends Type
     case object TimestampTz extends Type
     case object UUID extends Type

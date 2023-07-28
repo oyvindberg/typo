@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgAmprocRepoImpl extends PgAmprocRepo {
   override def delete(oid: PgAmprocId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_amproc where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_amproc where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgAmprocRow): ConnectionIO[PgAmprocRow] = {
     sql"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
@@ -25,10 +25,10 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
     sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc".query[PgAmprocRow].stream
   }
   override def selectById(oid: PgAmprocId): ConnectionIO[Option[PgAmprocRow]] = {
-    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = $oid".query[PgAmprocRow].option
+    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ${oid}".query[PgAmprocRow].option
   }
   override def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow] = {
-    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ANY($oids)".query[PgAmprocRow].stream
+    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ANY(${oids})".query[PgAmprocRow].stream
   }
   override def update(row: PgAmprocRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -38,7 +38,7 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
               amprocrighttype = ${row.amprocrighttype}::oid,
               amprocnum = ${row.amprocnum}::int2,
               amproc = ${row.amproc}::regproc
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

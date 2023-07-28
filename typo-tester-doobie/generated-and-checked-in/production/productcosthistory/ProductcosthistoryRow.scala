@@ -7,69 +7,47 @@ package adventureworks
 package production
 package productcosthistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class ProductcosthistoryRow(
   /** Product identification number. Foreign key to Product.ProductID
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** Product cost start date. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Product cost end date. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Standard cost of the product. */
   standardcost: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductcosthistoryId = ProductcosthistoryId(productid, startdate)
  }
 
 object ProductcosthistoryRow {
-  implicit val decoder: Decoder[ProductcosthistoryRow] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        standardcost <- c.downField("standardcost").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductcosthistoryRow(productid, startdate, enddate, standardcost, modifieddate)
-  implicit val encoder: Encoder[ProductcosthistoryRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "standardcost" := row.standardcost,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductcosthistoryRow] =
-    new Read[ProductcosthistoryRow](
-      gets = List(
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductcosthistoryRow(
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
-        startdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
-        standardcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[ProductcosthistoryRow] = Decoder.forProduct5[ProductcosthistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "standardcost", "modifieddate")(ProductcosthistoryRow.apply)
+  implicit val encoder: Encoder[ProductcosthistoryRow] = Encoder.forProduct5[ProductcosthistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "standardcost", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate))
+  implicit val read: Read[ProductcosthistoryRow] = new Read[ProductcosthistoryRow](
+    gets = List(
+      (Get[ProductId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductcosthistoryRow(
+      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 0),
+      startdate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 1),
+      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
+      standardcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

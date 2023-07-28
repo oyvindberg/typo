@@ -2,9 +2,26 @@ package adventureworks
 
 import adventureworks.public.pgtest.{PgtestRepoImpl, PgtestRow}
 import adventureworks.public.pgtestnull.{PgtestnullRepoImpl, PgtestnullRow}
+import doobie.implicits.toSqlInterpolator
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
+import java.time.*
+import java.util.UUID
+
+class ArrayTest2 extends AnyFunSuite with TypeCheckedTripleEquals {
+  def tableFor(dbType: String): Int =
+    withConnection {
+      val tableName = s"test_type_${dbType.filter(_.isLetterOrDigit)}"
+      sql"""create table if not exists $tableName (
+           |    one        $dbType   not null,
+           |    maybe_one  $dbType,
+           |    many       $dbType[] not null,
+           |    maybe_many $dbType[]
+           |    );
+           |""".stripMargin.update.run
+    }
+}
 class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
     withConnection {
@@ -23,6 +40,12 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         jsonb = TypoJsonb("""{"a": 2}"""),
         hstore = TypoHStore(Map("a" -> "1", "b" -> "2")),
         inet = TypoInet("::10.2.3.4"),
+        timestamp = TypoLocalDateTime.now,
+        timestampz = TypoOffsetDateTime.now,
+        time = TypoLocalTime.now,
+        timez = TypoOffsetTime.now,
+        date = TypoLocalDate(LocalDate.now),
+        uuid = UUID.randomUUID(),
         boxes = Array(TypoBox(3.0, 4.0, 1.0, 2.0)),
         circlees = Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0)),
         linees = Array(TypoLine(3.0, 4.5, 5.5)),
@@ -36,7 +59,13 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         jsones = Array(TypoJson("""{"a": 1}""")),
         jsonbes = Array(TypoJsonb("""{"a": 2}""")),
         hstores = Array(), // todo
-        inets = Array(TypoInet("::10.2.3.4"))
+        inets = Array(TypoInet("::10.2.3.4")),
+        timestamps = Array(TypoLocalDateTime.now),
+        timestampzs = Array(TypoOffsetDateTime.now),
+        times = Array(TypoLocalTime.now),
+        timezs = Array(TypoOffsetTime.now),
+        dates = Array(TypoLocalDate(LocalDate.now)),
+        uuids = Array(UUID.randomUUID())
       )
       PgtestRepoImpl.insert(before).map { after =>
         assert(after.box === before.box)
@@ -53,6 +82,12 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.jsonb === before.jsonb)
         assert(after.hstore === before.hstore)
         assert(after.inet === before.inet)
+        assert(after.timestamp === before.timestamp)
+        assert(after.timestampz === before.timestampz)
+        assert(after.time === before.time)
+        assert(after.timez === before.timez)
+        assert(after.date === before.date)
+        assert(after.uuid === before.uuid)
         assert(after.boxes === before.boxes)
         assert(after.circlees === before.circlees)
         assert(after.linees === before.linees)
@@ -67,6 +102,12 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.jsonbes === before.jsonbes)
         assert(after.hstores === before.hstores)
         assert(after.inets === before.inets)
+        assert(after.timestamps === before.timestamps)
+        assert(after.timestampzs === before.timestampzs)
+        assert(after.times === before.times)
+        assert(after.timezs === before.timezs)
+        assert(after.dates === before.dates)
+        assert(after.uuids === before.uuids)
       }
     }
   }
@@ -88,6 +129,12 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         jsonb = None,
         hstore = None,
         inet = None,
+        timestamp = None,
+        timestampz = None,
+        time = None,
+        timez = None,
+        date = None,
+        uuid = None,
         boxes = None,
         circlees = None,
         linees = None,
@@ -101,7 +148,13 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         jsones = None,
         jsonbes = None,
         hstores = None,
-        inets = None
+        inets = None,
+        timestamps = None,
+        timestampzs = None,
+        times = None,
+        timezs = None,
+        dates = None,
+        uuids = None
       )
       PgtestnullRepoImpl.insert(before).map { after =>
         assert(after === before)
@@ -126,6 +179,12 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         jsonb = Some(TypoJsonb("""{"a": 2}""")),
         hstore = Some(TypoHStore(Map("a" -> "1", "b" -> "2"))),
         inet = Some(TypoInet("::10.2.3.4")),
+        timestamp = Some(TypoLocalDateTime.now),
+        timestampz = Some(TypoOffsetDateTime.now),
+        time = Some(TypoLocalTime.now),
+        timez = Some(TypoOffsetTime.now),
+        date = Some(TypoLocalDate(LocalDate.now)),
+        uuid = Some(UUID.randomUUID()),
         boxes = Some(Array(TypoBox(3.0, 4.0, 1.0, 2.0))),
         circlees = Some(Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0))),
         linees = Some(Array(TypoLine(3.0, 4.5, 5.5))),
@@ -139,7 +198,13 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         jsones = Some(Array(TypoJson("""{"a": 1}"""))),
         jsonbes = Some(Array(TypoJsonb("""{"a": 2}"""))),
         hstores = Some(Array()),
-        inets = Some(Array(TypoInet("::10.2.3.4")))
+        inets = Some(Array(TypoInet("::10.2.3.4"))),
+        timestamps = Some(Array(TypoLocalDateTime.now)),
+        timestampzs = Some(Array(TypoOffsetDateTime.now)),
+        times = Some(Array(TypoLocalTime.now)),
+        timezs = Some(Array(TypoOffsetTime.now)),
+        dates = Some(Array(TypoLocalDate(LocalDate.now))),
+        uuids = Some(Array(UUID.randomUUID()))
       )
 
       PgtestnullRepoImpl.insert(before).map { after =>
@@ -157,6 +222,12 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.jsonb === before.jsonb)
         assert(after.hstore === before.hstore)
         assert(after.inet === before.inet)
+        assert(after.timestamp === before.timestamp)
+        assert(after.timestampz === before.timestampz)
+        assert(after.time === before.time)
+        assert(after.timez === before.timez)
+        assert(after.date === before.date)
+        assert(after.uuid === before.uuid)
         assert(after.boxes.map(_.toList) === before.boxes.map(_.toList))
         assert(after.circlees.map(_.toList) === before.circlees.map(_.toList))
         assert(after.linees.map(_.toList) === before.linees.map(_.toList))
@@ -171,6 +242,12 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         assert(after.jsonbes.map(_.toList) === before.jsonbes.map(_.toList))
         assert(after.hstores.map(_.toList) === before.hstores.map(_.toList))
         assert(after.inets.map(_.toList) === before.inets.map(_.toList))
+        assert(after.timestamps.map(_.toList) === before.timestamps.map(_.toList))
+        assert(after.timestampzs.map(_.toList) === before.timestampzs.map(_.toList))
+        assert(after.times.map(_.toList) === before.times.map(_.toList))
+        assert(after.timezs.map(_.toList) === before.timezs.map(_.toList))
+        assert(after.dates.map(_.toList) === before.dates.map(_.toList))
+        assert(after.uuids.map(_.toList) === before.uuids.map(_.toList))
       }
     }
   }

@@ -7,18 +7,19 @@ package adventureworks
 package humanresources
 package jobcandidate
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `humanresources.jobcandidate` */
 case class JobcandidateId(value: Int) extends AnyVal
 object JobcandidateId {
+  implicit val arrayGet: Get[Array[JobcandidateId]] = Get[Array[Int]].map(_.map(JobcandidateId.apply))
+  implicit val arrayPut: Put[Array[JobcandidateId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[JobcandidateId] = Decoder[Int].map(JobcandidateId.apply)
+  implicit val encoder: Encoder[JobcandidateId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[JobcandidateId] = Get[Int].map(JobcandidateId.apply)
   implicit val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[JobcandidateId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[JobcandidateId] =
-    Decoder[Int].map(JobcandidateId(_))
-  implicit val meta: Meta[JobcandidateId] = Meta[Int].imap(JobcandidateId.apply)(_.value)
-  implicit val metaArray: Meta[Array[JobcandidateId]] = Meta[Array[Int]].imap(_.map(JobcandidateId.apply))(_.map(_.value))
+  implicit val put: Put[JobcandidateId] = Put[Int].contramap(_.value)
 }

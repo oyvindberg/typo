@@ -7,18 +7,16 @@ package adventureworks
 package person
 package personphone
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PersonphoneRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
@@ -29,44 +27,26 @@ case class PersonphoneRow(
   /** Kind of phone number. Foreign key to PhoneNumberType.PhoneNumberTypeID.
       Points to [[phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
   phonenumbertypeid: PhonenumbertypeId,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersonphoneId = PersonphoneId(businessentityid, phonenumber, phonenumbertypeid)
  }
 
 object PersonphoneRow {
-  implicit val decoder: Decoder[PersonphoneRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        phonenumber <- c.downField("phonenumber").as[Phone]
-        phonenumbertypeid <- c.downField("phonenumbertypeid").as[PhonenumbertypeId]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield PersonphoneRow(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
-  implicit val encoder: Encoder[PersonphoneRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "phonenumber" := row.phonenumber,
-        "phonenumbertypeid" := row.phonenumbertypeid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PersonphoneRow] =
-    new Read[PersonphoneRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Phone], Nullability.NoNulls),
-        (Get[PhonenumbertypeId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonphoneRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        phonenumber = Get[Phone].unsafeGetNonNullable(rs, i + 1),
-        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PersonphoneRow] = Decoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRow.apply)
+  implicit val encoder: Encoder[PersonphoneRow] = Encoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))
+  implicit val read: Read[PersonphoneRow] = new Read[PersonphoneRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[Phone], Nullability.NoNulls),
+      (Get[PhonenumbertypeId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PersonphoneRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      phonenumber = Get[Phone].unsafeGetNonNullable(rs, i + 1),
+      phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNonNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

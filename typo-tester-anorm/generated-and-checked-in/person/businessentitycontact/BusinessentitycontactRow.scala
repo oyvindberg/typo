@@ -7,17 +7,19 @@ package adventureworks
 package person
 package businessentitycontact
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class BusinessentitycontactRow(
@@ -31,46 +33,42 @@ case class BusinessentitycontactRow(
       Points to [[contacttype.ContacttypeRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: BusinessentitycontactId = BusinessentitycontactId(businessentityid, personid, contacttypeid)
  }
 
 object BusinessentitycontactRow {
-  def rowParser(idx: Int): RowParser[BusinessentitycontactRow] =
-    RowParser[BusinessentitycontactRow] { row =>
-      Success(
+  implicit val reads: Reads[BusinessentitycontactRow] = Reads[BusinessentitycontactRow](json => JsResult.fromTry(
+      Try(
         BusinessentitycontactRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          personid = row[BusinessentityId](idx + 1),
-          contacttypeid = row[ContacttypeId](idx + 2),
-          rowguid = row[UUID](idx + 3),
-          modifieddate = row[LocalDateTime](idx + 4)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          personid = json.\("personid").as[BusinessentityId],
+          contacttypeid = json.\("contacttypeid").as[ContacttypeId],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[BusinessentitycontactRow] = new OFormat[BusinessentitycontactRow]{
-    override def writes(o: BusinessentitycontactRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "personid" -> o.personid,
-        "contacttypeid" -> o.contacttypeid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[BusinessentitycontactRow] = RowParser[BusinessentitycontactRow] { row =>
+    Success(
+      BusinessentitycontactRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        personid = row[BusinessentityId](idx + 1),
+        contacttypeid = row[ContacttypeId](idx + 2),
+        rowguid = row[UUID](idx + 3),
+        modifieddate = row[TypoLocalDateTime](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[BusinessentitycontactRow] = {
-      JsResult.fromTry(
-        Try(
-          BusinessentitycontactRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            personid = json.\("personid").as[BusinessentityId],
-            contacttypeid = json.\("contacttypeid").as[ContacttypeId],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[BusinessentitycontactRow] = OWrites[BusinessentitycontactRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "personid" -> Json.toJson(o.personid),
+      "contacttypeid" -> Json.toJson(o.contacttypeid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

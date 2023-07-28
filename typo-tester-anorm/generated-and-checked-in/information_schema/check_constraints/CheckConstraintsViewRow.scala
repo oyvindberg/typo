@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CheckConstraintsViewRow(
@@ -26,37 +28,33 @@ case class CheckConstraintsViewRow(
 )
 
 object CheckConstraintsViewRow {
-  def rowParser(idx: Int): RowParser[CheckConstraintsViewRow] =
-    RowParser[CheckConstraintsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[CheckConstraintsViewRow] = Reads[CheckConstraintsViewRow](json => JsResult.fromTry(
+      Try(
         CheckConstraintsViewRow(
-          constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
-          constraintSchema = row[Option[SqlIdentifier]](idx + 1),
-          constraintName = row[Option[SqlIdentifier]](idx + 2),
-          checkClause = row[Option[CharacterData]](idx + 3)
+          constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
+          constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
+          constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
+          checkClause = json.\("check_clause").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[CheckConstraintsViewRow] = new OFormat[CheckConstraintsViewRow]{
-    override def writes(o: CheckConstraintsViewRow): JsObject =
-      Json.obj(
-        "constraint_catalog" -> o.constraintCatalog,
-        "constraint_schema" -> o.constraintSchema,
-        "constraint_name" -> o.constraintName,
-        "check_clause" -> o.checkClause
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CheckConstraintsViewRow] = RowParser[CheckConstraintsViewRow] { row =>
+    Success(
+      CheckConstraintsViewRow(
+        constraintCatalog = row[Option[SqlIdentifier]](idx + 0),
+        constraintSchema = row[Option[SqlIdentifier]](idx + 1),
+        constraintName = row[Option[SqlIdentifier]](idx + 2),
+        checkClause = row[Option[CharacterData]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[CheckConstraintsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          CheckConstraintsViewRow(
-            constraintCatalog = json.\("constraint_catalog").toOption.map(_.as[SqlIdentifier]),
-            constraintSchema = json.\("constraint_schema").toOption.map(_.as[SqlIdentifier]),
-            constraintName = json.\("constraint_name").toOption.map(_.as[SqlIdentifier]),
-            checkClause = json.\("check_clause").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CheckConstraintsViewRow] = OWrites[CheckConstraintsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "constraint_catalog" -> Json.toJson(o.constraintCatalog),
+      "constraint_schema" -> Json.toJson(o.constraintSchema),
+      "constraint_name" -> Json.toJson(o.constraintName),
+      "check_clause" -> Json.toJson(o.checkClause)
+    ))
+  )
 }

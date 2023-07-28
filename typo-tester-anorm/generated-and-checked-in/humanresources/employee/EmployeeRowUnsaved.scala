@@ -8,16 +8,18 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `humanresources.employee` which has not been persisted yet */
@@ -32,13 +34,13 @@ case class EmployeeRowUnsaved(
   /** Work title such as Buyer or Sales Representative. */
   jobtitle: /* max 50 chars */ String,
   /** Date of birth. */
-  birthdate: LocalDate,
+  birthdate: TypoLocalDate,
   /** M = Married, S = Single */
   maritalstatus: /* bpchar */ String,
   /** M = Male, F = Female */
   gender: /* bpchar */ String,
   /** Employee hired on this date. */
-  hiredate: LocalDate,
+  hiredate: TypoLocalDate,
   /** Default: true
       Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
   salariedflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -54,12 +56,12 @@ case class EmployeeRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: '/'::character varying
       Where the employee is located in corporate hierarchy. */
   organizationnode: Defaulted[Option[String]] = Defaulted.UseDefault
 ) {
-  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => Int, sickleavehoursDefault: => Int, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
+  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => Int, sickleavehoursDefault: => Int, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
     EmployeeRow(
       businessentityid = businessentityid,
       nationalidnumber = nationalidnumber,
@@ -100,48 +102,45 @@ case class EmployeeRowUnsaved(
     )
 }
 object EmployeeRowUnsaved {
-  implicit val oFormat: OFormat[EmployeeRowUnsaved] = new OFormat[EmployeeRowUnsaved]{
-    override def writes(o: EmployeeRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "nationalidnumber" -> o.nationalidnumber,
-        "loginid" -> o.loginid,
-        "jobtitle" -> o.jobtitle,
-        "birthdate" -> o.birthdate,
-        "maritalstatus" -> o.maritalstatus,
-        "gender" -> o.gender,
-        "hiredate" -> o.hiredate,
-        "salariedflag" -> o.salariedflag,
-        "vacationhours" -> o.vacationhours,
-        "sickleavehours" -> o.sickleavehours,
-        "currentflag" -> o.currentflag,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate,
-        "organizationnode" -> o.organizationnode
-      )
-  
-    override def reads(json: JsValue): JsResult[EmployeeRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          EmployeeRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            nationalidnumber = json.\("nationalidnumber").as[/* max 15 chars */ String],
-            loginid = json.\("loginid").as[/* max 256 chars */ String],
-            jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
-            birthdate = json.\("birthdate").as[LocalDate],
-            maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
-            gender = json.\("gender").as[/* bpchar */ String],
-            hiredate = json.\("hiredate").as[LocalDate],
-            salariedflag = json.\("salariedflag").as[Defaulted[Flag]],
-            vacationhours = json.\("vacationhours").as[Defaulted[Int]],
-            sickleavehours = json.\("sickleavehours").as[Defaulted[Int]],
-            currentflag = json.\("currentflag").as[Defaulted[Flag]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]],
-            organizationnode = json.\("organizationnode").as[Defaulted[Option[String]]]
-          )
+  implicit val reads: Reads[EmployeeRowUnsaved] = Reads[EmployeeRowUnsaved](json => JsResult.fromTry(
+      Try(
+        EmployeeRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          nationalidnumber = json.\("nationalidnumber").as[/* max 15 chars */ String],
+          loginid = json.\("loginid").as[/* max 256 chars */ String],
+          jobtitle = json.\("jobtitle").as[/* max 50 chars */ String],
+          birthdate = json.\("birthdate").as[TypoLocalDate],
+          maritalstatus = json.\("maritalstatus").as[/* bpchar */ String],
+          gender = json.\("gender").as[/* bpchar */ String],
+          hiredate = json.\("hiredate").as[TypoLocalDate],
+          salariedflag = json.\("salariedflag").as[Defaulted[Flag]],
+          vacationhours = json.\("vacationhours").as[Defaulted[Int]],
+          sickleavehours = json.\("sickleavehours").as[Defaulted[Int]],
+          currentflag = json.\("currentflag").as[Defaulted[Flag]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]],
+          organizationnode = json.\("organizationnode").as[Defaulted[Option[String]]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[EmployeeRowUnsaved] = OWrites[EmployeeRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "nationalidnumber" -> Json.toJson(o.nationalidnumber),
+      "loginid" -> Json.toJson(o.loginid),
+      "jobtitle" -> Json.toJson(o.jobtitle),
+      "birthdate" -> Json.toJson(o.birthdate),
+      "maritalstatus" -> Json.toJson(o.maritalstatus),
+      "gender" -> Json.toJson(o.gender),
+      "hiredate" -> Json.toJson(o.hiredate),
+      "salariedflag" -> Json.toJson(o.salariedflag),
+      "vacationhours" -> Json.toJson(o.vacationhours),
+      "sickleavehours" -> Json.toJson(o.sickleavehours),
+      "currentflag" -> Json.toJson(o.currentflag),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate),
+      "organizationnode" -> Json.toJson(o.organizationnode)
+    ))
+  )
 }

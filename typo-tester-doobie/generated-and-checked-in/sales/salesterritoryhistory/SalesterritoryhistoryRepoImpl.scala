@@ -8,11 +8,11 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
@@ -22,7 +22,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+          returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
        """.query[SalesterritoryhistoryRow].unique
   }
   override def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow] = {
@@ -37,29 +37,29 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.salesterritoryhistory default values
-            returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+            returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesterritoryhistory(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+            returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
          """
     }
     q.query[SalesterritoryhistoryRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = {
-    sql"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory".query[SalesterritoryhistoryRow].stream
+    sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory".query[SalesterritoryhistoryRow].stream
   }
   override def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
-    sql"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".query[SalesterritoryhistoryRow].option
+    sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".query[SalesterritoryhistoryRow].option
   }
   override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -88,7 +88,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             enddate = EXCLUDED.enddate,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+          returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
        """.query[SalesterritoryhistoryRow].unique
   }
 }

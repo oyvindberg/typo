@@ -8,11 +8,11 @@ package sales
 package salesorderheadersalesreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
@@ -21,7 +21,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def insert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
           values (${unsaved.salesorderid}::int4, ${unsaved.salesreasonid}::int4, ${unsaved.modifieddate}::timestamp)
-          returning salesorderid, salesreasonid, modifieddate
+          returning salesorderid, salesreasonid, modifieddate::text
        """.query[SalesorderheadersalesreasonRow].unique
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
@@ -30,29 +30,29 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
       Some((Fragment.const(s"salesreasonid"), fr"${unsaved.salesreasonid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.salesorderheadersalesreason default values
-            returning salesorderid, salesreasonid, modifieddate
+            returning salesorderid, salesreasonid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.salesorderheadersalesreason(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning salesorderid, salesreasonid, modifieddate
+            returning salesorderid, salesreasonid, modifieddate::text
          """
     }
     q.query[SalesorderheadersalesreasonRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
-    sql"select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason".query[SalesorderheadersalesreasonRow].stream
+    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason".query[SalesorderheadersalesreasonRow].stream
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
-    sql"select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".query[SalesorderheadersalesreasonRow].option
+    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".query[SalesorderheadersalesreasonRow].option
   }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -74,7 +74,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           on conflict (salesorderid, salesreasonid)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning salesorderid, salesreasonid, modifieddate
+          returning salesorderid, salesreasonid, modifieddate::text
        """.query[SalesorderheadersalesreasonRow].unique
   }
 }

@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgForeignTableRepoImpl extends PgForeignTableRepo {
   override def delete(ftrelid: PgForeignTableId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_foreign_table where ftrelid = $ftrelid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_foreign_table where ftrelid = ${ftrelid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgForeignTableRow): ConnectionIO[PgForeignTableRow] = {
     sql"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)
@@ -25,17 +25,17 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table".query[PgForeignTableRow].stream
   }
   override def selectById(ftrelid: PgForeignTableId): ConnectionIO[Option[PgForeignTableRow]] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = $ftrelid".query[PgForeignTableRow].option
+    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ${ftrelid}".query[PgForeignTableRow].option
   }
   override def selectByIds(ftrelids: Array[PgForeignTableId]): Stream[ConnectionIO, PgForeignTableRow] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ANY($ftrelids)".query[PgForeignTableRow].stream
+    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ANY(${ftrelids})".query[PgForeignTableRow].stream
   }
   override def update(row: PgForeignTableRow): ConnectionIO[Boolean] = {
     val ftrelid = row.ftrelid
     sql"""update pg_catalog.pg_foreign_table
           set ftserver = ${row.ftserver}::oid,
               ftoptions = ${row.ftoptions}::_text
-          where ftrelid = $ftrelid
+          where ftrelid = ${ftrelid}
        """
       .update
       .run

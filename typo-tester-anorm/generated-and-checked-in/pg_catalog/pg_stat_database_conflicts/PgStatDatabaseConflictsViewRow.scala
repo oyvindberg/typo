@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatDatabaseConflictsViewRow(
@@ -27,46 +29,42 @@ case class PgStatDatabaseConflictsViewRow(
 )
 
 object PgStatDatabaseConflictsViewRow {
-  def rowParser(idx: Int): RowParser[PgStatDatabaseConflictsViewRow] =
-    RowParser[PgStatDatabaseConflictsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatDatabaseConflictsViewRow] = Reads[PgStatDatabaseConflictsViewRow](json => JsResult.fromTry(
+      Try(
         PgStatDatabaseConflictsViewRow(
-          datid = row[Option[/* oid */ Long]](idx + 0),
-          datname = row[Option[String]](idx + 1),
-          conflTablespace = row[Option[Long]](idx + 2),
-          conflLock = row[Option[Long]](idx + 3),
-          conflSnapshot = row[Option[Long]](idx + 4),
-          conflBufferpin = row[Option[Long]](idx + 5),
-          conflDeadlock = row[Option[Long]](idx + 6)
+          datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
+          datname = json.\("datname").toOption.map(_.as[String]),
+          conflTablespace = json.\("confl_tablespace").toOption.map(_.as[Long]),
+          conflLock = json.\("confl_lock").toOption.map(_.as[Long]),
+          conflSnapshot = json.\("confl_snapshot").toOption.map(_.as[Long]),
+          conflBufferpin = json.\("confl_bufferpin").toOption.map(_.as[Long]),
+          conflDeadlock = json.\("confl_deadlock").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatDatabaseConflictsViewRow] = new OFormat[PgStatDatabaseConflictsViewRow]{
-    override def writes(o: PgStatDatabaseConflictsViewRow): JsObject =
-      Json.obj(
-        "datid" -> o.datid,
-        "datname" -> o.datname,
-        "confl_tablespace" -> o.conflTablespace,
-        "confl_lock" -> o.conflLock,
-        "confl_snapshot" -> o.conflSnapshot,
-        "confl_bufferpin" -> o.conflBufferpin,
-        "confl_deadlock" -> o.conflDeadlock
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatDatabaseConflictsViewRow] = RowParser[PgStatDatabaseConflictsViewRow] { row =>
+    Success(
+      PgStatDatabaseConflictsViewRow(
+        datid = row[Option[/* oid */ Long]](idx + 0),
+        datname = row[Option[String]](idx + 1),
+        conflTablespace = row[Option[Long]](idx + 2),
+        conflLock = row[Option[Long]](idx + 3),
+        conflSnapshot = row[Option[Long]](idx + 4),
+        conflBufferpin = row[Option[Long]](idx + 5),
+        conflDeadlock = row[Option[Long]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatDatabaseConflictsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatDatabaseConflictsViewRow(
-            datid = json.\("datid").toOption.map(_.as[/* oid */ Long]),
-            datname = json.\("datname").toOption.map(_.as[String]),
-            conflTablespace = json.\("confl_tablespace").toOption.map(_.as[Long]),
-            conflLock = json.\("confl_lock").toOption.map(_.as[Long]),
-            conflSnapshot = json.\("confl_snapshot").toOption.map(_.as[Long]),
-            conflBufferpin = json.\("confl_bufferpin").toOption.map(_.as[Long]),
-            conflDeadlock = json.\("confl_deadlock").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatDatabaseConflictsViewRow] = OWrites[PgStatDatabaseConflictsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "datid" -> Json.toJson(o.datid),
+      "datname" -> Json.toJson(o.datname),
+      "confl_tablespace" -> Json.toJson(o.conflTablespace),
+      "confl_lock" -> Json.toJson(o.conflLock),
+      "confl_snapshot" -> Json.toJson(o.conflSnapshot),
+      "confl_bufferpin" -> Json.toJson(o.conflBufferpin),
+      "confl_deadlock" -> Json.toJson(o.conflDeadlock)
+    ))
+  )
 }

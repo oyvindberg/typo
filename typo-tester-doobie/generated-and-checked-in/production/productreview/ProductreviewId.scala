@@ -7,18 +7,19 @@ package adventureworks
 package production
 package productreview
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.productreview` */
 case class ProductreviewId(value: Int) extends AnyVal
 object ProductreviewId {
+  implicit val arrayGet: Get[Array[ProductreviewId]] = Get[Array[Int]].map(_.map(ProductreviewId.apply))
+  implicit val arrayPut: Put[Array[ProductreviewId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[ProductreviewId] = Decoder[Int].map(ProductreviewId.apply)
+  implicit val encoder: Encoder[ProductreviewId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[ProductreviewId] = Get[Int].map(ProductreviewId.apply)
   implicit val ordering: Ordering[ProductreviewId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[ProductreviewId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[ProductreviewId] =
-    Decoder[Int].map(ProductreviewId(_))
-  implicit val meta: Meta[ProductreviewId] = Meta[Int].imap(ProductreviewId.apply)(_.value)
-  implicit val metaArray: Meta[Array[ProductreviewId]] = Meta[Array[Int]].imap(_.map(ProductreviewId.apply))(_.map(_.value))
+  implicit val put: Put[ProductreviewId] = Put[Int].contramap(_.value)
 }

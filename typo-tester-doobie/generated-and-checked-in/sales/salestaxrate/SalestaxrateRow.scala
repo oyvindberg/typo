@@ -7,17 +7,15 @@ package adventureworks
 package sales
 package salestaxrate
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SalestaxrateRow(
@@ -33,54 +31,30 @@ case class SalestaxrateRow(
   /** Tax rate description. */
   name: Name,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object SalestaxrateRow {
-  implicit val decoder: Decoder[SalestaxrateRow] =
-    (c: HCursor) =>
-      for {
-        salestaxrateid <- c.downField("salestaxrateid").as[SalestaxrateId]
-        stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
-        taxtype <- c.downField("taxtype").as[Int]
-        taxrate <- c.downField("taxrate").as[BigDecimal]
-        name <- c.downField("name").as[Name]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield SalestaxrateRow(salestaxrateid, stateprovinceid, taxtype, taxrate, name, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalestaxrateRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "salestaxrateid" := row.salestaxrateid,
-        "stateprovinceid" := row.stateprovinceid,
-        "taxtype" := row.taxtype,
-        "taxrate" := row.taxrate,
-        "name" := row.name,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SalestaxrateRow] =
-    new Read[SalestaxrateRow](
-      gets = List(
-        (Get[SalestaxrateId], Nullability.NoNulls),
-        (Get[StateprovinceId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SalestaxrateRow(
-        salestaxrateid = Get[SalestaxrateId].unsafeGetNonNullable(rs, i + 0),
-        stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 1),
-        taxtype = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        taxrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)
+  implicit val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))
+  implicit val read: Read[SalestaxrateRow] = new Read[SalestaxrateRow](
+    gets = List(
+      (Get[SalestaxrateId], Nullability.NoNulls),
+      (Get[StateprovinceId], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SalestaxrateRow(
+      salestaxrateid = Get[SalestaxrateId].unsafeGetNonNullable(rs, i + 0),
+      stateprovinceid = Get[StateprovinceId].unsafeGetNonNullable(rs, i + 1),
+      taxtype = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      taxrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 4),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 6)
     )
-  
-
+  )
 }

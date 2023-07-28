@@ -7,24 +7,26 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoLocalDate
 import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDate
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class VpersondemographicsViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   totalpurchaseytd: Option[TypoMoney],
-  datefirstpurchase: Option[LocalDate],
-  birthdate: Option[LocalDate],
+  datefirstpurchase: Option[TypoLocalDate],
+  birthdate: Option[TypoLocalDate],
   maritalstatus: Option[/* max 1 chars */ String],
   yearlyincome: Option[/* max 30 chars */ String],
   gender: Option[/* max 1 chars */ String],
@@ -37,64 +39,60 @@ case class VpersondemographicsViewRow(
 )
 
 object VpersondemographicsViewRow {
-  def rowParser(idx: Int): RowParser[VpersondemographicsViewRow] =
-    RowParser[VpersondemographicsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[VpersondemographicsViewRow] = Reads[VpersondemographicsViewRow](json => JsResult.fromTry(
+      Try(
         VpersondemographicsViewRow(
-          businessentityid = row[Option[BusinessentityId]](idx + 0),
-          totalpurchaseytd = row[Option[TypoMoney]](idx + 1),
-          datefirstpurchase = row[Option[LocalDate]](idx + 2),
-          birthdate = row[Option[LocalDate]](idx + 3),
-          maritalstatus = row[Option[/* max 1 chars */ String]](idx + 4),
-          yearlyincome = row[Option[/* max 30 chars */ String]](idx + 5),
-          gender = row[Option[/* max 1 chars */ String]](idx + 6),
-          totalchildren = row[Option[Int]](idx + 7),
-          numberchildrenathome = row[Option[Int]](idx + 8),
-          education = row[Option[/* max 30 chars */ String]](idx + 9),
-          occupation = row[Option[/* max 30 chars */ String]](idx + 10),
-          homeownerflag = row[Option[Boolean]](idx + 11),
-          numbercarsowned = row[Option[Int]](idx + 12)
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          totalpurchaseytd = json.\("totalpurchaseytd").toOption.map(_.as[TypoMoney]),
+          datefirstpurchase = json.\("datefirstpurchase").toOption.map(_.as[TypoLocalDate]),
+          birthdate = json.\("birthdate").toOption.map(_.as[TypoLocalDate]),
+          maritalstatus = json.\("maritalstatus").toOption.map(_.as[/* max 1 chars */ String]),
+          yearlyincome = json.\("yearlyincome").toOption.map(_.as[/* max 30 chars */ String]),
+          gender = json.\("gender").toOption.map(_.as[/* max 1 chars */ String]),
+          totalchildren = json.\("totalchildren").toOption.map(_.as[Int]),
+          numberchildrenathome = json.\("numberchildrenathome").toOption.map(_.as[Int]),
+          education = json.\("education").toOption.map(_.as[/* max 30 chars */ String]),
+          occupation = json.\("occupation").toOption.map(_.as[/* max 30 chars */ String]),
+          homeownerflag = json.\("homeownerflag").toOption.map(_.as[Boolean]),
+          numbercarsowned = json.\("numbercarsowned").toOption.map(_.as[Int])
         )
       )
-    }
-  implicit val oFormat: OFormat[VpersondemographicsViewRow] = new OFormat[VpersondemographicsViewRow]{
-    override def writes(o: VpersondemographicsViewRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "totalpurchaseytd" -> o.totalpurchaseytd,
-        "datefirstpurchase" -> o.datefirstpurchase,
-        "birthdate" -> o.birthdate,
-        "maritalstatus" -> o.maritalstatus,
-        "yearlyincome" -> o.yearlyincome,
-        "gender" -> o.gender,
-        "totalchildren" -> o.totalchildren,
-        "numberchildrenathome" -> o.numberchildrenathome,
-        "education" -> o.education,
-        "occupation" -> o.occupation,
-        "homeownerflag" -> o.homeownerflag,
-        "numbercarsowned" -> o.numbercarsowned
+    ),
+  )
+  def rowParser(idx: Int): RowParser[VpersondemographicsViewRow] = RowParser[VpersondemographicsViewRow] { row =>
+    Success(
+      VpersondemographicsViewRow(
+        businessentityid = row[Option[BusinessentityId]](idx + 0),
+        totalpurchaseytd = row[Option[TypoMoney]](idx + 1),
+        datefirstpurchase = row[Option[TypoLocalDate]](idx + 2),
+        birthdate = row[Option[TypoLocalDate]](idx + 3),
+        maritalstatus = row[Option[/* max 1 chars */ String]](idx + 4),
+        yearlyincome = row[Option[/* max 30 chars */ String]](idx + 5),
+        gender = row[Option[/* max 1 chars */ String]](idx + 6),
+        totalchildren = row[Option[Int]](idx + 7),
+        numberchildrenathome = row[Option[Int]](idx + 8),
+        education = row[Option[/* max 30 chars */ String]](idx + 9),
+        occupation = row[Option[/* max 30 chars */ String]](idx + 10),
+        homeownerflag = row[Option[Boolean]](idx + 11),
+        numbercarsowned = row[Option[Int]](idx + 12)
       )
-  
-    override def reads(json: JsValue): JsResult[VpersondemographicsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          VpersondemographicsViewRow(
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            totalpurchaseytd = json.\("totalpurchaseytd").toOption.map(_.as[TypoMoney]),
-            datefirstpurchase = json.\("datefirstpurchase").toOption.map(_.as[LocalDate]),
-            birthdate = json.\("birthdate").toOption.map(_.as[LocalDate]),
-            maritalstatus = json.\("maritalstatus").toOption.map(_.as[/* max 1 chars */ String]),
-            yearlyincome = json.\("yearlyincome").toOption.map(_.as[/* max 30 chars */ String]),
-            gender = json.\("gender").toOption.map(_.as[/* max 1 chars */ String]),
-            totalchildren = json.\("totalchildren").toOption.map(_.as[Int]),
-            numberchildrenathome = json.\("numberchildrenathome").toOption.map(_.as[Int]),
-            education = json.\("education").toOption.map(_.as[/* max 30 chars */ String]),
-            occupation = json.\("occupation").toOption.map(_.as[/* max 30 chars */ String]),
-            homeownerflag = json.\("homeownerflag").toOption.map(_.as[Boolean]),
-            numbercarsowned = json.\("numbercarsowned").toOption.map(_.as[Int])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[VpersondemographicsViewRow] = OWrites[VpersondemographicsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "totalpurchaseytd" -> Json.toJson(o.totalpurchaseytd),
+      "datefirstpurchase" -> Json.toJson(o.datefirstpurchase),
+      "birthdate" -> Json.toJson(o.birthdate),
+      "maritalstatus" -> Json.toJson(o.maritalstatus),
+      "yearlyincome" -> Json.toJson(o.yearlyincome),
+      "gender" -> Json.toJson(o.gender),
+      "totalchildren" -> Json.toJson(o.totalchildren),
+      "numberchildrenathome" -> Json.toJson(o.numberchildrenathome),
+      "education" -> Json.toJson(o.education),
+      "occupation" -> Json.toJson(o.occupation),
+      "homeownerflag" -> Json.toJson(o.homeownerflag),
+      "numbercarsowned" -> Json.toJson(o.numbercarsowned)
+    ))
+  )
 }

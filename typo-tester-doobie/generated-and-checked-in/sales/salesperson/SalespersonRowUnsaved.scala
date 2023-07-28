@@ -8,13 +8,11 @@ package sales
 package salesperson
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `sales.salesperson` which has not been persisted yet */
@@ -42,9 +40,9 @@ case class SalespersonRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(bonusDefault: => BigDecimal, commissionpctDefault: => BigDecimal, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalespersonRow =
+  def toRow(bonusDefault: => BigDecimal, commissionpctDefault: => BigDecimal, salesytdDefault: => BigDecimal, saleslastyearDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalespersonRow =
     SalespersonRow(
       businessentityid = businessentityid,
       territoryid = territoryid,
@@ -76,31 +74,6 @@ case class SalespersonRowUnsaved(
     )
 }
 object SalespersonRowUnsaved {
-  implicit val decoder: Decoder[SalespersonRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        territoryid <- c.downField("territoryid").as[Option[SalesterritoryId]]
-        salesquota <- c.downField("salesquota").as[Option[BigDecimal]]
-        bonus <- c.downField("bonus").as[Defaulted[BigDecimal]]
-        commissionpct <- c.downField("commissionpct").as[Defaulted[BigDecimal]]
-        salesytd <- c.downField("salesytd").as[Defaulted[BigDecimal]]
-        saleslastyear <- c.downField("saleslastyear").as[Defaulted[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SalespersonRowUnsaved(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalespersonRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "territoryid" := row.territoryid,
-        "salesquota" := row.salesquota,
-        "bonus" := row.bonus,
-        "commissionpct" := row.commissionpct,
-        "salesytd" := row.salesytd,
-        "saleslastyear" := row.saleslastyear,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SalespersonRowUnsaved] = Decoder.forProduct9[SalespersonRowUnsaved, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SalespersonRowUnsaved.apply)
+  implicit val encoder: Encoder[SalespersonRowUnsaved] = Encoder.forProduct9[SalespersonRowUnsaved, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))
 }

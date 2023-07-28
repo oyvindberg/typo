@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgViewsViewRow(
@@ -24,37 +26,33 @@ case class PgViewsViewRow(
 )
 
 object PgViewsViewRow {
-  def rowParser(idx: Int): RowParser[PgViewsViewRow] =
-    RowParser[PgViewsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgViewsViewRow] = Reads[PgViewsViewRow](json => JsResult.fromTry(
+      Try(
         PgViewsViewRow(
-          schemaname = row[Option[String]](idx + 0),
-          viewname = row[Option[String]](idx + 1),
-          viewowner = row[Option[String]](idx + 2),
-          definition = row[Option[String]](idx + 3)
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          viewname = json.\("viewname").toOption.map(_.as[String]),
+          viewowner = json.\("viewowner").toOption.map(_.as[String]),
+          definition = json.\("definition").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgViewsViewRow] = new OFormat[PgViewsViewRow]{
-    override def writes(o: PgViewsViewRow): JsObject =
-      Json.obj(
-        "schemaname" -> o.schemaname,
-        "viewname" -> o.viewname,
-        "viewowner" -> o.viewowner,
-        "definition" -> o.definition
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgViewsViewRow] = RowParser[PgViewsViewRow] { row =>
+    Success(
+      PgViewsViewRow(
+        schemaname = row[Option[String]](idx + 0),
+        viewname = row[Option[String]](idx + 1),
+        viewowner = row[Option[String]](idx + 2),
+        definition = row[Option[String]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgViewsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgViewsViewRow(
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            viewname = json.\("viewname").toOption.map(_.as[String]),
-            viewowner = json.\("viewowner").toOption.map(_.as[String]),
-            definition = json.\("definition").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgViewsViewRow] = OWrites[PgViewsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "schemaname" -> Json.toJson(o.schemaname),
+      "viewname" -> Json.toJson(o.viewname),
+      "viewowner" -> Json.toJson(o.viewowner),
+      "definition" -> Json.toJson(o.definition)
+    ))
+  )
 }

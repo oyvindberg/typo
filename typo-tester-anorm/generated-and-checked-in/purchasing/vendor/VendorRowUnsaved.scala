@@ -8,16 +8,18 @@ package purchasing
 package vendor
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.vendor` which has not been persisted yet */
@@ -40,9 +42,9 @@ case class VendorRowUnsaved(
       0 = Vendor no longer used. 1 = Vendor is actively used. */
   activeflag: Defaulted[Flag] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(preferredvendorstatusDefault: => Flag, activeflagDefault: => Flag, modifieddateDefault: => LocalDateTime): VendorRow =
+  def toRow(preferredvendorstatusDefault: => Flag, activeflagDefault: => Flag, modifieddateDefault: => TypoLocalDateTime): VendorRow =
     VendorRow(
       businessentityid = businessentityid,
       accountnumber = accountnumber,
@@ -64,34 +66,31 @@ case class VendorRowUnsaved(
     )
 }
 object VendorRowUnsaved {
-  implicit val oFormat: OFormat[VendorRowUnsaved] = new OFormat[VendorRowUnsaved]{
-    override def writes(o: VendorRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "accountnumber" -> o.accountnumber,
-        "name" -> o.name,
-        "creditrating" -> o.creditrating,
-        "purchasingwebserviceurl" -> o.purchasingwebserviceurl,
-        "preferredvendorstatus" -> o.preferredvendorstatus,
-        "activeflag" -> o.activeflag,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[VendorRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          VendorRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            accountnumber = json.\("accountnumber").as[AccountNumber],
-            name = json.\("name").as[Name],
-            creditrating = json.\("creditrating").as[Int],
-            purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
-            preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[Flag]],
-            activeflag = json.\("activeflag").as[Defaulted[Flag]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[VendorRowUnsaved] = Reads[VendorRowUnsaved](json => JsResult.fromTry(
+      Try(
+        VendorRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          accountnumber = json.\("accountnumber").as[AccountNumber],
+          name = json.\("name").as[Name],
+          creditrating = json.\("creditrating").as[Int],
+          purchasingwebserviceurl = json.\("purchasingwebserviceurl").toOption.map(_.as[/* max 1024 chars */ String]),
+          preferredvendorstatus = json.\("preferredvendorstatus").as[Defaulted[Flag]],
+          activeflag = json.\("activeflag").as[Defaulted[Flag]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[VendorRowUnsaved] = OWrites[VendorRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "accountnumber" -> Json.toJson(o.accountnumber),
+      "name" -> Json.toJson(o.name),
+      "creditrating" -> Json.toJson(o.creditrating),
+      "purchasingwebserviceurl" -> Json.toJson(o.purchasingwebserviceurl),
+      "preferredvendorstatus" -> Json.toJson(o.preferredvendorstatus),
+      "activeflag" -> Json.toJson(o.activeflag),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

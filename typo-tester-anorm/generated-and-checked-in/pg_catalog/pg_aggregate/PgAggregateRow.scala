@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAggregateRow(
@@ -43,91 +45,87 @@ case class PgAggregateRow(
 )
 
 object PgAggregateRow {
-  def rowParser(idx: Int): RowParser[PgAggregateRow] =
-    RowParser[PgAggregateRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAggregateRow] = Reads[PgAggregateRow](json => JsResult.fromTry(
+      Try(
         PgAggregateRow(
-          aggfnoid = row[PgAggregateId](idx + 0),
-          aggkind = row[String](idx + 1),
-          aggnumdirectargs = row[Int](idx + 2),
-          aggtransfn = row[TypoRegproc](idx + 3),
-          aggfinalfn = row[TypoRegproc](idx + 4),
-          aggcombinefn = row[TypoRegproc](idx + 5),
-          aggserialfn = row[TypoRegproc](idx + 6),
-          aggdeserialfn = row[TypoRegproc](idx + 7),
-          aggmtransfn = row[TypoRegproc](idx + 8),
-          aggminvtransfn = row[TypoRegproc](idx + 9),
-          aggmfinalfn = row[TypoRegproc](idx + 10),
-          aggfinalextra = row[Boolean](idx + 11),
-          aggmfinalextra = row[Boolean](idx + 12),
-          aggfinalmodify = row[String](idx + 13),
-          aggmfinalmodify = row[String](idx + 14),
-          aggsortop = row[/* oid */ Long](idx + 15),
-          aggtranstype = row[/* oid */ Long](idx + 16),
-          aggtransspace = row[Int](idx + 17),
-          aggmtranstype = row[/* oid */ Long](idx + 18),
-          aggmtransspace = row[Int](idx + 19),
-          agginitval = row[Option[String]](idx + 20),
-          aggminitval = row[Option[String]](idx + 21)
+          aggfnoid = json.\("aggfnoid").as[PgAggregateId],
+          aggkind = json.\("aggkind").as[String],
+          aggnumdirectargs = json.\("aggnumdirectargs").as[Int],
+          aggtransfn = json.\("aggtransfn").as[TypoRegproc],
+          aggfinalfn = json.\("aggfinalfn").as[TypoRegproc],
+          aggcombinefn = json.\("aggcombinefn").as[TypoRegproc],
+          aggserialfn = json.\("aggserialfn").as[TypoRegproc],
+          aggdeserialfn = json.\("aggdeserialfn").as[TypoRegproc],
+          aggmtransfn = json.\("aggmtransfn").as[TypoRegproc],
+          aggminvtransfn = json.\("aggminvtransfn").as[TypoRegproc],
+          aggmfinalfn = json.\("aggmfinalfn").as[TypoRegproc],
+          aggfinalextra = json.\("aggfinalextra").as[Boolean],
+          aggmfinalextra = json.\("aggmfinalextra").as[Boolean],
+          aggfinalmodify = json.\("aggfinalmodify").as[String],
+          aggmfinalmodify = json.\("aggmfinalmodify").as[String],
+          aggsortop = json.\("aggsortop").as[/* oid */ Long],
+          aggtranstype = json.\("aggtranstype").as[/* oid */ Long],
+          aggtransspace = json.\("aggtransspace").as[Int],
+          aggmtranstype = json.\("aggmtranstype").as[/* oid */ Long],
+          aggmtransspace = json.\("aggmtransspace").as[Int],
+          agginitval = json.\("agginitval").toOption.map(_.as[String]),
+          aggminitval = json.\("aggminitval").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAggregateRow] = new OFormat[PgAggregateRow]{
-    override def writes(o: PgAggregateRow): JsObject =
-      Json.obj(
-        "aggfnoid" -> o.aggfnoid,
-        "aggkind" -> o.aggkind,
-        "aggnumdirectargs" -> o.aggnumdirectargs,
-        "aggtransfn" -> o.aggtransfn,
-        "aggfinalfn" -> o.aggfinalfn,
-        "aggcombinefn" -> o.aggcombinefn,
-        "aggserialfn" -> o.aggserialfn,
-        "aggdeserialfn" -> o.aggdeserialfn,
-        "aggmtransfn" -> o.aggmtransfn,
-        "aggminvtransfn" -> o.aggminvtransfn,
-        "aggmfinalfn" -> o.aggmfinalfn,
-        "aggfinalextra" -> o.aggfinalextra,
-        "aggmfinalextra" -> o.aggmfinalextra,
-        "aggfinalmodify" -> o.aggfinalmodify,
-        "aggmfinalmodify" -> o.aggmfinalmodify,
-        "aggsortop" -> o.aggsortop,
-        "aggtranstype" -> o.aggtranstype,
-        "aggtransspace" -> o.aggtransspace,
-        "aggmtranstype" -> o.aggmtranstype,
-        "aggmtransspace" -> o.aggmtransspace,
-        "agginitval" -> o.agginitval,
-        "aggminitval" -> o.aggminitval
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAggregateRow] = RowParser[PgAggregateRow] { row =>
+    Success(
+      PgAggregateRow(
+        aggfnoid = row[PgAggregateId](idx + 0),
+        aggkind = row[String](idx + 1),
+        aggnumdirectargs = row[Int](idx + 2),
+        aggtransfn = row[TypoRegproc](idx + 3),
+        aggfinalfn = row[TypoRegproc](idx + 4),
+        aggcombinefn = row[TypoRegproc](idx + 5),
+        aggserialfn = row[TypoRegproc](idx + 6),
+        aggdeserialfn = row[TypoRegproc](idx + 7),
+        aggmtransfn = row[TypoRegproc](idx + 8),
+        aggminvtransfn = row[TypoRegproc](idx + 9),
+        aggmfinalfn = row[TypoRegproc](idx + 10),
+        aggfinalextra = row[Boolean](idx + 11),
+        aggmfinalextra = row[Boolean](idx + 12),
+        aggfinalmodify = row[String](idx + 13),
+        aggmfinalmodify = row[String](idx + 14),
+        aggsortop = row[/* oid */ Long](idx + 15),
+        aggtranstype = row[/* oid */ Long](idx + 16),
+        aggtransspace = row[Int](idx + 17),
+        aggmtranstype = row[/* oid */ Long](idx + 18),
+        aggmtransspace = row[Int](idx + 19),
+        agginitval = row[Option[String]](idx + 20),
+        aggminitval = row[Option[String]](idx + 21)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAggregateRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAggregateRow(
-            aggfnoid = json.\("aggfnoid").as[PgAggregateId],
-            aggkind = json.\("aggkind").as[String],
-            aggnumdirectargs = json.\("aggnumdirectargs").as[Int],
-            aggtransfn = json.\("aggtransfn").as[TypoRegproc],
-            aggfinalfn = json.\("aggfinalfn").as[TypoRegproc],
-            aggcombinefn = json.\("aggcombinefn").as[TypoRegproc],
-            aggserialfn = json.\("aggserialfn").as[TypoRegproc],
-            aggdeserialfn = json.\("aggdeserialfn").as[TypoRegproc],
-            aggmtransfn = json.\("aggmtransfn").as[TypoRegproc],
-            aggminvtransfn = json.\("aggminvtransfn").as[TypoRegproc],
-            aggmfinalfn = json.\("aggmfinalfn").as[TypoRegproc],
-            aggfinalextra = json.\("aggfinalextra").as[Boolean],
-            aggmfinalextra = json.\("aggmfinalextra").as[Boolean],
-            aggfinalmodify = json.\("aggfinalmodify").as[String],
-            aggmfinalmodify = json.\("aggmfinalmodify").as[String],
-            aggsortop = json.\("aggsortop").as[/* oid */ Long],
-            aggtranstype = json.\("aggtranstype").as[/* oid */ Long],
-            aggtransspace = json.\("aggtransspace").as[Int],
-            aggmtranstype = json.\("aggmtranstype").as[/* oid */ Long],
-            aggmtransspace = json.\("aggmtransspace").as[Int],
-            agginitval = json.\("agginitval").toOption.map(_.as[String]),
-            aggminitval = json.\("aggminitval").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAggregateRow] = OWrites[PgAggregateRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "aggfnoid" -> Json.toJson(o.aggfnoid),
+      "aggkind" -> Json.toJson(o.aggkind),
+      "aggnumdirectargs" -> Json.toJson(o.aggnumdirectargs),
+      "aggtransfn" -> Json.toJson(o.aggtransfn),
+      "aggfinalfn" -> Json.toJson(o.aggfinalfn),
+      "aggcombinefn" -> Json.toJson(o.aggcombinefn),
+      "aggserialfn" -> Json.toJson(o.aggserialfn),
+      "aggdeserialfn" -> Json.toJson(o.aggdeserialfn),
+      "aggmtransfn" -> Json.toJson(o.aggmtransfn),
+      "aggminvtransfn" -> Json.toJson(o.aggminvtransfn),
+      "aggmfinalfn" -> Json.toJson(o.aggmfinalfn),
+      "aggfinalextra" -> Json.toJson(o.aggfinalextra),
+      "aggmfinalextra" -> Json.toJson(o.aggmfinalextra),
+      "aggfinalmodify" -> Json.toJson(o.aggfinalmodify),
+      "aggmfinalmodify" -> Json.toJson(o.aggmfinalmodify),
+      "aggsortop" -> Json.toJson(o.aggsortop),
+      "aggtranstype" -> Json.toJson(o.aggtranstype),
+      "aggtransspace" -> Json.toJson(o.aggtransspace),
+      "aggmtranstype" -> Json.toJson(o.aggmtranstype),
+      "aggmtransspace" -> Json.toJson(o.aggmtransspace),
+      "agginitval" -> Json.toJson(o.agginitval),
+      "aggminitval" -> Json.toJson(o.aggminitval)
+    ))
+  )
 }

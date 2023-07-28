@@ -8,11 +8,11 @@ package humanresources
 package shift
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ShiftRepoImpl extends ShiftRepo {
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
-          returning shiftid, "name", starttime, endtime, modifieddate
+          returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """
       .executeInsert(ShiftRow.rowParser(1).single)
   
@@ -37,19 +37,19 @@ object ShiftRepoImpl extends ShiftRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into humanresources.shift default values
-            returning shiftid, "name", starttime, endtime, modifieddate
+            returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
          """
         .executeInsert(ShiftRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.shift(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning shiftid, "name", starttime, endtime, modifieddate
+                  returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -60,18 +60,18 @@ object ShiftRepoImpl extends ShiftRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
-    SQL"""select shiftid, "name", starttime, endtime, modifieddate
+    SQL"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text
           from humanresources.shift
        """.as(ShiftRow.rowParser(1).*)
   }
   override def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow] = {
-    SQL"""select shiftid, "name", starttime, endtime, modifieddate
+    SQL"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text
           from humanresources.shift
           where shiftid = $shiftid
        """.as(ShiftRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow] = {
-    SQL"""select shiftid, "name", starttime, endtime, modifieddate
+    SQL"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text
           from humanresources.shift
           where shiftid = ANY($shiftids)
        """.as(ShiftRow.rowParser(1).*)
@@ -102,7 +102,7 @@ object ShiftRepoImpl extends ShiftRepo {
             starttime = EXCLUDED.starttime,
             endtime = EXCLUDED.endtime,
             modifieddate = EXCLUDED.modifieddate
-          returning shiftid, "name", starttime, endtime, modifieddate
+          returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
        """
       .executeInsert(ShiftRow.rowParser(1).single)
   

@@ -8,11 +8,11 @@ package person
 package emailaddress
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object EmailaddressRepoImpl extends EmailaddressRepo {
@@ -22,7 +22,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   override def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
     SQL"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.emailaddressid}::int4, ${unsaved.emailaddress}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
   
@@ -41,19 +41,19 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.emailaddress default values
-            returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+            returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
          """
         .executeInsert(EmailaddressRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.emailaddress(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+                  returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -64,12 +64,12 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
           from person.emailaddress
        """.as(EmailaddressRow.rowParser(1).*)
   }
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
-    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+    SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
           from person.emailaddress
           where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
        """.as(EmailaddressRow.rowParser(1).singleOpt)
@@ -97,7 +97,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             emailaddress = EXCLUDED.emailaddress,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
   

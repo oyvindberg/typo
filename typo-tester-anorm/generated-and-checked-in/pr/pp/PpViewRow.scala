@@ -7,15 +7,17 @@ package adventureworks
 package pr
 package pp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PpViewRow(
@@ -31,50 +33,46 @@ case class PpViewRow(
   /** Points to [[production.productphoto.ProductphotoRow.largephotofilename]] */
   largephotofilename: Option[/* max 50 chars */ String],
   /** Points to [[production.productphoto.ProductphotoRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PpViewRow {
-  def rowParser(idx: Int): RowParser[PpViewRow] =
-    RowParser[PpViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PpViewRow] = Reads[PpViewRow](json => JsResult.fromTry(
+      Try(
         PpViewRow(
-          id = row[Option[Int]](idx + 0),
-          productphotoid = row[Option[ProductphotoId]](idx + 1),
-          thumbnailphoto = row[Option[Byte]](idx + 2),
-          thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 3),
-          largephoto = row[Option[Byte]](idx + 4),
-          largephotofilename = row[Option[/* max 50 chars */ String]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          productphotoid = json.\("productphotoid").toOption.map(_.as[ProductphotoId]),
+          thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Byte]),
+          thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
+          largephoto = json.\("largephoto").toOption.map(_.as[Byte]),
+          largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PpViewRow] = new OFormat[PpViewRow]{
-    override def writes(o: PpViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "productphotoid" -> o.productphotoid,
-        "thumbnailphoto" -> o.thumbnailphoto,
-        "thumbnailphotofilename" -> o.thumbnailphotofilename,
-        "largephoto" -> o.largephoto,
-        "largephotofilename" -> o.largephotofilename,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PpViewRow] = RowParser[PpViewRow] { row =>
+    Success(
+      PpViewRow(
+        id = row[Option[Int]](idx + 0),
+        productphotoid = row[Option[ProductphotoId]](idx + 1),
+        thumbnailphoto = row[Option[Byte]](idx + 2),
+        thumbnailphotofilename = row[Option[/* max 50 chars */ String]](idx + 3),
+        largephoto = row[Option[Byte]](idx + 4),
+        largephotofilename = row[Option[/* max 50 chars */ String]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PpViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PpViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            productphotoid = json.\("productphotoid").toOption.map(_.as[ProductphotoId]),
-            thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as[Byte]),
-            thumbnailphotofilename = json.\("thumbnailphotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-            largephoto = json.\("largephoto").toOption.map(_.as[Byte]),
-            largephotofilename = json.\("largephotofilename").toOption.map(_.as[/* max 50 chars */ String]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PpViewRow] = OWrites[PpViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "productphotoid" -> Json.toJson(o.productphotoid),
+      "thumbnailphoto" -> Json.toJson(o.thumbnailphoto),
+      "thumbnailphotofilename" -> Json.toJson(o.thumbnailphotofilename),
+      "largephoto" -> Json.toJson(o.largephoto),
+      "largephotofilename" -> Json.toJson(o.largephotofilename),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

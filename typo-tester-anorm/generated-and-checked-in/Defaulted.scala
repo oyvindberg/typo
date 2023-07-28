@@ -24,7 +24,7 @@ sealed trait Defaulted[+T]
 object Defaulted {
   case class Provided[T](value: T) extends Defaulted[T]
   case object UseDefault extends Defaulted[Nothing]
-  implicit def reads[T: Reads]: Reads[Defaulted[T]] = {
+  implicit def reads[T](implicit T: Reads[T]): Reads[Defaulted[T]] = {
     case JsString("defaulted") =>
       JsSuccess(Defaulted.UseDefault)
     case JsObject(Seq(("provided", providedJson: JsValue))) =>
@@ -32,8 +32,7 @@ object Defaulted {
     case _ =>
       JsError(s"Expected `Defaulted` json object structure")
   }
-  
-  implicit def readsOpt[T: Reads]: Reads[Defaulted[Option[T]]] = {
+  implicit def readsOpt[T](implicit T: Reads[T]): Reads[Defaulted[Option[T]]] = {
     case JsString("defaulted") =>
       JsSuccess(Defaulted.UseDefault)
     case JsObject(Seq(("provided", JsNull))) =>
@@ -43,10 +42,8 @@ object Defaulted {
     case _ =>
       JsError(s"Expected `Defaulted` json object structure")
   }
-  
-  implicit def writes[T: play.api.libs.json.Writes]: Writes[Defaulted[T]] = {
-    case Defaulted.Provided(value) => Json.obj("provided" -> implicitly[Writes[T]].writes(value))
+  implicit def writes[T](implicit T: Writes[T]): Writes[Defaulted[T]] = {
+    case Defaulted.Provided(value) => Json.obj("provided" -> T.writes(value))
     case Defaulted.UseDefault      => JsString("defaulted")
   }
-
 }

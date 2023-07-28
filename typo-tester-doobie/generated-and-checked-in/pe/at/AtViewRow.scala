@@ -7,17 +7,15 @@ package adventureworks
 package pe
 package at
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class AtViewRow(
@@ -29,46 +27,26 @@ case class AtViewRow(
   /** Points to [[person.addresstype.AddresstypeRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.addresstype.AddresstypeRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object AtViewRow {
-  implicit val decoder: Decoder[AtViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        addresstypeid <- c.downField("addresstypeid").as[Option[AddresstypeId]]
-        name <- c.downField("name").as[Option[Name]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield AtViewRow(id, addresstypeid, name, rowguid, modifieddate)
-  implicit val encoder: Encoder[AtViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "addresstypeid" := row.addresstypeid,
-        "name" := row.name,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[AtViewRow] =
-    new Read[AtViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[AddresstypeId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => AtViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        addresstypeid = Get[AddresstypeId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[AtViewRow] = Decoder.forProduct5[AtViewRow, Option[Int], Option[AddresstypeId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "addresstypeid", "name", "rowguid", "modifieddate")(AtViewRow.apply)
+  implicit val encoder: Encoder[AtViewRow] = Encoder.forProduct5[AtViewRow, Option[Int], Option[AddresstypeId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "addresstypeid", "name", "rowguid", "modifieddate")(x => (x.id, x.addresstypeid, x.name, x.rowguid, x.modifieddate))
+  implicit val read: Read[AtViewRow] = new Read[AtViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[AddresstypeId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => AtViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      addresstypeid = Get[AddresstypeId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

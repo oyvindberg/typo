@@ -8,13 +8,11 @@ package information_schema
 package `_pg_foreign_tables`
 
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgForeignTablesViewRow(
@@ -28,50 +26,26 @@ case class PgForeignTablesViewRow(
 )
 
 object PgForeignTablesViewRow {
-  implicit val decoder: Decoder[PgForeignTablesViewRow] =
-    (c: HCursor) =>
-      for {
-        foreignTableCatalog <- c.downField("foreign_table_catalog").as[Option[SqlIdentifier]]
-        foreignTableSchema <- c.downField("foreign_table_schema").as[Option[SqlIdentifier]]
-        foreignTableName <- c.downField("foreign_table_name").as[Option[SqlIdentifier]]
-        ftoptions <- c.downField("ftoptions").as[Option[Array[String]]]
-        foreignServerCatalog <- c.downField("foreign_server_catalog").as[Option[SqlIdentifier]]
-        foreignServerName <- c.downField("foreign_server_name").as[Option[SqlIdentifier]]
-        authorizationIdentifier <- c.downField("authorization_identifier").as[Option[SqlIdentifier]]
-      } yield PgForeignTablesViewRow(foreignTableCatalog, foreignTableSchema, foreignTableName, ftoptions, foreignServerCatalog, foreignServerName, authorizationIdentifier)
-  implicit val encoder: Encoder[PgForeignTablesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "foreign_table_catalog" := row.foreignTableCatalog,
-        "foreign_table_schema" := row.foreignTableSchema,
-        "foreign_table_name" := row.foreignTableName,
-        "ftoptions" := row.ftoptions,
-        "foreign_server_catalog" := row.foreignServerCatalog,
-        "foreign_server_name" := row.foreignServerName,
-        "authorization_identifier" := row.authorizationIdentifier
-      )}
-  implicit val read: Read[PgForeignTablesViewRow] =
-    new Read[PgForeignTablesViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgForeignTablesViewRow(
-        foreignTableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        foreignTableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        foreignTableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        ftoptions = Get[Array[String]].unsafeGetNullable(rs, i + 3),
-        foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PgForeignTablesViewRow] = Decoder.forProduct7[PgForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[Array[String]], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "ftoptions", "foreign_server_catalog", "foreign_server_name", "authorization_identifier")(PgForeignTablesViewRow.apply)
+  implicit val encoder: Encoder[PgForeignTablesViewRow] = Encoder.forProduct7[PgForeignTablesViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[Array[String]], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("foreign_table_catalog", "foreign_table_schema", "foreign_table_name", "ftoptions", "foreign_server_catalog", "foreign_server_name", "authorization_identifier")(x => (x.foreignTableCatalog, x.foreignTableSchema, x.foreignTableName, x.ftoptions, x.foreignServerCatalog, x.foreignServerName, x.authorizationIdentifier))
+  implicit val read: Read[PgForeignTablesViewRow] = new Read[PgForeignTablesViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgForeignTablesViewRow(
+      foreignTableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      foreignTableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      foreignTableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      ftoptions = Get[Array[String]].unsafeGetNullable(rs, i + 3),
+      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

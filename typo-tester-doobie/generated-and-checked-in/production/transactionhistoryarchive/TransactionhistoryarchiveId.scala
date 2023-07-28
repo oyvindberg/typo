@@ -7,18 +7,19 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.transactionhistoryarchive` */
 case class TransactionhistoryarchiveId(value: Int) extends AnyVal
 object TransactionhistoryarchiveId {
+  implicit val arrayGet: Get[Array[TransactionhistoryarchiveId]] = Get[Array[Int]].map(_.map(TransactionhistoryarchiveId.apply))
+  implicit val arrayPut: Put[Array[TransactionhistoryarchiveId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[TransactionhistoryarchiveId] = Decoder[Int].map(TransactionhistoryarchiveId.apply)
+  implicit val encoder: Encoder[TransactionhistoryarchiveId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[TransactionhistoryarchiveId] = Get[Int].map(TransactionhistoryarchiveId.apply)
   implicit val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[TransactionhistoryarchiveId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[TransactionhistoryarchiveId] =
-    Decoder[Int].map(TransactionhistoryarchiveId(_))
-  implicit val meta: Meta[TransactionhistoryarchiveId] = Meta[Int].imap(TransactionhistoryarchiveId.apply)(_.value)
-  implicit val metaArray: Meta[Array[TransactionhistoryarchiveId]] = Meta[Array[Int]].imap(_.map(TransactionhistoryarchiveId.apply))(_.map(_.value))
+  implicit val put: Put[TransactionhistoryarchiveId] = Put[Int].contramap(_.value)
 }

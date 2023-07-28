@@ -6,48 +6,24 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.geometric.PGlseg
 import org.postgresql.geometric.PGpoint
 
 /** This implements a line represented by the linear equation Ax + By + C = 0 */
 case class TypoLineSegment(p1: TypoPoint, p2: TypoPoint)
+
 object TypoLineSegment {
-  implicit val decoder: Decoder[TypoLineSegment] =
-    (c: HCursor) =>
-      for {
-        p1 <- c.downField("p1").as[TypoPoint]
-        p2 <- c.downField("p2").as[TypoPoint]
-      } yield TypoLineSegment(p1, p2)
-  implicit val encoder: Encoder[TypoLineSegment] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "p1" := row.p1,
-        "p2" := row.p2
-      )}
-  implicit val get: Get[TypoLineSegment] =
-    Get.Advanced.other[PGlseg](cats.data.NonEmptyList.one("lseg"))
-      .map(v => TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
-  
-  implicit val put: Put[TypoLineSegment] =
-    Put.Advanced.other[PGlseg](NonEmptyList.one("lseg"))
-      .contramap(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y)))
-  
-  implicit val meta: Meta[TypoLineSegment] = new Meta(get, put)
-  val gets: Get[Array[TypoLineSegment]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_lseg"))
-      .map(_.map(v => TypoLineSegment(TypoPoint(v.asInstanceOf[PGlseg].point(0).x, v.asInstanceOf[PGlseg].point(0).y), TypoPoint(v.asInstanceOf[PGlseg].point(1).x, v.asInstanceOf[PGlseg].point(1).y))))
-  
-  val puts: Put[Array[TypoLineSegment]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_lseg"), "lseg")
-      .contramap(_.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
-  
-  implicit val metas: Meta[Array[TypoLineSegment]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoLineSegment]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_lseg"))
+    .map(_.map(v => TypoLineSegment(TypoPoint(v.asInstanceOf[PGlseg].point(0).x, v.asInstanceOf[PGlseg].point(0).y), TypoPoint(v.asInstanceOf[PGlseg].point(1).x, v.asInstanceOf[PGlseg].point(1).y))))
+  implicit val arrayPut: Put[Array[TypoLineSegment]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_lseg"), "lseg")
+    .contramap(_.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
+  implicit val decoder: Decoder[TypoLineSegment] = Decoder.forProduct2[TypoLineSegment, TypoPoint, TypoPoint]("p1", "p2")(TypoLineSegment.apply)
+  implicit val encoder: Encoder[TypoLineSegment] = Encoder.forProduct2[TypoLineSegment, TypoPoint, TypoPoint]("p1", "p2")(x => (x.p1, x.p2))
+  implicit val get: Get[TypoLineSegment] = Get.Advanced.other[PGlseg](NonEmptyList.one("lseg"))
+    .map(v => TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
+  implicit val put: Put[TypoLineSegment] = Put.Advanced.other[PGlseg](NonEmptyList.one("lseg")).contramap(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y)))
 }

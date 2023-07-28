@@ -3,17 +3,19 @@ package internal
 package codegen
 
 object PackageObjectFile {
-  def packageObject(options: InternalOptions): sc.File = {
+  def packageObject(options: InternalOptions): Option[sc.File] = {
     val parentPkg = NonEmptyList.fromList(options.pkg.idents.dropRight(1))
-    val content =
-      code"""|${parentPkg.fold(sc.Code.Empty)(nonEmpty => code"package ${nonEmpty.map(_.code).mkCode(".")}")}
+    val instances = options.dbLib.toList.flatMap(_.missingInstances) ++ options.jsonLibs.flatMap(_.missingInstances)
+    if (instances.isEmpty) None
+    else {
+      val content =
+        code"""|${parentPkg.fold(sc.Code.Empty)(nonEmpty => code"package ${nonEmpty.map(_.code).mkCode(".")}")}
              |
-             |package object ${options.pkg.name} {
-             |  ${options.dbLib.toList.flatMap(_.missingInstances).mkCode("\n")}
-             |}
+             |${code"package " ++ genObject(options.pkg, instances)}
              |""".stripMargin
 
-    sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content, secondaryTypes = Nil)
+      Some(sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content, secondaryTypes = Nil))
+    }
   }
 
 }

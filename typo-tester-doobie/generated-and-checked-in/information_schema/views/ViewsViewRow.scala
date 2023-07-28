@@ -10,13 +10,11 @@ package views
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class ViewsViewRow(
@@ -33,62 +31,32 @@ case class ViewsViewRow(
 )
 
 object ViewsViewRow {
-  implicit val decoder: Decoder[ViewsViewRow] =
-    (c: HCursor) =>
-      for {
-        tableCatalog <- c.downField("table_catalog").as[Option[SqlIdentifier]]
-        tableSchema <- c.downField("table_schema").as[Option[SqlIdentifier]]
-        tableName <- c.downField("table_name").as[Option[SqlIdentifier]]
-        viewDefinition <- c.downField("view_definition").as[Option[CharacterData]]
-        checkOption <- c.downField("check_option").as[Option[CharacterData]]
-        isUpdatable <- c.downField("is_updatable").as[Option[YesOrNo]]
-        isInsertableInto <- c.downField("is_insertable_into").as[Option[YesOrNo]]
-        isTriggerUpdatable <- c.downField("is_trigger_updatable").as[Option[YesOrNo]]
-        isTriggerDeletable <- c.downField("is_trigger_deletable").as[Option[YesOrNo]]
-        isTriggerInsertableInto <- c.downField("is_trigger_insertable_into").as[Option[YesOrNo]]
-      } yield ViewsViewRow(tableCatalog, tableSchema, tableName, viewDefinition, checkOption, isUpdatable, isInsertableInto, isTriggerUpdatable, isTriggerDeletable, isTriggerInsertableInto)
-  implicit val encoder: Encoder[ViewsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "table_catalog" := row.tableCatalog,
-        "table_schema" := row.tableSchema,
-        "table_name" := row.tableName,
-        "view_definition" := row.viewDefinition,
-        "check_option" := row.checkOption,
-        "is_updatable" := row.isUpdatable,
-        "is_insertable_into" := row.isInsertableInto,
-        "is_trigger_updatable" := row.isTriggerUpdatable,
-        "is_trigger_deletable" := row.isTriggerDeletable,
-        "is_trigger_insertable_into" := row.isTriggerInsertableInto
-      )}
-  implicit val read: Read[ViewsViewRow] =
-    new Read[ViewsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ViewsViewRow(
-        tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        viewDefinition = Get[CharacterData].unsafeGetNullable(rs, i + 3),
-        checkOption = Get[CharacterData].unsafeGetNullable(rs, i + 4),
-        isUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 5),
-        isInsertableInto = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
-        isTriggerUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 7),
-        isTriggerDeletable = Get[YesOrNo].unsafeGetNullable(rs, i + 8),
-        isTriggerInsertableInto = Get[YesOrNo].unsafeGetNullable(rs, i + 9)
-      )
+  implicit val decoder: Decoder[ViewsViewRow] = Decoder.forProduct10[ViewsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("table_catalog", "table_schema", "table_name", "view_definition", "check_option", "is_updatable", "is_insertable_into", "is_trigger_updatable", "is_trigger_deletable", "is_trigger_insertable_into")(ViewsViewRow.apply)
+  implicit val encoder: Encoder[ViewsViewRow] = Encoder.forProduct10[ViewsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo], Option[YesOrNo]]("table_catalog", "table_schema", "table_name", "view_definition", "check_option", "is_updatable", "is_insertable_into", "is_trigger_updatable", "is_trigger_deletable", "is_trigger_insertable_into")(x => (x.tableCatalog, x.tableSchema, x.tableName, x.viewDefinition, x.checkOption, x.isUpdatable, x.isInsertableInto, x.isTriggerUpdatable, x.isTriggerDeletable, x.isTriggerInsertableInto))
+  implicit val read: Read[ViewsViewRow] = new Read[ViewsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ViewsViewRow(
+      tableCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      tableSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      tableName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      viewDefinition = Get[CharacterData].unsafeGetNullable(rs, i + 3),
+      checkOption = Get[CharacterData].unsafeGetNullable(rs, i + 4),
+      isUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 5),
+      isInsertableInto = Get[YesOrNo].unsafeGetNullable(rs, i + 6),
+      isTriggerUpdatable = Get[YesOrNo].unsafeGetNullable(rs, i + 7),
+      isTriggerDeletable = Get[YesOrNo].unsafeGetNullable(rs, i + 8),
+      isTriggerInsertableInto = Get[YesOrNo].unsafeGetNullable(rs, i + 9)
     )
-  
-
+  )
 }

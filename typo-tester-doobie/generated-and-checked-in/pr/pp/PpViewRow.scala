@@ -7,16 +7,14 @@ package adventureworks
 package pr
 package pp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PpViewRow(
   id: Option[Int],
@@ -31,54 +29,30 @@ case class PpViewRow(
   /** Points to [[production.productphoto.ProductphotoRow.largephotofilename]] */
   largephotofilename: Option[/* max 50 chars */ String],
   /** Points to [[production.productphoto.ProductphotoRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PpViewRow {
-  implicit val decoder: Decoder[PpViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productphotoid <- c.downField("productphotoid").as[Option[ProductphotoId]]
-        thumbnailphoto <- c.downField("thumbnailphoto").as[Option[Byte]]
-        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[/* max 50 chars */ String]]
-        largephoto <- c.downField("largephoto").as[Option[Byte]]
-        largephotofilename <- c.downField("largephotofilename").as[Option[/* max 50 chars */ String]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PpViewRow(id, productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
-  implicit val encoder: Encoder[PpViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productphotoid" := row.productphotoid,
-        "thumbnailphoto" := row.thumbnailphoto,
-        "thumbnailphotofilename" := row.thumbnailphotofilename,
-        "largephoto" := row.largephoto,
-        "largephotofilename" := row.largephotofilename,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PpViewRow] =
-    new Read[PpViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductphotoId], Nullability.Nullable),
-        (Get[Byte], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Byte], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productphotoid = Get[ProductphotoId].unsafeGetNullable(rs, i + 1),
-        thumbnailphoto = Get[Byte].unsafeGetNullable(rs, i + 2),
-        thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
-        largephoto = Get[Byte].unsafeGetNullable(rs, i + 4),
-        largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[PpViewRow] = Decoder.forProduct7[PpViewRow, Option[Int], Option[ProductphotoId], Option[Byte], Option[/* max 50 chars */ String], Option[Byte], Option[/* max 50 chars */ String], Option[TypoLocalDateTime]]("id", "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(PpViewRow.apply)
+  implicit val encoder: Encoder[PpViewRow] = Encoder.forProduct7[PpViewRow, Option[Int], Option[ProductphotoId], Option[Byte], Option[/* max 50 chars */ String], Option[Byte], Option[/* max 50 chars */ String], Option[TypoLocalDateTime]]("id", "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.id, x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))
+  implicit val read: Read[PpViewRow] = new Read[PpViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductphotoId], Nullability.Nullable),
+      (Get[Byte], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Byte], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productphotoid = Get[ProductphotoId].unsafeGetNullable(rs, i + 1),
+      thumbnailphoto = Get[Byte].unsafeGetNullable(rs, i + 2),
+      thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
+      largephoto = Get[Byte].unsafeGetNullable(rs, i + 4),
+      largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

@@ -7,18 +7,19 @@ package adventureworks
 package humanresources
 package shift
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `humanresources.shift` */
 case class ShiftId(value: Int) extends AnyVal
 object ShiftId {
+  implicit val arrayGet: Get[Array[ShiftId]] = Get[Array[Int]].map(_.map(ShiftId.apply))
+  implicit val arrayPut: Put[Array[ShiftId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[ShiftId] = Decoder[Int].map(ShiftId.apply)
+  implicit val encoder: Encoder[ShiftId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[ShiftId] = Get[Int].map(ShiftId.apply)
   implicit val ordering: Ordering[ShiftId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[ShiftId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[ShiftId] =
-    Decoder[Int].map(ShiftId(_))
-  implicit val meta: Meta[ShiftId] = Meta[Int].imap(ShiftId.apply)(_.value)
-  implicit val metaArray: Meta[Array[ShiftId]] = Meta[Array[Int]].imap(_.map(ShiftId.apply))(_.map(_.value))
+  implicit val put: Put[ShiftId] = Put[Int].contramap(_.value)
 }

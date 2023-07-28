@@ -8,12 +8,14 @@ package production
 package transactionhistoryarchive
 
 import adventureworks.Defaulted
-import java.time.LocalDateTime
+import adventureworks.TypoLocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.transactionhistoryarchive` which has not been persisted yet */
@@ -35,11 +37,11 @@ case class TransactionhistoryarchiveRowUnsaved(
   referenceorderlineid: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: now()
       Date and time of the transaction. */
-  transactiondate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  transactiondate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(referenceorderlineidDefault: => Int, transactiondateDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): TransactionhistoryarchiveRow =
+  def toRow(referenceorderlineidDefault: => Int, transactiondateDefault: => TypoLocalDateTime, modifieddateDefault: => TypoLocalDateTime): TransactionhistoryarchiveRow =
     TransactionhistoryarchiveRow(
       transactionid = transactionid,
       productid = productid,
@@ -62,36 +64,33 @@ case class TransactionhistoryarchiveRowUnsaved(
     )
 }
 object TransactionhistoryarchiveRowUnsaved {
-  implicit val oFormat: OFormat[TransactionhistoryarchiveRowUnsaved] = new OFormat[TransactionhistoryarchiveRowUnsaved]{
-    override def writes(o: TransactionhistoryarchiveRowUnsaved): JsObject =
-      Json.obj(
-        "transactionid" -> o.transactionid,
-        "productid" -> o.productid,
-        "referenceorderid" -> o.referenceorderid,
-        "transactiontype" -> o.transactiontype,
-        "quantity" -> o.quantity,
-        "actualcost" -> o.actualcost,
-        "referenceorderlineid" -> o.referenceorderlineid,
-        "transactiondate" -> o.transactiondate,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[TransactionhistoryarchiveRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          TransactionhistoryarchiveRowUnsaved(
-            transactionid = json.\("transactionid").as[TransactionhistoryarchiveId],
-            productid = json.\("productid").as[Int],
-            referenceorderid = json.\("referenceorderid").as[Int],
-            transactiontype = json.\("transactiontype").as[/* bpchar */ String],
-            quantity = json.\("quantity").as[Int],
-            actualcost = json.\("actualcost").as[BigDecimal],
-            referenceorderlineid = json.\("referenceorderlineid").as[Defaulted[Int]],
-            transactiondate = json.\("transactiondate").as[Defaulted[LocalDateTime]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[TransactionhistoryarchiveRowUnsaved] = Reads[TransactionhistoryarchiveRowUnsaved](json => JsResult.fromTry(
+      Try(
+        TransactionhistoryarchiveRowUnsaved(
+          transactionid = json.\("transactionid").as[TransactionhistoryarchiveId],
+          productid = json.\("productid").as[Int],
+          referenceorderid = json.\("referenceorderid").as[Int],
+          transactiontype = json.\("transactiontype").as[/* bpchar */ String],
+          quantity = json.\("quantity").as[Int],
+          actualcost = json.\("actualcost").as[BigDecimal],
+          referenceorderlineid = json.\("referenceorderlineid").as[Defaulted[Int]],
+          transactiondate = json.\("transactiondate").as[Defaulted[TypoLocalDateTime]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[TransactionhistoryarchiveRowUnsaved] = OWrites[TransactionhistoryarchiveRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "transactionid" -> Json.toJson(o.transactionid),
+      "productid" -> Json.toJson(o.productid),
+      "referenceorderid" -> Json.toJson(o.referenceorderid),
+      "transactiontype" -> Json.toJson(o.transactiontype),
+      "quantity" -> Json.toJson(o.quantity),
+      "actualcost" -> Json.toJson(o.actualcost),
+      "referenceorderlineid" -> Json.toJson(o.referenceorderlineid),
+      "transactiondate" -> Json.toJson(o.transactiondate),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

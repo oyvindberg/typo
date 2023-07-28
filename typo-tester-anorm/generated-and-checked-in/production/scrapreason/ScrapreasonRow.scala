@@ -7,15 +7,17 @@ package adventureworks
 package production
 package scrapreason
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ScrapreasonRow(
@@ -23,38 +25,34 @@ case class ScrapreasonRow(
   scrapreasonid: ScrapreasonId,
   /** Failure description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ScrapreasonRow {
-  def rowParser(idx: Int): RowParser[ScrapreasonRow] =
-    RowParser[ScrapreasonRow] { row =>
-      Success(
+  implicit val reads: Reads[ScrapreasonRow] = Reads[ScrapreasonRow](json => JsResult.fromTry(
+      Try(
         ScrapreasonRow(
-          scrapreasonid = row[ScrapreasonId](idx + 0),
-          name = row[Name](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          scrapreasonid = json.\("scrapreasonid").as[ScrapreasonId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ScrapreasonRow] = new OFormat[ScrapreasonRow]{
-    override def writes(o: ScrapreasonRow): JsObject =
-      Json.obj(
-        "scrapreasonid" -> o.scrapreasonid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ScrapreasonRow] = RowParser[ScrapreasonRow] { row =>
+    Success(
+      ScrapreasonRow(
+        scrapreasonid = row[ScrapreasonId](idx + 0),
+        name = row[Name](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[ScrapreasonRow] = {
-      JsResult.fromTry(
-        Try(
-          ScrapreasonRow(
-            scrapreasonid = json.\("scrapreasonid").as[ScrapreasonId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ScrapreasonRow] = OWrites[ScrapreasonRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

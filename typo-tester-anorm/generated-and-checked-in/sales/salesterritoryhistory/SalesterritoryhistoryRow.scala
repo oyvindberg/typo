@@ -7,17 +7,19 @@ package adventureworks
 package sales
 package salesterritoryhistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SalesterritoryhistoryRow(
@@ -28,53 +30,49 @@ case class SalesterritoryhistoryRow(
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   /** Primary key. Date the sales representive started work in the territory. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Date the sales representative left work in the territory. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesterritoryhistoryId = SalesterritoryhistoryId(businessentityid, startdate, territoryid)
  }
 
 object SalesterritoryhistoryRow {
-  def rowParser(idx: Int): RowParser[SalesterritoryhistoryRow] =
-    RowParser[SalesterritoryhistoryRow] { row =>
-      Success(
+  implicit val reads: Reads[SalesterritoryhistoryRow] = Reads[SalesterritoryhistoryRow](json => JsResult.fromTry(
+      Try(
         SalesterritoryhistoryRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          territoryid = row[SalesterritoryId](idx + 1),
-          startdate = row[LocalDateTime](idx + 2),
-          enddate = row[Option[LocalDateTime]](idx + 3),
-          rowguid = row[UUID](idx + 4),
-          modifieddate = row[LocalDateTime](idx + 5)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          territoryid = json.\("territoryid").as[SalesterritoryId],
+          startdate = json.\("startdate").as[TypoLocalDateTime],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[SalesterritoryhistoryRow] = new OFormat[SalesterritoryhistoryRow]{
-    override def writes(o: SalesterritoryhistoryRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "territoryid" -> o.territoryid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SalesterritoryhistoryRow] = RowParser[SalesterritoryhistoryRow] { row =>
+    Success(
+      SalesterritoryhistoryRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        territoryid = row[SalesterritoryId](idx + 1),
+        startdate = row[TypoLocalDateTime](idx + 2),
+        enddate = row[Option[TypoLocalDateTime]](idx + 3),
+        rowguid = row[UUID](idx + 4),
+        modifieddate = row[TypoLocalDateTime](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[SalesterritoryhistoryRow] = {
-      JsResult.fromTry(
-        Try(
-          SalesterritoryhistoryRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            territoryid = json.\("territoryid").as[SalesterritoryId],
-            startdate = json.\("startdate").as[LocalDateTime],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SalesterritoryhistoryRow] = OWrites[SalesterritoryhistoryRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

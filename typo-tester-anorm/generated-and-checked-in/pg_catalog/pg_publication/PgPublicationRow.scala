@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPublicationRow(
@@ -29,52 +31,48 @@ case class PgPublicationRow(
 )
 
 object PgPublicationRow {
-  def rowParser(idx: Int): RowParser[PgPublicationRow] =
-    RowParser[PgPublicationRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPublicationRow] = Reads[PgPublicationRow](json => JsResult.fromTry(
+      Try(
         PgPublicationRow(
-          oid = row[PgPublicationId](idx + 0),
-          pubname = row[String](idx + 1),
-          pubowner = row[/* oid */ Long](idx + 2),
-          puballtables = row[Boolean](idx + 3),
-          pubinsert = row[Boolean](idx + 4),
-          pubupdate = row[Boolean](idx + 5),
-          pubdelete = row[Boolean](idx + 6),
-          pubtruncate = row[Boolean](idx + 7),
-          pubviaroot = row[Boolean](idx + 8)
+          oid = json.\("oid").as[PgPublicationId],
+          pubname = json.\("pubname").as[String],
+          pubowner = json.\("pubowner").as[/* oid */ Long],
+          puballtables = json.\("puballtables").as[Boolean],
+          pubinsert = json.\("pubinsert").as[Boolean],
+          pubupdate = json.\("pubupdate").as[Boolean],
+          pubdelete = json.\("pubdelete").as[Boolean],
+          pubtruncate = json.\("pubtruncate").as[Boolean],
+          pubviaroot = json.\("pubviaroot").as[Boolean]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPublicationRow] = new OFormat[PgPublicationRow]{
-    override def writes(o: PgPublicationRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "pubname" -> o.pubname,
-        "pubowner" -> o.pubowner,
-        "puballtables" -> o.puballtables,
-        "pubinsert" -> o.pubinsert,
-        "pubupdate" -> o.pubupdate,
-        "pubdelete" -> o.pubdelete,
-        "pubtruncate" -> o.pubtruncate,
-        "pubviaroot" -> o.pubviaroot
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPublicationRow] = RowParser[PgPublicationRow] { row =>
+    Success(
+      PgPublicationRow(
+        oid = row[PgPublicationId](idx + 0),
+        pubname = row[String](idx + 1),
+        pubowner = row[/* oid */ Long](idx + 2),
+        puballtables = row[Boolean](idx + 3),
+        pubinsert = row[Boolean](idx + 4),
+        pubupdate = row[Boolean](idx + 5),
+        pubdelete = row[Boolean](idx + 6),
+        pubtruncate = row[Boolean](idx + 7),
+        pubviaroot = row[Boolean](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPublicationRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPublicationRow(
-            oid = json.\("oid").as[PgPublicationId],
-            pubname = json.\("pubname").as[String],
-            pubowner = json.\("pubowner").as[/* oid */ Long],
-            puballtables = json.\("puballtables").as[Boolean],
-            pubinsert = json.\("pubinsert").as[Boolean],
-            pubupdate = json.\("pubupdate").as[Boolean],
-            pubdelete = json.\("pubdelete").as[Boolean],
-            pubtruncate = json.\("pubtruncate").as[Boolean],
-            pubviaroot = json.\("pubviaroot").as[Boolean]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPublicationRow] = OWrites[PgPublicationRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "pubname" -> Json.toJson(o.pubname),
+      "pubowner" -> Json.toJson(o.pubowner),
+      "puballtables" -> Json.toJson(o.puballtables),
+      "pubinsert" -> Json.toJson(o.pubinsert),
+      "pubupdate" -> Json.toJson(o.pubupdate),
+      "pubdelete" -> Json.toJson(o.pubdelete),
+      "pubtruncate" -> Json.toJson(o.pubtruncate),
+      "pubviaroot" -> Json.toJson(o.pubviaroot)
+    ))
+  )
 }

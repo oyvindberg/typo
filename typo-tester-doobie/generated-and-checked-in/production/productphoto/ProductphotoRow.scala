@@ -7,15 +7,13 @@ package adventureworks
 package production
 package productphoto
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class ProductphotoRow(
   /** Primary key for ProductPhoto records. */
@@ -28,50 +26,28 @@ case class ProductphotoRow(
   largephoto: Option[Array[Byte]],
   /** Large image file name. */
   largephotofilename: Option[/* max 50 chars */ String],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductphotoRow {
-  implicit val decoder: Decoder[ProductphotoRow] =
-    (c: HCursor) =>
-      for {
-        productphotoid <- c.downField("productphotoid").as[ProductphotoId]
-        thumbnailphoto <- c.downField("thumbnailphoto").as[Option[Array[Byte]]]
-        thumbnailphotofilename <- c.downField("thumbnailphotofilename").as[Option[/* max 50 chars */ String]]
-        largephoto <- c.downField("largephoto").as[Option[Array[Byte]]]
-        largephotofilename <- c.downField("largephotofilename").as[Option[/* max 50 chars */ String]]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductphotoRow(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
-  implicit val encoder: Encoder[ProductphotoRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productphotoid" := row.productphotoid,
-        "thumbnailphoto" := row.thumbnailphoto,
-        "thumbnailphotofilename" := row.thumbnailphotofilename,
-        "largephoto" := row.largephoto,
-        "largephotofilename" := row.largephotofilename,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductphotoRow] =
-    new Read[ProductphotoRow](
-      gets = List(
-        (Get[ProductphotoId], Nullability.NoNulls),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Array[Byte]], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductphotoRow(
-        productphotoid = Get[ProductphotoId].unsafeGetNonNullable(rs, i + 0),
-        thumbnailphoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 1),
-        thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        largephoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 3),
-        largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[ProductphotoRow] = Decoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(ProductphotoRow.apply)
+  implicit val encoder: Encoder[ProductphotoRow] = Encoder.forProduct6[ProductphotoRow, ProductphotoId, Option[Array[Byte]], Option[/* max 50 chars */ String], Option[Array[Byte]], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))
+  implicit val read: Read[ProductphotoRow] = new Read[ProductphotoRow](
+    gets = List(
+      (Get[ProductphotoId], Nullability.NoNulls),
+      (Get[Array[Byte]], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Array[Byte]], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductphotoRow(
+      productphotoid = Get[ProductphotoId].unsafeGetNonNullable(rs, i + 0),
+      thumbnailphoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 1),
+      thumbnailphotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
+      largephoto = Get[Array[Byte]].unsafeGetNullable(rs, i + 3),
+      largephotofilename = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

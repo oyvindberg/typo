@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_indexes
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgIndexesViewRow(
@@ -25,42 +23,22 @@ case class PgIndexesViewRow(
 )
 
 object PgIndexesViewRow {
-  implicit val decoder: Decoder[PgIndexesViewRow] =
-    (c: HCursor) =>
-      for {
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        tablename <- c.downField("tablename").as[Option[String]]
-        indexname <- c.downField("indexname").as[Option[String]]
-        tablespace <- c.downField("tablespace").as[Option[String]]
-        indexdef <- c.downField("indexdef").as[Option[String]]
-      } yield PgIndexesViewRow(schemaname, tablename, indexname, tablespace, indexdef)
-  implicit val encoder: Encoder[PgIndexesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "schemaname" := row.schemaname,
-        "tablename" := row.tablename,
-        "indexname" := row.indexname,
-        "tablespace" := row.tablespace,
-        "indexdef" := row.indexdef
-      )}
-  implicit val read: Read[PgIndexesViewRow] =
-    new Read[PgIndexesViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgIndexesViewRow(
-        schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-        tablename = Get[String].unsafeGetNullable(rs, i + 1),
-        indexname = Get[String].unsafeGetNullable(rs, i + 2),
-        tablespace = Get[String].unsafeGetNullable(rs, i + 3),
-        indexdef = Get[String].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[PgIndexesViewRow] = Decoder.forProduct5[PgIndexesViewRow, Option[String], Option[String], Option[String], Option[String], Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(PgIndexesViewRow.apply)
+  implicit val encoder: Encoder[PgIndexesViewRow] = Encoder.forProduct5[PgIndexesViewRow, Option[String], Option[String], Option[String], Option[String], Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(x => (x.schemaname, x.tablename, x.indexname, x.tablespace, x.indexdef))
+  implicit val read: Read[PgIndexesViewRow] = new Read[PgIndexesViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgIndexesViewRow(
+      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
+      tablename = Get[String].unsafeGetNullable(rs, i + 1),
+      indexname = Get[String].unsafeGetNullable(rs, i + 2),
+      tablespace = Get[String].unsafeGetNullable(rs, i + 3),
+      indexdef = Get[String].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

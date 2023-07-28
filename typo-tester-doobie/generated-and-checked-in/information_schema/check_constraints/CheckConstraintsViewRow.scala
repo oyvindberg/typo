@@ -9,13 +9,11 @@ package check_constraints
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class CheckConstraintsViewRow(
@@ -26,38 +24,20 @@ case class CheckConstraintsViewRow(
 )
 
 object CheckConstraintsViewRow {
-  implicit val decoder: Decoder[CheckConstraintsViewRow] =
-    (c: HCursor) =>
-      for {
-        constraintCatalog <- c.downField("constraint_catalog").as[Option[SqlIdentifier]]
-        constraintSchema <- c.downField("constraint_schema").as[Option[SqlIdentifier]]
-        constraintName <- c.downField("constraint_name").as[Option[SqlIdentifier]]
-        checkClause <- c.downField("check_clause").as[Option[CharacterData]]
-      } yield CheckConstraintsViewRow(constraintCatalog, constraintSchema, constraintName, checkClause)
-  implicit val encoder: Encoder[CheckConstraintsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "constraint_catalog" := row.constraintCatalog,
-        "constraint_schema" := row.constraintSchema,
-        "constraint_name" := row.constraintName,
-        "check_clause" := row.checkClause
-      )}
-  implicit val read: Read[CheckConstraintsViewRow] =
-    new Read[CheckConstraintsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CheckConstraintsViewRow(
-        constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        checkClause = Get[CharacterData].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[CheckConstraintsViewRow] = Decoder.forProduct4[CheckConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(CheckConstraintsViewRow.apply)
+  implicit val encoder: Encoder[CheckConstraintsViewRow] = Encoder.forProduct4[CheckConstraintsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("constraint_catalog", "constraint_schema", "constraint_name", "check_clause")(x => (x.constraintCatalog, x.constraintSchema, x.constraintName, x.checkClause))
+  implicit val read: Read[CheckConstraintsViewRow] = new Read[CheckConstraintsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CheckConstraintsViewRow(
+      constraintCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      constraintSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      constraintName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      checkClause = Get[CharacterData].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

@@ -10,19 +10,20 @@ package pg_ts_dict
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_ts_dict` */
 case class PgTsDictId(value: /* oid */ Long) extends AnyVal
 object PgTsDictId {
-  implicit val ordering: Ordering[PgTsDictId] = Ordering.by(_.value)
-  implicit val format: Format[PgTsDictId] = implicitly[Format[/* oid */ Long]].bimap(PgTsDictId.apply, _.value)
-  implicit val toStatement: ToStatement[PgTsDictId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgTsDictId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgTsDictId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit val column: Column[PgTsDictId] = implicitly[Column[/* oid */ Long]].map(PgTsDictId.apply)
+  implicit val ordering: Ordering[PgTsDictId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgTsDictId] = new ParameterMetaData[PgTsDictId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit val reads: Reads[PgTsDictId] = implicitly[Reads[/* oid */ Long]].map(PgTsDictId.apply)
+  implicit val toStatement: ToStatement[PgTsDictId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgTsDictId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
 }

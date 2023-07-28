@@ -17,6 +17,9 @@ package object typo {
   def fromMetaDb(publicOptions: Options, metaDb: MetaDb, selector: Selector): Generated = {
     val pkg = sc.Type.Qualified(publicOptions.pkg).value
     val naming = publicOptions.naming(pkg)
+    val default: ComputedDefault =
+      ComputedDefault(naming)
+
     val options = InternalOptions(
       pkg = pkg,
       jsonLibs = publicOptions.jsonLibs.map {
@@ -35,11 +38,8 @@ package object typo {
       debugTypes = publicOptions.debugTypes
     )
     val customTypes = new CustomTypes(options.pkg)
-
+    val genOrdering = new GenOrdering(customTypes, options.pkg)
     val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
-
-    val default: ComputedDefault =
-      ComputedDefault(naming)
 
     val computeds: SortedMap[db.RelationName, Lazy[HasSource]] =
       rewriteDependentData(metaDb.relations.map(rel => rel.name -> rel).toMap).apply[HasSource] {
@@ -63,7 +63,7 @@ package object typo {
 
     val relationFilesByName = computedRelations.flatMap {
       case viewComputed: ComputedView   => ViewFiles(viewComputed, options).all.map(x => (viewComputed.view.name, x))
-      case tableComputed: ComputedTable => TableFiles(tableComputed, options).all.map(x => (tableComputed.dbTable.name, x))
+      case tableComputed: ComputedTable => TableFiles(tableComputed, options, genOrdering).all.map(x => (tableComputed.dbTable.name, x))
       case _                            => Nil
     }
 
@@ -71,7 +71,7 @@ package object typo {
       List(
         List(DefaultFile(default, options.jsonLibs).file),
         metaDb.enums.map(StringEnumFile(naming, options)),
-        metaDb.domains.map(DomainFile(naming, options, scalaTypeMapper)),
+        metaDb.domains.map(DomainFile(naming, options, scalaTypeMapper, genOrdering)),
         customTypes.All.map(CustomTypeFile.apply(options)),
         relationFilesByName.map { case (_, f) => f },
         sqlFileFiles
@@ -89,7 +89,7 @@ package object typo {
 
     // package objects have weird scoping, so don't attempt to automatically write imports for them.
     // this should be a stop-gap solution anyway
-    val pkgObject = List(PackageObjectFile.packageObject(options))
+    val pkgObject = PackageObjectFile.packageObject(options)
 
     val allFiles = keptMostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
     Generated(allFiles.map(file => file.copy(contents = options.header.code ++ file.contents)))
@@ -102,7 +102,6 @@ package object typo {
     val toKeep: Set[sc.QIdent] = {
       val b = collection.mutable.HashSet.empty[sc.QIdent]
       b ++= entryPoints.map(_.tpe.value)
-
       entryPoints.foreach { f =>
         def goTree(tree: sc.Tree): Unit = {
           tree match {
@@ -114,23 +113,41 @@ package object typo {
               }
 
             case sc.Param(_, tpe, maybeCode) =>
-              go(tpe)
+              goTree(tpe)
               maybeCode.foreach(go)
             case sc.StrLit(_) => ()
+            case sc.Summon(tpe) =>
+              goTree(tpe)
             case sc.StringInterpolate(i, prefix, content) =>
               goTree(i)
               goTree(prefix)
               go(content)
+            case sc.Given(tparams, name, implicitParams, tpe, body) =>
+              tparams.foreach(goTree)
+              goTree(name)
+              implicitParams.foreach(goTree)
+              goTree(tpe)
+              go(body)
+            case sc.Value(tparams, name, params, tpe, body) =>
+              tparams.foreach(goTree)
+              goTree(name)
+              params.foreach(goTree)
+              goTree(tpe)
+              go(body)
+            case sc.Obj(name, members, body) =>
+              goTree(name)
+              members.foreach(goTree)
+              body.foreach(go)
             case sc.Type.Wildcard =>
               ()
             case sc.Type.TApply(underlying, targs) =>
-              go(underlying)
+              goTree(underlying)
               targs.foreach(goTree)
-            case sc.Type.Qualified(value)         => go(value)
+            case sc.Type.Qualified(value)         => goTree(value)
             case sc.Type.Abstract(_)              => ()
-            case sc.Type.Commented(underlying, _) => go(underlying)
-            case sc.Type.UserDefined(underlying)  => go(underlying)
-            case sc.Type.ByName(underlying)       => go(underlying)
+            case sc.Type.Commented(underlying, _) => goTree(underlying)
+            case sc.Type.UserDefined(underlying)  => goTree(underlying)
+            case sc.Type.ByName(underlying)       => goTree(underlying)
           }
         }
 

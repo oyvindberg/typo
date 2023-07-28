@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTimezoneNamesViewRow(
@@ -25,37 +27,33 @@ case class PgTimezoneNamesViewRow(
 )
 
 object PgTimezoneNamesViewRow {
-  def rowParser(idx: Int): RowParser[PgTimezoneNamesViewRow] =
-    RowParser[PgTimezoneNamesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTimezoneNamesViewRow] = Reads[PgTimezoneNamesViewRow](json => JsResult.fromTry(
+      Try(
         PgTimezoneNamesViewRow(
-          name = row[Option[String]](idx + 0),
-          abbrev = row[Option[String]](idx + 1),
-          utcOffset = row[Option[TypoInterval]](idx + 2),
-          isDst = row[Option[Boolean]](idx + 3)
+          name = json.\("name").toOption.map(_.as[String]),
+          abbrev = json.\("abbrev").toOption.map(_.as[String]),
+          utcOffset = json.\("utc_offset").toOption.map(_.as[TypoInterval]),
+          isDst = json.\("is_dst").toOption.map(_.as[Boolean])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTimezoneNamesViewRow] = new OFormat[PgTimezoneNamesViewRow]{
-    override def writes(o: PgTimezoneNamesViewRow): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "abbrev" -> o.abbrev,
-        "utc_offset" -> o.utcOffset,
-        "is_dst" -> o.isDst
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTimezoneNamesViewRow] = RowParser[PgTimezoneNamesViewRow] { row =>
+    Success(
+      PgTimezoneNamesViewRow(
+        name = row[Option[String]](idx + 0),
+        abbrev = row[Option[String]](idx + 1),
+        utcOffset = row[Option[TypoInterval]](idx + 2),
+        isDst = row[Option[Boolean]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTimezoneNamesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTimezoneNamesViewRow(
-            name = json.\("name").toOption.map(_.as[String]),
-            abbrev = json.\("abbrev").toOption.map(_.as[String]),
-            utcOffset = json.\("utc_offset").toOption.map(_.as[TypoInterval]),
-            isDst = json.\("is_dst").toOption.map(_.as[Boolean])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTimezoneNamesViewRow] = OWrites[PgTimezoneNamesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "abbrev" -> Json.toJson(o.abbrev),
+      "utc_offset" -> Json.toJson(o.utcOffset),
+      "is_dst" -> Json.toJson(o.isDst)
+    ))
+  )
 }

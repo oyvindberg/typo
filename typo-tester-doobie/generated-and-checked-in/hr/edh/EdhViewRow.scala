@@ -7,19 +7,17 @@ package adventureworks
 package hr
 package edh
 
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 case class EdhViewRow(
   id: Option[Int],
@@ -30,58 +28,34 @@ case class EdhViewRow(
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.shiftid]] */
   shiftid: Option[ShiftId],
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.startdate]] */
-  startdate: Option[LocalDate],
+  startdate: Option[TypoLocalDate],
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.enddate]] */
-  enddate: Option[LocalDate],
+  enddate: Option[TypoLocalDate],
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object EdhViewRow {
-  implicit val decoder: Decoder[EdhViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        departmentid <- c.downField("departmentid").as[Option[DepartmentId]]
-        shiftid <- c.downField("shiftid").as[Option[ShiftId]]
-        startdate <- c.downField("startdate").as[Option[LocalDate]]
-        enddate <- c.downField("enddate").as[Option[LocalDate]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield EdhViewRow(id, businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
-  implicit val encoder: Encoder[EdhViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "departmentid" := row.departmentid,
-        "shiftid" := row.shiftid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[EdhViewRow] =
-    new Read[EdhViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[DepartmentId], Nullability.Nullable),
-        (Get[ShiftId], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EdhViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        departmentid = Get[DepartmentId].unsafeGetNullable(rs, i + 2),
-        shiftid = Get[ShiftId].unsafeGetNullable(rs, i + 3),
-        startdate = Get[LocalDate].unsafeGetNullable(rs, i + 4),
-        enddate = Get[LocalDate].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[EdhViewRow] = Decoder.forProduct7[EdhViewRow, Option[Int], Option[BusinessentityId], Option[DepartmentId], Option[ShiftId], Option[TypoLocalDate], Option[TypoLocalDate], Option[TypoLocalDateTime]]("id", "businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EdhViewRow.apply)
+  implicit val encoder: Encoder[EdhViewRow] = Encoder.forProduct7[EdhViewRow, Option[Int], Option[BusinessentityId], Option[DepartmentId], Option[ShiftId], Option[TypoLocalDate], Option[TypoLocalDate], Option[TypoLocalDateTime]]("id", "businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.id, x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))
+  implicit val read: Read[EdhViewRow] = new Read[EdhViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[DepartmentId], Nullability.Nullable),
+      (Get[ShiftId], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => EdhViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      departmentid = Get[DepartmentId].unsafeGetNullable(rs, i + 2),
+      shiftid = Get[ShiftId].unsafeGetNullable(rs, i + 3),
+      startdate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 4),
+      enddate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

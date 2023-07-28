@@ -6,55 +6,33 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.util.PGobject
 
 /** jsonb (via PGObject) */
 case class TypoJsonb(value: String)
+
 object TypoJsonb {
-  implicit val decoder: Decoder[TypoJsonb] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[String]
-      } yield TypoJsonb(value)
-  implicit val encoder: Encoder[TypoJsonb] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoJsonb] =
-    Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("jsonb"))
-      .map(v => TypoJsonb(v.getValue))
-  
-  implicit val put: Put[TypoJsonb] =
-    Put.Advanced.other[PGobject](NonEmptyList.one("jsonb"))
-      .contramap(v => {
-                        val obj = new PGobject
-                        obj.setType("jsonb")
-                        obj.setValue(v.value)
-                        obj
-                      })
-  
-  implicit val meta: Meta[TypoJsonb] = new Meta(get, put)
-  val gets: Get[Array[TypoJsonb]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"))
-      .map(_.map(v => TypoJsonb(v.asInstanceOf[String])))
-  
-  val puts: Put[Array[TypoJsonb]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"), "jsonb")
-      .contramap(_.map(v => {
-                              val obj = new PGobject
-                              obj.setType("jsonb")
-                              obj.setValue(v.value)
-                              obj
-                            }))
-  
-  implicit val metas: Meta[Array[TypoJsonb]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoJsonb]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"))
+    .map(_.map(v => TypoJsonb(v.asInstanceOf[String])))
+  implicit val arrayPut: Put[Array[TypoJsonb]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"), "jsonb")
+    .contramap(_.map(v => {
+                            val obj = new PGobject
+                            obj.setType("jsonb")
+                            obj.setValue(v.value)
+                            obj
+                          }))
+  implicit val decoder: Decoder[TypoJsonb] = Decoder.forProduct1[TypoJsonb, String]("value")(TypoJsonb.apply)
+  implicit val encoder: Encoder[TypoJsonb] = Encoder.forProduct1[TypoJsonb, String]("value")(x => (x.value))
+  implicit val get: Get[TypoJsonb] = Get.Advanced.other[PGobject](NonEmptyList.one("jsonb"))
+    .map(v => TypoJsonb(v.getValue))
+  implicit val put: Put[TypoJsonb] = Put.Advanced.other[PGobject](NonEmptyList.one("jsonb")).contramap(v => {
+                                                                           val obj = new PGobject
+                                                                           obj.setType("jsonb")
+                                                                           obj.setValue(v.value)
+                                                                           obj
+                                                                         })
 }

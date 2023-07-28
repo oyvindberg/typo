@@ -10,19 +10,20 @@ package pg_foreign_data_wrapper
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_foreign_data_wrapper` */
 case class PgForeignDataWrapperId(value: /* oid */ Long) extends AnyVal
 object PgForeignDataWrapperId {
-  implicit val ordering: Ordering[PgForeignDataWrapperId] = Ordering.by(_.value)
-  implicit val format: Format[PgForeignDataWrapperId] = implicitly[Format[/* oid */ Long]].bimap(PgForeignDataWrapperId.apply, _.value)
-  implicit val toStatement: ToStatement[PgForeignDataWrapperId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgForeignDataWrapperId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgForeignDataWrapperId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit val column: Column[PgForeignDataWrapperId] = implicitly[Column[/* oid */ Long]].map(PgForeignDataWrapperId.apply)
+  implicit val ordering: Ordering[PgForeignDataWrapperId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgForeignDataWrapperId] = new ParameterMetaData[PgForeignDataWrapperId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit val reads: Reads[PgForeignDataWrapperId] = implicitly[Reads[/* oid */ Long]].map(PgForeignDataWrapperId.apply)
+  implicit val toStatement: ToStatement[PgForeignDataWrapperId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgForeignDataWrapperId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
 }

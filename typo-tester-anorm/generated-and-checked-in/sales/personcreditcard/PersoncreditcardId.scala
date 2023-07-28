@@ -13,29 +13,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `sales.personcreditcard` */
 case class PersoncreditcardId(businessentityid: BusinessentityId, creditcardid: CreditcardId)
 object PersoncreditcardId {
   implicit val ordering: Ordering[PersoncreditcardId] = Ordering.by(x => (x.businessentityid, x.creditcardid))
-  implicit val oFormat: OFormat[PersoncreditcardId] = new OFormat[PersoncreditcardId]{
-    override def writes(o: PersoncreditcardId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "creditcardid" -> o.creditcardid
-      )
-  
-    override def reads(json: JsValue): JsResult[PersoncreditcardId] = {
-      JsResult.fromTry(
-        Try(
-          PersoncreditcardId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            creditcardid = json.\("creditcardid").as[CreditcardId]
-          )
+  implicit val reads: Reads[PersoncreditcardId] = Reads[PersoncreditcardId](json => JsResult.fromTry(
+      Try(
+        PersoncreditcardId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          creditcardid = json.\("creditcardid").as[CreditcardId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PersoncreditcardId] = OWrites[PersoncreditcardId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "creditcardid" -> Json.toJson(o.creditcardid)
+    ))
+  )
 }

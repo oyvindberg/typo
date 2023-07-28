@@ -10,19 +10,20 @@ package pg_publication_rel
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_publication_rel` */
 case class PgPublicationRelId(value: /* oid */ Long) extends AnyVal
 object PgPublicationRelId {
-  implicit val ordering: Ordering[PgPublicationRelId] = Ordering.by(_.value)
-  implicit val format: Format[PgPublicationRelId] = implicitly[Format[/* oid */ Long]].bimap(PgPublicationRelId.apply, _.value)
-  implicit val toStatement: ToStatement[PgPublicationRelId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgPublicationRelId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgPublicationRelId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit val column: Column[PgPublicationRelId] = implicitly[Column[/* oid */ Long]].map(PgPublicationRelId.apply)
+  implicit val ordering: Ordering[PgPublicationRelId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgPublicationRelId] = new ParameterMetaData[PgPublicationRelId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit val reads: Reads[PgPublicationRelId] = implicitly[Reads[/* oid */ Long]].map(PgPublicationRelId.apply)
+  implicit val toStatement: ToStatement[PgPublicationRelId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgPublicationRelId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
 }

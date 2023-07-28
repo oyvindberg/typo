@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatXactUserFunctionsViewRow(
@@ -26,43 +28,39 @@ case class PgStatXactUserFunctionsViewRow(
 )
 
 object PgStatXactUserFunctionsViewRow {
-  def rowParser(idx: Int): RowParser[PgStatXactUserFunctionsViewRow] =
-    RowParser[PgStatXactUserFunctionsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatXactUserFunctionsViewRow] = Reads[PgStatXactUserFunctionsViewRow](json => JsResult.fromTry(
+      Try(
         PgStatXactUserFunctionsViewRow(
-          funcid = row[Option[/* oid */ Long]](idx + 0),
-          schemaname = row[Option[String]](idx + 1),
-          funcname = row[Option[String]](idx + 2),
-          calls = row[Option[Long]](idx + 3),
-          totalTime = row[Option[Double]](idx + 4),
-          selfTime = row[Option[Double]](idx + 5)
+          funcid = json.\("funcid").toOption.map(_.as[/* oid */ Long]),
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          funcname = json.\("funcname").toOption.map(_.as[String]),
+          calls = json.\("calls").toOption.map(_.as[Long]),
+          totalTime = json.\("total_time").toOption.map(_.as[Double]),
+          selfTime = json.\("self_time").toOption.map(_.as[Double])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatXactUserFunctionsViewRow] = new OFormat[PgStatXactUserFunctionsViewRow]{
-    override def writes(o: PgStatXactUserFunctionsViewRow): JsObject =
-      Json.obj(
-        "funcid" -> o.funcid,
-        "schemaname" -> o.schemaname,
-        "funcname" -> o.funcname,
-        "calls" -> o.calls,
-        "total_time" -> o.totalTime,
-        "self_time" -> o.selfTime
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatXactUserFunctionsViewRow] = RowParser[PgStatXactUserFunctionsViewRow] { row =>
+    Success(
+      PgStatXactUserFunctionsViewRow(
+        funcid = row[Option[/* oid */ Long]](idx + 0),
+        schemaname = row[Option[String]](idx + 1),
+        funcname = row[Option[String]](idx + 2),
+        calls = row[Option[Long]](idx + 3),
+        totalTime = row[Option[Double]](idx + 4),
+        selfTime = row[Option[Double]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatXactUserFunctionsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatXactUserFunctionsViewRow(
-            funcid = json.\("funcid").toOption.map(_.as[/* oid */ Long]),
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            funcname = json.\("funcname").toOption.map(_.as[String]),
-            calls = json.\("calls").toOption.map(_.as[Long]),
-            totalTime = json.\("total_time").toOption.map(_.as[Double]),
-            selfTime = json.\("self_time").toOption.map(_.as[Double])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatXactUserFunctionsViewRow] = OWrites[PgStatXactUserFunctionsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "funcid" -> Json.toJson(o.funcid),
+      "schemaname" -> Json.toJson(o.schemaname),
+      "funcname" -> Json.toJson(o.funcname),
+      "calls" -> Json.toJson(o.calls),
+      "total_time" -> Json.toJson(o.totalTime),
+      "self_time" -> Json.toJson(o.selfTime)
+    ))
+  )
 }

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgDbRoleSettingRow(
@@ -25,34 +27,30 @@ case class PgDbRoleSettingRow(
  }
 
 object PgDbRoleSettingRow {
-  def rowParser(idx: Int): RowParser[PgDbRoleSettingRow] =
-    RowParser[PgDbRoleSettingRow] { row =>
-      Success(
+  implicit val reads: Reads[PgDbRoleSettingRow] = Reads[PgDbRoleSettingRow](json => JsResult.fromTry(
+      Try(
         PgDbRoleSettingRow(
-          setdatabase = row[/* oid */ Long](idx + 0),
-          setrole = row[/* oid */ Long](idx + 1),
-          setconfig = row[Option[Array[String]]](idx + 2)
+          setdatabase = json.\("setdatabase").as[/* oid */ Long],
+          setrole = json.\("setrole").as[/* oid */ Long],
+          setconfig = json.\("setconfig").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgDbRoleSettingRow] = new OFormat[PgDbRoleSettingRow]{
-    override def writes(o: PgDbRoleSettingRow): JsObject =
-      Json.obj(
-        "setdatabase" -> o.setdatabase,
-        "setrole" -> o.setrole,
-        "setconfig" -> o.setconfig
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgDbRoleSettingRow] = RowParser[PgDbRoleSettingRow] { row =>
+    Success(
+      PgDbRoleSettingRow(
+        setdatabase = row[/* oid */ Long](idx + 0),
+        setrole = row[/* oid */ Long](idx + 1),
+        setconfig = row[Option[Array[String]]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PgDbRoleSettingRow] = {
-      JsResult.fromTry(
-        Try(
-          PgDbRoleSettingRow(
-            setdatabase = json.\("setdatabase").as[/* oid */ Long],
-            setrole = json.\("setrole").as[/* oid */ Long],
-            setconfig = json.\("setconfig").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgDbRoleSettingRow] = OWrites[PgDbRoleSettingRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "setdatabase" -> Json.toJson(o.setdatabase),
+      "setrole" -> Json.toJson(o.setrole),
+      "setconfig" -> Json.toJson(o.setconfig)
+    ))
+  )
 }

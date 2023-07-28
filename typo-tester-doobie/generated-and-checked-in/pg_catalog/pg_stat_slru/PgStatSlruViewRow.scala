@@ -7,15 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_stat_slru
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatSlruViewRow(
   name: Option[String],
@@ -26,62 +24,34 @@ case class PgStatSlruViewRow(
   blksExists: Option[Long],
   flushes: Option[Long],
   truncates: Option[Long],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatSlruViewRow {
-  implicit val decoder: Decoder[PgStatSlruViewRow] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Option[String]]
-        blksZeroed <- c.downField("blks_zeroed").as[Option[Long]]
-        blksHit <- c.downField("blks_hit").as[Option[Long]]
-        blksRead <- c.downField("blks_read").as[Option[Long]]
-        blksWritten <- c.downField("blks_written").as[Option[Long]]
-        blksExists <- c.downField("blks_exists").as[Option[Long]]
-        flushes <- c.downField("flushes").as[Option[Long]]
-        truncates <- c.downField("truncates").as[Option[Long]]
-        statsReset <- c.downField("stats_reset").as[Option[OffsetDateTime]]
-      } yield PgStatSlruViewRow(name, blksZeroed, blksHit, blksRead, blksWritten, blksExists, flushes, truncates, statsReset)
-  implicit val encoder: Encoder[PgStatSlruViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "blks_zeroed" := row.blksZeroed,
-        "blks_hit" := row.blksHit,
-        "blks_read" := row.blksRead,
-        "blks_written" := row.blksWritten,
-        "blks_exists" := row.blksExists,
-        "flushes" := row.flushes,
-        "truncates" := row.truncates,
-        "stats_reset" := row.statsReset
-      )}
-  implicit val read: Read[PgStatSlruViewRow] =
-    new Read[PgStatSlruViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatSlruViewRow(
-        name = Get[String].unsafeGetNullable(rs, i + 0),
-        blksZeroed = Get[Long].unsafeGetNullable(rs, i + 1),
-        blksHit = Get[Long].unsafeGetNullable(rs, i + 2),
-        blksRead = Get[Long].unsafeGetNullable(rs, i + 3),
-        blksWritten = Get[Long].unsafeGetNullable(rs, i + 4),
-        blksExists = Get[Long].unsafeGetNullable(rs, i + 5),
-        flushes = Get[Long].unsafeGetNullable(rs, i + 6),
-        truncates = Get[Long].unsafeGetNullable(rs, i + 7),
-        statsReset = Get[OffsetDateTime].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgStatSlruViewRow] = Decoder.forProduct9[PgStatSlruViewRow, Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("name", "blks_zeroed", "blks_hit", "blks_read", "blks_written", "blks_exists", "flushes", "truncates", "stats_reset")(PgStatSlruViewRow.apply)
+  implicit val encoder: Encoder[PgStatSlruViewRow] = Encoder.forProduct9[PgStatSlruViewRow, Option[String], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[Long], Option[TypoOffsetDateTime]]("name", "blks_zeroed", "blks_hit", "blks_read", "blks_written", "blks_exists", "flushes", "truncates", "stats_reset")(x => (x.name, x.blksZeroed, x.blksHit, x.blksRead, x.blksWritten, x.blksExists, x.flushes, x.truncates, x.statsReset))
+  implicit val read: Read[PgStatSlruViewRow] = new Read[PgStatSlruViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatSlruViewRow(
+      name = Get[String].unsafeGetNullable(rs, i + 0),
+      blksZeroed = Get[Long].unsafeGetNullable(rs, i + 1),
+      blksHit = Get[Long].unsafeGetNullable(rs, i + 2),
+      blksRead = Get[Long].unsafeGetNullable(rs, i + 3),
+      blksWritten = Get[Long].unsafeGetNullable(rs, i + 4),
+      blksExists = Get[Long].unsafeGetNullable(rs, i + 5),
+      flushes = Get[Long].unsafeGetNullable(rs, i + 6),
+      truncates = Get[Long].unsafeGetNullable(rs, i + 7),
+      statsReset = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

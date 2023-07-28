@@ -8,16 +8,18 @@ package sales
 package store
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.store` which has not been persisted yet */
@@ -35,9 +37,9 @@ case class StoreRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): StoreRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): StoreRow =
     StoreRow(
       businessentityid = businessentityid,
       name = name,
@@ -54,30 +56,27 @@ case class StoreRowUnsaved(
     )
 }
 object StoreRowUnsaved {
-  implicit val oFormat: OFormat[StoreRowUnsaved] = new OFormat[StoreRowUnsaved]{
-    override def writes(o: StoreRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "name" -> o.name,
-        "salespersonid" -> o.salespersonid,
-        "demographics" -> o.demographics,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[StoreRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          StoreRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            name = json.\("name").as[Name],
-            salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[StoreRowUnsaved] = Reads[StoreRowUnsaved](json => JsResult.fromTry(
+      Try(
+        StoreRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          name = json.\("name").as[Name],
+          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
+          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[StoreRowUnsaved] = OWrites[StoreRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "name" -> Json.toJson(o.name),
+      "salespersonid" -> Json.toJson(o.salespersonid),
+      "demographics" -> Json.toJson(o.demographics),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

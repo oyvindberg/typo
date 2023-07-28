@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgHbaFileRulesViewRow(
@@ -29,52 +31,48 @@ case class PgHbaFileRulesViewRow(
 )
 
 object PgHbaFileRulesViewRow {
-  def rowParser(idx: Int): RowParser[PgHbaFileRulesViewRow] =
-    RowParser[PgHbaFileRulesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgHbaFileRulesViewRow] = Reads[PgHbaFileRulesViewRow](json => JsResult.fromTry(
+      Try(
         PgHbaFileRulesViewRow(
-          lineNumber = row[Option[Int]](idx + 0),
-          `type` = row[Option[String]](idx + 1),
-          database = row[Option[Array[String]]](idx + 2),
-          userName = row[Option[Array[String]]](idx + 3),
-          address = row[Option[String]](idx + 4),
-          netmask = row[Option[String]](idx + 5),
-          authMethod = row[Option[String]](idx + 6),
-          options = row[Option[Array[String]]](idx + 7),
-          error = row[Option[String]](idx + 8)
+          lineNumber = json.\("line_number").toOption.map(_.as[Int]),
+          `type` = json.\("type").toOption.map(_.as[String]),
+          database = json.\("database").toOption.map(_.as[Array[String]]),
+          userName = json.\("user_name").toOption.map(_.as[Array[String]]),
+          address = json.\("address").toOption.map(_.as[String]),
+          netmask = json.\("netmask").toOption.map(_.as[String]),
+          authMethod = json.\("auth_method").toOption.map(_.as[String]),
+          options = json.\("options").toOption.map(_.as[Array[String]]),
+          error = json.\("error").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgHbaFileRulesViewRow] = new OFormat[PgHbaFileRulesViewRow]{
-    override def writes(o: PgHbaFileRulesViewRow): JsObject =
-      Json.obj(
-        "line_number" -> o.lineNumber,
-        "type" -> o.`type`,
-        "database" -> o.database,
-        "user_name" -> o.userName,
-        "address" -> o.address,
-        "netmask" -> o.netmask,
-        "auth_method" -> o.authMethod,
-        "options" -> o.options,
-        "error" -> o.error
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgHbaFileRulesViewRow] = RowParser[PgHbaFileRulesViewRow] { row =>
+    Success(
+      PgHbaFileRulesViewRow(
+        lineNumber = row[Option[Int]](idx + 0),
+        `type` = row[Option[String]](idx + 1),
+        database = row[Option[Array[String]]](idx + 2),
+        userName = row[Option[Array[String]]](idx + 3),
+        address = row[Option[String]](idx + 4),
+        netmask = row[Option[String]](idx + 5),
+        authMethod = row[Option[String]](idx + 6),
+        options = row[Option[Array[String]]](idx + 7),
+        error = row[Option[String]](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgHbaFileRulesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgHbaFileRulesViewRow(
-            lineNumber = json.\("line_number").toOption.map(_.as[Int]),
-            `type` = json.\("type").toOption.map(_.as[String]),
-            database = json.\("database").toOption.map(_.as[Array[String]]),
-            userName = json.\("user_name").toOption.map(_.as[Array[String]]),
-            address = json.\("address").toOption.map(_.as[String]),
-            netmask = json.\("netmask").toOption.map(_.as[String]),
-            authMethod = json.\("auth_method").toOption.map(_.as[String]),
-            options = json.\("options").toOption.map(_.as[Array[String]]),
-            error = json.\("error").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgHbaFileRulesViewRow] = OWrites[PgHbaFileRulesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "line_number" -> Json.toJson(o.lineNumber),
+      "type" -> Json.toJson(o.`type`),
+      "database" -> Json.toJson(o.database),
+      "user_name" -> Json.toJson(o.userName),
+      "address" -> Json.toJson(o.address),
+      "netmask" -> Json.toJson(o.netmask),
+      "auth_method" -> Json.toJson(o.authMethod),
+      "options" -> Json.toJson(o.options),
+      "error" -> Json.toJson(o.error)
+    ))
+  )
 }

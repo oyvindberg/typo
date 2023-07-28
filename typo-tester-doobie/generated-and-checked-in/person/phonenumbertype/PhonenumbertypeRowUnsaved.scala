@@ -8,12 +8,10 @@ package person
 package phonenumbertype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `person.phonenumbertype` which has not been persisted yet */
 case class PhonenumbertypeRowUnsaved(
@@ -23,9 +21,9 @@ case class PhonenumbertypeRowUnsaved(
       Primary key for telephone number type records. */
   phonenumbertypeid: Defaulted[PhonenumbertypeId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(phonenumbertypeidDefault: => PhonenumbertypeId, modifieddateDefault: => LocalDateTime): PhonenumbertypeRow =
+  def toRow(phonenumbertypeidDefault: => PhonenumbertypeId, modifieddateDefault: => TypoLocalDateTime): PhonenumbertypeRow =
     PhonenumbertypeRow(
       name = name,
       phonenumbertypeid = phonenumbertypeid match {
@@ -39,19 +37,6 @@ case class PhonenumbertypeRowUnsaved(
     )
 }
 object PhonenumbertypeRowUnsaved {
-  implicit val decoder: Decoder[PhonenumbertypeRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        phonenumbertypeid <- c.downField("phonenumbertypeid").as[Defaulted[PhonenumbertypeId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield PhonenumbertypeRowUnsaved(name, phonenumbertypeid, modifieddate)
-  implicit val encoder: Encoder[PhonenumbertypeRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "phonenumbertypeid" := row.phonenumbertypeid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[PhonenumbertypeRowUnsaved] = Decoder.forProduct3[PhonenumbertypeRowUnsaved, Name, Defaulted[PhonenumbertypeId], Defaulted[TypoLocalDateTime]]("name", "phonenumbertypeid", "modifieddate")(PhonenumbertypeRowUnsaved.apply)
+  implicit val encoder: Encoder[PhonenumbertypeRowUnsaved] = Encoder.forProduct3[PhonenumbertypeRowUnsaved, Name, Defaulted[PhonenumbertypeId], Defaulted[TypoLocalDateTime]]("name", "phonenumbertypeid", "modifieddate")(x => (x.name, x.phonenumbertypeid, x.modifieddate))
 }

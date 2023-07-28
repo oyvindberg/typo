@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_ts_dict
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgTsDictRow(
@@ -26,46 +24,24 @@ case class PgTsDictRow(
 )
 
 object PgTsDictRow {
-  implicit val decoder: Decoder[PgTsDictRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgTsDictId]
-        dictname <- c.downField("dictname").as[String]
-        dictnamespace <- c.downField("dictnamespace").as[/* oid */ Long]
-        dictowner <- c.downField("dictowner").as[/* oid */ Long]
-        dicttemplate <- c.downField("dicttemplate").as[/* oid */ Long]
-        dictinitoption <- c.downField("dictinitoption").as[Option[String]]
-      } yield PgTsDictRow(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
-  implicit val encoder: Encoder[PgTsDictRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "dictname" := row.dictname,
-        "dictnamespace" := row.dictnamespace,
-        "dictowner" := row.dictowner,
-        "dicttemplate" := row.dicttemplate,
-        "dictinitoption" := row.dictinitoption
-      )}
-  implicit val read: Read[PgTsDictRow] =
-    new Read[PgTsDictRow](
-      gets = List(
-        (Get[PgTsDictId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTsDictRow(
-        oid = Get[PgTsDictId].unsafeGetNonNullable(rs, i + 0),
-        dictname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        dictnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        dictowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        dicttemplate = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
-        dictinitoption = Get[String].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PgTsDictRow] = Decoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(PgTsDictRow.apply)
+  implicit val encoder: Encoder[PgTsDictRow] = Encoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(x => (x.oid, x.dictname, x.dictnamespace, x.dictowner, x.dicttemplate, x.dictinitoption))
+  implicit val read: Read[PgTsDictRow] = new Read[PgTsDictRow](
+    gets = List(
+      (Get[PgTsDictId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTsDictRow(
+      oid = Get[PgTsDictId].unsafeGetNonNullable(rs, i + 0),
+      dictname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      dictnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      dictowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      dicttemplate = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 4),
+      dictinitoption = Get[String].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

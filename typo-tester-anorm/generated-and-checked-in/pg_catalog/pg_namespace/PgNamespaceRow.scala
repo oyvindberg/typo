@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgNamespaceRow(
@@ -25,37 +27,33 @@ case class PgNamespaceRow(
 )
 
 object PgNamespaceRow {
-  def rowParser(idx: Int): RowParser[PgNamespaceRow] =
-    RowParser[PgNamespaceRow] { row =>
-      Success(
+  implicit val reads: Reads[PgNamespaceRow] = Reads[PgNamespaceRow](json => JsResult.fromTry(
+      Try(
         PgNamespaceRow(
-          oid = row[PgNamespaceId](idx + 0),
-          nspname = row[String](idx + 1),
-          nspowner = row[/* oid */ Long](idx + 2),
-          nspacl = row[Option[Array[TypoAclItem]]](idx + 3)
+          oid = json.\("oid").as[PgNamespaceId],
+          nspname = json.\("nspname").as[String],
+          nspowner = json.\("nspowner").as[/* oid */ Long],
+          nspacl = json.\("nspacl").toOption.map(_.as[Array[TypoAclItem]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgNamespaceRow] = new OFormat[PgNamespaceRow]{
-    override def writes(o: PgNamespaceRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "nspname" -> o.nspname,
-        "nspowner" -> o.nspowner,
-        "nspacl" -> o.nspacl
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgNamespaceRow] = RowParser[PgNamespaceRow] { row =>
+    Success(
+      PgNamespaceRow(
+        oid = row[PgNamespaceId](idx + 0),
+        nspname = row[String](idx + 1),
+        nspowner = row[/* oid */ Long](idx + 2),
+        nspacl = row[Option[Array[TypoAclItem]]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgNamespaceRow] = {
-      JsResult.fromTry(
-        Try(
-          PgNamespaceRow(
-            oid = json.\("oid").as[PgNamespaceId],
-            nspname = json.\("nspname").as[String],
-            nspowner = json.\("nspowner").as[/* oid */ Long],
-            nspacl = json.\("nspacl").toOption.map(_.as[Array[TypoAclItem]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgNamespaceRow] = OWrites[PgNamespaceRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "nspname" -> Json.toJson(o.nspname),
+      "nspowner" -> Json.toJson(o.nspowner),
+      "nspacl" -> Json.toJson(o.nspacl)
+    ))
+  )
 }

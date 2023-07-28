@@ -7,15 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgAuthidRow(
   oid: PgAuthidId,
@@ -29,74 +27,40 @@ case class PgAuthidRow(
   rolbypassrls: Boolean,
   rolconnlimit: Int,
   rolpassword: Option[String],
-  rolvaliduntil: Option[OffsetDateTime]
+  rolvaliduntil: Option[TypoOffsetDateTime]
 )
 
 object PgAuthidRow {
-  implicit val decoder: Decoder[PgAuthidRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgAuthidId]
-        rolname <- c.downField("rolname").as[String]
-        rolsuper <- c.downField("rolsuper").as[Boolean]
-        rolinherit <- c.downField("rolinherit").as[Boolean]
-        rolcreaterole <- c.downField("rolcreaterole").as[Boolean]
-        rolcreatedb <- c.downField("rolcreatedb").as[Boolean]
-        rolcanlogin <- c.downField("rolcanlogin").as[Boolean]
-        rolreplication <- c.downField("rolreplication").as[Boolean]
-        rolbypassrls <- c.downField("rolbypassrls").as[Boolean]
-        rolconnlimit <- c.downField("rolconnlimit").as[Int]
-        rolpassword <- c.downField("rolpassword").as[Option[String]]
-        rolvaliduntil <- c.downField("rolvaliduntil").as[Option[OffsetDateTime]]
-      } yield PgAuthidRow(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
-  implicit val encoder: Encoder[PgAuthidRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "rolname" := row.rolname,
-        "rolsuper" := row.rolsuper,
-        "rolinherit" := row.rolinherit,
-        "rolcreaterole" := row.rolcreaterole,
-        "rolcreatedb" := row.rolcreatedb,
-        "rolcanlogin" := row.rolcanlogin,
-        "rolreplication" := row.rolreplication,
-        "rolbypassrls" := row.rolbypassrls,
-        "rolconnlimit" := row.rolconnlimit,
-        "rolpassword" := row.rolpassword,
-        "rolvaliduntil" := row.rolvaliduntil
-      )}
-  implicit val read: Read[PgAuthidRow] =
-    new Read[PgAuthidRow](
-      gets = List(
-        (Get[PgAuthidId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAuthidRow(
-        oid = Get[PgAuthidId].unsafeGetNonNullable(rs, i + 0),
-        rolname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        rolsuper = Get[Boolean].unsafeGetNonNullable(rs, i + 2),
-        rolinherit = Get[Boolean].unsafeGetNonNullable(rs, i + 3),
-        rolcreaterole = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-        rolcreatedb = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-        rolcanlogin = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
-        rolreplication = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
-        rolbypassrls = Get[Boolean].unsafeGetNonNullable(rs, i + 8),
-        rolconnlimit = Get[Int].unsafeGetNonNullable(rs, i + 9),
-        rolpassword = Get[String].unsafeGetNullable(rs, i + 10),
-        rolvaliduntil = Get[OffsetDateTime].unsafeGetNullable(rs, i + 11)
-      )
+  implicit val decoder: Decoder[PgAuthidRow] = Decoder.forProduct12[PgAuthidRow, PgAuthidId, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, Option[String], Option[TypoOffsetDateTime]]("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")(PgAuthidRow.apply)
+  implicit val encoder: Encoder[PgAuthidRow] = Encoder.forProduct12[PgAuthidRow, PgAuthidId, String, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Int, Option[String], Option[TypoOffsetDateTime]]("oid", "rolname", "rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolcanlogin", "rolreplication", "rolbypassrls", "rolconnlimit", "rolpassword", "rolvaliduntil")(x => (x.oid, x.rolname, x.rolsuper, x.rolinherit, x.rolcreaterole, x.rolcreatedb, x.rolcanlogin, x.rolreplication, x.rolbypassrls, x.rolconnlimit, x.rolpassword, x.rolvaliduntil))
+  implicit val read: Read[PgAuthidRow] = new Read[PgAuthidRow](
+    gets = List(
+      (Get[PgAuthidId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAuthidRow(
+      oid = Get[PgAuthidId].unsafeGetNonNullable(rs, i + 0),
+      rolname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      rolsuper = Get[Boolean].unsafeGetNonNullable(rs, i + 2),
+      rolinherit = Get[Boolean].unsafeGetNonNullable(rs, i + 3),
+      rolcreaterole = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
+      rolcreatedb = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
+      rolcanlogin = Get[Boolean].unsafeGetNonNullable(rs, i + 6),
+      rolreplication = Get[Boolean].unsafeGetNonNullable(rs, i + 7),
+      rolbypassrls = Get[Boolean].unsafeGetNonNullable(rs, i + 8),
+      rolconnlimit = Get[Int].unsafeGetNonNullable(rs, i + 9),
+      rolpassword = Get[String].unsafeGetNullable(rs, i + 10),
+      rolvaliduntil = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 11)
     )
-  
-
+  )
 }

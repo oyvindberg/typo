@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object SpqhViewRepoImpl extends SpqhViewRepo {
   override def selectAll(implicit c: Connection): List[SpqhViewRow] = {
-    SQL"""select "id", businessentityid, quotadate, salesquota, rowguid, modifieddate
+    SQL"""select "id", businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
           from sa.spqh
        """.as(SpqhViewRow.rowParser(1).*)
   }

@@ -7,18 +7,16 @@ package adventureworks
 package pr
 package pr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PrViewRow(
   id: Option[Int],
@@ -29,7 +27,7 @@ case class PrViewRow(
   /** Points to [[production.productreview.ProductreviewRow.reviewername]] */
   reviewername: Option[Name],
   /** Points to [[production.productreview.ProductreviewRow.reviewdate]] */
-  reviewdate: Option[LocalDateTime],
+  reviewdate: Option[TypoLocalDateTime],
   /** Points to [[production.productreview.ProductreviewRow.emailaddress]] */
   emailaddress: Option[/* max 50 chars */ String],
   /** Points to [[production.productreview.ProductreviewRow.rating]] */
@@ -37,62 +35,34 @@ case class PrViewRow(
   /** Points to [[production.productreview.ProductreviewRow.comments]] */
   comments: Option[/* max 3850 chars */ String],
   /** Points to [[production.productreview.ProductreviewRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PrViewRow {
-  implicit val decoder: Decoder[PrViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productreviewid <- c.downField("productreviewid").as[Option[ProductreviewId]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        reviewername <- c.downField("reviewername").as[Option[Name]]
-        reviewdate <- c.downField("reviewdate").as[Option[LocalDateTime]]
-        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
-        rating <- c.downField("rating").as[Option[Int]]
-        comments <- c.downField("comments").as[Option[/* max 3850 chars */ String]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PrViewRow(id, productreviewid, productid, reviewername, reviewdate, emailaddress, rating, comments, modifieddate)
-  implicit val encoder: Encoder[PrViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productreviewid" := row.productreviewid,
-        "productid" := row.productid,
-        "reviewername" := row.reviewername,
-        "reviewdate" := row.reviewdate,
-        "emailaddress" := row.emailaddress,
-        "rating" := row.rating,
-        "comments" := row.comments,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PrViewRow] =
-    new Read[PrViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductreviewId], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 3850 chars */ String], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PrViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productreviewid = Get[ProductreviewId].unsafeGetNullable(rs, i + 1),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-        reviewername = Get[Name].unsafeGetNullable(rs, i + 3),
-        reviewdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
-        rating = Get[Int].unsafeGetNullable(rs, i + 6),
-        comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PrViewRow] = Decoder.forProduct9[PrViewRow, Option[Int], Option[ProductreviewId], Option[ProductId], Option[Name], Option[TypoLocalDateTime], Option[/* max 50 chars */ String], Option[Int], Option[/* max 3850 chars */ String], Option[TypoLocalDateTime]]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(PrViewRow.apply)
+  implicit val encoder: Encoder[PrViewRow] = Encoder.forProduct9[PrViewRow, Option[Int], Option[ProductreviewId], Option[ProductId], Option[Name], Option[TypoLocalDateTime], Option[/* max 50 chars */ String], Option[Int], Option[/* max 3850 chars */ String], Option[TypoLocalDateTime]]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(x => (x.id, x.productreviewid, x.productid, x.reviewername, x.reviewdate, x.emailaddress, x.rating, x.comments, x.modifieddate))
+  implicit val read: Read[PrViewRow] = new Read[PrViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductreviewId], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 3850 chars */ String], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PrViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productreviewid = Get[ProductreviewId].unsafeGetNullable(rs, i + 1),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 2),
+      reviewername = Get[Name].unsafeGetNullable(rs, i + 3),
+      reviewdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4),
+      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 5),
+      rating = Get[Int].unsafeGetNullable(rs, i + 6),
+      comments = Get[/* max 3850 chars */ String].unsafeGetNullable(rs, i + 7),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

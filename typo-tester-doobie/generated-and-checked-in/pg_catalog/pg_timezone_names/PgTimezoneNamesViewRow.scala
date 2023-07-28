@@ -8,13 +8,11 @@ package pg_catalog
 package pg_timezone_names
 
 import adventureworks.TypoInterval
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgTimezoneNamesViewRow(
@@ -25,38 +23,20 @@ case class PgTimezoneNamesViewRow(
 )
 
 object PgTimezoneNamesViewRow {
-  implicit val decoder: Decoder[PgTimezoneNamesViewRow] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Option[String]]
-        abbrev <- c.downField("abbrev").as[Option[String]]
-        utcOffset <- c.downField("utc_offset").as[Option[TypoInterval]]
-        isDst <- c.downField("is_dst").as[Option[Boolean]]
-      } yield PgTimezoneNamesViewRow(name, abbrev, utcOffset, isDst)
-  implicit val encoder: Encoder[PgTimezoneNamesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "abbrev" := row.abbrev,
-        "utc_offset" := row.utcOffset,
-        "is_dst" := row.isDst
-      )}
-  implicit val read: Read[PgTimezoneNamesViewRow] =
-    new Read[PgTimezoneNamesViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[TypoInterval], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTimezoneNamesViewRow(
-        name = Get[String].unsafeGetNullable(rs, i + 0),
-        abbrev = Get[String].unsafeGetNullable(rs, i + 1),
-        utcOffset = Get[TypoInterval].unsafeGetNullable(rs, i + 2),
-        isDst = Get[Boolean].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgTimezoneNamesViewRow] = Decoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(PgTimezoneNamesViewRow.apply)
+  implicit val encoder: Encoder[PgTimezoneNamesViewRow] = Encoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(x => (x.name, x.abbrev, x.utcOffset, x.isDst))
+  implicit val read: Read[PgTimezoneNamesViewRow] = new Read[PgTimezoneNamesViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[TypoInterval], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTimezoneNamesViewRow(
+      name = Get[String].unsafeGetNullable(rs, i + 0),
+      abbrev = Get[String].unsafeGetNullable(rs, i + 1),
+      utcOffset = Get[TypoInterval].unsafeGetNullable(rs, i + 2),
+      isDst = Get[Boolean].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

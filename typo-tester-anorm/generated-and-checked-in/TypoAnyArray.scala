@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
@@ -19,65 +16,63 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** anyarray (via PGObject) */
 case class TypoAnyArray(value: String)
+
 object TypoAnyArray {
-  implicit val oFormat: OFormat[TypoAnyArray] = new OFormat[TypoAnyArray]{
-    override def writes(o: TypoAnyArray): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoAnyArray] = {
-      JsResult.fromTry(
-        Try(
-          TypoAnyArray(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoAnyArrayDb: ToStatement[TypoAnyArray] with ParameterMetaData[TypoAnyArray] with Column[TypoAnyArray] = new ToStatement[TypoAnyArray] with ParameterMetaData[TypoAnyArray] with Column[TypoAnyArray] {
-    override def sqlType: String = "anyarray"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoAnyArray): Unit =
-      s.setObject(index, {
-                           val obj = new PGobject
-                           obj.setType("anyarray")
-                           obj.setValue(v.value)
-                           obj
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoAnyArray] =
-      v match {
-        case v: PGobject => Right(TypoAnyArray(v.getValue))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGobject from JDBC to produce a TypoAnyArray, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoAnyArrayDbArray: ToStatement[Array[TypoAnyArray]] with ParameterMetaData[Array[TypoAnyArray]] with Column[Array[TypoAnyArray]] = new ToStatement[Array[TypoAnyArray]] with ParameterMetaData[Array[TypoAnyArray]] with Column[Array[TypoAnyArray]] {
-    override def sqlType: String = "_anyarray"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoAnyArray]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("anyarray", v.map(v => {
-                                                                               val obj = new PGobject
-                                                                               obj.setType("anyarray")
-                                                                               obj.setValue(v.value)
-                                                                               obj
-                                                                             })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoAnyArray]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoAnyArray]] = Column.nonNull[Array[TypoAnyArray]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoAnyArray(v.asInstanceOf[String])))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoAnyArray, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoAnyArray, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoAnyArray]] = new ParameterMetaData[Array[TypoAnyArray]] {
+    override def sqlType: String = "_anyarray"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoAnyArray]] = ToStatement[Array[TypoAnyArray]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("anyarray", v.map(v => {
+                                                                                                                             val obj = new PGobject
+                                                                                                                             obj.setType("anyarray")
+                                                                                                                             obj.setValue(v.value)
+                                                                                                                             obj
+                                                                                                                           }))))
+  implicit val column: Column[TypoAnyArray] = Column.nonNull[TypoAnyArray]((v1: Any, _) =>
+    v1 match {
+      case v: PGobject => Right(TypoAnyArray(v.getValue))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoAnyArray] = new ParameterMetaData[TypoAnyArray] {
+    override def sqlType: String = "anyarray"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoAnyArray] = Reads[TypoAnyArray](json => JsResult.fromTry(
+      Try(
+        TypoAnyArray(
+          value = json.\("value").as[String]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoAnyArray] = ToStatement[TypoAnyArray]((s, index, v) => s.setObject(index, {
+                                                                  val obj = new PGobject
+                                                                  obj.setType("anyarray")
+                                                                  obj.setValue(v.value)
+                                                                  obj
+                                                                }))
+  implicit val writes: OWrites[TypoAnyArray] = OWrites[TypoAnyArray](o =>
+    new JsObject(ListMap[String, JsValue](
+      "value" -> Json.toJson(o.value)
+    ))
+  )
 }

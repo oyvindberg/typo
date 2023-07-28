@@ -7,14 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_stat_user_tables
 
+import adventureworks.TypoOffsetDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatUserTablesViewRow(
@@ -49,13 +51,13 @@ case class PgStatUserTablesViewRow(
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastVacuum]] */
-  lastVacuum: Option[OffsetDateTime],
+  lastVacuum: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutovacuum]] */
-  lastAutovacuum: Option[OffsetDateTime],
+  lastAutovacuum: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAnalyze]] */
-  lastAnalyze: Option[OffsetDateTime],
+  lastAnalyze: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutoanalyze]] */
-  lastAutoanalyze: Option[OffsetDateTime],
+  lastAutoanalyze: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.vacuumCount]] */
   vacuumCount: Option[Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.autovacuumCount]] */
@@ -67,94 +69,90 @@ case class PgStatUserTablesViewRow(
 )
 
 object PgStatUserTablesViewRow {
-  def rowParser(idx: Int): RowParser[PgStatUserTablesViewRow] =
-    RowParser[PgStatUserTablesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatUserTablesViewRow] = Reads[PgStatUserTablesViewRow](json => JsResult.fromTry(
+      Try(
         PgStatUserTablesViewRow(
-          relid = row[Option[/* oid */ Long]](idx + 0),
-          schemaname = row[Option[String]](idx + 1),
-          relname = row[Option[String]](idx + 2),
-          seqScan = row[Option[Long]](idx + 3),
-          seqTupRead = row[Option[Long]](idx + 4),
-          idxScan = row[Option[Long]](idx + 5),
-          idxTupFetch = row[Option[Long]](idx + 6),
-          nTupIns = row[Option[Long]](idx + 7),
-          nTupUpd = row[Option[Long]](idx + 8),
-          nTupDel = row[Option[Long]](idx + 9),
-          nTupHotUpd = row[Option[Long]](idx + 10),
-          nLiveTup = row[Option[Long]](idx + 11),
-          nDeadTup = row[Option[Long]](idx + 12),
-          nModSinceAnalyze = row[Option[Long]](idx + 13),
-          nInsSinceVacuum = row[Option[Long]](idx + 14),
-          lastVacuum = row[Option[OffsetDateTime]](idx + 15),
-          lastAutovacuum = row[Option[OffsetDateTime]](idx + 16),
-          lastAnalyze = row[Option[OffsetDateTime]](idx + 17),
-          lastAutoanalyze = row[Option[OffsetDateTime]](idx + 18),
-          vacuumCount = row[Option[Long]](idx + 19),
-          autovacuumCount = row[Option[Long]](idx + 20),
-          analyzeCount = row[Option[Long]](idx + 21),
-          autoanalyzeCount = row[Option[Long]](idx + 22)
+          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          relname = json.\("relname").toOption.map(_.as[String]),
+          seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
+          seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
+          idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
+          idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
+          nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
+          nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
+          nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
+          nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long]),
+          nLiveTup = json.\("n_live_tup").toOption.map(_.as[Long]),
+          nDeadTup = json.\("n_dead_tup").toOption.map(_.as[Long]),
+          nModSinceAnalyze = json.\("n_mod_since_analyze").toOption.map(_.as[Long]),
+          nInsSinceVacuum = json.\("n_ins_since_vacuum").toOption.map(_.as[Long]),
+          lastVacuum = json.\("last_vacuum").toOption.map(_.as[TypoOffsetDateTime]),
+          lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as[TypoOffsetDateTime]),
+          lastAnalyze = json.\("last_analyze").toOption.map(_.as[TypoOffsetDateTime]),
+          lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as[TypoOffsetDateTime]),
+          vacuumCount = json.\("vacuum_count").toOption.map(_.as[Long]),
+          autovacuumCount = json.\("autovacuum_count").toOption.map(_.as[Long]),
+          analyzeCount = json.\("analyze_count").toOption.map(_.as[Long]),
+          autoanalyzeCount = json.\("autoanalyze_count").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatUserTablesViewRow] = new OFormat[PgStatUserTablesViewRow]{
-    override def writes(o: PgStatUserTablesViewRow): JsObject =
-      Json.obj(
-        "relid" -> o.relid,
-        "schemaname" -> o.schemaname,
-        "relname" -> o.relname,
-        "seq_scan" -> o.seqScan,
-        "seq_tup_read" -> o.seqTupRead,
-        "idx_scan" -> o.idxScan,
-        "idx_tup_fetch" -> o.idxTupFetch,
-        "n_tup_ins" -> o.nTupIns,
-        "n_tup_upd" -> o.nTupUpd,
-        "n_tup_del" -> o.nTupDel,
-        "n_tup_hot_upd" -> o.nTupHotUpd,
-        "n_live_tup" -> o.nLiveTup,
-        "n_dead_tup" -> o.nDeadTup,
-        "n_mod_since_analyze" -> o.nModSinceAnalyze,
-        "n_ins_since_vacuum" -> o.nInsSinceVacuum,
-        "last_vacuum" -> o.lastVacuum,
-        "last_autovacuum" -> o.lastAutovacuum,
-        "last_analyze" -> o.lastAnalyze,
-        "last_autoanalyze" -> o.lastAutoanalyze,
-        "vacuum_count" -> o.vacuumCount,
-        "autovacuum_count" -> o.autovacuumCount,
-        "analyze_count" -> o.analyzeCount,
-        "autoanalyze_count" -> o.autoanalyzeCount
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatUserTablesViewRow] = RowParser[PgStatUserTablesViewRow] { row =>
+    Success(
+      PgStatUserTablesViewRow(
+        relid = row[Option[/* oid */ Long]](idx + 0),
+        schemaname = row[Option[String]](idx + 1),
+        relname = row[Option[String]](idx + 2),
+        seqScan = row[Option[Long]](idx + 3),
+        seqTupRead = row[Option[Long]](idx + 4),
+        idxScan = row[Option[Long]](idx + 5),
+        idxTupFetch = row[Option[Long]](idx + 6),
+        nTupIns = row[Option[Long]](idx + 7),
+        nTupUpd = row[Option[Long]](idx + 8),
+        nTupDel = row[Option[Long]](idx + 9),
+        nTupHotUpd = row[Option[Long]](idx + 10),
+        nLiveTup = row[Option[Long]](idx + 11),
+        nDeadTup = row[Option[Long]](idx + 12),
+        nModSinceAnalyze = row[Option[Long]](idx + 13),
+        nInsSinceVacuum = row[Option[Long]](idx + 14),
+        lastVacuum = row[Option[TypoOffsetDateTime]](idx + 15),
+        lastAutovacuum = row[Option[TypoOffsetDateTime]](idx + 16),
+        lastAnalyze = row[Option[TypoOffsetDateTime]](idx + 17),
+        lastAutoanalyze = row[Option[TypoOffsetDateTime]](idx + 18),
+        vacuumCount = row[Option[Long]](idx + 19),
+        autovacuumCount = row[Option[Long]](idx + 20),
+        analyzeCount = row[Option[Long]](idx + 21),
+        autoanalyzeCount = row[Option[Long]](idx + 22)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatUserTablesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatUserTablesViewRow(
-            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            relname = json.\("relname").toOption.map(_.as[String]),
-            seqScan = json.\("seq_scan").toOption.map(_.as[Long]),
-            seqTupRead = json.\("seq_tup_read").toOption.map(_.as[Long]),
-            idxScan = json.\("idx_scan").toOption.map(_.as[Long]),
-            idxTupFetch = json.\("idx_tup_fetch").toOption.map(_.as[Long]),
-            nTupIns = json.\("n_tup_ins").toOption.map(_.as[Long]),
-            nTupUpd = json.\("n_tup_upd").toOption.map(_.as[Long]),
-            nTupDel = json.\("n_tup_del").toOption.map(_.as[Long]),
-            nTupHotUpd = json.\("n_tup_hot_upd").toOption.map(_.as[Long]),
-            nLiveTup = json.\("n_live_tup").toOption.map(_.as[Long]),
-            nDeadTup = json.\("n_dead_tup").toOption.map(_.as[Long]),
-            nModSinceAnalyze = json.\("n_mod_since_analyze").toOption.map(_.as[Long]),
-            nInsSinceVacuum = json.\("n_ins_since_vacuum").toOption.map(_.as[Long]),
-            lastVacuum = json.\("last_vacuum").toOption.map(_.as[OffsetDateTime]),
-            lastAutovacuum = json.\("last_autovacuum").toOption.map(_.as[OffsetDateTime]),
-            lastAnalyze = json.\("last_analyze").toOption.map(_.as[OffsetDateTime]),
-            lastAutoanalyze = json.\("last_autoanalyze").toOption.map(_.as[OffsetDateTime]),
-            vacuumCount = json.\("vacuum_count").toOption.map(_.as[Long]),
-            autovacuumCount = json.\("autovacuum_count").toOption.map(_.as[Long]),
-            analyzeCount = json.\("analyze_count").toOption.map(_.as[Long]),
-            autoanalyzeCount = json.\("autoanalyze_count").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatUserTablesViewRow] = OWrites[PgStatUserTablesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "relid" -> Json.toJson(o.relid),
+      "schemaname" -> Json.toJson(o.schemaname),
+      "relname" -> Json.toJson(o.relname),
+      "seq_scan" -> Json.toJson(o.seqScan),
+      "seq_tup_read" -> Json.toJson(o.seqTupRead),
+      "idx_scan" -> Json.toJson(o.idxScan),
+      "idx_tup_fetch" -> Json.toJson(o.idxTupFetch),
+      "n_tup_ins" -> Json.toJson(o.nTupIns),
+      "n_tup_upd" -> Json.toJson(o.nTupUpd),
+      "n_tup_del" -> Json.toJson(o.nTupDel),
+      "n_tup_hot_upd" -> Json.toJson(o.nTupHotUpd),
+      "n_live_tup" -> Json.toJson(o.nLiveTup),
+      "n_dead_tup" -> Json.toJson(o.nDeadTup),
+      "n_mod_since_analyze" -> Json.toJson(o.nModSinceAnalyze),
+      "n_ins_since_vacuum" -> Json.toJson(o.nInsSinceVacuum),
+      "last_vacuum" -> Json.toJson(o.lastVacuum),
+      "last_autovacuum" -> Json.toJson(o.lastAutovacuum),
+      "last_analyze" -> Json.toJson(o.lastAnalyze),
+      "last_autoanalyze" -> Json.toJson(o.lastAutoanalyze),
+      "vacuum_count" -> Json.toJson(o.vacuumCount),
+      "autovacuum_count" -> Json.toJson(o.autovacuumCount),
+      "analyze_count" -> Json.toJson(o.analyzeCount),
+      "autoanalyze_count" -> Json.toJson(o.autoanalyzeCount)
+    ))
+  )
 }

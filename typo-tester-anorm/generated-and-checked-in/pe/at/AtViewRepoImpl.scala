@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object AtViewRepoImpl extends AtViewRepo {
   override def selectAll(implicit c: Connection): List[AtViewRow] = {
-    SQL"""select "id", addresstypeid, "name", rowguid, modifieddate
+    SQL"""select "id", addresstypeid, "name", rowguid, modifieddate::text
           from pe."at"
        """.as(AtViewRow.rowParser(1).*)
   }

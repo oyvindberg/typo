@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ViewTableUsageViewRow(
@@ -27,43 +29,39 @@ case class ViewTableUsageViewRow(
 )
 
 object ViewTableUsageViewRow {
-  def rowParser(idx: Int): RowParser[ViewTableUsageViewRow] =
-    RowParser[ViewTableUsageViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ViewTableUsageViewRow] = Reads[ViewTableUsageViewRow](json => JsResult.fromTry(
+      Try(
         ViewTableUsageViewRow(
-          viewCatalog = row[Option[SqlIdentifier]](idx + 0),
-          viewSchema = row[Option[SqlIdentifier]](idx + 1),
-          viewName = row[Option[SqlIdentifier]](idx + 2),
-          tableCatalog = row[Option[SqlIdentifier]](idx + 3),
-          tableSchema = row[Option[SqlIdentifier]](idx + 4),
-          tableName = row[Option[SqlIdentifier]](idx + 5)
+          viewCatalog = json.\("view_catalog").toOption.map(_.as[SqlIdentifier]),
+          viewSchema = json.\("view_schema").toOption.map(_.as[SqlIdentifier]),
+          viewName = json.\("view_name").toOption.map(_.as[SqlIdentifier]),
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[ViewTableUsageViewRow] = new OFormat[ViewTableUsageViewRow]{
-    override def writes(o: ViewTableUsageViewRow): JsObject =
-      Json.obj(
-        "view_catalog" -> o.viewCatalog,
-        "view_schema" -> o.viewSchema,
-        "view_name" -> o.viewName,
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ViewTableUsageViewRow] = RowParser[ViewTableUsageViewRow] { row =>
+    Success(
+      ViewTableUsageViewRow(
+        viewCatalog = row[Option[SqlIdentifier]](idx + 0),
+        viewSchema = row[Option[SqlIdentifier]](idx + 1),
+        viewName = row[Option[SqlIdentifier]](idx + 2),
+        tableCatalog = row[Option[SqlIdentifier]](idx + 3),
+        tableSchema = row[Option[SqlIdentifier]](idx + 4),
+        tableName = row[Option[SqlIdentifier]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[ViewTableUsageViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ViewTableUsageViewRow(
-            viewCatalog = json.\("view_catalog").toOption.map(_.as[SqlIdentifier]),
-            viewSchema = json.\("view_schema").toOption.map(_.as[SqlIdentifier]),
-            viewName = json.\("view_name").toOption.map(_.as[SqlIdentifier]),
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ViewTableUsageViewRow] = OWrites[ViewTableUsageViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "view_catalog" -> Json.toJson(o.viewCatalog),
+      "view_schema" -> Json.toJson(o.viewSchema),
+      "view_name" -> Json.toJson(o.viewName),
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName)
+    ))
+  )
 }

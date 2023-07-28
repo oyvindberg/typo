@@ -9,13 +9,11 @@ package administrable_role_authorizations
 
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class AdministrableRoleAuthorizationsViewRow(
@@ -28,34 +26,18 @@ case class AdministrableRoleAuthorizationsViewRow(
 )
 
 object AdministrableRoleAuthorizationsViewRow {
-  implicit val decoder: Decoder[AdministrableRoleAuthorizationsViewRow] =
-    (c: HCursor) =>
-      for {
-        grantee <- c.downField("grantee").as[Option[SqlIdentifier]]
-        roleName <- c.downField("role_name").as[Option[SqlIdentifier]]
-        isGrantable <- c.downField("is_grantable").as[Option[YesOrNo]]
-      } yield AdministrableRoleAuthorizationsViewRow(grantee, roleName, isGrantable)
-  implicit val encoder: Encoder[AdministrableRoleAuthorizationsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "grantee" := row.grantee,
-        "role_name" := row.roleName,
-        "is_grantable" := row.isGrantable
-      )}
-  implicit val read: Read[AdministrableRoleAuthorizationsViewRow] =
-    new Read[AdministrableRoleAuthorizationsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => AdministrableRoleAuthorizationsViewRow(
-        grantee = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        roleName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        isGrantable = Get[YesOrNo].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[AdministrableRoleAuthorizationsViewRow] = Decoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(AdministrableRoleAuthorizationsViewRow.apply)
+  implicit val encoder: Encoder[AdministrableRoleAuthorizationsViewRow] = Encoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))
+  implicit val read: Read[AdministrableRoleAuthorizationsViewRow] = new Read[AdministrableRoleAuthorizationsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => AdministrableRoleAuthorizationsViewRow(
+      grantee = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      roleName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      isGrantable = Get[YesOrNo].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

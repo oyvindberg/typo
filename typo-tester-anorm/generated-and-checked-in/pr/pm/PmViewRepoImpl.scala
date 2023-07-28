@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PmViewRepoImpl extends PmViewRepo {
   override def selectAll(implicit c: Connection): List[PmViewRow] = {
-    SQL"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate
+    SQL"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from pr.pm
        """.as(PmViewRow.rowParser(1).*)
   }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object CuViewRepoImpl extends CuViewRepo {
   override def selectAll: Stream[ConnectionIO, CuViewRow] = {
-    sql"""select "id", currencycode, "name", modifieddate from sa.cu""".query[CuViewRow].stream
+    sql"""select "id", currencycode, "name", modifieddate::text from sa.cu""".query[CuViewRow].stream
   }
 }

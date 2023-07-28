@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class RoutineSequenceUsageViewRow(
@@ -30,52 +32,48 @@ case class RoutineSequenceUsageViewRow(
 )
 
 object RoutineSequenceUsageViewRow {
-  def rowParser(idx: Int): RowParser[RoutineSequenceUsageViewRow] =
-    RowParser[RoutineSequenceUsageViewRow] { row =>
-      Success(
+  implicit val reads: Reads[RoutineSequenceUsageViewRow] = Reads[RoutineSequenceUsageViewRow](json => JsResult.fromTry(
+      Try(
         RoutineSequenceUsageViewRow(
-          specificCatalog = row[Option[SqlIdentifier]](idx + 0),
-          specificSchema = row[Option[SqlIdentifier]](idx + 1),
-          specificName = row[Option[SqlIdentifier]](idx + 2),
-          routineCatalog = row[Option[SqlIdentifier]](idx + 3),
-          routineSchema = row[Option[SqlIdentifier]](idx + 4),
-          routineName = row[Option[SqlIdentifier]](idx + 5),
-          sequenceCatalog = row[Option[SqlIdentifier]](idx + 6),
-          sequenceSchema = row[Option[SqlIdentifier]](idx + 7),
-          sequenceName = row[Option[SqlIdentifier]](idx + 8)
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
+          specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
+          specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
+          routineCatalog = json.\("routine_catalog").toOption.map(_.as[SqlIdentifier]),
+          routineSchema = json.\("routine_schema").toOption.map(_.as[SqlIdentifier]),
+          routineName = json.\("routine_name").toOption.map(_.as[SqlIdentifier]),
+          sequenceCatalog = json.\("sequence_catalog").toOption.map(_.as[SqlIdentifier]),
+          sequenceSchema = json.\("sequence_schema").toOption.map(_.as[SqlIdentifier]),
+          sequenceName = json.\("sequence_name").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[RoutineSequenceUsageViewRow] = new OFormat[RoutineSequenceUsageViewRow]{
-    override def writes(o: RoutineSequenceUsageViewRow): JsObject =
-      Json.obj(
-        "specific_catalog" -> o.specificCatalog,
-        "specific_schema" -> o.specificSchema,
-        "specific_name" -> o.specificName,
-        "routine_catalog" -> o.routineCatalog,
-        "routine_schema" -> o.routineSchema,
-        "routine_name" -> o.routineName,
-        "sequence_catalog" -> o.sequenceCatalog,
-        "sequence_schema" -> o.sequenceSchema,
-        "sequence_name" -> o.sequenceName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[RoutineSequenceUsageViewRow] = RowParser[RoutineSequenceUsageViewRow] { row =>
+    Success(
+      RoutineSequenceUsageViewRow(
+        specificCatalog = row[Option[SqlIdentifier]](idx + 0),
+        specificSchema = row[Option[SqlIdentifier]](idx + 1),
+        specificName = row[Option[SqlIdentifier]](idx + 2),
+        routineCatalog = row[Option[SqlIdentifier]](idx + 3),
+        routineSchema = row[Option[SqlIdentifier]](idx + 4),
+        routineName = row[Option[SqlIdentifier]](idx + 5),
+        sequenceCatalog = row[Option[SqlIdentifier]](idx + 6),
+        sequenceSchema = row[Option[SqlIdentifier]](idx + 7),
+        sequenceName = row[Option[SqlIdentifier]](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[RoutineSequenceUsageViewRow] = {
-      JsResult.fromTry(
-        Try(
-          RoutineSequenceUsageViewRow(
-            specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
-            specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
-            specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
-            routineCatalog = json.\("routine_catalog").toOption.map(_.as[SqlIdentifier]),
-            routineSchema = json.\("routine_schema").toOption.map(_.as[SqlIdentifier]),
-            routineName = json.\("routine_name").toOption.map(_.as[SqlIdentifier]),
-            sequenceCatalog = json.\("sequence_catalog").toOption.map(_.as[SqlIdentifier]),
-            sequenceSchema = json.\("sequence_schema").toOption.map(_.as[SqlIdentifier]),
-            sequenceName = json.\("sequence_name").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[RoutineSequenceUsageViewRow] = OWrites[RoutineSequenceUsageViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "specific_catalog" -> Json.toJson(o.specificCatalog),
+      "specific_schema" -> Json.toJson(o.specificSchema),
+      "specific_name" -> Json.toJson(o.specificName),
+      "routine_catalog" -> Json.toJson(o.routineCatalog),
+      "routine_schema" -> Json.toJson(o.routineSchema),
+      "routine_name" -> Json.toJson(o.routineName),
+      "sequence_catalog" -> Json.toJson(o.sequenceCatalog),
+      "sequence_schema" -> Json.toJson(o.sequenceSchema),
+      "sequence_name" -> Json.toJson(o.sequenceName)
+    ))
+  )
 }

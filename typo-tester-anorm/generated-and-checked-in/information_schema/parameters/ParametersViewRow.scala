@@ -17,7 +17,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ParametersViewRow(
@@ -56,121 +58,117 @@ case class ParametersViewRow(
 )
 
 object ParametersViewRow {
-  def rowParser(idx: Int): RowParser[ParametersViewRow] =
-    RowParser[ParametersViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ParametersViewRow] = Reads[ParametersViewRow](json => JsResult.fromTry(
+      Try(
         ParametersViewRow(
-          specificCatalog = row[Option[SqlIdentifier]](idx + 0),
-          specificSchema = row[Option[SqlIdentifier]](idx + 1),
-          specificName = row[Option[SqlIdentifier]](idx + 2),
-          ordinalPosition = row[Option[CardinalNumber]](idx + 3),
-          parameterMode = row[Option[CharacterData]](idx + 4),
-          isResult = row[Option[YesOrNo]](idx + 5),
-          asLocator = row[Option[YesOrNo]](idx + 6),
-          parameterName = row[Option[SqlIdentifier]](idx + 7),
-          dataType = row[Option[CharacterData]](idx + 8),
-          characterMaximumLength = row[Option[CardinalNumber]](idx + 9),
-          characterOctetLength = row[Option[CardinalNumber]](idx + 10),
-          characterSetCatalog = row[Option[SqlIdentifier]](idx + 11),
-          characterSetSchema = row[Option[SqlIdentifier]](idx + 12),
-          characterSetName = row[Option[SqlIdentifier]](idx + 13),
-          collationCatalog = row[Option[SqlIdentifier]](idx + 14),
-          collationSchema = row[Option[SqlIdentifier]](idx + 15),
-          collationName = row[Option[SqlIdentifier]](idx + 16),
-          numericPrecision = row[Option[CardinalNumber]](idx + 17),
-          numericPrecisionRadix = row[Option[CardinalNumber]](idx + 18),
-          numericScale = row[Option[CardinalNumber]](idx + 19),
-          datetimePrecision = row[Option[CardinalNumber]](idx + 20),
-          intervalType = row[Option[CharacterData]](idx + 21),
-          intervalPrecision = row[Option[CardinalNumber]](idx + 22),
-          udtCatalog = row[Option[SqlIdentifier]](idx + 23),
-          udtSchema = row[Option[SqlIdentifier]](idx + 24),
-          udtName = row[Option[SqlIdentifier]](idx + 25),
-          scopeCatalog = row[Option[SqlIdentifier]](idx + 26),
-          scopeSchema = row[Option[SqlIdentifier]](idx + 27),
-          scopeName = row[Option[SqlIdentifier]](idx + 28),
-          maximumCardinality = row[Option[CardinalNumber]](idx + 29),
-          dtdIdentifier = row[Option[SqlIdentifier]](idx + 30),
-          parameterDefault = row[Option[CharacterData]](idx + 31)
+          specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
+          specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
+          specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
+          ordinalPosition = json.\("ordinal_position").toOption.map(_.as[CardinalNumber]),
+          parameterMode = json.\("parameter_mode").toOption.map(_.as[CharacterData]),
+          isResult = json.\("is_result").toOption.map(_.as[YesOrNo]),
+          asLocator = json.\("as_locator").toOption.map(_.as[YesOrNo]),
+          parameterName = json.\("parameter_name").toOption.map(_.as[SqlIdentifier]),
+          dataType = json.\("data_type").toOption.map(_.as[CharacterData]),
+          characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as[CardinalNumber]),
+          characterOctetLength = json.\("character_octet_length").toOption.map(_.as[CardinalNumber]),
+          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
+          characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
+          characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier]),
+          collationCatalog = json.\("collation_catalog").toOption.map(_.as[SqlIdentifier]),
+          collationSchema = json.\("collation_schema").toOption.map(_.as[SqlIdentifier]),
+          collationName = json.\("collation_name").toOption.map(_.as[SqlIdentifier]),
+          numericPrecision = json.\("numeric_precision").toOption.map(_.as[CardinalNumber]),
+          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as[CardinalNumber]),
+          numericScale = json.\("numeric_scale").toOption.map(_.as[CardinalNumber]),
+          datetimePrecision = json.\("datetime_precision").toOption.map(_.as[CardinalNumber]),
+          intervalType = json.\("interval_type").toOption.map(_.as[CharacterData]),
+          intervalPrecision = json.\("interval_precision").toOption.map(_.as[CardinalNumber]),
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
+          udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
+          udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
+          scopeCatalog = json.\("scope_catalog").toOption.map(_.as[SqlIdentifier]),
+          scopeSchema = json.\("scope_schema").toOption.map(_.as[SqlIdentifier]),
+          scopeName = json.\("scope_name").toOption.map(_.as[SqlIdentifier]),
+          maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as[CardinalNumber]),
+          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as[SqlIdentifier]),
+          parameterDefault = json.\("parameter_default").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[ParametersViewRow] = new OFormat[ParametersViewRow]{
-    override def writes(o: ParametersViewRow): JsObject =
-      Json.obj(
-        "specific_catalog" -> o.specificCatalog,
-        "specific_schema" -> o.specificSchema,
-        "specific_name" -> o.specificName,
-        "ordinal_position" -> o.ordinalPosition,
-        "parameter_mode" -> o.parameterMode,
-        "is_result" -> o.isResult,
-        "as_locator" -> o.asLocator,
-        "parameter_name" -> o.parameterName,
-        "data_type" -> o.dataType,
-        "character_maximum_length" -> o.characterMaximumLength,
-        "character_octet_length" -> o.characterOctetLength,
-        "character_set_catalog" -> o.characterSetCatalog,
-        "character_set_schema" -> o.characterSetSchema,
-        "character_set_name" -> o.characterSetName,
-        "collation_catalog" -> o.collationCatalog,
-        "collation_schema" -> o.collationSchema,
-        "collation_name" -> o.collationName,
-        "numeric_precision" -> o.numericPrecision,
-        "numeric_precision_radix" -> o.numericPrecisionRadix,
-        "numeric_scale" -> o.numericScale,
-        "datetime_precision" -> o.datetimePrecision,
-        "interval_type" -> o.intervalType,
-        "interval_precision" -> o.intervalPrecision,
-        "udt_catalog" -> o.udtCatalog,
-        "udt_schema" -> o.udtSchema,
-        "udt_name" -> o.udtName,
-        "scope_catalog" -> o.scopeCatalog,
-        "scope_schema" -> o.scopeSchema,
-        "scope_name" -> o.scopeName,
-        "maximum_cardinality" -> o.maximumCardinality,
-        "dtd_identifier" -> o.dtdIdentifier,
-        "parameter_default" -> o.parameterDefault
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ParametersViewRow] = RowParser[ParametersViewRow] { row =>
+    Success(
+      ParametersViewRow(
+        specificCatalog = row[Option[SqlIdentifier]](idx + 0),
+        specificSchema = row[Option[SqlIdentifier]](idx + 1),
+        specificName = row[Option[SqlIdentifier]](idx + 2),
+        ordinalPosition = row[Option[CardinalNumber]](idx + 3),
+        parameterMode = row[Option[CharacterData]](idx + 4),
+        isResult = row[Option[YesOrNo]](idx + 5),
+        asLocator = row[Option[YesOrNo]](idx + 6),
+        parameterName = row[Option[SqlIdentifier]](idx + 7),
+        dataType = row[Option[CharacterData]](idx + 8),
+        characterMaximumLength = row[Option[CardinalNumber]](idx + 9),
+        characterOctetLength = row[Option[CardinalNumber]](idx + 10),
+        characterSetCatalog = row[Option[SqlIdentifier]](idx + 11),
+        characterSetSchema = row[Option[SqlIdentifier]](idx + 12),
+        characterSetName = row[Option[SqlIdentifier]](idx + 13),
+        collationCatalog = row[Option[SqlIdentifier]](idx + 14),
+        collationSchema = row[Option[SqlIdentifier]](idx + 15),
+        collationName = row[Option[SqlIdentifier]](idx + 16),
+        numericPrecision = row[Option[CardinalNumber]](idx + 17),
+        numericPrecisionRadix = row[Option[CardinalNumber]](idx + 18),
+        numericScale = row[Option[CardinalNumber]](idx + 19),
+        datetimePrecision = row[Option[CardinalNumber]](idx + 20),
+        intervalType = row[Option[CharacterData]](idx + 21),
+        intervalPrecision = row[Option[CardinalNumber]](idx + 22),
+        udtCatalog = row[Option[SqlIdentifier]](idx + 23),
+        udtSchema = row[Option[SqlIdentifier]](idx + 24),
+        udtName = row[Option[SqlIdentifier]](idx + 25),
+        scopeCatalog = row[Option[SqlIdentifier]](idx + 26),
+        scopeSchema = row[Option[SqlIdentifier]](idx + 27),
+        scopeName = row[Option[SqlIdentifier]](idx + 28),
+        maximumCardinality = row[Option[CardinalNumber]](idx + 29),
+        dtdIdentifier = row[Option[SqlIdentifier]](idx + 30),
+        parameterDefault = row[Option[CharacterData]](idx + 31)
       )
-  
-    override def reads(json: JsValue): JsResult[ParametersViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ParametersViewRow(
-            specificCatalog = json.\("specific_catalog").toOption.map(_.as[SqlIdentifier]),
-            specificSchema = json.\("specific_schema").toOption.map(_.as[SqlIdentifier]),
-            specificName = json.\("specific_name").toOption.map(_.as[SqlIdentifier]),
-            ordinalPosition = json.\("ordinal_position").toOption.map(_.as[CardinalNumber]),
-            parameterMode = json.\("parameter_mode").toOption.map(_.as[CharacterData]),
-            isResult = json.\("is_result").toOption.map(_.as[YesOrNo]),
-            asLocator = json.\("as_locator").toOption.map(_.as[YesOrNo]),
-            parameterName = json.\("parameter_name").toOption.map(_.as[SqlIdentifier]),
-            dataType = json.\("data_type").toOption.map(_.as[CharacterData]),
-            characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as[CardinalNumber]),
-            characterOctetLength = json.\("character_octet_length").toOption.map(_.as[CardinalNumber]),
-            characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
-            characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
-            characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier]),
-            collationCatalog = json.\("collation_catalog").toOption.map(_.as[SqlIdentifier]),
-            collationSchema = json.\("collation_schema").toOption.map(_.as[SqlIdentifier]),
-            collationName = json.\("collation_name").toOption.map(_.as[SqlIdentifier]),
-            numericPrecision = json.\("numeric_precision").toOption.map(_.as[CardinalNumber]),
-            numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as[CardinalNumber]),
-            numericScale = json.\("numeric_scale").toOption.map(_.as[CardinalNumber]),
-            datetimePrecision = json.\("datetime_precision").toOption.map(_.as[CardinalNumber]),
-            intervalType = json.\("interval_type").toOption.map(_.as[CharacterData]),
-            intervalPrecision = json.\("interval_precision").toOption.map(_.as[CardinalNumber]),
-            udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
-            udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
-            udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
-            scopeCatalog = json.\("scope_catalog").toOption.map(_.as[SqlIdentifier]),
-            scopeSchema = json.\("scope_schema").toOption.map(_.as[SqlIdentifier]),
-            scopeName = json.\("scope_name").toOption.map(_.as[SqlIdentifier]),
-            maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as[CardinalNumber]),
-            dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as[SqlIdentifier]),
-            parameterDefault = json.\("parameter_default").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ParametersViewRow] = OWrites[ParametersViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "specific_catalog" -> Json.toJson(o.specificCatalog),
+      "specific_schema" -> Json.toJson(o.specificSchema),
+      "specific_name" -> Json.toJson(o.specificName),
+      "ordinal_position" -> Json.toJson(o.ordinalPosition),
+      "parameter_mode" -> Json.toJson(o.parameterMode),
+      "is_result" -> Json.toJson(o.isResult),
+      "as_locator" -> Json.toJson(o.asLocator),
+      "parameter_name" -> Json.toJson(o.parameterName),
+      "data_type" -> Json.toJson(o.dataType),
+      "character_maximum_length" -> Json.toJson(o.characterMaximumLength),
+      "character_octet_length" -> Json.toJson(o.characterOctetLength),
+      "character_set_catalog" -> Json.toJson(o.characterSetCatalog),
+      "character_set_schema" -> Json.toJson(o.characterSetSchema),
+      "character_set_name" -> Json.toJson(o.characterSetName),
+      "collation_catalog" -> Json.toJson(o.collationCatalog),
+      "collation_schema" -> Json.toJson(o.collationSchema),
+      "collation_name" -> Json.toJson(o.collationName),
+      "numeric_precision" -> Json.toJson(o.numericPrecision),
+      "numeric_precision_radix" -> Json.toJson(o.numericPrecisionRadix),
+      "numeric_scale" -> Json.toJson(o.numericScale),
+      "datetime_precision" -> Json.toJson(o.datetimePrecision),
+      "interval_type" -> Json.toJson(o.intervalType),
+      "interval_precision" -> Json.toJson(o.intervalPrecision),
+      "udt_catalog" -> Json.toJson(o.udtCatalog),
+      "udt_schema" -> Json.toJson(o.udtSchema),
+      "udt_name" -> Json.toJson(o.udtName),
+      "scope_catalog" -> Json.toJson(o.scopeCatalog),
+      "scope_schema" -> Json.toJson(o.scopeSchema),
+      "scope_name" -> Json.toJson(o.scopeName),
+      "maximum_cardinality" -> Json.toJson(o.maximumCardinality),
+      "dtd_identifier" -> Json.toJson(o.dtdIdentifier),
+      "parameter_default" -> Json.toJson(o.parameterDefault)
+    ))
+  )
 }

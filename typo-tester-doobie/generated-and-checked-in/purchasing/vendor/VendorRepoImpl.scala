@@ -8,22 +8,22 @@ package purchasing
 package vendor
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"delete from purchasing.vendor where businessentityid = $businessentityid".update.run.map(_ > 0)
+    sql"delete from purchasing.vendor where businessentityid = ${businessentityid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.name}::"public"."Name", ${unsaved.creditrating}::int2, ${unsaved.preferredvendorstatus}::"public"."Flag", ${unsaved.activeflag}::"public"."Flag", ${unsaved.purchasingwebserviceurl}, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+          returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
        """.query[VendorRow].unique
   }
   override def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow] = {
@@ -43,32 +43,32 @@ object VendorRepoImpl extends VendorRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into purchasing.vendor default values
-            returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+            returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.vendor(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+            returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
          """
     }
     q.query[VendorRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
-    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor""".query[VendorRow].stream
+    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor""".query[VendorRow].stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[VendorRow]] = {
-    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid""".query[VendorRow].option
+    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor where businessentityid = ${businessentityid}""".query[VendorRow].option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow] = {
-    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = ANY($businessentityids)""".query[VendorRow].stream
+    sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from purchasing.vendor where businessentityid = ANY(${businessentityids})""".query[VendorRow].stream
   }
   override def update(row: VendorRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -80,7 +80,7 @@ object VendorRepoImpl extends VendorRepo {
               activeflag = ${row.activeflag}::"public"."Flag",
               purchasingwebserviceurl = ${row.purchasingwebserviceurl},
               modifieddate = ${row.modifieddate}::timestamp
-          where businessentityid = $businessentityid
+          where businessentityid = ${businessentityid}
        """
       .update
       .run
@@ -107,7 +107,7 @@ object VendorRepoImpl extends VendorRepo {
             activeflag = EXCLUDED.activeflag,
             purchasingwebserviceurl = EXCLUDED.purchasingwebserviceurl,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
+          returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
        """.query[VendorRow].unique
   }
 }

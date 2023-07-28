@@ -10,19 +10,20 @@ package culture
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `production.culture` */
 case class CultureId(value: /* bpchar */ String) extends AnyVal
 object CultureId {
-  implicit val ordering: Ordering[CultureId] = Ordering.by(_.value)
-  implicit val format: Format[CultureId] = implicitly[Format[/* bpchar */ String]].bimap(CultureId.apply, _.value)
-  implicit val toStatement: ToStatement[CultureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[CultureId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[CultureId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
   implicit val column: Column[CultureId] = implicitly[Column[/* bpchar */ String]].map(CultureId.apply)
+  implicit val ordering: Ordering[CultureId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[CultureId] = new ParameterMetaData[CultureId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* bpchar */ String]].jdbcType
   }
-
+  implicit val reads: Reads[CultureId] = implicitly[Reads[/* bpchar */ String]].map(CultureId.apply)
+  implicit val toStatement: ToStatement[CultureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
+  implicit val writes: Writes[CultureId] = implicitly[Writes[/* bpchar */ String]].contramap(_.value)
 }

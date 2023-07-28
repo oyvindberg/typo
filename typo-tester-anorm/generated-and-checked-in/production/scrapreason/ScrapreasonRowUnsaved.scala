@@ -8,13 +8,15 @@ package production
 package scrapreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.scrapreason` which has not been persisted yet */
@@ -25,9 +27,9 @@ case class ScrapreasonRowUnsaved(
       Primary key for ScrapReason records. */
   scrapreasonid: Defaulted[ScrapreasonId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(scrapreasonidDefault: => ScrapreasonId, modifieddateDefault: => LocalDateTime): ScrapreasonRow =
+  def toRow(scrapreasonidDefault: => ScrapreasonId, modifieddateDefault: => TypoLocalDateTime): ScrapreasonRow =
     ScrapreasonRow(
       name = name,
       scrapreasonid = scrapreasonid match {
@@ -41,24 +43,21 @@ case class ScrapreasonRowUnsaved(
     )
 }
 object ScrapreasonRowUnsaved {
-  implicit val oFormat: OFormat[ScrapreasonRowUnsaved] = new OFormat[ScrapreasonRowUnsaved]{
-    override def writes(o: ScrapreasonRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "scrapreasonid" -> o.scrapreasonid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ScrapreasonRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ScrapreasonRowUnsaved(
-            name = json.\("name").as[Name],
-            scrapreasonid = json.\("scrapreasonid").as[Defaulted[ScrapreasonId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ScrapreasonRowUnsaved] = Reads[ScrapreasonRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ScrapreasonRowUnsaved(
+          name = json.\("name").as[Name],
+          scrapreasonid = json.\("scrapreasonid").as[Defaulted[ScrapreasonId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ScrapreasonRowUnsaved] = OWrites[ScrapreasonRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

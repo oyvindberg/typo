@@ -8,18 +8,19 @@ package hardcoded
 package myschema
 package football_club
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `myschema.football_club` */
 case class FootballClubId(value: Long) extends AnyVal
 object FootballClubId {
+  implicit val arrayGet: Get[Array[FootballClubId]] = Get[Array[Long]].map(_.map(FootballClubId.apply))
+  implicit val arrayPut: Put[Array[FootballClubId]] = Put[Array[Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[FootballClubId] = Decoder[Long].map(FootballClubId.apply)
+  implicit val encoder: Encoder[FootballClubId] = Encoder[Long].contramap(_.value)
+  implicit val get: Get[FootballClubId] = Get[Long].map(FootballClubId.apply)
   implicit val ordering: Ordering[FootballClubId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[FootballClubId] =
-    Encoder[Long].contramap(_.value)
-  implicit val decoder: Decoder[FootballClubId] =
-    Decoder[Long].map(FootballClubId(_))
-  implicit val meta: Meta[FootballClubId] = Meta[Long].imap(FootballClubId.apply)(_.value)
-  implicit val metaArray: Meta[Array[FootballClubId]] = Meta[Array[Long]].imap(_.map(FootballClubId.apply))(_.map(_.value))
+  implicit val put: Put[FootballClubId] = Put[Long].contramap(_.value)
 }

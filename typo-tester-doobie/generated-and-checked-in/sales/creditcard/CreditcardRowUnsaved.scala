@@ -8,11 +8,9 @@ package sales
 package creditcard
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.creditcard` which has not been persisted yet */
 case class CreditcardRowUnsaved(
@@ -28,9 +26,9 @@ case class CreditcardRowUnsaved(
       Primary key for CreditCard records. */
   creditcardid: Defaulted[CreditcardId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(creditcardidDefault: => CreditcardId, modifieddateDefault: => LocalDateTime): CreditcardRow =
+  def toRow(creditcardidDefault: => CreditcardId, modifieddateDefault: => TypoLocalDateTime): CreditcardRow =
     CreditcardRow(
       cardtype = cardtype,
       cardnumber = cardnumber,
@@ -47,25 +45,6 @@ case class CreditcardRowUnsaved(
     )
 }
 object CreditcardRowUnsaved {
-  implicit val decoder: Decoder[CreditcardRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        cardtype <- c.downField("cardtype").as[/* max 50 chars */ String]
-        cardnumber <- c.downField("cardnumber").as[/* max 25 chars */ String]
-        expmonth <- c.downField("expmonth").as[Int]
-        expyear <- c.downField("expyear").as[Int]
-        creditcardid <- c.downField("creditcardid").as[Defaulted[CreditcardId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield CreditcardRowUnsaved(cardtype, cardnumber, expmonth, expyear, creditcardid, modifieddate)
-  implicit val encoder: Encoder[CreditcardRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "cardtype" := row.cardtype,
-        "cardnumber" := row.cardnumber,
-        "expmonth" := row.expmonth,
-        "expyear" := row.expyear,
-        "creditcardid" := row.creditcardid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[CreditcardRowUnsaved] = Decoder.forProduct6[CreditcardRowUnsaved, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, Defaulted[CreditcardId], Defaulted[TypoLocalDateTime]]("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate")(CreditcardRowUnsaved.apply)
+  implicit val encoder: Encoder[CreditcardRowUnsaved] = Encoder.forProduct6[CreditcardRowUnsaved, /* max 50 chars */ String, /* max 25 chars */ String, Int, Int, Defaulted[CreditcardId], Defaulted[TypoLocalDateTime]]("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate")(x => (x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.creditcardid, x.modifieddate))
 }

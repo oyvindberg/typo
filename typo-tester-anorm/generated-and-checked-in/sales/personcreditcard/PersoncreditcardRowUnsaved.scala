@@ -8,14 +8,16 @@ package sales
 package personcreditcard
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.personcreditcard` which has not been persisted yet */
@@ -27,9 +29,9 @@ case class PersoncreditcardRowUnsaved(
       Points to [[creditcard.CreditcardRow.creditcardid]] */
   creditcardid: CreditcardId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): PersoncreditcardRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): PersoncreditcardRow =
     PersoncreditcardRow(
       businessentityid = businessentityid,
       creditcardid = creditcardid,
@@ -40,24 +42,21 @@ case class PersoncreditcardRowUnsaved(
     )
 }
 object PersoncreditcardRowUnsaved {
-  implicit val oFormat: OFormat[PersoncreditcardRowUnsaved] = new OFormat[PersoncreditcardRowUnsaved]{
-    override def writes(o: PersoncreditcardRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "creditcardid" -> o.creditcardid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[PersoncreditcardRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          PersoncreditcardRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            creditcardid = json.\("creditcardid").as[CreditcardId],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[PersoncreditcardRowUnsaved] = Reads[PersoncreditcardRowUnsaved](json => JsResult.fromTry(
+      Try(
+        PersoncreditcardRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          creditcardid = json.\("creditcardid").as[CreditcardId],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PersoncreditcardRowUnsaved] = OWrites[PersoncreditcardRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "creditcardid" -> Json.toJson(o.creditcardid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

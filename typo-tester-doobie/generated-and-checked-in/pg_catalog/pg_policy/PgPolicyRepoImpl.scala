@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgPolicyRepoImpl extends PgPolicyRepo {
   override def delete(oid: PgPolicyId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_policy where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_policy where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow] = {
     sql"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
@@ -25,10 +25,10 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
     sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy".query[PgPolicyRow].stream
   }
   override def selectById(oid: PgPolicyId): ConnectionIO[Option[PgPolicyRow]] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = $oid".query[PgPolicyRow].option
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ${oid}".query[PgPolicyRow].option
   }
   override def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY($oids)".query[PgPolicyRow].stream
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${oids})".query[PgPolicyRow].stream
   }
   override def update(row: PgPolicyRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -40,7 +40,7 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
               polroles = ${row.polroles}::_oid,
               polqual = ${row.polqual}::pg_node_tree,
               polwithcheck = ${row.polwithcheck}::pg_node_tree
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

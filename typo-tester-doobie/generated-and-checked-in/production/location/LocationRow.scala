@@ -7,16 +7,14 @@ package adventureworks
 package production
 package location
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class LocationRow(
   /** Primary key for Location records. */
@@ -27,46 +25,26 @@ case class LocationRow(
   costrate: BigDecimal,
   /** Work capacity (in hours) of the manufacturing location. */
   availability: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object LocationRow {
-  implicit val decoder: Decoder[LocationRow] =
-    (c: HCursor) =>
-      for {
-        locationid <- c.downField("locationid").as[LocationId]
-        name <- c.downField("name").as[Name]
-        costrate <- c.downField("costrate").as[BigDecimal]
-        availability <- c.downField("availability").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield LocationRow(locationid, name, costrate, availability, modifieddate)
-  implicit val encoder: Encoder[LocationRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "locationid" := row.locationid,
-        "name" := row.name,
-        "costrate" := row.costrate,
-        "availability" := row.availability,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[LocationRow] =
-    new Read[LocationRow](
-      gets = List(
-        (Get[LocationId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => LocationRow(
-        locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        costrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
-        availability = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[LocationRow] = Decoder.forProduct5[LocationRow, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("locationid", "name", "costrate", "availability", "modifieddate")(LocationRow.apply)
+  implicit val encoder: Encoder[LocationRow] = Encoder.forProduct5[LocationRow, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("locationid", "name", "costrate", "availability", "modifieddate")(x => (x.locationid, x.name, x.costrate, x.availability, x.modifieddate))
+  implicit val read: Read[LocationRow] = new Read[LocationRow](
+    gets = List(
+      (Get[LocationId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => LocationRow(
+      locationid = Get[LocationId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      costrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 2),
+      availability = Get[BigDecimal].unsafeGetNonNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

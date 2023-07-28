@@ -7,16 +7,14 @@ package adventureworks
 package person
 package emailaddress
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class EmailaddressRow(
@@ -28,48 +26,28 @@ case class EmailaddressRow(
   /** E-mail address for the person. */
   emailaddress: Option[/* max 50 chars */ String],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmailaddressId = EmailaddressId(businessentityid, emailaddressid)
  }
 
 object EmailaddressRow {
-  implicit val decoder: Decoder[EmailaddressRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        emailaddressid <- c.downField("emailaddressid").as[Int]
-        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield EmailaddressRow(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
-  implicit val encoder: Encoder[EmailaddressRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "emailaddressid" := row.emailaddressid,
-        "emailaddress" := row.emailaddress,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[EmailaddressRow] =
-    new Read[EmailaddressRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EmailaddressRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        emailaddressid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[EmailaddressRow] = Decoder.forProduct5[EmailaddressRow, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EmailaddressRow.apply)
+  implicit val encoder: Encoder[EmailaddressRow] = Encoder.forProduct5[EmailaddressRow, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))
+  implicit val read: Read[EmailaddressRow] = new Read[EmailaddressRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => EmailaddressRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      emailaddressid = Get[Int].unsafeGetNonNullable(rs, i + 1),
+      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object TrViewRepoImpl extends TrViewRepo {
   override def selectAll(implicit c: Connection): List[TrViewRow] = {
-    SQL"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
+    SQL"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
           from sa.tr
        """.as(TrViewRow.rowParser(1).*)
   }

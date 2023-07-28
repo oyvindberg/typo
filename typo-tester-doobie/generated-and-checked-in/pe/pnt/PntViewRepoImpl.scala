@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PntViewRepoImpl extends PntViewRepo {
   override def selectAll: Stream[ConnectionIO, PntViewRow] = {
-    sql"""select "id", phonenumbertypeid, "name", modifieddate from pe.pnt""".query[PntViewRow].stream
+    sql"""select "id", phonenumbertypeid, "name", modifieddate::text from pe.pnt""".query[PntViewRow].stream
   }
 }

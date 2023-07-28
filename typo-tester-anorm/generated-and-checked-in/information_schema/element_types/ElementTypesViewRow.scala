@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ElementTypesViewRow(
@@ -56,112 +58,108 @@ case class ElementTypesViewRow(
 )
 
 object ElementTypesViewRow {
-  def rowParser(idx: Int): RowParser[ElementTypesViewRow] =
-    RowParser[ElementTypesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ElementTypesViewRow] = Reads[ElementTypesViewRow](json => JsResult.fromTry(
+      Try(
         ElementTypesViewRow(
-          objectCatalog = row[Option[SqlIdentifier]](idx + 0),
-          objectSchema = row[Option[SqlIdentifier]](idx + 1),
-          objectName = row[Option[SqlIdentifier]](idx + 2),
-          objectType = row[Option[CharacterData]](idx + 3),
-          collectionTypeIdentifier = row[Option[SqlIdentifier]](idx + 4),
-          dataType = row[Option[CharacterData]](idx + 5),
-          characterMaximumLength = row[Option[CardinalNumber]](idx + 6),
-          characterOctetLength = row[Option[CardinalNumber]](idx + 7),
-          characterSetCatalog = row[Option[SqlIdentifier]](idx + 8),
-          characterSetSchema = row[Option[SqlIdentifier]](idx + 9),
-          characterSetName = row[Option[SqlIdentifier]](idx + 10),
-          collationCatalog = row[Option[SqlIdentifier]](idx + 11),
-          collationSchema = row[Option[SqlIdentifier]](idx + 12),
-          collationName = row[Option[SqlIdentifier]](idx + 13),
-          numericPrecision = row[Option[CardinalNumber]](idx + 14),
-          numericPrecisionRadix = row[Option[CardinalNumber]](idx + 15),
-          numericScale = row[Option[CardinalNumber]](idx + 16),
-          datetimePrecision = row[Option[CardinalNumber]](idx + 17),
-          intervalType = row[Option[CharacterData]](idx + 18),
-          intervalPrecision = row[Option[CardinalNumber]](idx + 19),
-          domainDefault = row[Option[CharacterData]](idx + 20),
-          udtCatalog = row[Option[SqlIdentifier]](idx + 21),
-          udtSchema = row[Option[SqlIdentifier]](idx + 22),
-          udtName = row[Option[SqlIdentifier]](idx + 23),
-          scopeCatalog = row[Option[SqlIdentifier]](idx + 24),
-          scopeSchema = row[Option[SqlIdentifier]](idx + 25),
-          scopeName = row[Option[SqlIdentifier]](idx + 26),
-          maximumCardinality = row[Option[CardinalNumber]](idx + 27),
-          dtdIdentifier = row[Option[SqlIdentifier]](idx + 28)
+          objectCatalog = json.\("object_catalog").toOption.map(_.as[SqlIdentifier]),
+          objectSchema = json.\("object_schema").toOption.map(_.as[SqlIdentifier]),
+          objectName = json.\("object_name").toOption.map(_.as[SqlIdentifier]),
+          objectType = json.\("object_type").toOption.map(_.as[CharacterData]),
+          collectionTypeIdentifier = json.\("collection_type_identifier").toOption.map(_.as[SqlIdentifier]),
+          dataType = json.\("data_type").toOption.map(_.as[CharacterData]),
+          characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as[CardinalNumber]),
+          characterOctetLength = json.\("character_octet_length").toOption.map(_.as[CardinalNumber]),
+          characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
+          characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
+          characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier]),
+          collationCatalog = json.\("collation_catalog").toOption.map(_.as[SqlIdentifier]),
+          collationSchema = json.\("collation_schema").toOption.map(_.as[SqlIdentifier]),
+          collationName = json.\("collation_name").toOption.map(_.as[SqlIdentifier]),
+          numericPrecision = json.\("numeric_precision").toOption.map(_.as[CardinalNumber]),
+          numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as[CardinalNumber]),
+          numericScale = json.\("numeric_scale").toOption.map(_.as[CardinalNumber]),
+          datetimePrecision = json.\("datetime_precision").toOption.map(_.as[CardinalNumber]),
+          intervalType = json.\("interval_type").toOption.map(_.as[CharacterData]),
+          intervalPrecision = json.\("interval_precision").toOption.map(_.as[CardinalNumber]),
+          domainDefault = json.\("domain_default").toOption.map(_.as[CharacterData]),
+          udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
+          udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
+          udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
+          scopeCatalog = json.\("scope_catalog").toOption.map(_.as[SqlIdentifier]),
+          scopeSchema = json.\("scope_schema").toOption.map(_.as[SqlIdentifier]),
+          scopeName = json.\("scope_name").toOption.map(_.as[SqlIdentifier]),
+          maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as[CardinalNumber]),
+          dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[ElementTypesViewRow] = new OFormat[ElementTypesViewRow]{
-    override def writes(o: ElementTypesViewRow): JsObject =
-      Json.obj(
-        "object_catalog" -> o.objectCatalog,
-        "object_schema" -> o.objectSchema,
-        "object_name" -> o.objectName,
-        "object_type" -> o.objectType,
-        "collection_type_identifier" -> o.collectionTypeIdentifier,
-        "data_type" -> o.dataType,
-        "character_maximum_length" -> o.characterMaximumLength,
-        "character_octet_length" -> o.characterOctetLength,
-        "character_set_catalog" -> o.characterSetCatalog,
-        "character_set_schema" -> o.characterSetSchema,
-        "character_set_name" -> o.characterSetName,
-        "collation_catalog" -> o.collationCatalog,
-        "collation_schema" -> o.collationSchema,
-        "collation_name" -> o.collationName,
-        "numeric_precision" -> o.numericPrecision,
-        "numeric_precision_radix" -> o.numericPrecisionRadix,
-        "numeric_scale" -> o.numericScale,
-        "datetime_precision" -> o.datetimePrecision,
-        "interval_type" -> o.intervalType,
-        "interval_precision" -> o.intervalPrecision,
-        "domain_default" -> o.domainDefault,
-        "udt_catalog" -> o.udtCatalog,
-        "udt_schema" -> o.udtSchema,
-        "udt_name" -> o.udtName,
-        "scope_catalog" -> o.scopeCatalog,
-        "scope_schema" -> o.scopeSchema,
-        "scope_name" -> o.scopeName,
-        "maximum_cardinality" -> o.maximumCardinality,
-        "dtd_identifier" -> o.dtdIdentifier
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ElementTypesViewRow] = RowParser[ElementTypesViewRow] { row =>
+    Success(
+      ElementTypesViewRow(
+        objectCatalog = row[Option[SqlIdentifier]](idx + 0),
+        objectSchema = row[Option[SqlIdentifier]](idx + 1),
+        objectName = row[Option[SqlIdentifier]](idx + 2),
+        objectType = row[Option[CharacterData]](idx + 3),
+        collectionTypeIdentifier = row[Option[SqlIdentifier]](idx + 4),
+        dataType = row[Option[CharacterData]](idx + 5),
+        characterMaximumLength = row[Option[CardinalNumber]](idx + 6),
+        characterOctetLength = row[Option[CardinalNumber]](idx + 7),
+        characterSetCatalog = row[Option[SqlIdentifier]](idx + 8),
+        characterSetSchema = row[Option[SqlIdentifier]](idx + 9),
+        characterSetName = row[Option[SqlIdentifier]](idx + 10),
+        collationCatalog = row[Option[SqlIdentifier]](idx + 11),
+        collationSchema = row[Option[SqlIdentifier]](idx + 12),
+        collationName = row[Option[SqlIdentifier]](idx + 13),
+        numericPrecision = row[Option[CardinalNumber]](idx + 14),
+        numericPrecisionRadix = row[Option[CardinalNumber]](idx + 15),
+        numericScale = row[Option[CardinalNumber]](idx + 16),
+        datetimePrecision = row[Option[CardinalNumber]](idx + 17),
+        intervalType = row[Option[CharacterData]](idx + 18),
+        intervalPrecision = row[Option[CardinalNumber]](idx + 19),
+        domainDefault = row[Option[CharacterData]](idx + 20),
+        udtCatalog = row[Option[SqlIdentifier]](idx + 21),
+        udtSchema = row[Option[SqlIdentifier]](idx + 22),
+        udtName = row[Option[SqlIdentifier]](idx + 23),
+        scopeCatalog = row[Option[SqlIdentifier]](idx + 24),
+        scopeSchema = row[Option[SqlIdentifier]](idx + 25),
+        scopeName = row[Option[SqlIdentifier]](idx + 26),
+        maximumCardinality = row[Option[CardinalNumber]](idx + 27),
+        dtdIdentifier = row[Option[SqlIdentifier]](idx + 28)
       )
-  
-    override def reads(json: JsValue): JsResult[ElementTypesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ElementTypesViewRow(
-            objectCatalog = json.\("object_catalog").toOption.map(_.as[SqlIdentifier]),
-            objectSchema = json.\("object_schema").toOption.map(_.as[SqlIdentifier]),
-            objectName = json.\("object_name").toOption.map(_.as[SqlIdentifier]),
-            objectType = json.\("object_type").toOption.map(_.as[CharacterData]),
-            collectionTypeIdentifier = json.\("collection_type_identifier").toOption.map(_.as[SqlIdentifier]),
-            dataType = json.\("data_type").toOption.map(_.as[CharacterData]),
-            characterMaximumLength = json.\("character_maximum_length").toOption.map(_.as[CardinalNumber]),
-            characterOctetLength = json.\("character_octet_length").toOption.map(_.as[CardinalNumber]),
-            characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as[SqlIdentifier]),
-            characterSetSchema = json.\("character_set_schema").toOption.map(_.as[SqlIdentifier]),
-            characterSetName = json.\("character_set_name").toOption.map(_.as[SqlIdentifier]),
-            collationCatalog = json.\("collation_catalog").toOption.map(_.as[SqlIdentifier]),
-            collationSchema = json.\("collation_schema").toOption.map(_.as[SqlIdentifier]),
-            collationName = json.\("collation_name").toOption.map(_.as[SqlIdentifier]),
-            numericPrecision = json.\("numeric_precision").toOption.map(_.as[CardinalNumber]),
-            numericPrecisionRadix = json.\("numeric_precision_radix").toOption.map(_.as[CardinalNumber]),
-            numericScale = json.\("numeric_scale").toOption.map(_.as[CardinalNumber]),
-            datetimePrecision = json.\("datetime_precision").toOption.map(_.as[CardinalNumber]),
-            intervalType = json.\("interval_type").toOption.map(_.as[CharacterData]),
-            intervalPrecision = json.\("interval_precision").toOption.map(_.as[CardinalNumber]),
-            domainDefault = json.\("domain_default").toOption.map(_.as[CharacterData]),
-            udtCatalog = json.\("udt_catalog").toOption.map(_.as[SqlIdentifier]),
-            udtSchema = json.\("udt_schema").toOption.map(_.as[SqlIdentifier]),
-            udtName = json.\("udt_name").toOption.map(_.as[SqlIdentifier]),
-            scopeCatalog = json.\("scope_catalog").toOption.map(_.as[SqlIdentifier]),
-            scopeSchema = json.\("scope_schema").toOption.map(_.as[SqlIdentifier]),
-            scopeName = json.\("scope_name").toOption.map(_.as[SqlIdentifier]),
-            maximumCardinality = json.\("maximum_cardinality").toOption.map(_.as[CardinalNumber]),
-            dtdIdentifier = json.\("dtd_identifier").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ElementTypesViewRow] = OWrites[ElementTypesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "object_catalog" -> Json.toJson(o.objectCatalog),
+      "object_schema" -> Json.toJson(o.objectSchema),
+      "object_name" -> Json.toJson(o.objectName),
+      "object_type" -> Json.toJson(o.objectType),
+      "collection_type_identifier" -> Json.toJson(o.collectionTypeIdentifier),
+      "data_type" -> Json.toJson(o.dataType),
+      "character_maximum_length" -> Json.toJson(o.characterMaximumLength),
+      "character_octet_length" -> Json.toJson(o.characterOctetLength),
+      "character_set_catalog" -> Json.toJson(o.characterSetCatalog),
+      "character_set_schema" -> Json.toJson(o.characterSetSchema),
+      "character_set_name" -> Json.toJson(o.characterSetName),
+      "collation_catalog" -> Json.toJson(o.collationCatalog),
+      "collation_schema" -> Json.toJson(o.collationSchema),
+      "collation_name" -> Json.toJson(o.collationName),
+      "numeric_precision" -> Json.toJson(o.numericPrecision),
+      "numeric_precision_radix" -> Json.toJson(o.numericPrecisionRadix),
+      "numeric_scale" -> Json.toJson(o.numericScale),
+      "datetime_precision" -> Json.toJson(o.datetimePrecision),
+      "interval_type" -> Json.toJson(o.intervalType),
+      "interval_precision" -> Json.toJson(o.intervalPrecision),
+      "domain_default" -> Json.toJson(o.domainDefault),
+      "udt_catalog" -> Json.toJson(o.udtCatalog),
+      "udt_schema" -> Json.toJson(o.udtSchema),
+      "udt_name" -> Json.toJson(o.udtName),
+      "scope_catalog" -> Json.toJson(o.scopeCatalog),
+      "scope_schema" -> Json.toJson(o.scopeSchema),
+      "scope_name" -> Json.toJson(o.scopeName),
+      "maximum_cardinality" -> Json.toJson(o.maximumCardinality),
+      "dtd_identifier" -> Json.toJson(o.dtdIdentifier)
+    ))
+  )
 }

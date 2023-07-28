@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAvailableExtensionsViewRow(
@@ -24,37 +26,33 @@ case class PgAvailableExtensionsViewRow(
 )
 
 object PgAvailableExtensionsViewRow {
-  def rowParser(idx: Int): RowParser[PgAvailableExtensionsViewRow] =
-    RowParser[PgAvailableExtensionsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAvailableExtensionsViewRow] = Reads[PgAvailableExtensionsViewRow](json => JsResult.fromTry(
+      Try(
         PgAvailableExtensionsViewRow(
-          name = row[Option[String]](idx + 0),
-          defaultVersion = row[Option[String]](idx + 1),
-          installedVersion = row[Option[String]](idx + 2),
-          comment = row[Option[String]](idx + 3)
+          name = json.\("name").toOption.map(_.as[String]),
+          defaultVersion = json.\("default_version").toOption.map(_.as[String]),
+          installedVersion = json.\("installed_version").toOption.map(_.as[String]),
+          comment = json.\("comment").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAvailableExtensionsViewRow] = new OFormat[PgAvailableExtensionsViewRow]{
-    override def writes(o: PgAvailableExtensionsViewRow): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "default_version" -> o.defaultVersion,
-        "installed_version" -> o.installedVersion,
-        "comment" -> o.comment
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAvailableExtensionsViewRow] = RowParser[PgAvailableExtensionsViewRow] { row =>
+    Success(
+      PgAvailableExtensionsViewRow(
+        name = row[Option[String]](idx + 0),
+        defaultVersion = row[Option[String]](idx + 1),
+        installedVersion = row[Option[String]](idx + 2),
+        comment = row[Option[String]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAvailableExtensionsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAvailableExtensionsViewRow(
-            name = json.\("name").toOption.map(_.as[String]),
-            defaultVersion = json.\("default_version").toOption.map(_.as[String]),
-            installedVersion = json.\("installed_version").toOption.map(_.as[String]),
-            comment = json.\("comment").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAvailableExtensionsViewRow] = OWrites[PgAvailableExtensionsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "default_version" -> Json.toJson(o.defaultVersion),
+      "installed_version" -> Json.toJson(o.installedVersion),
+      "comment" -> Json.toJson(o.comment)
+    ))
+  )
 }

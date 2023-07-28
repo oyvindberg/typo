@@ -7,15 +7,17 @@ package adventureworks
 package sales
 package currency
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CurrencyRow(
@@ -23,38 +25,34 @@ case class CurrencyRow(
   currencycode: CurrencyId,
   /** Currency name. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CurrencyRow {
-  def rowParser(idx: Int): RowParser[CurrencyRow] =
-    RowParser[CurrencyRow] { row =>
-      Success(
+  implicit val reads: Reads[CurrencyRow] = Reads[CurrencyRow](json => JsResult.fromTry(
+      Try(
         CurrencyRow(
-          currencycode = row[CurrencyId](idx + 0),
-          name = row[Name](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          currencycode = json.\("currencycode").as[CurrencyId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[CurrencyRow] = new OFormat[CurrencyRow]{
-    override def writes(o: CurrencyRow): JsObject =
-      Json.obj(
-        "currencycode" -> o.currencycode,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CurrencyRow] = RowParser[CurrencyRow] { row =>
+    Success(
+      CurrencyRow(
+        currencycode = row[CurrencyId](idx + 0),
+        name = row[Name](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[CurrencyRow] = {
-      JsResult.fromTry(
-        Try(
-          CurrencyRow(
-            currencycode = json.\("currencycode").as[CurrencyId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[CurrencyRow] = OWrites[CurrencyRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "currencycode" -> Json.toJson(o.currencycode),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

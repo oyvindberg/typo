@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgShadowViewRepoImpl extends PgShadowViewRepo {
   override def selectAll: Stream[ConnectionIO, PgShadowViewRow] = {
-    sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig from pg_catalog.pg_shadow".query[PgShadowViewRow].stream
+    sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig from pg_catalog.pg_shadow".query[PgShadowViewRow].stream
   }
 }

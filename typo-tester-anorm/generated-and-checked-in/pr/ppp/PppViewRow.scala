@@ -7,17 +7,19 @@ package adventureworks
 package pr
 package ppp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PppViewRow(
@@ -28,41 +30,37 @@ case class PppViewRow(
   /** Points to [[production.productproductphoto.ProductproductphotoRow.primary]] */
   primary: Flag,
   /** Points to [[production.productproductphoto.ProductproductphotoRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PppViewRow {
-  def rowParser(idx: Int): RowParser[PppViewRow] =
-    RowParser[PppViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PppViewRow] = Reads[PppViewRow](json => JsResult.fromTry(
+      Try(
         PppViewRow(
-          productid = row[Option[ProductId]](idx + 0),
-          productphotoid = row[Option[ProductphotoId]](idx + 1),
-          primary = row[Flag](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          productid = json.\("productid").toOption.map(_.as[ProductId]),
+          productphotoid = json.\("productphotoid").toOption.map(_.as[ProductphotoId]),
+          primary = json.\("primary").as[Flag],
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PppViewRow] = new OFormat[PppViewRow]{
-    override def writes(o: PppViewRow): JsObject =
-      Json.obj(
-        "productid" -> o.productid,
-        "productphotoid" -> o.productphotoid,
-        "primary" -> o.primary,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PppViewRow] = RowParser[PppViewRow] { row =>
+    Success(
+      PppViewRow(
+        productid = row[Option[ProductId]](idx + 0),
+        productphotoid = row[Option[ProductphotoId]](idx + 1),
+        primary = row[Flag](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PppViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PppViewRow(
-            productid = json.\("productid").toOption.map(_.as[ProductId]),
-            productphotoid = json.\("productphotoid").toOption.map(_.as[ProductphotoId]),
-            primary = json.\("primary").as[Flag],
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PppViewRow] = OWrites[PppViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productid" -> Json.toJson(o.productid),
+      "productphotoid" -> Json.toJson(o.productphotoid),
+      "primary" -> Json.toJson(o.primary),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

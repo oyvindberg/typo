@@ -13,6 +13,6 @@ import fs2.Stream
 
 object LViewRepoImpl extends LViewRepo {
   override def selectAll: Stream[ConnectionIO, LViewRow] = {
-    sql"""select "id", locationid, "name", costrate, availability, modifieddate from pr.l""".query[LViewRow].stream
+    sql"""select "id", locationid, "name", costrate, availability, modifieddate::text from pr.l""".query[LViewRow].stream
   }
 }

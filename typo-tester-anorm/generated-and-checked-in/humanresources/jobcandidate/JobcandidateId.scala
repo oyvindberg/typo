@@ -10,19 +10,20 @@ package jobcandidate
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `humanresources.jobcandidate` */
 case class JobcandidateId(value: Int) extends AnyVal
 object JobcandidateId {
-  implicit val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
-  implicit val format: Format[JobcandidateId] = implicitly[Format[Int]].bimap(JobcandidateId.apply, _.value)
-  implicit val toStatement: ToStatement[JobcandidateId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[JobcandidateId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[JobcandidateId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[JobcandidateId] = implicitly[Column[Int]].map(JobcandidateId.apply)
+  implicit val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[JobcandidateId] = new ParameterMetaData[JobcandidateId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[JobcandidateId] = implicitly[Reads[Int]].map(JobcandidateId.apply)
+  implicit val toStatement: ToStatement[JobcandidateId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[JobcandidateId] = implicitly[Writes[Int]].contramap(_.value)
 }

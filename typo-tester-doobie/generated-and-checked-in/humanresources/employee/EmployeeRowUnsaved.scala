@@ -8,14 +8,12 @@ package humanresources
 package employee
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `humanresources.employee` which has not been persisted yet */
@@ -30,13 +28,13 @@ case class EmployeeRowUnsaved(
   /** Work title such as Buyer or Sales Representative. */
   jobtitle: /* max 50 chars */ String,
   /** Date of birth. */
-  birthdate: LocalDate,
+  birthdate: TypoLocalDate,
   /** M = Married, S = Single */
   maritalstatus: /* bpchar */ String,
   /** M = Male, F = Female */
   gender: /* bpchar */ String,
   /** Employee hired on this date. */
-  hiredate: LocalDate,
+  hiredate: TypoLocalDate,
   /** Default: true
       Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */
   salariedflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -52,12 +50,12 @@ case class EmployeeRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: '/'::character varying
       Where the employee is located in corporate hierarchy. */
   organizationnode: Defaulted[Option[String]] = Defaulted.UseDefault
 ) {
-  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => Int, sickleavehoursDefault: => Int, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
+  def toRow(salariedflagDefault: => Flag, vacationhoursDefault: => Int, sickleavehoursDefault: => Int, currentflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime, organizationnodeDefault: => Option[String]): EmployeeRow =
     EmployeeRow(
       businessentityid = businessentityid,
       nationalidnumber = nationalidnumber,
@@ -98,43 +96,6 @@ case class EmployeeRowUnsaved(
     )
 }
 object EmployeeRowUnsaved {
-  implicit val decoder: Decoder[EmployeeRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        nationalidnumber <- c.downField("nationalidnumber").as[/* max 15 chars */ String]
-        loginid <- c.downField("loginid").as[/* max 256 chars */ String]
-        jobtitle <- c.downField("jobtitle").as[/* max 50 chars */ String]
-        birthdate <- c.downField("birthdate").as[LocalDate]
-        maritalstatus <- c.downField("maritalstatus").as[/* bpchar */ String]
-        gender <- c.downField("gender").as[/* bpchar */ String]
-        hiredate <- c.downField("hiredate").as[LocalDate]
-        salariedflag <- c.downField("salariedflag").as[Defaulted[Flag]]
-        vacationhours <- c.downField("vacationhours").as[Defaulted[Int]]
-        sickleavehours <- c.downField("sickleavehours").as[Defaulted[Int]]
-        currentflag <- c.downField("currentflag").as[Defaulted[Flag]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-        organizationnode <- c.downField("organizationnode").as[Defaulted[Option[String]]]
-      } yield EmployeeRowUnsaved(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
-  implicit val encoder: Encoder[EmployeeRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "nationalidnumber" := row.nationalidnumber,
-        "loginid" := row.loginid,
-        "jobtitle" := row.jobtitle,
-        "birthdate" := row.birthdate,
-        "maritalstatus" := row.maritalstatus,
-        "gender" := row.gender,
-        "hiredate" := row.hiredate,
-        "salariedflag" := row.salariedflag,
-        "vacationhours" := row.vacationhours,
-        "sickleavehours" := row.sickleavehours,
-        "currentflag" := row.currentflag,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate,
-        "organizationnode" := row.organizationnode
-      )}
+  implicit val decoder: Decoder[EmployeeRowUnsaved] = Decoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar */ String, /* bpchar */ String, TypoLocalDate, Defaulted[Flag], Defaulted[Int], Defaulted[Int], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRowUnsaved.apply)
+  implicit val encoder: Encoder[EmployeeRowUnsaved] = Encoder.forProduct15[EmployeeRowUnsaved, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar */ String, /* bpchar */ String, TypoLocalDate, Defaulted[Flag], Defaulted[Int], Defaulted[Int], Defaulted[Flag], Defaulted[UUID], Defaulted[TypoLocalDateTime], Defaulted[Option[String]]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))
 }

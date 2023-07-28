@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_dict where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_dict where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
     sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
@@ -25,10 +25,10 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
     sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict".query[PgTsDictRow].stream
   }
   override def selectById(oid: PgTsDictId): ConnectionIO[Option[PgTsDictRow]] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = $oid".query[PgTsDictRow].option
+    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ${oid}".query[PgTsDictRow].option
   }
   override def selectByIds(oids: Array[PgTsDictId]): Stream[ConnectionIO, PgTsDictRow] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY($oids)".query[PgTsDictRow].stream
+    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY(${oids})".query[PgTsDictRow].stream
   }
   override def update(row: PgTsDictRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -38,7 +38,7 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
               dictowner = ${row.dictowner}::oid,
               dicttemplate = ${row.dicttemplate}::oid,
               dictinitoption = ${row.dictinitoption}
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

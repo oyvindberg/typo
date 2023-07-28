@@ -8,11 +8,11 @@ package person
 package emailaddress
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object EmailaddressRepoImpl extends EmailaddressRepo {
@@ -22,7 +22,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   override def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.emailaddressid}::int4, ${unsaved.emailaddress}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
        """.query[EmailaddressRow].unique
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
@@ -39,29 +39,29 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.emailaddress default values
-            returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+            returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.emailaddress(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+            returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
          """
     }
     q.query[EmailaddressRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
-    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress".query[EmailaddressRow].stream
+    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress".query[EmailaddressRow].stream
   }
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
-    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".query[EmailaddressRow].option
+    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".query[EmailaddressRow].option
   }
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -89,7 +89,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             emailaddress = EXCLUDED.emailaddress,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
+          returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
        """.query[EmailaddressRow].unique
   }
 }

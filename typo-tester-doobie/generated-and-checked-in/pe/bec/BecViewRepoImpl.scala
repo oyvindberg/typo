@@ -13,6 +13,6 @@ import fs2.Stream
 
 object BecViewRepoImpl extends BecViewRepo {
   override def selectAll: Stream[ConnectionIO, BecViewRow] = {
-    sql"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate from pe.bec""".query[BecViewRow].stream
+    sql"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate::text from pe.bec""".query[BecViewRow].stream
   }
 }

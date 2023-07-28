@@ -7,17 +7,15 @@ package adventureworks
 package pr
 package pi
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class PiViewRow(
@@ -35,58 +33,32 @@ case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productinventory.ProductinventoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PiViewRow {
-  implicit val decoder: Decoder[PiViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        locationid <- c.downField("locationid").as[Option[LocationId]]
-        shelf <- c.downField("shelf").as[Option[/* max 10 chars */ String]]
-        bin <- c.downField("bin").as[Option[Int]]
-        quantity <- c.downField("quantity").as[Option[Int]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PiViewRow(id, productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
-  implicit val encoder: Encoder[PiViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productid" := row.productid,
-        "locationid" := row.locationid,
-        "shelf" := row.shelf,
-        "bin" := row.bin,
-        "quantity" := row.quantity,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PiViewRow] =
-    new Read[PiViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[LocationId], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        locationid = Get[LocationId].unsafeGetNullable(rs, i + 2),
-        shelf = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
-        bin = Get[Int].unsafeGetNullable(rs, i + 4),
-        quantity = Get[Int].unsafeGetNullable(rs, i + 5),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 6),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)
+  implicit val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, Option[Int], Option[ProductId], Option[LocationId], Option[/* max 10 chars */ String], Option[Int], Option[Int], Option[UUID], Option[TypoLocalDateTime]]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))
+  implicit val read: Read[PiViewRow] = new Read[PiViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[LocationId], Nullability.Nullable),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
+      locationid = Get[LocationId].unsafeGetNullable(rs, i + 2),
+      shelf = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 3),
+      bin = Get[Int].unsafeGetNullable(rs, i + 4),
+      quantity = Get[Int].unsafeGetNullable(rs, i + 5),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 6),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

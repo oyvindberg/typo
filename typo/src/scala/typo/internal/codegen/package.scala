@@ -58,13 +58,4 @@ package object codegen {
                |  */""".stripMargin
     }
   }
-
-  def obj(name: sc.Ident, members: List[sc.Code]): sc.Code =
-    members match {
-      case Nil => sc.Code.Empty
-      case nonEmpty =>
-        code"""|object $name {
-               |  ${nonEmpty.mkCode("\n")}
-               |}""".stripMargin
-    }
 }

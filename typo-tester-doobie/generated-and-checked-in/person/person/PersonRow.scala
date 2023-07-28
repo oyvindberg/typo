@@ -7,19 +7,17 @@ package adventureworks
 package person
 package person
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class PersonRow(
@@ -47,78 +45,42 @@ case class PersonRow(
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
   demographics: Option[TypoXml],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object PersonRow {
-  implicit val decoder: Decoder[PersonRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        persontype <- c.downField("persontype").as[/* bpchar */ String]
-        namestyle <- c.downField("namestyle").as[NameStyle]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Name]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Name]
-        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
-        emailpromotion <- c.downField("emailpromotion").as[Int]
-        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
-        demographics <- c.downField("demographics").as[Option[TypoXml]]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield PersonRow(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
-  implicit val encoder: Encoder[PersonRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "persontype" := row.persontype,
-        "namestyle" := row.namestyle,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "suffix" := row.suffix,
-        "emailpromotion" := row.emailpromotion,
-        "additionalcontactinfo" := row.additionalcontactinfo,
-        "demographics" := row.demographics,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PersonRow] =
-    new Read[PersonRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[NameStyle], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.NoNulls),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        persontype = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 1),
-        namestyle = Get[NameStyle].unsafeGetNonNullable(rs, i + 2),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 3),
-        firstname = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 5),
-        lastname = Get[Name].unsafeGetNonNullable(rs, i + 6),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 7),
-        emailpromotion = Get[Int].unsafeGetNonNullable(rs, i + 8),
-        additionalcontactinfo = Get[TypoXml].unsafeGetNullable(rs, i + 9),
-        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 10),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 11),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 12)
-      )
+  implicit val decoder: Decoder[PersonRow] = Decoder.forProduct13[PersonRow, BusinessentityId, /* bpchar */ String, NameStyle, Option[/* max 8 chars */ String], Name, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(PersonRow.apply)
+  implicit val encoder: Encoder[PersonRow] = Encoder.forProduct13[PersonRow, BusinessentityId, /* bpchar */ String, NameStyle, Option[/* max 8 chars */ String], Name, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate))
+  implicit val read: Read[PersonRow] = new Read[PersonRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[/* bpchar */ String], Nullability.NoNulls),
+      (Get[NameStyle], Nullability.NoNulls),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.NoNulls),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.NoNulls),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      persontype = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 1),
+      namestyle = Get[NameStyle].unsafeGetNonNullable(rs, i + 2),
+      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 3),
+      firstname = Get[Name].unsafeGetNonNullable(rs, i + 4),
+      middlename = Get[Name].unsafeGetNullable(rs, i + 5),
+      lastname = Get[Name].unsafeGetNonNullable(rs, i + 6),
+      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 7),
+      emailpromotion = Get[Int].unsafeGetNonNullable(rs, i + 8),
+      additionalcontactinfo = Get[TypoXml].unsafeGetNullable(rs, i + 9),
+      demographics = Get[TypoXml].unsafeGetNullable(rs, i + 10),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 11),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 12)
     )
-  
-
+  )
 }

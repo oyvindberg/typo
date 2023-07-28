@@ -7,18 +7,20 @@ package adventureworks
 package pr
 package psc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PscViewRow(
@@ -32,47 +34,43 @@ case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PscViewRow {
-  def rowParser(idx: Int): RowParser[PscViewRow] =
-    RowParser[PscViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PscViewRow] = Reads[PscViewRow](json => JsResult.fromTry(
+      Try(
         PscViewRow(
-          id = row[Option[Int]](idx + 0),
-          productsubcategoryid = row[Option[ProductsubcategoryId]](idx + 1),
-          productcategoryid = row[Option[ProductcategoryId]](idx + 2),
-          name = row[Option[Name]](idx + 3),
-          rowguid = row[Option[UUID]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          productsubcategoryid = json.\("productsubcategoryid").toOption.map(_.as[ProductsubcategoryId]),
+          productcategoryid = json.\("productcategoryid").toOption.map(_.as[ProductcategoryId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PscViewRow] = new OFormat[PscViewRow]{
-    override def writes(o: PscViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "productsubcategoryid" -> o.productsubcategoryid,
-        "productcategoryid" -> o.productcategoryid,
-        "name" -> o.name,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PscViewRow] = RowParser[PscViewRow] { row =>
+    Success(
+      PscViewRow(
+        id = row[Option[Int]](idx + 0),
+        productsubcategoryid = row[Option[ProductsubcategoryId]](idx + 1),
+        productcategoryid = row[Option[ProductcategoryId]](idx + 2),
+        name = row[Option[Name]](idx + 3),
+        rowguid = row[Option[UUID]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PscViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PscViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            productsubcategoryid = json.\("productsubcategoryid").toOption.map(_.as[ProductsubcategoryId]),
-            productcategoryid = json.\("productcategoryid").toOption.map(_.as[ProductcategoryId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PscViewRow] = OWrites[PscViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "productsubcategoryid" -> Json.toJson(o.productsubcategoryid),
+      "productcategoryid" -> Json.toJson(o.productcategoryid),
+      "name" -> Json.toJson(o.name),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

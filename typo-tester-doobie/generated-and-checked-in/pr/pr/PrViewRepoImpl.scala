@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PrViewRepoImpl extends PrViewRepo {
   override def selectAll: Stream[ConnectionIO, PrViewRow] = {
-    sql"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from pr.pr""".query[PrViewRow].stream
+    sql"""select "id", productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from pr.pr""".query[PrViewRow].stream
   }
 }

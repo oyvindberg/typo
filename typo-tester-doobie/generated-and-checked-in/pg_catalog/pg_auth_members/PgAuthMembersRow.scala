@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_auth_members
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgAuthMembersRow(
@@ -26,38 +24,20 @@ case class PgAuthMembersRow(
  }
 
 object PgAuthMembersRow {
-  implicit val decoder: Decoder[PgAuthMembersRow] =
-    (c: HCursor) =>
-      for {
-        roleid <- c.downField("roleid").as[/* oid */ Long]
-        member <- c.downField("member").as[/* oid */ Long]
-        grantor <- c.downField("grantor").as[/* oid */ Long]
-        adminOption <- c.downField("admin_option").as[Boolean]
-      } yield PgAuthMembersRow(roleid, member, grantor, adminOption)
-  implicit val encoder: Encoder[PgAuthMembersRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "roleid" := row.roleid,
-        "member" := row.member,
-        "grantor" := row.grantor,
-        "admin_option" := row.adminOption
-      )}
-  implicit val read: Read[PgAuthMembersRow] =
-    new Read[PgAuthMembersRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgAuthMembersRow(
-        roleid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        member = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        grantor = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        adminOption = Get[Boolean].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgAuthMembersRow] = Decoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(PgAuthMembersRow.apply)
+  implicit val encoder: Encoder[PgAuthMembersRow] = Encoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(x => (x.roleid, x.member, x.grantor, x.adminOption))
+  implicit val read: Read[PgAuthMembersRow] = new Read[PgAuthMembersRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgAuthMembersRow(
+      roleid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      member = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      grantor = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      adminOption = Get[Boolean].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

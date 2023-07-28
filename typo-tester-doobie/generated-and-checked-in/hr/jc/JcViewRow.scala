@@ -7,18 +7,16 @@ package adventureworks
 package hr
 package jc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class JcViewRow(
   id: Option[Int],
@@ -29,46 +27,26 @@ case class JcViewRow(
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.resume]] */
   resume: Option[TypoXml],
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object JcViewRow {
-  implicit val decoder: Decoder[JcViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        jobcandidateid <- c.downField("jobcandidateid").as[Option[JobcandidateId]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        resume <- c.downField("resume").as[Option[TypoXml]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield JcViewRow(id, jobcandidateid, businessentityid, resume, modifieddate)
-  implicit val encoder: Encoder[JcViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "jobcandidateid" := row.jobcandidateid,
-        "businessentityid" := row.businessentityid,
-        "resume" := row.resume,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[JcViewRow] =
-    new Read[JcViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[JobcandidateId], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => JcViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 1),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
-        resume = Get[TypoXml].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[JcViewRow] = Decoder.forProduct5[JcViewRow, Option[Int], Option[JobcandidateId], Option[BusinessentityId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(JcViewRow.apply)
+  implicit val encoder: Encoder[JcViewRow] = Encoder.forProduct5[JcViewRow, Option[Int], Option[JobcandidateId], Option[BusinessentityId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.id, x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))
+  implicit val read: Read[JcViewRow] = new Read[JcViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[JobcandidateId], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => JcViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      jobcandidateid = Get[JobcandidateId].unsafeGetNullable(rs, i + 1),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 2),
+      resume = Get[TypoXml].unsafeGetNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

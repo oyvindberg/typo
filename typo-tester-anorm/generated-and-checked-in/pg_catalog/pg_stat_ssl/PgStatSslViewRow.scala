@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatSslViewRow(
@@ -28,49 +30,45 @@ case class PgStatSslViewRow(
 )
 
 object PgStatSslViewRow {
-  def rowParser(idx: Int): RowParser[PgStatSslViewRow] =
-    RowParser[PgStatSslViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatSslViewRow] = Reads[PgStatSslViewRow](json => JsResult.fromTry(
+      Try(
         PgStatSslViewRow(
-          pid = row[Option[Int]](idx + 0),
-          ssl = row[Option[Boolean]](idx + 1),
-          version = row[Option[String]](idx + 2),
-          cipher = row[Option[String]](idx + 3),
-          bits = row[Option[Int]](idx + 4),
-          clientDn = row[Option[String]](idx + 5),
-          clientSerial = row[Option[BigDecimal]](idx + 6),
-          issuerDn = row[Option[String]](idx + 7)
+          pid = json.\("pid").toOption.map(_.as[Int]),
+          ssl = json.\("ssl").toOption.map(_.as[Boolean]),
+          version = json.\("version").toOption.map(_.as[String]),
+          cipher = json.\("cipher").toOption.map(_.as[String]),
+          bits = json.\("bits").toOption.map(_.as[Int]),
+          clientDn = json.\("client_dn").toOption.map(_.as[String]),
+          clientSerial = json.\("client_serial").toOption.map(_.as[BigDecimal]),
+          issuerDn = json.\("issuer_dn").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatSslViewRow] = new OFormat[PgStatSslViewRow]{
-    override def writes(o: PgStatSslViewRow): JsObject =
-      Json.obj(
-        "pid" -> o.pid,
-        "ssl" -> o.ssl,
-        "version" -> o.version,
-        "cipher" -> o.cipher,
-        "bits" -> o.bits,
-        "client_dn" -> o.clientDn,
-        "client_serial" -> o.clientSerial,
-        "issuer_dn" -> o.issuerDn
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatSslViewRow] = RowParser[PgStatSslViewRow] { row =>
+    Success(
+      PgStatSslViewRow(
+        pid = row[Option[Int]](idx + 0),
+        ssl = row[Option[Boolean]](idx + 1),
+        version = row[Option[String]](idx + 2),
+        cipher = row[Option[String]](idx + 3),
+        bits = row[Option[Int]](idx + 4),
+        clientDn = row[Option[String]](idx + 5),
+        clientSerial = row[Option[BigDecimal]](idx + 6),
+        issuerDn = row[Option[String]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatSslViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatSslViewRow(
-            pid = json.\("pid").toOption.map(_.as[Int]),
-            ssl = json.\("ssl").toOption.map(_.as[Boolean]),
-            version = json.\("version").toOption.map(_.as[String]),
-            cipher = json.\("cipher").toOption.map(_.as[String]),
-            bits = json.\("bits").toOption.map(_.as[Int]),
-            clientDn = json.\("client_dn").toOption.map(_.as[String]),
-            clientSerial = json.\("client_serial").toOption.map(_.as[BigDecimal]),
-            issuerDn = json.\("issuer_dn").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatSslViewRow] = OWrites[PgStatSslViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "pid" -> Json.toJson(o.pid),
+      "ssl" -> Json.toJson(o.ssl),
+      "version" -> Json.toJson(o.version),
+      "cipher" -> Json.toJson(o.cipher),
+      "bits" -> Json.toJson(o.bits),
+      "client_dn" -> Json.toJson(o.clientDn),
+      "client_serial" -> Json.toJson(o.clientSerial),
+      "issuer_dn" -> Json.toJson(o.issuerDn)
+    ))
+  )
 }

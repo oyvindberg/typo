@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_collation
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgCollationRow(
@@ -30,62 +28,32 @@ case class PgCollationRow(
 )
 
 object PgCollationRow {
-  implicit val decoder: Decoder[PgCollationRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgCollationId]
-        collname <- c.downField("collname").as[String]
-        collnamespace <- c.downField("collnamespace").as[/* oid */ Long]
-        collowner <- c.downField("collowner").as[/* oid */ Long]
-        collprovider <- c.downField("collprovider").as[String]
-        collisdeterministic <- c.downField("collisdeterministic").as[Boolean]
-        collencoding <- c.downField("collencoding").as[Int]
-        collcollate <- c.downField("collcollate").as[String]
-        collctype <- c.downField("collctype").as[String]
-        collversion <- c.downField("collversion").as[Option[String]]
-      } yield PgCollationRow(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
-  implicit val encoder: Encoder[PgCollationRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "collname" := row.collname,
-        "collnamespace" := row.collnamespace,
-        "collowner" := row.collowner,
-        "collprovider" := row.collprovider,
-        "collisdeterministic" := row.collisdeterministic,
-        "collencoding" := row.collencoding,
-        "collcollate" := row.collcollate,
-        "collctype" := row.collctype,
-        "collversion" := row.collversion
-      )}
-  implicit val read: Read[PgCollationRow] =
-    new Read[PgCollationRow](
-      gets = List(
-        (Get[PgCollationId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgCollationRow(
-        oid = Get[PgCollationId].unsafeGetNonNullable(rs, i + 0),
-        collname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        collnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        collowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        collprovider = Get[String].unsafeGetNonNullable(rs, i + 4),
-        collisdeterministic = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-        collencoding = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        collcollate = Get[String].unsafeGetNonNullable(rs, i + 7),
-        collctype = Get[String].unsafeGetNonNullable(rs, i + 8),
-        collversion = Get[String].unsafeGetNullable(rs, i + 9)
-      )
+  implicit val decoder: Decoder[PgCollationRow] = Decoder.forProduct10[PgCollationRow, PgCollationId, String, /* oid */ Long, /* oid */ Long, String, Boolean, Int, String, String, Option[String]]("oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion")(PgCollationRow.apply)
+  implicit val encoder: Encoder[PgCollationRow] = Encoder.forProduct10[PgCollationRow, PgCollationId, String, /* oid */ Long, /* oid */ Long, String, Boolean, Int, String, String, Option[String]]("oid", "collname", "collnamespace", "collowner", "collprovider", "collisdeterministic", "collencoding", "collcollate", "collctype", "collversion")(x => (x.oid, x.collname, x.collnamespace, x.collowner, x.collprovider, x.collisdeterministic, x.collencoding, x.collcollate, x.collctype, x.collversion))
+  implicit val read: Read[PgCollationRow] = new Read[PgCollationRow](
+    gets = List(
+      (Get[PgCollationId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgCollationRow(
+      oid = Get[PgCollationId].unsafeGetNonNullable(rs, i + 0),
+      collname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      collnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      collowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      collprovider = Get[String].unsafeGetNonNullable(rs, i + 4),
+      collisdeterministic = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
+      collencoding = Get[Int].unsafeGetNonNullable(rs, i + 6),
+      collcollate = Get[String].unsafeGetNonNullable(rs, i + 7),
+      collctype = Get[String].unsafeGetNonNullable(rs, i + 8),
+      collversion = Get[String].unsafeGetNullable(rs, i + 9)
     )
-  
-
+  )
 }

@@ -7,61 +7,41 @@ package adventureworks
 package pr
 package pdoc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PdocViewRow(
   id: Option[Int],
   /** Points to [[production.productdocument.ProductdocumentRow.productid]] */
   productid: Option[ProductId],
   /** Points to [[production.productdocument.ProductdocumentRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime],
+  modifieddate: Option[TypoLocalDateTime],
   /** Points to [[production.productdocument.ProductdocumentRow.documentnode]] */
   documentnode: Option[DocumentId]
 )
 
 object PdocViewRow {
-  implicit val decoder: Decoder[PdocViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-        documentnode <- c.downField("documentnode").as[Option[DocumentId]]
-      } yield PdocViewRow(id, productid, modifieddate, documentnode)
-  implicit val encoder: Encoder[PdocViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productid" := row.productid,
-        "modifieddate" := row.modifieddate,
-        "documentnode" := row.documentnode
-      )}
-  implicit val read: Read[PdocViewRow] =
-    new Read[PdocViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[DocumentId], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PdocViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
-        documentnode = Get[DocumentId].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PdocViewRow] = Decoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(PdocViewRow.apply)
+  implicit val encoder: Encoder[PdocViewRow] = Encoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(x => (x.id, x.productid, x.modifieddate, x.documentnode))
+  implicit val read: Read[PdocViewRow] = new Read[PdocViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[DocumentId], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PdocViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
+      documentnode = Get[DocumentId].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

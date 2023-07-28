@@ -10,26 +10,11 @@ package workorderrouting
 import adventureworks.production.workorder.WorkorderId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `production.workorderrouting` */
 case class WorkorderroutingId(workorderid: WorkorderId, productid: Int, operationsequence: Int)
 object WorkorderroutingId {
+  implicit val decoder: Decoder[WorkorderroutingId] = Decoder.forProduct3[WorkorderroutingId, WorkorderId, Int, Int]("workorderid", "productid", "operationsequence")(WorkorderroutingId.apply)
+  implicit val encoder: Encoder[WorkorderroutingId] = Encoder.forProduct3[WorkorderroutingId, WorkorderId, Int, Int]("workorderid", "productid", "operationsequence")(x => (x.workorderid, x.productid, x.operationsequence))
   implicit val ordering: Ordering[WorkorderroutingId] = Ordering.by(x => (x.workorderid, x.productid, x.operationsequence))
-  implicit val decoder: Decoder[WorkorderroutingId] =
-    (c: HCursor) =>
-      for {
-        workorderid <- c.downField("workorderid").as[WorkorderId]
-        productid <- c.downField("productid").as[Int]
-        operationsequence <- c.downField("operationsequence").as[Int]
-      } yield WorkorderroutingId(workorderid, productid, operationsequence)
-  implicit val encoder: Encoder[WorkorderroutingId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "workorderid" := row.workorderid,
-        "productid" := row.productid,
-        "operationsequence" := row.operationsequence
-      )}
 }

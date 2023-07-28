@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_rewrite
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_rewrite` */
 case class PgRewriteId(value: /* oid */ Long) extends AnyVal
 object PgRewriteId {
+  implicit val arrayGet: Get[Array[PgRewriteId]] = Get[Array[/* oid */ Long]].map(_.map(PgRewriteId.apply))
+  implicit val arrayPut: Put[Array[PgRewriteId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgRewriteId] = Decoder[/* oid */ Long].map(PgRewriteId.apply)
+  implicit val encoder: Encoder[PgRewriteId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgRewriteId] = Get[/* oid */ Long].map(PgRewriteId.apply)
   implicit val ordering: Ordering[PgRewriteId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgRewriteId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgRewriteId] =
-    Decoder[/* oid */ Long].map(PgRewriteId(_))
-  implicit val meta: Meta[PgRewriteId] = Meta[/* oid */ Long].imap(PgRewriteId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgRewriteId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgRewriteId.apply))(_.map(_.value))
+  implicit val put: Put[PgRewriteId] = Put[/* oid */ Long].contramap(_.value)
 }

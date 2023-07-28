@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_statistic_ext where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_statistic_ext where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
@@ -25,10 +25,10 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext".query[PgStatisticExtRow].stream
   }
   override def selectById(oid: PgStatisticExtId): ConnectionIO[Option[PgStatisticExtRow]] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = $oid".query[PgStatisticExtRow].option
+    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ${oid}".query[PgStatisticExtRow].option
   }
   override def selectByIds(oids: Array[PgStatisticExtId]): Stream[ConnectionIO, PgStatisticExtRow] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY($oids)".query[PgStatisticExtRow].stream
+    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY(${oids})".query[PgStatisticExtRow].stream
   }
   override def update(row: PgStatisticExtRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -41,7 +41,7 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
               stxkeys = ${row.stxkeys}::int2vector,
               stxkind = ${row.stxkind}::_char,
               stxexprs = ${row.stxexprs}::pg_node_tree
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

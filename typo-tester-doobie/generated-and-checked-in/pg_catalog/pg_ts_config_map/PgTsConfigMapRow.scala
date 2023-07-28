@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_ts_config_map
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgTsConfigMapRow(
@@ -26,38 +24,20 @@ case class PgTsConfigMapRow(
  }
 
 object PgTsConfigMapRow {
-  implicit val decoder: Decoder[PgTsConfigMapRow] =
-    (c: HCursor) =>
-      for {
-        mapcfg <- c.downField("mapcfg").as[/* oid */ Long]
-        maptokentype <- c.downField("maptokentype").as[Int]
-        mapseqno <- c.downField("mapseqno").as[Int]
-        mapdict <- c.downField("mapdict").as[/* oid */ Long]
-      } yield PgTsConfigMapRow(mapcfg, maptokentype, mapseqno, mapdict)
-  implicit val encoder: Encoder[PgTsConfigMapRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "mapcfg" := row.mapcfg,
-        "maptokentype" := row.maptokentype,
-        "mapseqno" := row.mapseqno,
-        "mapdict" := row.mapdict
-      )}
-  implicit val read: Read[PgTsConfigMapRow] =
-    new Read[PgTsConfigMapRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTsConfigMapRow(
-        mapcfg = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        maptokentype = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        mapseqno = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        mapdict = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgTsConfigMapRow] = Decoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(PgTsConfigMapRow.apply)
+  implicit val encoder: Encoder[PgTsConfigMapRow] = Encoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(x => (x.mapcfg, x.maptokentype, x.mapseqno, x.mapdict))
+  implicit val read: Read[PgTsConfigMapRow] = new Read[PgTsConfigMapRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTsConfigMapRow(
+      mapcfg = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      maptokentype = Get[Int].unsafeGetNonNullable(rs, i + 1),
+      mapseqno = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      mapdict = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

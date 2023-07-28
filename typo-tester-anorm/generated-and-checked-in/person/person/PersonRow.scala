@@ -7,19 +7,21 @@ package adventureworks
 package person
 package person
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PersonRow(
@@ -47,68 +49,64 @@ case class PersonRow(
   /** Personal information such as hobbies, and income collected from online shoppers. Used for sales analysis. */
   demographics: Option[TypoXml],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object PersonRow {
-  def rowParser(idx: Int): RowParser[PersonRow] =
-    RowParser[PersonRow] { row =>
-      Success(
+  implicit val reads: Reads[PersonRow] = Reads[PersonRow](json => JsResult.fromTry(
+      Try(
         PersonRow(
-          businessentityid = row[BusinessentityId](idx + 0),
-          persontype = row[/* bpchar */ String](idx + 1),
-          namestyle = row[NameStyle](idx + 2),
-          title = row[Option[/* max 8 chars */ String]](idx + 3),
-          firstname = row[Name](idx + 4),
-          middlename = row[Option[Name]](idx + 5),
-          lastname = row[Name](idx + 6),
-          suffix = row[Option[/* max 10 chars */ String]](idx + 7),
-          emailpromotion = row[Int](idx + 8),
-          additionalcontactinfo = row[Option[TypoXml]](idx + 9),
-          demographics = row[Option[TypoXml]](idx + 10),
-          rowguid = row[UUID](idx + 11),
-          modifieddate = row[LocalDateTime](idx + 12)
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          persontype = json.\("persontype").as[/* bpchar */ String],
+          namestyle = json.\("namestyle").as[NameStyle],
+          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
+          firstname = json.\("firstname").as[Name],
+          middlename = json.\("middlename").toOption.map(_.as[Name]),
+          lastname = json.\("lastname").as[Name],
+          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
+          emailpromotion = json.\("emailpromotion").as[Int],
+          additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
+          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[PersonRow] = new OFormat[PersonRow]{
-    override def writes(o: PersonRow): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "persontype" -> o.persontype,
-        "namestyle" -> o.namestyle,
-        "title" -> o.title,
-        "firstname" -> o.firstname,
-        "middlename" -> o.middlename,
-        "lastname" -> o.lastname,
-        "suffix" -> o.suffix,
-        "emailpromotion" -> o.emailpromotion,
-        "additionalcontactinfo" -> o.additionalcontactinfo,
-        "demographics" -> o.demographics,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PersonRow] = RowParser[PersonRow] { row =>
+    Success(
+      PersonRow(
+        businessentityid = row[BusinessentityId](idx + 0),
+        persontype = row[/* bpchar */ String](idx + 1),
+        namestyle = row[NameStyle](idx + 2),
+        title = row[Option[/* max 8 chars */ String]](idx + 3),
+        firstname = row[Name](idx + 4),
+        middlename = row[Option[Name]](idx + 5),
+        lastname = row[Name](idx + 6),
+        suffix = row[Option[/* max 10 chars */ String]](idx + 7),
+        emailpromotion = row[Int](idx + 8),
+        additionalcontactinfo = row[Option[TypoXml]](idx + 9),
+        demographics = row[Option[TypoXml]](idx + 10),
+        rowguid = row[UUID](idx + 11),
+        modifieddate = row[TypoLocalDateTime](idx + 12)
       )
-  
-    override def reads(json: JsValue): JsResult[PersonRow] = {
-      JsResult.fromTry(
-        Try(
-          PersonRow(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            persontype = json.\("persontype").as[/* bpchar */ String],
-            namestyle = json.\("namestyle").as[NameStyle],
-            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-            firstname = json.\("firstname").as[Name],
-            middlename = json.\("middlename").toOption.map(_.as[Name]),
-            lastname = json.\("lastname").as[Name],
-            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-            emailpromotion = json.\("emailpromotion").as[Int],
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
-            demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PersonRow] = OWrites[PersonRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "persontype" -> Json.toJson(o.persontype),
+      "namestyle" -> Json.toJson(o.namestyle),
+      "title" -> Json.toJson(o.title),
+      "firstname" -> Json.toJson(o.firstname),
+      "middlename" -> Json.toJson(o.middlename),
+      "lastname" -> Json.toJson(o.lastname),
+      "suffix" -> Json.toJson(o.suffix),
+      "emailpromotion" -> Json.toJson(o.emailpromotion),
+      "additionalcontactinfo" -> Json.toJson(o.additionalcontactinfo),
+      "demographics" -> Json.toJson(o.demographics),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

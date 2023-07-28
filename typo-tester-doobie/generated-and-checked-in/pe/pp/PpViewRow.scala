@@ -7,18 +7,16 @@ package adventureworks
 package pe
 package pp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PpViewRow(
   id: Option[Int],
@@ -29,46 +27,26 @@ case class PpViewRow(
   /** Points to [[person.personphone.PersonphoneRow.phonenumbertypeid]] */
   phonenumbertypeid: Option[PhonenumbertypeId],
   /** Points to [[person.personphone.PersonphoneRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PpViewRow {
-  implicit val decoder: Decoder[PpViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        phonenumber <- c.downField("phonenumber").as[Option[Phone]]
-        phonenumbertypeid <- c.downField("phonenumbertypeid").as[Option[PhonenumbertypeId]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PpViewRow(id, businessentityid, phonenumber, phonenumbertypeid, modifieddate)
-  implicit val encoder: Encoder[PpViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "phonenumber" := row.phonenumber,
-        "phonenumbertypeid" := row.phonenumbertypeid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PpViewRow] =
-    new Read[PpViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Phone], Nullability.Nullable),
-        (Get[PhonenumbertypeId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        phonenumber = Get[Phone].unsafeGetNullable(rs, i + 2),
-        phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[PpViewRow] = Decoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PpViewRow.apply)
+  implicit val encoder: Encoder[PpViewRow] = Encoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.id, x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))
+  implicit val read: Read[PpViewRow] = new Read[PpViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[Phone], Nullability.Nullable),
+      (Get[PhonenumbertypeId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      phonenumber = Get[Phone].unsafeGetNullable(rs, i + 2),
+      phonenumbertypeid = Get[PhonenumbertypeId].unsafeGetNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

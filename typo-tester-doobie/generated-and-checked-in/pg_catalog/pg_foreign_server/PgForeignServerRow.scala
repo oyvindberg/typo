@@ -8,13 +8,11 @@ package pg_catalog
 package pg_foreign_server
 
 import adventureworks.TypoAclItem
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgForeignServerRow(
@@ -29,54 +27,28 @@ case class PgForeignServerRow(
 )
 
 object PgForeignServerRow {
-  implicit val decoder: Decoder[PgForeignServerRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgForeignServerId]
-        srvname <- c.downField("srvname").as[String]
-        srvowner <- c.downField("srvowner").as[/* oid */ Long]
-        srvfdw <- c.downField("srvfdw").as[/* oid */ Long]
-        srvtype <- c.downField("srvtype").as[Option[String]]
-        srvversion <- c.downField("srvversion").as[Option[String]]
-        srvacl <- c.downField("srvacl").as[Option[Array[TypoAclItem]]]
-        srvoptions <- c.downField("srvoptions").as[Option[Array[String]]]
-      } yield PgForeignServerRow(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
-  implicit val encoder: Encoder[PgForeignServerRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "srvname" := row.srvname,
-        "srvowner" := row.srvowner,
-        "srvfdw" := row.srvfdw,
-        "srvtype" := row.srvtype,
-        "srvversion" := row.srvversion,
-        "srvacl" := row.srvacl,
-        "srvoptions" := row.srvoptions
-      )}
-  implicit val read: Read[PgForeignServerRow] =
-    new Read[PgForeignServerRow](
-      gets = List(
-        (Get[PgForeignServerId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Array[TypoAclItem]], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgForeignServerRow(
-        oid = Get[PgForeignServerId].unsafeGetNonNullable(rs, i + 0),
-        srvname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        srvowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        srvfdw = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        srvtype = Get[String].unsafeGetNullable(rs, i + 4),
-        srvversion = Get[String].unsafeGetNullable(rs, i + 5),
-        srvacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 6),
-        srvoptions = Get[Array[String]].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgForeignServerRow] = Decoder.forProduct8[PgForeignServerRow, PgForeignServerId, String, /* oid */ Long, /* oid */ Long, Option[String], Option[String], Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")(PgForeignServerRow.apply)
+  implicit val encoder: Encoder[PgForeignServerRow] = Encoder.forProduct8[PgForeignServerRow, PgForeignServerId, String, /* oid */ Long, /* oid */ Long, Option[String], Option[String], Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "srvname", "srvowner", "srvfdw", "srvtype", "srvversion", "srvacl", "srvoptions")(x => (x.oid, x.srvname, x.srvowner, x.srvfdw, x.srvtype, x.srvversion, x.srvacl, x.srvoptions))
+  implicit val read: Read[PgForeignServerRow] = new Read[PgForeignServerRow](
+    gets = List(
+      (Get[PgForeignServerId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Array[TypoAclItem]], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgForeignServerRow(
+      oid = Get[PgForeignServerId].unsafeGetNonNullable(rs, i + 0),
+      srvname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      srvowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      srvfdw = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      srvtype = Get[String].unsafeGetNullable(rs, i + 4),
+      srvversion = Get[String].unsafeGetNullable(rs, i + 5),
+      srvacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 6),
+      srvoptions = Get[Array[String]].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

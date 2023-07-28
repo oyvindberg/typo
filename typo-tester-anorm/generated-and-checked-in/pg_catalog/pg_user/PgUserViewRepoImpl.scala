@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgUserViewRepoImpl extends PgUserViewRepo {
   override def selectAll(implicit c: Connection): List[PgUserViewRow] = {
-    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig
+    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig
           from pg_catalog.pg_user
        """.as(PgUserViewRow.rowParser(1).*)
   }

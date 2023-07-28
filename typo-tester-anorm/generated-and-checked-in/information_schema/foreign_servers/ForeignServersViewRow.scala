@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignServersViewRow(
@@ -36,46 +38,42 @@ case class ForeignServersViewRow(
 )
 
 object ForeignServersViewRow {
-  def rowParser(idx: Int): RowParser[ForeignServersViewRow] =
-    RowParser[ForeignServersViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ForeignServersViewRow] = Reads[ForeignServersViewRow](json => JsResult.fromTry(
+      Try(
         ForeignServersViewRow(
-          foreignServerCatalog = row[Option[SqlIdentifier]](idx + 0),
-          foreignServerName = row[Option[SqlIdentifier]](idx + 1),
-          foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 2),
-          foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 3),
-          foreignServerType = row[Option[CharacterData]](idx + 4),
-          foreignServerVersion = row[Option[CharacterData]](idx + 5),
-          authorizationIdentifier = row[Option[SqlIdentifier]](idx + 6)
+          foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
+          foreignServerType = json.\("foreign_server_type").toOption.map(_.as[CharacterData]),
+          foreignServerVersion = json.\("foreign_server_version").toOption.map(_.as[CharacterData]),
+          authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier])
         )
       )
-    }
-  implicit val oFormat: OFormat[ForeignServersViewRow] = new OFormat[ForeignServersViewRow]{
-    override def writes(o: ForeignServersViewRow): JsObject =
-      Json.obj(
-        "foreign_server_catalog" -> o.foreignServerCatalog,
-        "foreign_server_name" -> o.foreignServerName,
-        "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
-        "foreign_server_type" -> o.foreignServerType,
-        "foreign_server_version" -> o.foreignServerVersion,
-        "authorization_identifier" -> o.authorizationIdentifier
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ForeignServersViewRow] = RowParser[ForeignServersViewRow] { row =>
+    Success(
+      ForeignServersViewRow(
+        foreignServerCatalog = row[Option[SqlIdentifier]](idx + 0),
+        foreignServerName = row[Option[SqlIdentifier]](idx + 1),
+        foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 2),
+        foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 3),
+        foreignServerType = row[Option[CharacterData]](idx + 4),
+        foreignServerVersion = row[Option[CharacterData]](idx + 5),
+        authorizationIdentifier = row[Option[SqlIdentifier]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[ForeignServersViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ForeignServersViewRow(
-            foreignServerCatalog = json.\("foreign_server_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignServerName = json.\("foreign_server_name").toOption.map(_.as[SqlIdentifier]),
-            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
-            foreignServerType = json.\("foreign_server_type").toOption.map(_.as[CharacterData]),
-            foreignServerVersion = json.\("foreign_server_version").toOption.map(_.as[CharacterData]),
-            authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as[SqlIdentifier])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ForeignServersViewRow] = OWrites[ForeignServersViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "foreign_server_catalog" -> Json.toJson(o.foreignServerCatalog),
+      "foreign_server_name" -> Json.toJson(o.foreignServerName),
+      "foreign_data_wrapper_catalog" -> Json.toJson(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> Json.toJson(o.foreignDataWrapperName),
+      "foreign_server_type" -> Json.toJson(o.foreignServerType),
+      "foreign_server_version" -> Json.toJson(o.foreignServerVersion),
+      "authorization_identifier" -> Json.toJson(o.authorizationIdentifier)
+    ))
+  )
 }

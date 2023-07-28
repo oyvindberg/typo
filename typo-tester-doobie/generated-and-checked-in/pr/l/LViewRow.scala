@@ -7,17 +7,15 @@ package adventureworks
 package pr
 package l
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class LViewRow(
   id: Option[Int],
@@ -30,50 +28,28 @@ case class LViewRow(
   /** Points to [[production.location.LocationRow.availability]] */
   availability: Option[BigDecimal],
   /** Points to [[production.location.LocationRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object LViewRow {
-  implicit val decoder: Decoder[LViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        locationid <- c.downField("locationid").as[Option[LocationId]]
-        name <- c.downField("name").as[Option[Name]]
-        costrate <- c.downField("costrate").as[Option[BigDecimal]]
-        availability <- c.downField("availability").as[Option[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield LViewRow(id, locationid, name, costrate, availability, modifieddate)
-  implicit val encoder: Encoder[LViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "locationid" := row.locationid,
-        "name" := row.name,
-        "costrate" := row.costrate,
-        "availability" := row.availability,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[LViewRow] =
-    new Read[LViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[LocationId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => LViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        locationid = Get[LocationId].unsafeGetNullable(rs, i + 1),
-        name = Get[Name].unsafeGetNullable(rs, i + 2),
-        costrate = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
-        availability = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[LViewRow] = Decoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(LViewRow.apply)
+  implicit val encoder: Encoder[LViewRow] = Encoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(x => (x.id, x.locationid, x.name, x.costrate, x.availability, x.modifieddate))
+  implicit val read: Read[LViewRow] = new Read[LViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[LocationId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => LViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      locationid = Get[LocationId].unsafeGetNullable(rs, i + 1),
+      name = Get[Name].unsafeGetNullable(rs, i + 2),
+      costrate = Get[BigDecimal].unsafeGetNullable(rs, i + 3),
+      availability = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

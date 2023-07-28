@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTsConfigMapRow(
@@ -26,37 +28,33 @@ case class PgTsConfigMapRow(
  }
 
 object PgTsConfigMapRow {
-  def rowParser(idx: Int): RowParser[PgTsConfigMapRow] =
-    RowParser[PgTsConfigMapRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTsConfigMapRow] = Reads[PgTsConfigMapRow](json => JsResult.fromTry(
+      Try(
         PgTsConfigMapRow(
-          mapcfg = row[/* oid */ Long](idx + 0),
-          maptokentype = row[Int](idx + 1),
-          mapseqno = row[Int](idx + 2),
-          mapdict = row[/* oid */ Long](idx + 3)
+          mapcfg = json.\("mapcfg").as[/* oid */ Long],
+          maptokentype = json.\("maptokentype").as[Int],
+          mapseqno = json.\("mapseqno").as[Int],
+          mapdict = json.\("mapdict").as[/* oid */ Long]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTsConfigMapRow] = new OFormat[PgTsConfigMapRow]{
-    override def writes(o: PgTsConfigMapRow): JsObject =
-      Json.obj(
-        "mapcfg" -> o.mapcfg,
-        "maptokentype" -> o.maptokentype,
-        "mapseqno" -> o.mapseqno,
-        "mapdict" -> o.mapdict
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTsConfigMapRow] = RowParser[PgTsConfigMapRow] { row =>
+    Success(
+      PgTsConfigMapRow(
+        mapcfg = row[/* oid */ Long](idx + 0),
+        maptokentype = row[Int](idx + 1),
+        mapseqno = row[Int](idx + 2),
+        mapdict = row[/* oid */ Long](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTsConfigMapRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTsConfigMapRow(
-            mapcfg = json.\("mapcfg").as[/* oid */ Long],
-            maptokentype = json.\("maptokentype").as[Int],
-            mapseqno = json.\("mapseqno").as[Int],
-            mapdict = json.\("mapdict").as[/* oid */ Long]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTsConfigMapRow] = OWrites[PgTsConfigMapRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "mapcfg" -> Json.toJson(o.mapcfg),
+      "maptokentype" -> Json.toJson(o.maptokentype),
+      "mapseqno" -> Json.toJson(o.mapseqno),
+      "mapdict" -> Json.toJson(o.mapdict)
+    ))
+  )
 }

@@ -8,13 +8,11 @@ package pg_catalog
 package pg_transform
 
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgTransformRow(
@@ -26,42 +24,22 @@ case class PgTransformRow(
 )
 
 object PgTransformRow {
-  implicit val decoder: Decoder[PgTransformRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgTransformId]
-        trftype <- c.downField("trftype").as[/* oid */ Long]
-        trflang <- c.downField("trflang").as[/* oid */ Long]
-        trffromsql <- c.downField("trffromsql").as[TypoRegproc]
-        trftosql <- c.downField("trftosql").as[TypoRegproc]
-      } yield PgTransformRow(oid, trftype, trflang, trffromsql, trftosql)
-  implicit val encoder: Encoder[PgTransformRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "trftype" := row.trftype,
-        "trflang" := row.trflang,
-        "trffromsql" := row.trffromsql,
-        "trftosql" := row.trftosql
-      )}
-  implicit val read: Read[PgTransformRow] =
-    new Read[PgTransformRow](
-      gets = List(
-        (Get[PgTransformId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTransformRow(
-        oid = Get[PgTransformId].unsafeGetNonNullable(rs, i + 0),
-        trftype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        trflang = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        trffromsql = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
-        trftosql = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[PgTransformRow] = Decoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(PgTransformRow.apply)
+  implicit val encoder: Encoder[PgTransformRow] = Encoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(x => (x.oid, x.trftype, x.trflang, x.trffromsql, x.trftosql))
+  implicit val read: Read[PgTransformRow] = new Read[PgTransformRow](
+    gets = List(
+      (Get[PgTransformId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTransformRow(
+      oid = Get[PgTransformId].unsafeGetNonNullable(rs, i + 0),
+      trftype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      trflang = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      trffromsql = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
+      trftosql = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

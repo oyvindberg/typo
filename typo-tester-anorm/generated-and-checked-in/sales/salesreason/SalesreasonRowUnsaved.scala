@@ -8,13 +8,15 @@ package sales
 package salesreason
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesreason` which has not been persisted yet */
@@ -27,9 +29,9 @@ case class SalesreasonRowUnsaved(
       Primary key for SalesReason records. */
   salesreasonid: Defaulted[SalesreasonId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesreasonidDefault: => SalesreasonId, modifieddateDefault: => LocalDateTime): SalesreasonRow =
+  def toRow(salesreasonidDefault: => SalesreasonId, modifieddateDefault: => TypoLocalDateTime): SalesreasonRow =
     SalesreasonRow(
       name = name,
       reasontype = reasontype,
@@ -44,26 +46,23 @@ case class SalesreasonRowUnsaved(
     )
 }
 object SalesreasonRowUnsaved {
-  implicit val oFormat: OFormat[SalesreasonRowUnsaved] = new OFormat[SalesreasonRowUnsaved]{
-    override def writes(o: SalesreasonRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "reasontype" -> o.reasontype,
-        "salesreasonid" -> o.salesreasonid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[SalesreasonRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          SalesreasonRowUnsaved(
-            name = json.\("name").as[Name],
-            reasontype = json.\("reasontype").as[Name],
-            salesreasonid = json.\("salesreasonid").as[Defaulted[SalesreasonId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[SalesreasonRowUnsaved] = Reads[SalesreasonRowUnsaved](json => JsResult.fromTry(
+      Try(
+        SalesreasonRowUnsaved(
+          name = json.\("name").as[Name],
+          reasontype = json.\("reasontype").as[Name],
+          salesreasonid = json.\("salesreasonid").as[Defaulted[SalesreasonId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalesreasonRowUnsaved] = OWrites[SalesreasonRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "reasontype" -> Json.toJson(o.reasontype),
+      "salesreasonid" -> Json.toJson(o.salesreasonid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

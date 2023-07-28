@@ -7,18 +7,16 @@ package adventureworks
 package production
 package productmodelproductdescriptionculture
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class ProductmodelproductdescriptioncultureRow(
   /** Primary key. Foreign key to ProductModel.ProductModelID.
@@ -30,44 +28,26 @@ case class ProductmodelproductdescriptioncultureRow(
   /** Culture identification number. Foreign key to Culture.CultureID.
       Points to [[culture.CultureRow.cultureid]] */
   cultureid: CultureId,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductmodelproductdescriptioncultureId = ProductmodelproductdescriptioncultureId(productmodelid, productdescriptionid, cultureid)
  }
 
 object ProductmodelproductdescriptioncultureRow {
-  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRow] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[ProductmodelId]
-        productdescriptionid <- c.downField("productdescriptionid").as[ProductdescriptionId]
-        cultureid <- c.downField("cultureid").as[CultureId]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield ProductmodelproductdescriptioncultureRow(productmodelid, productdescriptionid, cultureid, modifieddate)
-  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "productdescriptionid" := row.productdescriptionid,
-        "cultureid" := row.cultureid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[ProductmodelproductdescriptioncultureRow] =
-    new Read[ProductmodelproductdescriptioncultureRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.NoNulls),
-        (Get[ProductdescriptionId], Nullability.NoNulls),
-        (Get[CultureId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
-        productdescriptionid = Get[ProductdescriptionId].unsafeGetNonNullable(rs, i + 1),
-        cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRow] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRow.apply)
+  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))
+  implicit val read: Read[ProductmodelproductdescriptioncultureRow] = new Read[ProductmodelproductdescriptioncultureRow](
+    gets = List(
+      (Get[ProductmodelId], Nullability.NoNulls),
+      (Get[ProductdescriptionId], Nullability.NoNulls),
+      (Get[CultureId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
+      productmodelid = Get[ProductmodelId].unsafeGetNonNullable(rs, i + 0),
+      productdescriptionid = Get[ProductdescriptionId].unsafeGetNonNullable(rs, i + 1),
+      cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

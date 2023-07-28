@@ -8,14 +8,16 @@ package sales
 package countryregioncurrency
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.countryregioncurrency` which has not been persisted yet */
@@ -27,9 +29,9 @@ case class CountryregioncurrencyRowUnsaved(
       Points to [[currency.CurrencyRow.currencycode]] */
   currencycode: CurrencyId,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): CountryregioncurrencyRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CountryregioncurrencyRow =
     CountryregioncurrencyRow(
       countryregioncode = countryregioncode,
       currencycode = currencycode,
@@ -40,24 +42,21 @@ case class CountryregioncurrencyRowUnsaved(
     )
 }
 object CountryregioncurrencyRowUnsaved {
-  implicit val oFormat: OFormat[CountryregioncurrencyRowUnsaved] = new OFormat[CountryregioncurrencyRowUnsaved]{
-    override def writes(o: CountryregioncurrencyRowUnsaved): JsObject =
-      Json.obj(
-        "countryregioncode" -> o.countryregioncode,
-        "currencycode" -> o.currencycode,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[CountryregioncurrencyRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          CountryregioncurrencyRowUnsaved(
-            countryregioncode = json.\("countryregioncode").as[CountryregionId],
-            currencycode = json.\("currencycode").as[CurrencyId],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[CountryregioncurrencyRowUnsaved] = Reads[CountryregioncurrencyRowUnsaved](json => JsResult.fromTry(
+      Try(
+        CountryregioncurrencyRowUnsaved(
+          countryregioncode = json.\("countryregioncode").as[CountryregionId],
+          currencycode = json.\("currencycode").as[CurrencyId],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[CountryregioncurrencyRowUnsaved] = OWrites[CountryregioncurrencyRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "countryregioncode" -> Json.toJson(o.countryregioncode),
+      "currencycode" -> Json.toJson(o.currencycode),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

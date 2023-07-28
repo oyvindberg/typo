@@ -17,7 +17,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgProcRow(
@@ -54,115 +56,111 @@ case class PgProcRow(
 )
 
 object PgProcRow {
-  def rowParser(idx: Int): RowParser[PgProcRow] =
-    RowParser[PgProcRow] { row =>
-      Success(
+  implicit val reads: Reads[PgProcRow] = Reads[PgProcRow](json => JsResult.fromTry(
+      Try(
         PgProcRow(
-          oid = row[PgProcId](idx + 0),
-          proname = row[String](idx + 1),
-          pronamespace = row[/* oid */ Long](idx + 2),
-          proowner = row[/* oid */ Long](idx + 3),
-          prolang = row[/* oid */ Long](idx + 4),
-          procost = row[Float](idx + 5),
-          prorows = row[Float](idx + 6),
-          provariadic = row[/* oid */ Long](idx + 7),
-          prosupport = row[TypoRegproc](idx + 8),
-          prokind = row[String](idx + 9),
-          prosecdef = row[Boolean](idx + 10),
-          proleakproof = row[Boolean](idx + 11),
-          proisstrict = row[Boolean](idx + 12),
-          proretset = row[Boolean](idx + 13),
-          provolatile = row[String](idx + 14),
-          proparallel = row[String](idx + 15),
-          pronargs = row[Int](idx + 16),
-          pronargdefaults = row[Int](idx + 17),
-          prorettype = row[/* oid */ Long](idx + 18),
-          proargtypes = row[TypoOidVector](idx + 19),
-          proallargtypes = row[Option[Array[/* oid */ Long]]](idx + 20),
-          proargmodes = row[Option[Array[String]]](idx + 21),
-          proargnames = row[Option[Array[String]]](idx + 22),
-          proargdefaults = row[Option[TypoPgNodeTree]](idx + 23),
-          protrftypes = row[Option[Array[/* oid */ Long]]](idx + 24),
-          prosrc = row[String](idx + 25),
-          probin = row[Option[String]](idx + 26),
-          prosqlbody = row[Option[TypoPgNodeTree]](idx + 27),
-          proconfig = row[Option[Array[String]]](idx + 28),
-          proacl = row[Option[Array[TypoAclItem]]](idx + 29)
+          oid = json.\("oid").as[PgProcId],
+          proname = json.\("proname").as[String],
+          pronamespace = json.\("pronamespace").as[/* oid */ Long],
+          proowner = json.\("proowner").as[/* oid */ Long],
+          prolang = json.\("prolang").as[/* oid */ Long],
+          procost = json.\("procost").as[Float],
+          prorows = json.\("prorows").as[Float],
+          provariadic = json.\("provariadic").as[/* oid */ Long],
+          prosupport = json.\("prosupport").as[TypoRegproc],
+          prokind = json.\("prokind").as[String],
+          prosecdef = json.\("prosecdef").as[Boolean],
+          proleakproof = json.\("proleakproof").as[Boolean],
+          proisstrict = json.\("proisstrict").as[Boolean],
+          proretset = json.\("proretset").as[Boolean],
+          provolatile = json.\("provolatile").as[String],
+          proparallel = json.\("proparallel").as[String],
+          pronargs = json.\("pronargs").as[Int],
+          pronargdefaults = json.\("pronargdefaults").as[Int],
+          prorettype = json.\("prorettype").as[/* oid */ Long],
+          proargtypes = json.\("proargtypes").as[TypoOidVector],
+          proallargtypes = json.\("proallargtypes").toOption.map(_.as[Array[/* oid */ Long]]),
+          proargmodes = json.\("proargmodes").toOption.map(_.as[Array[String]]),
+          proargnames = json.\("proargnames").toOption.map(_.as[Array[String]]),
+          proargdefaults = json.\("proargdefaults").toOption.map(_.as[TypoPgNodeTree]),
+          protrftypes = json.\("protrftypes").toOption.map(_.as[Array[/* oid */ Long]]),
+          prosrc = json.\("prosrc").as[String],
+          probin = json.\("probin").toOption.map(_.as[String]),
+          prosqlbody = json.\("prosqlbody").toOption.map(_.as[TypoPgNodeTree]),
+          proconfig = json.\("proconfig").toOption.map(_.as[Array[String]]),
+          proacl = json.\("proacl").toOption.map(_.as[Array[TypoAclItem]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgProcRow] = new OFormat[PgProcRow]{
-    override def writes(o: PgProcRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "proname" -> o.proname,
-        "pronamespace" -> o.pronamespace,
-        "proowner" -> o.proowner,
-        "prolang" -> o.prolang,
-        "procost" -> o.procost,
-        "prorows" -> o.prorows,
-        "provariadic" -> o.provariadic,
-        "prosupport" -> o.prosupport,
-        "prokind" -> o.prokind,
-        "prosecdef" -> o.prosecdef,
-        "proleakproof" -> o.proleakproof,
-        "proisstrict" -> o.proisstrict,
-        "proretset" -> o.proretset,
-        "provolatile" -> o.provolatile,
-        "proparallel" -> o.proparallel,
-        "pronargs" -> o.pronargs,
-        "pronargdefaults" -> o.pronargdefaults,
-        "prorettype" -> o.prorettype,
-        "proargtypes" -> o.proargtypes,
-        "proallargtypes" -> o.proallargtypes,
-        "proargmodes" -> o.proargmodes,
-        "proargnames" -> o.proargnames,
-        "proargdefaults" -> o.proargdefaults,
-        "protrftypes" -> o.protrftypes,
-        "prosrc" -> o.prosrc,
-        "probin" -> o.probin,
-        "prosqlbody" -> o.prosqlbody,
-        "proconfig" -> o.proconfig,
-        "proacl" -> o.proacl
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgProcRow] = RowParser[PgProcRow] { row =>
+    Success(
+      PgProcRow(
+        oid = row[PgProcId](idx + 0),
+        proname = row[String](idx + 1),
+        pronamespace = row[/* oid */ Long](idx + 2),
+        proowner = row[/* oid */ Long](idx + 3),
+        prolang = row[/* oid */ Long](idx + 4),
+        procost = row[Float](idx + 5),
+        prorows = row[Float](idx + 6),
+        provariadic = row[/* oid */ Long](idx + 7),
+        prosupport = row[TypoRegproc](idx + 8),
+        prokind = row[String](idx + 9),
+        prosecdef = row[Boolean](idx + 10),
+        proleakproof = row[Boolean](idx + 11),
+        proisstrict = row[Boolean](idx + 12),
+        proretset = row[Boolean](idx + 13),
+        provolatile = row[String](idx + 14),
+        proparallel = row[String](idx + 15),
+        pronargs = row[Int](idx + 16),
+        pronargdefaults = row[Int](idx + 17),
+        prorettype = row[/* oid */ Long](idx + 18),
+        proargtypes = row[TypoOidVector](idx + 19),
+        proallargtypes = row[Option[Array[/* oid */ Long]]](idx + 20),
+        proargmodes = row[Option[Array[String]]](idx + 21),
+        proargnames = row[Option[Array[String]]](idx + 22),
+        proargdefaults = row[Option[TypoPgNodeTree]](idx + 23),
+        protrftypes = row[Option[Array[/* oid */ Long]]](idx + 24),
+        prosrc = row[String](idx + 25),
+        probin = row[Option[String]](idx + 26),
+        prosqlbody = row[Option[TypoPgNodeTree]](idx + 27),
+        proconfig = row[Option[Array[String]]](idx + 28),
+        proacl = row[Option[Array[TypoAclItem]]](idx + 29)
       )
-  
-    override def reads(json: JsValue): JsResult[PgProcRow] = {
-      JsResult.fromTry(
-        Try(
-          PgProcRow(
-            oid = json.\("oid").as[PgProcId],
-            proname = json.\("proname").as[String],
-            pronamespace = json.\("pronamespace").as[/* oid */ Long],
-            proowner = json.\("proowner").as[/* oid */ Long],
-            prolang = json.\("prolang").as[/* oid */ Long],
-            procost = json.\("procost").as[Float],
-            prorows = json.\("prorows").as[Float],
-            provariadic = json.\("provariadic").as[/* oid */ Long],
-            prosupport = json.\("prosupport").as[TypoRegproc],
-            prokind = json.\("prokind").as[String],
-            prosecdef = json.\("prosecdef").as[Boolean],
-            proleakproof = json.\("proleakproof").as[Boolean],
-            proisstrict = json.\("proisstrict").as[Boolean],
-            proretset = json.\("proretset").as[Boolean],
-            provolatile = json.\("provolatile").as[String],
-            proparallel = json.\("proparallel").as[String],
-            pronargs = json.\("pronargs").as[Int],
-            pronargdefaults = json.\("pronargdefaults").as[Int],
-            prorettype = json.\("prorettype").as[/* oid */ Long],
-            proargtypes = json.\("proargtypes").as[TypoOidVector],
-            proallargtypes = json.\("proallargtypes").toOption.map(_.as[Array[/* oid */ Long]]),
-            proargmodes = json.\("proargmodes").toOption.map(_.as[Array[String]]),
-            proargnames = json.\("proargnames").toOption.map(_.as[Array[String]]),
-            proargdefaults = json.\("proargdefaults").toOption.map(_.as[TypoPgNodeTree]),
-            protrftypes = json.\("protrftypes").toOption.map(_.as[Array[/* oid */ Long]]),
-            prosrc = json.\("prosrc").as[String],
-            probin = json.\("probin").toOption.map(_.as[String]),
-            prosqlbody = json.\("prosqlbody").toOption.map(_.as[TypoPgNodeTree]),
-            proconfig = json.\("proconfig").toOption.map(_.as[Array[String]]),
-            proacl = json.\("proacl").toOption.map(_.as[Array[TypoAclItem]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgProcRow] = OWrites[PgProcRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "proname" -> Json.toJson(o.proname),
+      "pronamespace" -> Json.toJson(o.pronamespace),
+      "proowner" -> Json.toJson(o.proowner),
+      "prolang" -> Json.toJson(o.prolang),
+      "procost" -> Json.toJson(o.procost),
+      "prorows" -> Json.toJson(o.prorows),
+      "provariadic" -> Json.toJson(o.provariadic),
+      "prosupport" -> Json.toJson(o.prosupport),
+      "prokind" -> Json.toJson(o.prokind),
+      "prosecdef" -> Json.toJson(o.prosecdef),
+      "proleakproof" -> Json.toJson(o.proleakproof),
+      "proisstrict" -> Json.toJson(o.proisstrict),
+      "proretset" -> Json.toJson(o.proretset),
+      "provolatile" -> Json.toJson(o.provolatile),
+      "proparallel" -> Json.toJson(o.proparallel),
+      "pronargs" -> Json.toJson(o.pronargs),
+      "pronargdefaults" -> Json.toJson(o.pronargdefaults),
+      "prorettype" -> Json.toJson(o.prorettype),
+      "proargtypes" -> Json.toJson(o.proargtypes),
+      "proallargtypes" -> Json.toJson(o.proallargtypes),
+      "proargmodes" -> Json.toJson(o.proargmodes),
+      "proargnames" -> Json.toJson(o.proargnames),
+      "proargdefaults" -> Json.toJson(o.proargdefaults),
+      "protrftypes" -> Json.toJson(o.protrftypes),
+      "prosrc" -> Json.toJson(o.prosrc),
+      "probin" -> Json.toJson(o.probin),
+      "prosqlbody" -> Json.toJson(o.prosqlbody),
+      "proconfig" -> Json.toJson(o.proconfig),
+      "proacl" -> Json.toJson(o.proacl)
+    ))
+  )
 }

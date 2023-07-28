@@ -7,15 +7,17 @@ package adventureworks
 package production
 package unitmeasure
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UnitmeasureRow(
@@ -23,38 +25,34 @@ case class UnitmeasureRow(
   unitmeasurecode: UnitmeasureId,
   /** Unit of measure description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object UnitmeasureRow {
-  def rowParser(idx: Int): RowParser[UnitmeasureRow] =
-    RowParser[UnitmeasureRow] { row =>
-      Success(
+  implicit val reads: Reads[UnitmeasureRow] = Reads[UnitmeasureRow](json => JsResult.fromTry(
+      Try(
         UnitmeasureRow(
-          unitmeasurecode = row[UnitmeasureId](idx + 0),
-          name = row[Name](idx + 1),
-          modifieddate = row[LocalDateTime](idx + 2)
+          unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
+          name = json.\("name").as[Name],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[UnitmeasureRow] = new OFormat[UnitmeasureRow]{
-    override def writes(o: UnitmeasureRow): JsObject =
-      Json.obj(
-        "unitmeasurecode" -> o.unitmeasurecode,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[UnitmeasureRow] = RowParser[UnitmeasureRow] { row =>
+    Success(
+      UnitmeasureRow(
+        unitmeasurecode = row[UnitmeasureId](idx + 0),
+        name = row[Name](idx + 1),
+        modifieddate = row[TypoLocalDateTime](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[UnitmeasureRow] = {
-      JsResult.fromTry(
-        Try(
-          UnitmeasureRow(
-            unitmeasurecode = json.\("unitmeasurecode").as[UnitmeasureId],
-            name = json.\("name").as[Name],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[UnitmeasureRow] = OWrites[UnitmeasureRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "unitmeasurecode" -> Json.toJson(o.unitmeasurecode),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

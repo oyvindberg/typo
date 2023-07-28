@@ -7,17 +7,19 @@ package adventureworks
 package sa
 package sop
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SopViewRow(
@@ -29,44 +31,40 @@ case class SopViewRow(
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SopViewRow {
-  def rowParser(idx: Int): RowParser[SopViewRow] =
-    RowParser[SopViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SopViewRow] = Reads[SopViewRow](json => JsResult.fromTry(
+      Try(
         SopViewRow(
-          id = row[Option[Int]](idx + 0),
-          specialofferid = row[Option[SpecialofferId]](idx + 1),
-          productid = row[Option[ProductId]](idx + 2),
-          rowguid = row[Option[UUID]](idx + 3),
-          modifieddate = row[Option[LocalDateTime]](idx + 4)
+          id = json.\("id").toOption.map(_.as[Int]),
+          specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),
+          productid = json.\("productid").toOption.map(_.as[ProductId]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SopViewRow] = new OFormat[SopViewRow]{
-    override def writes(o: SopViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "specialofferid" -> o.specialofferid,
-        "productid" -> o.productid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SopViewRow] = RowParser[SopViewRow] { row =>
+    Success(
+      SopViewRow(
+        id = row[Option[Int]](idx + 0),
+        specialofferid = row[Option[SpecialofferId]](idx + 1),
+        productid = row[Option[ProductId]](idx + 2),
+        rowguid = row[Option[UUID]](idx + 3),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[SopViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SopViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),
-            productid = json.\("productid").toOption.map(_.as[ProductId]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SopViewRow] = OWrites[SopViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "specialofferid" -> Json.toJson(o.specialofferid),
+      "productid" -> Json.toJson(o.productid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

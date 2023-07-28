@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAvailableExtensionVersionsViewRow(
@@ -29,52 +31,48 @@ case class PgAvailableExtensionVersionsViewRow(
 )
 
 object PgAvailableExtensionVersionsViewRow {
-  def rowParser(idx: Int): RowParser[PgAvailableExtensionVersionsViewRow] =
-    RowParser[PgAvailableExtensionVersionsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAvailableExtensionVersionsViewRow] = Reads[PgAvailableExtensionVersionsViewRow](json => JsResult.fromTry(
+      Try(
         PgAvailableExtensionVersionsViewRow(
-          name = row[Option[String]](idx + 0),
-          version = row[Option[String]](idx + 1),
-          installed = row[Option[Boolean]](idx + 2),
-          superuser = row[Option[Boolean]](idx + 3),
-          trusted = row[Option[Boolean]](idx + 4),
-          relocatable = row[Option[Boolean]](idx + 5),
-          schema = row[Option[String]](idx + 6),
-          requires = row[Option[Array[String]]](idx + 7),
-          comment = row[Option[String]](idx + 8)
+          name = json.\("name").toOption.map(_.as[String]),
+          version = json.\("version").toOption.map(_.as[String]),
+          installed = json.\("installed").toOption.map(_.as[Boolean]),
+          superuser = json.\("superuser").toOption.map(_.as[Boolean]),
+          trusted = json.\("trusted").toOption.map(_.as[Boolean]),
+          relocatable = json.\("relocatable").toOption.map(_.as[Boolean]),
+          schema = json.\("schema").toOption.map(_.as[String]),
+          requires = json.\("requires").toOption.map(_.as[Array[String]]),
+          comment = json.\("comment").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAvailableExtensionVersionsViewRow] = new OFormat[PgAvailableExtensionVersionsViewRow]{
-    override def writes(o: PgAvailableExtensionVersionsViewRow): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "version" -> o.version,
-        "installed" -> o.installed,
-        "superuser" -> o.superuser,
-        "trusted" -> o.trusted,
-        "relocatable" -> o.relocatable,
-        "schema" -> o.schema,
-        "requires" -> o.requires,
-        "comment" -> o.comment
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAvailableExtensionVersionsViewRow] = RowParser[PgAvailableExtensionVersionsViewRow] { row =>
+    Success(
+      PgAvailableExtensionVersionsViewRow(
+        name = row[Option[String]](idx + 0),
+        version = row[Option[String]](idx + 1),
+        installed = row[Option[Boolean]](idx + 2),
+        superuser = row[Option[Boolean]](idx + 3),
+        trusted = row[Option[Boolean]](idx + 4),
+        relocatable = row[Option[Boolean]](idx + 5),
+        schema = row[Option[String]](idx + 6),
+        requires = row[Option[Array[String]]](idx + 7),
+        comment = row[Option[String]](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAvailableExtensionVersionsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAvailableExtensionVersionsViewRow(
-            name = json.\("name").toOption.map(_.as[String]),
-            version = json.\("version").toOption.map(_.as[String]),
-            installed = json.\("installed").toOption.map(_.as[Boolean]),
-            superuser = json.\("superuser").toOption.map(_.as[Boolean]),
-            trusted = json.\("trusted").toOption.map(_.as[Boolean]),
-            relocatable = json.\("relocatable").toOption.map(_.as[Boolean]),
-            schema = json.\("schema").toOption.map(_.as[String]),
-            requires = json.\("requires").toOption.map(_.as[Array[String]]),
-            comment = json.\("comment").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAvailableExtensionVersionsViewRow] = OWrites[PgAvailableExtensionVersionsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "version" -> Json.toJson(o.version),
+      "installed" -> Json.toJson(o.installed),
+      "superuser" -> Json.toJson(o.superuser),
+      "trusted" -> Json.toJson(o.trusted),
+      "relocatable" -> Json.toJson(o.relocatable),
+      "schema" -> Json.toJson(o.schema),
+      "requires" -> Json.toJson(o.requires),
+      "comment" -> Json.toJson(o.comment)
+    ))
+  )
 }

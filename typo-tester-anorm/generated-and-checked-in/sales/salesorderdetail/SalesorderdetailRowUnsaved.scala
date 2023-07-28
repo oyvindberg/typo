@@ -8,16 +8,18 @@ package sales
 package salesorderdetail
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.salesorderdetail` which has not been persisted yet */
@@ -46,9 +48,9 @@ case class SalesorderdetailRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(salesorderdetailidDefault: => Int, unitpricediscountDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesorderdetailRow =
+  def toRow(salesorderdetailidDefault: => Int, unitpricediscountDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesorderdetailRow =
     SalesorderdetailRow(
       salesorderid = salesorderid,
       carriertrackingnumber = carriertrackingnumber,
@@ -75,38 +77,35 @@ case class SalesorderdetailRowUnsaved(
     )
 }
 object SalesorderdetailRowUnsaved {
-  implicit val oFormat: OFormat[SalesorderdetailRowUnsaved] = new OFormat[SalesorderdetailRowUnsaved]{
-    override def writes(o: SalesorderdetailRowUnsaved): JsObject =
-      Json.obj(
-        "salesorderid" -> o.salesorderid,
-        "carriertrackingnumber" -> o.carriertrackingnumber,
-        "orderqty" -> o.orderqty,
-        "productid" -> o.productid,
-        "specialofferid" -> o.specialofferid,
-        "unitprice" -> o.unitprice,
-        "salesorderdetailid" -> o.salesorderdetailid,
-        "unitpricediscount" -> o.unitpricediscount,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[SalesorderdetailRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          SalesorderdetailRowUnsaved(
-            salesorderid = json.\("salesorderid").as[SalesorderheaderId],
-            carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[/* max 25 chars */ String]),
-            orderqty = json.\("orderqty").as[Int],
-            productid = json.\("productid").as[ProductId],
-            specialofferid = json.\("specialofferid").as[SpecialofferId],
-            unitprice = json.\("unitprice").as[BigDecimal],
-            salesorderdetailid = json.\("salesorderdetailid").as[Defaulted[Int]],
-            unitpricediscount = json.\("unitpricediscount").as[Defaulted[BigDecimal]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[SalesorderdetailRowUnsaved] = Reads[SalesorderdetailRowUnsaved](json => JsResult.fromTry(
+      Try(
+        SalesorderdetailRowUnsaved(
+          salesorderid = json.\("salesorderid").as[SalesorderheaderId],
+          carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[/* max 25 chars */ String]),
+          orderqty = json.\("orderqty").as[Int],
+          productid = json.\("productid").as[ProductId],
+          specialofferid = json.\("specialofferid").as[SpecialofferId],
+          unitprice = json.\("unitprice").as[BigDecimal],
+          salesorderdetailid = json.\("salesorderdetailid").as[Defaulted[Int]],
+          unitpricediscount = json.\("unitpricediscount").as[Defaulted[BigDecimal]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[SalesorderdetailRowUnsaved] = OWrites[SalesorderdetailRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "salesorderid" -> Json.toJson(o.salesorderid),
+      "carriertrackingnumber" -> Json.toJson(o.carriertrackingnumber),
+      "orderqty" -> Json.toJson(o.orderqty),
+      "productid" -> Json.toJson(o.productid),
+      "specialofferid" -> Json.toJson(o.specialofferid),
+      "unitprice" -> Json.toJson(o.unitprice),
+      "salesorderdetailid" -> Json.toJson(o.salesorderdetailid),
+      "unitpricediscount" -> Json.toJson(o.unitpricediscount),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

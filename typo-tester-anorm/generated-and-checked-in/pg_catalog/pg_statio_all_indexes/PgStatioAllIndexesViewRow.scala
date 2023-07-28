@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatioAllIndexesViewRow(
@@ -27,46 +29,42 @@ case class PgStatioAllIndexesViewRow(
 )
 
 object PgStatioAllIndexesViewRow {
-  def rowParser(idx: Int): RowParser[PgStatioAllIndexesViewRow] =
-    RowParser[PgStatioAllIndexesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatioAllIndexesViewRow] = Reads[PgStatioAllIndexesViewRow](json => JsResult.fromTry(
+      Try(
         PgStatioAllIndexesViewRow(
-          relid = row[Option[/* oid */ Long]](idx + 0),
-          indexrelid = row[Option[/* oid */ Long]](idx + 1),
-          schemaname = row[Option[String]](idx + 2),
-          relname = row[Option[String]](idx + 3),
-          indexrelname = row[Option[String]](idx + 4),
-          idxBlksRead = row[Option[Long]](idx + 5),
-          idxBlksHit = row[Option[Long]](idx + 6)
+          relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
+          indexrelid = json.\("indexrelid").toOption.map(_.as[/* oid */ Long]),
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          relname = json.\("relname").toOption.map(_.as[String]),
+          indexrelname = json.\("indexrelname").toOption.map(_.as[String]),
+          idxBlksRead = json.\("idx_blks_read").toOption.map(_.as[Long]),
+          idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as[Long])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatioAllIndexesViewRow] = new OFormat[PgStatioAllIndexesViewRow]{
-    override def writes(o: PgStatioAllIndexesViewRow): JsObject =
-      Json.obj(
-        "relid" -> o.relid,
-        "indexrelid" -> o.indexrelid,
-        "schemaname" -> o.schemaname,
-        "relname" -> o.relname,
-        "indexrelname" -> o.indexrelname,
-        "idx_blks_read" -> o.idxBlksRead,
-        "idx_blks_hit" -> o.idxBlksHit
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatioAllIndexesViewRow] = RowParser[PgStatioAllIndexesViewRow] { row =>
+    Success(
+      PgStatioAllIndexesViewRow(
+        relid = row[Option[/* oid */ Long]](idx + 0),
+        indexrelid = row[Option[/* oid */ Long]](idx + 1),
+        schemaname = row[Option[String]](idx + 2),
+        relname = row[Option[String]](idx + 3),
+        indexrelname = row[Option[String]](idx + 4),
+        idxBlksRead = row[Option[Long]](idx + 5),
+        idxBlksHit = row[Option[Long]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatioAllIndexesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatioAllIndexesViewRow(
-            relid = json.\("relid").toOption.map(_.as[/* oid */ Long]),
-            indexrelid = json.\("indexrelid").toOption.map(_.as[/* oid */ Long]),
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            relname = json.\("relname").toOption.map(_.as[String]),
-            indexrelname = json.\("indexrelname").toOption.map(_.as[String]),
-            idxBlksRead = json.\("idx_blks_read").toOption.map(_.as[Long]),
-            idxBlksHit = json.\("idx_blks_hit").toOption.map(_.as[Long])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatioAllIndexesViewRow] = OWrites[PgStatioAllIndexesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "relid" -> Json.toJson(o.relid),
+      "indexrelid" -> Json.toJson(o.indexrelid),
+      "schemaname" -> Json.toJson(o.schemaname),
+      "relname" -> Json.toJson(o.relname),
+      "indexrelname" -> Json.toJson(o.indexrelname),
+      "idx_blks_read" -> Json.toJson(o.idxBlksRead),
+      "idx_blks_hit" -> Json.toJson(o.idxBlksHit)
+    ))
+  )
 }

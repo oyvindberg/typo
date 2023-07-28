@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object EViewRepoImpl extends EViewRepo {
   override def selectAll(implicit c: Connection): List[EViewRow] = {
-    SQL"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
+    SQL"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
           from hr.e
        """.as(EViewRow.rowParser(1).*)
   }

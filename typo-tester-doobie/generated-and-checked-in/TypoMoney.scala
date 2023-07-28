@@ -6,44 +6,22 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Money and cash types in PostgreSQL */
 case class TypoMoney(value: BigDecimal)
+
 object TypoMoney {
-  implicit val decoder: Decoder[TypoMoney] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[BigDecimal]
-      } yield TypoMoney(value)
-  implicit val encoder: Encoder[TypoMoney] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoMoney] =
-    Get.Advanced.other[java.math.BigDecimal](cats.data.NonEmptyList.one("money"))
-      .map(v => TypoMoney(BigDecimal(v)))
-  
-  implicit val put: Put[TypoMoney] =
-    Put.Advanced.other[java.math.BigDecimal](NonEmptyList.one("money"))
-      .contramap(v => v.value.bigDecimal)
-  
-  implicit val meta: Meta[TypoMoney] = new Meta(get, put)
-  val gets: Get[Array[TypoMoney]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_money"))
-      .map(_.map(v => TypoMoney(BigDecimal(v.asInstanceOf[java.math.BigDecimal]))))
-  
-  val puts: Put[Array[TypoMoney]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_money"), "money")
-      .contramap(_.map(v => v.value.bigDecimal))
-  
-  implicit val metas: Meta[Array[TypoMoney]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoMoney]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_money"))
+    .map(_.map(v => TypoMoney(BigDecimal(v.asInstanceOf[java.math.BigDecimal]))))
+  implicit val arrayPut: Put[Array[TypoMoney]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_money"), "money")
+    .contramap(_.map(v => v.value.bigDecimal))
+  implicit val decoder: Decoder[TypoMoney] = Decoder.forProduct1[TypoMoney, BigDecimal]("value")(TypoMoney.apply)
+  implicit val encoder: Encoder[TypoMoney] = Encoder.forProduct1[TypoMoney, BigDecimal]("value")(x => (x.value))
+  implicit val get: Get[TypoMoney] = Get.Advanced.other[java.math.BigDecimal](NonEmptyList.one("money"))
+    .map(v => TypoMoney(BigDecimal(v)))
+  implicit val put: Put[TypoMoney] = Put.Advanced.other[java.math.BigDecimal](NonEmptyList.one("money")).contramap(v => v.value.bigDecimal)
 }

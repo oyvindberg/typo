@@ -10,19 +10,20 @@ package contacttype
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `person.contacttype` */
 case class ContacttypeId(value: Int) extends AnyVal
 object ContacttypeId {
-  implicit val ordering: Ordering[ContacttypeId] = Ordering.by(_.value)
-  implicit val format: Format[ContacttypeId] = implicitly[Format[Int]].bimap(ContacttypeId.apply, _.value)
-  implicit val toStatement: ToStatement[ContacttypeId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[ContacttypeId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[ContacttypeId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[ContacttypeId] = implicitly[Column[Int]].map(ContacttypeId.apply)
+  implicit val ordering: Ordering[ContacttypeId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[ContacttypeId] = new ParameterMetaData[ContacttypeId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[ContacttypeId] = implicitly[Reads[Int]].map(ContacttypeId.apply)
+  implicit val toStatement: ToStatement[ContacttypeId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[ContacttypeId] = implicitly[Writes[Int]].contramap(_.value)
 }

@@ -9,13 +9,11 @@ package `_pg_foreign_servers`
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgForeignServersViewRow(
@@ -31,58 +29,30 @@ case class PgForeignServersViewRow(
 )
 
 object PgForeignServersViewRow {
-  implicit val decoder: Decoder[PgForeignServersViewRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[Option[/* oid */ Long]]
-        srvoptions <- c.downField("srvoptions").as[Option[Array[String]]]
-        foreignServerCatalog <- c.downField("foreign_server_catalog").as[Option[SqlIdentifier]]
-        foreignServerName <- c.downField("foreign_server_name").as[Option[SqlIdentifier]]
-        foreignDataWrapperCatalog <- c.downField("foreign_data_wrapper_catalog").as[Option[SqlIdentifier]]
-        foreignDataWrapperName <- c.downField("foreign_data_wrapper_name").as[Option[SqlIdentifier]]
-        foreignServerType <- c.downField("foreign_server_type").as[Option[CharacterData]]
-        foreignServerVersion <- c.downField("foreign_server_version").as[Option[CharacterData]]
-        authorizationIdentifier <- c.downField("authorization_identifier").as[Option[SqlIdentifier]]
-      } yield PgForeignServersViewRow(oid, srvoptions, foreignServerCatalog, foreignServerName, foreignDataWrapperCatalog, foreignDataWrapperName, foreignServerType, foreignServerVersion, authorizationIdentifier)
-  implicit val encoder: Encoder[PgForeignServersViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "srvoptions" := row.srvoptions,
-        "foreign_server_catalog" := row.foreignServerCatalog,
-        "foreign_server_name" := row.foreignServerName,
-        "foreign_data_wrapper_catalog" := row.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" := row.foreignDataWrapperName,
-        "foreign_server_type" := row.foreignServerType,
-        "foreign_server_version" := row.foreignServerVersion,
-        "authorization_identifier" := row.authorizationIdentifier
-      )}
-  implicit val read: Read[PgForeignServersViewRow] =
-    new Read[PgForeignServersViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgForeignServersViewRow(
-        oid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        srvoptions = Get[Array[String]].unsafeGetNullable(rs, i + 1),
-        foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
-        foreignServerType = Get[CharacterData].unsafeGetNullable(rs, i + 6),
-        foreignServerVersion = Get[CharacterData].unsafeGetNullable(rs, i + 7),
-        authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgForeignServersViewRow] = Decoder.forProduct9[PgForeignServersViewRow, Option[/* oid */ Long], Option[Array[String]], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier]]("oid", "srvoptions", "foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(PgForeignServersViewRow.apply)
+  implicit val encoder: Encoder[PgForeignServersViewRow] = Encoder.forProduct9[PgForeignServersViewRow, Option[/* oid */ Long], Option[Array[String]], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[CharacterData], Option[SqlIdentifier]]("oid", "srvoptions", "foreign_server_catalog", "foreign_server_name", "foreign_data_wrapper_catalog", "foreign_data_wrapper_name", "foreign_server_type", "foreign_server_version", "authorization_identifier")(x => (x.oid, x.srvoptions, x.foreignServerCatalog, x.foreignServerName, x.foreignDataWrapperCatalog, x.foreignDataWrapperName, x.foreignServerType, x.foreignServerVersion, x.authorizationIdentifier))
+  implicit val read: Read[PgForeignServersViewRow] = new Read[PgForeignServersViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgForeignServersViewRow(
+      oid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      srvoptions = Get[Array[String]].unsafeGetNullable(rs, i + 1),
+      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      foreignDataWrapperCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      foreignDataWrapperName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 5),
+      foreignServerType = Get[CharacterData].unsafeGetNullable(rs, i + 6),
+      foreignServerVersion = Get[CharacterData].unsafeGetNullable(rs, i + 7),
+      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

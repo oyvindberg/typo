@@ -8,20 +8,20 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean] = {
-    sql"delete from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".update.run.map(_ > 0)
+    sql"delete from sales.shoppingcartitem where shoppingcartitemid = ${shoppingcartitemid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
           values (${unsaved.shoppingcartitemid}::int4, ${unsaved.shoppingcartid}, ${unsaved.quantity}::int4, ${unsaved.productid}::int4, ${unsaved.datecreated}::timestamp, ${unsaved.modifieddate}::timestamp)
-          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
        """.query[ShoppingcartitemRow].unique
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
@@ -38,36 +38,36 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       },
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"datecreated"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"datecreated"), fr"${value: TypoLocalDateTime}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.shoppingcartitem default values
-            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.shoppingcartitem(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+            returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
          """
     }
     q.query[ShoppingcartitemRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem".query[ShoppingcartitemRow].stream
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem".query[ShoppingcartitemRow].stream
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".query[ShoppingcartitemRow].option
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ${shoppingcartitemid}".query[ShoppingcartitemRow].option
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = ANY($shoppingcartitemids)".query[ShoppingcartitemRow].stream
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ANY(${shoppingcartitemids})".query[ShoppingcartitemRow].stream
   }
   override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
@@ -77,7 +77,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               productid = ${row.productid}::int4,
               datecreated = ${row.datecreated}::timestamp,
               modifieddate = ${row.modifieddate}::timestamp
-          where shoppingcartitemid = $shoppingcartitemid
+          where shoppingcartitemid = ${shoppingcartitemid}
        """
       .update
       .run
@@ -100,7 +100,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             productid = EXCLUDED.productid,
             datecreated = EXCLUDED.datecreated,
             modifieddate = EXCLUDED.modifieddate
-          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
+          returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
        """.query[ShoppingcartitemRow].unique
   }
 }

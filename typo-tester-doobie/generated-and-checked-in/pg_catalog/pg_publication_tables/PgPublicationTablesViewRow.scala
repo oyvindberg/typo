@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_publication_tables
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgPublicationTablesViewRow(
@@ -23,34 +21,18 @@ case class PgPublicationTablesViewRow(
 )
 
 object PgPublicationTablesViewRow {
-  implicit val decoder: Decoder[PgPublicationTablesViewRow] =
-    (c: HCursor) =>
-      for {
-        pubname <- c.downField("pubname").as[Option[String]]
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        tablename <- c.downField("tablename").as[Option[String]]
-      } yield PgPublicationTablesViewRow(pubname, schemaname, tablename)
-  implicit val encoder: Encoder[PgPublicationTablesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "pubname" := row.pubname,
-        "schemaname" := row.schemaname,
-        "tablename" := row.tablename
-      )}
-  implicit val read: Read[PgPublicationTablesViewRow] =
-    new Read[PgPublicationTablesViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgPublicationTablesViewRow(
-        pubname = Get[String].unsafeGetNullable(rs, i + 0),
-        schemaname = Get[String].unsafeGetNullable(rs, i + 1),
-        tablename = Get[String].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PgPublicationTablesViewRow] = Decoder.forProduct3[PgPublicationTablesViewRow, Option[String], Option[String], Option[String]]("pubname", "schemaname", "tablename")(PgPublicationTablesViewRow.apply)
+  implicit val encoder: Encoder[PgPublicationTablesViewRow] = Encoder.forProduct3[PgPublicationTablesViewRow, Option[String], Option[String], Option[String]]("pubname", "schemaname", "tablename")(x => (x.pubname, x.schemaname, x.tablename))
+  implicit val read: Read[PgPublicationTablesViewRow] = new Read[PgPublicationTablesViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgPublicationTablesViewRow(
+      pubname = Get[String].unsafeGetNullable(rs, i + 0),
+      schemaname = Get[String].unsafeGetNullable(rs, i + 1),
+      tablename = Get[String].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

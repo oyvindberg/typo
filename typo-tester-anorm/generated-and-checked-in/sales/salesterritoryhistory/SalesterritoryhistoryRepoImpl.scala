@@ -8,11 +8,11 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
@@ -22,7 +22,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def insert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
     SQL"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+          returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
        """
       .executeInsert(SalesterritoryhistoryRow.rowParser(1).single)
   
@@ -39,19 +39,19 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.salesterritoryhistory default values
-            returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+            returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
          """
         .executeInsert(SalesterritoryhistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesterritoryhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+                  returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -62,12 +62,12 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
-    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+    SQL"""select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
           from sales.salesterritoryhistory
        """.as(SalesterritoryhistoryRow.rowParser(1).*)
   }
   override def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
-    SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+    SQL"""select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
           from sales.salesterritoryhistory
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
        """.as(SalesterritoryhistoryRow.rowParser(1).singleOpt)
@@ -96,7 +96,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             enddate = EXCLUDED.enddate,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
+          returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
        """
       .executeInsert(SalesterritoryhistoryRow.rowParser(1).single)
   

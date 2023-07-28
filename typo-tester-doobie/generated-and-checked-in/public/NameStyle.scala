@@ -6,7 +6,8 @@
 package adventureworks
 package public
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -15,11 +16,11 @@ import io.circe.Encoder
   */
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
-  implicit def ordering(implicit ev: Ordering[Boolean]): Ordering[NameStyle] = Ordering.by(_.value)
-  implicit val encoder: Encoder[NameStyle] =
-    Encoder[Boolean].contramap(_.value)
-  implicit val decoder: Decoder[NameStyle] =
-    Decoder[Boolean].map(NameStyle(_))
-  implicit val meta: Meta[NameStyle] = Meta[Boolean].imap(NameStyle.apply)(_.value)
-  implicit val metaArray: Meta[Array[NameStyle]] = Meta[Array[Boolean]].imap(_.map(NameStyle.apply))(_.map(_.value))
+  implicit val arrayGet: Get[Array[NameStyle]] = Get[Array[Boolean]].map(_.map(NameStyle.apply))
+  implicit val arrayPut: Put[Array[NameStyle]] = Put[Array[Boolean]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[NameStyle] = Decoder[Boolean].map(NameStyle.apply)
+  implicit val encoder: Encoder[NameStyle] = Encoder[Boolean].contramap(_.value)
+  implicit val get: Get[NameStyle] = Get[Boolean].map(NameStyle.apply)
+  implicit val ordering: Ordering[NameStyle] = Ordering.by(_.value)
+  implicit val put: Put[NameStyle] = Put[Boolean].contramap(_.value)
 }

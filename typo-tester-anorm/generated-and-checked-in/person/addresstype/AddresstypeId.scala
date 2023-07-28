@@ -10,19 +10,20 @@ package addresstype
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `person.addresstype` */
 case class AddresstypeId(value: Int) extends AnyVal
 object AddresstypeId {
-  implicit val ordering: Ordering[AddresstypeId] = Ordering.by(_.value)
-  implicit val format: Format[AddresstypeId] = implicitly[Format[Int]].bimap(AddresstypeId.apply, _.value)
-  implicit val toStatement: ToStatement[AddresstypeId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[AddresstypeId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[AddresstypeId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[AddresstypeId] = implicitly[Column[Int]].map(AddresstypeId.apply)
+  implicit val ordering: Ordering[AddresstypeId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[AddresstypeId] = new ParameterMetaData[AddresstypeId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[AddresstypeId] = implicitly[Reads[Int]].map(AddresstypeId.apply)
+  implicit val toStatement: ToStatement[AddresstypeId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[AddresstypeId] = implicitly[Writes[Int]].contramap(_.value)
 }

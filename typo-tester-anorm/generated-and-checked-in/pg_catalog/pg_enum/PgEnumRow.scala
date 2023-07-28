@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgEnumRow(
@@ -24,37 +26,33 @@ case class PgEnumRow(
 )
 
 object PgEnumRow {
-  def rowParser(idx: Int): RowParser[PgEnumRow] =
-    RowParser[PgEnumRow] { row =>
-      Success(
+  implicit val reads: Reads[PgEnumRow] = Reads[PgEnumRow](json => JsResult.fromTry(
+      Try(
         PgEnumRow(
-          oid = row[PgEnumId](idx + 0),
-          enumtypid = row[/* oid */ Long](idx + 1),
-          enumsortorder = row[Float](idx + 2),
-          enumlabel = row[String](idx + 3)
+          oid = json.\("oid").as[PgEnumId],
+          enumtypid = json.\("enumtypid").as[/* oid */ Long],
+          enumsortorder = json.\("enumsortorder").as[Float],
+          enumlabel = json.\("enumlabel").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgEnumRow] = new OFormat[PgEnumRow]{
-    override def writes(o: PgEnumRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "enumtypid" -> o.enumtypid,
-        "enumsortorder" -> o.enumsortorder,
-        "enumlabel" -> o.enumlabel
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgEnumRow] = RowParser[PgEnumRow] { row =>
+    Success(
+      PgEnumRow(
+        oid = row[PgEnumId](idx + 0),
+        enumtypid = row[/* oid */ Long](idx + 1),
+        enumsortorder = row[Float](idx + 2),
+        enumlabel = row[String](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgEnumRow] = {
-      JsResult.fromTry(
-        Try(
-          PgEnumRow(
-            oid = json.\("oid").as[PgEnumId],
-            enumtypid = json.\("enumtypid").as[/* oid */ Long],
-            enumsortorder = json.\("enumsortorder").as[Float],
-            enumlabel = json.\("enumlabel").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgEnumRow] = OWrites[PgEnumRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "enumtypid" -> Json.toJson(o.enumtypid),
+      "enumsortorder" -> Json.toJson(o.enumsortorder),
+      "enumlabel" -> Json.toJson(o.enumlabel)
+    ))
+  )
 }

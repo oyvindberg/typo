@@ -6,49 +6,23 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.geometric.PGline
 
 /** This implements a line represented by the linear equation Ax + By + C = 0 */
 case class TypoLine(a: Double, b: Double, c: Double)
+
 object TypoLine {
-  implicit val decoder: Decoder[TypoLine] =
-    (c: HCursor) =>
-      for {
-        a <- c.downField("a").as[Double]
-        b <- c.downField("b").as[Double]
-        c <- c.downField("c").as[Double]
-      } yield TypoLine(a, b, c)
-  implicit val encoder: Encoder[TypoLine] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "a" := row.a,
-        "b" := row.b,
-        "c" := row.c
-      )}
-  implicit val get: Get[TypoLine] =
-    Get.Advanced.other[PGline](cats.data.NonEmptyList.one("line"))
-      .map(v => TypoLine(v.a, v.b, v.c))
-  
-  implicit val put: Put[TypoLine] =
-    Put.Advanced.other[PGline](NonEmptyList.one("line"))
-      .contramap(v => new PGline(v.a, v.b, v.c))
-  
-  implicit val meta: Meta[TypoLine] = new Meta(get, put)
-  val gets: Get[Array[TypoLine]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_line"))
-      .map(_.map(v => TypoLine(v.asInstanceOf[PGline].a, v.asInstanceOf[PGline].b, v.asInstanceOf[PGline].c)))
-  
-  val puts: Put[Array[TypoLine]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_line"), "line")
-      .contramap(_.map(v => new PGline(v.a, v.b, v.c)))
-  
-  implicit val metas: Meta[Array[TypoLine]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoLine]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_line"))
+    .map(_.map(v => TypoLine(v.asInstanceOf[PGline].a, v.asInstanceOf[PGline].b, v.asInstanceOf[PGline].c)))
+  implicit val arrayPut: Put[Array[TypoLine]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_line"), "line")
+    .contramap(_.map(v => new PGline(v.a, v.b, v.c)))
+  implicit val decoder: Decoder[TypoLine] = Decoder.forProduct3[TypoLine, Double, Double, Double]("a", "b", "c")(TypoLine.apply)
+  implicit val encoder: Encoder[TypoLine] = Encoder.forProduct3[TypoLine, Double, Double, Double]("a", "b", "c")(x => (x.a, x.b, x.c))
+  implicit val get: Get[TypoLine] = Get.Advanced.other[PGline](NonEmptyList.one("line"))
+    .map(v => TypoLine(v.a, v.b, v.c))
+  implicit val put: Put[TypoLine] = Put.Advanced.other[PGline](NonEmptyList.one("line")).contramap(v => new PGline(v.a, v.b, v.c))
 }

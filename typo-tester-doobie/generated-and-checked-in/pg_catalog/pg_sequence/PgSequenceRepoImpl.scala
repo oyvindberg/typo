@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgSequenceRepoImpl extends PgSequenceRepo {
   override def delete(seqrelid: PgSequenceId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_sequence where seqrelid = $seqrelid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_sequence where seqrelid = ${seqrelid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow] = {
     sql"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)
@@ -25,10 +25,10 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
     sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence".query[PgSequenceRow].stream
   }
   override def selectById(seqrelid: PgSequenceId): ConnectionIO[Option[PgSequenceRow]] = {
-    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = $seqrelid".query[PgSequenceRow].option
+    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ${seqrelid}".query[PgSequenceRow].option
   }
   override def selectByIds(seqrelids: Array[PgSequenceId]): Stream[ConnectionIO, PgSequenceRow] = {
-    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ANY($seqrelids)".query[PgSequenceRow].stream
+    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ANY(${seqrelids})".query[PgSequenceRow].stream
   }
   override def update(row: PgSequenceRow): ConnectionIO[Boolean] = {
     val seqrelid = row.seqrelid
@@ -40,7 +40,7 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
               seqmin = ${row.seqmin}::int8,
               seqcache = ${row.seqcache}::int8,
               seqcycle = ${row.seqcycle}
-          where seqrelid = $seqrelid
+          where seqrelid = ${seqrelid}
        """
       .update
       .run

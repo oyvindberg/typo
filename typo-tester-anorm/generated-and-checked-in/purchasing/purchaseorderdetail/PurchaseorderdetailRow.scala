@@ -7,16 +7,18 @@ package adventureworks
 package purchasing
 package purchaseorderdetail
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PurchaseorderdetailRow(
@@ -26,7 +28,7 @@ case class PurchaseorderdetailRow(
   /** Primary key. One line number per purchased product. */
   purchaseorderdetailid: Int,
   /** Date the product is expected to be received. */
-  duedate: LocalDateTime,
+  duedate: TypoLocalDateTime,
   /** Quantity ordered. */
   orderqty: Int,
   /** Product identification number. Foreign key to Product.ProductID.
@@ -38,58 +40,54 @@ case class PurchaseorderdetailRow(
   receivedqty: BigDecimal,
   /** Quantity rejected during inspection. */
   rejectedqty: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: PurchaseorderdetailId = PurchaseorderdetailId(purchaseorderid, purchaseorderdetailid)
  }
 
 object PurchaseorderdetailRow {
-  def rowParser(idx: Int): RowParser[PurchaseorderdetailRow] =
-    RowParser[PurchaseorderdetailRow] { row =>
-      Success(
+  implicit val reads: Reads[PurchaseorderdetailRow] = Reads[PurchaseorderdetailRow](json => JsResult.fromTry(
+      Try(
         PurchaseorderdetailRow(
-          purchaseorderid = row[PurchaseorderheaderId](idx + 0),
-          purchaseorderdetailid = row[Int](idx + 1),
-          duedate = row[LocalDateTime](idx + 2),
-          orderqty = row[Int](idx + 3),
-          productid = row[ProductId](idx + 4),
-          unitprice = row[BigDecimal](idx + 5),
-          receivedqty = row[BigDecimal](idx + 6),
-          rejectedqty = row[BigDecimal](idx + 7),
-          modifieddate = row[LocalDateTime](idx + 8)
+          purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
+          purchaseorderdetailid = json.\("purchaseorderdetailid").as[Int],
+          duedate = json.\("duedate").as[TypoLocalDateTime],
+          orderqty = json.\("orderqty").as[Int],
+          productid = json.\("productid").as[ProductId],
+          unitprice = json.\("unitprice").as[BigDecimal],
+          receivedqty = json.\("receivedqty").as[BigDecimal],
+          rejectedqty = json.\("rejectedqty").as[BigDecimal],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[PurchaseorderdetailRow] = new OFormat[PurchaseorderdetailRow]{
-    override def writes(o: PurchaseorderdetailRow): JsObject =
-      Json.obj(
-        "purchaseorderid" -> o.purchaseorderid,
-        "purchaseorderdetailid" -> o.purchaseorderdetailid,
-        "duedate" -> o.duedate,
-        "orderqty" -> o.orderqty,
-        "productid" -> o.productid,
-        "unitprice" -> o.unitprice,
-        "receivedqty" -> o.receivedqty,
-        "rejectedqty" -> o.rejectedqty,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PurchaseorderdetailRow] = RowParser[PurchaseorderdetailRow] { row =>
+    Success(
+      PurchaseorderdetailRow(
+        purchaseorderid = row[PurchaseorderheaderId](idx + 0),
+        purchaseorderdetailid = row[Int](idx + 1),
+        duedate = row[TypoLocalDateTime](idx + 2),
+        orderqty = row[Int](idx + 3),
+        productid = row[ProductId](idx + 4),
+        unitprice = row[BigDecimal](idx + 5),
+        receivedqty = row[BigDecimal](idx + 6),
+        rejectedqty = row[BigDecimal](idx + 7),
+        modifieddate = row[TypoLocalDateTime](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PurchaseorderdetailRow] = {
-      JsResult.fromTry(
-        Try(
-          PurchaseorderdetailRow(
-            purchaseorderid = json.\("purchaseorderid").as[PurchaseorderheaderId],
-            purchaseorderdetailid = json.\("purchaseorderdetailid").as[Int],
-            duedate = json.\("duedate").as[LocalDateTime],
-            orderqty = json.\("orderqty").as[Int],
-            productid = json.\("productid").as[ProductId],
-            unitprice = json.\("unitprice").as[BigDecimal],
-            receivedqty = json.\("receivedqty").as[BigDecimal],
-            rejectedqty = json.\("rejectedqty").as[BigDecimal],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PurchaseorderdetailRow] = OWrites[PurchaseorderdetailRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
+      "purchaseorderdetailid" -> Json.toJson(o.purchaseorderdetailid),
+      "duedate" -> Json.toJson(o.duedate),
+      "orderqty" -> Json.toJson(o.orderqty),
+      "productid" -> Json.toJson(o.productid),
+      "unitprice" -> Json.toJson(o.unitprice),
+      "receivedqty" -> Json.toJson(o.receivedqty),
+      "rejectedqty" -> Json.toJson(o.rejectedqty),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

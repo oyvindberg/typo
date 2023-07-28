@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgLargeobjectMetadataRow(
@@ -24,34 +26,30 @@ case class PgLargeobjectMetadataRow(
 )
 
 object PgLargeobjectMetadataRow {
-  def rowParser(idx: Int): RowParser[PgLargeobjectMetadataRow] =
-    RowParser[PgLargeobjectMetadataRow] { row =>
-      Success(
+  implicit val reads: Reads[PgLargeobjectMetadataRow] = Reads[PgLargeobjectMetadataRow](json => JsResult.fromTry(
+      Try(
         PgLargeobjectMetadataRow(
-          oid = row[PgLargeobjectMetadataId](idx + 0),
-          lomowner = row[/* oid */ Long](idx + 1),
-          lomacl = row[Option[Array[TypoAclItem]]](idx + 2)
+          oid = json.\("oid").as[PgLargeobjectMetadataId],
+          lomowner = json.\("lomowner").as[/* oid */ Long],
+          lomacl = json.\("lomacl").toOption.map(_.as[Array[TypoAclItem]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgLargeobjectMetadataRow] = new OFormat[PgLargeobjectMetadataRow]{
-    override def writes(o: PgLargeobjectMetadataRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "lomowner" -> o.lomowner,
-        "lomacl" -> o.lomacl
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgLargeobjectMetadataRow] = RowParser[PgLargeobjectMetadataRow] { row =>
+    Success(
+      PgLargeobjectMetadataRow(
+        oid = row[PgLargeobjectMetadataId](idx + 0),
+        lomowner = row[/* oid */ Long](idx + 1),
+        lomacl = row[Option[Array[TypoAclItem]]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PgLargeobjectMetadataRow] = {
-      JsResult.fromTry(
-        Try(
-          PgLargeobjectMetadataRow(
-            oid = json.\("oid").as[PgLargeobjectMetadataId],
-            lomowner = json.\("lomowner").as[/* oid */ Long],
-            lomacl = json.\("lomacl").toOption.map(_.as[Array[TypoAclItem]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgLargeobjectMetadataRow] = OWrites[PgLargeobjectMetadataRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "lomowner" -> Json.toJson(o.lomowner),
+      "lomacl" -> Json.toJson(o.lomacl)
+    ))
+  )
 }

@@ -10,19 +10,20 @@ package pg_event_trigger
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_event_trigger` */
 case class PgEventTriggerId(value: /* oid */ Long) extends AnyVal
 object PgEventTriggerId {
-  implicit val ordering: Ordering[PgEventTriggerId] = Ordering.by(_.value)
-  implicit val format: Format[PgEventTriggerId] = implicitly[Format[/* oid */ Long]].bimap(PgEventTriggerId.apply, _.value)
-  implicit val toStatement: ToStatement[PgEventTriggerId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[PgEventTriggerId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[PgEventTriggerId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit val column: Column[PgEventTriggerId] = implicitly[Column[/* oid */ Long]].map(PgEventTriggerId.apply)
+  implicit val ordering: Ordering[PgEventTriggerId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgEventTriggerId] = new ParameterMetaData[PgEventTriggerId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit val reads: Reads[PgEventTriggerId] = implicitly[Reads[/* oid */ Long]].map(PgEventTriggerId.apply)
+  implicit val toStatement: ToStatement[PgEventTriggerId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit val writes: Writes[PgEventTriggerId] = implicitly[Writes[/* oid */ Long]].contramap(_.value)
 }

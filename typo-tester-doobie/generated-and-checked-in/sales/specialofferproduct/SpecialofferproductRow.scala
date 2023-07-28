@@ -7,17 +7,15 @@ package adventureworks
 package sales
 package specialofferproduct
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class SpecialofferproductRow(
@@ -28,44 +26,26 @@ case class SpecialofferproductRow(
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: SpecialofferproductId = SpecialofferproductId(specialofferid, productid)
  }
 
 object SpecialofferproductRow {
-  implicit val decoder: Decoder[SpecialofferproductRow] =
-    (c: HCursor) =>
-      for {
-        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
-        productid <- c.downField("productid").as[ProductId]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield SpecialofferproductRow(specialofferid, productid, rowguid, modifieddate)
-  implicit val encoder: Encoder[SpecialofferproductRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "specialofferid" := row.specialofferid,
-        "productid" := row.productid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SpecialofferproductRow] =
-    new Read[SpecialofferproductRow](
-      gets = List(
-        (Get[SpecialofferId], Nullability.NoNulls),
-        (Get[ProductId], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SpecialofferproductRow(
-        specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[SpecialofferproductRow] = Decoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRow.apply)
+  implicit val encoder: Encoder[SpecialofferproductRow] = Encoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))
+  implicit val read: Read[SpecialofferproductRow] = new Read[SpecialofferproductRow](
+    gets = List(
+      (Get[SpecialofferId], Nullability.NoNulls),
+      (Get[ProductId], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SpecialofferproductRow(
+      specialofferid = Get[SpecialofferId].unsafeGetNonNullable(rs, i + 0),
+      productid = Get[ProductId].unsafeGetNonNullable(rs, i + 1),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

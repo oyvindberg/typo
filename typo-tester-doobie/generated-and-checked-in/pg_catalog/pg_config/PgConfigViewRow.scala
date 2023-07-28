@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_config
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgConfigViewRow(
@@ -22,30 +20,16 @@ case class PgConfigViewRow(
 )
 
 object PgConfigViewRow {
-  implicit val decoder: Decoder[PgConfigViewRow] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Option[String]]
-        setting <- c.downField("setting").as[Option[String]]
-      } yield PgConfigViewRow(name, setting)
-  implicit val encoder: Encoder[PgConfigViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "setting" := row.setting
-      )}
-  implicit val read: Read[PgConfigViewRow] =
-    new Read[PgConfigViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgConfigViewRow(
-        name = Get[String].unsafeGetNullable(rs, i + 0),
-        setting = Get[String].unsafeGetNullable(rs, i + 1)
-      )
+  implicit val decoder: Decoder[PgConfigViewRow] = Decoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(PgConfigViewRow.apply)
+  implicit val encoder: Encoder[PgConfigViewRow] = Encoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(x => (x.name, x.setting))
+  implicit val read: Read[PgConfigViewRow] = new Read[PgConfigViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgConfigViewRow(
+      name = Get[String].unsafeGetNullable(rs, i + 0),
+      setting = Get[String].unsafeGetNullable(rs, i + 1)
     )
-  
-
+  )
 }

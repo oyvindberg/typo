@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_collation where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_collation where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgCollationRow): ConnectionIO[PgCollationRow] = {
     sql"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
@@ -25,10 +25,10 @@ object PgCollationRepoImpl extends PgCollationRepo {
     sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation".query[PgCollationRow].stream
   }
   override def selectById(oid: PgCollationId): ConnectionIO[Option[PgCollationRow]] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = $oid".query[PgCollationRow].option
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ${oid}".query[PgCollationRow].option
   }
   override def selectByIds(oids: Array[PgCollationId]): Stream[ConnectionIO, PgCollationRow] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY($oids)".query[PgCollationRow].stream
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY(${oids})".query[PgCollationRow].stream
   }
   override def update(row: PgCollationRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -42,7 +42,7 @@ object PgCollationRepoImpl extends PgCollationRepo {
               collcollate = ${row.collcollate}::name,
               collctype = ${row.collctype}::name,
               collversion = ${row.collversion}
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

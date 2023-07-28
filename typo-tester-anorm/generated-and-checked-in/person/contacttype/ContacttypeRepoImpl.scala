@@ -8,11 +8,11 @@ package person
 package contacttype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)
           values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning contacttypeid, "name", modifieddate
+          returning contacttypeid, "name", modifieddate::text
        """
       .executeInsert(ContacttypeRow.rowParser(1).single)
   
@@ -35,19 +35,19 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into person.contacttype default values
-            returning contacttypeid, "name", modifieddate
+            returning contacttypeid, "name", modifieddate::text
          """
         .executeInsert(ContacttypeRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.contacttype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning contacttypeid, "name", modifieddate
+                  returning contacttypeid, "name", modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -58,18 +58,18 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"""select contacttypeid, "name", modifieddate
+    SQL"""select contacttypeid, "name", modifieddate::text
           from person.contacttype
        """.as(ContacttypeRow.rowParser(1).*)
   }
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
-    SQL"""select contacttypeid, "name", modifieddate
+    SQL"""select contacttypeid, "name", modifieddate::text
           from person.contacttype
           where contacttypeid = $contacttypeid
        """.as(ContacttypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
-    SQL"""select contacttypeid, "name", modifieddate
+    SQL"""select contacttypeid, "name", modifieddate::text
           from person.contacttype
           where contacttypeid = ANY($contacttypeids)
        """.as(ContacttypeRow.rowParser(1).*)
@@ -94,7 +94,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning contacttypeid, "name", modifieddate
+          returning contacttypeid, "name", modifieddate::text
        """
       .executeInsert(ContacttypeRow.rowParser(1).single)
   

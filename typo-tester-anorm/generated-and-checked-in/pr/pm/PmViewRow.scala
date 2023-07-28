@@ -7,18 +7,20 @@ package adventureworks
 package pr
 package pm
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PmViewRow(
@@ -34,50 +36,46 @@ case class PmViewRow(
   /** Points to [[production.productmodel.ProductmodelRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productmodel.ProductmodelRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PmViewRow {
-  def rowParser(idx: Int): RowParser[PmViewRow] =
-    RowParser[PmViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PmViewRow] = Reads[PmViewRow](json => JsResult.fromTry(
+      Try(
         PmViewRow(
-          id = row[Option[Int]](idx + 0),
-          productmodelid = row[Option[ProductmodelId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          catalogdescription = row[Option[TypoXml]](idx + 3),
-          instructions = row[Option[TypoXml]](idx + 4),
-          rowguid = row[Option[UUID]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
+          instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PmViewRow] = new OFormat[PmViewRow]{
-    override def writes(o: PmViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "productmodelid" -> o.productmodelid,
-        "name" -> o.name,
-        "catalogdescription" -> o.catalogdescription,
-        "instructions" -> o.instructions,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PmViewRow] = RowParser[PmViewRow] { row =>
+    Success(
+      PmViewRow(
+        id = row[Option[Int]](idx + 0),
+        productmodelid = row[Option[ProductmodelId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        catalogdescription = row[Option[TypoXml]](idx + 3),
+        instructions = row[Option[TypoXml]](idx + 4),
+        rowguid = row[Option[UUID]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PmViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PmViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            catalogdescription = json.\("catalogdescription").toOption.map(_.as[TypoXml]),
-            instructions = json.\("instructions").toOption.map(_.as[TypoXml]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PmViewRow] = OWrites[PmViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "name" -> Json.toJson(o.name),
+      "catalogdescription" -> Json.toJson(o.catalogdescription),
+      "instructions" -> Json.toJson(o.instructions),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

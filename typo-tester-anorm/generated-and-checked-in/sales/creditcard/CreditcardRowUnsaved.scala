@@ -8,12 +8,14 @@ package sales
 package creditcard
 
 import adventureworks.Defaulted
-import java.time.LocalDateTime
+import adventureworks.TypoLocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `sales.creditcard` which has not been persisted yet */
@@ -30,9 +32,9 @@ case class CreditcardRowUnsaved(
       Primary key for CreditCard records. */
   creditcardid: Defaulted[CreditcardId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(creditcardidDefault: => CreditcardId, modifieddateDefault: => LocalDateTime): CreditcardRow =
+  def toRow(creditcardidDefault: => CreditcardId, modifieddateDefault: => TypoLocalDateTime): CreditcardRow =
     CreditcardRow(
       cardtype = cardtype,
       cardnumber = cardnumber,
@@ -49,30 +51,27 @@ case class CreditcardRowUnsaved(
     )
 }
 object CreditcardRowUnsaved {
-  implicit val oFormat: OFormat[CreditcardRowUnsaved] = new OFormat[CreditcardRowUnsaved]{
-    override def writes(o: CreditcardRowUnsaved): JsObject =
-      Json.obj(
-        "cardtype" -> o.cardtype,
-        "cardnumber" -> o.cardnumber,
-        "expmonth" -> o.expmonth,
-        "expyear" -> o.expyear,
-        "creditcardid" -> o.creditcardid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[CreditcardRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          CreditcardRowUnsaved(
-            cardtype = json.\("cardtype").as[/* max 50 chars */ String],
-            cardnumber = json.\("cardnumber").as[/* max 25 chars */ String],
-            expmonth = json.\("expmonth").as[Int],
-            expyear = json.\("expyear").as[Int],
-            creditcardid = json.\("creditcardid").as[Defaulted[CreditcardId]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[CreditcardRowUnsaved] = Reads[CreditcardRowUnsaved](json => JsResult.fromTry(
+      Try(
+        CreditcardRowUnsaved(
+          cardtype = json.\("cardtype").as[/* max 50 chars */ String],
+          cardnumber = json.\("cardnumber").as[/* max 25 chars */ String],
+          expmonth = json.\("expmonth").as[Int],
+          expyear = json.\("expyear").as[Int],
+          creditcardid = json.\("creditcardid").as[Defaulted[CreditcardId]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[CreditcardRowUnsaved] = OWrites[CreditcardRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "cardtype" -> Json.toJson(o.cardtype),
+      "cardnumber" -> Json.toJson(o.cardnumber),
+      "expmonth" -> Json.toJson(o.expmonth),
+      "expyear" -> Json.toJson(o.expyear),
+      "creditcardid" -> Json.toJson(o.creditcardid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

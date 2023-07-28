@@ -7,17 +7,15 @@ package adventureworks
 package sa
 package pcc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PccViewRow(
   id: Option[Int],
@@ -26,42 +24,24 @@ case class PccViewRow(
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.creditcardid]] */
   creditcardid: Option[CreditcardId],
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PccViewRow {
-  implicit val decoder: Decoder[PccViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        creditcardid <- c.downField("creditcardid").as[Option[CreditcardId]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PccViewRow(id, businessentityid, creditcardid, modifieddate)
-  implicit val encoder: Encoder[PccViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "creditcardid" := row.creditcardid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PccViewRow] =
-    new Read[PccViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[CreditcardId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PccViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PccViewRow] = Decoder.forProduct4[PccViewRow, Option[Int], Option[BusinessentityId], Option[CreditcardId], Option[TypoLocalDateTime]]("id", "businessentityid", "creditcardid", "modifieddate")(PccViewRow.apply)
+  implicit val encoder: Encoder[PccViewRow] = Encoder.forProduct4[PccViewRow, Option[Int], Option[BusinessentityId], Option[CreditcardId], Option[TypoLocalDateTime]]("id", "businessentityid", "creditcardid", "modifieddate")(x => (x.id, x.businessentityid, x.creditcardid, x.modifieddate))
+  implicit val read: Read[PccViewRow] = new Read[PccViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[CreditcardId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PccViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      creditcardid = Get[CreditcardId].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

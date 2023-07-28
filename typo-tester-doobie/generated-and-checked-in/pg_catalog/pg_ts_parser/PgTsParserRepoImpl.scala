@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_ts_parser where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_ts_parser where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow] = {
     sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
@@ -25,10 +25,10 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser".query[PgTsParserRow].stream
   }
   override def selectById(oid: PgTsParserId): ConnectionIO[Option[PgTsParserRow]] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = $oid".query[PgTsParserRow].option
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ${oid}".query[PgTsParserRow].option
   }
   override def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY($oids)".query[PgTsParserRow].stream
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${oids})".query[PgTsParserRow].stream
   }
   override def update(row: PgTsParserRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -40,7 +40,7 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
               prsend = ${row.prsend}::regproc,
               prsheadline = ${row.prsheadline}::regproc,
               prslextype = ${row.prslextype}::regproc
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

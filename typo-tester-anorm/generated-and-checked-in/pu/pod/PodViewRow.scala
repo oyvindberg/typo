@@ -7,16 +7,18 @@ package adventureworks
 package pu
 package pod
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PodViewRow(
@@ -26,7 +28,7 @@ case class PodViewRow(
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]] */
   purchaseorderdetailid: Option[Int],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.duedate]] */
-  duedate: Option[LocalDateTime],
+  duedate: Option[TypoLocalDateTime],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.orderqty]] */
   orderqty: Option[Int],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.productid]] */
@@ -38,59 +40,55 @@ case class PodViewRow(
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.rejectedqty]] */
   rejectedqty: Option[BigDecimal],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PodViewRow {
-  def rowParser(idx: Int): RowParser[PodViewRow] =
-    RowParser[PodViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PodViewRow] = Reads[PodViewRow](json => JsResult.fromTry(
+      Try(
         PodViewRow(
-          id = row[Option[Int]](idx + 0),
-          purchaseorderid = row[Option[PurchaseorderheaderId]](idx + 1),
-          purchaseorderdetailid = row[Option[Int]](idx + 2),
-          duedate = row[Option[LocalDateTime]](idx + 3),
-          orderqty = row[Option[Int]](idx + 4),
-          productid = row[Option[ProductId]](idx + 5),
-          unitprice = row[Option[BigDecimal]](idx + 6),
-          receivedqty = row[Option[BigDecimal]](idx + 7),
-          rejectedqty = row[Option[BigDecimal]](idx + 8),
-          modifieddate = row[Option[LocalDateTime]](idx + 9)
+          id = json.\("id").toOption.map(_.as[Int]),
+          purchaseorderid = json.\("purchaseorderid").toOption.map(_.as[PurchaseorderheaderId]),
+          purchaseorderdetailid = json.\("purchaseorderdetailid").toOption.map(_.as[Int]),
+          duedate = json.\("duedate").toOption.map(_.as[TypoLocalDateTime]),
+          orderqty = json.\("orderqty").toOption.map(_.as[Int]),
+          productid = json.\("productid").toOption.map(_.as[ProductId]),
+          unitprice = json.\("unitprice").toOption.map(_.as[BigDecimal]),
+          receivedqty = json.\("receivedqty").toOption.map(_.as[BigDecimal]),
+          rejectedqty = json.\("rejectedqty").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PodViewRow] = new OFormat[PodViewRow]{
-    override def writes(o: PodViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "purchaseorderid" -> o.purchaseorderid,
-        "purchaseorderdetailid" -> o.purchaseorderdetailid,
-        "duedate" -> o.duedate,
-        "orderqty" -> o.orderqty,
-        "productid" -> o.productid,
-        "unitprice" -> o.unitprice,
-        "receivedqty" -> o.receivedqty,
-        "rejectedqty" -> o.rejectedqty,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PodViewRow] = RowParser[PodViewRow] { row =>
+    Success(
+      PodViewRow(
+        id = row[Option[Int]](idx + 0),
+        purchaseorderid = row[Option[PurchaseorderheaderId]](idx + 1),
+        purchaseorderdetailid = row[Option[Int]](idx + 2),
+        duedate = row[Option[TypoLocalDateTime]](idx + 3),
+        orderqty = row[Option[Int]](idx + 4),
+        productid = row[Option[ProductId]](idx + 5),
+        unitprice = row[Option[BigDecimal]](idx + 6),
+        receivedqty = row[Option[BigDecimal]](idx + 7),
+        rejectedqty = row[Option[BigDecimal]](idx + 8),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[PodViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PodViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            purchaseorderid = json.\("purchaseorderid").toOption.map(_.as[PurchaseorderheaderId]),
-            purchaseorderdetailid = json.\("purchaseorderdetailid").toOption.map(_.as[Int]),
-            duedate = json.\("duedate").toOption.map(_.as[LocalDateTime]),
-            orderqty = json.\("orderqty").toOption.map(_.as[Int]),
-            productid = json.\("productid").toOption.map(_.as[ProductId]),
-            unitprice = json.\("unitprice").toOption.map(_.as[BigDecimal]),
-            receivedqty = json.\("receivedqty").toOption.map(_.as[BigDecimal]),
-            rejectedqty = json.\("rejectedqty").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PodViewRow] = OWrites[PodViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "purchaseorderid" -> Json.toJson(o.purchaseorderid),
+      "purchaseorderdetailid" -> Json.toJson(o.purchaseorderdetailid),
+      "duedate" -> Json.toJson(o.duedate),
+      "orderqty" -> Json.toJson(o.orderqty),
+      "productid" -> Json.toJson(o.productid),
+      "unitprice" -> Json.toJson(o.unitprice),
+      "receivedqty" -> Json.toJson(o.receivedqty),
+      "rejectedqty" -> Json.toJson(o.rejectedqty),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -7,17 +7,15 @@ package adventureworks
 package humanresources
 package jobcandidate
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class JobcandidateRow(
   /** Primary key for JobCandidate records. */
@@ -27,42 +25,24 @@ case class JobcandidateRow(
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
   resume: Option[TypoXml],
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object JobcandidateRow {
-  implicit val decoder: Decoder[JobcandidateRow] =
-    (c: HCursor) =>
-      for {
-        jobcandidateid <- c.downField("jobcandidateid").as[JobcandidateId]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        resume <- c.downField("resume").as[Option[TypoXml]]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield JobcandidateRow(jobcandidateid, businessentityid, resume, modifieddate)
-  implicit val encoder: Encoder[JobcandidateRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "jobcandidateid" := row.jobcandidateid,
-        "businessentityid" := row.businessentityid,
-        "resume" := row.resume,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[JobcandidateRow] =
-    new Read[JobcandidateRow](
-      gets = List(
-        (Get[JobcandidateId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => JobcandidateRow(
-        jobcandidateid = Get[JobcandidateId].unsafeGetNonNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        resume = Get[TypoXml].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[JobcandidateRow] = Decoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(JobcandidateRow.apply)
+  implicit val encoder: Encoder[JobcandidateRow] = Encoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))
+  implicit val read: Read[JobcandidateRow] = new Read[JobcandidateRow](
+    gets = List(
+      (Get[JobcandidateId], Nullability.NoNulls),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[TypoXml], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => JobcandidateRow(
+      jobcandidateid = Get[JobcandidateId].unsafeGetNonNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      resume = Get[TypoXml].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

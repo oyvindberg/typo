@@ -7,15 +7,17 @@ package adventureworks
 package pg_catalog
 package pg_stat_sys_tables
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
+import scala.util.Try
 
 case class PgStatSysTablesViewRow(
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.relid]] */
@@ -49,13 +51,13 @@ case class PgStatSysTablesViewRow(
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.nInsSinceVacuum]] */
   nInsSinceVacuum: Option[Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastVacuum]] */
-  lastVacuum: Option[OffsetDateTime],
+  lastVacuum: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutovacuum]] */
-  lastAutovacuum: Option[OffsetDateTime],
+  lastAutovacuum: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAnalyze]] */
-  lastAnalyze: Option[OffsetDateTime],
+  lastAnalyze: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.lastAutoanalyze]] */
-  lastAutoanalyze: Option[OffsetDateTime],
+  lastAutoanalyze: Option[TypoOffsetDateTime],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.vacuumCount]] */
   vacuumCount: Option[Long],
   /** Points to [[pg_stat_all_tables.PgStatAllTablesViewRow.autovacuumCount]] */
@@ -67,114 +69,116 @@ case class PgStatSysTablesViewRow(
 )
 
 object PgStatSysTablesViewRow {
-  implicit val decoder: Decoder[PgStatSysTablesViewRow] =
-    (c: HCursor) =>
-      for {
-        relid <- c.downField("relid").as[Option[/* oid */ Long]]
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        relname <- c.downField("relname").as[Option[String]]
-        seqScan <- c.downField("seq_scan").as[Option[Long]]
-        seqTupRead <- c.downField("seq_tup_read").as[Option[Long]]
-        idxScan <- c.downField("idx_scan").as[Option[Long]]
-        idxTupFetch <- c.downField("idx_tup_fetch").as[Option[Long]]
-        nTupIns <- c.downField("n_tup_ins").as[Option[Long]]
-        nTupUpd <- c.downField("n_tup_upd").as[Option[Long]]
-        nTupDel <- c.downField("n_tup_del").as[Option[Long]]
-        nTupHotUpd <- c.downField("n_tup_hot_upd").as[Option[Long]]
-        nLiveTup <- c.downField("n_live_tup").as[Option[Long]]
-        nDeadTup <- c.downField("n_dead_tup").as[Option[Long]]
-        nModSinceAnalyze <- c.downField("n_mod_since_analyze").as[Option[Long]]
-        nInsSinceVacuum <- c.downField("n_ins_since_vacuum").as[Option[Long]]
-        lastVacuum <- c.downField("last_vacuum").as[Option[OffsetDateTime]]
-        lastAutovacuum <- c.downField("last_autovacuum").as[Option[OffsetDateTime]]
-        lastAnalyze <- c.downField("last_analyze").as[Option[OffsetDateTime]]
-        lastAutoanalyze <- c.downField("last_autoanalyze").as[Option[OffsetDateTime]]
-        vacuumCount <- c.downField("vacuum_count").as[Option[Long]]
-        autovacuumCount <- c.downField("autovacuum_count").as[Option[Long]]
-        analyzeCount <- c.downField("analyze_count").as[Option[Long]]
-        autoanalyzeCount <- c.downField("autoanalyze_count").as[Option[Long]]
-      } yield PgStatSysTablesViewRow(relid, schemaname, relname, seqScan, seqTupRead, idxScan, idxTupFetch, nTupIns, nTupUpd, nTupDel, nTupHotUpd, nLiveTup, nDeadTup, nModSinceAnalyze, nInsSinceVacuum, lastVacuum, lastAutovacuum, lastAnalyze, lastAutoanalyze, vacuumCount, autovacuumCount, analyzeCount, autoanalyzeCount)
-  implicit val encoder: Encoder[PgStatSysTablesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "relid" := row.relid,
-        "schemaname" := row.schemaname,
-        "relname" := row.relname,
-        "seq_scan" := row.seqScan,
-        "seq_tup_read" := row.seqTupRead,
-        "idx_scan" := row.idxScan,
-        "idx_tup_fetch" := row.idxTupFetch,
-        "n_tup_ins" := row.nTupIns,
-        "n_tup_upd" := row.nTupUpd,
-        "n_tup_del" := row.nTupDel,
-        "n_tup_hot_upd" := row.nTupHotUpd,
-        "n_live_tup" := row.nLiveTup,
-        "n_dead_tup" := row.nDeadTup,
-        "n_mod_since_analyze" := row.nModSinceAnalyze,
-        "n_ins_since_vacuum" := row.nInsSinceVacuum,
-        "last_vacuum" := row.lastVacuum,
-        "last_autovacuum" := row.lastAutovacuum,
-        "last_analyze" := row.lastAnalyze,
-        "last_autoanalyze" := row.lastAutoanalyze,
-        "vacuum_count" := row.vacuumCount,
-        "autovacuum_count" := row.autovacuumCount,
-        "analyze_count" := row.analyzeCount,
-        "autoanalyze_count" := row.autoanalyzeCount
-      )}
-  implicit val read: Read[PgStatSysTablesViewRow] =
-    new Read[PgStatSysTablesViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatSysTablesViewRow(
-        relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        schemaname = Get[String].unsafeGetNullable(rs, i + 1),
-        relname = Get[String].unsafeGetNullable(rs, i + 2),
-        seqScan = Get[Long].unsafeGetNullable(rs, i + 3),
-        seqTupRead = Get[Long].unsafeGetNullable(rs, i + 4),
-        idxScan = Get[Long].unsafeGetNullable(rs, i + 5),
-        idxTupFetch = Get[Long].unsafeGetNullable(rs, i + 6),
-        nTupIns = Get[Long].unsafeGetNullable(rs, i + 7),
-        nTupUpd = Get[Long].unsafeGetNullable(rs, i + 8),
-        nTupDel = Get[Long].unsafeGetNullable(rs, i + 9),
-        nTupHotUpd = Get[Long].unsafeGetNullable(rs, i + 10),
-        nLiveTup = Get[Long].unsafeGetNullable(rs, i + 11),
-        nDeadTup = Get[Long].unsafeGetNullable(rs, i + 12),
-        nModSinceAnalyze = Get[Long].unsafeGetNullable(rs, i + 13),
-        nInsSinceVacuum = Get[Long].unsafeGetNullable(rs, i + 14),
-        lastVacuum = Get[OffsetDateTime].unsafeGetNullable(rs, i + 15),
-        lastAutovacuum = Get[OffsetDateTime].unsafeGetNullable(rs, i + 16),
-        lastAnalyze = Get[OffsetDateTime].unsafeGetNullable(rs, i + 17),
-        lastAutoanalyze = Get[OffsetDateTime].unsafeGetNullable(rs, i + 18),
-        vacuumCount = Get[Long].unsafeGetNullable(rs, i + 19),
-        autovacuumCount = Get[Long].unsafeGetNullable(rs, i + 20),
-        analyzeCount = Get[Long].unsafeGetNullable(rs, i + 21),
-        autoanalyzeCount = Get[Long].unsafeGetNullable(rs, i + 22)
+  implicit val decoder: Decoder[PgStatSysTablesViewRow] = Decoder.instanceTry[PgStatSysTablesViewRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      PgStatSysTablesViewRow(
+        relid = orThrow(c.get("relid")(Decoder[Option[/* oid */ Long]])),
+        schemaname = orThrow(c.get("schemaname")(Decoder[Option[String]])),
+        relname = orThrow(c.get("relname")(Decoder[Option[String]])),
+        seqScan = orThrow(c.get("seq_scan")(Decoder[Option[Long]])),
+        seqTupRead = orThrow(c.get("seq_tup_read")(Decoder[Option[Long]])),
+        idxScan = orThrow(c.get("idx_scan")(Decoder[Option[Long]])),
+        idxTupFetch = orThrow(c.get("idx_tup_fetch")(Decoder[Option[Long]])),
+        nTupIns = orThrow(c.get("n_tup_ins")(Decoder[Option[Long]])),
+        nTupUpd = orThrow(c.get("n_tup_upd")(Decoder[Option[Long]])),
+        nTupDel = orThrow(c.get("n_tup_del")(Decoder[Option[Long]])),
+        nTupHotUpd = orThrow(c.get("n_tup_hot_upd")(Decoder[Option[Long]])),
+        nLiveTup = orThrow(c.get("n_live_tup")(Decoder[Option[Long]])),
+        nDeadTup = orThrow(c.get("n_dead_tup")(Decoder[Option[Long]])),
+        nModSinceAnalyze = orThrow(c.get("n_mod_since_analyze")(Decoder[Option[Long]])),
+        nInsSinceVacuum = orThrow(c.get("n_ins_since_vacuum")(Decoder[Option[Long]])),
+        lastVacuum = orThrow(c.get("last_vacuum")(Decoder[Option[TypoOffsetDateTime]])),
+        lastAutovacuum = orThrow(c.get("last_autovacuum")(Decoder[Option[TypoOffsetDateTime]])),
+        lastAnalyze = orThrow(c.get("last_analyze")(Decoder[Option[TypoOffsetDateTime]])),
+        lastAutoanalyze = orThrow(c.get("last_autoanalyze")(Decoder[Option[TypoOffsetDateTime]])),
+        vacuumCount = orThrow(c.get("vacuum_count")(Decoder[Option[Long]])),
+        autovacuumCount = orThrow(c.get("autovacuum_count")(Decoder[Option[Long]])),
+        analyzeCount = orThrow(c.get("analyze_count")(Decoder[Option[Long]])),
+        autoanalyzeCount = orThrow(c.get("autoanalyze_count")(Decoder[Option[Long]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[PgStatSysTablesViewRow] = Encoder[PgStatSysTablesViewRow](row =>
+    Json.obj(
+      "relid" -> Encoder[Option[/* oid */ Long]].apply(row.relid),
+      "schemaname" -> Encoder[Option[String]].apply(row.schemaname),
+      "relname" -> Encoder[Option[String]].apply(row.relname),
+      "seq_scan" -> Encoder[Option[Long]].apply(row.seqScan),
+      "seq_tup_read" -> Encoder[Option[Long]].apply(row.seqTupRead),
+      "idx_scan" -> Encoder[Option[Long]].apply(row.idxScan),
+      "idx_tup_fetch" -> Encoder[Option[Long]].apply(row.idxTupFetch),
+      "n_tup_ins" -> Encoder[Option[Long]].apply(row.nTupIns),
+      "n_tup_upd" -> Encoder[Option[Long]].apply(row.nTupUpd),
+      "n_tup_del" -> Encoder[Option[Long]].apply(row.nTupDel),
+      "n_tup_hot_upd" -> Encoder[Option[Long]].apply(row.nTupHotUpd),
+      "n_live_tup" -> Encoder[Option[Long]].apply(row.nLiveTup),
+      "n_dead_tup" -> Encoder[Option[Long]].apply(row.nDeadTup),
+      "n_mod_since_analyze" -> Encoder[Option[Long]].apply(row.nModSinceAnalyze),
+      "n_ins_since_vacuum" -> Encoder[Option[Long]].apply(row.nInsSinceVacuum),
+      "last_vacuum" -> Encoder[Option[TypoOffsetDateTime]].apply(row.lastVacuum),
+      "last_autovacuum" -> Encoder[Option[TypoOffsetDateTime]].apply(row.lastAutovacuum),
+      "last_analyze" -> Encoder[Option[TypoOffsetDateTime]].apply(row.lastAnalyze),
+      "last_autoanalyze" -> Encoder[Option[TypoOffsetDateTime]].apply(row.lastAutoanalyze),
+      "vacuum_count" -> Encoder[Option[Long]].apply(row.vacuumCount),
+      "autovacuum_count" -> Encoder[Option[Long]].apply(row.autovacuumCount),
+      "analyze_count" -> Encoder[Option[Long]].apply(row.analyzeCount),
+      "autoanalyze_count" -> Encoder[Option[Long]].apply(row.autoanalyzeCount)
     )
-  
-
+  )
+  implicit val read: Read[PgStatSysTablesViewRow] = new Read[PgStatSysTablesViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatSysTablesViewRow(
+      relid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      schemaname = Get[String].unsafeGetNullable(rs, i + 1),
+      relname = Get[String].unsafeGetNullable(rs, i + 2),
+      seqScan = Get[Long].unsafeGetNullable(rs, i + 3),
+      seqTupRead = Get[Long].unsafeGetNullable(rs, i + 4),
+      idxScan = Get[Long].unsafeGetNullable(rs, i + 5),
+      idxTupFetch = Get[Long].unsafeGetNullable(rs, i + 6),
+      nTupIns = Get[Long].unsafeGetNullable(rs, i + 7),
+      nTupUpd = Get[Long].unsafeGetNullable(rs, i + 8),
+      nTupDel = Get[Long].unsafeGetNullable(rs, i + 9),
+      nTupHotUpd = Get[Long].unsafeGetNullable(rs, i + 10),
+      nLiveTup = Get[Long].unsafeGetNullable(rs, i + 11),
+      nDeadTup = Get[Long].unsafeGetNullable(rs, i + 12),
+      nModSinceAnalyze = Get[Long].unsafeGetNullable(rs, i + 13),
+      nInsSinceVacuum = Get[Long].unsafeGetNullable(rs, i + 14),
+      lastVacuum = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 15),
+      lastAutovacuum = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 16),
+      lastAnalyze = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 17),
+      lastAutoanalyze = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 18),
+      vacuumCount = Get[Long].unsafeGetNullable(rs, i + 19),
+      autovacuumCount = Get[Long].unsafeGetNullable(rs, i + 20),
+      analyzeCount = Get[Long].unsafeGetNullable(rs, i + 21),
+      autoanalyzeCount = Get[Long].unsafeGetNullable(rs, i + 22)
+    )
+  )
 }

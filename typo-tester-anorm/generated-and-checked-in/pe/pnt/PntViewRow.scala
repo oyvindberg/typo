@@ -7,16 +7,18 @@ package adventureworks
 package pe
 package pnt
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PntViewRow(
@@ -26,41 +28,37 @@ case class PntViewRow(
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.name]] */
   name: Option[Name],
   /** Points to [[person.phonenumbertype.PhonenumbertypeRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PntViewRow {
-  def rowParser(idx: Int): RowParser[PntViewRow] =
-    RowParser[PntViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PntViewRow] = Reads[PntViewRow](json => JsResult.fromTry(
+      Try(
         PntViewRow(
-          id = row[Option[Int]](idx + 0),
-          phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[Int]),
+          phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as[PhonenumbertypeId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PntViewRow] = new OFormat[PntViewRow]{
-    override def writes(o: PntViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "phonenumbertypeid" -> o.phonenumbertypeid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PntViewRow] = RowParser[PntViewRow] { row =>
+    Success(
+      PntViewRow(
+        id = row[Option[Int]](idx + 0),
+        phonenumbertypeid = row[Option[PhonenumbertypeId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PntViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PntViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            phonenumbertypeid = json.\("phonenumbertypeid").toOption.map(_.as[PhonenumbertypeId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PntViewRow] = OWrites[PntViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "phonenumbertypeid" -> Json.toJson(o.phonenumbertypeid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

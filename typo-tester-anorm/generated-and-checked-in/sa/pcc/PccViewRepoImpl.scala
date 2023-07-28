@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PccViewRepoImpl extends PccViewRepo {
   override def selectAll(implicit c: Connection): List[PccViewRow] = {
-    SQL"""select "id", businessentityid, creditcardid, modifieddate
+    SQL"""select "id", businessentityid, creditcardid, modifieddate::text
           from sa.pcc
        """.as(PccViewRow.rowParser(1).*)
   }

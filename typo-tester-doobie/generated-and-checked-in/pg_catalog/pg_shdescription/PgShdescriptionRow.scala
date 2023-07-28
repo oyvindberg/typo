@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_shdescription
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgShdescriptionRow(
@@ -25,34 +23,18 @@ case class PgShdescriptionRow(
  }
 
 object PgShdescriptionRow {
-  implicit val decoder: Decoder[PgShdescriptionRow] =
-    (c: HCursor) =>
-      for {
-        objoid <- c.downField("objoid").as[/* oid */ Long]
-        classoid <- c.downField("classoid").as[/* oid */ Long]
-        description <- c.downField("description").as[String]
-      } yield PgShdescriptionRow(objoid, classoid, description)
-  implicit val encoder: Encoder[PgShdescriptionRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "objoid" := row.objoid,
-        "classoid" := row.classoid,
-        "description" := row.description
-      )}
-  implicit val read: Read[PgShdescriptionRow] =
-    new Read[PgShdescriptionRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgShdescriptionRow(
-        objoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        classoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        description = Get[String].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PgShdescriptionRow] = Decoder.forProduct3[PgShdescriptionRow, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "description")(PgShdescriptionRow.apply)
+  implicit val encoder: Encoder[PgShdescriptionRow] = Encoder.forProduct3[PgShdescriptionRow, /* oid */ Long, /* oid */ Long, String]("objoid", "classoid", "description")(x => (x.objoid, x.classoid, x.description))
+  implicit val read: Read[PgShdescriptionRow] = new Read[PgShdescriptionRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgShdescriptionRow(
+      objoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      classoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      description = Get[String].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

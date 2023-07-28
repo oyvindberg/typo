@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_subscription
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_subscription` */
 case class PgSubscriptionId(value: /* oid */ Long) extends AnyVal
 object PgSubscriptionId {
+  implicit val arrayGet: Get[Array[PgSubscriptionId]] = Get[Array[/* oid */ Long]].map(_.map(PgSubscriptionId.apply))
+  implicit val arrayPut: Put[Array[PgSubscriptionId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgSubscriptionId] = Decoder[/* oid */ Long].map(PgSubscriptionId.apply)
+  implicit val encoder: Encoder[PgSubscriptionId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgSubscriptionId] = Get[/* oid */ Long].map(PgSubscriptionId.apply)
   implicit val ordering: Ordering[PgSubscriptionId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgSubscriptionId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgSubscriptionId] =
-    Decoder[/* oid */ Long].map(PgSubscriptionId(_))
-  implicit val meta: Meta[PgSubscriptionId] = Meta[/* oid */ Long].imap(PgSubscriptionId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgSubscriptionId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgSubscriptionId.apply))(_.map(_.value))
+  implicit val put: Put[PgSubscriptionId] = Put[/* oid */ Long].contramap(_.value)
 }

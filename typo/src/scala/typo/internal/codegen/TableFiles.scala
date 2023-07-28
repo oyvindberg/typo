@@ -4,7 +4,7 @@ package codegen
 
 import play.api.libs.json.{JsNull, Json}
 
-case class TableFiles(table: ComputedTable, options: InternalOptions) {
+case class TableFiles(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
   val relation = RelationFiles(table.naming, table.names, options)
 
   val UnsavedRowFile: Option[sc.File] = table.maybeUnsavedRow.map { unsaved =>
@@ -72,82 +72,41 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
       code"$comment${col.param.code}$default"
     }
 
-    val str =
+    sc.File(
+      unsaved.tpe,
       code"""|$comments
              |case class ${unsaved.tpe.name}(
              |  ${formattedCols.mkCode(",\n")}
              |) {
              |  $toRow
              |}
-             |${obj(unsaved.tpe.name, options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)))}
-             |""".stripMargin
-
-    sc.File(unsaved.tpe, str, secondaryTypes = Nil)
-  }
-
-  val JoinedRowFile: Option[sc.File] = table.RowJoined.map { rowJoined =>
-    val str =
-      code"""|case class ${rowJoined.name.name}(
-             |  ${rowJoined.params.map(_.param.code).mkCode(",\n")}
-             |)
-             |""".stripMargin
-
-    sc.File(sc.Type.Qualified(rowJoined.name), str, secondaryTypes = Nil)
-  }
-
-  def ordering(tpe: sc.Type, constituents: NonEmptyList[sc.Param]) = {
-    val ordering = sc.Type.Ordering.of(tpe)
-
-    val impl =
-      constituents match {
-        case NonEmptyList(col, Nil) =>
-          code"${sc.Type.Ordering}.by(_.${col.name.code})"
-        case more =>
-          code"${sc.Type.Ordering}.by(x => (${more.map(col => code"x.${col.name.code}").mkCode(", ")}))"
-      }
-
-    // don't demand that parts of the id are ordered, for instance if they are custom types or user-provided
-    val needsImplicits = constituents.toList.filterNot { x =>
-      val baseType = sc.Type.base(x.tpe)
-      val hasOrdering = sc.Type.HasOrdering(baseType)
-
-      def isInternal = baseType match {
-        case sc.Type.Qualified(qident)
-            if qident.idents.startsWith(options.pkg.idents)
-            // custom types do not have ordering
-              && table.scalaTypeMapper.customTypes.All.forall(_.typoType != baseType) =>
-          true
-        case _ => false
-      }
-
-      hasOrdering || isInternal
-    }
-
-    needsImplicits match {
-      case Nil =>
-        code"implicit val ordering: $ordering = $impl"
-      case nonEmpty =>
-        val orderingParams = nonEmpty.map(_.tpe).distinct.zipWithIndex.map { case (colTpe, idx) => code"O$idx: ${sc.Type.Ordering.of(colTpe)}" }
-        code"implicit def ordering(implicit ${orderingParams.mkCode(", ")}): $ordering = $impl"
-    }
+             |${genObject(unsaved.tpe.value, options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)))}
+             |""".stripMargin,
+      secondaryTypes = Nil
+    )
   }
 
   val IdFile: Option[sc.File] = {
     table.maybeId.flatMap {
       case id: IdComputed.UnaryNormal =>
         val comments = scaladoc(s"Type for the primary key of table `${table.dbTable.name.value}`")(Nil)
-
-        val str =
-          code"""$comments
-                |case class ${id.tpe.name}(value: ${id.underlying}) extends AnyVal
-                |object ${id.tpe.name} {
-                |  ${ordering(id.tpe, NonEmptyList(sc.Param(sc.Ident("value"), id.underlying, None)))}
-                |  ${options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)).mkCode("\n")}
-                |  ${options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)).mkCode("\n")}
-                |}
-""".stripMargin
-
-        Some(sc.File(id.tpe, str, secondaryTypes = Nil))
+        val instances = List(
+          List(
+            genOrdering.ordering(id.tpe, NonEmptyList(sc.Param(sc.Ident("value"), id.underlying, None)))
+          ),
+          options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)),
+          options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying))
+        ).flatten
+        Some(
+          sc.File(
+            id.tpe,
+            code"""|$comments
+                   |case class ${id.tpe.name}(value: ${id.underlying}) extends AnyVal
+                   |${genObject(id.tpe.value, instances)}
+                   |""".stripMargin,
+            secondaryTypes = Nil
+          )
+        )
 
       case _: IdComputed.UnaryUserSpecified =>
         None
@@ -155,16 +114,20 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
         None
       case id @ IdComputed.Composite(cols, qident, _) =>
         val comments = scaladoc(s"Type for the composite primary key of table `${table.dbTable.name.value}`")(Nil)
-
-        val str =
-          code"""$comments
-                |case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
-                |object ${qident.name} {
-                |  ${ordering(id.tpe, cols.map(cc => sc.Param(cc.param.name, cc.tpe, None)))}
-                |  ${options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols)).mkCode("\n")}
-                |}
-""".stripMargin
-        Some(sc.File(id.tpe, str, secondaryTypes = Nil))
+        val instances = List(
+          List(genOrdering.ordering(id.tpe, cols.map(cc => sc.Param(cc.param.name, cc.tpe, None)))),
+          options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols))
+        ).flatten
+        Some(
+          sc.File(
+            id.tpe,
+            code"""|$comments
+                   |case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
+                   |${genObject(qident.value, instances)}
+                   |""".stripMargin,
+            secondaryTypes = Nil
+          )
+        )
     }
   }
 
@@ -189,6 +152,5 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
     relation.FieldValueFile,
     maybeMockRepo,
     IdFile
-    // JoinedRowFile
   ).flatten
 }

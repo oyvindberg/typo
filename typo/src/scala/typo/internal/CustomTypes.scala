@@ -9,7 +9,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "This represents the box datatype in PostgreSQL",
     sqlType = "box",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoBox")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("x1"), sc.Type.Double, None),
       sc.Param(sc.Ident("y1"), sc.Type.Double, None),
       sc.Param(sc.Ident("x2"), sc.Type.Double, None),
@@ -26,11 +26,127 @@ class CustomTypes(pkg: sc.QIdent) {
     )
   )
 
+  lazy val TypoLocalDate = CustomType(
+    comment = "This is `java.time.LocalDate`, but transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
+    sqlType = "text",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalDate")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.LocalDate, None)
+    ),
+    isNull = p => code"$p != null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.String,
+      toTypo = (expr, target) => code"$target(${sc.Type.LocalDate}.parse($expr))"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.String,
+      fromTypo = (expr, _) => code"$expr.value.toString"
+    ),
+    objBody = Some { target =>
+      code"def now = $target(${sc.Type.LocalDate}.now)"
+    }
+  )
+  lazy val TypoLocalTime = CustomType(
+    comment = "This is `java.time.LocalTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
+    sqlType = "text",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalTime")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.LocalTime, None)
+    ),
+    isNull = p => code"$p != null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.String,
+      toTypo = (expr, target) => code"$target(${sc.Type.LocalTime}.parse($expr))"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.String,
+      fromTypo = (expr, _) => code"$expr.value.toString"
+    ),
+    objBody = Some { target =>
+      code"""|def apply(value: ${sc.Type.LocalTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
+             |def now = $target(${sc.Type.LocalTime}.now)""".stripMargin
+    }
+  )
+
+  lazy val TypoLocalDateTime = CustomType(
+    comment = "This is `java.time.LocalDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
+    sqlType = "text",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalDateTime")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.LocalDateTime, None)
+    ),
+    isNull = p => code"$p != null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.String,
+      toTypo = (expr, target) => code"$target(${sc.Type.LocalDateTime}.parse($expr, parser))"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.String,
+      fromTypo = (expr, _) => code"$expr.value.toString"
+    ),
+    objBody = Some { target =>
+      code"""|val parser: ${sc.Type.DateTimeFormatter} =
+             |  new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).toFormatter
+             |def apply(value: ${sc.Type.LocalDateTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
+             |def now = $target(${sc.Type.LocalDateTime}.now)
+             |""".stripMargin
+    }
+  )
+  lazy val TypoOffsetDateTime = CustomType(
+    comment = "This is `java.time.OffsetDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
+    sqlType = "text",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoOffsetDateTime")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.OffsetDateTime, None)
+    ),
+    isNull = p => code"$p != null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.String,
+      toTypo = (expr, target) => code"$target(${sc.Type.OffsetDateTime}.parse($expr, parser))"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.String,
+      fromTypo = (expr, _) => code"$expr.value.toString"
+    ),
+    objBody = Some { target =>
+      code"""|val parser: ${sc.Type.DateTimeFormatter} =
+             |  new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
+             |def apply(value: ${sc.Type.OffsetDateTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))  
+             |def now = $target(${sc.Type.OffsetDateTime}.now)
+             |""".stripMargin
+    }
+  )
+
+  lazy val TypoOffsetTime = CustomType(
+    comment = "This is `java.time.OffsetTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
+    sqlType = "text",
+    typoType = sc.Type.Qualified(pkg / sc.Ident("TypoOffsetTime")),
+    params = NonEmptyList(
+      sc.Param(sc.Ident("value"), sc.Type.OffsetTime, None)
+    ),
+    isNull = p => code"$p != null",
+    toTypo = CustomType.ToTypo(
+      jdbcType = sc.Type.String,
+      toTypo = (expr, target) => code"$target(${sc.Type.OffsetTime}.parse($expr, parser))"
+    ),
+    fromTypo = CustomType.FromTypo(
+      jdbcType = sc.Type.String,
+      fromTypo = (expr, _) => code"$expr.value.toString"
+    ),
+    objBody = Some { target =>
+      code"""|val parser: ${sc.Type.DateTimeFormatter} =
+             |  new ${sc.Type.DateTimeFormatterBuilder}().appendPattern("HH:mm:ss").appendFraction(${sc.Type.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
+             |def apply(value: ${sc.Type.OffsetTime}): $target = new $target(value.truncatedTo(${sc.Type.ChronoUnit}.MICROS))
+             |def now = $target(${sc.Type.OffsetTime}.now)
+             |""".stripMargin
+    }
+  )
+
   lazy val TypoCircle = CustomType(
     comment = "This represents circle datatype in PostgreSQL, consisting of a point and a radius",
     sqlType = "circle",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoCircle")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("center"), TypoPoint.typoType, None),
       sc.Param(sc.Ident("radius"), sc.Type.Double, None)
     ),
@@ -49,7 +165,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "This implements a line represented by the linear equation Ax + By + C = 0",
     sqlType = "line",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLine")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("a"), sc.Type.Double, None),
       sc.Param(sc.Ident("b"), sc.Type.Double, None),
       sc.Param(sc.Ident("c"), sc.Type.Double, None)
@@ -69,7 +185,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "This implements a line represented by the linear equation Ax + By + C = 0",
     sqlType = "lseg",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLineSegment")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("p1"), TypoPoint.typoType, None),
       sc.Param(sc.Ident("p2"), TypoPoint.typoType, None)
     ),
@@ -88,7 +204,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "This implements a path (a multiple segmented line, which may be closed)",
     sqlType = "path",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoPath")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("open"), sc.Type.Boolean, None),
       sc.Param(sc.Ident("points"), sc.Type.List.of(TypoPoint.typoType), None)
     ),
@@ -107,7 +223,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "Point datatype in PostgreSQL",
     sqlType = "point",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoPoint")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("x"), sc.Type.Double, None),
       sc.Param(sc.Ident("y"), sc.Type.Double, None)
     ),
@@ -126,7 +242,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "Polygon datatype in PostgreSQL",
     sqlType = "polygon",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoPolygon")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("points"), sc.Type.List.of(TypoPoint.typoType), None)
     ),
     isNull = p => code"$p.points == null",
@@ -144,7 +260,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "Interval type in PostgreSQL",
     sqlType = "interval",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoInterval")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("years"), sc.Type.Int, None),
       sc.Param(sc.Ident("months"), sc.Type.Int, None),
       sc.Param(sc.Ident("days"), sc.Type.Int, None),
@@ -167,7 +283,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "The text representation of an hstore, used for input and output, includes zero or more key => value pairs separated by commas",
     sqlType = "hstore",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoHStore")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.Map.of(sc.Type.String, sc.Type.String), None)
     ),
     isNull = p => code"$p == null",
@@ -197,7 +313,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "Money and cash types in PostgreSQL",
     sqlType = "money",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoMoney")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.BigDecimal, None)
     ),
     isNull = p => code"$p.isNull",
@@ -215,7 +331,7 @@ class CustomTypes(pkg: sc.QIdent) {
     comment = "XML",
     sqlType = "xml",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoXml")),
-    params = List(
+    params = NonEmptyList(
       sc.Param(sc.Ident("value"), sc.Type.String, None)
     ),
     isNull = p => code"$p.getString == null",
@@ -253,7 +369,7 @@ class CustomTypes(pkg: sc.QIdent) {
       comment = s"$sqlType (via PGObject)",
       sqlType = sqlType,
       typoType = sc.Type.Qualified(pkg / sc.Ident(name)),
-      params = List(
+      params = NonEmptyList(
         sc.Param(sc.Ident("value"), sc.Type.String, None)
       ),
       isNull = p => code"$p.getValue == null",
@@ -299,28 +415,32 @@ class CustomTypes(pkg: sc.QIdent) {
 
   val All: List[CustomType] =
     List(
-      TypoBox,
-      TypoCircle,
-      TypoLine,
-      TypoLineSegment,
-      TypoPath,
-      TypoPoint,
-      TypoPolygon,
-      TypoInterval,
-      TypoMoney,
-      TypoXml,
-      TypoJson,
-      TypoJsonb,
-      TypoHStore,
-      TypoInet,
-      TypoJson,
-      TypoJsonb,
-      TypoInet,
       TypoAclItem,
       TypoAnyArray,
+      TypoBox,
+      TypoCircle,
+      TypoHStore,
+      TypoInet,
+      TypoInet,
       TypoInt2Vector,
+      TypoInterval,
+      TypoJson,
+      TypoJson,
+      TypoJsonb,
+      TypoJsonb,
+      TypoLine,
+      TypoLineSegment,
+      TypoLocalDate,
+      TypoLocalDateTime,
+      TypoLocalTime,
+      TypoMoney,
+      TypoOffsetDateTime,
+      TypoOffsetTime,
       TypoOidVector,
+      TypoPath,
       TypoPgNodeTree,
+      TypoPoint,
+      TypoPolygon,
       TypoRegclass,
       TypoRegconfig,
       TypoRegdictionary,
@@ -331,6 +451,7 @@ class CustomTypes(pkg: sc.QIdent) {
       TypoRegprocedure,
       TypoRegrole,
       TypoRegtype,
-      TypoXid
+      TypoXid,
+      TypoXml
     )
 }

@@ -8,18 +8,20 @@ package production
 package product
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `production.product` which has not been persisted yet */
@@ -63,11 +65,11 @@ case class ProductRowUnsaved(
       Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: Option[ProductmodelId],
   /** Date the product was available for sale. */
-  sellstartdate: LocalDateTime,
+  sellstartdate: TypoLocalDateTime,
   /** Date the product was no longer available for sale. */
-  sellenddate: Option[LocalDateTime],
+  sellenddate: Option[TypoLocalDateTime],
   /** Date the product was discontinued. */
-  discontinueddate: Option[LocalDateTime],
+  discontinueddate: Option[TypoLocalDateTime],
   /** Default: nextval('production.product_productid_seq'::regclass)
       Primary key for Product records. */
   productid: Defaulted[ProductId] = Defaulted.UseDefault,
@@ -80,9 +82,9 @@ case class ProductRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productidDefault: => ProductId, makeflagDefault: => Flag, finishedgoodsflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ProductRow =
+  def toRow(productidDefault: => ProductId, makeflagDefault: => Flag, finishedgoodsflagDefault: => Flag, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ProductRow =
     ProductRow(
       name = name,
       productnumber = productnumber,
@@ -127,68 +129,65 @@ case class ProductRowUnsaved(
     )
 }
 object ProductRowUnsaved {
-  implicit val oFormat: OFormat[ProductRowUnsaved] = new OFormat[ProductRowUnsaved]{
-    override def writes(o: ProductRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "productnumber" -> o.productnumber,
-        "color" -> o.color,
-        "safetystocklevel" -> o.safetystocklevel,
-        "reorderpoint" -> o.reorderpoint,
-        "standardcost" -> o.standardcost,
-        "listprice" -> o.listprice,
-        "size" -> o.size,
-        "sizeunitmeasurecode" -> o.sizeunitmeasurecode,
-        "weightunitmeasurecode" -> o.weightunitmeasurecode,
-        "weight" -> o.weight,
-        "daystomanufacture" -> o.daystomanufacture,
-        "productline" -> o.productline,
-        "class" -> o.`class`,
-        "style" -> o.style,
-        "productsubcategoryid" -> o.productsubcategoryid,
-        "productmodelid" -> o.productmodelid,
-        "sellstartdate" -> o.sellstartdate,
-        "sellenddate" -> o.sellenddate,
-        "discontinueddate" -> o.discontinueddate,
-        "productid" -> o.productid,
-        "makeflag" -> o.makeflag,
-        "finishedgoodsflag" -> o.finishedgoodsflag,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ProductRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ProductRowUnsaved(
-            name = json.\("name").as[Name],
-            productnumber = json.\("productnumber").as[/* max 25 chars */ String],
-            color = json.\("color").toOption.map(_.as[/* max 15 chars */ String]),
-            safetystocklevel = json.\("safetystocklevel").as[Int],
-            reorderpoint = json.\("reorderpoint").as[Int],
-            standardcost = json.\("standardcost").as[BigDecimal],
-            listprice = json.\("listprice").as[BigDecimal],
-            size = json.\("size").toOption.map(_.as[/* max 5 chars */ String]),
-            sizeunitmeasurecode = json.\("sizeunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
-            weightunitmeasurecode = json.\("weightunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
-            weight = json.\("weight").toOption.map(_.as[BigDecimal]),
-            daystomanufacture = json.\("daystomanufacture").as[Int],
-            productline = json.\("productline").toOption.map(_.as[/* bpchar */ String]),
-            `class` = json.\("class").toOption.map(_.as[/* bpchar */ String]),
-            style = json.\("style").toOption.map(_.as[/* bpchar */ String]),
-            productsubcategoryid = json.\("productsubcategoryid").toOption.map(_.as[ProductsubcategoryId]),
-            productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            sellstartdate = json.\("sellstartdate").as[LocalDateTime],
-            sellenddate = json.\("sellenddate").toOption.map(_.as[LocalDateTime]),
-            discontinueddate = json.\("discontinueddate").toOption.map(_.as[LocalDateTime]),
-            productid = json.\("productid").as[Defaulted[ProductId]],
-            makeflag = json.\("makeflag").as[Defaulted[Flag]],
-            finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[Flag]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ProductRowUnsaved] = Reads[ProductRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ProductRowUnsaved(
+          name = json.\("name").as[Name],
+          productnumber = json.\("productnumber").as[/* max 25 chars */ String],
+          color = json.\("color").toOption.map(_.as[/* max 15 chars */ String]),
+          safetystocklevel = json.\("safetystocklevel").as[Int],
+          reorderpoint = json.\("reorderpoint").as[Int],
+          standardcost = json.\("standardcost").as[BigDecimal],
+          listprice = json.\("listprice").as[BigDecimal],
+          size = json.\("size").toOption.map(_.as[/* max 5 chars */ String]),
+          sizeunitmeasurecode = json.\("sizeunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
+          weightunitmeasurecode = json.\("weightunitmeasurecode").toOption.map(_.as[UnitmeasureId]),
+          weight = json.\("weight").toOption.map(_.as[BigDecimal]),
+          daystomanufacture = json.\("daystomanufacture").as[Int],
+          productline = json.\("productline").toOption.map(_.as[/* bpchar */ String]),
+          `class` = json.\("class").toOption.map(_.as[/* bpchar */ String]),
+          style = json.\("style").toOption.map(_.as[/* bpchar */ String]),
+          productsubcategoryid = json.\("productsubcategoryid").toOption.map(_.as[ProductsubcategoryId]),
+          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
+          sellstartdate = json.\("sellstartdate").as[TypoLocalDateTime],
+          sellenddate = json.\("sellenddate").toOption.map(_.as[TypoLocalDateTime]),
+          discontinueddate = json.\("discontinueddate").toOption.map(_.as[TypoLocalDateTime]),
+          productid = json.\("productid").as[Defaulted[ProductId]],
+          makeflag = json.\("makeflag").as[Defaulted[Flag]],
+          finishedgoodsflag = json.\("finishedgoodsflag").as[Defaulted[Flag]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ProductRowUnsaved] = OWrites[ProductRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "productnumber" -> Json.toJson(o.productnumber),
+      "color" -> Json.toJson(o.color),
+      "safetystocklevel" -> Json.toJson(o.safetystocklevel),
+      "reorderpoint" -> Json.toJson(o.reorderpoint),
+      "standardcost" -> Json.toJson(o.standardcost),
+      "listprice" -> Json.toJson(o.listprice),
+      "size" -> Json.toJson(o.size),
+      "sizeunitmeasurecode" -> Json.toJson(o.sizeunitmeasurecode),
+      "weightunitmeasurecode" -> Json.toJson(o.weightunitmeasurecode),
+      "weight" -> Json.toJson(o.weight),
+      "daystomanufacture" -> Json.toJson(o.daystomanufacture),
+      "productline" -> Json.toJson(o.productline),
+      "class" -> Json.toJson(o.`class`),
+      "style" -> Json.toJson(o.style),
+      "productsubcategoryid" -> Json.toJson(o.productsubcategoryid),
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "sellstartdate" -> Json.toJson(o.sellstartdate),
+      "sellenddate" -> Json.toJson(o.sellenddate),
+      "discontinueddate" -> Json.toJson(o.discontinueddate),
+      "productid" -> Json.toJson(o.productid),
+      "makeflag" -> Json.toJson(o.makeflag),
+      "finishedgoodsflag" -> Json.toJson(o.finishedgoodsflag),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

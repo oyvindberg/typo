@@ -7,15 +7,17 @@ package adventureworks
 package pr
 package plph
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PlphViewRow(
@@ -23,53 +25,49 @@ case class PlphViewRow(
   /** Points to [[production.productlistpricehistory.ProductlistpricehistoryRow.productid]] */
   productid: Option[ProductId],
   /** Points to [[production.productlistpricehistory.ProductlistpricehistoryRow.startdate]] */
-  startdate: Option[LocalDateTime],
+  startdate: Option[TypoLocalDateTime],
   /** Points to [[production.productlistpricehistory.ProductlistpricehistoryRow.enddate]] */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[production.productlistpricehistory.ProductlistpricehistoryRow.listprice]] */
   listprice: Option[BigDecimal],
   /** Points to [[production.productlistpricehistory.ProductlistpricehistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PlphViewRow {
-  def rowParser(idx: Int): RowParser[PlphViewRow] =
-    RowParser[PlphViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PlphViewRow] = Reads[PlphViewRow](json => JsResult.fromTry(
+      Try(
         PlphViewRow(
-          id = row[Option[Int]](idx + 0),
-          productid = row[Option[ProductId]](idx + 1),
-          startdate = row[Option[LocalDateTime]](idx + 2),
-          enddate = row[Option[LocalDateTime]](idx + 3),
-          listprice = row[Option[BigDecimal]](idx + 4),
-          modifieddate = row[Option[LocalDateTime]](idx + 5)
+          id = json.\("id").toOption.map(_.as[Int]),
+          productid = json.\("productid").toOption.map(_.as[ProductId]),
+          startdate = json.\("startdate").toOption.map(_.as[TypoLocalDateTime]),
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDateTime]),
+          listprice = json.\("listprice").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PlphViewRow] = new OFormat[PlphViewRow]{
-    override def writes(o: PlphViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "productid" -> o.productid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "listprice" -> o.listprice,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PlphViewRow] = RowParser[PlphViewRow] { row =>
+    Success(
+      PlphViewRow(
+        id = row[Option[Int]](idx + 0),
+        productid = row[Option[ProductId]](idx + 1),
+        startdate = row[Option[TypoLocalDateTime]](idx + 2),
+        enddate = row[Option[TypoLocalDateTime]](idx + 3),
+        listprice = row[Option[BigDecimal]](idx + 4),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PlphViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PlphViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            productid = json.\("productid").toOption.map(_.as[ProductId]),
-            startdate = json.\("startdate").toOption.map(_.as[LocalDateTime]),
-            enddate = json.\("enddate").toOption.map(_.as[LocalDateTime]),
-            listprice = json.\("listprice").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PlphViewRow] = OWrites[PlphViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "productid" -> Json.toJson(o.productid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "listprice" -> Json.toJson(o.listprice),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

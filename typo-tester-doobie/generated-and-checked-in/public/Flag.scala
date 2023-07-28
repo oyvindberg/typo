@@ -6,7 +6,8 @@
 package adventureworks
 package public
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
@@ -15,11 +16,11 @@ import io.circe.Encoder
   */
 case class Flag(value: Boolean) extends AnyVal
 object Flag {
-  implicit def ordering(implicit ev: Ordering[Boolean]): Ordering[Flag] = Ordering.by(_.value)
-  implicit val encoder: Encoder[Flag] =
-    Encoder[Boolean].contramap(_.value)
-  implicit val decoder: Decoder[Flag] =
-    Decoder[Boolean].map(Flag(_))
-  implicit val meta: Meta[Flag] = Meta[Boolean].imap(Flag.apply)(_.value)
-  implicit val metaArray: Meta[Array[Flag]] = Meta[Array[Boolean]].imap(_.map(Flag.apply))(_.map(_.value))
+  implicit val arrayGet: Get[Array[Flag]] = Get[Array[Boolean]].map(_.map(Flag.apply))
+  implicit val arrayPut: Put[Array[Flag]] = Put[Array[Boolean]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[Flag] = Decoder[Boolean].map(Flag.apply)
+  implicit val encoder: Encoder[Flag] = Encoder[Boolean].contramap(_.value)
+  implicit val get: Get[Flag] = Get[Boolean].map(Flag.apply)
+  implicit val ordering: Ordering[Flag] = Ordering.by(_.value)
+  implicit val put: Put[Flag] = Put[Boolean].contramap(_.value)
 }

@@ -7,17 +7,15 @@ package adventureworks
 package pr
 package pmi
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PmiViewRow(
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
@@ -25,38 +23,22 @@ case class PmiViewRow(
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
   illustrationid: Option[IllustrationId],
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PmiViewRow {
-  implicit val decoder: Decoder[PmiViewRow] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
-        illustrationid <- c.downField("illustrationid").as[Option[IllustrationId]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PmiViewRow(productmodelid, illustrationid, modifieddate)
-  implicit val encoder: Encoder[PmiViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "illustrationid" := row.illustrationid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PmiViewRow] =
-    new Read[PmiViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[IllustrationId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)
+  implicit val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))
+  implicit val read: Read[PmiViewRow] = new Read[PmiViewRow](
+    gets = List(
+      (Get[ProductmodelId], Nullability.Nullable),
+      (Get[IllustrationId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
+      productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
+      illustrationid = Get[IllustrationId].unsafeGetNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2)
     )
-  
-
+  )
 }

@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_policies
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgPoliciesViewRow(
@@ -28,54 +26,28 @@ case class PgPoliciesViewRow(
 )
 
 object PgPoliciesViewRow {
-  implicit val decoder: Decoder[PgPoliciesViewRow] =
-    (c: HCursor) =>
-      for {
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        tablename <- c.downField("tablename").as[Option[String]]
-        policyname <- c.downField("policyname").as[Option[String]]
-        permissive <- c.downField("permissive").as[Option[String]]
-        roles <- c.downField("roles").as[Option[Array[String]]]
-        cmd <- c.downField("cmd").as[Option[String]]
-        qual <- c.downField("qual").as[Option[String]]
-        withCheck <- c.downField("with_check").as[Option[String]]
-      } yield PgPoliciesViewRow(schemaname, tablename, policyname, permissive, roles, cmd, qual, withCheck)
-  implicit val encoder: Encoder[PgPoliciesViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "schemaname" := row.schemaname,
-        "tablename" := row.tablename,
-        "policyname" := row.policyname,
-        "permissive" := row.permissive,
-        "roles" := row.roles,
-        "cmd" := row.cmd,
-        "qual" := row.qual,
-        "with_check" := row.withCheck
-      )}
-  implicit val read: Read[PgPoliciesViewRow] =
-    new Read[PgPoliciesViewRow](
-      gets = List(
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Array[String]], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgPoliciesViewRow(
-        schemaname = Get[String].unsafeGetNullable(rs, i + 0),
-        tablename = Get[String].unsafeGetNullable(rs, i + 1),
-        policyname = Get[String].unsafeGetNullable(rs, i + 2),
-        permissive = Get[String].unsafeGetNullable(rs, i + 3),
-        roles = Get[Array[String]].unsafeGetNullable(rs, i + 4),
-        cmd = Get[String].unsafeGetNullable(rs, i + 5),
-        qual = Get[String].unsafeGetNullable(rs, i + 6),
-        withCheck = Get[String].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgPoliciesViewRow] = Decoder.forProduct8[PgPoliciesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Array[String]], Option[String], Option[String], Option[String]]("schemaname", "tablename", "policyname", "permissive", "roles", "cmd", "qual", "with_check")(PgPoliciesViewRow.apply)
+  implicit val encoder: Encoder[PgPoliciesViewRow] = Encoder.forProduct8[PgPoliciesViewRow, Option[String], Option[String], Option[String], Option[String], Option[Array[String]], Option[String], Option[String], Option[String]]("schemaname", "tablename", "policyname", "permissive", "roles", "cmd", "qual", "with_check")(x => (x.schemaname, x.tablename, x.policyname, x.permissive, x.roles, x.cmd, x.qual, x.withCheck))
+  implicit val read: Read[PgPoliciesViewRow] = new Read[PgPoliciesViewRow](
+    gets = List(
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Array[String]], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgPoliciesViewRow(
+      schemaname = Get[String].unsafeGetNullable(rs, i + 0),
+      tablename = Get[String].unsafeGetNullable(rs, i + 1),
+      policyname = Get[String].unsafeGetNullable(rs, i + 2),
+      permissive = Get[String].unsafeGetNullable(rs, i + 3),
+      roles = Get[Array[String]].unsafeGetNullable(rs, i + 4),
+      cmd = Get[String].unsafeGetNullable(rs, i + 5),
+      qual = Get[String].unsafeGetNullable(rs, i + 6),
+      withCheck = Get[String].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

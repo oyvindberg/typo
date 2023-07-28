@@ -7,24 +7,22 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoLocalDate
 import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDate
 
 case class VpersondemographicsViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   totalpurchaseytd: Option[TypoMoney],
-  datefirstpurchase: Option[LocalDate],
-  birthdate: Option[LocalDate],
+  datefirstpurchase: Option[TypoLocalDate],
+  birthdate: Option[TypoLocalDate],
   maritalstatus: Option[/* max 1 chars */ String],
   yearlyincome: Option[/* max 30 chars */ String],
   gender: Option[/* max 1 chars */ String],
@@ -37,74 +35,38 @@ case class VpersondemographicsViewRow(
 )
 
 object VpersondemographicsViewRow {
-  implicit val decoder: Decoder[VpersondemographicsViewRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        totalpurchaseytd <- c.downField("totalpurchaseytd").as[Option[TypoMoney]]
-        datefirstpurchase <- c.downField("datefirstpurchase").as[Option[LocalDate]]
-        birthdate <- c.downField("birthdate").as[Option[LocalDate]]
-        maritalstatus <- c.downField("maritalstatus").as[Option[/* max 1 chars */ String]]
-        yearlyincome <- c.downField("yearlyincome").as[Option[/* max 30 chars */ String]]
-        gender <- c.downField("gender").as[Option[/* max 1 chars */ String]]
-        totalchildren <- c.downField("totalchildren").as[Option[Int]]
-        numberchildrenathome <- c.downField("numberchildrenathome").as[Option[Int]]
-        education <- c.downField("education").as[Option[/* max 30 chars */ String]]
-        occupation <- c.downField("occupation").as[Option[/* max 30 chars */ String]]
-        homeownerflag <- c.downField("homeownerflag").as[Option[Boolean]]
-        numbercarsowned <- c.downField("numbercarsowned").as[Option[Int]]
-      } yield VpersondemographicsViewRow(businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned)
-  implicit val encoder: Encoder[VpersondemographicsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "totalpurchaseytd" := row.totalpurchaseytd,
-        "datefirstpurchase" := row.datefirstpurchase,
-        "birthdate" := row.birthdate,
-        "maritalstatus" := row.maritalstatus,
-        "yearlyincome" := row.yearlyincome,
-        "gender" := row.gender,
-        "totalchildren" := row.totalchildren,
-        "numberchildrenathome" := row.numberchildrenathome,
-        "education" := row.education,
-        "occupation" := row.occupation,
-        "homeownerflag" := row.homeownerflag,
-        "numbercarsowned" := row.numbercarsowned
-      )}
-  implicit val read: Read[VpersondemographicsViewRow] =
-    new Read[VpersondemographicsViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[TypoMoney], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[LocalDate], Nullability.Nullable),
-        (Get[/* max 1 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 1 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Boolean], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VpersondemographicsViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        totalpurchaseytd = Get[TypoMoney].unsafeGetNullable(rs, i + 1),
-        datefirstpurchase = Get[LocalDate].unsafeGetNullable(rs, i + 2),
-        birthdate = Get[LocalDate].unsafeGetNullable(rs, i + 3),
-        maritalstatus = Get[/* max 1 chars */ String].unsafeGetNullable(rs, i + 4),
-        yearlyincome = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 5),
-        gender = Get[/* max 1 chars */ String].unsafeGetNullable(rs, i + 6),
-        totalchildren = Get[Int].unsafeGetNullable(rs, i + 7),
-        numberchildrenathome = Get[Int].unsafeGetNullable(rs, i + 8),
-        education = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 9),
-        occupation = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 10),
-        homeownerflag = Get[Boolean].unsafeGetNullable(rs, i + 11),
-        numbercarsowned = Get[Int].unsafeGetNullable(rs, i + 12)
-      )
+  implicit val decoder: Decoder[VpersondemographicsViewRow] = Decoder.forProduct13[VpersondemographicsViewRow, Option[BusinessentityId], Option[TypoMoney], Option[TypoLocalDate], Option[TypoLocalDate], Option[/* max 1 chars */ String], Option[/* max 30 chars */ String], Option[/* max 1 chars */ String], Option[Int], Option[Int], Option[/* max 30 chars */ String], Option[/* max 30 chars */ String], Option[Boolean], Option[Int]]("businessentityid", "totalpurchaseytd", "datefirstpurchase", "birthdate", "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned")(VpersondemographicsViewRow.apply)
+  implicit val encoder: Encoder[VpersondemographicsViewRow] = Encoder.forProduct13[VpersondemographicsViewRow, Option[BusinessentityId], Option[TypoMoney], Option[TypoLocalDate], Option[TypoLocalDate], Option[/* max 1 chars */ String], Option[/* max 30 chars */ String], Option[/* max 1 chars */ String], Option[Int], Option[Int], Option[/* max 30 chars */ String], Option[/* max 30 chars */ String], Option[Boolean], Option[Int]]("businessentityid", "totalpurchaseytd", "datefirstpurchase", "birthdate", "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned")(x => (x.businessentityid, x.totalpurchaseytd, x.datefirstpurchase, x.birthdate, x.maritalstatus, x.yearlyincome, x.gender, x.totalchildren, x.numberchildrenathome, x.education, x.occupation, x.homeownerflag, x.numbercarsowned))
+  implicit val read: Read[VpersondemographicsViewRow] = new Read[VpersondemographicsViewRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[TypoMoney], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[TypoLocalDate], Nullability.Nullable),
+      (Get[/* max 1 chars */ String], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[/* max 1 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[Boolean], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VpersondemographicsViewRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+      totalpurchaseytd = Get[TypoMoney].unsafeGetNullable(rs, i + 1),
+      datefirstpurchase = Get[TypoLocalDate].unsafeGetNullable(rs, i + 2),
+      birthdate = Get[TypoLocalDate].unsafeGetNullable(rs, i + 3),
+      maritalstatus = Get[/* max 1 chars */ String].unsafeGetNullable(rs, i + 4),
+      yearlyincome = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 5),
+      gender = Get[/* max 1 chars */ String].unsafeGetNullable(rs, i + 6),
+      totalchildren = Get[Int].unsafeGetNullable(rs, i + 7),
+      numberchildrenathome = Get[Int].unsafeGetNullable(rs, i + 8),
+      education = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 9),
+      occupation = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 10),
+      homeownerflag = Get[Boolean].unsafeGetNullable(rs, i + 11),
+      numbercarsowned = Get[Int].unsafeGetNullable(rs, i + 12)
     )
-  
-
+  )
 }

@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgCastRepoImpl extends PgCastRepo {
   override def delete(oid: PgCastId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_cast where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_cast where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgCastRow): ConnectionIO[PgCastRow] = {
     sql"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
@@ -25,10 +25,10 @@ object PgCastRepoImpl extends PgCastRepo {
     sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast".query[PgCastRow].stream
   }
   override def selectById(oid: PgCastId): ConnectionIO[Option[PgCastRow]] = {
-    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = $oid".query[PgCastRow].option
+    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ${oid}".query[PgCastRow].option
   }
   override def selectByIds(oids: Array[PgCastId]): Stream[ConnectionIO, PgCastRow] = {
-    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ANY($oids)".query[PgCastRow].stream
+    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ANY(${oids})".query[PgCastRow].stream
   }
   override def update(row: PgCastRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -38,7 +38,7 @@ object PgCastRepoImpl extends PgCastRepo {
               castfunc = ${row.castfunc}::oid,
               castcontext = ${row.castcontext}::char,
               castmethod = ${row.castmethod}::char
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

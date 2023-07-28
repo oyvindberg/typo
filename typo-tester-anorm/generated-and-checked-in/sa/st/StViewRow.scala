@@ -7,18 +7,20 @@ package adventureworks
 package sa
 package st
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class StViewRow(
@@ -42,62 +44,58 @@ case class StViewRow(
   /** Points to [[sales.salesterritory.SalesterritoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesterritory.SalesterritoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object StViewRow {
-  def rowParser(idx: Int): RowParser[StViewRow] =
-    RowParser[StViewRow] { row =>
-      Success(
+  implicit val reads: Reads[StViewRow] = Reads[StViewRow](json => JsResult.fromTry(
+      Try(
         StViewRow(
-          id = row[Option[Int]](idx + 0),
-          territoryid = row[Option[SalesterritoryId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          countryregioncode = row[Option[CountryregionId]](idx + 3),
-          group = row[Option[/* max 50 chars */ String]](idx + 4),
-          salesytd = row[Option[BigDecimal]](idx + 5),
-          saleslastyear = row[Option[BigDecimal]](idx + 6),
-          costytd = row[Option[BigDecimal]](idx + 7),
-          costlastyear = row[Option[BigDecimal]](idx + 8),
-          rowguid = row[Option[UUID]](idx + 9),
-          modifieddate = row[Option[LocalDateTime]](idx + 10)
+          id = json.\("id").toOption.map(_.as[Int]),
+          territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
+          group = json.\("group").toOption.map(_.as[/* max 50 chars */ String]),
+          salesytd = json.\("salesytd").toOption.map(_.as[BigDecimal]),
+          saleslastyear = json.\("saleslastyear").toOption.map(_.as[BigDecimal]),
+          costytd = json.\("costytd").toOption.map(_.as[BigDecimal]),
+          costlastyear = json.\("costlastyear").toOption.map(_.as[BigDecimal]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[StViewRow] = new OFormat[StViewRow]{
-    override def writes(o: StViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "territoryid" -> o.territoryid,
-        "name" -> o.name,
-        "countryregioncode" -> o.countryregioncode,
-        "group" -> o.group,
-        "salesytd" -> o.salesytd,
-        "saleslastyear" -> o.saleslastyear,
-        "costytd" -> o.costytd,
-        "costlastyear" -> o.costlastyear,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[StViewRow] = RowParser[StViewRow] { row =>
+    Success(
+      StViewRow(
+        id = row[Option[Int]](idx + 0),
+        territoryid = row[Option[SalesterritoryId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        countryregioncode = row[Option[CountryregionId]](idx + 3),
+        group = row[Option[/* max 50 chars */ String]](idx + 4),
+        salesytd = row[Option[BigDecimal]](idx + 5),
+        saleslastyear = row[Option[BigDecimal]](idx + 6),
+        costytd = row[Option[BigDecimal]](idx + 7),
+        costlastyear = row[Option[BigDecimal]](idx + 8),
+        rowguid = row[Option[UUID]](idx + 9),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[StViewRow] = {
-      JsResult.fromTry(
-        Try(
-          StViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            territoryid = json.\("territoryid").toOption.map(_.as[SalesterritoryId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            countryregioncode = json.\("countryregioncode").toOption.map(_.as[CountryregionId]),
-            group = json.\("group").toOption.map(_.as[/* max 50 chars */ String]),
-            salesytd = json.\("salesytd").toOption.map(_.as[BigDecimal]),
-            saleslastyear = json.\("saleslastyear").toOption.map(_.as[BigDecimal]),
-            costytd = json.\("costytd").toOption.map(_.as[BigDecimal]),
-            costlastyear = json.\("costlastyear").toOption.map(_.as[BigDecimal]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[StViewRow] = OWrites[StViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "territoryid" -> Json.toJson(o.territoryid),
+      "name" -> Json.toJson(o.name),
+      "countryregioncode" -> Json.toJson(o.countryregioncode),
+      "group" -> Json.toJson(o.group),
+      "salesytd" -> Json.toJson(o.salesytd),
+      "saleslastyear" -> Json.toJson(o.saleslastyear),
+      "costytd" -> Json.toJson(o.costytd),
+      "costlastyear" -> Json.toJson(o.costlastyear),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

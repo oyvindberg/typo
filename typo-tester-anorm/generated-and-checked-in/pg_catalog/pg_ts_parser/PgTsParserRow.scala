@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTsParserRow(
@@ -29,49 +31,45 @@ case class PgTsParserRow(
 )
 
 object PgTsParserRow {
-  def rowParser(idx: Int): RowParser[PgTsParserRow] =
-    RowParser[PgTsParserRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTsParserRow] = Reads[PgTsParserRow](json => JsResult.fromTry(
+      Try(
         PgTsParserRow(
-          oid = row[PgTsParserId](idx + 0),
-          prsname = row[String](idx + 1),
-          prsnamespace = row[/* oid */ Long](idx + 2),
-          prsstart = row[TypoRegproc](idx + 3),
-          prstoken = row[TypoRegproc](idx + 4),
-          prsend = row[TypoRegproc](idx + 5),
-          prsheadline = row[TypoRegproc](idx + 6),
-          prslextype = row[TypoRegproc](idx + 7)
+          oid = json.\("oid").as[PgTsParserId],
+          prsname = json.\("prsname").as[String],
+          prsnamespace = json.\("prsnamespace").as[/* oid */ Long],
+          prsstart = json.\("prsstart").as[TypoRegproc],
+          prstoken = json.\("prstoken").as[TypoRegproc],
+          prsend = json.\("prsend").as[TypoRegproc],
+          prsheadline = json.\("prsheadline").as[TypoRegproc],
+          prslextype = json.\("prslextype").as[TypoRegproc]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTsParserRow] = new OFormat[PgTsParserRow]{
-    override def writes(o: PgTsParserRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "prsname" -> o.prsname,
-        "prsnamespace" -> o.prsnamespace,
-        "prsstart" -> o.prsstart,
-        "prstoken" -> o.prstoken,
-        "prsend" -> o.prsend,
-        "prsheadline" -> o.prsheadline,
-        "prslextype" -> o.prslextype
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTsParserRow] = RowParser[PgTsParserRow] { row =>
+    Success(
+      PgTsParserRow(
+        oid = row[PgTsParserId](idx + 0),
+        prsname = row[String](idx + 1),
+        prsnamespace = row[/* oid */ Long](idx + 2),
+        prsstart = row[TypoRegproc](idx + 3),
+        prstoken = row[TypoRegproc](idx + 4),
+        prsend = row[TypoRegproc](idx + 5),
+        prsheadline = row[TypoRegproc](idx + 6),
+        prslextype = row[TypoRegproc](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTsParserRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTsParserRow(
-            oid = json.\("oid").as[PgTsParserId],
-            prsname = json.\("prsname").as[String],
-            prsnamespace = json.\("prsnamespace").as[/* oid */ Long],
-            prsstart = json.\("prsstart").as[TypoRegproc],
-            prstoken = json.\("prstoken").as[TypoRegproc],
-            prsend = json.\("prsend").as[TypoRegproc],
-            prsheadline = json.\("prsheadline").as[TypoRegproc],
-            prslextype = json.\("prslextype").as[TypoRegproc]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTsParserRow] = OWrites[PgTsParserRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "prsname" -> Json.toJson(o.prsname),
+      "prsnamespace" -> Json.toJson(o.prsnamespace),
+      "prsstart" -> Json.toJson(o.prsstart),
+      "prstoken" -> Json.toJson(o.prstoken),
+      "prsend" -> Json.toJson(o.prsend),
+      "prsheadline" -> Json.toJson(o.prsheadline),
+      "prslextype" -> Json.toJson(o.prslextype)
+    ))
+  )
 }

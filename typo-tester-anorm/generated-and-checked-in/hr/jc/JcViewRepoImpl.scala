@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object JcViewRepoImpl extends JcViewRepo {
   override def selectAll(implicit c: Connection): List[JcViewRow] = {
-    SQL"""select "id", jobcandidateid, businessentityid, resume, modifieddate
+    SQL"""select "id", jobcandidateid, businessentityid, resume, modifieddate::text
           from hr.jc
        """.as(JcViewRow.rowParser(1).*)
   }

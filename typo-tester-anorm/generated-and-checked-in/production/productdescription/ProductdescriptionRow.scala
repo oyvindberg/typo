@@ -7,15 +7,17 @@ package adventureworks
 package production
 package productdescription
 
+import adventureworks.TypoLocalDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ProductdescriptionRow(
@@ -24,41 +26,37 @@ case class ProductdescriptionRow(
   /** Description of the product. */
   description: /* max 400 chars */ String,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object ProductdescriptionRow {
-  def rowParser(idx: Int): RowParser[ProductdescriptionRow] =
-    RowParser[ProductdescriptionRow] { row =>
-      Success(
+  implicit val reads: Reads[ProductdescriptionRow] = Reads[ProductdescriptionRow](json => JsResult.fromTry(
+      Try(
         ProductdescriptionRow(
-          productdescriptionid = row[ProductdescriptionId](idx + 0),
-          description = row[/* max 400 chars */ String](idx + 1),
-          rowguid = row[UUID](idx + 2),
-          modifieddate = row[LocalDateTime](idx + 3)
+          productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
+          description = json.\("description").as[/* max 400 chars */ String],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[ProductdescriptionRow] = new OFormat[ProductdescriptionRow]{
-    override def writes(o: ProductdescriptionRow): JsObject =
-      Json.obj(
-        "productdescriptionid" -> o.productdescriptionid,
-        "description" -> o.description,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ProductdescriptionRow] = RowParser[ProductdescriptionRow] { row =>
+    Success(
+      ProductdescriptionRow(
+        productdescriptionid = row[ProductdescriptionId](idx + 0),
+        description = row[/* max 400 chars */ String](idx + 1),
+        rowguid = row[UUID](idx + 2),
+        modifieddate = row[TypoLocalDateTime](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[ProductdescriptionRow] = {
-      JsResult.fromTry(
-        Try(
-          ProductdescriptionRow(
-            productdescriptionid = json.\("productdescriptionid").as[ProductdescriptionId],
-            description = json.\("description").as[/* max 400 chars */ String],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ProductdescriptionRow] = OWrites[ProductdescriptionRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productdescriptionid" -> Json.toJson(o.productdescriptionid),
+      "description" -> Json.toJson(o.description),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

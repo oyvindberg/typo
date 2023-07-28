@@ -6,55 +6,33 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import org.postgresql.util.PGobject
 
 /** aclitem (via PGObject) */
 case class TypoAclItem(value: String)
+
 object TypoAclItem {
-  implicit val decoder: Decoder[TypoAclItem] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[String]
-      } yield TypoAclItem(value)
-  implicit val encoder: Encoder[TypoAclItem] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoAclItem] =
-    Get.Advanced.other[PGobject](cats.data.NonEmptyList.one("aclitem"))
-      .map(v => TypoAclItem(v.getValue))
-  
-  implicit val put: Put[TypoAclItem] =
-    Put.Advanced.other[PGobject](NonEmptyList.one("aclitem"))
-      .contramap(v => {
-                        val obj = new PGobject
-                        obj.setType("aclitem")
-                        obj.setValue(v.value)
-                        obj
-                      })
-  
-  implicit val meta: Meta[TypoAclItem] = new Meta(get, put)
-  val gets: Get[Array[TypoAclItem]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"))
-      .map(_.map(v => TypoAclItem(v.asInstanceOf[String])))
-  
-  val puts: Put[Array[TypoAclItem]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"), "aclitem")
-      .contramap(_.map(v => {
-                              val obj = new PGobject
-                              obj.setType("aclitem")
-                              obj.setValue(v.value)
-                              obj
-                            }))
-  
-  implicit val metas: Meta[Array[TypoAclItem]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoAclItem]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"))
+    .map(_.map(v => TypoAclItem(v.asInstanceOf[String])))
+  implicit val arrayPut: Put[Array[TypoAclItem]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"), "aclitem")
+    .contramap(_.map(v => {
+                            val obj = new PGobject
+                            obj.setType("aclitem")
+                            obj.setValue(v.value)
+                            obj
+                          }))
+  implicit val decoder: Decoder[TypoAclItem] = Decoder.forProduct1[TypoAclItem, String]("value")(TypoAclItem.apply)
+  implicit val encoder: Encoder[TypoAclItem] = Encoder.forProduct1[TypoAclItem, String]("value")(x => (x.value))
+  implicit val get: Get[TypoAclItem] = Get.Advanced.other[PGobject](NonEmptyList.one("aclitem"))
+    .map(v => TypoAclItem(v.getValue))
+  implicit val put: Put[TypoAclItem] = Put.Advanced.other[PGobject](NonEmptyList.one("aclitem")).contramap(v => {
+                                                                             val obj = new PGobject
+                                                                             obj.setType("aclitem")
+                                                                             obj.setValue(v.value)
+                                                                             obj
+                                                                           })
 }

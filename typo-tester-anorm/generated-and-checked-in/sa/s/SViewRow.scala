@@ -7,18 +7,20 @@ package adventureworks
 package sa
 package s
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SViewRow(
@@ -34,50 +36,46 @@ case class SViewRow(
   /** Points to [[sales.store.StoreRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.store.StoreRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SViewRow {
-  def rowParser(idx: Int): RowParser[SViewRow] =
-    RowParser[SViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SViewRow] = Reads[SViewRow](json => JsResult.fromTry(
+      Try(
         SViewRow(
-          id = row[Option[Int]](idx + 0),
-          businessentityid = row[Option[BusinessentityId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          salespersonid = row[Option[BusinessentityId]](idx + 3),
-          demographics = row[Option[TypoXml]](idx + 4),
-          rowguid = row[Option[UUID]](idx + 5),
-          modifieddate = row[Option[LocalDateTime]](idx + 6)
+          id = json.\("id").toOption.map(_.as[Int]),
+          businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
+          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SViewRow] = new OFormat[SViewRow]{
-    override def writes(o: SViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "businessentityid" -> o.businessentityid,
-        "name" -> o.name,
-        "salespersonid" -> o.salespersonid,
-        "demographics" -> o.demographics,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SViewRow] = RowParser[SViewRow] { row =>
+    Success(
+      SViewRow(
+        id = row[Option[Int]](idx + 0),
+        businessentityid = row[Option[BusinessentityId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        salespersonid = row[Option[BusinessentityId]](idx + 3),
+        demographics = row[Option[TypoXml]](idx + 4),
+        rowguid = row[Option[UUID]](idx + 5),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[SViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            businessentityid = json.\("businessentityid").toOption.map(_.as[BusinessentityId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            salespersonid = json.\("salespersonid").toOption.map(_.as[BusinessentityId]),
-            demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SViewRow] = OWrites[SViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "name" -> Json.toJson(o.name),
+      "salespersonid" -> Json.toJson(o.salespersonid),
+      "demographics" -> Json.toJson(o.demographics),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

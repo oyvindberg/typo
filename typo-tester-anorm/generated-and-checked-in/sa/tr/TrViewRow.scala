@@ -7,18 +7,20 @@ package adventureworks
 package sa
 package tr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TrViewRow(
@@ -36,53 +38,49 @@ case class TrViewRow(
   /** Points to [[sales.salestaxrate.SalestaxrateRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salestaxrate.SalestaxrateRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object TrViewRow {
-  def rowParser(idx: Int): RowParser[TrViewRow] =
-    RowParser[TrViewRow] { row =>
-      Success(
+  implicit val reads: Reads[TrViewRow] = Reads[TrViewRow](json => JsResult.fromTry(
+      Try(
         TrViewRow(
-          id = row[Option[Int]](idx + 0),
-          salestaxrateid = row[Option[SalestaxrateId]](idx + 1),
-          stateprovinceid = row[Option[StateprovinceId]](idx + 2),
-          taxtype = row[Option[Int]](idx + 3),
-          taxrate = row[Option[BigDecimal]](idx + 4),
-          name = row[Option[Name]](idx + 5),
-          rowguid = row[Option[UUID]](idx + 6),
-          modifieddate = row[Option[LocalDateTime]](idx + 7)
+          id = json.\("id").toOption.map(_.as[Int]),
+          salestaxrateid = json.\("salestaxrateid").toOption.map(_.as[SalestaxrateId]),
+          stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
+          taxtype = json.\("taxtype").toOption.map(_.as[Int]),
+          taxrate = json.\("taxrate").toOption.map(_.as[BigDecimal]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[TrViewRow] = new OFormat[TrViewRow]{
-    override def writes(o: TrViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "salestaxrateid" -> o.salestaxrateid,
-        "stateprovinceid" -> o.stateprovinceid,
-        "taxtype" -> o.taxtype,
-        "taxrate" -> o.taxrate,
-        "name" -> o.name,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[TrViewRow] = RowParser[TrViewRow] { row =>
+    Success(
+      TrViewRow(
+        id = row[Option[Int]](idx + 0),
+        salestaxrateid = row[Option[SalestaxrateId]](idx + 1),
+        stateprovinceid = row[Option[StateprovinceId]](idx + 2),
+        taxtype = row[Option[Int]](idx + 3),
+        taxrate = row[Option[BigDecimal]](idx + 4),
+        name = row[Option[Name]](idx + 5),
+        rowguid = row[Option[UUID]](idx + 6),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[TrViewRow] = {
-      JsResult.fromTry(
-        Try(
-          TrViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            salestaxrateid = json.\("salestaxrateid").toOption.map(_.as[SalestaxrateId]),
-            stateprovinceid = json.\("stateprovinceid").toOption.map(_.as[StateprovinceId]),
-            taxtype = json.\("taxtype").toOption.map(_.as[Int]),
-            taxrate = json.\("taxrate").toOption.map(_.as[BigDecimal]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[TrViewRow] = OWrites[TrViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "salestaxrateid" -> Json.toJson(o.salestaxrateid),
+      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
+      "taxtype" -> Json.toJson(o.taxtype),
+      "taxrate" -> Json.toJson(o.taxrate),
+      "name" -> Json.toJson(o.name),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

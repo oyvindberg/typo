@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgLanguageRow(
@@ -30,52 +32,48 @@ case class PgLanguageRow(
 )
 
 object PgLanguageRow {
-  def rowParser(idx: Int): RowParser[PgLanguageRow] =
-    RowParser[PgLanguageRow] { row =>
-      Success(
+  implicit val reads: Reads[PgLanguageRow] = Reads[PgLanguageRow](json => JsResult.fromTry(
+      Try(
         PgLanguageRow(
-          oid = row[PgLanguageId](idx + 0),
-          lanname = row[String](idx + 1),
-          lanowner = row[/* oid */ Long](idx + 2),
-          lanispl = row[Boolean](idx + 3),
-          lanpltrusted = row[Boolean](idx + 4),
-          lanplcallfoid = row[/* oid */ Long](idx + 5),
-          laninline = row[/* oid */ Long](idx + 6),
-          lanvalidator = row[/* oid */ Long](idx + 7),
-          lanacl = row[Option[Array[TypoAclItem]]](idx + 8)
+          oid = json.\("oid").as[PgLanguageId],
+          lanname = json.\("lanname").as[String],
+          lanowner = json.\("lanowner").as[/* oid */ Long],
+          lanispl = json.\("lanispl").as[Boolean],
+          lanpltrusted = json.\("lanpltrusted").as[Boolean],
+          lanplcallfoid = json.\("lanplcallfoid").as[/* oid */ Long],
+          laninline = json.\("laninline").as[/* oid */ Long],
+          lanvalidator = json.\("lanvalidator").as[/* oid */ Long],
+          lanacl = json.\("lanacl").toOption.map(_.as[Array[TypoAclItem]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgLanguageRow] = new OFormat[PgLanguageRow]{
-    override def writes(o: PgLanguageRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "lanname" -> o.lanname,
-        "lanowner" -> o.lanowner,
-        "lanispl" -> o.lanispl,
-        "lanpltrusted" -> o.lanpltrusted,
-        "lanplcallfoid" -> o.lanplcallfoid,
-        "laninline" -> o.laninline,
-        "lanvalidator" -> o.lanvalidator,
-        "lanacl" -> o.lanacl
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgLanguageRow] = RowParser[PgLanguageRow] { row =>
+    Success(
+      PgLanguageRow(
+        oid = row[PgLanguageId](idx + 0),
+        lanname = row[String](idx + 1),
+        lanowner = row[/* oid */ Long](idx + 2),
+        lanispl = row[Boolean](idx + 3),
+        lanpltrusted = row[Boolean](idx + 4),
+        lanplcallfoid = row[/* oid */ Long](idx + 5),
+        laninline = row[/* oid */ Long](idx + 6),
+        lanvalidator = row[/* oid */ Long](idx + 7),
+        lanacl = row[Option[Array[TypoAclItem]]](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[PgLanguageRow] = {
-      JsResult.fromTry(
-        Try(
-          PgLanguageRow(
-            oid = json.\("oid").as[PgLanguageId],
-            lanname = json.\("lanname").as[String],
-            lanowner = json.\("lanowner").as[/* oid */ Long],
-            lanispl = json.\("lanispl").as[Boolean],
-            lanpltrusted = json.\("lanpltrusted").as[Boolean],
-            lanplcallfoid = json.\("lanplcallfoid").as[/* oid */ Long],
-            laninline = json.\("laninline").as[/* oid */ Long],
-            lanvalidator = json.\("lanvalidator").as[/* oid */ Long],
-            lanacl = json.\("lanacl").toOption.map(_.as[Array[TypoAclItem]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgLanguageRow] = OWrites[PgLanguageRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "lanname" -> Json.toJson(o.lanname),
+      "lanowner" -> Json.toJson(o.lanowner),
+      "lanispl" -> Json.toJson(o.lanispl),
+      "lanpltrusted" -> Json.toJson(o.lanpltrusted),
+      "lanplcallfoid" -> Json.toJson(o.lanplcallfoid),
+      "laninline" -> Json.toJson(o.laninline),
+      "lanvalidator" -> Json.toJson(o.lanvalidator),
+      "lanacl" -> Json.toJson(o.lanacl)
+    ))
+  )
 }

@@ -8,14 +8,16 @@ package person
 package address
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `person.address` which has not been persisted yet */
@@ -39,9 +41,9 @@ case class AddressRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(addressidDefault: => AddressId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): AddressRow =
+  def toRow(addressidDefault: => AddressId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): AddressRow =
     AddressRow(
       addressline1 = addressline1,
       addressline2 = addressline2,
@@ -64,36 +66,33 @@ case class AddressRowUnsaved(
     )
 }
 object AddressRowUnsaved {
-  implicit val oFormat: OFormat[AddressRowUnsaved] = new OFormat[AddressRowUnsaved]{
-    override def writes(o: AddressRowUnsaved): JsObject =
-      Json.obj(
-        "addressline1" -> o.addressline1,
-        "addressline2" -> o.addressline2,
-        "city" -> o.city,
-        "stateprovinceid" -> o.stateprovinceid,
-        "postalcode" -> o.postalcode,
-        "spatiallocation" -> o.spatiallocation,
-        "addressid" -> o.addressid,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[AddressRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          AddressRowUnsaved(
-            addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
-            addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
-            city = json.\("city").as[/* max 30 chars */ String],
-            stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-            postalcode = json.\("postalcode").as[/* max 15 chars */ String],
-            spatiallocation = json.\("spatiallocation").toOption.map(_.as[Array[Byte]]),
-            addressid = json.\("addressid").as[Defaulted[AddressId]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[AddressRowUnsaved] = Reads[AddressRowUnsaved](json => JsResult.fromTry(
+      Try(
+        AddressRowUnsaved(
+          addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
+          addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
+          city = json.\("city").as[/* max 30 chars */ String],
+          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
+          postalcode = json.\("postalcode").as[/* max 15 chars */ String],
+          spatiallocation = json.\("spatiallocation").toOption.map(_.as[Array[Byte]]),
+          addressid = json.\("addressid").as[Defaulted[AddressId]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[AddressRowUnsaved] = OWrites[AddressRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "addressline1" -> Json.toJson(o.addressline1),
+      "addressline2" -> Json.toJson(o.addressline2),
+      "city" -> Json.toJson(o.city),
+      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
+      "postalcode" -> Json.toJson(o.postalcode),
+      "spatiallocation" -> Json.toJson(o.spatiallocation),
+      "addressid" -> Json.toJson(o.addressid),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -7,22 +7,20 @@ package adventureworks
 package sales
 package currencyrate
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CurrencyrateRow(
   /** Primary key for CurrencyRate records. */
   currencyrateid: CurrencyrateId,
   /** Date and time the exchange rate was obtained. */
-  currencyratedate: LocalDateTime,
+  currencyratedate: TypoLocalDateTime,
   /** Exchange rate was converted from this currency code.
       Points to [[currency.CurrencyRow.currencycode]] */
   fromcurrencycode: CurrencyId,
@@ -33,54 +31,30 @@ case class CurrencyrateRow(
   averagerate: BigDecimal,
   /** Final exchange rate for the day. */
   endofdayrate: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CurrencyrateRow {
-  implicit val decoder: Decoder[CurrencyrateRow] =
-    (c: HCursor) =>
-      for {
-        currencyrateid <- c.downField("currencyrateid").as[CurrencyrateId]
-        currencyratedate <- c.downField("currencyratedate").as[LocalDateTime]
-        fromcurrencycode <- c.downField("fromcurrencycode").as[CurrencyId]
-        tocurrencycode <- c.downField("tocurrencycode").as[CurrencyId]
-        averagerate <- c.downField("averagerate").as[BigDecimal]
-        endofdayrate <- c.downField("endofdayrate").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield CurrencyrateRow(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
-  implicit val encoder: Encoder[CurrencyrateRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "currencyrateid" := row.currencyrateid,
-        "currencyratedate" := row.currencyratedate,
-        "fromcurrencycode" := row.fromcurrencycode,
-        "tocurrencycode" := row.tocurrencycode,
-        "averagerate" := row.averagerate,
-        "endofdayrate" := row.endofdayrate,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CurrencyrateRow] =
-    new Read[CurrencyrateRow](
-      gets = List(
-        (Get[CurrencyrateId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[CurrencyId], Nullability.NoNulls),
-        (Get[CurrencyId], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CurrencyrateRow(
-        currencyrateid = Get[CurrencyrateId].unsafeGetNonNullable(rs, i + 0),
-        currencyratedate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 1),
-        fromcurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 2),
-        tocurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 3),
-        averagerate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
-        endofdayrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[CurrencyrateRow] = Decoder.forProduct7[CurrencyrateRow, CurrencyrateId, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, TypoLocalDateTime]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(CurrencyrateRow.apply)
+  implicit val encoder: Encoder[CurrencyrateRow] = Encoder.forProduct7[CurrencyrateRow, CurrencyrateId, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, TypoLocalDateTime]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(x => (x.currencyrateid, x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.modifieddate))
+  implicit val read: Read[CurrencyrateRow] = new Read[CurrencyrateRow](
+    gets = List(
+      (Get[CurrencyrateId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[CurrencyId], Nullability.NoNulls),
+      (Get[CurrencyId], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CurrencyrateRow(
+      currencyrateid = Get[CurrencyrateId].unsafeGetNonNullable(rs, i + 0),
+      currencyratedate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 1),
+      fromcurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 2),
+      tocurrencycode = Get[CurrencyId].unsafeGetNonNullable(rs, i + 3),
+      averagerate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 4),
+      endofdayrate = Get[BigDecimal].unsafeGetNonNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 6)
     )
-  
-
+  )
 }

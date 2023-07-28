@@ -7,54 +7,36 @@ package adventureworks
 package person
 package countryregion
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CountryregionRow(
   /** ISO standard code for countries and regions. */
   countryregioncode: CountryregionId,
   /** Country or region name. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CountryregionRow {
-  implicit val decoder: Decoder[CountryregionRow] =
-    (c: HCursor) =>
-      for {
-        countryregioncode <- c.downField("countryregioncode").as[CountryregionId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield CountryregionRow(countryregioncode, name, modifieddate)
-  implicit val encoder: Encoder[CountryregionRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "countryregioncode" := row.countryregioncode,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CountryregionRow] =
-    new Read[CountryregionRow](
-      gets = List(
-        (Get[CountryregionId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CountryregionRow(
-        countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[CountryregionRow] = Decoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CountryregionRow.apply)
+  implicit val encoder: Encoder[CountryregionRow] = Encoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))
+  implicit val read: Read[CountryregionRow] = new Read[CountryregionRow](
+    gets = List(
+      (Get[CountryregionId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CountryregionRow(
+      countryregioncode = Get[CountryregionId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

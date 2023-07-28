@@ -8,15 +8,13 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `person.person` which has not been persisted yet */
@@ -49,9 +47,9 @@ case class PersonRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(namestyleDefault: => NameStyle, emailpromotionDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): PersonRow =
+  def toRow(namestyleDefault: => NameStyle, emailpromotionDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): PersonRow =
     PersonRow(
       businessentityid = businessentityid,
       persontype = persontype,
@@ -81,39 +79,6 @@ case class PersonRowUnsaved(
     )
 }
 object PersonRowUnsaved {
-  implicit val decoder: Decoder[PersonRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        persontype <- c.downField("persontype").as[/* bpchar */ String]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Name]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Name]
-        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
-        additionalcontactinfo <- c.downField("additionalcontactinfo").as[Option[TypoXml]]
-        demographics <- c.downField("demographics").as[Option[TypoXml]]
-        namestyle <- c.downField("namestyle").as[Defaulted[NameStyle]]
-        emailpromotion <- c.downField("emailpromotion").as[Defaulted[Int]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield PersonRowUnsaved(businessentityid, persontype, title, firstname, middlename, lastname, suffix, additionalcontactinfo, demographics, namestyle, emailpromotion, rowguid, modifieddate)
-  implicit val encoder: Encoder[PersonRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "persontype" := row.persontype,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "suffix" := row.suffix,
-        "additionalcontactinfo" := row.additionalcontactinfo,
-        "demographics" := row.demographics,
-        "namestyle" := row.namestyle,
-        "emailpromotion" := row.emailpromotion,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct13[PersonRowUnsaved, BusinessentityId, /* bpchar */ String, Option[/* max 8 chars */ String], Name, Option[Name], Name, Option[/* max 10 chars */ String], Option[TypoXml], Option[TypoXml], Defaulted[NameStyle], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate")(PersonRowUnsaved.apply)
+  implicit val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct13[PersonRowUnsaved, BusinessentityId, /* bpchar */ String, Option[/* max 8 chars */ String], Name, Option[Name], Name, Option[/* max 10 chars */ String], Option[TypoXml], Option[TypoXml], Defaulted[NameStyle], Defaulted[Int], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate")(x => (x.businessentityid, x.persontype, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.additionalcontactinfo, x.demographics, x.namestyle, x.emailpromotion, x.rowguid, x.modifieddate))
 }

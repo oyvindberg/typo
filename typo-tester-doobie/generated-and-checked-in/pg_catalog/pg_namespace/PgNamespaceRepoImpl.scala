@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_namespace where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_namespace where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
     sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
@@ -25,10 +25,10 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace".query[PgNamespaceRow].stream
   }
   override def selectById(oid: PgNamespaceId): ConnectionIO[Option[PgNamespaceRow]] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = $oid".query[PgNamespaceRow].option
+    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ${oid}".query[PgNamespaceRow].option
   }
   override def selectByIds(oids: Array[PgNamespaceId]): Stream[ConnectionIO, PgNamespaceRow] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY($oids)".query[PgNamespaceRow].stream
+    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY(${oids})".query[PgNamespaceRow].stream
   }
   override def update(row: PgNamespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -36,7 +36,7 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           set nspname = ${row.nspname}::name,
               nspowner = ${row.nspowner}::oid,
               nspacl = ${row.nspacl}::_aclitem
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

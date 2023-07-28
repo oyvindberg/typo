@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PgShadowViewRepoImpl extends PgShadowViewRepo {
   override def selectAll(implicit c: Connection): List[PgShadowViewRow] = {
-    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig
+    SQL"""select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig
           from pg_catalog.pg_shadow
        """.as(PgShadowViewRow.rowParser(1).*)
   }

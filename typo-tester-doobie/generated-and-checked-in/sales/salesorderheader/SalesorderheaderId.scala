@@ -7,18 +7,19 @@ package adventureworks
 package sales
 package salesorderheader
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `sales.salesorderheader` */
 case class SalesorderheaderId(value: Int) extends AnyVal
 object SalesorderheaderId {
+  implicit val arrayGet: Get[Array[SalesorderheaderId]] = Get[Array[Int]].map(_.map(SalesorderheaderId.apply))
+  implicit val arrayPut: Put[Array[SalesorderheaderId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[SalesorderheaderId] = Decoder[Int].map(SalesorderheaderId.apply)
+  implicit val encoder: Encoder[SalesorderheaderId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[SalesorderheaderId] = Get[Int].map(SalesorderheaderId.apply)
   implicit val ordering: Ordering[SalesorderheaderId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[SalesorderheaderId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[SalesorderheaderId] =
-    Decoder[Int].map(SalesorderheaderId(_))
-  implicit val meta: Meta[SalesorderheaderId] = Meta[Int].imap(SalesorderheaderId.apply)(_.value)
-  implicit val metaArray: Meta[Array[SalesorderheaderId]] = Meta[Array[Int]].imap(_.map(SalesorderheaderId.apply))(_.map(_.value))
+  implicit val put: Put[SalesorderheaderId] = Put[Int].contramap(_.value)
 }

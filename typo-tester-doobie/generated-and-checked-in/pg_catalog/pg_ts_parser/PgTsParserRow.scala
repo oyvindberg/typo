@@ -8,13 +8,11 @@ package pg_catalog
 package pg_ts_parser
 
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgTsParserRow(
@@ -29,54 +27,28 @@ case class PgTsParserRow(
 )
 
 object PgTsParserRow {
-  implicit val decoder: Decoder[PgTsParserRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgTsParserId]
-        prsname <- c.downField("prsname").as[String]
-        prsnamespace <- c.downField("prsnamespace").as[/* oid */ Long]
-        prsstart <- c.downField("prsstart").as[TypoRegproc]
-        prstoken <- c.downField("prstoken").as[TypoRegproc]
-        prsend <- c.downField("prsend").as[TypoRegproc]
-        prsheadline <- c.downField("prsheadline").as[TypoRegproc]
-        prslextype <- c.downField("prslextype").as[TypoRegproc]
-      } yield PgTsParserRow(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
-  implicit val encoder: Encoder[PgTsParserRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "prsname" := row.prsname,
-        "prsnamespace" := row.prsnamespace,
-        "prsstart" := row.prsstart,
-        "prstoken" := row.prstoken,
-        "prsend" := row.prsend,
-        "prsheadline" := row.prsheadline,
-        "prslextype" := row.prslextype
-      )}
-  implicit val read: Read[PgTsParserRow] =
-    new Read[PgTsParserRow](
-      gets = List(
-        (Get[PgTsParserId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTsParserRow(
-        oid = Get[PgTsParserId].unsafeGetNonNullable(rs, i + 0),
-        prsname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        prsnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        prsstart = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
-        prstoken = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4),
-        prsend = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 5),
-        prsheadline = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 6),
-        prslextype = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgTsParserRow] = Decoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(PgTsParserRow.apply)
+  implicit val encoder: Encoder[PgTsParserRow] = Encoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(x => (x.oid, x.prsname, x.prsnamespace, x.prsstart, x.prstoken, x.prsend, x.prsheadline, x.prslextype))
+  implicit val read: Read[PgTsParserRow] = new Read[PgTsParserRow](
+    gets = List(
+      (Get[PgTsParserId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTsParserRow(
+      oid = Get[PgTsParserId].unsafeGetNonNullable(rs, i + 0),
+      prsname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      prsnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      prsstart = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 3),
+      prstoken = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 4),
+      prsend = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 5),
+      prsheadline = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 6),
+      prslextype = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 7)
     )
-  
-
+  )
 }

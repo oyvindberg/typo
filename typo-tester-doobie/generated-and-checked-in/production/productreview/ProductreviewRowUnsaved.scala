@@ -8,13 +8,11 @@ package production
 package productreview
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `production.productreview` which has not been persisted yet */
 case class ProductreviewRowUnsaved(
@@ -34,11 +32,11 @@ case class ProductreviewRowUnsaved(
   productreviewid: Defaulted[ProductreviewId] = Defaulted.UseDefault,
   /** Default: now()
       Date review was submitted. */
-  reviewdate: Defaulted[LocalDateTime] = Defaulted.UseDefault,
+  reviewdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(productreviewidDefault: => ProductreviewId, reviewdateDefault: => LocalDateTime, modifieddateDefault: => LocalDateTime): ProductreviewRow =
+  def toRow(productreviewidDefault: => ProductreviewId, reviewdateDefault: => TypoLocalDateTime, modifieddateDefault: => TypoLocalDateTime): ProductreviewRow =
     ProductreviewRow(
       productid = productid,
       reviewername = reviewername,
@@ -60,29 +58,6 @@ case class ProductreviewRowUnsaved(
     )
 }
 object ProductreviewRowUnsaved {
-  implicit val decoder: Decoder[ProductreviewRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        productid <- c.downField("productid").as[ProductId]
-        reviewername <- c.downField("reviewername").as[Name]
-        emailaddress <- c.downField("emailaddress").as[/* max 50 chars */ String]
-        rating <- c.downField("rating").as[Int]
-        comments <- c.downField("comments").as[Option[/* max 3850 chars */ String]]
-        productreviewid <- c.downField("productreviewid").as[Defaulted[ProductreviewId]]
-        reviewdate <- c.downField("reviewdate").as[Defaulted[LocalDateTime]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ProductreviewRowUnsaved(productid, reviewername, emailaddress, rating, comments, productreviewid, reviewdate, modifieddate)
-  implicit val encoder: Encoder[ProductreviewRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productid" := row.productid,
-        "reviewername" := row.reviewername,
-        "emailaddress" := row.emailaddress,
-        "rating" := row.rating,
-        "comments" := row.comments,
-        "productreviewid" := row.productreviewid,
-        "reviewdate" := row.reviewdate,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ProductreviewRowUnsaved] = Decoder.forProduct8[ProductreviewRowUnsaved, ProductId, Name, /* max 50 chars */ String, Int, Option[/* max 3850 chars */ String], Defaulted[ProductreviewId], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate")(ProductreviewRowUnsaved.apply)
+  implicit val encoder: Encoder[ProductreviewRowUnsaved] = Encoder.forProduct8[ProductreviewRowUnsaved, ProductId, Name, /* max 50 chars */ String, Int, Option[/* max 3850 chars */ String], Defaulted[ProductreviewId], Defaulted[TypoLocalDateTime], Defaulted[TypoLocalDateTime]]("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate")(x => (x.productid, x.reviewername, x.emailaddress, x.rating, x.comments, x.productreviewid, x.reviewdate, x.modifieddate))
 }

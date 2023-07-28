@@ -7,67 +7,65 @@ package adventureworks
 package pg_catalog
 package pg_stat_archiver
 
+import adventureworks.TypoOffsetDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatArchiverViewRow(
   archivedCount: Option[Long],
   lastArchivedWal: Option[String],
-  lastArchivedTime: Option[OffsetDateTime],
+  lastArchivedTime: Option[TypoOffsetDateTime],
   failedCount: Option[Long],
   lastFailedWal: Option[String],
-  lastFailedTime: Option[OffsetDateTime],
-  statsReset: Option[OffsetDateTime]
+  lastFailedTime: Option[TypoOffsetDateTime],
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatArchiverViewRow {
-  def rowParser(idx: Int): RowParser[PgStatArchiverViewRow] =
-    RowParser[PgStatArchiverViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatArchiverViewRow] = Reads[PgStatArchiverViewRow](json => JsResult.fromTry(
+      Try(
         PgStatArchiverViewRow(
-          archivedCount = row[Option[Long]](idx + 0),
-          lastArchivedWal = row[Option[String]](idx + 1),
-          lastArchivedTime = row[Option[OffsetDateTime]](idx + 2),
-          failedCount = row[Option[Long]](idx + 3),
-          lastFailedWal = row[Option[String]](idx + 4),
-          lastFailedTime = row[Option[OffsetDateTime]](idx + 5),
-          statsReset = row[Option[OffsetDateTime]](idx + 6)
+          archivedCount = json.\("archived_count").toOption.map(_.as[Long]),
+          lastArchivedWal = json.\("last_archived_wal").toOption.map(_.as[String]),
+          lastArchivedTime = json.\("last_archived_time").toOption.map(_.as[TypoOffsetDateTime]),
+          failedCount = json.\("failed_count").toOption.map(_.as[Long]),
+          lastFailedWal = json.\("last_failed_wal").toOption.map(_.as[String]),
+          lastFailedTime = json.\("last_failed_time").toOption.map(_.as[TypoOffsetDateTime]),
+          statsReset = json.\("stats_reset").toOption.map(_.as[TypoOffsetDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatArchiverViewRow] = new OFormat[PgStatArchiverViewRow]{
-    override def writes(o: PgStatArchiverViewRow): JsObject =
-      Json.obj(
-        "archived_count" -> o.archivedCount,
-        "last_archived_wal" -> o.lastArchivedWal,
-        "last_archived_time" -> o.lastArchivedTime,
-        "failed_count" -> o.failedCount,
-        "last_failed_wal" -> o.lastFailedWal,
-        "last_failed_time" -> o.lastFailedTime,
-        "stats_reset" -> o.statsReset
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatArchiverViewRow] = RowParser[PgStatArchiverViewRow] { row =>
+    Success(
+      PgStatArchiverViewRow(
+        archivedCount = row[Option[Long]](idx + 0),
+        lastArchivedWal = row[Option[String]](idx + 1),
+        lastArchivedTime = row[Option[TypoOffsetDateTime]](idx + 2),
+        failedCount = row[Option[Long]](idx + 3),
+        lastFailedWal = row[Option[String]](idx + 4),
+        lastFailedTime = row[Option[TypoOffsetDateTime]](idx + 5),
+        statsReset = row[Option[TypoOffsetDateTime]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatArchiverViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatArchiverViewRow(
-            archivedCount = json.\("archived_count").toOption.map(_.as[Long]),
-            lastArchivedWal = json.\("last_archived_wal").toOption.map(_.as[String]),
-            lastArchivedTime = json.\("last_archived_time").toOption.map(_.as[OffsetDateTime]),
-            failedCount = json.\("failed_count").toOption.map(_.as[Long]),
-            lastFailedWal = json.\("last_failed_wal").toOption.map(_.as[String]),
-            lastFailedTime = json.\("last_failed_time").toOption.map(_.as[OffsetDateTime]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[OffsetDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatArchiverViewRow] = OWrites[PgStatArchiverViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "archived_count" -> Json.toJson(o.archivedCount),
+      "last_archived_wal" -> Json.toJson(o.lastArchivedWal),
+      "last_archived_time" -> Json.toJson(o.lastArchivedTime),
+      "failed_count" -> Json.toJson(o.failedCount),
+      "last_failed_wal" -> Json.toJson(o.lastFailedWal),
+      "last_failed_time" -> Json.toJson(o.lastFailedTime),
+      "stats_reset" -> Json.toJson(o.statsReset)
+    ))
+  )
 }

@@ -7,17 +7,15 @@ package adventureworks
 package pu
 package pod
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PodViewRow(
   id: Option[Int],
@@ -26,7 +24,7 @@ case class PodViewRow(
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]] */
   purchaseorderdetailid: Option[Int],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.duedate]] */
-  duedate: Option[LocalDateTime],
+  duedate: Option[TypoLocalDateTime],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.orderqty]] */
   orderqty: Option[Int],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.productid]] */
@@ -38,66 +36,36 @@ case class PodViewRow(
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.rejectedqty]] */
   rejectedqty: Option[BigDecimal],
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PodViewRow {
-  implicit val decoder: Decoder[PodViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        purchaseorderid <- c.downField("purchaseorderid").as[Option[PurchaseorderheaderId]]
-        purchaseorderdetailid <- c.downField("purchaseorderdetailid").as[Option[Int]]
-        duedate <- c.downField("duedate").as[Option[LocalDateTime]]
-        orderqty <- c.downField("orderqty").as[Option[Int]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        unitprice <- c.downField("unitprice").as[Option[BigDecimal]]
-        receivedqty <- c.downField("receivedqty").as[Option[BigDecimal]]
-        rejectedqty <- c.downField("rejectedqty").as[Option[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PodViewRow(id, purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
-  implicit val encoder: Encoder[PodViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "purchaseorderid" := row.purchaseorderid,
-        "purchaseorderdetailid" := row.purchaseorderdetailid,
-        "duedate" := row.duedate,
-        "orderqty" := row.orderqty,
-        "productid" := row.productid,
-        "unitprice" := row.unitprice,
-        "receivedqty" := row.receivedqty,
-        "rejectedqty" := row.rejectedqty,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PodViewRow] =
-    new Read[PodViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[PurchaseorderheaderId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PodViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNullable(rs, i + 1),
-        purchaseorderdetailid = Get[Int].unsafeGetNullable(rs, i + 2),
-        duedate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
-        orderqty = Get[Int].unsafeGetNullable(rs, i + 4),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 5),
-        unitprice = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
-        receivedqty = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
-        rejectedqty = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 9)
-      )
+  implicit val decoder: Decoder[PodViewRow] = Decoder.forProduct10[PodViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[TypoLocalDateTime], Option[Int], Option[ProductId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(PodViewRow.apply)
+  implicit val encoder: Encoder[PodViewRow] = Encoder.forProduct10[PodViewRow, Option[Int], Option[PurchaseorderheaderId], Option[Int], Option[TypoLocalDateTime], Option[Int], Option[ProductId], Option[BigDecimal], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(x => (x.id, x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate))
+  implicit val read: Read[PodViewRow] = new Read[PodViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[PurchaseorderheaderId], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PodViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNullable(rs, i + 1),
+      purchaseorderdetailid = Get[Int].unsafeGetNullable(rs, i + 2),
+      duedate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3),
+      orderqty = Get[Int].unsafeGetNullable(rs, i + 4),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 5),
+      unitprice = Get[BigDecimal].unsafeGetNullable(rs, i + 6),
+      receivedqty = Get[BigDecimal].unsafeGetNullable(rs, i + 7),
+      rejectedqty = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 9)
     )
-  
-
+  )
 }

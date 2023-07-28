@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGInterval
@@ -19,65 +16,63 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Interval type in PostgreSQL */
 case class TypoInterval(years: Int, months: Int, days: Int, hours: Int, minutes: Int, seconds: Double)
+
 object TypoInterval {
-  implicit val oFormat: OFormat[TypoInterval] = new OFormat[TypoInterval]{
-    override def writes(o: TypoInterval): JsObject =
-      Json.obj(
-        "years" -> o.years,
-        "months" -> o.months,
-        "days" -> o.days,
-        "hours" -> o.hours,
-        "minutes" -> o.minutes,
-        "seconds" -> o.seconds
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoInterval] = {
-      JsResult.fromTry(
-        Try(
-          TypoInterval(
-            years = json.\("years").as[Int],
-            months = json.\("months").as[Int],
-            days = json.\("days").as[Int],
-            hours = json.\("hours").as[Int],
-            minutes = json.\("minutes").as[Int],
-            seconds = json.\("seconds").as[Double]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoIntervalDb: ToStatement[TypoInterval] with ParameterMetaData[TypoInterval] with Column[TypoInterval] = new ToStatement[TypoInterval] with ParameterMetaData[TypoInterval] with Column[TypoInterval] {
-    override def sqlType: String = "interval"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoInterval): Unit =
-      s.setObject(index, new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoInterval] =
-      v match {
-        case v: PGInterval => Right(TypoInterval(v.getYears, v.getMonths, v.getDays, v.getHours, v.getMinutes, v.getSeconds))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGInterval from JDBC to produce a TypoInterval, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoIntervalDbArray: ToStatement[Array[TypoInterval]] with ParameterMetaData[Array[TypoInterval]] with Column[Array[TypoInterval]] = new ToStatement[Array[TypoInterval]] with ParameterMetaData[Array[TypoInterval]] with Column[Array[TypoInterval]] {
-    override def sqlType: String = "_interval"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoInterval]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("interval", v.map(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds))))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoInterval]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoInterval]] = Column.nonNull[Array[TypoInterval]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoInterval(v.asInstanceOf[PGInterval].getYears, v.asInstanceOf[PGInterval].getMonths, v.asInstanceOf[PGInterval].getDays, v.asInstanceOf[PGInterval].getHours, v.asInstanceOf[PGInterval].getMinutes, v.asInstanceOf[PGInterval].getSeconds)))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoInterval, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoInterval, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoInterval]] = new ParameterMetaData[Array[TypoInterval]] {
+    override def sqlType: String = "_interval"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoInterval]] = ToStatement[Array[TypoInterval]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("interval", v.map(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))))
+  implicit val column: Column[TypoInterval] = Column.nonNull[TypoInterval]((v1: Any, _) =>
+    v1 match {
+      case v: PGInterval => Right(TypoInterval(v.getYears, v.getMonths, v.getDays, v.getHours, v.getMinutes, v.getSeconds))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGInterval, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoInterval] = new ParameterMetaData[TypoInterval] {
+    override def sqlType: String = "interval"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoInterval] = Reads[TypoInterval](json => JsResult.fromTry(
+      Try(
+        TypoInterval(
+          years = json.\("years").as[Int],
+          months = json.\("months").as[Int],
+          days = json.\("days").as[Int],
+          hours = json.\("hours").as[Int],
+          minutes = json.\("minutes").as[Int],
+          seconds = json.\("seconds").as[Double]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoInterval] = ToStatement[TypoInterval]((s, index, v) => s.setObject(index, new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))
+  implicit val writes: OWrites[TypoInterval] = OWrites[TypoInterval](o =>
+    new JsObject(ListMap[String, JsValue](
+      "years" -> Json.toJson(o.years),
+      "months" -> Json.toJson(o.months),
+      "days" -> Json.toJson(o.days),
+      "hours" -> Json.toJson(o.hours),
+      "minutes" -> Json.toJson(o.minutes),
+      "seconds" -> Json.toJson(o.seconds)
+    ))
+  )
 }

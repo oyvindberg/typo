@@ -14,31 +14,30 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `person.businessentityaddress` */
 case class BusinessentityaddressId(businessentityid: BusinessentityId, addressid: AddressId, addresstypeid: AddresstypeId)
 object BusinessentityaddressId {
   implicit val ordering: Ordering[BusinessentityaddressId] = Ordering.by(x => (x.businessentityid, x.addressid, x.addresstypeid))
-  implicit val oFormat: OFormat[BusinessentityaddressId] = new OFormat[BusinessentityaddressId]{
-    override def writes(o: BusinessentityaddressId): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "addressid" -> o.addressid,
-        "addresstypeid" -> o.addresstypeid
-      )
-  
-    override def reads(json: JsValue): JsResult[BusinessentityaddressId] = {
-      JsResult.fromTry(
-        Try(
-          BusinessentityaddressId(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            addressid = json.\("addressid").as[AddressId],
-            addresstypeid = json.\("addresstypeid").as[AddresstypeId]
-          )
+  implicit val reads: Reads[BusinessentityaddressId] = Reads[BusinessentityaddressId](json => JsResult.fromTry(
+      Try(
+        BusinessentityaddressId(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          addressid = json.\("addressid").as[AddressId],
+          addresstypeid = json.\("addresstypeid").as[AddresstypeId]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[BusinessentityaddressId] = OWrites[BusinessentityaddressId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "addressid" -> Json.toJson(o.addressid),
+      "addresstypeid" -> Json.toJson(o.addresstypeid)
+    ))
+  )
 }

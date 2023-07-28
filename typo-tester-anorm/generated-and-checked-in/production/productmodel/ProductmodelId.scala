@@ -10,19 +10,20 @@ package productmodel
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `production.productmodel` */
 case class ProductmodelId(value: Int) extends AnyVal
 object ProductmodelId {
-  implicit val ordering: Ordering[ProductmodelId] = Ordering.by(_.value)
-  implicit val format: Format[ProductmodelId] = implicitly[Format[Int]].bimap(ProductmodelId.apply, _.value)
-  implicit val toStatement: ToStatement[ProductmodelId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[ProductmodelId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[ProductmodelId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[ProductmodelId] = implicitly[Column[Int]].map(ProductmodelId.apply)
+  implicit val ordering: Ordering[ProductmodelId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[ProductmodelId] = new ParameterMetaData[ProductmodelId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[ProductmodelId] = implicitly[Reads[Int]].map(ProductmodelId.apply)
+  implicit val toStatement: ToStatement[ProductmodelId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[ProductmodelId] = implicitly[Writes[Int]].contramap(_.value)
 }

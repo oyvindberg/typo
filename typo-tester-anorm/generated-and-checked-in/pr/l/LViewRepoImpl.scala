@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object LViewRepoImpl extends LViewRepo {
   override def selectAll(implicit c: Connection): List[LViewRow] = {
-    SQL"""select "id", locationid, "name", costrate, availability, modifieddate
+    SQL"""select "id", locationid, "name", costrate, availability, modifieddate::text
           from pr.l
        """.as(LViewRow.rowParser(1).*)
   }

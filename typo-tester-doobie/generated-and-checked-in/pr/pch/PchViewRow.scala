@@ -7,72 +7,48 @@ package adventureworks
 package pr
 package pch
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PchViewRow(
   id: Option[Int],
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]] */
   productid: Option[ProductId],
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.startdate]] */
-  startdate: Option[LocalDateTime],
+  startdate: Option[TypoLocalDateTime],
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.enddate]] */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.standardcost]] */
   standardcost: Option[BigDecimal],
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PchViewRow {
-  implicit val decoder: Decoder[PchViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        startdate <- c.downField("startdate").as[Option[LocalDateTime]]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        standardcost <- c.downField("standardcost").as[Option[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PchViewRow(id, productid, startdate, enddate, standardcost, modifieddate)
-  implicit val encoder: Encoder[PchViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productid" := row.productid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "standardcost" := row.standardcost,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PchViewRow] =
-    new Read[PchViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PchViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
-        startdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 2),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3),
-        standardcost = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PchViewRow] = Decoder.forProduct6[PchViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "productid", "startdate", "enddate", "standardcost", "modifieddate")(PchViewRow.apply)
+  implicit val encoder: Encoder[PchViewRow] = Encoder.forProduct6[PchViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "productid", "startdate", "enddate", "standardcost", "modifieddate")(x => (x.id, x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate))
+  implicit val read: Read[PchViewRow] = new Read[PchViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PchViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 1),
+      startdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 2),
+      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3),
+      standardcost = Get[BigDecimal].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgTsConfigRow(
@@ -25,40 +27,36 @@ case class PgTsConfigRow(
 )
 
 object PgTsConfigRow {
-  def rowParser(idx: Int): RowParser[PgTsConfigRow] =
-    RowParser[PgTsConfigRow] { row =>
-      Success(
+  implicit val reads: Reads[PgTsConfigRow] = Reads[PgTsConfigRow](json => JsResult.fromTry(
+      Try(
         PgTsConfigRow(
-          oid = row[PgTsConfigId](idx + 0),
-          cfgname = row[String](idx + 1),
-          cfgnamespace = row[/* oid */ Long](idx + 2),
-          cfgowner = row[/* oid */ Long](idx + 3),
-          cfgparser = row[/* oid */ Long](idx + 4)
+          oid = json.\("oid").as[PgTsConfigId],
+          cfgname = json.\("cfgname").as[String],
+          cfgnamespace = json.\("cfgnamespace").as[/* oid */ Long],
+          cfgowner = json.\("cfgowner").as[/* oid */ Long],
+          cfgparser = json.\("cfgparser").as[/* oid */ Long]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgTsConfigRow] = new OFormat[PgTsConfigRow]{
-    override def writes(o: PgTsConfigRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "cfgname" -> o.cfgname,
-        "cfgnamespace" -> o.cfgnamespace,
-        "cfgowner" -> o.cfgowner,
-        "cfgparser" -> o.cfgparser
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgTsConfigRow] = RowParser[PgTsConfigRow] { row =>
+    Success(
+      PgTsConfigRow(
+        oid = row[PgTsConfigId](idx + 0),
+        cfgname = row[String](idx + 1),
+        cfgnamespace = row[/* oid */ Long](idx + 2),
+        cfgowner = row[/* oid */ Long](idx + 3),
+        cfgparser = row[/* oid */ Long](idx + 4)
       )
-  
-    override def reads(json: JsValue): JsResult[PgTsConfigRow] = {
-      JsResult.fromTry(
-        Try(
-          PgTsConfigRow(
-            oid = json.\("oid").as[PgTsConfigId],
-            cfgname = json.\("cfgname").as[String],
-            cfgnamespace = json.\("cfgnamespace").as[/* oid */ Long],
-            cfgowner = json.\("cfgowner").as[/* oid */ Long],
-            cfgparser = json.\("cfgparser").as[/* oid */ Long]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgTsConfigRow] = OWrites[PgTsConfigRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "cfgname" -> Json.toJson(o.cfgname),
+      "cfgnamespace" -> Json.toJson(o.cfgnamespace),
+      "cfgowner" -> Json.toJson(o.cfgowner),
+      "cfgparser" -> Json.toJson(o.cfgparser)
+    ))
+  )
 }

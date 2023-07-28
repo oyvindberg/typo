@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
   override def delete(oid: PgLargeobjectMetadataId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_largeobject_metadata where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_largeobject_metadata where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgLargeobjectMetadataRow): ConnectionIO[PgLargeobjectMetadataRow] = {
     sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
@@ -25,17 +25,17 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata".query[PgLargeobjectMetadataRow].stream
   }
   override def selectById(oid: PgLargeobjectMetadataId): ConnectionIO[Option[PgLargeobjectMetadataRow]] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = $oid".query[PgLargeobjectMetadataRow].option
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ${oid}".query[PgLargeobjectMetadataRow].option
   }
   override def selectByIds(oids: Array[PgLargeobjectMetadataId]): Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY($oids)".query[PgLargeobjectMetadataRow].stream
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${oids})".query[PgLargeobjectMetadataRow].stream
   }
   override def update(row: PgLargeobjectMetadataRow): ConnectionIO[Boolean] = {
     val oid = row.oid
     sql"""update pg_catalog.pg_largeobject_metadata
           set lomowner = ${row.lomowner}::oid,
               lomacl = ${row.lomacl}::_aclitem
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

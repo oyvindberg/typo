@@ -7,17 +7,15 @@ package adventureworks
 package sa
 package sci
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class SciViewRow(
   id: Option[Int],
@@ -30,56 +28,32 @@ case class SciViewRow(
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.productid]] */
   productid: Option[ProductId],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.datecreated]] */
-  datecreated: Option[LocalDateTime],
+  datecreated: Option[TypoLocalDateTime],
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SciViewRow {
-  implicit val decoder: Decoder[SciViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        shoppingcartitemid <- c.downField("shoppingcartitemid").as[Option[ShoppingcartitemId]]
-        shoppingcartid <- c.downField("shoppingcartid").as[Option[/* max 50 chars */ String]]
-        quantity <- c.downField("quantity").as[Option[Int]]
-        productid <- c.downField("productid").as[Option[ProductId]]
-        datecreated <- c.downField("datecreated").as[Option[LocalDateTime]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield SciViewRow(id, shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
-  implicit val encoder: Encoder[SciViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "shoppingcartitemid" := row.shoppingcartitemid,
-        "shoppingcartid" := row.shoppingcartid,
-        "quantity" := row.quantity,
-        "productid" := row.productid,
-        "datecreated" := row.datecreated,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[SciViewRow] =
-    new Read[SciViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ShoppingcartitemId], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => SciViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNullable(rs, i + 1),
-        shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
-        quantity = Get[Int].unsafeGetNullable(rs, i + 3),
-        productid = Get[ProductId].unsafeGetNullable(rs, i + 4),
-        datecreated = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[SciViewRow] = Decoder.forProduct7[SciViewRow, Option[Int], Option[ShoppingcartitemId], Option[/* max 50 chars */ String], Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime]]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(SciViewRow.apply)
+  implicit val encoder: Encoder[SciViewRow] = Encoder.forProduct7[SciViewRow, Option[Int], Option[ShoppingcartitemId], Option[/* max 50 chars */ String], Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime]]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.id, x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))
+  implicit val read: Read[SciViewRow] = new Read[SciViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ShoppingcartitemId], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => SciViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      shoppingcartitemid = Get[ShoppingcartitemId].unsafeGetNullable(rs, i + 1),
+      shoppingcartid = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 2),
+      quantity = Get[Int].unsafeGetNullable(rs, i + 3),
+      productid = Get[ProductId].unsafeGetNullable(rs, i + 4),
+      datecreated = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

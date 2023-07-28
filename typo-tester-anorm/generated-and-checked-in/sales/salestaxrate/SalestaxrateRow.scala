@@ -7,17 +7,19 @@ package adventureworks
 package sales
 package salestaxrate
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SalestaxrateRow(
@@ -33,50 +35,46 @@ case class SalestaxrateRow(
   /** Tax rate description. */
   name: Name,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object SalestaxrateRow {
-  def rowParser(idx: Int): RowParser[SalestaxrateRow] =
-    RowParser[SalestaxrateRow] { row =>
-      Success(
+  implicit val reads: Reads[SalestaxrateRow] = Reads[SalestaxrateRow](json => JsResult.fromTry(
+      Try(
         SalestaxrateRow(
-          salestaxrateid = row[SalestaxrateId](idx + 0),
-          stateprovinceid = row[StateprovinceId](idx + 1),
-          taxtype = row[Int](idx + 2),
-          taxrate = row[BigDecimal](idx + 3),
-          name = row[Name](idx + 4),
-          rowguid = row[UUID](idx + 5),
-          modifieddate = row[LocalDateTime](idx + 6)
+          salestaxrateid = json.\("salestaxrateid").as[SalestaxrateId],
+          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
+          taxtype = json.\("taxtype").as[Int],
+          taxrate = json.\("taxrate").as[BigDecimal],
+          name = json.\("name").as[Name],
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[SalestaxrateRow] = new OFormat[SalestaxrateRow]{
-    override def writes(o: SalestaxrateRow): JsObject =
-      Json.obj(
-        "salestaxrateid" -> o.salestaxrateid,
-        "stateprovinceid" -> o.stateprovinceid,
-        "taxtype" -> o.taxtype,
-        "taxrate" -> o.taxrate,
-        "name" -> o.name,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SalestaxrateRow] = RowParser[SalestaxrateRow] { row =>
+    Success(
+      SalestaxrateRow(
+        salestaxrateid = row[SalestaxrateId](idx + 0),
+        stateprovinceid = row[StateprovinceId](idx + 1),
+        taxtype = row[Int](idx + 2),
+        taxrate = row[BigDecimal](idx + 3),
+        name = row[Name](idx + 4),
+        rowguid = row[UUID](idx + 5),
+        modifieddate = row[TypoLocalDateTime](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[SalestaxrateRow] = {
-      JsResult.fromTry(
-        Try(
-          SalestaxrateRow(
-            salestaxrateid = json.\("salestaxrateid").as[SalestaxrateId],
-            stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-            taxtype = json.\("taxtype").as[Int],
-            taxrate = json.\("taxrate").as[BigDecimal],
-            name = json.\("name").as[Name],
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SalestaxrateRow] = OWrites[SalestaxrateRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "salestaxrateid" -> Json.toJson(o.salestaxrateid),
+      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
+      "taxtype" -> Json.toJson(o.taxtype),
+      "taxrate" -> Json.toJson(o.taxrate),
+      "name" -> Json.toJson(o.name),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

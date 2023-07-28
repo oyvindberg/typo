@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgLanguageRepoImpl extends PgLanguageRepo {
   override def delete(oid: PgLanguageId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_language where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_language where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgLanguageRow): ConnectionIO[PgLanguageRow] = {
     sql"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
@@ -25,10 +25,10 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
     sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language".query[PgLanguageRow].stream
   }
   override def selectById(oid: PgLanguageId): ConnectionIO[Option[PgLanguageRow]] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = $oid".query[PgLanguageRow].option
+    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ${oid}".query[PgLanguageRow].option
   }
   override def selectByIds(oids: Array[PgLanguageId]): Stream[ConnectionIO, PgLanguageRow] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY($oids)".query[PgLanguageRow].stream
+    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY(${oids})".query[PgLanguageRow].stream
   }
   override def update(row: PgLanguageRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -41,7 +41,7 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
               laninline = ${row.laninline}::oid,
               lanvalidator = ${row.lanvalidator}::oid,
               lanacl = ${row.lanacl}::_aclitem
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgClassRow(
@@ -56,124 +58,120 @@ case class PgClassRow(
 )
 
 object PgClassRow {
-  def rowParser(idx: Int): RowParser[PgClassRow] =
-    RowParser[PgClassRow] { row =>
-      Success(
+  implicit val reads: Reads[PgClassRow] = Reads[PgClassRow](json => JsResult.fromTry(
+      Try(
         PgClassRow(
-          oid = row[PgClassId](idx + 0),
-          relname = row[String](idx + 1),
-          relnamespace = row[/* oid */ Long](idx + 2),
-          reltype = row[/* oid */ Long](idx + 3),
-          reloftype = row[/* oid */ Long](idx + 4),
-          relowner = row[/* oid */ Long](idx + 5),
-          relam = row[/* oid */ Long](idx + 6),
-          relfilenode = row[/* oid */ Long](idx + 7),
-          reltablespace = row[/* oid */ Long](idx + 8),
-          relpages = row[Int](idx + 9),
-          reltuples = row[Float](idx + 10),
-          relallvisible = row[Int](idx + 11),
-          reltoastrelid = row[/* oid */ Long](idx + 12),
-          relhasindex = row[Boolean](idx + 13),
-          relisshared = row[Boolean](idx + 14),
-          relpersistence = row[String](idx + 15),
-          relkind = row[String](idx + 16),
-          relnatts = row[Int](idx + 17),
-          relchecks = row[Int](idx + 18),
-          relhasrules = row[Boolean](idx + 19),
-          relhastriggers = row[Boolean](idx + 20),
-          relhassubclass = row[Boolean](idx + 21),
-          relrowsecurity = row[Boolean](idx + 22),
-          relforcerowsecurity = row[Boolean](idx + 23),
-          relispopulated = row[Boolean](idx + 24),
-          relreplident = row[String](idx + 25),
-          relispartition = row[Boolean](idx + 26),
-          relrewrite = row[/* oid */ Long](idx + 27),
-          relfrozenxid = row[TypoXid](idx + 28),
-          relminmxid = row[TypoXid](idx + 29),
-          relacl = row[Option[Array[TypoAclItem]]](idx + 30),
-          reloptions = row[Option[Array[String]]](idx + 31),
-          relpartbound = row[Option[TypoPgNodeTree]](idx + 32)
+          oid = json.\("oid").as[PgClassId],
+          relname = json.\("relname").as[String],
+          relnamespace = json.\("relnamespace").as[/* oid */ Long],
+          reltype = json.\("reltype").as[/* oid */ Long],
+          reloftype = json.\("reloftype").as[/* oid */ Long],
+          relowner = json.\("relowner").as[/* oid */ Long],
+          relam = json.\("relam").as[/* oid */ Long],
+          relfilenode = json.\("relfilenode").as[/* oid */ Long],
+          reltablespace = json.\("reltablespace").as[/* oid */ Long],
+          relpages = json.\("relpages").as[Int],
+          reltuples = json.\("reltuples").as[Float],
+          relallvisible = json.\("relallvisible").as[Int],
+          reltoastrelid = json.\("reltoastrelid").as[/* oid */ Long],
+          relhasindex = json.\("relhasindex").as[Boolean],
+          relisshared = json.\("relisshared").as[Boolean],
+          relpersistence = json.\("relpersistence").as[String],
+          relkind = json.\("relkind").as[String],
+          relnatts = json.\("relnatts").as[Int],
+          relchecks = json.\("relchecks").as[Int],
+          relhasrules = json.\("relhasrules").as[Boolean],
+          relhastriggers = json.\("relhastriggers").as[Boolean],
+          relhassubclass = json.\("relhassubclass").as[Boolean],
+          relrowsecurity = json.\("relrowsecurity").as[Boolean],
+          relforcerowsecurity = json.\("relforcerowsecurity").as[Boolean],
+          relispopulated = json.\("relispopulated").as[Boolean],
+          relreplident = json.\("relreplident").as[String],
+          relispartition = json.\("relispartition").as[Boolean],
+          relrewrite = json.\("relrewrite").as[/* oid */ Long],
+          relfrozenxid = json.\("relfrozenxid").as[TypoXid],
+          relminmxid = json.\("relminmxid").as[TypoXid],
+          relacl = json.\("relacl").toOption.map(_.as[Array[TypoAclItem]]),
+          reloptions = json.\("reloptions").toOption.map(_.as[Array[String]]),
+          relpartbound = json.\("relpartbound").toOption.map(_.as[TypoPgNodeTree])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgClassRow] = new OFormat[PgClassRow]{
-    override def writes(o: PgClassRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "relname" -> o.relname,
-        "relnamespace" -> o.relnamespace,
-        "reltype" -> o.reltype,
-        "reloftype" -> o.reloftype,
-        "relowner" -> o.relowner,
-        "relam" -> o.relam,
-        "relfilenode" -> o.relfilenode,
-        "reltablespace" -> o.reltablespace,
-        "relpages" -> o.relpages,
-        "reltuples" -> o.reltuples,
-        "relallvisible" -> o.relallvisible,
-        "reltoastrelid" -> o.reltoastrelid,
-        "relhasindex" -> o.relhasindex,
-        "relisshared" -> o.relisshared,
-        "relpersistence" -> o.relpersistence,
-        "relkind" -> o.relkind,
-        "relnatts" -> o.relnatts,
-        "relchecks" -> o.relchecks,
-        "relhasrules" -> o.relhasrules,
-        "relhastriggers" -> o.relhastriggers,
-        "relhassubclass" -> o.relhassubclass,
-        "relrowsecurity" -> o.relrowsecurity,
-        "relforcerowsecurity" -> o.relforcerowsecurity,
-        "relispopulated" -> o.relispopulated,
-        "relreplident" -> o.relreplident,
-        "relispartition" -> o.relispartition,
-        "relrewrite" -> o.relrewrite,
-        "relfrozenxid" -> o.relfrozenxid,
-        "relminmxid" -> o.relminmxid,
-        "relacl" -> o.relacl,
-        "reloptions" -> o.reloptions,
-        "relpartbound" -> o.relpartbound
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgClassRow] = RowParser[PgClassRow] { row =>
+    Success(
+      PgClassRow(
+        oid = row[PgClassId](idx + 0),
+        relname = row[String](idx + 1),
+        relnamespace = row[/* oid */ Long](idx + 2),
+        reltype = row[/* oid */ Long](idx + 3),
+        reloftype = row[/* oid */ Long](idx + 4),
+        relowner = row[/* oid */ Long](idx + 5),
+        relam = row[/* oid */ Long](idx + 6),
+        relfilenode = row[/* oid */ Long](idx + 7),
+        reltablespace = row[/* oid */ Long](idx + 8),
+        relpages = row[Int](idx + 9),
+        reltuples = row[Float](idx + 10),
+        relallvisible = row[Int](idx + 11),
+        reltoastrelid = row[/* oid */ Long](idx + 12),
+        relhasindex = row[Boolean](idx + 13),
+        relisshared = row[Boolean](idx + 14),
+        relpersistence = row[String](idx + 15),
+        relkind = row[String](idx + 16),
+        relnatts = row[Int](idx + 17),
+        relchecks = row[Int](idx + 18),
+        relhasrules = row[Boolean](idx + 19),
+        relhastriggers = row[Boolean](idx + 20),
+        relhassubclass = row[Boolean](idx + 21),
+        relrowsecurity = row[Boolean](idx + 22),
+        relforcerowsecurity = row[Boolean](idx + 23),
+        relispopulated = row[Boolean](idx + 24),
+        relreplident = row[String](idx + 25),
+        relispartition = row[Boolean](idx + 26),
+        relrewrite = row[/* oid */ Long](idx + 27),
+        relfrozenxid = row[TypoXid](idx + 28),
+        relminmxid = row[TypoXid](idx + 29),
+        relacl = row[Option[Array[TypoAclItem]]](idx + 30),
+        reloptions = row[Option[Array[String]]](idx + 31),
+        relpartbound = row[Option[TypoPgNodeTree]](idx + 32)
       )
-  
-    override def reads(json: JsValue): JsResult[PgClassRow] = {
-      JsResult.fromTry(
-        Try(
-          PgClassRow(
-            oid = json.\("oid").as[PgClassId],
-            relname = json.\("relname").as[String],
-            relnamespace = json.\("relnamespace").as[/* oid */ Long],
-            reltype = json.\("reltype").as[/* oid */ Long],
-            reloftype = json.\("reloftype").as[/* oid */ Long],
-            relowner = json.\("relowner").as[/* oid */ Long],
-            relam = json.\("relam").as[/* oid */ Long],
-            relfilenode = json.\("relfilenode").as[/* oid */ Long],
-            reltablespace = json.\("reltablespace").as[/* oid */ Long],
-            relpages = json.\("relpages").as[Int],
-            reltuples = json.\("reltuples").as[Float],
-            relallvisible = json.\("relallvisible").as[Int],
-            reltoastrelid = json.\("reltoastrelid").as[/* oid */ Long],
-            relhasindex = json.\("relhasindex").as[Boolean],
-            relisshared = json.\("relisshared").as[Boolean],
-            relpersistence = json.\("relpersistence").as[String],
-            relkind = json.\("relkind").as[String],
-            relnatts = json.\("relnatts").as[Int],
-            relchecks = json.\("relchecks").as[Int],
-            relhasrules = json.\("relhasrules").as[Boolean],
-            relhastriggers = json.\("relhastriggers").as[Boolean],
-            relhassubclass = json.\("relhassubclass").as[Boolean],
-            relrowsecurity = json.\("relrowsecurity").as[Boolean],
-            relforcerowsecurity = json.\("relforcerowsecurity").as[Boolean],
-            relispopulated = json.\("relispopulated").as[Boolean],
-            relreplident = json.\("relreplident").as[String],
-            relispartition = json.\("relispartition").as[Boolean],
-            relrewrite = json.\("relrewrite").as[/* oid */ Long],
-            relfrozenxid = json.\("relfrozenxid").as[TypoXid],
-            relminmxid = json.\("relminmxid").as[TypoXid],
-            relacl = json.\("relacl").toOption.map(_.as[Array[TypoAclItem]]),
-            reloptions = json.\("reloptions").toOption.map(_.as[Array[String]]),
-            relpartbound = json.\("relpartbound").toOption.map(_.as[TypoPgNodeTree])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgClassRow] = OWrites[PgClassRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "relname" -> Json.toJson(o.relname),
+      "relnamespace" -> Json.toJson(o.relnamespace),
+      "reltype" -> Json.toJson(o.reltype),
+      "reloftype" -> Json.toJson(o.reloftype),
+      "relowner" -> Json.toJson(o.relowner),
+      "relam" -> Json.toJson(o.relam),
+      "relfilenode" -> Json.toJson(o.relfilenode),
+      "reltablespace" -> Json.toJson(o.reltablespace),
+      "relpages" -> Json.toJson(o.relpages),
+      "reltuples" -> Json.toJson(o.reltuples),
+      "relallvisible" -> Json.toJson(o.relallvisible),
+      "reltoastrelid" -> Json.toJson(o.reltoastrelid),
+      "relhasindex" -> Json.toJson(o.relhasindex),
+      "relisshared" -> Json.toJson(o.relisshared),
+      "relpersistence" -> Json.toJson(o.relpersistence),
+      "relkind" -> Json.toJson(o.relkind),
+      "relnatts" -> Json.toJson(o.relnatts),
+      "relchecks" -> Json.toJson(o.relchecks),
+      "relhasrules" -> Json.toJson(o.relhasrules),
+      "relhastriggers" -> Json.toJson(o.relhastriggers),
+      "relhassubclass" -> Json.toJson(o.relhassubclass),
+      "relrowsecurity" -> Json.toJson(o.relrowsecurity),
+      "relforcerowsecurity" -> Json.toJson(o.relforcerowsecurity),
+      "relispopulated" -> Json.toJson(o.relispopulated),
+      "relreplident" -> Json.toJson(o.relreplident),
+      "relispartition" -> Json.toJson(o.relispartition),
+      "relrewrite" -> Json.toJson(o.relrewrite),
+      "relfrozenxid" -> Json.toJson(o.relfrozenxid),
+      "relminmxid" -> Json.toJson(o.relminmxid),
+      "relacl" -> Json.toJson(o.relacl),
+      "reloptions" -> Json.toJson(o.reloptions),
+      "relpartbound" -> Json.toJson(o.relpartbound)
+    ))
+  )
 }

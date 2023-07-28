@@ -7,17 +7,15 @@ package adventureworks
 package purchasing
 package purchaseorderheader
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PurchaseorderheaderRow(
   /** Primary key. */
@@ -36,83 +34,49 @@ case class PurchaseorderheaderRow(
       Points to [[shipmethod.ShipmethodRow.shipmethodid]] */
   shipmethodid: ShipmethodId,
   /** Purchase order creation date. */
-  orderdate: LocalDateTime,
+  orderdate: TypoLocalDateTime,
   /** Estimated shipment date from the vendor. */
-  shipdate: Option[LocalDateTime],
+  shipdate: Option[TypoLocalDateTime],
   /** Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID. */
   subtotal: BigDecimal,
   /** Tax amount. */
   taxamt: BigDecimal,
   /** Shipping cost. */
   freight: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object PurchaseorderheaderRow {
-  implicit val decoder: Decoder[PurchaseorderheaderRow] =
-    (c: HCursor) =>
-      for {
-        purchaseorderid <- c.downField("purchaseorderid").as[PurchaseorderheaderId]
-        revisionnumber <- c.downField("revisionnumber").as[Int]
-        status <- c.downField("status").as[Int]
-        employeeid <- c.downField("employeeid").as[BusinessentityId]
-        vendorid <- c.downField("vendorid").as[BusinessentityId]
-        shipmethodid <- c.downField("shipmethodid").as[ShipmethodId]
-        orderdate <- c.downField("orderdate").as[LocalDateTime]
-        shipdate <- c.downField("shipdate").as[Option[LocalDateTime]]
-        subtotal <- c.downField("subtotal").as[BigDecimal]
-        taxamt <- c.downField("taxamt").as[BigDecimal]
-        freight <- c.downField("freight").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield PurchaseorderheaderRow(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
-  implicit val encoder: Encoder[PurchaseorderheaderRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "purchaseorderid" := row.purchaseorderid,
-        "revisionnumber" := row.revisionnumber,
-        "status" := row.status,
-        "employeeid" := row.employeeid,
-        "vendorid" := row.vendorid,
-        "shipmethodid" := row.shipmethodid,
-        "orderdate" := row.orderdate,
-        "shipdate" := row.shipdate,
-        "subtotal" := row.subtotal,
-        "taxamt" := row.taxamt,
-        "freight" := row.freight,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PurchaseorderheaderRow] =
-    new Read[PurchaseorderheaderRow](
-      gets = List(
-        (Get[PurchaseorderheaderId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[ShipmethodId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderheaderRow(
-        purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNonNullable(rs, i + 0),
-        revisionnumber = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        status = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        employeeid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 3),
-        vendorid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 4),
-        shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 5),
-        orderdate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 6),
-        shipdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 7),
-        subtotal = Get[BigDecimal].unsafeGetNonNullable(rs, i + 8),
-        taxamt = Get[BigDecimal].unsafeGetNonNullable(rs, i + 9),
-        freight = Get[BigDecimal].unsafeGetNonNullable(rs, i + 10),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 11)
-      )
+  implicit val decoder: Decoder[PurchaseorderheaderRow] = Decoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, Int, Int, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRow.apply)
+  implicit val encoder: Encoder[PurchaseorderheaderRow] = Encoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, Int, Int, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))
+  implicit val read: Read[PurchaseorderheaderRow] = new Read[PurchaseorderheaderRow](
+    gets = List(
+      (Get[PurchaseorderheaderId], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[ShipmethodId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderheaderRow(
+      purchaseorderid = Get[PurchaseorderheaderId].unsafeGetNonNullable(rs, i + 0),
+      revisionnumber = Get[Int].unsafeGetNonNullable(rs, i + 1),
+      status = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      employeeid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 3),
+      vendorid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 4),
+      shipmethodid = Get[ShipmethodId].unsafeGetNonNullable(rs, i + 5),
+      orderdate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 6),
+      shipdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 7),
+      subtotal = Get[BigDecimal].unsafeGetNonNullable(rs, i + 8),
+      taxamt = Get[BigDecimal].unsafeGetNonNullable(rs, i + 9),
+      freight = Get[BigDecimal].unsafeGetNonNullable(rs, i + 10),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 11)
     )
-  
-
+  )
 }

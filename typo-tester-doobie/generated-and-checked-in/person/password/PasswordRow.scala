@@ -7,16 +7,14 @@ package adventureworks
 package person
 package password
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class PasswordRow(
@@ -27,46 +25,26 @@ case class PasswordRow(
   /** Random value concatenated with the password string before the password is hashed. */
   passwordsalt: /* max 10 chars */ String,
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object PasswordRow {
-  implicit val decoder: Decoder[PasswordRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        passwordhash <- c.downField("passwordhash").as[/* max 128 chars */ String]
-        passwordsalt <- c.downField("passwordsalt").as[/* max 10 chars */ String]
-        rowguid <- c.downField("rowguid").as[UUID]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield PasswordRow(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
-  implicit val encoder: Encoder[PasswordRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "passwordhash" := row.passwordhash,
-        "passwordsalt" := row.passwordsalt,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PasswordRow] =
-    new Read[PasswordRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[/* max 128 chars */ String], Nullability.NoNulls),
-        (Get[/* max 10 chars */ String], Nullability.NoNulls),
-        (Get[UUID], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PasswordRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        passwordhash = Get[/* max 128 chars */ String].unsafeGetNonNullable(rs, i + 1),
-        passwordsalt = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
-        rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[PasswordRow] = Decoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PasswordRow.apply)
+  implicit val encoder: Encoder[PasswordRow] = Encoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))
+  implicit val read: Read[PasswordRow] = new Read[PasswordRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[/* max 128 chars */ String], Nullability.NoNulls),
+      (Get[/* max 10 chars */ String], Nullability.NoNulls),
+      (Get[UUID], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PasswordRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      passwordhash = Get[/* max 128 chars */ String].unsafeGetNonNullable(rs, i + 1),
+      passwordsalt = Get[/* max 10 chars */ String].unsafeGetNonNullable(rs, i + 2),
+      rowguid = Get[UUID].unsafeGetNonNullable(rs, i + 3),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4)
     )
-  
-
+  )
 }

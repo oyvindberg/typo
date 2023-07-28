@@ -8,21 +8,21 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
-    sql"delete from purchasing.shipmethod where shipmethodid = $shipmethodid".update.run.map(_ > 0)
+    sql"delete from purchasing.shipmethod where shipmethodid = ${shipmethodid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """.query[ShipmethodRow].unique
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
@@ -46,32 +46,32 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into purchasing.shipmethod default values
-            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into purchasing.shipmethod(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+            returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
          """
     }
     q.query[ShipmethodRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod""".query[ShipmethodRow].stream
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod""".query[ShipmethodRow].stream
   }
   override def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid""".query[ShipmethodRow].option
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ${shipmethodid}""".query[ShipmethodRow].option
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = ANY($shipmethodids)""".query[ShipmethodRow].stream
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ANY(${shipmethodids})""".query[ShipmethodRow].stream
   }
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     val shipmethodid = row.shipmethodid
@@ -81,7 +81,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
               shiprate = ${row.shiprate}::numeric,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where shipmethodid = $shipmethodid
+          where shipmethodid = ${shipmethodid}
        """
       .update
       .run
@@ -104,7 +104,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             shiprate = EXCLUDED.shiprate,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
+          returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
        """.query[ShipmethodRow].unique
   }
 }

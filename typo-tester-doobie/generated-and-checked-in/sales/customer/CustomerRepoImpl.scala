@@ -8,21 +8,21 @@ package sales
 package customer
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId): ConnectionIO[Boolean] = {
-    sql"delete from sales.customer where customerid = $customerid".update.run.map(_ > 0)
+    sql"delete from sales.customer where customerid = ${customerid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
           values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+          returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """.query[CustomerRow].unique
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
@@ -40,32 +40,32 @@ object CustomerRepoImpl extends CustomerRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.customer default values
-            returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+            returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into sales.customer(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+            returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
          """
     }
     q.query[CustomerRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer".query[CustomerRow].stream
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer".query[CustomerRow].stream
   }
   override def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = $customerid".query[CustomerRow].option
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ${customerid}".query[CustomerRow].option
   }
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = ANY($customerids)".query[CustomerRow].stream
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${customerids})".query[CustomerRow].stream
   }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid
@@ -75,7 +75,7 @@ object CustomerRepoImpl extends CustomerRepo {
               territoryid = ${row.territoryid}::int4,
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where customerid = $customerid
+          where customerid = ${customerid}
        """
       .update
       .run
@@ -98,7 +98,7 @@ object CustomerRepoImpl extends CustomerRepo {
             territoryid = EXCLUDED.territoryid,
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning customerid, personid, storeid, territoryid, rowguid, modifieddate
+          returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
        """.query[CustomerRow].unique
   }
 }

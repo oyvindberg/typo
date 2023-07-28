@@ -1,49 +1,56 @@
 package adventureworks.production.product
 
-import adventureworks.production.productcategory.{ProductcategoryRepoImpl, ProductcategoryRowUnsaved}
-import adventureworks.production.productmodel.{ProductmodelRepoImpl, ProductmodelRowUnsaved}
-import adventureworks.production.productsubcategory.{ProductsubcategoryRepoImpl, ProductsubcategoryRowUnsaved}
-import adventureworks.production.unitmeasure.{UnitmeasureId, UnitmeasureRepoImpl, UnitmeasureRowUnsaved}
+import adventureworks.production.productcategory.*
+import adventureworks.production.productmodel.*
+import adventureworks.production.productsubcategory.*
+import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
-import adventureworks.{Defaulted, TypoXml, withConnection}
+import adventureworks.{Defaulted, TypoLocalDateTime, TypoXml, withConnection}
 import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
+import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
 import java.util.UUID
 
 class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  val repo = ProductRepoImpl
 
-  test("works") {
+  def runTest(
+      productRepo: ProductRepo,
+      projectModelRepo: ProductmodelRepo,
+      unitmeasureRepo: UnitmeasureRepo,
+      productcategoryRepo: ProductcategoryRepo,
+      productsubcategoryRepo: ProductsubcategoryRepo
+  ): Assertion = {
     withConnection {
       for {
         // setup
-        unitmeasure <- UnitmeasureRepoImpl.insert(
+        unitmeasure <- unitmeasureRepo.insert(
           UnitmeasureRowUnsaved(
             unitmeasurecode = UnitmeasureId("kgg"),
             name = Name("name")
           )
         )
-        productCategory <- ProductcategoryRepoImpl.insert(
+        productCategory <- productcategoryRepo.insert(
           ProductcategoryRowUnsaved(
             name = Name("name")
           )
         )
-        productSubcategory <- ProductsubcategoryRepoImpl.insert(
+        productSubcategory <- productsubcategoryRepo.insert(
           ProductsubcategoryRowUnsaved(
             productcategoryid = productCategory.productcategoryid,
             name = Name("name")
           )
         )
-        productmodel <- ProductmodelRepoImpl.insert(
+        productmodel <- projectModelRepo.insert(
           ProductmodelRowUnsaved(
             name = Name("name"),
             catalogdescription = Some(new TypoXml("<xml/>")),
             instructions = Some(new TypoXml("<instructions/>"))
           )
         )
+
         unsaved1 = ProductRowUnsaved(
           name = Name("name"),
           productnumber = "productnumber",
@@ -62,36 +69,57 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           style = Some("W "),
           productsubcategoryid = Some(productSubcategory.productsubcategoryid),
           productmodelid = Some(productmodel.productmodelid),
-          sellstartdate = LocalDateTime.now().plusDays(1).withNano(0),
-          sellenddate = Some(LocalDateTime.now().plusDays(10).withNano(0)),
-          discontinueddate = Some(LocalDateTime.now().plusDays(100).withNano(0)),
+          sellstartdate = TypoLocalDateTime(LocalDateTime.now().plusDays(1).withNano(0)),
+          sellenddate = Some(TypoLocalDateTime(LocalDateTime.now().plusDays(10).withNano(0))),
+          discontinueddate = Some(TypoLocalDateTime(LocalDateTime.now().plusDays(100).withNano(0))),
           productid = Defaulted.UseDefault,
           makeflag = Defaulted.Provided(Flag(true)),
           finishedgoodsflag = Defaulted.Provided(Flag(true)),
           rowguid = Defaulted.Provided(UUID.randomUUID()),
-          modifieddate = Defaulted.Provided(LocalDateTime.now().withNano(0))
+          modifieddate = Defaulted.Provided(TypoLocalDateTime.now)
         )
         // insert and round trip check
-        saved1 <- repo.insert(unsaved1)
+        saved1 <- productRepo.insert(unsaved1)
         saved2 = unsaved1.toRow(saved1.productid, ???, ???, ???, ???)
         _ <- delay(assert(saved1 === saved2))
 
         // check field values
-        newModifiedDate = saved1.modifieddate.minusDays(1)
-        _ <- repo.update(saved1.copy(modifieddate = newModifiedDate))
-        saved3 <- repo.selectAll.compile.toList.map {
+        newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
+        _ <- productRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        saved3 <- productRepo.selectAll.compile.toList.map {
           case List(x) => x
           case other   => throw new MatchError(other)
         }
         _ <- delay(assert(saved3.modifieddate == newModifiedDate))
-        _ <- repo.update(saved3.copy(size = None)).map(res => assert(res))
+        _ <- productRepo.update(saved3.copy(size = None)).map(res => assert(res))
         // delete
-        _ <- repo.delete(saved1.productid)
-        _ <- repo.selectAll.compile.toList.map {
+        _ <- productRepo.delete(saved1.productid)
+        _ <- productRepo.selectAll.compile.toList.map {
           case Nil   => ()
           case other => throw new MatchError(other)
         }
+
       } yield succeed
     }
+  }
+
+  test("in-memory") {
+    runTest(
+      productRepo = new ProductRepoMock(_.toRow(ProductId(0), Flag.apply(true), Flag.apply(false), UUID.randomUUID(), TypoLocalDateTime.now)),
+      projectModelRepo = new ProductmodelRepoMock(_.toRow(ProductmodelId(0), UUID.randomUUID(), TypoLocalDateTime.now)),
+      unitmeasureRepo = new UnitmeasureRepoMock(_.toRow(TypoLocalDateTime.now)),
+      productcategoryRepo = new ProductcategoryRepoMock(_.toRow(ProductcategoryId(0), UUID.randomUUID(), TypoLocalDateTime.now)),
+      productsubcategoryRepo = new ProductsubcategoryRepoMock(_.toRow(ProductsubcategoryId(0), UUID.randomUUID(), TypoLocalDateTime.now))
+    )
+  }
+
+  test("pg") {
+    runTest(
+      productRepo = ProductRepoImpl,
+      projectModelRepo = ProductmodelRepoImpl,
+      unitmeasureRepo = UnitmeasureRepoImpl,
+      productcategoryRepo = ProductcategoryRepoImpl,
+      productsubcategoryRepo = ProductsubcategoryRepoImpl
+    )
   }
 }

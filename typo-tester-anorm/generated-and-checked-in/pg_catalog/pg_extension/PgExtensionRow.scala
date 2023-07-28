@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgExtensionRow(
@@ -28,49 +30,45 @@ case class PgExtensionRow(
 )
 
 object PgExtensionRow {
-  def rowParser(idx: Int): RowParser[PgExtensionRow] =
-    RowParser[PgExtensionRow] { row =>
-      Success(
+  implicit val reads: Reads[PgExtensionRow] = Reads[PgExtensionRow](json => JsResult.fromTry(
+      Try(
         PgExtensionRow(
-          oid = row[PgExtensionId](idx + 0),
-          extname = row[String](idx + 1),
-          extowner = row[/* oid */ Long](idx + 2),
-          extnamespace = row[/* oid */ Long](idx + 3),
-          extrelocatable = row[Boolean](idx + 4),
-          extversion = row[String](idx + 5),
-          extconfig = row[Option[Array[/* oid */ Long]]](idx + 6),
-          extcondition = row[Option[Array[String]]](idx + 7)
+          oid = json.\("oid").as[PgExtensionId],
+          extname = json.\("extname").as[String],
+          extowner = json.\("extowner").as[/* oid */ Long],
+          extnamespace = json.\("extnamespace").as[/* oid */ Long],
+          extrelocatable = json.\("extrelocatable").as[Boolean],
+          extversion = json.\("extversion").as[String],
+          extconfig = json.\("extconfig").toOption.map(_.as[Array[/* oid */ Long]]),
+          extcondition = json.\("extcondition").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgExtensionRow] = new OFormat[PgExtensionRow]{
-    override def writes(o: PgExtensionRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "extname" -> o.extname,
-        "extowner" -> o.extowner,
-        "extnamespace" -> o.extnamespace,
-        "extrelocatable" -> o.extrelocatable,
-        "extversion" -> o.extversion,
-        "extconfig" -> o.extconfig,
-        "extcondition" -> o.extcondition
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgExtensionRow] = RowParser[PgExtensionRow] { row =>
+    Success(
+      PgExtensionRow(
+        oid = row[PgExtensionId](idx + 0),
+        extname = row[String](idx + 1),
+        extowner = row[/* oid */ Long](idx + 2),
+        extnamespace = row[/* oid */ Long](idx + 3),
+        extrelocatable = row[Boolean](idx + 4),
+        extversion = row[String](idx + 5),
+        extconfig = row[Option[Array[/* oid */ Long]]](idx + 6),
+        extcondition = row[Option[Array[String]]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgExtensionRow] = {
-      JsResult.fromTry(
-        Try(
-          PgExtensionRow(
-            oid = json.\("oid").as[PgExtensionId],
-            extname = json.\("extname").as[String],
-            extowner = json.\("extowner").as[/* oid */ Long],
-            extnamespace = json.\("extnamespace").as[/* oid */ Long],
-            extrelocatable = json.\("extrelocatable").as[Boolean],
-            extversion = json.\("extversion").as[String],
-            extconfig = json.\("extconfig").toOption.map(_.as[Array[/* oid */ Long]]),
-            extcondition = json.\("extcondition").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgExtensionRow] = OWrites[PgExtensionRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "extname" -> Json.toJson(o.extname),
+      "extowner" -> Json.toJson(o.extowner),
+      "extnamespace" -> Json.toJson(o.extnamespace),
+      "extrelocatable" -> Json.toJson(o.extrelocatable),
+      "extversion" -> Json.toJson(o.extversion),
+      "extconfig" -> Json.toJson(o.extconfig),
+      "extcondition" -> Json.toJson(o.extcondition)
+    ))
+  )
 }

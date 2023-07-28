@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgFileSettingsViewRow(
@@ -27,46 +29,42 @@ case class PgFileSettingsViewRow(
 )
 
 object PgFileSettingsViewRow {
-  def rowParser(idx: Int): RowParser[PgFileSettingsViewRow] =
-    RowParser[PgFileSettingsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgFileSettingsViewRow] = Reads[PgFileSettingsViewRow](json => JsResult.fromTry(
+      Try(
         PgFileSettingsViewRow(
-          sourcefile = row[Option[String]](idx + 0),
-          sourceline = row[Option[Int]](idx + 1),
-          seqno = row[Option[Int]](idx + 2),
-          name = row[Option[String]](idx + 3),
-          setting = row[Option[String]](idx + 4),
-          applied = row[Option[Boolean]](idx + 5),
-          error = row[Option[String]](idx + 6)
+          sourcefile = json.\("sourcefile").toOption.map(_.as[String]),
+          sourceline = json.\("sourceline").toOption.map(_.as[Int]),
+          seqno = json.\("seqno").toOption.map(_.as[Int]),
+          name = json.\("name").toOption.map(_.as[String]),
+          setting = json.\("setting").toOption.map(_.as[String]),
+          applied = json.\("applied").toOption.map(_.as[Boolean]),
+          error = json.\("error").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgFileSettingsViewRow] = new OFormat[PgFileSettingsViewRow]{
-    override def writes(o: PgFileSettingsViewRow): JsObject =
-      Json.obj(
-        "sourcefile" -> o.sourcefile,
-        "sourceline" -> o.sourceline,
-        "seqno" -> o.seqno,
-        "name" -> o.name,
-        "setting" -> o.setting,
-        "applied" -> o.applied,
-        "error" -> o.error
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgFileSettingsViewRow] = RowParser[PgFileSettingsViewRow] { row =>
+    Success(
+      PgFileSettingsViewRow(
+        sourcefile = row[Option[String]](idx + 0),
+        sourceline = row[Option[Int]](idx + 1),
+        seqno = row[Option[Int]](idx + 2),
+        name = row[Option[String]](idx + 3),
+        setting = row[Option[String]](idx + 4),
+        applied = row[Option[Boolean]](idx + 5),
+        error = row[Option[String]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgFileSettingsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgFileSettingsViewRow(
-            sourcefile = json.\("sourcefile").toOption.map(_.as[String]),
-            sourceline = json.\("sourceline").toOption.map(_.as[Int]),
-            seqno = json.\("seqno").toOption.map(_.as[Int]),
-            name = json.\("name").toOption.map(_.as[String]),
-            setting = json.\("setting").toOption.map(_.as[String]),
-            applied = json.\("applied").toOption.map(_.as[Boolean]),
-            error = json.\("error").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgFileSettingsViewRow] = OWrites[PgFileSettingsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "sourcefile" -> Json.toJson(o.sourcefile),
+      "sourceline" -> Json.toJson(o.sourceline),
+      "seqno" -> Json.toJson(o.seqno),
+      "name" -> Json.toJson(o.name),
+      "setting" -> Json.toJson(o.setting),
+      "applied" -> Json.toJson(o.applied),
+      "error" -> Json.toJson(o.error)
+    ))
+  )
 }

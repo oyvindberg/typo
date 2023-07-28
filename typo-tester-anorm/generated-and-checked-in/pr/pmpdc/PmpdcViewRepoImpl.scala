@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PmpdcViewRepoImpl extends PmpdcViewRepo {
   override def selectAll(implicit c: Connection): List[PmpdcViewRow] = {
-    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
+    SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate::text
           from pr.pmpdc
        """.as(PmpdcViewRow.rowParser(1).*)
   }

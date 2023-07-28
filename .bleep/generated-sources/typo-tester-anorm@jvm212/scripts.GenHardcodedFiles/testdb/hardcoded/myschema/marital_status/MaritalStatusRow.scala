@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class MaritalStatusRow(
@@ -22,28 +24,24 @@ case class MaritalStatusRow(
 )
 
 object MaritalStatusRow {
-  def rowParser(idx: Int): RowParser[MaritalStatusRow] =
-    RowParser[MaritalStatusRow] { row =>
-      Success(
+  implicit val reads: Reads[MaritalStatusRow] = Reads[MaritalStatusRow](json => JsResult.fromTry(
+      Try(
         MaritalStatusRow(
-          id = row[MaritalStatusId](idx + 0)
+          id = json.\("id").as[MaritalStatusId]
         )
       )
-    }
-  implicit val oFormat: OFormat[MaritalStatusRow] = new OFormat[MaritalStatusRow]{
-    override def writes(o: MaritalStatusRow): JsObject =
-      Json.obj(
-        "id" -> o.id
+    ),
+  )
+  def rowParser(idx: Int): RowParser[MaritalStatusRow] = RowParser[MaritalStatusRow] { row =>
+    Success(
+      MaritalStatusRow(
+        id = row[MaritalStatusId](idx + 0)
       )
-  
-    override def reads(json: JsValue): JsResult[MaritalStatusRow] = {
-      JsResult.fromTry(
-        Try(
-          MaritalStatusRow(
-            id = json.\("id").as[MaritalStatusId]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[MaritalStatusRow] = OWrites[MaritalStatusRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id)
+    ))
+  )
 }

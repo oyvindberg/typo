@@ -7,18 +7,16 @@ package adventureworks
 package pr
 package d
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class DViewRow(
@@ -45,80 +43,44 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.document.DocumentRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime],
+  modifieddate: Option[TypoLocalDateTime],
   /** Points to [[production.document.DocumentRow.documentnode]] */
   documentnode: Option[DocumentId]
 )
 
 object DViewRow {
-  implicit val decoder: Decoder[DViewRow] =
-    (c: HCursor) =>
-      for {
-        title <- c.downField("title").as[Option[/* max 50 chars */ String]]
-        owner <- c.downField("owner").as[Option[BusinessentityId]]
-        folderflag <- c.downField("folderflag").as[Flag]
-        filename <- c.downField("filename").as[Option[/* max 400 chars */ String]]
-        fileextension <- c.downField("fileextension").as[Option[/* max 8 chars */ String]]
-        revision <- c.downField("revision").as[Option[/* bpchar */ String]]
-        changenumber <- c.downField("changenumber").as[Option[Int]]
-        status <- c.downField("status").as[Option[Int]]
-        documentsummary <- c.downField("documentsummary").as[Option[String]]
-        document <- c.downField("document").as[Option[Byte]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-        documentnode <- c.downField("documentnode").as[Option[DocumentId]]
-      } yield DViewRow(title, owner, folderflag, filename, fileextension, revision, changenumber, status, documentsummary, document, rowguid, modifieddate, documentnode)
-  implicit val encoder: Encoder[DViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "title" := row.title,
-        "owner" := row.owner,
-        "folderflag" := row.folderflag,
-        "filename" := row.filename,
-        "fileextension" := row.fileextension,
-        "revision" := row.revision,
-        "changenumber" := row.changenumber,
-        "status" := row.status,
-        "documentsummary" := row.documentsummary,
-        "document" := row.document,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate,
-        "documentnode" := row.documentnode
-      )}
-  implicit val read: Read[DViewRow] =
-    new Read[DViewRow](
-      gets = List(
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Flag], Nullability.NoNulls),
-        (Get[/* max 400 chars */ String], Nullability.Nullable),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[/* bpchar */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Byte], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[DocumentId], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-        title = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 0),
-        owner = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
-        filename = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 3),
-        fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
-        revision = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 5),
-        changenumber = Get[Int].unsafeGetNullable(rs, i + 6),
-        status = Get[Int].unsafeGetNullable(rs, i + 7),
-        documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
-        document = Get[Byte].unsafeGetNullable(rs, i + 9),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 10),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 11),
-        documentnode = Get[DocumentId].unsafeGetNullable(rs, i + 12)
-      )
+  implicit val decoder: Decoder[DViewRow] = Decoder.forProduct13[DViewRow, Option[/* max 50 chars */ String], Option[BusinessentityId], Flag, Option[/* max 400 chars */ String], Option[/* max 8 chars */ String], Option[/* bpchar */ String], Option[Int], Option[Int], Option[String], Option[Byte], Option[UUID], Option[TypoLocalDateTime], Option[DocumentId]]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DViewRow.apply)
+  implicit val encoder: Encoder[DViewRow] = Encoder.forProduct13[DViewRow, Option[/* max 50 chars */ String], Option[BusinessentityId], Flag, Option[/* max 400 chars */ String], Option[/* max 8 chars */ String], Option[/* bpchar */ String], Option[Int], Option[Int], Option[String], Option[Byte], Option[UUID], Option[TypoLocalDateTime], Option[DocumentId]]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))
+  implicit val read: Read[DViewRow] = new Read[DViewRow](
+    gets = List(
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[Flag], Nullability.NoNulls),
+      (Get[/* max 400 chars */ String], Nullability.Nullable),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[/* bpchar */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Byte], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[DocumentId], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
+      title = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 0),
+      owner = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      folderflag = Get[Flag].unsafeGetNonNullable(rs, i + 2),
+      filename = Get[/* max 400 chars */ String].unsafeGetNullable(rs, i + 3),
+      fileextension = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 4),
+      revision = Get[/* bpchar */ String].unsafeGetNullable(rs, i + 5),
+      changenumber = Get[Int].unsafeGetNullable(rs, i + 6),
+      status = Get[Int].unsafeGetNullable(rs, i + 7),
+      documentsummary = Get[String].unsafeGetNullable(rs, i + 8),
+      document = Get[Byte].unsafeGetNullable(rs, i + 9),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 10),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 11),
+      documentnode = Get[DocumentId].unsafeGetNullable(rs, i + 12)
     )
-  
-
+  )
 }

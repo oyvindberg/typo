@@ -8,11 +8,11 @@ package production
 package productphoto
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
           values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
-          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
   
@@ -38,19 +38,19 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productphoto default values
-            returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+            returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
          """
         .executeInsert(ProductphotoRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+                  returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -61,18 +61,18 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
-    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
           from production.productphoto
        """.as(ProductphotoRow.rowParser(1).*)
   }
   override def selectById(productphotoid: ProductphotoId)(implicit c: Connection): Option[ProductphotoRow] = {
-    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
           from production.productphoto
           where productphotoid = $productphotoid
        """.as(ProductphotoRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
-    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+    SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
           from production.productphoto
           where productphotoid = ANY($productphotoids)
        """.as(ProductphotoRow.rowParser(1).*)
@@ -106,7 +106,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             largephoto = EXCLUDED.largephoto,
             largephotofilename = EXCLUDED.largephotofilename,
             modifieddate = EXCLUDED.modifieddate
-          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
+          returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
   

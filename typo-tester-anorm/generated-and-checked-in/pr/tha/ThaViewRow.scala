@@ -7,15 +7,17 @@ package adventureworks
 package pr
 package tha
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ThaViewRow(
@@ -29,7 +31,7 @@ case class ThaViewRow(
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.referenceorderlineid]] */
   referenceorderlineid: Option[Int],
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiondate]] */
-  transactiondate: Option[LocalDateTime],
+  transactiondate: Option[TypoLocalDateTime],
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiontype]] */
   transactiontype: Option[/* bpchar */ String],
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.quantity]] */
@@ -37,59 +39,55 @@ case class ThaViewRow(
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.actualcost]] */
   actualcost: Option[BigDecimal],
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object ThaViewRow {
-  def rowParser(idx: Int): RowParser[ThaViewRow] =
-    RowParser[ThaViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ThaViewRow] = Reads[ThaViewRow](json => JsResult.fromTry(
+      Try(
         ThaViewRow(
-          id = row[Option[Int]](idx + 0),
-          transactionid = row[Option[TransactionhistoryarchiveId]](idx + 1),
-          productid = row[Option[Int]](idx + 2),
-          referenceorderid = row[Option[Int]](idx + 3),
-          referenceorderlineid = row[Option[Int]](idx + 4),
-          transactiondate = row[Option[LocalDateTime]](idx + 5),
-          transactiontype = row[Option[/* bpchar */ String]](idx + 6),
-          quantity = row[Option[Int]](idx + 7),
-          actualcost = row[Option[BigDecimal]](idx + 8),
-          modifieddate = row[Option[LocalDateTime]](idx + 9)
+          id = json.\("id").toOption.map(_.as[Int]),
+          transactionid = json.\("transactionid").toOption.map(_.as[TransactionhistoryarchiveId]),
+          productid = json.\("productid").toOption.map(_.as[Int]),
+          referenceorderid = json.\("referenceorderid").toOption.map(_.as[Int]),
+          referenceorderlineid = json.\("referenceorderlineid").toOption.map(_.as[Int]),
+          transactiondate = json.\("transactiondate").toOption.map(_.as[TypoLocalDateTime]),
+          transactiontype = json.\("transactiontype").toOption.map(_.as[/* bpchar */ String]),
+          quantity = json.\("quantity").toOption.map(_.as[Int]),
+          actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[ThaViewRow] = new OFormat[ThaViewRow]{
-    override def writes(o: ThaViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "transactionid" -> o.transactionid,
-        "productid" -> o.productid,
-        "referenceorderid" -> o.referenceorderid,
-        "referenceorderlineid" -> o.referenceorderlineid,
-        "transactiondate" -> o.transactiondate,
-        "transactiontype" -> o.transactiontype,
-        "quantity" -> o.quantity,
-        "actualcost" -> o.actualcost,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ThaViewRow] = RowParser[ThaViewRow] { row =>
+    Success(
+      ThaViewRow(
+        id = row[Option[Int]](idx + 0),
+        transactionid = row[Option[TransactionhistoryarchiveId]](idx + 1),
+        productid = row[Option[Int]](idx + 2),
+        referenceorderid = row[Option[Int]](idx + 3),
+        referenceorderlineid = row[Option[Int]](idx + 4),
+        transactiondate = row[Option[TypoLocalDateTime]](idx + 5),
+        transactiontype = row[Option[/* bpchar */ String]](idx + 6),
+        quantity = row[Option[Int]](idx + 7),
+        actualcost = row[Option[BigDecimal]](idx + 8),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[ThaViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ThaViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            transactionid = json.\("transactionid").toOption.map(_.as[TransactionhistoryarchiveId]),
-            productid = json.\("productid").toOption.map(_.as[Int]),
-            referenceorderid = json.\("referenceorderid").toOption.map(_.as[Int]),
-            referenceorderlineid = json.\("referenceorderlineid").toOption.map(_.as[Int]),
-            transactiondate = json.\("transactiondate").toOption.map(_.as[LocalDateTime]),
-            transactiontype = json.\("transactiontype").toOption.map(_.as[/* bpchar */ String]),
-            quantity = json.\("quantity").toOption.map(_.as[Int]),
-            actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ThaViewRow] = OWrites[ThaViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "transactionid" -> Json.toJson(o.transactionid),
+      "productid" -> Json.toJson(o.productid),
+      "referenceorderid" -> Json.toJson(o.referenceorderid),
+      "referenceorderlineid" -> Json.toJson(o.referenceorderlineid),
+      "transactiondate" -> Json.toJson(o.transactiondate),
+      "transactiontype" -> Json.toJson(o.transactiontype),
+      "quantity" -> Json.toJson(o.quantity),
+      "actualcost" -> Json.toJson(o.actualcost),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

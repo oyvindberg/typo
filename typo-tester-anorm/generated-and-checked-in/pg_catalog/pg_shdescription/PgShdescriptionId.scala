@@ -11,29 +11,28 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `pg_catalog.pg_shdescription` */
 case class PgShdescriptionId(objoid: /* oid */ Long, classoid: /* oid */ Long)
 object PgShdescriptionId {
   implicit val ordering: Ordering[PgShdescriptionId] = Ordering.by(x => (x.objoid, x.classoid))
-  implicit val oFormat: OFormat[PgShdescriptionId] = new OFormat[PgShdescriptionId]{
-    override def writes(o: PgShdescriptionId): JsObject =
-      Json.obj(
-        "objoid" -> o.objoid,
-        "classoid" -> o.classoid
-      )
-  
-    override def reads(json: JsValue): JsResult[PgShdescriptionId] = {
-      JsResult.fromTry(
-        Try(
-          PgShdescriptionId(
-            objoid = json.\("objoid").as[/* oid */ Long],
-            classoid = json.\("classoid").as[/* oid */ Long]
-          )
+  implicit val reads: Reads[PgShdescriptionId] = Reads[PgShdescriptionId](json => JsResult.fromTry(
+      Try(
+        PgShdescriptionId(
+          objoid = json.\("objoid").as[/* oid */ Long],
+          classoid = json.\("classoid").as[/* oid */ Long]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PgShdescriptionId] = OWrites[PgShdescriptionId](o =>
+    new JsObject(ListMap[String, JsValue](
+      "objoid" -> Json.toJson(o.objoid),
+      "classoid" -> Json.toJson(o.classoid)
+    ))
+  )
 }

@@ -10,19 +10,20 @@ package shift
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `humanresources.shift` */
 case class ShiftId(value: Int) extends AnyVal
 object ShiftId {
-  implicit val ordering: Ordering[ShiftId] = Ordering.by(_.value)
-  implicit val format: Format[ShiftId] = implicitly[Format[Int]].bimap(ShiftId.apply, _.value)
-  implicit val toStatement: ToStatement[ShiftId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[ShiftId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[ShiftId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[ShiftId] = implicitly[Column[Int]].map(ShiftId.apply)
+  implicit val ordering: Ordering[ShiftId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[ShiftId] = new ParameterMetaData[ShiftId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[ShiftId] = implicitly[Reads[Int]].map(ShiftId.apply)
+  implicit val toStatement: ToStatement[ShiftId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[ShiftId] = implicitly[Writes[Int]].contramap(_.value)
 }

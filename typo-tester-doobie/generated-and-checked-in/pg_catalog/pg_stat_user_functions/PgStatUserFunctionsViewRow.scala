@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_stat_user_functions
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgStatUserFunctionsViewRow(
@@ -26,46 +24,24 @@ case class PgStatUserFunctionsViewRow(
 )
 
 object PgStatUserFunctionsViewRow {
-  implicit val decoder: Decoder[PgStatUserFunctionsViewRow] =
-    (c: HCursor) =>
-      for {
-        funcid <- c.downField("funcid").as[Option[/* oid */ Long]]
-        schemaname <- c.downField("schemaname").as[Option[String]]
-        funcname <- c.downField("funcname").as[Option[String]]
-        calls <- c.downField("calls").as[Option[Long]]
-        totalTime <- c.downField("total_time").as[Option[Double]]
-        selfTime <- c.downField("self_time").as[Option[Double]]
-      } yield PgStatUserFunctionsViewRow(funcid, schemaname, funcname, calls, totalTime, selfTime)
-  implicit val encoder: Encoder[PgStatUserFunctionsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "funcid" := row.funcid,
-        "schemaname" := row.schemaname,
-        "funcname" := row.funcname,
-        "calls" := row.calls,
-        "total_time" := row.totalTime,
-        "self_time" := row.selfTime
-      )}
-  implicit val read: Read[PgStatUserFunctionsViewRow] =
-    new Read[PgStatUserFunctionsViewRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatUserFunctionsViewRow(
-        funcid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
-        schemaname = Get[String].unsafeGetNullable(rs, i + 1),
-        funcname = Get[String].unsafeGetNullable(rs, i + 2),
-        calls = Get[Long].unsafeGetNullable(rs, i + 3),
-        totalTime = Get[Double].unsafeGetNullable(rs, i + 4),
-        selfTime = Get[Double].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PgStatUserFunctionsViewRow] = Decoder.forProduct6[PgStatUserFunctionsViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Double], Option[Double]]("funcid", "schemaname", "funcname", "calls", "total_time", "self_time")(PgStatUserFunctionsViewRow.apply)
+  implicit val encoder: Encoder[PgStatUserFunctionsViewRow] = Encoder.forProduct6[PgStatUserFunctionsViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Double], Option[Double]]("funcid", "schemaname", "funcname", "calls", "total_time", "self_time")(x => (x.funcid, x.schemaname, x.funcname, x.calls, x.totalTime, x.selfTime))
+  implicit val read: Read[PgStatUserFunctionsViewRow] = new Read[PgStatUserFunctionsViewRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatUserFunctionsViewRow(
+      funcid = Get[/* oid */ Long].unsafeGetNullable(rs, i + 0),
+      schemaname = Get[String].unsafeGetNullable(rs, i + 1),
+      funcname = Get[String].unsafeGetNullable(rs, i + 2),
+      calls = Get[Long].unsafeGetNullable(rs, i + 3),
+      totalTime = Get[Double].unsafeGetNullable(rs, i + 4),
+      selfTime = Get[Double].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

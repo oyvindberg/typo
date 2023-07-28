@@ -7,16 +7,18 @@ package adventureworks
 package pr
 package pmi
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PmiViewRow(
@@ -25,38 +27,34 @@ case class PmiViewRow(
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
   illustrationid: Option[IllustrationId],
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PmiViewRow {
-  def rowParser(idx: Int): RowParser[PmiViewRow] =
-    RowParser[PmiViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PmiViewRow] = Reads[PmiViewRow](json => JsResult.fromTry(
+      Try(
         PmiViewRow(
-          productmodelid = row[Option[ProductmodelId]](idx + 0),
-          illustrationid = row[Option[IllustrationId]](idx + 1),
-          modifieddate = row[Option[LocalDateTime]](idx + 2)
+          productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
+          illustrationid = json.\("illustrationid").toOption.map(_.as[IllustrationId]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PmiViewRow] = new OFormat[PmiViewRow]{
-    override def writes(o: PmiViewRow): JsObject =
-      Json.obj(
-        "productmodelid" -> o.productmodelid,
-        "illustrationid" -> o.illustrationid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PmiViewRow] = RowParser[PmiViewRow] { row =>
+    Success(
+      PmiViewRow(
+        productmodelid = row[Option[ProductmodelId]](idx + 0),
+        illustrationid = row[Option[IllustrationId]](idx + 1),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[PmiViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PmiViewRow(
-            productmodelid = json.\("productmodelid").toOption.map(_.as[ProductmodelId]),
-            illustrationid = json.\("illustrationid").toOption.map(_.as[IllustrationId]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PmiViewRow] = OWrites[PmiViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "productmodelid" -> Json.toJson(o.productmodelid),
+      "illustrationid" -> Json.toJson(o.illustrationid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -9,26 +9,11 @@ package pg_description
 
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 
 /** Type for the composite primary key of table `pg_catalog.pg_description` */
 case class PgDescriptionId(objoid: /* oid */ Long, classoid: /* oid */ Long, objsubid: Int)
 object PgDescriptionId {
+  implicit val decoder: Decoder[PgDescriptionId] = Decoder.forProduct3[PgDescriptionId, /* oid */ Long, /* oid */ Long, Int]("objoid", "classoid", "objsubid")(PgDescriptionId.apply)
+  implicit val encoder: Encoder[PgDescriptionId] = Encoder.forProduct3[PgDescriptionId, /* oid */ Long, /* oid */ Long, Int]("objoid", "classoid", "objsubid")(x => (x.objoid, x.classoid, x.objsubid))
   implicit val ordering: Ordering[PgDescriptionId] = Ordering.by(x => (x.objoid, x.classoid, x.objsubid))
-  implicit val decoder: Decoder[PgDescriptionId] =
-    (c: HCursor) =>
-      for {
-        objoid <- c.downField("objoid").as[/* oid */ Long]
-        classoid <- c.downField("classoid").as[/* oid */ Long]
-        objsubid <- c.downField("objsubid").as[Int]
-      } yield PgDescriptionId(objoid, classoid, objsubid)
-  implicit val encoder: Encoder[PgDescriptionId] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "objoid" := row.objoid,
-        "classoid" := row.classoid,
-        "objsubid" := row.objsubid
-      )}
 }

@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatisticRow(
@@ -54,118 +56,114 @@ case class PgStatisticRow(
  }
 
 object PgStatisticRow {
-  def rowParser(idx: Int): RowParser[PgStatisticRow] =
-    RowParser[PgStatisticRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatisticRow] = Reads[PgStatisticRow](json => JsResult.fromTry(
+      Try(
         PgStatisticRow(
-          starelid = row[/* oid */ Long](idx + 0),
-          staattnum = row[Int](idx + 1),
-          stainherit = row[Boolean](idx + 2),
-          stanullfrac = row[Float](idx + 3),
-          stawidth = row[Int](idx + 4),
-          stadistinct = row[Float](idx + 5),
-          stakind1 = row[Int](idx + 6),
-          stakind2 = row[Int](idx + 7),
-          stakind3 = row[Int](idx + 8),
-          stakind4 = row[Int](idx + 9),
-          stakind5 = row[Int](idx + 10),
-          staop1 = row[/* oid */ Long](idx + 11),
-          staop2 = row[/* oid */ Long](idx + 12),
-          staop3 = row[/* oid */ Long](idx + 13),
-          staop4 = row[/* oid */ Long](idx + 14),
-          staop5 = row[/* oid */ Long](idx + 15),
-          stacoll1 = row[/* oid */ Long](idx + 16),
-          stacoll2 = row[/* oid */ Long](idx + 17),
-          stacoll3 = row[/* oid */ Long](idx + 18),
-          stacoll4 = row[/* oid */ Long](idx + 19),
-          stacoll5 = row[/* oid */ Long](idx + 20),
-          stanumbers1 = row[Option[Array[Float]]](idx + 21),
-          stanumbers2 = row[Option[Array[Float]]](idx + 22),
-          stanumbers3 = row[Option[Array[Float]]](idx + 23),
-          stanumbers4 = row[Option[Array[Float]]](idx + 24),
-          stanumbers5 = row[Option[Array[Float]]](idx + 25),
-          stavalues1 = row[Option[TypoAnyArray]](idx + 26),
-          stavalues2 = row[Option[TypoAnyArray]](idx + 27),
-          stavalues3 = row[Option[TypoAnyArray]](idx + 28),
-          stavalues4 = row[Option[TypoAnyArray]](idx + 29),
-          stavalues5 = row[Option[TypoAnyArray]](idx + 30)
+          starelid = json.\("starelid").as[/* oid */ Long],
+          staattnum = json.\("staattnum").as[Int],
+          stainherit = json.\("stainherit").as[Boolean],
+          stanullfrac = json.\("stanullfrac").as[Float],
+          stawidth = json.\("stawidth").as[Int],
+          stadistinct = json.\("stadistinct").as[Float],
+          stakind1 = json.\("stakind1").as[Int],
+          stakind2 = json.\("stakind2").as[Int],
+          stakind3 = json.\("stakind3").as[Int],
+          stakind4 = json.\("stakind4").as[Int],
+          stakind5 = json.\("stakind5").as[Int],
+          staop1 = json.\("staop1").as[/* oid */ Long],
+          staop2 = json.\("staop2").as[/* oid */ Long],
+          staop3 = json.\("staop3").as[/* oid */ Long],
+          staop4 = json.\("staop4").as[/* oid */ Long],
+          staop5 = json.\("staop5").as[/* oid */ Long],
+          stacoll1 = json.\("stacoll1").as[/* oid */ Long],
+          stacoll2 = json.\("stacoll2").as[/* oid */ Long],
+          stacoll3 = json.\("stacoll3").as[/* oid */ Long],
+          stacoll4 = json.\("stacoll4").as[/* oid */ Long],
+          stacoll5 = json.\("stacoll5").as[/* oid */ Long],
+          stanumbers1 = json.\("stanumbers1").toOption.map(_.as[Array[Float]]),
+          stanumbers2 = json.\("stanumbers2").toOption.map(_.as[Array[Float]]),
+          stanumbers3 = json.\("stanumbers3").toOption.map(_.as[Array[Float]]),
+          stanumbers4 = json.\("stanumbers4").toOption.map(_.as[Array[Float]]),
+          stanumbers5 = json.\("stanumbers5").toOption.map(_.as[Array[Float]]),
+          stavalues1 = json.\("stavalues1").toOption.map(_.as[TypoAnyArray]),
+          stavalues2 = json.\("stavalues2").toOption.map(_.as[TypoAnyArray]),
+          stavalues3 = json.\("stavalues3").toOption.map(_.as[TypoAnyArray]),
+          stavalues4 = json.\("stavalues4").toOption.map(_.as[TypoAnyArray]),
+          stavalues5 = json.\("stavalues5").toOption.map(_.as[TypoAnyArray])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatisticRow] = new OFormat[PgStatisticRow]{
-    override def writes(o: PgStatisticRow): JsObject =
-      Json.obj(
-        "starelid" -> o.starelid,
-        "staattnum" -> o.staattnum,
-        "stainherit" -> o.stainherit,
-        "stanullfrac" -> o.stanullfrac,
-        "stawidth" -> o.stawidth,
-        "stadistinct" -> o.stadistinct,
-        "stakind1" -> o.stakind1,
-        "stakind2" -> o.stakind2,
-        "stakind3" -> o.stakind3,
-        "stakind4" -> o.stakind4,
-        "stakind5" -> o.stakind5,
-        "staop1" -> o.staop1,
-        "staop2" -> o.staop2,
-        "staop3" -> o.staop3,
-        "staop4" -> o.staop4,
-        "staop5" -> o.staop5,
-        "stacoll1" -> o.stacoll1,
-        "stacoll2" -> o.stacoll2,
-        "stacoll3" -> o.stacoll3,
-        "stacoll4" -> o.stacoll4,
-        "stacoll5" -> o.stacoll5,
-        "stanumbers1" -> o.stanumbers1,
-        "stanumbers2" -> o.stanumbers2,
-        "stanumbers3" -> o.stanumbers3,
-        "stanumbers4" -> o.stanumbers4,
-        "stanumbers5" -> o.stanumbers5,
-        "stavalues1" -> o.stavalues1,
-        "stavalues2" -> o.stavalues2,
-        "stavalues3" -> o.stavalues3,
-        "stavalues4" -> o.stavalues4,
-        "stavalues5" -> o.stavalues5
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatisticRow] = RowParser[PgStatisticRow] { row =>
+    Success(
+      PgStatisticRow(
+        starelid = row[/* oid */ Long](idx + 0),
+        staattnum = row[Int](idx + 1),
+        stainherit = row[Boolean](idx + 2),
+        stanullfrac = row[Float](idx + 3),
+        stawidth = row[Int](idx + 4),
+        stadistinct = row[Float](idx + 5),
+        stakind1 = row[Int](idx + 6),
+        stakind2 = row[Int](idx + 7),
+        stakind3 = row[Int](idx + 8),
+        stakind4 = row[Int](idx + 9),
+        stakind5 = row[Int](idx + 10),
+        staop1 = row[/* oid */ Long](idx + 11),
+        staop2 = row[/* oid */ Long](idx + 12),
+        staop3 = row[/* oid */ Long](idx + 13),
+        staop4 = row[/* oid */ Long](idx + 14),
+        staop5 = row[/* oid */ Long](idx + 15),
+        stacoll1 = row[/* oid */ Long](idx + 16),
+        stacoll2 = row[/* oid */ Long](idx + 17),
+        stacoll3 = row[/* oid */ Long](idx + 18),
+        stacoll4 = row[/* oid */ Long](idx + 19),
+        stacoll5 = row[/* oid */ Long](idx + 20),
+        stanumbers1 = row[Option[Array[Float]]](idx + 21),
+        stanumbers2 = row[Option[Array[Float]]](idx + 22),
+        stanumbers3 = row[Option[Array[Float]]](idx + 23),
+        stanumbers4 = row[Option[Array[Float]]](idx + 24),
+        stanumbers5 = row[Option[Array[Float]]](idx + 25),
+        stavalues1 = row[Option[TypoAnyArray]](idx + 26),
+        stavalues2 = row[Option[TypoAnyArray]](idx + 27),
+        stavalues3 = row[Option[TypoAnyArray]](idx + 28),
+        stavalues4 = row[Option[TypoAnyArray]](idx + 29),
+        stavalues5 = row[Option[TypoAnyArray]](idx + 30)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatisticRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatisticRow(
-            starelid = json.\("starelid").as[/* oid */ Long],
-            staattnum = json.\("staattnum").as[Int],
-            stainherit = json.\("stainherit").as[Boolean],
-            stanullfrac = json.\("stanullfrac").as[Float],
-            stawidth = json.\("stawidth").as[Int],
-            stadistinct = json.\("stadistinct").as[Float],
-            stakind1 = json.\("stakind1").as[Int],
-            stakind2 = json.\("stakind2").as[Int],
-            stakind3 = json.\("stakind3").as[Int],
-            stakind4 = json.\("stakind4").as[Int],
-            stakind5 = json.\("stakind5").as[Int],
-            staop1 = json.\("staop1").as[/* oid */ Long],
-            staop2 = json.\("staop2").as[/* oid */ Long],
-            staop3 = json.\("staop3").as[/* oid */ Long],
-            staop4 = json.\("staop4").as[/* oid */ Long],
-            staop5 = json.\("staop5").as[/* oid */ Long],
-            stacoll1 = json.\("stacoll1").as[/* oid */ Long],
-            stacoll2 = json.\("stacoll2").as[/* oid */ Long],
-            stacoll3 = json.\("stacoll3").as[/* oid */ Long],
-            stacoll4 = json.\("stacoll4").as[/* oid */ Long],
-            stacoll5 = json.\("stacoll5").as[/* oid */ Long],
-            stanumbers1 = json.\("stanumbers1").toOption.map(_.as[Array[Float]]),
-            stanumbers2 = json.\("stanumbers2").toOption.map(_.as[Array[Float]]),
-            stanumbers3 = json.\("stanumbers3").toOption.map(_.as[Array[Float]]),
-            stanumbers4 = json.\("stanumbers4").toOption.map(_.as[Array[Float]]),
-            stanumbers5 = json.\("stanumbers5").toOption.map(_.as[Array[Float]]),
-            stavalues1 = json.\("stavalues1").toOption.map(_.as[TypoAnyArray]),
-            stavalues2 = json.\("stavalues2").toOption.map(_.as[TypoAnyArray]),
-            stavalues3 = json.\("stavalues3").toOption.map(_.as[TypoAnyArray]),
-            stavalues4 = json.\("stavalues4").toOption.map(_.as[TypoAnyArray]),
-            stavalues5 = json.\("stavalues5").toOption.map(_.as[TypoAnyArray])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatisticRow] = OWrites[PgStatisticRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "starelid" -> Json.toJson(o.starelid),
+      "staattnum" -> Json.toJson(o.staattnum),
+      "stainherit" -> Json.toJson(o.stainherit),
+      "stanullfrac" -> Json.toJson(o.stanullfrac),
+      "stawidth" -> Json.toJson(o.stawidth),
+      "stadistinct" -> Json.toJson(o.stadistinct),
+      "stakind1" -> Json.toJson(o.stakind1),
+      "stakind2" -> Json.toJson(o.stakind2),
+      "stakind3" -> Json.toJson(o.stakind3),
+      "stakind4" -> Json.toJson(o.stakind4),
+      "stakind5" -> Json.toJson(o.stakind5),
+      "staop1" -> Json.toJson(o.staop1),
+      "staop2" -> Json.toJson(o.staop2),
+      "staop3" -> Json.toJson(o.staop3),
+      "staop4" -> Json.toJson(o.staop4),
+      "staop5" -> Json.toJson(o.staop5),
+      "stacoll1" -> Json.toJson(o.stacoll1),
+      "stacoll2" -> Json.toJson(o.stacoll2),
+      "stacoll3" -> Json.toJson(o.stacoll3),
+      "stacoll4" -> Json.toJson(o.stacoll4),
+      "stacoll5" -> Json.toJson(o.stacoll5),
+      "stanumbers1" -> Json.toJson(o.stanumbers1),
+      "stanumbers2" -> Json.toJson(o.stanumbers2),
+      "stanumbers3" -> Json.toJson(o.stanumbers3),
+      "stanumbers4" -> Json.toJson(o.stanumbers4),
+      "stanumbers5" -> Json.toJson(o.stanumbers5),
+      "stavalues1" -> Json.toJson(o.stavalues1),
+      "stavalues2" -> Json.toJson(o.stavalues2),
+      "stavalues3" -> Json.toJson(o.stavalues3),
+      "stavalues4" -> Json.toJson(o.stavalues4),
+      "stavalues5" -> Json.toJson(o.stavalues5)
+    ))
+  )
 }

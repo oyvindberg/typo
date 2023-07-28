@@ -8,16 +8,18 @@ package humanresources
 package employeedepartmenthistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import java.time.LocalDate
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `humanresources.employeedepartmenthistory` which has not been persisted yet */
@@ -32,13 +34,13 @@ case class EmployeedepartmenthistoryRowUnsaved(
       Points to [[shift.ShiftRow.shiftid]] */
   shiftid: ShiftId,
   /** Date the employee started work in the department. */
-  startdate: LocalDate,
+  startdate: TypoLocalDate,
   /** Date the employee left the department. NULL = Current department. */
-  enddate: Option[LocalDate],
+  enddate: Option[TypoLocalDate],
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(modifieddateDefault: => LocalDateTime): EmployeedepartmenthistoryRow =
+  def toRow(modifieddateDefault: => TypoLocalDateTime): EmployeedepartmenthistoryRow =
     EmployeedepartmenthistoryRow(
       businessentityid = businessentityid,
       departmentid = departmentid,
@@ -52,30 +54,27 @@ case class EmployeedepartmenthistoryRowUnsaved(
     )
 }
 object EmployeedepartmenthistoryRowUnsaved {
-  implicit val oFormat: OFormat[EmployeedepartmenthistoryRowUnsaved] = new OFormat[EmployeedepartmenthistoryRowUnsaved]{
-    override def writes(o: EmployeedepartmenthistoryRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "departmentid" -> o.departmentid,
-        "shiftid" -> o.shiftid,
-        "startdate" -> o.startdate,
-        "enddate" -> o.enddate,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[EmployeedepartmenthistoryRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          EmployeedepartmenthistoryRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            departmentid = json.\("departmentid").as[DepartmentId],
-            shiftid = json.\("shiftid").as[ShiftId],
-            startdate = json.\("startdate").as[LocalDate],
-            enddate = json.\("enddate").toOption.map(_.as[LocalDate]),
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[EmployeedepartmenthistoryRowUnsaved] = Reads[EmployeedepartmenthistoryRowUnsaved](json => JsResult.fromTry(
+      Try(
+        EmployeedepartmenthistoryRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          departmentid = json.\("departmentid").as[DepartmentId],
+          shiftid = json.\("shiftid").as[ShiftId],
+          startdate = json.\("startdate").as[TypoLocalDate],
+          enddate = json.\("enddate").toOption.map(_.as[TypoLocalDate]),
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[EmployeedepartmenthistoryRowUnsaved] = OWrites[EmployeedepartmenthistoryRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "departmentid" -> Json.toJson(o.departmentid),
+      "shiftid" -> Json.toJson(o.shiftid),
+      "startdate" -> Json.toJson(o.startdate),
+      "enddate" -> Json.toJson(o.enddate),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

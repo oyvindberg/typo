@@ -7,15 +7,13 @@ package adventureworks
 package pg_catalog
 package pg_stat_wal
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.OffsetDateTime
 
 case class PgStatWalViewRow(
   walRecords: Option[Long],
@@ -26,62 +24,34 @@ case class PgStatWalViewRow(
   walSync: Option[Long],
   walWriteTime: Option[Double],
   walSyncTime: Option[Double],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatWalViewRow {
-  implicit val decoder: Decoder[PgStatWalViewRow] =
-    (c: HCursor) =>
-      for {
-        walRecords <- c.downField("wal_records").as[Option[Long]]
-        walFpi <- c.downField("wal_fpi").as[Option[Long]]
-        walBytes <- c.downField("wal_bytes").as[Option[BigDecimal]]
-        walBuffersFull <- c.downField("wal_buffers_full").as[Option[Long]]
-        walWrite <- c.downField("wal_write").as[Option[Long]]
-        walSync <- c.downField("wal_sync").as[Option[Long]]
-        walWriteTime <- c.downField("wal_write_time").as[Option[Double]]
-        walSyncTime <- c.downField("wal_sync_time").as[Option[Double]]
-        statsReset <- c.downField("stats_reset").as[Option[OffsetDateTime]]
-      } yield PgStatWalViewRow(walRecords, walFpi, walBytes, walBuffersFull, walWrite, walSync, walWriteTime, walSyncTime, statsReset)
-  implicit val encoder: Encoder[PgStatWalViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "wal_records" := row.walRecords,
-        "wal_fpi" := row.walFpi,
-        "wal_bytes" := row.walBytes,
-        "wal_buffers_full" := row.walBuffersFull,
-        "wal_write" := row.walWrite,
-        "wal_sync" := row.walSync,
-        "wal_write_time" := row.walWriteTime,
-        "wal_sync_time" := row.walSyncTime,
-        "stats_reset" := row.statsReset
-      )}
-  implicit val read: Read[PgStatWalViewRow] =
-    new Read[PgStatWalViewRow](
-      gets = List(
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Long], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[Double], Nullability.Nullable),
-        (Get[OffsetDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgStatWalViewRow(
-        walRecords = Get[Long].unsafeGetNullable(rs, i + 0),
-        walFpi = Get[Long].unsafeGetNullable(rs, i + 1),
-        walBytes = Get[BigDecimal].unsafeGetNullable(rs, i + 2),
-        walBuffersFull = Get[Long].unsafeGetNullable(rs, i + 3),
-        walWrite = Get[Long].unsafeGetNullable(rs, i + 4),
-        walSync = Get[Long].unsafeGetNullable(rs, i + 5),
-        walWriteTime = Get[Double].unsafeGetNullable(rs, i + 6),
-        walSyncTime = Get[Double].unsafeGetNullable(rs, i + 7),
-        statsReset = Get[OffsetDateTime].unsafeGetNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PgStatWalViewRow] = Decoder.forProduct9[PgStatWalViewRow, Option[Long], Option[Long], Option[BigDecimal], Option[Long], Option[Long], Option[Long], Option[Double], Option[Double], Option[TypoOffsetDateTime]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(PgStatWalViewRow.apply)
+  implicit val encoder: Encoder[PgStatWalViewRow] = Encoder.forProduct9[PgStatWalViewRow, Option[Long], Option[Long], Option[BigDecimal], Option[Long], Option[Long], Option[Long], Option[Double], Option[Double], Option[TypoOffsetDateTime]]("wal_records", "wal_fpi", "wal_bytes", "wal_buffers_full", "wal_write", "wal_sync", "wal_write_time", "wal_sync_time", "stats_reset")(x => (x.walRecords, x.walFpi, x.walBytes, x.walBuffersFull, x.walWrite, x.walSync, x.walWriteTime, x.walSyncTime, x.statsReset))
+  implicit val read: Read[PgStatWalViewRow] = new Read[PgStatWalViewRow](
+    gets = List(
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Long], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[Double], Nullability.Nullable),
+      (Get[TypoOffsetDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgStatWalViewRow(
+      walRecords = Get[Long].unsafeGetNullable(rs, i + 0),
+      walFpi = Get[Long].unsafeGetNullable(rs, i + 1),
+      walBytes = Get[BigDecimal].unsafeGetNullable(rs, i + 2),
+      walBuffersFull = Get[Long].unsafeGetNullable(rs, i + 3),
+      walWrite = Get[Long].unsafeGetNullable(rs, i + 4),
+      walSync = Get[Long].unsafeGetNullable(rs, i + 5),
+      walWriteTime = Get[Double].unsafeGetNullable(rs, i + 6),
+      walSyncTime = Get[Double].unsafeGetNullable(rs, i + 7),
+      statsReset = Get[TypoOffsetDateTime].unsafeGetNullable(rs, i + 8)
     )
-  
-
+  )
 }

@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SqlFeaturesRow(
@@ -29,46 +31,42 @@ case class SqlFeaturesRow(
 )
 
 object SqlFeaturesRow {
-  def rowParser(idx: Int): RowParser[SqlFeaturesRow] =
-    RowParser[SqlFeaturesRow] { row =>
-      Success(
+  implicit val reads: Reads[SqlFeaturesRow] = Reads[SqlFeaturesRow](json => JsResult.fromTry(
+      Try(
         SqlFeaturesRow(
-          featureId = row[Option[CharacterData]](idx + 0),
-          featureName = row[Option[CharacterData]](idx + 1),
-          subFeatureId = row[Option[CharacterData]](idx + 2),
-          subFeatureName = row[Option[CharacterData]](idx + 3),
-          isSupported = row[Option[YesOrNo]](idx + 4),
-          isVerifiedBy = row[Option[CharacterData]](idx + 5),
-          comments = row[Option[CharacterData]](idx + 6)
+          featureId = json.\("feature_id").toOption.map(_.as[CharacterData]),
+          featureName = json.\("feature_name").toOption.map(_.as[CharacterData]),
+          subFeatureId = json.\("sub_feature_id").toOption.map(_.as[CharacterData]),
+          subFeatureName = json.\("sub_feature_name").toOption.map(_.as[CharacterData]),
+          isSupported = json.\("is_supported").toOption.map(_.as[YesOrNo]),
+          isVerifiedBy = json.\("is_verified_by").toOption.map(_.as[CharacterData]),
+          comments = json.\("comments").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[SqlFeaturesRow] = new OFormat[SqlFeaturesRow]{
-    override def writes(o: SqlFeaturesRow): JsObject =
-      Json.obj(
-        "feature_id" -> o.featureId,
-        "feature_name" -> o.featureName,
-        "sub_feature_id" -> o.subFeatureId,
-        "sub_feature_name" -> o.subFeatureName,
-        "is_supported" -> o.isSupported,
-        "is_verified_by" -> o.isVerifiedBy,
-        "comments" -> o.comments
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SqlFeaturesRow] = RowParser[SqlFeaturesRow] { row =>
+    Success(
+      SqlFeaturesRow(
+        featureId = row[Option[CharacterData]](idx + 0),
+        featureName = row[Option[CharacterData]](idx + 1),
+        subFeatureId = row[Option[CharacterData]](idx + 2),
+        subFeatureName = row[Option[CharacterData]](idx + 3),
+        isSupported = row[Option[YesOrNo]](idx + 4),
+        isVerifiedBy = row[Option[CharacterData]](idx + 5),
+        comments = row[Option[CharacterData]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[SqlFeaturesRow] = {
-      JsResult.fromTry(
-        Try(
-          SqlFeaturesRow(
-            featureId = json.\("feature_id").toOption.map(_.as[CharacterData]),
-            featureName = json.\("feature_name").toOption.map(_.as[CharacterData]),
-            subFeatureId = json.\("sub_feature_id").toOption.map(_.as[CharacterData]),
-            subFeatureName = json.\("sub_feature_name").toOption.map(_.as[CharacterData]),
-            isSupported = json.\("is_supported").toOption.map(_.as[YesOrNo]),
-            isVerifiedBy = json.\("is_verified_by").toOption.map(_.as[CharacterData]),
-            comments = json.\("comments").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SqlFeaturesRow] = OWrites[SqlFeaturesRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "feature_id" -> Json.toJson(o.featureId),
+      "feature_name" -> Json.toJson(o.featureName),
+      "sub_feature_id" -> Json.toJson(o.subFeatureId),
+      "sub_feature_name" -> Json.toJson(o.subFeatureName),
+      "is_supported" -> Json.toJson(o.isSupported),
+      "is_verified_by" -> Json.toJson(o.isVerifiedBy),
+      "comments" -> Json.toJson(o.comments)
+    ))
+  )
 }

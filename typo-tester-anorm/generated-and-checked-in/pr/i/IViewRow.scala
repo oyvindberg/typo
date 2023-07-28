@@ -7,16 +7,18 @@ package adventureworks
 package pr
 package i
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class IViewRow(
@@ -26,41 +28,37 @@ case class IViewRow(
   /** Points to [[production.illustration.IllustrationRow.diagram]] */
   diagram: Option[TypoXml],
   /** Points to [[production.illustration.IllustrationRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object IViewRow {
-  def rowParser(idx: Int): RowParser[IViewRow] =
-    RowParser[IViewRow] { row =>
-      Success(
+  implicit val reads: Reads[IViewRow] = Reads[IViewRow](json => JsResult.fromTry(
+      Try(
         IViewRow(
-          id = row[Option[Int]](idx + 0),
-          illustrationid = row[Option[IllustrationId]](idx + 1),
-          diagram = row[Option[TypoXml]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[Int]),
+          illustrationid = json.\("illustrationid").toOption.map(_.as[IllustrationId]),
+          diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[IViewRow] = new OFormat[IViewRow]{
-    override def writes(o: IViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "illustrationid" -> o.illustrationid,
-        "diagram" -> o.diagram,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[IViewRow] = RowParser[IViewRow] { row =>
+    Success(
+      IViewRow(
+        id = row[Option[Int]](idx + 0),
+        illustrationid = row[Option[IllustrationId]](idx + 1),
+        diagram = row[Option[TypoXml]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[IViewRow] = {
-      JsResult.fromTry(
-        Try(
-          IViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            illustrationid = json.\("illustrationid").toOption.map(_.as[IllustrationId]),
-            diagram = json.\("diagram").toOption.map(_.as[TypoXml]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[IViewRow] = OWrites[IViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "illustrationid" -> Json.toJson(o.illustrationid),
+      "diagram" -> Json.toJson(o.diagram),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ForeignDataWrapperOptionsViewRow(
@@ -28,37 +30,33 @@ case class ForeignDataWrapperOptionsViewRow(
 )
 
 object ForeignDataWrapperOptionsViewRow {
-  def rowParser(idx: Int): RowParser[ForeignDataWrapperOptionsViewRow] =
-    RowParser[ForeignDataWrapperOptionsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ForeignDataWrapperOptionsViewRow] = Reads[ForeignDataWrapperOptionsViewRow](json => JsResult.fromTry(
+      Try(
         ForeignDataWrapperOptionsViewRow(
-          foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 0),
-          foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 1),
-          optionName = row[Option[SqlIdentifier]](idx + 2),
-          optionValue = row[Option[CharacterData]](idx + 3)
+          foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
+          foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
+          optionName = json.\("option_name").toOption.map(_.as[SqlIdentifier]),
+          optionValue = json.\("option_value").toOption.map(_.as[CharacterData])
         )
       )
-    }
-  implicit val oFormat: OFormat[ForeignDataWrapperOptionsViewRow] = new OFormat[ForeignDataWrapperOptionsViewRow]{
-    override def writes(o: ForeignDataWrapperOptionsViewRow): JsObject =
-      Json.obj(
-        "foreign_data_wrapper_catalog" -> o.foreignDataWrapperCatalog,
-        "foreign_data_wrapper_name" -> o.foreignDataWrapperName,
-        "option_name" -> o.optionName,
-        "option_value" -> o.optionValue
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ForeignDataWrapperOptionsViewRow] = RowParser[ForeignDataWrapperOptionsViewRow] { row =>
+    Success(
+      ForeignDataWrapperOptionsViewRow(
+        foreignDataWrapperCatalog = row[Option[SqlIdentifier]](idx + 0),
+        foreignDataWrapperName = row[Option[SqlIdentifier]](idx + 1),
+        optionName = row[Option[SqlIdentifier]](idx + 2),
+        optionValue = row[Option[CharacterData]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[ForeignDataWrapperOptionsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ForeignDataWrapperOptionsViewRow(
-            foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as[SqlIdentifier]),
-            foreignDataWrapperName = json.\("foreign_data_wrapper_name").toOption.map(_.as[SqlIdentifier]),
-            optionName = json.\("option_name").toOption.map(_.as[SqlIdentifier]),
-            optionValue = json.\("option_value").toOption.map(_.as[CharacterData])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ForeignDataWrapperOptionsViewRow] = OWrites[ForeignDataWrapperOptionsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "foreign_data_wrapper_catalog" -> Json.toJson(o.foreignDataWrapperCatalog),
+      "foreign_data_wrapper_name" -> Json.toJson(o.foreignDataWrapperName),
+      "option_name" -> Json.toJson(o.optionName),
+      "option_value" -> Json.toJson(o.optionValue)
+    ))
+  )
 }

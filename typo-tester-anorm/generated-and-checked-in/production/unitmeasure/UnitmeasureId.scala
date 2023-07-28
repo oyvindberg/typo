@@ -10,19 +10,20 @@ package unitmeasure
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar */ String) extends AnyVal
 object UnitmeasureId {
-  implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
-  implicit val format: Format[UnitmeasureId] = implicitly[Format[/* bpchar */ String]].bimap(UnitmeasureId.apply, _.value)
-  implicit val toStatement: ToStatement[UnitmeasureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[UnitmeasureId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[UnitmeasureId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
   implicit val column: Column[UnitmeasureId] = implicitly[Column[/* bpchar */ String]].map(UnitmeasureId.apply)
+  implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[UnitmeasureId] = new ParameterMetaData[UnitmeasureId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* bpchar */ String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* bpchar */ String]].jdbcType
   }
-
+  implicit val reads: Reads[UnitmeasureId] = implicitly[Reads[/* bpchar */ String]].map(UnitmeasureId.apply)
+  implicit val toStatement: ToStatement[UnitmeasureId] = implicitly[ToStatement[/* bpchar */ String]].contramap(_.value)
+  implicit val writes: Writes[UnitmeasureId] = implicitly[Writes[/* bpchar */ String]].contramap(_.value)
 }

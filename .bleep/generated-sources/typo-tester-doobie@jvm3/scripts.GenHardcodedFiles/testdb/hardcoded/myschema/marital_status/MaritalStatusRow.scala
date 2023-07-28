@@ -8,13 +8,11 @@ package hardcoded
 package myschema
 package marital_status
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class MaritalStatusRow(
@@ -22,26 +20,14 @@ case class MaritalStatusRow(
 )
 
 object MaritalStatusRow {
-  implicit val decoder: Decoder[MaritalStatusRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[MaritalStatusId]
-      } yield MaritalStatusRow(id)
-  implicit val encoder: Encoder[MaritalStatusRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id
-      )}
-  implicit val read: Read[MaritalStatusRow] =
-    new Read[MaritalStatusRow](
-      gets = List(
-        (Get[MaritalStatusId], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => MaritalStatusRow(
-        id = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 0)
-      )
+  implicit val decoder: Decoder[MaritalStatusRow] = Decoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(MaritalStatusRow.apply)
+  implicit val encoder: Encoder[MaritalStatusRow] = Encoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(x => (x.id))
+  implicit val read: Read[MaritalStatusRow] = new Read[MaritalStatusRow](
+    gets = List(
+      (Get[MaritalStatusId], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => MaritalStatusRow(
+      id = Get[MaritalStatusId].unsafeGetNonNullable(rs, i + 0)
     )
-  
-
+  )
 }

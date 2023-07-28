@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import java.util.HashMap
 import org.postgresql.jdbc.PgArray
@@ -19,71 +16,69 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** The text representation of an hstore, used for input and output, includes zero or more key => value pairs separated by commas */
 case class TypoHStore(value: Map[String, String])
+
 object TypoHStore {
-  implicit val oFormat: OFormat[TypoHStore] = new OFormat[TypoHStore]{
-    override def writes(o: TypoHStore): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoHStore] = {
-      JsResult.fromTry(
-        Try(
-          TypoHStore(
-            value = json.\("value").as[Map[String, String]]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoHStoreDb: ToStatement[TypoHStore] with ParameterMetaData[TypoHStore] with Column[TypoHStore] = new ToStatement[TypoHStore] with ParameterMetaData[TypoHStore] with Column[TypoHStore] {
-    override def sqlType: String = "hstore"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoHStore): Unit =
-      s.setObject(index, {
-                           val b = new HashMap[String, String]
-                           v.value.foreach { case (k, v) => b.put(k, v)}
-                           b
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoHStore] =
-      v match {
-        case v: java.util.Map[_, _] => Right({
-                                               val b = Map.newBuilder[String, String]
-                                               v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
-                                               TypoHStore(b.result())
-                                             })
-        case other => Left(TypeDoesNotMatch(s"Expected instance of java.util.Map[_, _] from JDBC to produce a TypoHStore, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoHStoreDbArray: ToStatement[Array[TypoHStore]] with ParameterMetaData[Array[TypoHStore]] with Column[Array[TypoHStore]] = new ToStatement[Array[TypoHStore]] with ParameterMetaData[Array[TypoHStore]] with Column[Array[TypoHStore]] {
-    override def sqlType: String = "_hstore"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoHStore]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("hstore", v.map(v => {
-                                                                             val b = new HashMap[String, String]
-                                                                             v.value.foreach { case (k, v) => b.put(k, v)}
-                                                                             b
-                                                                           })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoHStore]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoHStore]] = Column.nonNull[Array[TypoHStore]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => {
                                 val b = Map.newBuilder[String, String]
-                                v.asInstanceOf[java.util.Map[_, _]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
+                                v.asInstanceOf[java.util.Map[?, ?]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                                 TypoHStore(b.result())
                               }))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoHStore, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoHStore, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoHStore]] = new ParameterMetaData[Array[TypoHStore]] {
+    override def sqlType: String = "_hstore"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoHStore]] = ToStatement[Array[TypoHStore]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("hstore", v.map(v => {
+                                                                                                                         val b = new HashMap[String, String]
+                                                                                                                         v.value.foreach { case (k, v) => b.put(k, v)}
+                                                                                                                         b
+                                                                                                                       }))))
+  implicit val column: Column[TypoHStore] = Column.nonNull[TypoHStore]((v1: Any, _) =>
+    v1 match {
+      case v: java.util.Map[?, ?] => Right({
+                                             val b = Map.newBuilder[String, String]
+                                             v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
+                                             TypoHStore(b.result())
+                                           })
+      case other => Left(TypeDoesNotMatch(s"Expected instance of java.util.Map[?, ?], got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoHStore] = new ParameterMetaData[TypoHStore] {
+    override def sqlType: String = "hstore"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoHStore] = Reads[TypoHStore](json => JsResult.fromTry(
+      Try(
+        TypoHStore(
+          value = json.\("value").as[Map[String, String]]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoHStore] = ToStatement[TypoHStore]((s, index, v) => s.setObject(index, {
+                                                                val b = new HashMap[String, String]
+                                                                v.value.foreach { case (k, v) => b.put(k, v)}
+                                                                b
+                                                              }))
+  implicit val writes: OWrites[TypoHStore] = OWrites[TypoHStore](o =>
+    new JsObject(ListMap[String, JsValue](
+      "value" -> Json.toJson(o.value)
+    ))
+  )
 }

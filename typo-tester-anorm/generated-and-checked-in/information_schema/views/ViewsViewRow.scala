@@ -16,7 +16,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ViewsViewRow(
@@ -33,55 +35,51 @@ case class ViewsViewRow(
 )
 
 object ViewsViewRow {
-  def rowParser(idx: Int): RowParser[ViewsViewRow] =
-    RowParser[ViewsViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ViewsViewRow] = Reads[ViewsViewRow](json => JsResult.fromTry(
+      Try(
         ViewsViewRow(
-          tableCatalog = row[Option[SqlIdentifier]](idx + 0),
-          tableSchema = row[Option[SqlIdentifier]](idx + 1),
-          tableName = row[Option[SqlIdentifier]](idx + 2),
-          viewDefinition = row[Option[CharacterData]](idx + 3),
-          checkOption = row[Option[CharacterData]](idx + 4),
-          isUpdatable = row[Option[YesOrNo]](idx + 5),
-          isInsertableInto = row[Option[YesOrNo]](idx + 6),
-          isTriggerUpdatable = row[Option[YesOrNo]](idx + 7),
-          isTriggerDeletable = row[Option[YesOrNo]](idx + 8),
-          isTriggerInsertableInto = row[Option[YesOrNo]](idx + 9)
+          tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
+          tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
+          tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
+          viewDefinition = json.\("view_definition").toOption.map(_.as[CharacterData]),
+          checkOption = json.\("check_option").toOption.map(_.as[CharacterData]),
+          isUpdatable = json.\("is_updatable").toOption.map(_.as[YesOrNo]),
+          isInsertableInto = json.\("is_insertable_into").toOption.map(_.as[YesOrNo]),
+          isTriggerUpdatable = json.\("is_trigger_updatable").toOption.map(_.as[YesOrNo]),
+          isTriggerDeletable = json.\("is_trigger_deletable").toOption.map(_.as[YesOrNo]),
+          isTriggerInsertableInto = json.\("is_trigger_insertable_into").toOption.map(_.as[YesOrNo])
         )
       )
-    }
-  implicit val oFormat: OFormat[ViewsViewRow] = new OFormat[ViewsViewRow]{
-    override def writes(o: ViewsViewRow): JsObject =
-      Json.obj(
-        "table_catalog" -> o.tableCatalog,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "view_definition" -> o.viewDefinition,
-        "check_option" -> o.checkOption,
-        "is_updatable" -> o.isUpdatable,
-        "is_insertable_into" -> o.isInsertableInto,
-        "is_trigger_updatable" -> o.isTriggerUpdatable,
-        "is_trigger_deletable" -> o.isTriggerDeletable,
-        "is_trigger_insertable_into" -> o.isTriggerInsertableInto
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ViewsViewRow] = RowParser[ViewsViewRow] { row =>
+    Success(
+      ViewsViewRow(
+        tableCatalog = row[Option[SqlIdentifier]](idx + 0),
+        tableSchema = row[Option[SqlIdentifier]](idx + 1),
+        tableName = row[Option[SqlIdentifier]](idx + 2),
+        viewDefinition = row[Option[CharacterData]](idx + 3),
+        checkOption = row[Option[CharacterData]](idx + 4),
+        isUpdatable = row[Option[YesOrNo]](idx + 5),
+        isInsertableInto = row[Option[YesOrNo]](idx + 6),
+        isTriggerUpdatable = row[Option[YesOrNo]](idx + 7),
+        isTriggerDeletable = row[Option[YesOrNo]](idx + 8),
+        isTriggerInsertableInto = row[Option[YesOrNo]](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[ViewsViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ViewsViewRow(
-            tableCatalog = json.\("table_catalog").toOption.map(_.as[SqlIdentifier]),
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            viewDefinition = json.\("view_definition").toOption.map(_.as[CharacterData]),
-            checkOption = json.\("check_option").toOption.map(_.as[CharacterData]),
-            isUpdatable = json.\("is_updatable").toOption.map(_.as[YesOrNo]),
-            isInsertableInto = json.\("is_insertable_into").toOption.map(_.as[YesOrNo]),
-            isTriggerUpdatable = json.\("is_trigger_updatable").toOption.map(_.as[YesOrNo]),
-            isTriggerDeletable = json.\("is_trigger_deletable").toOption.map(_.as[YesOrNo]),
-            isTriggerInsertableInto = json.\("is_trigger_insertable_into").toOption.map(_.as[YesOrNo])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ViewsViewRow] = OWrites[ViewsViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "table_catalog" -> Json.toJson(o.tableCatalog),
+      "table_schema" -> Json.toJson(o.tableSchema),
+      "table_name" -> Json.toJson(o.tableName),
+      "view_definition" -> Json.toJson(o.viewDefinition),
+      "check_option" -> Json.toJson(o.checkOption),
+      "is_updatable" -> Json.toJson(o.isUpdatable),
+      "is_insertable_into" -> Json.toJson(o.isInsertableInto),
+      "is_trigger_updatable" -> Json.toJson(o.isTriggerUpdatable),
+      "is_trigger_deletable" -> Json.toJson(o.isTriggerDeletable),
+      "is_trigger_insertable_into" -> Json.toJson(o.isTriggerInsertableInto)
+    ))
+  )
 }

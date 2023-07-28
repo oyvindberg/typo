@@ -10,14 +10,16 @@ package pg_type
 import adventureworks.TypoAclItem
 import adventureworks.TypoPgNodeTree
 import adventureworks.TypoRegproc
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
+import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
 import java.sql.ResultSet
+import scala.util.Try
 
 case class PgTypeRow(
   oid: PgTypeId,
@@ -55,150 +57,152 @@ case class PgTypeRow(
 )
 
 object PgTypeRow {
-  implicit val decoder: Decoder[PgTypeRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgTypeId]
-        typname <- c.downField("typname").as[String]
-        typnamespace <- c.downField("typnamespace").as[/* oid */ Long]
-        typowner <- c.downField("typowner").as[/* oid */ Long]
-        typlen <- c.downField("typlen").as[Int]
-        typbyval <- c.downField("typbyval").as[Boolean]
-        typtype <- c.downField("typtype").as[String]
-        typcategory <- c.downField("typcategory").as[String]
-        typispreferred <- c.downField("typispreferred").as[Boolean]
-        typisdefined <- c.downField("typisdefined").as[Boolean]
-        typdelim <- c.downField("typdelim").as[String]
-        typrelid <- c.downField("typrelid").as[/* oid */ Long]
-        typsubscript <- c.downField("typsubscript").as[TypoRegproc]
-        typelem <- c.downField("typelem").as[/* oid */ Long]
-        typarray <- c.downField("typarray").as[/* oid */ Long]
-        typinput <- c.downField("typinput").as[TypoRegproc]
-        typoutput <- c.downField("typoutput").as[TypoRegproc]
-        typreceive <- c.downField("typreceive").as[TypoRegproc]
-        typsend <- c.downField("typsend").as[TypoRegproc]
-        typmodin <- c.downField("typmodin").as[TypoRegproc]
-        typmodout <- c.downField("typmodout").as[TypoRegproc]
-        typanalyze <- c.downField("typanalyze").as[TypoRegproc]
-        typalign <- c.downField("typalign").as[String]
-        typstorage <- c.downField("typstorage").as[String]
-        typnotnull <- c.downField("typnotnull").as[Boolean]
-        typbasetype <- c.downField("typbasetype").as[/* oid */ Long]
-        typtypmod <- c.downField("typtypmod").as[Int]
-        typndims <- c.downField("typndims").as[Int]
-        typcollation <- c.downField("typcollation").as[/* oid */ Long]
-        typdefaultbin <- c.downField("typdefaultbin").as[Option[TypoPgNodeTree]]
-        typdefault <- c.downField("typdefault").as[Option[String]]
-        typacl <- c.downField("typacl").as[Option[Array[TypoAclItem]]]
-      } yield PgTypeRow(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
-  implicit val encoder: Encoder[PgTypeRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "typname" := row.typname,
-        "typnamespace" := row.typnamespace,
-        "typowner" := row.typowner,
-        "typlen" := row.typlen,
-        "typbyval" := row.typbyval,
-        "typtype" := row.typtype,
-        "typcategory" := row.typcategory,
-        "typispreferred" := row.typispreferred,
-        "typisdefined" := row.typisdefined,
-        "typdelim" := row.typdelim,
-        "typrelid" := row.typrelid,
-        "typsubscript" := row.typsubscript,
-        "typelem" := row.typelem,
-        "typarray" := row.typarray,
-        "typinput" := row.typinput,
-        "typoutput" := row.typoutput,
-        "typreceive" := row.typreceive,
-        "typsend" := row.typsend,
-        "typmodin" := row.typmodin,
-        "typmodout" := row.typmodout,
-        "typanalyze" := row.typanalyze,
-        "typalign" := row.typalign,
-        "typstorage" := row.typstorage,
-        "typnotnull" := row.typnotnull,
-        "typbasetype" := row.typbasetype,
-        "typtypmod" := row.typtypmod,
-        "typndims" := row.typndims,
-        "typcollation" := row.typcollation,
-        "typdefaultbin" := row.typdefaultbin,
-        "typdefault" := row.typdefault,
-        "typacl" := row.typacl
-      )}
-  implicit val read: Read[PgTypeRow] =
-    new Read[PgTypeRow](
-      gets = List(
-        (Get[PgTypeId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[TypoRegproc], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[TypoPgNodeTree], Nullability.Nullable),
-        (Get[String], Nullability.Nullable),
-        (Get[Array[TypoAclItem]], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgTypeRow(
-        oid = Get[PgTypeId].unsafeGetNonNullable(rs, i + 0),
-        typname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        typnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        typowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        typlen = Get[Int].unsafeGetNonNullable(rs, i + 4),
-        typbyval = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
-        typtype = Get[String].unsafeGetNonNullable(rs, i + 6),
-        typcategory = Get[String].unsafeGetNonNullable(rs, i + 7),
-        typispreferred = Get[Boolean].unsafeGetNonNullable(rs, i + 8),
-        typisdefined = Get[Boolean].unsafeGetNonNullable(rs, i + 9),
-        typdelim = Get[String].unsafeGetNonNullable(rs, i + 10),
-        typrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 11),
-        typsubscript = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 12),
-        typelem = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 13),
-        typarray = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 14),
-        typinput = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 15),
-        typoutput = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 16),
-        typreceive = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 17),
-        typsend = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 18),
-        typmodin = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 19),
-        typmodout = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 20),
-        typanalyze = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 21),
-        typalign = Get[String].unsafeGetNonNullable(rs, i + 22),
-        typstorage = Get[String].unsafeGetNonNullable(rs, i + 23),
-        typnotnull = Get[Boolean].unsafeGetNonNullable(rs, i + 24),
-        typbasetype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 25),
-        typtypmod = Get[Int].unsafeGetNonNullable(rs, i + 26),
-        typndims = Get[Int].unsafeGetNonNullable(rs, i + 27),
-        typcollation = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 28),
-        typdefaultbin = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 29),
-        typdefault = Get[String].unsafeGetNullable(rs, i + 30),
-        typacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 31)
+  implicit val decoder: Decoder[PgTypeRow] = Decoder.instanceTry[PgTypeRow]((c: HCursor) =>
+    Try {
+      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+        case Left(err) => throw err
+        case Right(r)  => r
+      }
+      PgTypeRow(
+        oid = orThrow(c.get("oid")(Decoder[PgTypeId])),
+        typname = orThrow(c.get("typname")(Decoder[String])),
+        typnamespace = orThrow(c.get("typnamespace")(Decoder[/* oid */ Long])),
+        typowner = orThrow(c.get("typowner")(Decoder[/* oid */ Long])),
+        typlen = orThrow(c.get("typlen")(Decoder[Int])),
+        typbyval = orThrow(c.get("typbyval")(Decoder[Boolean])),
+        typtype = orThrow(c.get("typtype")(Decoder[String])),
+        typcategory = orThrow(c.get("typcategory")(Decoder[String])),
+        typispreferred = orThrow(c.get("typispreferred")(Decoder[Boolean])),
+        typisdefined = orThrow(c.get("typisdefined")(Decoder[Boolean])),
+        typdelim = orThrow(c.get("typdelim")(Decoder[String])),
+        typrelid = orThrow(c.get("typrelid")(Decoder[/* oid */ Long])),
+        typsubscript = orThrow(c.get("typsubscript")(Decoder[TypoRegproc])),
+        typelem = orThrow(c.get("typelem")(Decoder[/* oid */ Long])),
+        typarray = orThrow(c.get("typarray")(Decoder[/* oid */ Long])),
+        typinput = orThrow(c.get("typinput")(Decoder[TypoRegproc])),
+        typoutput = orThrow(c.get("typoutput")(Decoder[TypoRegproc])),
+        typreceive = orThrow(c.get("typreceive")(Decoder[TypoRegproc])),
+        typsend = orThrow(c.get("typsend")(Decoder[TypoRegproc])),
+        typmodin = orThrow(c.get("typmodin")(Decoder[TypoRegproc])),
+        typmodout = orThrow(c.get("typmodout")(Decoder[TypoRegproc])),
+        typanalyze = orThrow(c.get("typanalyze")(Decoder[TypoRegproc])),
+        typalign = orThrow(c.get("typalign")(Decoder[String])),
+        typstorage = orThrow(c.get("typstorage")(Decoder[String])),
+        typnotnull = orThrow(c.get("typnotnull")(Decoder[Boolean])),
+        typbasetype = orThrow(c.get("typbasetype")(Decoder[/* oid */ Long])),
+        typtypmod = orThrow(c.get("typtypmod")(Decoder[Int])),
+        typndims = orThrow(c.get("typndims")(Decoder[Int])),
+        typcollation = orThrow(c.get("typcollation")(Decoder[/* oid */ Long])),
+        typdefaultbin = orThrow(c.get("typdefaultbin")(Decoder[Option[TypoPgNodeTree]])),
+        typdefault = orThrow(c.get("typdefault")(Decoder[Option[String]])),
+        typacl = orThrow(c.get("typacl")(Decoder[Option[Array[TypoAclItem]]]))
       )
+    }
+  )
+  implicit val encoder: Encoder[PgTypeRow] = Encoder[PgTypeRow](row =>
+    Json.obj(
+      "oid" -> Encoder[PgTypeId].apply(row.oid),
+      "typname" -> Encoder[String].apply(row.typname),
+      "typnamespace" -> Encoder[/* oid */ Long].apply(row.typnamespace),
+      "typowner" -> Encoder[/* oid */ Long].apply(row.typowner),
+      "typlen" -> Encoder[Int].apply(row.typlen),
+      "typbyval" -> Encoder[Boolean].apply(row.typbyval),
+      "typtype" -> Encoder[String].apply(row.typtype),
+      "typcategory" -> Encoder[String].apply(row.typcategory),
+      "typispreferred" -> Encoder[Boolean].apply(row.typispreferred),
+      "typisdefined" -> Encoder[Boolean].apply(row.typisdefined),
+      "typdelim" -> Encoder[String].apply(row.typdelim),
+      "typrelid" -> Encoder[/* oid */ Long].apply(row.typrelid),
+      "typsubscript" -> Encoder[TypoRegproc].apply(row.typsubscript),
+      "typelem" -> Encoder[/* oid */ Long].apply(row.typelem),
+      "typarray" -> Encoder[/* oid */ Long].apply(row.typarray),
+      "typinput" -> Encoder[TypoRegproc].apply(row.typinput),
+      "typoutput" -> Encoder[TypoRegproc].apply(row.typoutput),
+      "typreceive" -> Encoder[TypoRegproc].apply(row.typreceive),
+      "typsend" -> Encoder[TypoRegproc].apply(row.typsend),
+      "typmodin" -> Encoder[TypoRegproc].apply(row.typmodin),
+      "typmodout" -> Encoder[TypoRegproc].apply(row.typmodout),
+      "typanalyze" -> Encoder[TypoRegproc].apply(row.typanalyze),
+      "typalign" -> Encoder[String].apply(row.typalign),
+      "typstorage" -> Encoder[String].apply(row.typstorage),
+      "typnotnull" -> Encoder[Boolean].apply(row.typnotnull),
+      "typbasetype" -> Encoder[/* oid */ Long].apply(row.typbasetype),
+      "typtypmod" -> Encoder[Int].apply(row.typtypmod),
+      "typndims" -> Encoder[Int].apply(row.typndims),
+      "typcollation" -> Encoder[/* oid */ Long].apply(row.typcollation),
+      "typdefaultbin" -> Encoder[Option[TypoPgNodeTree]].apply(row.typdefaultbin),
+      "typdefault" -> Encoder[Option[String]].apply(row.typdefault),
+      "typacl" -> Encoder[Option[Array[TypoAclItem]]].apply(row.typacl)
     )
-  
-
+  )
+  implicit val read: Read[PgTypeRow] = new Read[PgTypeRow](
+    gets = List(
+      (Get[PgTypeId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[TypoRegproc], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[TypoPgNodeTree], Nullability.Nullable),
+      (Get[String], Nullability.Nullable),
+      (Get[Array[TypoAclItem]], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgTypeRow(
+      oid = Get[PgTypeId].unsafeGetNonNullable(rs, i + 0),
+      typname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      typnamespace = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      typowner = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      typlen = Get[Int].unsafeGetNonNullable(rs, i + 4),
+      typbyval = Get[Boolean].unsafeGetNonNullable(rs, i + 5),
+      typtype = Get[String].unsafeGetNonNullable(rs, i + 6),
+      typcategory = Get[String].unsafeGetNonNullable(rs, i + 7),
+      typispreferred = Get[Boolean].unsafeGetNonNullable(rs, i + 8),
+      typisdefined = Get[Boolean].unsafeGetNonNullable(rs, i + 9),
+      typdelim = Get[String].unsafeGetNonNullable(rs, i + 10),
+      typrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 11),
+      typsubscript = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 12),
+      typelem = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 13),
+      typarray = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 14),
+      typinput = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 15),
+      typoutput = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 16),
+      typreceive = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 17),
+      typsend = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 18),
+      typmodin = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 19),
+      typmodout = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 20),
+      typanalyze = Get[TypoRegproc].unsafeGetNonNullable(rs, i + 21),
+      typalign = Get[String].unsafeGetNonNullable(rs, i + 22),
+      typstorage = Get[String].unsafeGetNonNullable(rs, i + 23),
+      typnotnull = Get[Boolean].unsafeGetNonNullable(rs, i + 24),
+      typbasetype = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 25),
+      typtypmod = Get[Int].unsafeGetNonNullable(rs, i + 26),
+      typndims = Get[Int].unsafeGetNonNullable(rs, i + 27),
+      typcollation = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 28),
+      typdefaultbin = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 29),
+      typdefault = Get[String].unsafeGetNullable(rs, i + 30),
+      typacl = Get[Array[TypoAclItem]].unsafeGetNullable(rs, i + 31)
+    )
+  )
 }

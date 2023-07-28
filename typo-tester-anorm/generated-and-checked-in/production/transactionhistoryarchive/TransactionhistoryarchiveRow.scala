@@ -7,14 +7,16 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
+import adventureworks.TypoLocalDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class TransactionhistoryarchiveRow(
@@ -27,63 +29,59 @@ case class TransactionhistoryarchiveRow(
   /** Line number associated with the purchase order, sales order, or work order. */
   referenceorderlineid: Int,
   /** Date and time of the transaction. */
-  transactiondate: LocalDateTime,
+  transactiondate: TypoLocalDateTime,
   /** W = Work Order, S = Sales Order, P = Purchase Order */
   transactiontype: /* bpchar */ String,
   /** Product quantity. */
   quantity: Int,
   /** Product cost. */
   actualcost: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object TransactionhistoryarchiveRow {
-  def rowParser(idx: Int): RowParser[TransactionhistoryarchiveRow] =
-    RowParser[TransactionhistoryarchiveRow] { row =>
-      Success(
+  implicit val reads: Reads[TransactionhistoryarchiveRow] = Reads[TransactionhistoryarchiveRow](json => JsResult.fromTry(
+      Try(
         TransactionhistoryarchiveRow(
-          transactionid = row[TransactionhistoryarchiveId](idx + 0),
-          productid = row[Int](idx + 1),
-          referenceorderid = row[Int](idx + 2),
-          referenceorderlineid = row[Int](idx + 3),
-          transactiondate = row[LocalDateTime](idx + 4),
-          transactiontype = row[/* bpchar */ String](idx + 5),
-          quantity = row[Int](idx + 6),
-          actualcost = row[BigDecimal](idx + 7),
-          modifieddate = row[LocalDateTime](idx + 8)
+          transactionid = json.\("transactionid").as[TransactionhistoryarchiveId],
+          productid = json.\("productid").as[Int],
+          referenceorderid = json.\("referenceorderid").as[Int],
+          referenceorderlineid = json.\("referenceorderlineid").as[Int],
+          transactiondate = json.\("transactiondate").as[TypoLocalDateTime],
+          transactiontype = json.\("transactiontype").as[/* bpchar */ String],
+          quantity = json.\("quantity").as[Int],
+          actualcost = json.\("actualcost").as[BigDecimal],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[TransactionhistoryarchiveRow] = new OFormat[TransactionhistoryarchiveRow]{
-    override def writes(o: TransactionhistoryarchiveRow): JsObject =
-      Json.obj(
-        "transactionid" -> o.transactionid,
-        "productid" -> o.productid,
-        "referenceorderid" -> o.referenceorderid,
-        "referenceorderlineid" -> o.referenceorderlineid,
-        "transactiondate" -> o.transactiondate,
-        "transactiontype" -> o.transactiontype,
-        "quantity" -> o.quantity,
-        "actualcost" -> o.actualcost,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[TransactionhistoryarchiveRow] = RowParser[TransactionhistoryarchiveRow] { row =>
+    Success(
+      TransactionhistoryarchiveRow(
+        transactionid = row[TransactionhistoryarchiveId](idx + 0),
+        productid = row[Int](idx + 1),
+        referenceorderid = row[Int](idx + 2),
+        referenceorderlineid = row[Int](idx + 3),
+        transactiondate = row[TypoLocalDateTime](idx + 4),
+        transactiontype = row[/* bpchar */ String](idx + 5),
+        quantity = row[Int](idx + 6),
+        actualcost = row[BigDecimal](idx + 7),
+        modifieddate = row[TypoLocalDateTime](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[TransactionhistoryarchiveRow] = {
-      JsResult.fromTry(
-        Try(
-          TransactionhistoryarchiveRow(
-            transactionid = json.\("transactionid").as[TransactionhistoryarchiveId],
-            productid = json.\("productid").as[Int],
-            referenceorderid = json.\("referenceorderid").as[Int],
-            referenceorderlineid = json.\("referenceorderlineid").as[Int],
-            transactiondate = json.\("transactiondate").as[LocalDateTime],
-            transactiontype = json.\("transactiontype").as[/* bpchar */ String],
-            quantity = json.\("quantity").as[Int],
-            actualcost = json.\("actualcost").as[BigDecimal],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[TransactionhistoryarchiveRow] = OWrites[TransactionhistoryarchiveRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "transactionid" -> Json.toJson(o.transactionid),
+      "productid" -> Json.toJson(o.productid),
+      "referenceorderid" -> Json.toJson(o.referenceorderid),
+      "referenceorderlineid" -> Json.toJson(o.referenceorderlineid),
+      "transactiondate" -> Json.toJson(o.transactiondate),
+      "transactiontype" -> Json.toJson(o.transactiontype),
+      "quantity" -> Json.toJson(o.quantity),
+      "actualcost" -> Json.toJson(o.actualcost),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

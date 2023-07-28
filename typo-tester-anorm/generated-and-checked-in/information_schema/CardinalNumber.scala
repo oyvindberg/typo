@@ -9,21 +9,22 @@ package information_schema
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Domain `information_schema.cardinal_number`
   * Constraint: CHECK ((VALUE >= 0))
   */
 case class CardinalNumber(value: Int) extends AnyVal
 object CardinalNumber {
-  implicit def ordering(implicit ev: Ordering[Int]): Ordering[CardinalNumber] = Ordering.by(_.value)
-  implicit val format: Format[CardinalNumber] = implicitly[Format[Int]].bimap(CardinalNumber.apply, _.value)
-  implicit val toStatement: ToStatement[CardinalNumber] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val toStatementArray: ToStatement[Array[CardinalNumber]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val arrayToStatement: ToStatement[Array[CardinalNumber]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit val column: Column[CardinalNumber] = implicitly[Column[Int]].map(CardinalNumber.apply)
+  implicit val ordering: Ordering[CardinalNumber] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[CardinalNumber] = new ParameterMetaData[CardinalNumber] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-
+  implicit val reads: Reads[CardinalNumber] = implicitly[Reads[Int]].map(CardinalNumber.apply)
+  implicit val toStatement: ToStatement[CardinalNumber] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit val writes: Writes[CardinalNumber] = implicitly[Writes[Int]].contramap(_.value)
 }

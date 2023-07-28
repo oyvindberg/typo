@@ -15,7 +15,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ApplicableRolesViewRow(
@@ -25,34 +27,30 @@ case class ApplicableRolesViewRow(
 )
 
 object ApplicableRolesViewRow {
-  def rowParser(idx: Int): RowParser[ApplicableRolesViewRow] =
-    RowParser[ApplicableRolesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ApplicableRolesViewRow] = Reads[ApplicableRolesViewRow](json => JsResult.fromTry(
+      Try(
         ApplicableRolesViewRow(
-          grantee = row[Option[SqlIdentifier]](idx + 0),
-          roleName = row[Option[SqlIdentifier]](idx + 1),
-          isGrantable = row[Option[YesOrNo]](idx + 2)
+          grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
+          roleName = json.\("role_name").toOption.map(_.as[SqlIdentifier]),
+          isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
         )
       )
-    }
-  implicit val oFormat: OFormat[ApplicableRolesViewRow] = new OFormat[ApplicableRolesViewRow]{
-    override def writes(o: ApplicableRolesViewRow): JsObject =
-      Json.obj(
-        "grantee" -> o.grantee,
-        "role_name" -> o.roleName,
-        "is_grantable" -> o.isGrantable
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ApplicableRolesViewRow] = RowParser[ApplicableRolesViewRow] { row =>
+    Success(
+      ApplicableRolesViewRow(
+        grantee = row[Option[SqlIdentifier]](idx + 0),
+        roleName = row[Option[SqlIdentifier]](idx + 1),
+        isGrantable = row[Option[YesOrNo]](idx + 2)
       )
-  
-    override def reads(json: JsValue): JsResult[ApplicableRolesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ApplicableRolesViewRow(
-            grantee = json.\("grantee").toOption.map(_.as[SqlIdentifier]),
-            roleName = json.\("role_name").toOption.map(_.as[SqlIdentifier]),
-            isGrantable = json.\("is_grantable").toOption.map(_.as[YesOrNo])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ApplicableRolesViewRow] = OWrites[ApplicableRolesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "grantee" -> Json.toJson(o.grantee),
+      "role_name" -> Json.toJson(o.roleName),
+      "is_grantable" -> Json.toJson(o.isGrantable)
+    ))
+  )
 }

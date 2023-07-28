@@ -7,14 +7,16 @@ package adventureworks
 package pg_catalog
 package pg_stat_bgwriter
 
+import adventureworks.TypoOffsetDateTime
 import anorm.RowParser
 import anorm.Success
-import java.time.OffsetDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgStatBgwriterViewRow(
@@ -28,62 +30,58 @@ case class PgStatBgwriterViewRow(
   buffersBackend: Option[Long],
   buffersBackendFsync: Option[Long],
   buffersAlloc: Option[Long],
-  statsReset: Option[OffsetDateTime]
+  statsReset: Option[TypoOffsetDateTime]
 )
 
 object PgStatBgwriterViewRow {
-  def rowParser(idx: Int): RowParser[PgStatBgwriterViewRow] =
-    RowParser[PgStatBgwriterViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgStatBgwriterViewRow] = Reads[PgStatBgwriterViewRow](json => JsResult.fromTry(
+      Try(
         PgStatBgwriterViewRow(
-          checkpointsTimed = row[Option[Long]](idx + 0),
-          checkpointsReq = row[Option[Long]](idx + 1),
-          checkpointWriteTime = row[Option[Double]](idx + 2),
-          checkpointSyncTime = row[Option[Double]](idx + 3),
-          buffersCheckpoint = row[Option[Long]](idx + 4),
-          buffersClean = row[Option[Long]](idx + 5),
-          maxwrittenClean = row[Option[Long]](idx + 6),
-          buffersBackend = row[Option[Long]](idx + 7),
-          buffersBackendFsync = row[Option[Long]](idx + 8),
-          buffersAlloc = row[Option[Long]](idx + 9),
-          statsReset = row[Option[OffsetDateTime]](idx + 10)
+          checkpointsTimed = json.\("checkpoints_timed").toOption.map(_.as[Long]),
+          checkpointsReq = json.\("checkpoints_req").toOption.map(_.as[Long]),
+          checkpointWriteTime = json.\("checkpoint_write_time").toOption.map(_.as[Double]),
+          checkpointSyncTime = json.\("checkpoint_sync_time").toOption.map(_.as[Double]),
+          buffersCheckpoint = json.\("buffers_checkpoint").toOption.map(_.as[Long]),
+          buffersClean = json.\("buffers_clean").toOption.map(_.as[Long]),
+          maxwrittenClean = json.\("maxwritten_clean").toOption.map(_.as[Long]),
+          buffersBackend = json.\("buffers_backend").toOption.map(_.as[Long]),
+          buffersBackendFsync = json.\("buffers_backend_fsync").toOption.map(_.as[Long]),
+          buffersAlloc = json.\("buffers_alloc").toOption.map(_.as[Long]),
+          statsReset = json.\("stats_reset").toOption.map(_.as[TypoOffsetDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgStatBgwriterViewRow] = new OFormat[PgStatBgwriterViewRow]{
-    override def writes(o: PgStatBgwriterViewRow): JsObject =
-      Json.obj(
-        "checkpoints_timed" -> o.checkpointsTimed,
-        "checkpoints_req" -> o.checkpointsReq,
-        "checkpoint_write_time" -> o.checkpointWriteTime,
-        "checkpoint_sync_time" -> o.checkpointSyncTime,
-        "buffers_checkpoint" -> o.buffersCheckpoint,
-        "buffers_clean" -> o.buffersClean,
-        "maxwritten_clean" -> o.maxwrittenClean,
-        "buffers_backend" -> o.buffersBackend,
-        "buffers_backend_fsync" -> o.buffersBackendFsync,
-        "buffers_alloc" -> o.buffersAlloc,
-        "stats_reset" -> o.statsReset
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgStatBgwriterViewRow] = RowParser[PgStatBgwriterViewRow] { row =>
+    Success(
+      PgStatBgwriterViewRow(
+        checkpointsTimed = row[Option[Long]](idx + 0),
+        checkpointsReq = row[Option[Long]](idx + 1),
+        checkpointWriteTime = row[Option[Double]](idx + 2),
+        checkpointSyncTime = row[Option[Double]](idx + 3),
+        buffersCheckpoint = row[Option[Long]](idx + 4),
+        buffersClean = row[Option[Long]](idx + 5),
+        maxwrittenClean = row[Option[Long]](idx + 6),
+        buffersBackend = row[Option[Long]](idx + 7),
+        buffersBackendFsync = row[Option[Long]](idx + 8),
+        buffersAlloc = row[Option[Long]](idx + 9),
+        statsReset = row[Option[TypoOffsetDateTime]](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[PgStatBgwriterViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgStatBgwriterViewRow(
-            checkpointsTimed = json.\("checkpoints_timed").toOption.map(_.as[Long]),
-            checkpointsReq = json.\("checkpoints_req").toOption.map(_.as[Long]),
-            checkpointWriteTime = json.\("checkpoint_write_time").toOption.map(_.as[Double]),
-            checkpointSyncTime = json.\("checkpoint_sync_time").toOption.map(_.as[Double]),
-            buffersCheckpoint = json.\("buffers_checkpoint").toOption.map(_.as[Long]),
-            buffersClean = json.\("buffers_clean").toOption.map(_.as[Long]),
-            maxwrittenClean = json.\("maxwritten_clean").toOption.map(_.as[Long]),
-            buffersBackend = json.\("buffers_backend").toOption.map(_.as[Long]),
-            buffersBackendFsync = json.\("buffers_backend_fsync").toOption.map(_.as[Long]),
-            buffersAlloc = json.\("buffers_alloc").toOption.map(_.as[Long]),
-            statsReset = json.\("stats_reset").toOption.map(_.as[OffsetDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgStatBgwriterViewRow] = OWrites[PgStatBgwriterViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "checkpoints_timed" -> Json.toJson(o.checkpointsTimed),
+      "checkpoints_req" -> Json.toJson(o.checkpointsReq),
+      "checkpoint_write_time" -> Json.toJson(o.checkpointWriteTime),
+      "checkpoint_sync_time" -> Json.toJson(o.checkpointSyncTime),
+      "buffers_checkpoint" -> Json.toJson(o.buffersCheckpoint),
+      "buffers_clean" -> Json.toJson(o.buffersClean),
+      "maxwritten_clean" -> Json.toJson(o.maxwrittenClean),
+      "buffers_backend" -> Json.toJson(o.buffersBackend),
+      "buffers_backend_fsync" -> Json.toJson(o.buffersBackendFsync),
+      "buffers_alloc" -> Json.toJson(o.buffersAlloc),
+      "stats_reset" -> Json.toJson(o.statsReset)
+    ))
+  )
 }

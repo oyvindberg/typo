@@ -8,12 +8,12 @@ package production
 package productdocument
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
@@ -22,7 +22,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)
           values (${unsaved.productid}::int4, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
-          returning productid, modifieddate, documentnode
+          returning productid, modifieddate::text, documentnode
        """.query[ProductdocumentRow].unique
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
@@ -30,7 +30,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
       Some((Fragment.const(s"productid"), fr"${unsaved.productid}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
@@ -40,23 +40,23 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.productdocument default values
-            returning productid, modifieddate, documentnode
+            returning productid, modifieddate::text, documentnode
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into production.productdocument(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning productid, modifieddate, documentnode
+            returning productid, modifieddate::text, documentnode
          """
     }
     q.query[ProductdocumentRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
-    sql"select productid, modifieddate, documentnode from production.productdocument".query[ProductdocumentRow].stream
+    sql"select productid, modifieddate::text, documentnode from production.productdocument".query[ProductdocumentRow].stream
   }
   override def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]] = {
-    sql"select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".query[ProductdocumentRow].option
+    sql"select productid, modifieddate::text, documentnode from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".query[ProductdocumentRow].option
   }
   override def update(row: ProductdocumentRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -78,7 +78,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           on conflict (productid, documentnode)
           do update set
             modifieddate = EXCLUDED.modifieddate
-          returning productid, modifieddate, documentnode
+          returning productid, modifieddate::text, documentnode
        """.query[ProductdocumentRow].unique
   }
 }

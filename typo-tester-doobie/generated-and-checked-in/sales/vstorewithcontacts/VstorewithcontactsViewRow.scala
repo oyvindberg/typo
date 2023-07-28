@@ -10,13 +10,11 @@ package vstorewithcontacts
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class VstorewithcontactsViewRow(
@@ -45,70 +43,36 @@ case class VstorewithcontactsViewRow(
 )
 
 object VstorewithcontactsViewRow {
-  implicit val decoder: Decoder[VstorewithcontactsViewRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        name <- c.downField("name").as[Option[Name]]
-        contacttype <- c.downField("contacttype").as[Option[Name]]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Option[Name]]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
-        phonenumber <- c.downField("phonenumber").as[Option[Phone]]
-        phonenumbertype <- c.downField("phonenumbertype").as[Option[Name]]
-        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
-        emailpromotion <- c.downField("emailpromotion").as[Option[Int]]
-      } yield VstorewithcontactsViewRow(businessentityid, name, contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion)
-  implicit val encoder: Encoder[VstorewithcontactsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "name" := row.name,
-        "contacttype" := row.contacttype,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "suffix" := row.suffix,
-        "phonenumber" := row.phonenumber,
-        "phonenumbertype" := row.phonenumbertype,
-        "emailaddress" := row.emailaddress,
-        "emailpromotion" := row.emailpromotion
-      )}
-  implicit val read: Read[VstorewithcontactsViewRow] =
-    new Read[VstorewithcontactsViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[Phone], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VstorewithcontactsViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNullable(rs, i + 1),
-        contacttype = Get[Name].unsafeGetNullable(rs, i + 2),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 3),
-        firstname = Get[Name].unsafeGetNullable(rs, i + 4),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 5),
-        lastname = Get[Name].unsafeGetNullable(rs, i + 6),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 7),
-        phonenumber = Get[Phone].unsafeGetNullable(rs, i + 8),
-        phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 9),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 10),
-        emailpromotion = Get[Int].unsafeGetNullable(rs, i + 11)
-      )
+  implicit val decoder: Decoder[VstorewithcontactsViewRow] = Decoder.forProduct12[VstorewithcontactsViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int]]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(VstorewithcontactsViewRow.apply)
+  implicit val encoder: Encoder[VstorewithcontactsViewRow] = Encoder.forProduct12[VstorewithcontactsViewRow, Option[BusinessentityId], Option[Name], Option[Name], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int]]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(x => (x.businessentityid, x.name, x.contacttype, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion))
+  implicit val read: Read[VstorewithcontactsViewRow] = new Read[VstorewithcontactsViewRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[Phone], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VstorewithcontactsViewRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNullable(rs, i + 1),
+      contacttype = Get[Name].unsafeGetNullable(rs, i + 2),
+      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 3),
+      firstname = Get[Name].unsafeGetNullable(rs, i + 4),
+      middlename = Get[Name].unsafeGetNullable(rs, i + 5),
+      lastname = Get[Name].unsafeGetNullable(rs, i + 6),
+      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 7),
+      phonenumber = Get[Phone].unsafeGetNullable(rs, i + 8),
+      phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 9),
+      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 10),
+      emailpromotion = Get[Int].unsafeGetNullable(rs, i + 11)
     )
-  
-
+  )
 }

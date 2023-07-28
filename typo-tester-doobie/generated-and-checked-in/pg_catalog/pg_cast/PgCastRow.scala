@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_cast
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgCastRow(
@@ -26,46 +24,24 @@ case class PgCastRow(
 )
 
 object PgCastRow {
-  implicit val decoder: Decoder[PgCastRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgCastId]
-        castsource <- c.downField("castsource").as[/* oid */ Long]
-        casttarget <- c.downField("casttarget").as[/* oid */ Long]
-        castfunc <- c.downField("castfunc").as[/* oid */ Long]
-        castcontext <- c.downField("castcontext").as[String]
-        castmethod <- c.downField("castmethod").as[String]
-      } yield PgCastRow(oid, castsource, casttarget, castfunc, castcontext, castmethod)
-  implicit val encoder: Encoder[PgCastRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "castsource" := row.castsource,
-        "casttarget" := row.casttarget,
-        "castfunc" := row.castfunc,
-        "castcontext" := row.castcontext,
-        "castmethod" := row.castmethod
-      )}
-  implicit val read: Read[PgCastRow] =
-    new Read[PgCastRow](
-      gets = List(
-        (Get[PgCastId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgCastRow(
-        oid = Get[PgCastId].unsafeGetNonNullable(rs, i + 0),
-        castsource = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        casttarget = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        castfunc = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
-        castcontext = Get[String].unsafeGetNonNullable(rs, i + 4),
-        castmethod = Get[String].unsafeGetNonNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PgCastRow] = Decoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(PgCastRow.apply)
+  implicit val encoder: Encoder[PgCastRow] = Encoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(x => (x.oid, x.castsource, x.casttarget, x.castfunc, x.castcontext, x.castmethod))
+  implicit val read: Read[PgCastRow] = new Read[PgCastRow](
+    gets = List(
+      (Get[PgCastId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgCastRow(
+      oid = Get[PgCastId].unsafeGetNonNullable(rs, i + 0),
+      castsource = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      casttarget = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      castfunc = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 3),
+      castcontext = Get[String].unsafeGetNonNullable(rs, i + 4),
+      castmethod = Get[String].unsafeGetNonNullable(rs, i + 5)
     )
-  
-
+  )
 }

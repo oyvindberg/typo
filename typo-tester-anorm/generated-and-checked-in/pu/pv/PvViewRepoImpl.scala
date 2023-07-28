@@ -12,7 +12,7 @@ import java.sql.Connection
 
 object PvViewRepoImpl extends PvViewRepo {
   override def selectAll(implicit c: Connection): List[PvViewRow] = {
-    SQL"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
+    SQL"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
           from pu.pv
        """.as(PvViewRow.rowParser(1).*)
   }

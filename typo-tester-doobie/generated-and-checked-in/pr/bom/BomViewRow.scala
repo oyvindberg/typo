@@ -7,18 +7,16 @@ package adventureworks
 package pr
 package bom
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class BomViewRow(
   id: Option[Int],
@@ -29,9 +27,9 @@ case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.componentid]] */
   componentid: Option[ProductId],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.startdate]] */
-  startdate: Option[LocalDateTime],
+  startdate: Option[TypoLocalDateTime],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.enddate]] */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.unitmeasurecode]] */
   unitmeasurecode: Option[UnitmeasureId],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.bomlevel]] */
@@ -39,66 +37,36 @@ case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.perassemblyqty]] */
   perassemblyqty: Option[BigDecimal],
   /** Points to [[production.billofmaterials.BillofmaterialsRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object BomViewRow {
-  implicit val decoder: Decoder[BomViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        billofmaterialsid <- c.downField("billofmaterialsid").as[Option[BillofmaterialsId]]
-        productassemblyid <- c.downField("productassemblyid").as[Option[ProductId]]
-        componentid <- c.downField("componentid").as[Option[ProductId]]
-        startdate <- c.downField("startdate").as[Option[LocalDateTime]]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        unitmeasurecode <- c.downField("unitmeasurecode").as[Option[UnitmeasureId]]
-        bomlevel <- c.downField("bomlevel").as[Option[Int]]
-        perassemblyqty <- c.downField("perassemblyqty").as[Option[BigDecimal]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield BomViewRow(id, billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
-  implicit val encoder: Encoder[BomViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "billofmaterialsid" := row.billofmaterialsid,
-        "productassemblyid" := row.productassemblyid,
-        "componentid" := row.componentid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "unitmeasurecode" := row.unitmeasurecode,
-        "bomlevel" := row.bomlevel,
-        "perassemblyqty" := row.perassemblyqty,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[BomViewRow] =
-    new Read[BomViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BillofmaterialsId], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[ProductId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable),
-        (Get[UnitmeasureId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[BigDecimal], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => BomViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        billofmaterialsid = Get[BillofmaterialsId].unsafeGetNullable(rs, i + 1),
-        productassemblyid = Get[ProductId].unsafeGetNullable(rs, i + 2),
-        componentid = Get[ProductId].unsafeGetNullable(rs, i + 3),
-        startdate = Get[LocalDateTime].unsafeGetNullable(rs, i + 4),
-        enddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5),
-        unitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 6),
-        bomlevel = Get[Int].unsafeGetNullable(rs, i + 7),
-        perassemblyqty = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 9)
-      )
+  implicit val decoder: Decoder[BomViewRow] = Decoder.forProduct10[BomViewRow, Option[Int], Option[BillofmaterialsId], Option[ProductId], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[UnitmeasureId], Option[Int], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BomViewRow.apply)
+  implicit val encoder: Encoder[BomViewRow] = Encoder.forProduct10[BomViewRow, Option[Int], Option[BillofmaterialsId], Option[ProductId], Option[ProductId], Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[UnitmeasureId], Option[Int], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.id, x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))
+  implicit val read: Read[BomViewRow] = new Read[BomViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BillofmaterialsId], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[ProductId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable),
+      (Get[UnitmeasureId], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[BigDecimal], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => BomViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      billofmaterialsid = Get[BillofmaterialsId].unsafeGetNullable(rs, i + 1),
+      productassemblyid = Get[ProductId].unsafeGetNullable(rs, i + 2),
+      componentid = Get[ProductId].unsafeGetNullable(rs, i + 3),
+      startdate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 4),
+      enddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5),
+      unitmeasurecode = Get[UnitmeasureId].unsafeGetNullable(rs, i + 6),
+      bomlevel = Get[Int].unsafeGetNullable(rs, i + 7),
+      perassemblyqty = Get[BigDecimal].unsafeGetNullable(rs, i + 8),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 9)
     )
-  
-
+  )
 }

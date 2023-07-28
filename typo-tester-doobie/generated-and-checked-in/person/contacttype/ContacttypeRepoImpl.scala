@@ -8,20 +8,20 @@ package person
 package contacttype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 
 object ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
-    sql"delete from person.contacttype where contacttypeid = $contacttypeid".update.run.map(_ > 0)
+    sql"delete from person.contacttype where contacttypeid = ${contacttypeid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
           values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
-          returning contacttypeid, "name", modifieddate
+          returning contacttypeid, "name", modifieddate::text
        """.query[ContacttypeRow].unique
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
@@ -33,39 +33,39 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.contacttype default values
-            returning contacttypeid, "name", modifieddate
+            returning contacttypeid, "name", modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.contacttype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning contacttypeid, "name", modifieddate
+            returning contacttypeid, "name", modifieddate::text
          """
     }
     q.query[ContacttypeRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select contacttypeid, "name", modifieddate from person.contacttype""".query[ContacttypeRow].stream
+    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype""".query[ContacttypeRow].stream
   }
   override def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]] = {
-    sql"""select contacttypeid, "name", modifieddate from person.contacttype where contacttypeid = $contacttypeid""".query[ContacttypeRow].option
+    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ${contacttypeid}""".query[ContacttypeRow].option
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select contacttypeid, "name", modifieddate from person.contacttype where contacttypeid = ANY($contacttypeids)""".query[ContacttypeRow].stream
+    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ANY(${contacttypeids})""".query[ContacttypeRow].stream
   }
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     val contacttypeid = row.contacttypeid
     sql"""update person.contacttype
           set "name" = ${row.name}::"public"."Name",
               modifieddate = ${row.modifieddate}::timestamp
-          where contacttypeid = $contacttypeid
+          where contacttypeid = ${contacttypeid}
        """
       .update
       .run
@@ -82,7 +82,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           do update set
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
-          returning contacttypeid, "name", modifieddate
+          returning contacttypeid, "name", modifieddate::text
        """.query[ContacttypeRow].unique
   }
 }

@@ -7,18 +7,19 @@ package adventureworks
 package production
 package location
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `production.location` */
 case class LocationId(value: Int) extends AnyVal
 object LocationId {
+  implicit val arrayGet: Get[Array[LocationId]] = Get[Array[Int]].map(_.map(LocationId.apply))
+  implicit val arrayPut: Put[Array[LocationId]] = Put[Array[Int]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[LocationId] = Decoder[Int].map(LocationId.apply)
+  implicit val encoder: Encoder[LocationId] = Encoder[Int].contramap(_.value)
+  implicit val get: Get[LocationId] = Get[Int].map(LocationId.apply)
   implicit val ordering: Ordering[LocationId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[LocationId] =
-    Encoder[Int].contramap(_.value)
-  implicit val decoder: Decoder[LocationId] =
-    Decoder[Int].map(LocationId(_))
-  implicit val meta: Meta[LocationId] = Meta[Int].imap(LocationId.apply)(_.value)
-  implicit val metaArray: Meta[Array[LocationId]] = Meta[Array[Int]].imap(_.map(LocationId.apply))(_.map(_.value))
+  implicit val put: Put[LocationId] = Put[Int].contramap(_.value)
 }

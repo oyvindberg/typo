@@ -8,11 +8,11 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 
 object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
@@ -21,7 +21,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
     SQL"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.ratechangedate}::timestamp, ${unsaved.rate}::numeric, ${unsaved.payfrequency}::int2, ${unsaved.modifieddate}::timestamp)
-          returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+          returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
        """
       .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
   
@@ -34,19 +34,19 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       Some((NamedParameter("payfrequency", ParameterValue.from(unsaved.payfrequency)), "::int2")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into humanresources.employeepayhistory default values
-            returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+            returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
          """
         .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.employeepayhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+                  returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -57,12 +57,12 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
-    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate
+    SQL"""select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
           from humanresources.employeepayhistory
        """.as(EmployeepayhistoryRow.rowParser(1).*)
   }
   override def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
-    SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate
+    SQL"""select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
           from humanresources.employeepayhistory
           where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
        """.as(EmployeepayhistoryRow.rowParser(1).singleOpt)
@@ -90,7 +90,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             rate = EXCLUDED.rate,
             payfrequency = EXCLUDED.payfrequency,
             modifieddate = EXCLUDED.modifieddate
-          returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
+          returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
        """
       .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
   

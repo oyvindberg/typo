@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgShseclabelRow(
@@ -26,37 +28,33 @@ case class PgShseclabelRow(
  }
 
 object PgShseclabelRow {
-  def rowParser(idx: Int): RowParser[PgShseclabelRow] =
-    RowParser[PgShseclabelRow] { row =>
-      Success(
+  implicit val reads: Reads[PgShseclabelRow] = Reads[PgShseclabelRow](json => JsResult.fromTry(
+      Try(
         PgShseclabelRow(
-          objoid = row[/* oid */ Long](idx + 0),
-          classoid = row[/* oid */ Long](idx + 1),
-          provider = row[String](idx + 2),
-          label = row[String](idx + 3)
+          objoid = json.\("objoid").as[/* oid */ Long],
+          classoid = json.\("classoid").as[/* oid */ Long],
+          provider = json.\("provider").as[String],
+          label = json.\("label").as[String]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgShseclabelRow] = new OFormat[PgShseclabelRow]{
-    override def writes(o: PgShseclabelRow): JsObject =
-      Json.obj(
-        "objoid" -> o.objoid,
-        "classoid" -> o.classoid,
-        "provider" -> o.provider,
-        "label" -> o.label
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgShseclabelRow] = RowParser[PgShseclabelRow] { row =>
+    Success(
+      PgShseclabelRow(
+        objoid = row[/* oid */ Long](idx + 0),
+        classoid = row[/* oid */ Long](idx + 1),
+        provider = row[String](idx + 2),
+        label = row[String](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[PgShseclabelRow] = {
-      JsResult.fromTry(
-        Try(
-          PgShseclabelRow(
-            objoid = json.\("objoid").as[/* oid */ Long],
-            classoid = json.\("classoid").as[/* oid */ Long],
-            provider = json.\("provider").as[String],
-            label = json.\("label").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgShseclabelRow] = OWrites[PgShseclabelRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "objoid" -> Json.toJson(o.objoid),
+      "classoid" -> Json.toJson(o.classoid),
+      "provider" -> Json.toJson(o.provider),
+      "label" -> Json.toJson(o.label)
+    ))
+  )
 }

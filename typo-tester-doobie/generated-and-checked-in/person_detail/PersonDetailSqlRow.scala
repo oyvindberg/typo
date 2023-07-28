@@ -8,13 +8,11 @@ package person_detail
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PersonDetailSqlRow(
@@ -39,58 +37,30 @@ case class PersonDetailSqlRow(
 )
 
 object PersonDetailSqlRow {
-  implicit val decoder: Decoder[PersonDetailSqlRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Name]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Name]
-        jobtitle <- c.downField("jobtitle").as[/* max 50 chars */ String]
-        addressline1 <- c.downField("addressline1").as[/* max 60 chars */ String]
-        city <- c.downField("city").as[/* max 30 chars */ String]
-        postalcode <- c.downField("postalcode").as[/* max 15 chars */ String]
-      } yield PersonDetailSqlRow(businessentityid, title, firstname, middlename, lastname, jobtitle, addressline1, city, postalcode)
-  implicit val encoder: Encoder[PersonDetailSqlRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "jobtitle" := row.jobtitle,
-        "addressline1" := row.addressline1,
-        "city" := row.city,
-        "postalcode" := row.postalcode
-      )}
-  implicit val read: Read[PersonDetailSqlRow] =
-    new Read[PersonDetailSqlRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.NoNulls),
-        (Get[/* max 50 chars */ String], Nullability.NoNulls),
-        (Get[/* max 60 chars */ String], Nullability.NoNulls),
-        (Get[/* max 30 chars */ String], Nullability.NoNulls),
-        (Get[/* max 15 chars */ String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersonDetailSqlRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-        firstname = Get[Name].unsafeGetNonNullable(rs, i + 2),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-        lastname = Get[Name].unsafeGetNonNullable(rs, i + 4),
-        jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 5),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 6),
-        city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 7),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[PersonDetailSqlRow] = Decoder.forProduct9[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], Name, Option[Name], Name, /* max 50 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, /* max 15 chars */ String]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode")(PersonDetailSqlRow.apply)
+  implicit val encoder: Encoder[PersonDetailSqlRow] = Encoder.forProduct9[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], Name, Option[Name], Name, /* max 50 chars */ String, /* max 60 chars */ String, /* max 30 chars */ String, /* max 15 chars */ String]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.jobtitle, x.addressline1, x.city, x.postalcode))
+  implicit val read: Read[PersonDetailSqlRow] = new Read[PersonDetailSqlRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.NoNulls),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.NoNulls),
+      (Get[/* max 50 chars */ String], Nullability.NoNulls),
+      (Get[/* max 60 chars */ String], Nullability.NoNulls),
+      (Get[/* max 30 chars */ String], Nullability.NoNulls),
+      (Get[/* max 15 chars */ String], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PersonDetailSqlRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
+      firstname = Get[Name].unsafeGetNonNullable(rs, i + 2),
+      middlename = Get[Name].unsafeGetNullable(rs, i + 3),
+      lastname = Get[Name].unsafeGetNonNullable(rs, i + 4),
+      jobtitle = Get[/* max 50 chars */ String].unsafeGetNonNullable(rs, i + 5),
+      addressline1 = Get[/* max 60 chars */ String].unsafeGetNonNullable(rs, i + 6),
+      city = Get[/* max 30 chars */ String].unsafeGetNonNullable(rs, i + 7),
+      postalcode = Get[/* max 15 chars */ String].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

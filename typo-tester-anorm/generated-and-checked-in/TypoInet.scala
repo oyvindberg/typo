@@ -6,12 +6,9 @@
 package adventureworks
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
@@ -19,65 +16,63 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** inet (via PGObject) */
 case class TypoInet(value: String)
+
 object TypoInet {
-  implicit val oFormat: OFormat[TypoInet] = new OFormat[TypoInet]{
-    override def writes(o: TypoInet): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoInet] = {
-      JsResult.fromTry(
-        Try(
-          TypoInet(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoInetDb: ToStatement[TypoInet] with ParameterMetaData[TypoInet] with Column[TypoInet] = new ToStatement[TypoInet] with ParameterMetaData[TypoInet] with Column[TypoInet] {
-    override def sqlType: String = "inet"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoInet): Unit =
-      s.setObject(index, {
-                           val obj = new PGobject
-                           obj.setType("inet")
-                           obj.setValue(v.value)
-                           obj
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoInet] =
-      v match {
-        case v: PGobject => Right(TypoInet(v.getValue))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGobject from JDBC to produce a TypoInet, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoInetDbArray: ToStatement[Array[TypoInet]] with ParameterMetaData[Array[TypoInet]] with Column[Array[TypoInet]] = new ToStatement[Array[TypoInet]] with ParameterMetaData[Array[TypoInet]] with Column[Array[TypoInet]] {
-    override def sqlType: String = "_inet"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoInet]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("inet", v.map(v => {
-                                                                           val obj = new PGobject
-                                                                           obj.setType("inet")
-                                                                           obj.setValue(v.value)
-                                                                           obj
-                                                                         })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoInet]] =
-      v match {
+  implicit val arrayColumn: Column[Array[TypoInet]] = Column.nonNull[Array[TypoInet]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoInet(v.asInstanceOf[PGobject].getValue)))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoInet, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoInet, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoInet]] = new ParameterMetaData[Array[TypoInet]] {
+    override def sqlType: String = "_inet"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit val arrayToStatement: ToStatement[Array[TypoInet]] = ToStatement[Array[TypoInet]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("inet", v.map(v => {
+                                                                                                                     val obj = new PGobject
+                                                                                                                     obj.setType("inet")
+                                                                                                                     obj.setValue(v.value)
+                                                                                                                     obj
+                                                                                                                   }))))
+  implicit val column: Column[TypoInet] = Column.nonNull[TypoInet]((v1: Any, _) =>
+    v1 match {
+      case v: PGobject => Right(TypoInet(v.getValue))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
+    }
+  )
+  implicit val parameterMetadata: ParameterMetaData[TypoInet] = new ParameterMetaData[TypoInet] {
+    override def sqlType: String = "inet"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit val reads: Reads[TypoInet] = Reads[TypoInet](json => JsResult.fromTry(
+      Try(
+        TypoInet(
+          value = json.\("value").as[String]
+        )
+      )
+    ),
+  )
+  implicit val toStatement: ToStatement[TypoInet] = ToStatement[TypoInet]((s, index, v) => s.setObject(index, {
+                                                              val obj = new PGobject
+                                                              obj.setType("inet")
+                                                              obj.setValue(v.value)
+                                                              obj
+                                                            }))
+  implicit val writes: OWrites[TypoInet] = OWrites[TypoInet](o =>
+    new JsObject(ListMap[String, JsValue](
+      "value" -> Json.toJson(o.value)
+    ))
+  )
 }

@@ -7,54 +7,36 @@ package adventureworks
 package production
 package unitmeasure
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class UnitmeasureRow(
   /** Primary key. */
   unitmeasurecode: UnitmeasureId,
   /** Unit of measure description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object UnitmeasureRow {
-  implicit val decoder: Decoder[UnitmeasureRow] =
-    (c: HCursor) =>
-      for {
-        unitmeasurecode <- c.downField("unitmeasurecode").as[UnitmeasureId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield UnitmeasureRow(unitmeasurecode, name, modifieddate)
-  implicit val encoder: Encoder[UnitmeasureRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "unitmeasurecode" := row.unitmeasurecode,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[UnitmeasureRow] =
-    new Read[UnitmeasureRow](
-      gets = List(
-        (Get[UnitmeasureId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => UnitmeasureRow(
-        unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[UnitmeasureRow] = Decoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRow.apply)
+  implicit val encoder: Encoder[UnitmeasureRow] = Encoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))
+  implicit val read: Read[UnitmeasureRow] = new Read[UnitmeasureRow](
+    gets = List(
+      (Get[UnitmeasureId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => UnitmeasureRow(
+      unitmeasurecode = Get[UnitmeasureId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

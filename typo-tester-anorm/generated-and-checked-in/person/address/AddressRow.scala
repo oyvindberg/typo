@@ -7,16 +7,18 @@ package adventureworks
 package person
 package address
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class AddressRow(
@@ -36,56 +38,52 @@ case class AddressRow(
   /** Latitude and longitude of this address. */
   spatiallocation: Option[Array[Byte]],
   rowguid: UUID,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object AddressRow {
-  def rowParser(idx: Int): RowParser[AddressRow] =
-    RowParser[AddressRow] { row =>
-      Success(
+  implicit val reads: Reads[AddressRow] = Reads[AddressRow](json => JsResult.fromTry(
+      Try(
         AddressRow(
-          addressid = row[AddressId](idx + 0),
-          addressline1 = row[/* max 60 chars */ String](idx + 1),
-          addressline2 = row[Option[/* max 60 chars */ String]](idx + 2),
-          city = row[/* max 30 chars */ String](idx + 3),
-          stateprovinceid = row[StateprovinceId](idx + 4),
-          postalcode = row[/* max 15 chars */ String](idx + 5),
-          spatiallocation = row[Option[Array[Byte]]](idx + 6),
-          rowguid = row[UUID](idx + 7),
-          modifieddate = row[LocalDateTime](idx + 8)
+          addressid = json.\("addressid").as[AddressId],
+          addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
+          addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
+          city = json.\("city").as[/* max 30 chars */ String],
+          stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
+          postalcode = json.\("postalcode").as[/* max 15 chars */ String],
+          spatiallocation = json.\("spatiallocation").toOption.map(_.as[Array[Byte]]),
+          rowguid = json.\("rowguid").as[UUID],
+          modifieddate = json.\("modifieddate").as[TypoLocalDateTime]
         )
       )
-    }
-  implicit val oFormat: OFormat[AddressRow] = new OFormat[AddressRow]{
-    override def writes(o: AddressRow): JsObject =
-      Json.obj(
-        "addressid" -> o.addressid,
-        "addressline1" -> o.addressline1,
-        "addressline2" -> o.addressline2,
-        "city" -> o.city,
-        "stateprovinceid" -> o.stateprovinceid,
-        "postalcode" -> o.postalcode,
-        "spatiallocation" -> o.spatiallocation,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[AddressRow] = RowParser[AddressRow] { row =>
+    Success(
+      AddressRow(
+        addressid = row[AddressId](idx + 0),
+        addressline1 = row[/* max 60 chars */ String](idx + 1),
+        addressline2 = row[Option[/* max 60 chars */ String]](idx + 2),
+        city = row[/* max 30 chars */ String](idx + 3),
+        stateprovinceid = row[StateprovinceId](idx + 4),
+        postalcode = row[/* max 15 chars */ String](idx + 5),
+        spatiallocation = row[Option[Array[Byte]]](idx + 6),
+        rowguid = row[UUID](idx + 7),
+        modifieddate = row[TypoLocalDateTime](idx + 8)
       )
-  
-    override def reads(json: JsValue): JsResult[AddressRow] = {
-      JsResult.fromTry(
-        Try(
-          AddressRow(
-            addressid = json.\("addressid").as[AddressId],
-            addressline1 = json.\("addressline1").as[/* max 60 chars */ String],
-            addressline2 = json.\("addressline2").toOption.map(_.as[/* max 60 chars */ String]),
-            city = json.\("city").as[/* max 30 chars */ String],
-            stateprovinceid = json.\("stateprovinceid").as[StateprovinceId],
-            postalcode = json.\("postalcode").as[/* max 15 chars */ String],
-            spatiallocation = json.\("spatiallocation").toOption.map(_.as[Array[Byte]]),
-            rowguid = json.\("rowguid").as[UUID],
-            modifieddate = json.\("modifieddate").as[LocalDateTime]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[AddressRow] = OWrites[AddressRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "addressid" -> Json.toJson(o.addressid),
+      "addressline1" -> Json.toJson(o.addressline1),
+      "addressline2" -> Json.toJson(o.addressline2),
+      "city" -> Json.toJson(o.city),
+      "stateprovinceid" -> Json.toJson(o.stateprovinceid),
+      "postalcode" -> Json.toJson(o.postalcode),
+      "spatiallocation" -> Json.toJson(o.spatiallocation),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

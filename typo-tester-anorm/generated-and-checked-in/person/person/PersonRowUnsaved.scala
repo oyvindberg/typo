@@ -8,17 +8,19 @@ package person
 package person
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `person.person` which has not been persisted yet */
@@ -51,9 +53,9 @@ case class PersonRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(namestyleDefault: => NameStyle, emailpromotionDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): PersonRow =
+  def toRow(namestyleDefault: => NameStyle, emailpromotionDefault: => Int, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): PersonRow =
     PersonRow(
       businessentityid = businessentityid,
       persontype = persontype,
@@ -83,44 +85,41 @@ case class PersonRowUnsaved(
     )
 }
 object PersonRowUnsaved {
-  implicit val oFormat: OFormat[PersonRowUnsaved] = new OFormat[PersonRowUnsaved]{
-    override def writes(o: PersonRowUnsaved): JsObject =
-      Json.obj(
-        "businessentityid" -> o.businessentityid,
-        "persontype" -> o.persontype,
-        "title" -> o.title,
-        "firstname" -> o.firstname,
-        "middlename" -> o.middlename,
-        "lastname" -> o.lastname,
-        "suffix" -> o.suffix,
-        "additionalcontactinfo" -> o.additionalcontactinfo,
-        "demographics" -> o.demographics,
-        "namestyle" -> o.namestyle,
-        "emailpromotion" -> o.emailpromotion,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[PersonRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          PersonRowUnsaved(
-            businessentityid = json.\("businessentityid").as[BusinessentityId],
-            persontype = json.\("persontype").as[/* bpchar */ String],
-            title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
-            firstname = json.\("firstname").as[Name],
-            middlename = json.\("middlename").toOption.map(_.as[Name]),
-            lastname = json.\("lastname").as[Name],
-            suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
-            additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
-            demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
-            namestyle = json.\("namestyle").as[Defaulted[NameStyle]],
-            emailpromotion = json.\("emailpromotion").as[Defaulted[Int]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[PersonRowUnsaved] = Reads[PersonRowUnsaved](json => JsResult.fromTry(
+      Try(
+        PersonRowUnsaved(
+          businessentityid = json.\("businessentityid").as[BusinessentityId],
+          persontype = json.\("persontype").as[/* bpchar */ String],
+          title = json.\("title").toOption.map(_.as[/* max 8 chars */ String]),
+          firstname = json.\("firstname").as[Name],
+          middlename = json.\("middlename").toOption.map(_.as[Name]),
+          lastname = json.\("lastname").as[Name],
+          suffix = json.\("suffix").toOption.map(_.as[/* max 10 chars */ String]),
+          additionalcontactinfo = json.\("additionalcontactinfo").toOption.map(_.as[TypoXml]),
+          demographics = json.\("demographics").toOption.map(_.as[TypoXml]),
+          namestyle = json.\("namestyle").as[Defaulted[NameStyle]],
+          emailpromotion = json.\("emailpromotion").as[Defaulted[Int]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[PersonRowUnsaved] = OWrites[PersonRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "businessentityid" -> Json.toJson(o.businessentityid),
+      "persontype" -> Json.toJson(o.persontype),
+      "title" -> Json.toJson(o.title),
+      "firstname" -> Json.toJson(o.firstname),
+      "middlename" -> Json.toJson(o.middlename),
+      "lastname" -> Json.toJson(o.lastname),
+      "suffix" -> Json.toJson(o.suffix),
+      "additionalcontactinfo" -> Json.toJson(o.additionalcontactinfo),
+      "demographics" -> Json.toJson(o.demographics),
+      "namestyle" -> Json.toJson(o.namestyle),
+      "emailpromotion" -> Json.toJson(o.emailpromotion),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

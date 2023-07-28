@@ -7,16 +7,14 @@ package adventureworks
 package pe
 package e
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class EViewRow(
@@ -30,50 +28,28 @@ case class EViewRow(
   /** Points to [[person.emailaddress.EmailaddressRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[person.emailaddress.EmailaddressRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object EViewRow {
-  implicit val decoder: Decoder[EViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        emailaddressid <- c.downField("emailaddressid").as[Option[Int]]
-        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield EViewRow(id, businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
-  implicit val encoder: Encoder[EViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "businessentityid" := row.businessentityid,
-        "emailaddressid" := row.emailaddressid,
-        "emailaddress" := row.emailaddress,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[EViewRow] =
-    new Read[EViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => EViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
-        emailaddressid = Get[Int].unsafeGetNullable(rs, i + 2),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[EViewRow] = Decoder.forProduct6[EViewRow, Option[Int], Option[BusinessentityId], Option[Int], Option[/* max 50 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EViewRow.apply)
+  implicit val encoder: Encoder[EViewRow] = Encoder.forProduct6[EViewRow, Option[Int], Option[BusinessentityId], Option[Int], Option[/* max 50 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))
+  implicit val read: Read[EViewRow] = new Read[EViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => EViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 1),
+      emailaddressid = Get[Int].unsafeGetNullable(rs, i + 2),
+      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 3),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

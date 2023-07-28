@@ -8,13 +8,11 @@ package pg_catalog
 package pg_policy
 
 import adventureworks.TypoPgNodeTree
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgPolicyRow(
@@ -29,54 +27,28 @@ case class PgPolicyRow(
 )
 
 object PgPolicyRow {
-  implicit val decoder: Decoder[PgPolicyRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgPolicyId]
-        polname <- c.downField("polname").as[String]
-        polrelid <- c.downField("polrelid").as[/* oid */ Long]
-        polcmd <- c.downField("polcmd").as[String]
-        polpermissive <- c.downField("polpermissive").as[Boolean]
-        polroles <- c.downField("polroles").as[Array[/* oid */ Long]]
-        polqual <- c.downField("polqual").as[Option[TypoPgNodeTree]]
-        polwithcheck <- c.downField("polwithcheck").as[Option[TypoPgNodeTree]]
-      } yield PgPolicyRow(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
-  implicit val encoder: Encoder[PgPolicyRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "polname" := row.polname,
-        "polrelid" := row.polrelid,
-        "polcmd" := row.polcmd,
-        "polpermissive" := row.polpermissive,
-        "polroles" := row.polroles,
-        "polqual" := row.polqual,
-        "polwithcheck" := row.polwithcheck
-      )}
-  implicit val read: Read[PgPolicyRow] =
-    new Read[PgPolicyRow](
-      gets = List(
-        (Get[PgPolicyId], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[Boolean], Nullability.NoNulls),
-        (Get[Array[/* oid */ Long]], Nullability.NoNulls),
-        (Get[TypoPgNodeTree], Nullability.Nullable),
-        (Get[TypoPgNodeTree], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgPolicyRow(
-        oid = Get[PgPolicyId].unsafeGetNonNullable(rs, i + 0),
-        polname = Get[String].unsafeGetNonNullable(rs, i + 1),
-        polrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
-        polcmd = Get[String].unsafeGetNonNullable(rs, i + 3),
-        polpermissive = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
-        polroles = Get[Array[/* oid */ Long]].unsafeGetNonNullable(rs, i + 5),
-        polqual = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 6),
-        polwithcheck = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 7)
-      )
+  implicit val decoder: Decoder[PgPolicyRow] = Decoder.forProduct8[PgPolicyRow, PgPolicyId, String, /* oid */ Long, String, Boolean, Array[/* oid */ Long], Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")(PgPolicyRow.apply)
+  implicit val encoder: Encoder[PgPolicyRow] = Encoder.forProduct8[PgPolicyRow, PgPolicyId, String, /* oid */ Long, String, Boolean, Array[/* oid */ Long], Option[TypoPgNodeTree], Option[TypoPgNodeTree]]("oid", "polname", "polrelid", "polcmd", "polpermissive", "polroles", "polqual", "polwithcheck")(x => (x.oid, x.polname, x.polrelid, x.polcmd, x.polpermissive, x.polroles, x.polqual, x.polwithcheck))
+  implicit val read: Read[PgPolicyRow] = new Read[PgPolicyRow](
+    gets = List(
+      (Get[PgPolicyId], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[Boolean], Nullability.NoNulls),
+      (Get[Array[/* oid */ Long]], Nullability.NoNulls),
+      (Get[TypoPgNodeTree], Nullability.Nullable),
+      (Get[TypoPgNodeTree], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgPolicyRow(
+      oid = Get[PgPolicyId].unsafeGetNonNullable(rs, i + 0),
+      polname = Get[String].unsafeGetNonNullable(rs, i + 1),
+      polrelid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 2),
+      polcmd = Get[String].unsafeGetNonNullable(rs, i + 3),
+      polpermissive = Get[Boolean].unsafeGetNonNullable(rs, i + 4),
+      polroles = Get[Array[/* oid */ Long]].unsafeGetNonNullable(rs, i + 5),
+      polqual = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 6),
+      polwithcheck = Get[TypoPgNodeTree].unsafeGetNullable(rs, i + 7)
     )
-  
-
+  )
 }

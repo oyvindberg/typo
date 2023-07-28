@@ -8,12 +8,10 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `purchasing.shipmethod` which has not been persisted yet */
@@ -32,9 +30,9 @@ case class ShipmethodRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(shipmethodidDefault: => ShipmethodId, shipbaseDefault: => BigDecimal, shiprateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ShipmethodRow =
+  def toRow(shipmethodidDefault: => ShipmethodId, shipbaseDefault: => BigDecimal, shiprateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ShipmethodRow =
     ShipmethodRow(
       name = name,
       shipmethodid = shipmethodid match {
@@ -60,25 +58,6 @@ case class ShipmethodRowUnsaved(
     )
 }
 object ShipmethodRowUnsaved {
-  implicit val decoder: Decoder[ShipmethodRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        name <- c.downField("name").as[Name]
-        shipmethodid <- c.downField("shipmethodid").as[Defaulted[ShipmethodId]]
-        shipbase <- c.downField("shipbase").as[Defaulted[BigDecimal]]
-        shiprate <- c.downField("shiprate").as[Defaulted[BigDecimal]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield ShipmethodRowUnsaved(name, shipmethodid, shipbase, shiprate, rowguid, modifieddate)
-  implicit val encoder: Encoder[ShipmethodRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "name" := row.name,
-        "shipmethodid" := row.shipmethodid,
-        "shipbase" := row.shipbase,
-        "shiprate" := row.shiprate,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[ShipmethodRowUnsaved] = Decoder.forProduct6[ShipmethodRowUnsaved, Name, Defaulted[ShipmethodId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRowUnsaved.apply)
+  implicit val encoder: Encoder[ShipmethodRowUnsaved] = Encoder.forProduct6[ShipmethodRowUnsaved, Name, Defaulted[ShipmethodId], Defaulted[BigDecimal], Defaulted[BigDecimal], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.name, x.shipmethodid, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))
 }

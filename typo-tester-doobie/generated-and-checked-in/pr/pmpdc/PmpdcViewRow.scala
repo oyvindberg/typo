@@ -7,18 +7,16 @@ package adventureworks
 package pr
 package pmpdc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PmpdcViewRow(
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.productmodelid]] */
@@ -28,42 +26,24 @@ case class PmpdcViewRow(
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.cultureid]] */
   cultureid: Option[CultureId],
   /** Points to [[production.productmodelproductdescriptionculture.ProductmodelproductdescriptioncultureRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PmpdcViewRow {
-  implicit val decoder: Decoder[PmpdcViewRow] =
-    (c: HCursor) =>
-      for {
-        productmodelid <- c.downField("productmodelid").as[Option[ProductmodelId]]
-        productdescriptionid <- c.downField("productdescriptionid").as[Option[ProductdescriptionId]]
-        cultureid <- c.downField("cultureid").as[Option[CultureId]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PmpdcViewRow(productmodelid, productdescriptionid, cultureid, modifieddate)
-  implicit val encoder: Encoder[PmpdcViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "productmodelid" := row.productmodelid,
-        "productdescriptionid" := row.productdescriptionid,
-        "cultureid" := row.cultureid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PmpdcViewRow] =
-    new Read[PmpdcViewRow](
-      gets = List(
-        (Get[ProductmodelId], Nullability.Nullable),
-        (Get[ProductdescriptionId], Nullability.Nullable),
-        (Get[CultureId], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PmpdcViewRow(
-        productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
-        productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
-        cultureid = Get[CultureId].unsafeGetNullable(rs, i + 2),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)
+  implicit val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))
+  implicit val read: Read[PmpdcViewRow] = new Read[PmpdcViewRow](
+    gets = List(
+      (Get[ProductmodelId], Nullability.Nullable),
+      (Get[ProductdescriptionId], Nullability.Nullable),
+      (Get[CultureId], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PmpdcViewRow(
+      productmodelid = Get[ProductmodelId].unsafeGetNullable(rs, i + 0),
+      productdescriptionid = Get[ProductdescriptionId].unsafeGetNullable(rs, i + 1),
+      cultureid = Get[CultureId].unsafeGetNullable(rs, i + 2),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 3)
     )
-  
-
+  )
 }

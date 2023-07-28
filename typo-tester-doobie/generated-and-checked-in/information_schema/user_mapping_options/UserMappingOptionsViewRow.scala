@@ -9,13 +9,11 @@ package user_mapping_options
 
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class UserMappingOptionsViewRow(
@@ -30,42 +28,22 @@ case class UserMappingOptionsViewRow(
 )
 
 object UserMappingOptionsViewRow {
-  implicit val decoder: Decoder[UserMappingOptionsViewRow] =
-    (c: HCursor) =>
-      for {
-        authorizationIdentifier <- c.downField("authorization_identifier").as[Option[SqlIdentifier]]
-        foreignServerCatalog <- c.downField("foreign_server_catalog").as[Option[SqlIdentifier]]
-        foreignServerName <- c.downField("foreign_server_name").as[Option[SqlIdentifier]]
-        optionName <- c.downField("option_name").as[Option[SqlIdentifier]]
-        optionValue <- c.downField("option_value").as[Option[CharacterData]]
-      } yield UserMappingOptionsViewRow(authorizationIdentifier, foreignServerCatalog, foreignServerName, optionName, optionValue)
-  implicit val encoder: Encoder[UserMappingOptionsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "authorization_identifier" := row.authorizationIdentifier,
-        "foreign_server_catalog" := row.foreignServerCatalog,
-        "foreign_server_name" := row.foreignServerName,
-        "option_name" := row.optionName,
-        "option_value" := row.optionValue
-      )}
-  implicit val read: Read[UserMappingOptionsViewRow] =
-    new Read[UserMappingOptionsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => UserMappingOptionsViewRow(
-        authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 4)
-      )
+  implicit val decoder: Decoder[UserMappingOptionsViewRow] = Decoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(UserMappingOptionsViewRow.apply)
+  implicit val encoder: Encoder[UserMappingOptionsViewRow] = Encoder.forProduct5[UserMappingOptionsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name", "option_name", "option_value")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName, x.optionName, x.optionValue))
+  implicit val read: Read[UserMappingOptionsViewRow] = new Read[UserMappingOptionsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => UserMappingOptionsViewRow(
+      authorizationIdentifier = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      foreignServerCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      foreignServerName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      optionName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      optionValue = Get[CharacterData].unsafeGetNullable(rs, i + 4)
     )
-  
-
+  )
 }

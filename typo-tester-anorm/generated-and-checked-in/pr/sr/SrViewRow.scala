@@ -7,16 +7,18 @@ package adventureworks
 package pr
 package sr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SrViewRow(
@@ -26,41 +28,37 @@ case class SrViewRow(
   /** Points to [[production.scrapreason.ScrapreasonRow.name]] */
   name: Option[Name],
   /** Points to [[production.scrapreason.ScrapreasonRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SrViewRow {
-  def rowParser(idx: Int): RowParser[SrViewRow] =
-    RowParser[SrViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
+      Try(
         SrViewRow(
-          id = row[Option[Int]](idx + 0),
-          scrapreasonid = row[Option[ScrapreasonId]](idx + 1),
-          name = row[Option[Name]](idx + 2),
-          modifieddate = row[Option[LocalDateTime]](idx + 3)
+          id = json.\("id").toOption.map(_.as[Int]),
+          scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
+          name = json.\("name").toOption.map(_.as[Name]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SrViewRow] = new OFormat[SrViewRow]{
-    override def writes(o: SrViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "scrapreasonid" -> o.scrapreasonid,
-        "name" -> o.name,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
+    Success(
+      SrViewRow(
+        id = row[Option[Int]](idx + 0),
+        scrapreasonid = row[Option[ScrapreasonId]](idx + 1),
+        name = row[Option[Name]](idx + 2),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 3)
       )
-  
-    override def reads(json: JsValue): JsResult[SrViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SrViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            scrapreasonid = json.\("scrapreasonid").toOption.map(_.as[ScrapreasonId]),
-            name = json.\("name").toOption.map(_.as[Name]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "scrapreasonid" -> Json.toJson(o.scrapreasonid),
+      "name" -> Json.toJson(o.name),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

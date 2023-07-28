@@ -8,12 +8,10 @@ package person
 package address
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `person.address` which has not been persisted yet */
@@ -37,9 +35,9 @@ case class AddressRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(addressidDefault: => AddressId, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): AddressRow =
+  def toRow(addressidDefault: => AddressId, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): AddressRow =
     AddressRow(
       addressline1 = addressline1,
       addressline2 = addressline2,
@@ -62,31 +60,6 @@ case class AddressRowUnsaved(
     )
 }
 object AddressRowUnsaved {
-  implicit val decoder: Decoder[AddressRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        addressline1 <- c.downField("addressline1").as[/* max 60 chars */ String]
-        addressline2 <- c.downField("addressline2").as[Option[/* max 60 chars */ String]]
-        city <- c.downField("city").as[/* max 30 chars */ String]
-        stateprovinceid <- c.downField("stateprovinceid").as[StateprovinceId]
-        postalcode <- c.downField("postalcode").as[/* max 15 chars */ String]
-        spatiallocation <- c.downField("spatiallocation").as[Option[Array[Byte]]]
-        addressid <- c.downField("addressid").as[Defaulted[AddressId]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield AddressRowUnsaved(addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, addressid, rowguid, modifieddate)
-  implicit val encoder: Encoder[AddressRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "addressline1" := row.addressline1,
-        "addressline2" := row.addressline2,
-        "city" := row.city,
-        "stateprovinceid" := row.stateprovinceid,
-        "postalcode" := row.postalcode,
-        "spatiallocation" := row.spatiallocation,
-        "addressid" := row.addressid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[AddressRowUnsaved] = Decoder.forProduct9[AddressRowUnsaved, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], Defaulted[AddressId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate")(AddressRowUnsaved.apply)
+  implicit val encoder: Encoder[AddressRowUnsaved] = Encoder.forProduct9[AddressRowUnsaved, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[Array[Byte]], Defaulted[AddressId], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate")(x => (x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.addressid, x.rowguid, x.modifieddate))
 }

@@ -8,13 +8,11 @@ package sales
 package specialofferproduct
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `sales.specialofferproduct` which has not been persisted yet */
@@ -28,9 +26,9 @@ case class SpecialofferproductRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SpecialofferproductRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SpecialofferproductRow =
     SpecialofferproductRow(
       specialofferid = specialofferid,
       productid = productid,
@@ -45,21 +43,6 @@ case class SpecialofferproductRowUnsaved(
     )
 }
 object SpecialofferproductRowUnsaved {
-  implicit val decoder: Decoder[SpecialofferproductRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        specialofferid <- c.downField("specialofferid").as[SpecialofferId]
-        productid <- c.downField("productid").as[ProductId]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SpecialofferproductRowUnsaved(specialofferid, productid, rowguid, modifieddate)
-  implicit val encoder: Encoder[SpecialofferproductRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "specialofferid" := row.specialofferid,
-        "productid" := row.productid,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SpecialofferproductRowUnsaved] = Decoder.forProduct4[SpecialofferproductRowUnsaved, SpecialofferId, ProductId, Defaulted[UUID], Defaulted[TypoLocalDateTime]]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRowUnsaved.apply)
+  implicit val encoder: Encoder[SpecialofferproductRowUnsaved] = Encoder.forProduct4[SpecialofferproductRowUnsaved, SpecialofferId, ProductId, Defaulted[UUID], Defaulted[TypoLocalDateTime]]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))
 }

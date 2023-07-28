@@ -7,18 +7,16 @@ package adventureworks
 package pr
 package psc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 import java.util.UUID
 
 case class PscViewRow(
@@ -32,50 +30,28 @@ case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object PscViewRow {
-  implicit val decoder: Decoder[PscViewRow] =
-    (c: HCursor) =>
-      for {
-        id <- c.downField("id").as[Option[Int]]
-        productsubcategoryid <- c.downField("productsubcategoryid").as[Option[ProductsubcategoryId]]
-        productcategoryid <- c.downField("productcategoryid").as[Option[ProductcategoryId]]
-        name <- c.downField("name").as[Option[Name]]
-        rowguid <- c.downField("rowguid").as[Option[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Option[LocalDateTime]]
-      } yield PscViewRow(id, productsubcategoryid, productcategoryid, name, rowguid, modifieddate)
-  implicit val encoder: Encoder[PscViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "id" := row.id,
-        "productsubcategoryid" := row.productsubcategoryid,
-        "productcategoryid" := row.productcategoryid,
-        "name" := row.name,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PscViewRow] =
-    new Read[PscViewRow](
-      gets = List(
-        (Get[Int], Nullability.Nullable),
-        (Get[ProductsubcategoryId], Nullability.Nullable),
-        (Get[ProductcategoryId], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[UUID], Nullability.Nullable),
-        (Get[LocalDateTime], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PscViewRow(
-        id = Get[Int].unsafeGetNullable(rs, i + 0),
-        productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 1),
-        productcategoryid = Get[ProductcategoryId].unsafeGetNullable(rs, i + 2),
-        name = Get[Name].unsafeGetNullable(rs, i + 3),
-        rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
-        modifieddate = Get[LocalDateTime].unsafeGetNullable(rs, i + 5)
-      )
+  implicit val decoder: Decoder[PscViewRow] = Decoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(PscViewRow.apply)
+  implicit val encoder: Encoder[PscViewRow] = Encoder.forProduct6[PscViewRow, Option[Int], Option[ProductsubcategoryId], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))
+  implicit val read: Read[PscViewRow] = new Read[PscViewRow](
+    gets = List(
+      (Get[Int], Nullability.Nullable),
+      (Get[ProductsubcategoryId], Nullability.Nullable),
+      (Get[ProductcategoryId], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[UUID], Nullability.Nullable),
+      (Get[TypoLocalDateTime], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PscViewRow(
+      id = Get[Int].unsafeGetNullable(rs, i + 0),
+      productsubcategoryid = Get[ProductsubcategoryId].unsafeGetNullable(rs, i + 1),
+      productcategoryid = Get[ProductcategoryId].unsafeGetNullable(rs, i + 2),
+      name = Get[Name].unsafeGetNullable(rs, i + 3),
+      rowguid = Get[UUID].unsafeGetNullable(rs, i + 4),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNullable(rs, i + 5)
     )
-  
-
+  )
 }

@@ -8,11 +8,11 @@ package production
 package productsubcategory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import java.time.LocalDateTime
 import java.util.UUID
 
 object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
@@ -22,7 +22,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
           values (${unsaved.productsubcategoryid}::int4, ${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
   
@@ -41,19 +41,19 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[LocalDateTime](value)), "::timestamp"))
+        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue.from[TypoLocalDateTime](value)), "::timestamp"))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into production.productsubcategory default values
-            returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+            returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
          """
         .executeInsert(ProductsubcategoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productsubcategory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+                  returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -64,18 +64,18 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
-    SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+    SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
           from production.productsubcategory
        """.as(ProductsubcategoryRow.rowParser(1).*)
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Option[ProductsubcategoryRow] = {
-    SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+    SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
           from production.productsubcategory
           where productsubcategoryid = $productsubcategoryid
        """.as(ProductsubcategoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): List[ProductsubcategoryRow] = {
-    SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+    SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
           from production.productsubcategory
           where productsubcategoryid = ANY($productsubcategoryids)
        """.as(ProductsubcategoryRow.rowParser(1).*)
@@ -106,7 +106,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             "name" = EXCLUDED."name",
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
+          returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
   

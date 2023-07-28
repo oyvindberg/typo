@@ -13,6 +13,6 @@ import fs2.Stream
 
 object CrcViewRepoImpl extends CrcViewRepo {
   override def selectAll: Stream[ConnectionIO, CrcViewRow] = {
-    sql"select countryregioncode, currencycode, modifieddate from sa.crc".query[CrcViewRow].stream
+    sql"select countryregioncode, currencycode, modifieddate::text from sa.crc".query[CrcViewRow].stream
   }
 }

@@ -6,61 +6,39 @@
 package adventureworks
 
 import cats.data.NonEmptyList
-import doobie.Get
-import doobie.Meta
-import doobie.Put
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.util.HashMap
 
 /** The text representation of an hstore, used for input and output, includes zero or more key => value pairs separated by commas */
 case class TypoHStore(value: Map[String, String])
+
 object TypoHStore {
-  implicit val decoder: Decoder[TypoHStore] =
-    (c: HCursor) =>
-      for {
-        value <- c.downField("value").as[Map[String, String]]
-      } yield TypoHStore(value)
-  implicit val encoder: Encoder[TypoHStore] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "value" := row.value
-      )}
-  implicit val get: Get[TypoHStore] =
-    Get.Advanced.other[java.util.Map[_, _]](cats.data.NonEmptyList.one("hstore"))
-      .map(v => {
-                  val b = Map.newBuilder[String, String]
-                  v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
-                  TypoHStore(b.result())
-                })
-  
-  implicit val put: Put[TypoHStore] =
-    Put.Advanced.other[java.util.Map[String, String]](NonEmptyList.one("hstore"))
-      .contramap(v => {
-                        val b = new HashMap[String, String]
-                        v.value.foreach { case (k, v) => b.put(k, v)}
-                        b
-                      })
-  
-  implicit val meta: Meta[TypoHStore] = new Meta(get, put)
-  val gets: Get[Array[TypoHStore]] =
-    Get.Advanced.array[AnyRef](NonEmptyList.one("_hstore"))
-      .map(_.map(v => {
-                        val b = Map.newBuilder[String, String]
-                        v.asInstanceOf[java.util.Map[_, _]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
-                        TypoHStore(b.result())
-                      }))
-  
-  val puts: Put[Array[TypoHStore]] =
-    Put.Advanced.array[AnyRef](NonEmptyList.one("_hstore"), "hstore")
-      .contramap(_.map(v => {
-                              val b = new HashMap[String, String]
-                              v.value.foreach { case (k, v) => b.put(k, v)}
-                              b
-                            }))
-  
-  implicit val metas: Meta[Array[TypoHStore]] = new Meta(gets, puts)
+  implicit val arrayGet: Get[Array[TypoHStore]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_hstore"))
+    .map(_.map(v => {
+                      val b = Map.newBuilder[String, String]
+                      v.asInstanceOf[java.util.Map[?, ?]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
+                      TypoHStore(b.result())
+                    }))
+  implicit val arrayPut: Put[Array[TypoHStore]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_hstore"), "hstore")
+    .contramap(_.map(v => {
+                            val b = new HashMap[String, String]
+                            v.value.foreach { case (k, v) => b.put(k, v)}
+                            b
+                          }))
+  implicit val decoder: Decoder[TypoHStore] = Decoder.forProduct1[TypoHStore, Map[String, String]]("value")(TypoHStore.apply)
+  implicit val encoder: Encoder[TypoHStore] = Encoder.forProduct1[TypoHStore, Map[String, String]]("value")(x => (x.value))
+  implicit val get: Get[TypoHStore] = Get.Advanced.other[java.util.Map[?, ?]](NonEmptyList.one("hstore"))
+    .map(v => {
+                val b = Map.newBuilder[String, String]
+                v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
+                TypoHStore(b.result())
+              })
+  implicit val put: Put[TypoHStore] = Put.Advanced.other[java.util.Map[String, String]](NonEmptyList.one("hstore")).contramap(v => {
+                                                                                                 val b = new HashMap[String, String]
+                                                                                                 v.value.foreach { case (k, v) => b.put(k, v)}
+                                                                                                 b
+                                                                                               })
 }

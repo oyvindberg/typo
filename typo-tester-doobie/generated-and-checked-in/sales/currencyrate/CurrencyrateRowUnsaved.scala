@@ -8,17 +8,15 @@ package sales
 package currencyrate
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 
 /** This class corresponds to a row in table `sales.currencyrate` which has not been persisted yet */
 case class CurrencyrateRowUnsaved(
   /** Date and time the exchange rate was obtained. */
-  currencyratedate: LocalDateTime,
+  currencyratedate: TypoLocalDateTime,
   /** Exchange rate was converted from this currency code.
       Points to [[currency.CurrencyRow.currencycode]] */
   fromcurrencycode: CurrencyId,
@@ -33,9 +31,9 @@ case class CurrencyrateRowUnsaved(
       Primary key for CurrencyRate records. */
   currencyrateid: Defaulted[CurrencyrateId] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(currencyrateidDefault: => CurrencyrateId, modifieddateDefault: => LocalDateTime): CurrencyrateRow =
+  def toRow(currencyrateidDefault: => CurrencyrateId, modifieddateDefault: => TypoLocalDateTime): CurrencyrateRow =
     CurrencyrateRow(
       currencyratedate = currencyratedate,
       fromcurrencycode = fromcurrencycode,
@@ -53,27 +51,6 @@ case class CurrencyrateRowUnsaved(
     )
 }
 object CurrencyrateRowUnsaved {
-  implicit val decoder: Decoder[CurrencyrateRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        currencyratedate <- c.downField("currencyratedate").as[LocalDateTime]
-        fromcurrencycode <- c.downField("fromcurrencycode").as[CurrencyId]
-        tocurrencycode <- c.downField("tocurrencycode").as[CurrencyId]
-        averagerate <- c.downField("averagerate").as[BigDecimal]
-        endofdayrate <- c.downField("endofdayrate").as[BigDecimal]
-        currencyrateid <- c.downField("currencyrateid").as[Defaulted[CurrencyrateId]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield CurrencyrateRowUnsaved(currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, currencyrateid, modifieddate)
-  implicit val encoder: Encoder[CurrencyrateRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "currencyratedate" := row.currencyratedate,
-        "fromcurrencycode" := row.fromcurrencycode,
-        "tocurrencycode" := row.tocurrencycode,
-        "averagerate" := row.averagerate,
-        "endofdayrate" := row.endofdayrate,
-        "currencyrateid" := row.currencyrateid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[CurrencyrateRowUnsaved] = Decoder.forProduct7[CurrencyrateRowUnsaved, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, Defaulted[CurrencyrateId], Defaulted[TypoLocalDateTime]]("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate")(CurrencyrateRowUnsaved.apply)
+  implicit val encoder: Encoder[CurrencyrateRowUnsaved] = Encoder.forProduct7[CurrencyrateRowUnsaved, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, Defaulted[CurrencyrateId], Defaulted[TypoLocalDateTime]]("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate")(x => (x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.currencyrateid, x.modifieddate))
 }

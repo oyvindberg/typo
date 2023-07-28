@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_enum
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgEnumRow(
@@ -24,38 +22,20 @@ case class PgEnumRow(
 )
 
 object PgEnumRow {
-  implicit val decoder: Decoder[PgEnumRow] =
-    (c: HCursor) =>
-      for {
-        oid <- c.downField("oid").as[PgEnumId]
-        enumtypid <- c.downField("enumtypid").as[/* oid */ Long]
-        enumsortorder <- c.downField("enumsortorder").as[Float]
-        enumlabel <- c.downField("enumlabel").as[String]
-      } yield PgEnumRow(oid, enumtypid, enumsortorder, enumlabel)
-  implicit val encoder: Encoder[PgEnumRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "oid" := row.oid,
-        "enumtypid" := row.enumtypid,
-        "enumsortorder" := row.enumsortorder,
-        "enumlabel" := row.enumlabel
-      )}
-  implicit val read: Read[PgEnumRow] =
-    new Read[PgEnumRow](
-      gets = List(
-        (Get[PgEnumId], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[Float], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgEnumRow(
-        oid = Get[PgEnumId].unsafeGetNonNullable(rs, i + 0),
-        enumtypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        enumsortorder = Get[Float].unsafeGetNonNullable(rs, i + 2),
-        enumlabel = Get[String].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgEnumRow] = Decoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(PgEnumRow.apply)
+  implicit val encoder: Encoder[PgEnumRow] = Encoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(x => (x.oid, x.enumtypid, x.enumsortorder, x.enumlabel))
+  implicit val read: Read[PgEnumRow] = new Read[PgEnumRow](
+    gets = List(
+      (Get[PgEnumId], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[Float], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgEnumRow(
+      oid = Get[PgEnumId].unsafeGetNonNullable(rs, i + 0),
+      enumtypid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      enumsortorder = Get[Float].unsafeGetNonNullable(rs, i + 2),
+      enumlabel = Get[String].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

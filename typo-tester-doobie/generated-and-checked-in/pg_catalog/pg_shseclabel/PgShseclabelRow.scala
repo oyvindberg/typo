@@ -7,13 +7,11 @@ package adventureworks
 package pg_catalog
 package pg_shseclabel
 
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class PgShseclabelRow(
@@ -26,38 +24,20 @@ case class PgShseclabelRow(
  }
 
 object PgShseclabelRow {
-  implicit val decoder: Decoder[PgShseclabelRow] =
-    (c: HCursor) =>
-      for {
-        objoid <- c.downField("objoid").as[/* oid */ Long]
-        classoid <- c.downField("classoid").as[/* oid */ Long]
-        provider <- c.downField("provider").as[String]
-        label <- c.downField("label").as[String]
-      } yield PgShseclabelRow(objoid, classoid, provider, label)
-  implicit val encoder: Encoder[PgShseclabelRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "objoid" := row.objoid,
-        "classoid" := row.classoid,
-        "provider" := row.provider,
-        "label" := row.label
-      )}
-  implicit val read: Read[PgShseclabelRow] =
-    new Read[PgShseclabelRow](
-      gets = List(
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[/* oid */ Long], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls),
-        (Get[String], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PgShseclabelRow(
-        objoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
-        classoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
-        provider = Get[String].unsafeGetNonNullable(rs, i + 2),
-        label = Get[String].unsafeGetNonNullable(rs, i + 3)
-      )
+  implicit val decoder: Decoder[PgShseclabelRow] = Decoder.forProduct4[PgShseclabelRow, /* oid */ Long, /* oid */ Long, String, String]("objoid", "classoid", "provider", "label")(PgShseclabelRow.apply)
+  implicit val encoder: Encoder[PgShseclabelRow] = Encoder.forProduct4[PgShseclabelRow, /* oid */ Long, /* oid */ Long, String, String]("objoid", "classoid", "provider", "label")(x => (x.objoid, x.classoid, x.provider, x.label))
+  implicit val read: Read[PgShseclabelRow] = new Read[PgShseclabelRow](
+    gets = List(
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[/* oid */ Long], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls),
+      (Get[String], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PgShseclabelRow(
+      objoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 0),
+      classoid = Get[/* oid */ Long].unsafeGetNonNullable(rs, i + 1),
+      provider = Get[String].unsafeGetNonNullable(rs, i + 2),
+      label = Get[String].unsafeGetNonNullable(rs, i + 3)
     )
-  
-
+  )
 }

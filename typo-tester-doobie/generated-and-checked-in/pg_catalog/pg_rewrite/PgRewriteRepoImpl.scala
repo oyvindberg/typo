@@ -13,7 +13,7 @@ import fs2.Stream
 
 object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId): ConnectionIO[Boolean] = {
-    sql"delete from pg_catalog.pg_rewrite where oid = $oid".update.run.map(_ > 0)
+    sql"delete from pg_catalog.pg_rewrite where oid = ${oid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow] = {
     sql"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
@@ -25,10 +25,10 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
     sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite".query[PgRewriteRow].stream
   }
   override def selectById(oid: PgRewriteId): ConnectionIO[Option[PgRewriteRow]] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = $oid".query[PgRewriteRow].option
+    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ${oid}".query[PgRewriteRow].option
   }
   override def selectByIds(oids: Array[PgRewriteId]): Stream[ConnectionIO, PgRewriteRow] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY($oids)".query[PgRewriteRow].stream
+    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY(${oids})".query[PgRewriteRow].stream
   }
   override def update(row: PgRewriteRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -40,7 +40,7 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
               is_instead = ${row.isInstead},
               ev_qual = ${row.evQual}::pg_node_tree,
               ev_action = ${row.evAction}::pg_node_tree
-          where oid = $oid
+          where oid = ${oid}
        """
       .update
       .run

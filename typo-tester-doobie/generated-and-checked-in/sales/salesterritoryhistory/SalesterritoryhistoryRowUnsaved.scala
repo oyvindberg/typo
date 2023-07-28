@@ -8,13 +8,11 @@ package sales
 package salesterritoryhistory
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.time.LocalDateTime
 import java.util.UUID
 
 /** This class corresponds to a row in table `sales.salesterritoryhistory` which has not been persisted yet */
@@ -26,15 +24,15 @@ case class SalesterritoryhistoryRowUnsaved(
       Points to [[salesterritory.SalesterritoryRow.territoryid]] */
   territoryid: SalesterritoryId,
   /** Primary key. Date the sales representive started work in the territory. */
-  startdate: LocalDateTime,
+  startdate: TypoLocalDateTime,
   /** Date the sales representative left work in the territory. */
-  enddate: Option[LocalDateTime],
+  enddate: Option[TypoLocalDateTime],
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): SalesterritoryhistoryRow =
+  def toRow(rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): SalesterritoryhistoryRow =
     SalesterritoryhistoryRow(
       businessentityid = businessentityid,
       territoryid = territoryid,
@@ -51,25 +49,6 @@ case class SalesterritoryhistoryRowUnsaved(
     )
 }
 object SalesterritoryhistoryRowUnsaved {
-  implicit val decoder: Decoder[SalesterritoryhistoryRowUnsaved] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        territoryid <- c.downField("territoryid").as[SalesterritoryId]
-        startdate <- c.downField("startdate").as[LocalDateTime]
-        enddate <- c.downField("enddate").as[Option[LocalDateTime]]
-        rowguid <- c.downField("rowguid").as[Defaulted[UUID]]
-        modifieddate <- c.downField("modifieddate").as[Defaulted[LocalDateTime]]
-      } yield SalesterritoryhistoryRowUnsaved(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
-  implicit val encoder: Encoder[SalesterritoryhistoryRowUnsaved] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "territoryid" := row.territoryid,
-        "startdate" := row.startdate,
-        "enddate" := row.enddate,
-        "rowguid" := row.rowguid,
-        "modifieddate" := row.modifieddate
-      )}
+  implicit val decoder: Decoder[SalesterritoryhistoryRowUnsaved] = Decoder.forProduct6[SalesterritoryhistoryRowUnsaved, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SalesterritoryhistoryRowUnsaved.apply)
+  implicit val encoder: Encoder[SalesterritoryhistoryRowUnsaved] = Encoder.forProduct6[SalesterritoryhistoryRowUnsaved, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], Defaulted[UUID], Defaulted[TypoLocalDateTime]]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))
 }

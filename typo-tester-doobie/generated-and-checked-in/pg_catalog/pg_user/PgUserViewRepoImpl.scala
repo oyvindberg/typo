@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgUserViewRepoImpl extends PgUserViewRepo {
   override def selectAll: Stream[ConnectionIO, PgUserViewRow] = {
-    sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil, useconfig from pg_catalog.pg_user".query[PgUserViewRow].stream
+    sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig from pg_catalog.pg_user".query[PgUserViewRow].stream
   }
 }

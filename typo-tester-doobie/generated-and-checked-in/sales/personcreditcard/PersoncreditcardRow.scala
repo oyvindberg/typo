@@ -7,17 +7,15 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class PersoncreditcardRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
@@ -26,40 +24,24 @@ case class PersoncreditcardRow(
   /** Credit card identification number. Foreign key to CreditCard.CreditCardID.
       Points to [[creditcard.CreditcardRow.creditcardid]] */
   creditcardid: CreditcardId,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersoncreditcardId = PersoncreditcardId(businessentityid, creditcardid)
  }
 
 object PersoncreditcardRow {
-  implicit val decoder: Decoder[PersoncreditcardRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[BusinessentityId]
-        creditcardid <- c.downField("creditcardid").as[CreditcardId]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield PersoncreditcardRow(businessentityid, creditcardid, modifieddate)
-  implicit val encoder: Encoder[PersoncreditcardRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "creditcardid" := row.creditcardid,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[PersoncreditcardRow] =
-    new Read[PersoncreditcardRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.NoNulls),
-        (Get[CreditcardId], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => PersoncreditcardRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
-        creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[PersoncreditcardRow] = Decoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRow.apply)
+  implicit val encoder: Encoder[PersoncreditcardRow] = Encoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))
+  implicit val read: Read[PersoncreditcardRow] = new Read[PersoncreditcardRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.NoNulls),
+      (Get[CreditcardId], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => PersoncreditcardRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNonNullable(rs, i + 0),
+      creditcardid = Get[CreditcardId].unsafeGetNonNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

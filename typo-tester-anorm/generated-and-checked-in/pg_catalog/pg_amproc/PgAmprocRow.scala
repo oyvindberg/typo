@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgAmprocRow(
@@ -27,43 +29,39 @@ case class PgAmprocRow(
 )
 
 object PgAmprocRow {
-  def rowParser(idx: Int): RowParser[PgAmprocRow] =
-    RowParser[PgAmprocRow] { row =>
-      Success(
+  implicit val reads: Reads[PgAmprocRow] = Reads[PgAmprocRow](json => JsResult.fromTry(
+      Try(
         PgAmprocRow(
-          oid = row[PgAmprocId](idx + 0),
-          amprocfamily = row[/* oid */ Long](idx + 1),
-          amproclefttype = row[/* oid */ Long](idx + 2),
-          amprocrighttype = row[/* oid */ Long](idx + 3),
-          amprocnum = row[Int](idx + 4),
-          amproc = row[TypoRegproc](idx + 5)
+          oid = json.\("oid").as[PgAmprocId],
+          amprocfamily = json.\("amprocfamily").as[/* oid */ Long],
+          amproclefttype = json.\("amproclefttype").as[/* oid */ Long],
+          amprocrighttype = json.\("amprocrighttype").as[/* oid */ Long],
+          amprocnum = json.\("amprocnum").as[Int],
+          amproc = json.\("amproc").as[TypoRegproc]
         )
       )
-    }
-  implicit val oFormat: OFormat[PgAmprocRow] = new OFormat[PgAmprocRow]{
-    override def writes(o: PgAmprocRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "amprocfamily" -> o.amprocfamily,
-        "amproclefttype" -> o.amproclefttype,
-        "amprocrighttype" -> o.amprocrighttype,
-        "amprocnum" -> o.amprocnum,
-        "amproc" -> o.amproc
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgAmprocRow] = RowParser[PgAmprocRow] { row =>
+    Success(
+      PgAmprocRow(
+        oid = row[PgAmprocId](idx + 0),
+        amprocfamily = row[/* oid */ Long](idx + 1),
+        amproclefttype = row[/* oid */ Long](idx + 2),
+        amprocrighttype = row[/* oid */ Long](idx + 3),
+        amprocnum = row[Int](idx + 4),
+        amproc = row[TypoRegproc](idx + 5)
       )
-  
-    override def reads(json: JsValue): JsResult[PgAmprocRow] = {
-      JsResult.fromTry(
-        Try(
-          PgAmprocRow(
-            oid = json.\("oid").as[PgAmprocId],
-            amprocfamily = json.\("amprocfamily").as[/* oid */ Long],
-            amproclefttype = json.\("amproclefttype").as[/* oid */ Long],
-            amprocrighttype = json.\("amprocrighttype").as[/* oid */ Long],
-            amprocnum = json.\("amprocnum").as[Int],
-            amproc = json.\("amproc").as[TypoRegproc]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgAmprocRow] = OWrites[PgAmprocRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "amprocfamily" -> Json.toJson(o.amprocfamily),
+      "amproclefttype" -> Json.toJson(o.amproclefttype),
+      "amprocrighttype" -> Json.toJson(o.amprocrighttype),
+      "amprocnum" -> Json.toJson(o.amprocnum),
+      "amproc" -> Json.toJson(o.amproc)
+    ))
+  )
 }

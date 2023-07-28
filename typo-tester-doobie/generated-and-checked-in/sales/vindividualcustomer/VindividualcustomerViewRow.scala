@@ -11,13 +11,11 @@ import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class VindividualcustomerViewRow(
@@ -56,94 +54,48 @@ case class VindividualcustomerViewRow(
 )
 
 object VindividualcustomerViewRow {
-  implicit val decoder: Decoder[VindividualcustomerViewRow] =
-    (c: HCursor) =>
-      for {
-        businessentityid <- c.downField("businessentityid").as[Option[BusinessentityId]]
-        title <- c.downField("title").as[Option[/* max 8 chars */ String]]
-        firstname <- c.downField("firstname").as[Option[Name]]
-        middlename <- c.downField("middlename").as[Option[Name]]
-        lastname <- c.downField("lastname").as[Option[Name]]
-        suffix <- c.downField("suffix").as[Option[/* max 10 chars */ String]]
-        phonenumber <- c.downField("phonenumber").as[Option[Phone]]
-        phonenumbertype <- c.downField("phonenumbertype").as[Option[Name]]
-        emailaddress <- c.downField("emailaddress").as[Option[/* max 50 chars */ String]]
-        emailpromotion <- c.downField("emailpromotion").as[Option[Int]]
-        addresstype <- c.downField("addresstype").as[Option[Name]]
-        addressline1 <- c.downField("addressline1").as[Option[/* max 60 chars */ String]]
-        addressline2 <- c.downField("addressline2").as[Option[/* max 60 chars */ String]]
-        city <- c.downField("city").as[Option[/* max 30 chars */ String]]
-        stateprovincename <- c.downField("stateprovincename").as[Option[Name]]
-        postalcode <- c.downField("postalcode").as[Option[/* max 15 chars */ String]]
-        countryregionname <- c.downField("countryregionname").as[Option[Name]]
-        demographics <- c.downField("demographics").as[Option[TypoXml]]
-      } yield VindividualcustomerViewRow(businessentityid, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion, addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, demographics)
-  implicit val encoder: Encoder[VindividualcustomerViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "businessentityid" := row.businessentityid,
-        "title" := row.title,
-        "firstname" := row.firstname,
-        "middlename" := row.middlename,
-        "lastname" := row.lastname,
-        "suffix" := row.suffix,
-        "phonenumber" := row.phonenumber,
-        "phonenumbertype" := row.phonenumbertype,
-        "emailaddress" := row.emailaddress,
-        "emailpromotion" := row.emailpromotion,
-        "addresstype" := row.addresstype,
-        "addressline1" := row.addressline1,
-        "addressline2" := row.addressline2,
-        "city" := row.city,
-        "stateprovincename" := row.stateprovincename,
-        "postalcode" := row.postalcode,
-        "countryregionname" := row.countryregionname,
-        "demographics" := row.demographics
-      )}
-  implicit val read: Read[VindividualcustomerViewRow] =
-    new Read[VindividualcustomerViewRow](
-      gets = List(
-        (Get[BusinessentityId], Nullability.Nullable),
-        (Get[/* max 8 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 10 chars */ String], Nullability.Nullable),
-        (Get[Phone], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 50 chars */ String], Nullability.Nullable),
-        (Get[Int], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 60 chars */ String], Nullability.Nullable),
-        (Get[/* max 30 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[/* max 15 chars */ String], Nullability.Nullable),
-        (Get[Name], Nullability.Nullable),
-        (Get[TypoXml], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => VindividualcustomerViewRow(
-        businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
-        title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
-        firstname = Get[Name].unsafeGetNullable(rs, i + 2),
-        middlename = Get[Name].unsafeGetNullable(rs, i + 3),
-        lastname = Get[Name].unsafeGetNullable(rs, i + 4),
-        suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
-        phonenumber = Get[Phone].unsafeGetNullable(rs, i + 6),
-        phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 7),
-        emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 8),
-        emailpromotion = Get[Int].unsafeGetNullable(rs, i + 9),
-        addresstype = Get[Name].unsafeGetNullable(rs, i + 10),
-        addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 11),
-        addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 12),
-        city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 13),
-        stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
-        postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 15),
-        countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
-        demographics = Get[TypoXml].unsafeGetNullable(rs, i + 17)
-      )
+  implicit val decoder: Decoder[VindividualcustomerViewRow] = Decoder.forProduct18[VindividualcustomerViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[Name], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[TypoXml]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics")(VindividualcustomerViewRow.apply)
+  implicit val encoder: Encoder[VindividualcustomerViewRow] = Encoder.forProduct18[VindividualcustomerViewRow, Option[BusinessentityId], Option[/* max 8 chars */ String], Option[Name], Option[Name], Option[Name], Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Option[Int], Option[Name], Option[/* max 60 chars */ String], Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[Name], Option[/* max 15 chars */ String], Option[Name], Option[TypoXml]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion, x.addresstype, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname, x.demographics))
+  implicit val read: Read[VindividualcustomerViewRow] = new Read[VindividualcustomerViewRow](
+    gets = List(
+      (Get[BusinessentityId], Nullability.Nullable),
+      (Get[/* max 8 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 10 chars */ String], Nullability.Nullable),
+      (Get[Phone], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 50 chars */ String], Nullability.Nullable),
+      (Get[Int], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 60 chars */ String], Nullability.Nullable),
+      (Get[/* max 60 chars */ String], Nullability.Nullable),
+      (Get[/* max 30 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[/* max 15 chars */ String], Nullability.Nullable),
+      (Get[Name], Nullability.Nullable),
+      (Get[TypoXml], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => VindividualcustomerViewRow(
+      businessentityid = Get[BusinessentityId].unsafeGetNullable(rs, i + 0),
+      title = Get[/* max 8 chars */ String].unsafeGetNullable(rs, i + 1),
+      firstname = Get[Name].unsafeGetNullable(rs, i + 2),
+      middlename = Get[Name].unsafeGetNullable(rs, i + 3),
+      lastname = Get[Name].unsafeGetNullable(rs, i + 4),
+      suffix = Get[/* max 10 chars */ String].unsafeGetNullable(rs, i + 5),
+      phonenumber = Get[Phone].unsafeGetNullable(rs, i + 6),
+      phonenumbertype = Get[Name].unsafeGetNullable(rs, i + 7),
+      emailaddress = Get[/* max 50 chars */ String].unsafeGetNullable(rs, i + 8),
+      emailpromotion = Get[Int].unsafeGetNullable(rs, i + 9),
+      addresstype = Get[Name].unsafeGetNullable(rs, i + 10),
+      addressline1 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 11),
+      addressline2 = Get[/* max 60 chars */ String].unsafeGetNullable(rs, i + 12),
+      city = Get[/* max 30 chars */ String].unsafeGetNullable(rs, i + 13),
+      stateprovincename = Get[Name].unsafeGetNullable(rs, i + 14),
+      postalcode = Get[/* max 15 chars */ String].unsafeGetNullable(rs, i + 15),
+      countryregionname = Get[Name].unsafeGetNullable(rs, i + 16),
+      demographics = Get[TypoXml].unsafeGetNullable(rs, i + 17)
     )
-  
-
+  )
 }

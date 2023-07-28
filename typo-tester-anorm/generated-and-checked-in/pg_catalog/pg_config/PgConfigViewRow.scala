@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgConfigViewRow(
@@ -22,31 +24,27 @@ case class PgConfigViewRow(
 )
 
 object PgConfigViewRow {
-  def rowParser(idx: Int): RowParser[PgConfigViewRow] =
-    RowParser[PgConfigViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgConfigViewRow] = Reads[PgConfigViewRow](json => JsResult.fromTry(
+      Try(
         PgConfigViewRow(
-          name = row[Option[String]](idx + 0),
-          setting = row[Option[String]](idx + 1)
+          name = json.\("name").toOption.map(_.as[String]),
+          setting = json.\("setting").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgConfigViewRow] = new OFormat[PgConfigViewRow]{
-    override def writes(o: PgConfigViewRow): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "setting" -> o.setting
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgConfigViewRow] = RowParser[PgConfigViewRow] { row =>
+    Success(
+      PgConfigViewRow(
+        name = row[Option[String]](idx + 0),
+        setting = row[Option[String]](idx + 1)
       )
-  
-    override def reads(json: JsValue): JsResult[PgConfigViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgConfigViewRow(
-            name = json.\("name").toOption.map(_.as[String]),
-            setting = json.\("setting").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgConfigViewRow] = OWrites[PgConfigViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "setting" -> Json.toJson(o.setting)
+    ))
+  )
 }

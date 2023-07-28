@@ -10,13 +10,11 @@ package role_udt_grants
 import adventureworks.information_schema.CharacterData
 import adventureworks.information_schema.SqlIdentifier
 import adventureworks.information_schema.YesOrNo
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
 
 case class RoleUdtGrantsViewRow(
@@ -37,50 +35,26 @@ case class RoleUdtGrantsViewRow(
 )
 
 object RoleUdtGrantsViewRow {
-  implicit val decoder: Decoder[RoleUdtGrantsViewRow] =
-    (c: HCursor) =>
-      for {
-        grantor <- c.downField("grantor").as[Option[SqlIdentifier]]
-        grantee <- c.downField("grantee").as[Option[SqlIdentifier]]
-        udtCatalog <- c.downField("udt_catalog").as[Option[SqlIdentifier]]
-        udtSchema <- c.downField("udt_schema").as[Option[SqlIdentifier]]
-        udtName <- c.downField("udt_name").as[Option[SqlIdentifier]]
-        privilegeType <- c.downField("privilege_type").as[Option[CharacterData]]
-        isGrantable <- c.downField("is_grantable").as[Option[YesOrNo]]
-      } yield RoleUdtGrantsViewRow(grantor, grantee, udtCatalog, udtSchema, udtName, privilegeType, isGrantable)
-  implicit val encoder: Encoder[RoleUdtGrantsViewRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "grantor" := row.grantor,
-        "grantee" := row.grantee,
-        "udt_catalog" := row.udtCatalog,
-        "udt_schema" := row.udtSchema,
-        "udt_name" := row.udtName,
-        "privilege_type" := row.privilegeType,
-        "is_grantable" := row.isGrantable
-      )}
-  implicit val read: Read[RoleUdtGrantsViewRow] =
-    new Read[RoleUdtGrantsViewRow](
-      gets = List(
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[SqlIdentifier], Nullability.Nullable),
-        (Get[CharacterData], Nullability.Nullable),
-        (Get[YesOrNo], Nullability.Nullable)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => RoleUdtGrantsViewRow(
-        grantor = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
-        grantee = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
-        udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
-        udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
-        udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
-        privilegeType = Get[CharacterData].unsafeGetNullable(rs, i + 5),
-        isGrantable = Get[YesOrNo].unsafeGetNullable(rs, i + 6)
-      )
+  implicit val decoder: Decoder[RoleUdtGrantsViewRow] = Decoder.forProduct7[RoleUdtGrantsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(RoleUdtGrantsViewRow.apply)
+  implicit val encoder: Encoder[RoleUdtGrantsViewRow] = Encoder.forProduct7[RoleUdtGrantsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData], Option[YesOrNo]]("grantor", "grantee", "udt_catalog", "udt_schema", "udt_name", "privilege_type", "is_grantable")(x => (x.grantor, x.grantee, x.udtCatalog, x.udtSchema, x.udtName, x.privilegeType, x.isGrantable))
+  implicit val read: Read[RoleUdtGrantsViewRow] = new Read[RoleUdtGrantsViewRow](
+    gets = List(
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[SqlIdentifier], Nullability.Nullable),
+      (Get[CharacterData], Nullability.Nullable),
+      (Get[YesOrNo], Nullability.Nullable)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => RoleUdtGrantsViewRow(
+      grantor = Get[SqlIdentifier].unsafeGetNullable(rs, i + 0),
+      grantee = Get[SqlIdentifier].unsafeGetNullable(rs, i + 1),
+      udtCatalog = Get[SqlIdentifier].unsafeGetNullable(rs, i + 2),
+      udtSchema = Get[SqlIdentifier].unsafeGetNullable(rs, i + 3),
+      udtName = Get[SqlIdentifier].unsafeGetNullable(rs, i + 4),
+      privilegeType = Get[CharacterData].unsafeGetNullable(rs, i + 5),
+      isGrantable = Get[YesOrNo].unsafeGetNullable(rs, i + 6)
     )
-  
-
+  )
 }

@@ -7,54 +7,36 @@ package adventureworks
 package production
 package culture
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.Get
-import doobie.Read
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class CultureRow(
   /** Primary key for Culture records. */
   cultureid: CultureId,
   /** Culture description. */
   name: Name,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object CultureRow {
-  implicit val decoder: Decoder[CultureRow] =
-    (c: HCursor) =>
-      for {
-        cultureid <- c.downField("cultureid").as[CultureId]
-        name <- c.downField("name").as[Name]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield CultureRow(cultureid, name, modifieddate)
-  implicit val encoder: Encoder[CultureRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "cultureid" := row.cultureid,
-        "name" := row.name,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[CultureRow] =
-    new Read[CultureRow](
-      gets = List(
-        (Get[CultureId], Nullability.NoNulls),
-        (Get[Name], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => CultureRow(
-        cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 0),
-        name = Get[Name].unsafeGetNonNullable(rs, i + 1),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 2)
-      )
+  implicit val decoder: Decoder[CultureRow] = Decoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(CultureRow.apply)
+  implicit val encoder: Encoder[CultureRow] = Encoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))
+  implicit val read: Read[CultureRow] = new Read[CultureRow](
+    gets = List(
+      (Get[CultureId], Nullability.NoNulls),
+      (Get[Name], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => CultureRow(
+      cultureid = Get[CultureId].unsafeGetNonNullable(rs, i + 0),
+      name = Get[Name].unsafeGetNonNullable(rs, i + 1),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 2)
     )
-  
-
+  )
 }

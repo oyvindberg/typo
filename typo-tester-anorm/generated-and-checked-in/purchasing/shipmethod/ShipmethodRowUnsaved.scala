@@ -8,14 +8,16 @@ package purchasing
 package shipmethod
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** This class corresponds to a row in table `purchasing.shipmethod` which has not been persisted yet */
@@ -34,9 +36,9 @@ case class ShipmethodRowUnsaved(
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[UUID] = Defaulted.UseDefault,
   /** Default: now() */
-  modifieddate: Defaulted[LocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
 ) {
-  def toRow(shipmethodidDefault: => ShipmethodId, shipbaseDefault: => BigDecimal, shiprateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => LocalDateTime): ShipmethodRow =
+  def toRow(shipmethodidDefault: => ShipmethodId, shipbaseDefault: => BigDecimal, shiprateDefault: => BigDecimal, rowguidDefault: => UUID, modifieddateDefault: => TypoLocalDateTime): ShipmethodRow =
     ShipmethodRow(
       name = name,
       shipmethodid = shipmethodid match {
@@ -62,30 +64,27 @@ case class ShipmethodRowUnsaved(
     )
 }
 object ShipmethodRowUnsaved {
-  implicit val oFormat: OFormat[ShipmethodRowUnsaved] = new OFormat[ShipmethodRowUnsaved]{
-    override def writes(o: ShipmethodRowUnsaved): JsObject =
-      Json.obj(
-        "name" -> o.name,
-        "shipmethodid" -> o.shipmethodid,
-        "shipbase" -> o.shipbase,
-        "shiprate" -> o.shiprate,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
-      )
-  
-    override def reads(json: JsValue): JsResult[ShipmethodRowUnsaved] = {
-      JsResult.fromTry(
-        Try(
-          ShipmethodRowUnsaved(
-            name = json.\("name").as[Name],
-            shipmethodid = json.\("shipmethodid").as[Defaulted[ShipmethodId]],
-            shipbase = json.\("shipbase").as[Defaulted[BigDecimal]],
-            shiprate = json.\("shiprate").as[Defaulted[BigDecimal]],
-            rowguid = json.\("rowguid").as[Defaulted[UUID]],
-            modifieddate = json.\("modifieddate").as[Defaulted[LocalDateTime]]
-          )
+  implicit val reads: Reads[ShipmethodRowUnsaved] = Reads[ShipmethodRowUnsaved](json => JsResult.fromTry(
+      Try(
+        ShipmethodRowUnsaved(
+          name = json.\("name").as[Name],
+          shipmethodid = json.\("shipmethodid").as[Defaulted[ShipmethodId]],
+          shipbase = json.\("shipbase").as[Defaulted[BigDecimal]],
+          shiprate = json.\("shiprate").as[Defaulted[BigDecimal]],
+          rowguid = json.\("rowguid").as[Defaulted[UUID]],
+          modifieddate = json.\("modifieddate").as[Defaulted[TypoLocalDateTime]]
         )
       )
-    }
-  }
+    ),
+  )
+  implicit val writes: OWrites[ShipmethodRowUnsaved] = OWrites[ShipmethodRowUnsaved](o =>
+    new JsObject(ListMap[String, JsValue](
+      "name" -> Json.toJson(o.name),
+      "shipmethodid" -> Json.toJson(o.shipmethodid),
+      "shipbase" -> Json.toJson(o.shipbase),
+      "shiprate" -> Json.toJson(o.shiprate),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

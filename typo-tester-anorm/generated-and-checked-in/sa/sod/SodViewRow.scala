@@ -7,18 +7,20 @@ package adventureworks
 package sa
 package sod
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class SodViewRow(
@@ -42,62 +44,58 @@ case class SodViewRow(
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.rowguid]] */
   rowguid: Option[UUID],
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object SodViewRow {
-  def rowParser(idx: Int): RowParser[SodViewRow] =
-    RowParser[SodViewRow] { row =>
-      Success(
+  implicit val reads: Reads[SodViewRow] = Reads[SodViewRow](json => JsResult.fromTry(
+      Try(
         SodViewRow(
-          id = row[Option[Int]](idx + 0),
-          salesorderid = row[Option[SalesorderheaderId]](idx + 1),
-          salesorderdetailid = row[Option[Int]](idx + 2),
-          carriertrackingnumber = row[Option[/* max 25 chars */ String]](idx + 3),
-          orderqty = row[Option[Int]](idx + 4),
-          productid = row[Option[ProductId]](idx + 5),
-          specialofferid = row[Option[SpecialofferId]](idx + 6),
-          unitprice = row[Option[BigDecimal]](idx + 7),
-          unitpricediscount = row[Option[BigDecimal]](idx + 8),
-          rowguid = row[Option[UUID]](idx + 9),
-          modifieddate = row[Option[LocalDateTime]](idx + 10)
+          id = json.\("id").toOption.map(_.as[Int]),
+          salesorderid = json.\("salesorderid").toOption.map(_.as[SalesorderheaderId]),
+          salesorderdetailid = json.\("salesorderdetailid").toOption.map(_.as[Int]),
+          carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[/* max 25 chars */ String]),
+          orderqty = json.\("orderqty").toOption.map(_.as[Int]),
+          productid = json.\("productid").toOption.map(_.as[ProductId]),
+          specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),
+          unitprice = json.\("unitprice").toOption.map(_.as[BigDecimal]),
+          unitpricediscount = json.\("unitpricediscount").toOption.map(_.as[BigDecimal]),
+          rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[SodViewRow] = new OFormat[SodViewRow]{
-    override def writes(o: SodViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "salesorderid" -> o.salesorderid,
-        "salesorderdetailid" -> o.salesorderdetailid,
-        "carriertrackingnumber" -> o.carriertrackingnumber,
-        "orderqty" -> o.orderqty,
-        "productid" -> o.productid,
-        "specialofferid" -> o.specialofferid,
-        "unitprice" -> o.unitprice,
-        "unitpricediscount" -> o.unitpricediscount,
-        "rowguid" -> o.rowguid,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[SodViewRow] = RowParser[SodViewRow] { row =>
+    Success(
+      SodViewRow(
+        id = row[Option[Int]](idx + 0),
+        salesorderid = row[Option[SalesorderheaderId]](idx + 1),
+        salesorderdetailid = row[Option[Int]](idx + 2),
+        carriertrackingnumber = row[Option[/* max 25 chars */ String]](idx + 3),
+        orderqty = row[Option[Int]](idx + 4),
+        productid = row[Option[ProductId]](idx + 5),
+        specialofferid = row[Option[SpecialofferId]](idx + 6),
+        unitprice = row[Option[BigDecimal]](idx + 7),
+        unitpricediscount = row[Option[BigDecimal]](idx + 8),
+        rowguid = row[Option[UUID]](idx + 9),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 10)
       )
-  
-    override def reads(json: JsValue): JsResult[SodViewRow] = {
-      JsResult.fromTry(
-        Try(
-          SodViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            salesorderid = json.\("salesorderid").toOption.map(_.as[SalesorderheaderId]),
-            salesorderdetailid = json.\("salesorderdetailid").toOption.map(_.as[Int]),
-            carriertrackingnumber = json.\("carriertrackingnumber").toOption.map(_.as[/* max 25 chars */ String]),
-            orderqty = json.\("orderqty").toOption.map(_.as[Int]),
-            productid = json.\("productid").toOption.map(_.as[ProductId]),
-            specialofferid = json.\("specialofferid").toOption.map(_.as[SpecialofferId]),
-            unitprice = json.\("unitprice").toOption.map(_.as[BigDecimal]),
-            unitpricediscount = json.\("unitpricediscount").toOption.map(_.as[BigDecimal]),
-            rowguid = json.\("rowguid").toOption.map(_.as[UUID]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[SodViewRow] = OWrites[SodViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "salesorderid" -> Json.toJson(o.salesorderid),
+      "salesorderdetailid" -> Json.toJson(o.salesorderdetailid),
+      "carriertrackingnumber" -> Json.toJson(o.carriertrackingnumber),
+      "orderqty" -> Json.toJson(o.orderqty),
+      "productid" -> Json.toJson(o.productid),
+      "specialofferid" -> Json.toJson(o.specialofferid),
+      "unitprice" -> Json.toJson(o.unitprice),
+      "unitpricediscount" -> Json.toJson(o.unitpricediscount),
+      "rowguid" -> Json.toJson(o.rowguid),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }

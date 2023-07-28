@@ -8,21 +8,21 @@ package person
 package addresstype
 
 import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
 import fs2.Stream
-import java.time.LocalDateTime
 import java.util.UUID
 
 object AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
-    sql"delete from person.addresstype where addresstypeid = $addresstypeid".update.run.map(_ > 0)
+    sql"delete from person.addresstype where addresstypeid = ${addresstypeid}".update.run.map(_ > 0)
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
           values (${unsaved.addresstypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
-          returning addresstypeid, "name", rowguid, modifieddate
+          returning addresstypeid, "name", rowguid, modifieddate::text
        """.query[AddresstypeRow].unique
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
@@ -38,32 +38,32 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: LocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const(s"modifieddate"), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.addresstype default values
-            returning addresstypeid, "name", rowguid, modifieddate
+            returning addresstypeid, "name", rowguid, modifieddate::text
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into person.addresstype(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning addresstypeid, "name", rowguid, modifieddate
+            returning addresstypeid, "name", rowguid, modifieddate::text
          """
     }
     q.query[AddresstypeRow].unique
   
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype""".query[AddresstypeRow].stream
+    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype""".query[AddresstypeRow].stream
   }
   override def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid""".query[AddresstypeRow].option
+    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ${addresstypeid}""".query[AddresstypeRow].option
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype where addresstypeid = ANY($addresstypeids)""".query[AddresstypeRow].stream
+    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ANY(${addresstypeids})""".query[AddresstypeRow].stream
   }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
@@ -71,7 +71,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           set "name" = ${row.name}::"public"."Name",
               rowguid = ${row.rowguid}::uuid,
               modifieddate = ${row.modifieddate}::timestamp
-          where addresstypeid = $addresstypeid
+          where addresstypeid = ${addresstypeid}
        """
       .update
       .run
@@ -90,7 +90,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
             "name" = EXCLUDED."name",
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
-          returning addresstypeid, "name", rowguid, modifieddate
+          returning addresstypeid, "name", rowguid, modifieddate::text
        """.query[AddresstypeRow].unique
   }
 }

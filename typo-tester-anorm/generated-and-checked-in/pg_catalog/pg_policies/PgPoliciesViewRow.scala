@@ -13,7 +13,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgPoliciesViewRow(
@@ -28,49 +30,45 @@ case class PgPoliciesViewRow(
 )
 
 object PgPoliciesViewRow {
-  def rowParser(idx: Int): RowParser[PgPoliciesViewRow] =
-    RowParser[PgPoliciesViewRow] { row =>
-      Success(
+  implicit val reads: Reads[PgPoliciesViewRow] = Reads[PgPoliciesViewRow](json => JsResult.fromTry(
+      Try(
         PgPoliciesViewRow(
-          schemaname = row[Option[String]](idx + 0),
-          tablename = row[Option[String]](idx + 1),
-          policyname = row[Option[String]](idx + 2),
-          permissive = row[Option[String]](idx + 3),
-          roles = row[Option[Array[String]]](idx + 4),
-          cmd = row[Option[String]](idx + 5),
-          qual = row[Option[String]](idx + 6),
-          withCheck = row[Option[String]](idx + 7)
+          schemaname = json.\("schemaname").toOption.map(_.as[String]),
+          tablename = json.\("tablename").toOption.map(_.as[String]),
+          policyname = json.\("policyname").toOption.map(_.as[String]),
+          permissive = json.\("permissive").toOption.map(_.as[String]),
+          roles = json.\("roles").toOption.map(_.as[Array[String]]),
+          cmd = json.\("cmd").toOption.map(_.as[String]),
+          qual = json.\("qual").toOption.map(_.as[String]),
+          withCheck = json.\("with_check").toOption.map(_.as[String])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgPoliciesViewRow] = new OFormat[PgPoliciesViewRow]{
-    override def writes(o: PgPoliciesViewRow): JsObject =
-      Json.obj(
-        "schemaname" -> o.schemaname,
-        "tablename" -> o.tablename,
-        "policyname" -> o.policyname,
-        "permissive" -> o.permissive,
-        "roles" -> o.roles,
-        "cmd" -> o.cmd,
-        "qual" -> o.qual,
-        "with_check" -> o.withCheck
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgPoliciesViewRow] = RowParser[PgPoliciesViewRow] { row =>
+    Success(
+      PgPoliciesViewRow(
+        schemaname = row[Option[String]](idx + 0),
+        tablename = row[Option[String]](idx + 1),
+        policyname = row[Option[String]](idx + 2),
+        permissive = row[Option[String]](idx + 3),
+        roles = row[Option[Array[String]]](idx + 4),
+        cmd = row[Option[String]](idx + 5),
+        qual = row[Option[String]](idx + 6),
+        withCheck = row[Option[String]](idx + 7)
       )
-  
-    override def reads(json: JsValue): JsResult[PgPoliciesViewRow] = {
-      JsResult.fromTry(
-        Try(
-          PgPoliciesViewRow(
-            schemaname = json.\("schemaname").toOption.map(_.as[String]),
-            tablename = json.\("tablename").toOption.map(_.as[String]),
-            policyname = json.\("policyname").toOption.map(_.as[String]),
-            permissive = json.\("permissive").toOption.map(_.as[String]),
-            roles = json.\("roles").toOption.map(_.as[Array[String]]),
-            cmd = json.\("cmd").toOption.map(_.as[String]),
-            qual = json.\("qual").toOption.map(_.as[String]),
-            withCheck = json.\("with_check").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgPoliciesViewRow] = OWrites[PgPoliciesViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "schemaname" -> Json.toJson(o.schemaname),
+      "tablename" -> Json.toJson(o.tablename),
+      "policyname" -> Json.toJson(o.policyname),
+      "permissive" -> Json.toJson(o.permissive),
+      "roles" -> Json.toJson(o.roles),
+      "cmd" -> Json.toJson(o.cmd),
+      "qual" -> Json.toJson(o.qual),
+      "with_check" -> Json.toJson(o.withCheck)
+    ))
+  )
 }

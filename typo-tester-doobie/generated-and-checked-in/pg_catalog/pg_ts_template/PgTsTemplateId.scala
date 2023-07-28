@@ -7,18 +7,19 @@ package adventureworks
 package pg_catalog
 package pg_ts_template
 
-import doobie.Meta
+import doobie.util.Get
+import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the primary key of table `pg_catalog.pg_ts_template` */
 case class PgTsTemplateId(value: /* oid */ Long) extends AnyVal
 object PgTsTemplateId {
+  implicit val arrayGet: Get[Array[PgTsTemplateId]] = Get[Array[/* oid */ Long]].map(_.map(PgTsTemplateId.apply))
+  implicit val arrayPut: Put[Array[PgTsTemplateId]] = Put[Array[/* oid */ Long]].contramap(_.map(_.value))
+  implicit val decoder: Decoder[PgTsTemplateId] = Decoder[/* oid */ Long].map(PgTsTemplateId.apply)
+  implicit val encoder: Encoder[PgTsTemplateId] = Encoder[/* oid */ Long].contramap(_.value)
+  implicit val get: Get[PgTsTemplateId] = Get[/* oid */ Long].map(PgTsTemplateId.apply)
   implicit val ordering: Ordering[PgTsTemplateId] = Ordering.by(_.value)
-  implicit val encoder: Encoder[PgTsTemplateId] =
-    Encoder[/* oid */ Long].contramap(_.value)
-  implicit val decoder: Decoder[PgTsTemplateId] =
-    Decoder[/* oid */ Long].map(PgTsTemplateId(_))
-  implicit val meta: Meta[PgTsTemplateId] = Meta[/* oid */ Long].imap(PgTsTemplateId.apply)(_.value)
-  implicit val metaArray: Meta[Array[PgTsTemplateId]] = Meta[Array[/* oid */ Long]].imap(_.map(PgTsTemplateId.apply))(_.map(_.value))
+  implicit val put: Put[PgTsTemplateId] = Put[/* oid */ Long].contramap(_.value)
 }

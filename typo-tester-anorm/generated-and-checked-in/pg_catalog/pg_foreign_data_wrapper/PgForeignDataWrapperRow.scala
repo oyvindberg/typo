@@ -14,7 +14,9 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class PgForeignDataWrapperRow(
@@ -28,46 +30,42 @@ case class PgForeignDataWrapperRow(
 )
 
 object PgForeignDataWrapperRow {
-  def rowParser(idx: Int): RowParser[PgForeignDataWrapperRow] =
-    RowParser[PgForeignDataWrapperRow] { row =>
-      Success(
+  implicit val reads: Reads[PgForeignDataWrapperRow] = Reads[PgForeignDataWrapperRow](json => JsResult.fromTry(
+      Try(
         PgForeignDataWrapperRow(
-          oid = row[PgForeignDataWrapperId](idx + 0),
-          fdwname = row[String](idx + 1),
-          fdwowner = row[/* oid */ Long](idx + 2),
-          fdwhandler = row[/* oid */ Long](idx + 3),
-          fdwvalidator = row[/* oid */ Long](idx + 4),
-          fdwacl = row[Option[Array[TypoAclItem]]](idx + 5),
-          fdwoptions = row[Option[Array[String]]](idx + 6)
+          oid = json.\("oid").as[PgForeignDataWrapperId],
+          fdwname = json.\("fdwname").as[String],
+          fdwowner = json.\("fdwowner").as[/* oid */ Long],
+          fdwhandler = json.\("fdwhandler").as[/* oid */ Long],
+          fdwvalidator = json.\("fdwvalidator").as[/* oid */ Long],
+          fdwacl = json.\("fdwacl").toOption.map(_.as[Array[TypoAclItem]]),
+          fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]])
         )
       )
-    }
-  implicit val oFormat: OFormat[PgForeignDataWrapperRow] = new OFormat[PgForeignDataWrapperRow]{
-    override def writes(o: PgForeignDataWrapperRow): JsObject =
-      Json.obj(
-        "oid" -> o.oid,
-        "fdwname" -> o.fdwname,
-        "fdwowner" -> o.fdwowner,
-        "fdwhandler" -> o.fdwhandler,
-        "fdwvalidator" -> o.fdwvalidator,
-        "fdwacl" -> o.fdwacl,
-        "fdwoptions" -> o.fdwoptions
+    ),
+  )
+  def rowParser(idx: Int): RowParser[PgForeignDataWrapperRow] = RowParser[PgForeignDataWrapperRow] { row =>
+    Success(
+      PgForeignDataWrapperRow(
+        oid = row[PgForeignDataWrapperId](idx + 0),
+        fdwname = row[String](idx + 1),
+        fdwowner = row[/* oid */ Long](idx + 2),
+        fdwhandler = row[/* oid */ Long](idx + 3),
+        fdwvalidator = row[/* oid */ Long](idx + 4),
+        fdwacl = row[Option[Array[TypoAclItem]]](idx + 5),
+        fdwoptions = row[Option[Array[String]]](idx + 6)
       )
-  
-    override def reads(json: JsValue): JsResult[PgForeignDataWrapperRow] = {
-      JsResult.fromTry(
-        Try(
-          PgForeignDataWrapperRow(
-            oid = json.\("oid").as[PgForeignDataWrapperId],
-            fdwname = json.\("fdwname").as[String],
-            fdwowner = json.\("fdwowner").as[/* oid */ Long],
-            fdwhandler = json.\("fdwhandler").as[/* oid */ Long],
-            fdwvalidator = json.\("fdwvalidator").as[/* oid */ Long],
-            fdwacl = json.\("fdwacl").toOption.map(_.as[Array[TypoAclItem]]),
-            fdwoptions = json.\("fdwoptions").toOption.map(_.as[Array[String]])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[PgForeignDataWrapperRow] = OWrites[PgForeignDataWrapperRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "oid" -> Json.toJson(o.oid),
+      "fdwname" -> Json.toJson(o.fdwname),
+      "fdwowner" -> Json.toJson(o.fdwowner),
+      "fdwhandler" -> Json.toJson(o.fdwhandler),
+      "fdwvalidator" -> Json.toJson(o.fdwvalidator),
+      "fdwacl" -> Json.toJson(o.fdwacl),
+      "fdwoptions" -> Json.toJson(o.fdwoptions)
+    ))
+  )
 }

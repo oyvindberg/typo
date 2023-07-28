@@ -7,15 +7,13 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
-import doobie.Get
-import doobie.Read
+import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
+import doobie.util.Get
+import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
 import java.sql.ResultSet
-import java.time.LocalDateTime
 
 case class TransactionhistoryarchiveRow(
   /** Primary key for TransactionHistoryArchive records. */
@@ -27,69 +25,41 @@ case class TransactionhistoryarchiveRow(
   /** Line number associated with the purchase order, sales order, or work order. */
   referenceorderlineid: Int,
   /** Date and time of the transaction. */
-  transactiondate: LocalDateTime,
+  transactiondate: TypoLocalDateTime,
   /** W = Work Order, S = Sales Order, P = Purchase Order */
   transactiontype: /* bpchar */ String,
   /** Product quantity. */
   quantity: Int,
   /** Product cost. */
   actualcost: BigDecimal,
-  modifieddate: LocalDateTime
+  modifieddate: TypoLocalDateTime
 )
 
 object TransactionhistoryarchiveRow {
-  implicit val decoder: Decoder[TransactionhistoryarchiveRow] =
-    (c: HCursor) =>
-      for {
-        transactionid <- c.downField("transactionid").as[TransactionhistoryarchiveId]
-        productid <- c.downField("productid").as[Int]
-        referenceorderid <- c.downField("referenceorderid").as[Int]
-        referenceorderlineid <- c.downField("referenceorderlineid").as[Int]
-        transactiondate <- c.downField("transactiondate").as[LocalDateTime]
-        transactiontype <- c.downField("transactiontype").as[/* bpchar */ String]
-        quantity <- c.downField("quantity").as[Int]
-        actualcost <- c.downField("actualcost").as[BigDecimal]
-        modifieddate <- c.downField("modifieddate").as[LocalDateTime]
-      } yield TransactionhistoryarchiveRow(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
-  implicit val encoder: Encoder[TransactionhistoryarchiveRow] = {
-    import io.circe.syntax._
-    row =>
-      Json.obj(
-        "transactionid" := row.transactionid,
-        "productid" := row.productid,
-        "referenceorderid" := row.referenceorderid,
-        "referenceorderlineid" := row.referenceorderlineid,
-        "transactiondate" := row.transactiondate,
-        "transactiontype" := row.transactiontype,
-        "quantity" := row.quantity,
-        "actualcost" := row.actualcost,
-        "modifieddate" := row.modifieddate
-      )}
-  implicit val read: Read[TransactionhistoryarchiveRow] =
-    new Read[TransactionhistoryarchiveRow](
-      gets = List(
-        (Get[TransactionhistoryarchiveId], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls),
-        (Get[/* bpchar */ String], Nullability.NoNulls),
-        (Get[Int], Nullability.NoNulls),
-        (Get[BigDecimal], Nullability.NoNulls),
-        (Get[LocalDateTime], Nullability.NoNulls)
-      ),
-      unsafeGet = (rs: ResultSet, i: Int) => TransactionhistoryarchiveRow(
-        transactionid = Get[TransactionhistoryarchiveId].unsafeGetNonNullable(rs, i + 0),
-        productid = Get[Int].unsafeGetNonNullable(rs, i + 1),
-        referenceorderid = Get[Int].unsafeGetNonNullable(rs, i + 2),
-        referenceorderlineid = Get[Int].unsafeGetNonNullable(rs, i + 3),
-        transactiondate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 4),
-        transactiontype = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
-        quantity = Get[Int].unsafeGetNonNullable(rs, i + 6),
-        actualcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
-        modifieddate = Get[LocalDateTime].unsafeGetNonNullable(rs, i + 8)
-      )
+  implicit val decoder: Decoder[TransactionhistoryarchiveRow] = Decoder.forProduct9[TransactionhistoryarchiveRow, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(TransactionhistoryarchiveRow.apply)
+  implicit val encoder: Encoder[TransactionhistoryarchiveRow] = Encoder.forProduct9[TransactionhistoryarchiveRow, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))
+  implicit val read: Read[TransactionhistoryarchiveRow] = new Read[TransactionhistoryarchiveRow](
+    gets = List(
+      (Get[TransactionhistoryarchiveId], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls),
+      (Get[/* bpchar */ String], Nullability.NoNulls),
+      (Get[Int], Nullability.NoNulls),
+      (Get[BigDecimal], Nullability.NoNulls),
+      (Get[TypoLocalDateTime], Nullability.NoNulls)
+    ),
+    unsafeGet = (rs: ResultSet, i: Int) => TransactionhistoryarchiveRow(
+      transactionid = Get[TransactionhistoryarchiveId].unsafeGetNonNullable(rs, i + 0),
+      productid = Get[Int].unsafeGetNonNullable(rs, i + 1),
+      referenceorderid = Get[Int].unsafeGetNonNullable(rs, i + 2),
+      referenceorderlineid = Get[Int].unsafeGetNonNullable(rs, i + 3),
+      transactiondate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 4),
+      transactiontype = Get[/* bpchar */ String].unsafeGetNonNullable(rs, i + 5),
+      quantity = Get[Int].unsafeGetNonNullable(rs, i + 6),
+      actualcost = Get[BigDecimal].unsafeGetNonNullable(rs, i + 7),
+      modifieddate = Get[TypoLocalDateTime].unsafeGetNonNullable(rs, i + 8)
     )
-  
-
+  )
 }

@@ -7,16 +7,18 @@ package adventureworks
 package pr
 package th
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.transactionhistory.TransactionhistoryId
 import anorm.RowParser
 import anorm.Success
-import java.time.LocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class ThViewRow(
@@ -30,7 +32,7 @@ case class ThViewRow(
   /** Points to [[production.transactionhistory.TransactionhistoryRow.referenceorderlineid]] */
   referenceorderlineid: Option[Int],
   /** Points to [[production.transactionhistory.TransactionhistoryRow.transactiondate]] */
-  transactiondate: Option[LocalDateTime],
+  transactiondate: Option[TypoLocalDateTime],
   /** Points to [[production.transactionhistory.TransactionhistoryRow.transactiontype]] */
   transactiontype: Option[/* bpchar */ String],
   /** Points to [[production.transactionhistory.TransactionhistoryRow.quantity]] */
@@ -38,59 +40,55 @@ case class ThViewRow(
   /** Points to [[production.transactionhistory.TransactionhistoryRow.actualcost]] */
   actualcost: Option[BigDecimal],
   /** Points to [[production.transactionhistory.TransactionhistoryRow.modifieddate]] */
-  modifieddate: Option[LocalDateTime]
+  modifieddate: Option[TypoLocalDateTime]
 )
 
 object ThViewRow {
-  def rowParser(idx: Int): RowParser[ThViewRow] =
-    RowParser[ThViewRow] { row =>
-      Success(
+  implicit val reads: Reads[ThViewRow] = Reads[ThViewRow](json => JsResult.fromTry(
+      Try(
         ThViewRow(
-          id = row[Option[Int]](idx + 0),
-          transactionid = row[Option[TransactionhistoryId]](idx + 1),
-          productid = row[Option[ProductId]](idx + 2),
-          referenceorderid = row[Option[Int]](idx + 3),
-          referenceorderlineid = row[Option[Int]](idx + 4),
-          transactiondate = row[Option[LocalDateTime]](idx + 5),
-          transactiontype = row[Option[/* bpchar */ String]](idx + 6),
-          quantity = row[Option[Int]](idx + 7),
-          actualcost = row[Option[BigDecimal]](idx + 8),
-          modifieddate = row[Option[LocalDateTime]](idx + 9)
+          id = json.\("id").toOption.map(_.as[Int]),
+          transactionid = json.\("transactionid").toOption.map(_.as[TransactionhistoryId]),
+          productid = json.\("productid").toOption.map(_.as[ProductId]),
+          referenceorderid = json.\("referenceorderid").toOption.map(_.as[Int]),
+          referenceorderlineid = json.\("referenceorderlineid").toOption.map(_.as[Int]),
+          transactiondate = json.\("transactiondate").toOption.map(_.as[TypoLocalDateTime]),
+          transactiontype = json.\("transactiontype").toOption.map(_.as[/* bpchar */ String]),
+          quantity = json.\("quantity").toOption.map(_.as[Int]),
+          actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
+          modifieddate = json.\("modifieddate").toOption.map(_.as[TypoLocalDateTime])
         )
       )
-    }
-  implicit val oFormat: OFormat[ThViewRow] = new OFormat[ThViewRow]{
-    override def writes(o: ThViewRow): JsObject =
-      Json.obj(
-        "id" -> o.id,
-        "transactionid" -> o.transactionid,
-        "productid" -> o.productid,
-        "referenceorderid" -> o.referenceorderid,
-        "referenceorderlineid" -> o.referenceorderlineid,
-        "transactiondate" -> o.transactiondate,
-        "transactiontype" -> o.transactiontype,
-        "quantity" -> o.quantity,
-        "actualcost" -> o.actualcost,
-        "modifieddate" -> o.modifieddate
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ThViewRow] = RowParser[ThViewRow] { row =>
+    Success(
+      ThViewRow(
+        id = row[Option[Int]](idx + 0),
+        transactionid = row[Option[TransactionhistoryId]](idx + 1),
+        productid = row[Option[ProductId]](idx + 2),
+        referenceorderid = row[Option[Int]](idx + 3),
+        referenceorderlineid = row[Option[Int]](idx + 4),
+        transactiondate = row[Option[TypoLocalDateTime]](idx + 5),
+        transactiontype = row[Option[/* bpchar */ String]](idx + 6),
+        quantity = row[Option[Int]](idx + 7),
+        actualcost = row[Option[BigDecimal]](idx + 8),
+        modifieddate = row[Option[TypoLocalDateTime]](idx + 9)
       )
-  
-    override def reads(json: JsValue): JsResult[ThViewRow] = {
-      JsResult.fromTry(
-        Try(
-          ThViewRow(
-            id = json.\("id").toOption.map(_.as[Int]),
-            transactionid = json.\("transactionid").toOption.map(_.as[TransactionhistoryId]),
-            productid = json.\("productid").toOption.map(_.as[ProductId]),
-            referenceorderid = json.\("referenceorderid").toOption.map(_.as[Int]),
-            referenceorderlineid = json.\("referenceorderlineid").toOption.map(_.as[Int]),
-            transactiondate = json.\("transactiondate").toOption.map(_.as[LocalDateTime]),
-            transactiontype = json.\("transactiontype").toOption.map(_.as[/* bpchar */ String]),
-            quantity = json.\("quantity").toOption.map(_.as[Int]),
-            actualcost = json.\("actualcost").toOption.map(_.as[BigDecimal]),
-            modifieddate = json.\("modifieddate").toOption.map(_.as[LocalDateTime])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit val writes: OWrites[ThViewRow] = OWrites[ThViewRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "id" -> Json.toJson(o.id),
+      "transactionid" -> Json.toJson(o.transactionid),
+      "productid" -> Json.toJson(o.productid),
+      "referenceorderid" -> Json.toJson(o.referenceorderid),
+      "referenceorderlineid" -> Json.toJson(o.referenceorderlineid),
+      "transactiondate" -> Json.toJson(o.transactiondate),
+      "transactiontype" -> Json.toJson(o.transactiontype),
+      "quantity" -> Json.toJson(o.quantity),
+      "actualcost" -> Json.toJson(o.actualcost),
+      "modifieddate" -> Json.toJson(o.modifieddate)
+    ))
+  )
 }
