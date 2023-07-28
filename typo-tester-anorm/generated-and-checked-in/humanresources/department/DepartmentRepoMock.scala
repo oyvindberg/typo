@@ -27,14 +27,6 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]])(implicit c: Connection): List[DepartmentRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, DepartmentFieldValue.departmentid(value)) => acc.filter(_.departmentid == value)
-      case (acc, DepartmentFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, DepartmentFieldValue.groupname(value)) => acc.filter(_.groupname == value)
-      case (acc, DepartmentFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow] = {
     map.get(departmentid)
   }
@@ -47,23 +39,6 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
       case Some(_) =>
         map.put(row.departmentid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(departmentid: DepartmentId, fieldValues: List[DepartmentFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(departmentid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, DepartmentFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, DepartmentFieldValue.groupname(value)) => acc.copy(groupname = value)
-          case (acc, DepartmentFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(departmentid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

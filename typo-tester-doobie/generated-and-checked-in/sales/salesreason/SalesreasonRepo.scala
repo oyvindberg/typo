@@ -15,10 +15,8 @@ trait SalesreasonRepo {
   def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
   def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow]
   def selectAll: Stream[ConnectionIO, SalesreasonRow]
-  def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]]): Stream[ConnectionIO, SalesreasonRow]
   def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]]
   def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow]
   def update(row: SalesreasonRow): ConnectionIO[Boolean]
-  def updateFieldValues(salesreasonid: SalesreasonId, fieldValues: List[SalesreasonFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
 }

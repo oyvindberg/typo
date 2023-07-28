@@ -82,36 +82,6 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
           from sales.specialoffer
        """.as(SpecialofferRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SpecialofferFieldValue.specialofferid(value) => NamedParameter("specialofferid", ParameterValue.from(value))
-          case SpecialofferFieldValue.description(value) => NamedParameter("description", ParameterValue.from(value))
-          case SpecialofferFieldValue.discountpct(value) => NamedParameter("discountpct", ParameterValue.from(value))
-          case SpecialofferFieldValue.`type`(value) => NamedParameter("type", ParameterValue.from(value))
-          case SpecialofferFieldValue.category(value) => NamedParameter("category", ParameterValue.from(value))
-          case SpecialofferFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case SpecialofferFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case SpecialofferFieldValue.minqty(value) => NamedParameter("minqty", ParameterValue.from(value))
-          case SpecialofferFieldValue.maxqty(value) => NamedParameter("maxqty", ParameterValue.from(value))
-          case SpecialofferFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SpecialofferFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
-                    from sales.specialoffer
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SpecialofferRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow] = {
     SQL"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sales.specialoffer
@@ -144,36 +114,6 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where specialofferid = $specialofferid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(specialofferid: SpecialofferId, fieldValues: List[SpecialofferFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SpecialofferFieldValue.description(value) => NamedParameter("description", ParameterValue.from(value))
-          case SpecialofferFieldValue.discountpct(value) => NamedParameter("discountpct", ParameterValue.from(value))
-          case SpecialofferFieldValue.`type`(value) => NamedParameter("type", ParameterValue.from(value))
-          case SpecialofferFieldValue.category(value) => NamedParameter("category", ParameterValue.from(value))
-          case SpecialofferFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case SpecialofferFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case SpecialofferFieldValue.minqty(value) => NamedParameter("minqty", ParameterValue.from(value))
-          case SpecialofferFieldValue.maxqty(value) => NamedParameter("maxqty", ParameterValue.from(value))
-          case SpecialofferFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SpecialofferFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.specialoffer
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where specialofferid = {specialofferid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("specialofferid", ParameterValue.from(specialofferid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)

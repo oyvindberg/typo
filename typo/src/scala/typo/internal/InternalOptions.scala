@@ -11,5 +11,6 @@ case class InternalOptions(
     typeOverride: TypeOverride,
     generateMockRepos: Selector,
     header: String,
+    enableFieldValue: Boolean,
     debugTypes: Boolean
 )

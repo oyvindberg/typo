@@ -9,10 +9,8 @@ package salesterritoryhistory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -60,20 +58,6 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = {
     sql"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory".query[SalesterritoryhistoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalesterritoryhistoryFieldOrIdValue[_]]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalesterritoryhistoryFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case SalesterritoryhistoryFieldValue.territoryid(value) => fr"territoryid = $value"
-        case SalesterritoryhistoryFieldValue.startdate(value) => fr"startdate = $value"
-        case SalesterritoryhistoryFieldValue.enddate(value) => fr"enddate = $value"
-        case SalesterritoryhistoryFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SalesterritoryhistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salesterritoryhistory $where".query[SalesterritoryhistoryRow].stream
-  
-  }
   override def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
     sql"select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".query[SalesterritoryhistoryRow].option
   }
@@ -88,23 +72,6 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: SalesterritoryhistoryId, fieldValues: List[SalesterritoryhistoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalesterritoryhistoryFieldValue.enddate(value) => fr"enddate = $value"
-            case SalesterritoryhistoryFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SalesterritoryhistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salesterritoryhistory
-              $updates
-              where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)

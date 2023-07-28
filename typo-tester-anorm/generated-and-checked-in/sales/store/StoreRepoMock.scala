@@ -28,16 +28,6 @@ class StoreRepoMock(toRow: Function1[StoreRowUnsaved, StoreRow],
   override def selectAll(implicit c: Connection): List[StoreRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[StoreFieldOrIdValue[_]])(implicit c: Connection): List[StoreRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, StoreFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-      case (acc, StoreFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, StoreFieldValue.salespersonid(value)) => acc.filter(_.salespersonid == value)
-      case (acc, StoreFieldValue.demographics(value)) => acc.filter(_.demographics == value)
-      case (acc, StoreFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, StoreFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
     map.get(businessentityid)
   }
@@ -50,25 +40,6 @@ class StoreRepoMock(toRow: Function1[StoreRowUnsaved, StoreRow],
       case Some(_) =>
         map.put(row.businessentityid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[StoreFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(businessentityid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, StoreFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, StoreFieldValue.salespersonid(value)) => acc.copy(salespersonid = value)
-          case (acc, StoreFieldValue.demographics(value)) => acc.copy(demographics = value)
-          case (acc, StoreFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, StoreFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(businessentityid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

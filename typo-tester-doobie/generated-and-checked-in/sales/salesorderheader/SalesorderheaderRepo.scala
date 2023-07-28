@@ -15,10 +15,8 @@ trait SalesorderheaderRepo {
   def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow]
   def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow]
   def selectAll: Stream[ConnectionIO, SalesorderheaderRow]
-  def selectByFieldValues(fieldValues: List[SalesorderheaderFieldOrIdValue[_]]): Stream[ConnectionIO, SalesorderheaderRow]
   def selectById(salesorderid: SalesorderheaderId): ConnectionIO[Option[SalesorderheaderRow]]
   def selectByIds(salesorderids: Array[SalesorderheaderId]): Stream[ConnectionIO, SalesorderheaderRow]
   def update(row: SalesorderheaderRow): ConnectionIO[Boolean]
-  def updateFieldValues(salesorderid: SalesorderheaderId, fieldValues: List[SalesorderheaderFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow]
 }

@@ -16,10 +16,8 @@ trait StoreRepo {
   def insert(unsaved: StoreRow): ConnectionIO[StoreRow]
   def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow]
   def selectAll: Stream[ConnectionIO, StoreRow]
-  def selectByFieldValues(fieldValues: List[StoreFieldOrIdValue[_]]): Stream[ConnectionIO, StoreRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[StoreRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow]
   def update(row: StoreRow): ConnectionIO[Boolean]
-  def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[StoreFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: StoreRow): ConnectionIO[StoreRow]
 }

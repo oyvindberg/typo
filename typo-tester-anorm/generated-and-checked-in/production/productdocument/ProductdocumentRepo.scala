@@ -14,9 +14,7 @@ trait ProductdocumentRepo {
   def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow
   def insert(unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow
   def selectAll(implicit c: Connection): List[ProductdocumentRow]
-  def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]])(implicit c: Connection): List[ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow]
   def update(row: ProductdocumentRow)(implicit c: Connection): Boolean
-  def updateFieldValues(compositeId: ProductdocumentId, fieldValues: List[ProductdocumentFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow
 }

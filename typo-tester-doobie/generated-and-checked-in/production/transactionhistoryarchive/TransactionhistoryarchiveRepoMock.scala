@@ -31,21 +31,6 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
   override def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[TransactionhistoryarchiveFieldOrIdValue[_]]): Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, TransactionhistoryarchiveFieldValue.transactionid(value)) => acc.filter(_.transactionid == value)
-        case (acc, TransactionhistoryarchiveFieldValue.productid(value)) => acc.filter(_.productid == value)
-        case (acc, TransactionhistoryarchiveFieldValue.referenceorderid(value)) => acc.filter(_.referenceorderid == value)
-        case (acc, TransactionhistoryarchiveFieldValue.referenceorderlineid(value)) => acc.filter(_.referenceorderlineid == value)
-        case (acc, TransactionhistoryarchiveFieldValue.transactiondate(value)) => acc.filter(_.transactiondate == value)
-        case (acc, TransactionhistoryarchiveFieldValue.transactiontype(value)) => acc.filter(_.transactiontype == value)
-        case (acc, TransactionhistoryarchiveFieldValue.quantity(value)) => acc.filter(_.quantity == value)
-        case (acc, TransactionhistoryarchiveFieldValue.actualcost(value)) => acc.filter(_.actualcost == value)
-        case (acc, TransactionhistoryarchiveFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(transactionid: TransactionhistoryarchiveId): ConnectionIO[Option[TransactionhistoryarchiveRow]] = {
     delay(map.get(transactionid))
   }
@@ -59,30 +44,6 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
         case Some(_) =>
           map.put(row.transactionid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(transactionid: TransactionhistoryarchiveId, fieldValues: List[TransactionhistoryarchiveFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(transactionid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, TransactionhistoryarchiveFieldValue.productid(value)) => acc.copy(productid = value)
-            case (acc, TransactionhistoryarchiveFieldValue.referenceorderid(value)) => acc.copy(referenceorderid = value)
-            case (acc, TransactionhistoryarchiveFieldValue.referenceorderlineid(value)) => acc.copy(referenceorderlineid = value)
-            case (acc, TransactionhistoryarchiveFieldValue.transactiondate(value)) => acc.copy(transactiondate = value)
-            case (acc, TransactionhistoryarchiveFieldValue.transactiontype(value)) => acc.copy(transactiontype = value)
-            case (acc, TransactionhistoryarchiveFieldValue.quantity(value)) => acc.copy(quantity = value)
-            case (acc, TransactionhistoryarchiveFieldValue.actualcost(value)) => acc.copy(actualcost = value)
-            case (acc, TransactionhistoryarchiveFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(transactionid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

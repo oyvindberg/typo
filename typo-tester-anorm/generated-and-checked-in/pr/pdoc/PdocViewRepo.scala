@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait PdocViewRepo {
   def selectAll(implicit c: Connection): List[PdocViewRow]
-  def selectByFieldValues(fieldValues: List[PdocViewFieldOrIdValue[_]])(implicit c: Connection): List[PdocViewRow]
 }

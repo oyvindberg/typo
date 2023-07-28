@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait VproductmodelcatalogdescriptionViewRepo {
   def selectAll(implicit c: Connection): List[VproductmodelcatalogdescriptionViewRow]
-  def selectByFieldValues(fieldValues: List[VproductmodelcatalogdescriptionViewFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelcatalogdescriptionViewRow]
 }

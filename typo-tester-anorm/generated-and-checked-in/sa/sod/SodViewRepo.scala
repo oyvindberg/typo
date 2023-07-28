@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait SodViewRepo {
   def selectAll(implicit c: Connection): List[SodViewRow]
-  def selectByFieldValues(fieldValues: List[SodViewFieldOrIdValue[_]])(implicit c: Connection): List[SodViewRow]
 }

@@ -7,8 +7,6 @@ package adventureworks
 package hr
 package s
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,30 +15,5 @@ object SViewRepoImpl extends SViewRepo {
     SQL"""select "id", shiftid, "name", starttime, endtime, modifieddate
           from hr.s
        """.as(SViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SViewFieldOrIdValue[_]])(implicit c: Connection): List[SViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SViewFieldValue.shiftid(value) => NamedParameter("shiftid", ParameterValue.from(value))
-          case SViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SViewFieldValue.starttime(value) => NamedParameter("starttime", ParameterValue.from(value))
-          case SViewFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
-          case SViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", shiftid, "name", starttime, endtime, modifieddate
-                    from hr.s
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SViewRow.rowParser(1).*)
-    }
-  
   }
 }

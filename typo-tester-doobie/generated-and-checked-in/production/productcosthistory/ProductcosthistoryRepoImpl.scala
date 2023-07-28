@@ -9,10 +9,8 @@ package productcosthistory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -55,19 +53,6 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
     sql"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory".query[ProductcosthistoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductcosthistoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductcosthistoryFieldValue.productid(value) => fr"productid = $value"
-        case ProductcosthistoryFieldValue.startdate(value) => fr"startdate = $value"
-        case ProductcosthistoryFieldValue.enddate(value) => fr"enddate = $value"
-        case ProductcosthistoryFieldValue.standardcost(value) => fr"standardcost = $value"
-        case ProductcosthistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productcosthistory $where".query[ProductcosthistoryRow].stream
-  
-  }
   override def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]] = {
     sql"select productid, startdate, enddate, standardcost, modifieddate from production.productcosthistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query[ProductcosthistoryRow].option
   }
@@ -82,23 +67,6 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: ProductcosthistoryId, fieldValues: List[ProductcosthistoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductcosthistoryFieldValue.enddate(value) => fr"enddate = $value"
-            case ProductcosthistoryFieldValue.standardcost(value) => fr"standardcost = $value"
-            case ProductcosthistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productcosthistory
-              $updates
-              where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)

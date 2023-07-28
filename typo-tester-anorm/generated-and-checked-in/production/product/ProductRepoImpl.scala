@@ -97,50 +97,6 @@ object ProductRepoImpl extends ProductRepo {
           from production.product
        """.as(ProductRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ProductFieldOrIdValue[_]])(implicit c: Connection): List[ProductRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ProductFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ProductFieldValue.productnumber(value) => NamedParameter("productnumber", ParameterValue.from(value))
-          case ProductFieldValue.makeflag(value) => NamedParameter("makeflag", ParameterValue.from(value))
-          case ProductFieldValue.finishedgoodsflag(value) => NamedParameter("finishedgoodsflag", ParameterValue.from(value))
-          case ProductFieldValue.color(value) => NamedParameter("color", ParameterValue.from(value))
-          case ProductFieldValue.safetystocklevel(value) => NamedParameter("safetystocklevel", ParameterValue.from(value))
-          case ProductFieldValue.reorderpoint(value) => NamedParameter("reorderpoint", ParameterValue.from(value))
-          case ProductFieldValue.standardcost(value) => NamedParameter("standardcost", ParameterValue.from(value))
-          case ProductFieldValue.listprice(value) => NamedParameter("listprice", ParameterValue.from(value))
-          case ProductFieldValue.size(value) => NamedParameter("size", ParameterValue.from(value))
-          case ProductFieldValue.sizeunitmeasurecode(value) => NamedParameter("sizeunitmeasurecode", ParameterValue.from(value))
-          case ProductFieldValue.weightunitmeasurecode(value) => NamedParameter("weightunitmeasurecode", ParameterValue.from(value))
-          case ProductFieldValue.weight(value) => NamedParameter("weight", ParameterValue.from(value))
-          case ProductFieldValue.daystomanufacture(value) => NamedParameter("daystomanufacture", ParameterValue.from(value))
-          case ProductFieldValue.productline(value) => NamedParameter("productline", ParameterValue.from(value))
-          case ProductFieldValue.`class`(value) => NamedParameter("class", ParameterValue.from(value))
-          case ProductFieldValue.style(value) => NamedParameter("style", ParameterValue.from(value))
-          case ProductFieldValue.productsubcategoryid(value) => NamedParameter("productsubcategoryid", ParameterValue.from(value))
-          case ProductFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))
-          case ProductFieldValue.sellstartdate(value) => NamedParameter("sellstartdate", ParameterValue.from(value))
-          case ProductFieldValue.sellenddate(value) => NamedParameter("sellenddate", ParameterValue.from(value))
-          case ProductFieldValue.discontinueddate(value) => NamedParameter("discontinueddate", ParameterValue.from(value))
-          case ProductFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case ProductFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
-                    from production.product
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ProductRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(productid: ProductId)(implicit c: Connection): Option[ProductRow] = {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from production.product
@@ -187,50 +143,6 @@ object ProductRepoImpl extends ProductRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productid = $productid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(productid: ProductId, fieldValues: List[ProductFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ProductFieldValue.productnumber(value) => NamedParameter("productnumber", ParameterValue.from(value))
-          case ProductFieldValue.makeflag(value) => NamedParameter("makeflag", ParameterValue.from(value))
-          case ProductFieldValue.finishedgoodsflag(value) => NamedParameter("finishedgoodsflag", ParameterValue.from(value))
-          case ProductFieldValue.color(value) => NamedParameter("color", ParameterValue.from(value))
-          case ProductFieldValue.safetystocklevel(value) => NamedParameter("safetystocklevel", ParameterValue.from(value))
-          case ProductFieldValue.reorderpoint(value) => NamedParameter("reorderpoint", ParameterValue.from(value))
-          case ProductFieldValue.standardcost(value) => NamedParameter("standardcost", ParameterValue.from(value))
-          case ProductFieldValue.listprice(value) => NamedParameter("listprice", ParameterValue.from(value))
-          case ProductFieldValue.size(value) => NamedParameter("size", ParameterValue.from(value))
-          case ProductFieldValue.sizeunitmeasurecode(value) => NamedParameter("sizeunitmeasurecode", ParameterValue.from(value))
-          case ProductFieldValue.weightunitmeasurecode(value) => NamedParameter("weightunitmeasurecode", ParameterValue.from(value))
-          case ProductFieldValue.weight(value) => NamedParameter("weight", ParameterValue.from(value))
-          case ProductFieldValue.daystomanufacture(value) => NamedParameter("daystomanufacture", ParameterValue.from(value))
-          case ProductFieldValue.productline(value) => NamedParameter("productline", ParameterValue.from(value))
-          case ProductFieldValue.`class`(value) => NamedParameter("class", ParameterValue.from(value))
-          case ProductFieldValue.style(value) => NamedParameter("style", ParameterValue.from(value))
-          case ProductFieldValue.productsubcategoryid(value) => NamedParameter("productsubcategoryid", ParameterValue.from(value))
-          case ProductFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))
-          case ProductFieldValue.sellstartdate(value) => NamedParameter("sellstartdate", ParameterValue.from(value))
-          case ProductFieldValue.sellenddate(value) => NamedParameter("sellenddate", ParameterValue.from(value))
-          case ProductFieldValue.discontinueddate(value) => NamedParameter("discontinueddate", ParameterValue.from(value))
-          case ProductFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case ProductFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.product
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where productid = {productid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("productid", ParameterValue.from(productid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)

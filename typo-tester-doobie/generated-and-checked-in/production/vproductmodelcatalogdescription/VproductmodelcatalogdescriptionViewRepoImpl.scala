@@ -9,44 +9,10 @@ package vproductmodelcatalogdescription
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VproductmodelcatalogdescriptionViewRepoImpl extends VproductmodelcatalogdescriptionViewRepo {
   override def selectAll: Stream[ConnectionIO, VproductmodelcatalogdescriptionViewRow] = {
     sql"""select productmodelid, "name", Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, "style", riderexperience, rowguid, modifieddate from production.vproductmodelcatalogdescription""".query[VproductmodelcatalogdescriptionViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VproductmodelcatalogdescriptionViewFieldOrIdValue[_]]): Stream[ConnectionIO, VproductmodelcatalogdescriptionViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VproductmodelcatalogdescriptionViewFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.name(value) => fr""""name" = $value"""
-        case VproductmodelcatalogdescriptionViewFieldValue.Summary(value) => fr"Summary = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.manufacturer(value) => fr"manufacturer = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.copyright(value) => fr"copyright = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.producturl(value) => fr"producturl = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.warrantyperiod(value) => fr"warrantyperiod = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.warrantydescription(value) => fr"warrantydescription = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.noofyears(value) => fr"noofyears = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.maintenancedescription(value) => fr"maintenancedescription = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.wheel(value) => fr"wheel = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.saddle(value) => fr"saddle = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.pedal(value) => fr"pedal = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.bikeframe(value) => fr"bikeframe = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.crankset(value) => fr"crankset = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.pictureangle(value) => fr"pictureangle = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.picturesize(value) => fr"picturesize = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.productphotoid(value) => fr"productphotoid = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.material(value) => fr"material = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.color(value) => fr"color = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.productline(value) => fr"productline = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.style(value) => fr""""style" = $value"""
-        case VproductmodelcatalogdescriptionViewFieldValue.riderexperience(value) => fr"riderexperience = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case VproductmodelcatalogdescriptionViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.vproductmodelcatalogdescription $where".query[VproductmodelcatalogdescriptionViewRow].stream
-  
   }
 }

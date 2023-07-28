@@ -7,8 +7,6 @@ package adventureworks
 package pu
 package sm
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,31 +15,5 @@ object SmViewRepoImpl extends SmViewRepo {
     SQL"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from pu.sm
        """.as(SmViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SmViewFieldOrIdValue[_]])(implicit c: Connection): List[SmViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SmViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SmViewFieldValue.shipmethodid(value) => NamedParameter("shipmethodid", ParameterValue.from(value))
-          case SmViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SmViewFieldValue.shipbase(value) => NamedParameter("shipbase", ParameterValue.from(value))
-          case SmViewFieldValue.shiprate(value) => NamedParameter("shiprate", ParameterValue.from(value))
-          case SmViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SmViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
-                    from pu.sm
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SmViewRow.rowParser(1).*)
-    }
-  
   }
 }

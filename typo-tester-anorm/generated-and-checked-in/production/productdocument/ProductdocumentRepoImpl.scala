@@ -63,28 +63,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           from production.productdocument
        """.as(ProductdocumentRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]])(implicit c: Connection): List[ProductdocumentRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductdocumentFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ProductdocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-          case ProductdocumentFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productid, modifieddate, documentnode
-                    from production.productdocument
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ProductdocumentRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
     SQL"""select productid, modifieddate, documentnode
           from production.productdocument
@@ -97,27 +75,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: ProductdocumentId, fieldValues: List[ProductdocumentFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductdocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.productdocument
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where productid = {productid} AND documentnode = {documentnode}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("documentnode", ParameterValue.from(compositeId.documentnode)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
     SQL"""insert into production.productdocument(productid, modifieddate, documentnode)

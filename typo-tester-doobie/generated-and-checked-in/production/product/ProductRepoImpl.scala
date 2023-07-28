@@ -10,10 +10,8 @@ package product
 import adventureworks.Defaulted
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -89,39 +87,6 @@ object ProductRepoImpl extends ProductRepo {
   override def selectAll: Stream[ConnectionIO, ProductRow] = {
     sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product""".query[ProductRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductFieldOrIdValue[_]]): Stream[ConnectionIO, ProductRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductFieldValue.productid(value) => fr"productid = $value"
-        case ProductFieldValue.name(value) => fr""""name" = $value"""
-        case ProductFieldValue.productnumber(value) => fr"productnumber = $value"
-        case ProductFieldValue.makeflag(value) => fr"makeflag = $value"
-        case ProductFieldValue.finishedgoodsflag(value) => fr"finishedgoodsflag = $value"
-        case ProductFieldValue.color(value) => fr"color = $value"
-        case ProductFieldValue.safetystocklevel(value) => fr"safetystocklevel = $value"
-        case ProductFieldValue.reorderpoint(value) => fr"reorderpoint = $value"
-        case ProductFieldValue.standardcost(value) => fr"standardcost = $value"
-        case ProductFieldValue.listprice(value) => fr"listprice = $value"
-        case ProductFieldValue.size(value) => fr""""size" = $value"""
-        case ProductFieldValue.sizeunitmeasurecode(value) => fr"sizeunitmeasurecode = $value"
-        case ProductFieldValue.weightunitmeasurecode(value) => fr"weightunitmeasurecode = $value"
-        case ProductFieldValue.weight(value) => fr"weight = $value"
-        case ProductFieldValue.daystomanufacture(value) => fr"daystomanufacture = $value"
-        case ProductFieldValue.productline(value) => fr"productline = $value"
-        case ProductFieldValue.`class`(value) => fr""""class" = $value"""
-        case ProductFieldValue.style(value) => fr""""style" = $value"""
-        case ProductFieldValue.productsubcategoryid(value) => fr"productsubcategoryid = $value"
-        case ProductFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case ProductFieldValue.sellstartdate(value) => fr"sellstartdate = $value"
-        case ProductFieldValue.sellenddate(value) => fr"sellenddate = $value"
-        case ProductFieldValue.discontinueddate(value) => fr"discontinueddate = $value"
-        case ProductFieldValue.rowguid(value) => fr"rowguid = $value"
-        case ProductFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.product $where".query[ProductRow].stream
-  
-  }
   override def selectById(productid: ProductId): ConnectionIO[Option[ProductRow]] = {
     sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from production.product where productid = $productid""".query[ProductRow].option
   }
@@ -160,44 +125,6 @@ object ProductRepoImpl extends ProductRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(productid: ProductId, fieldValues: List[ProductFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductFieldValue.name(value) => fr""""name" = $value"""
-            case ProductFieldValue.productnumber(value) => fr"productnumber = $value"
-            case ProductFieldValue.makeflag(value) => fr"makeflag = $value"
-            case ProductFieldValue.finishedgoodsflag(value) => fr"finishedgoodsflag = $value"
-            case ProductFieldValue.color(value) => fr"color = $value"
-            case ProductFieldValue.safetystocklevel(value) => fr"safetystocklevel = $value"
-            case ProductFieldValue.reorderpoint(value) => fr"reorderpoint = $value"
-            case ProductFieldValue.standardcost(value) => fr"standardcost = $value"
-            case ProductFieldValue.listprice(value) => fr"listprice = $value"
-            case ProductFieldValue.size(value) => fr""""size" = $value"""
-            case ProductFieldValue.sizeunitmeasurecode(value) => fr"sizeunitmeasurecode = $value"
-            case ProductFieldValue.weightunitmeasurecode(value) => fr"weightunitmeasurecode = $value"
-            case ProductFieldValue.weight(value) => fr"weight = $value"
-            case ProductFieldValue.daystomanufacture(value) => fr"daystomanufacture = $value"
-            case ProductFieldValue.productline(value) => fr"productline = $value"
-            case ProductFieldValue.`class`(value) => fr""""class" = $value"""
-            case ProductFieldValue.style(value) => fr""""style" = $value"""
-            case ProductFieldValue.productsubcategoryid(value) => fr"productsubcategoryid = $value"
-            case ProductFieldValue.productmodelid(value) => fr"productmodelid = $value"
-            case ProductFieldValue.sellstartdate(value) => fr"sellstartdate = $value"
-            case ProductFieldValue.sellenddate(value) => fr"sellenddate = $value"
-            case ProductFieldValue.discontinueddate(value) => fr"discontinueddate = $value"
-            case ProductFieldValue.rowguid(value) => fr"rowguid = $value"
-            case ProductFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.product
-              $updates
-              where productid = $productid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)

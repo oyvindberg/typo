@@ -61,28 +61,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
           from person.countryregion
        """.as(CountryregionRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]])(implicit c: Connection): List[CountryregionRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CountryregionFieldValue.countryregioncode(value) => NamedParameter("countryregioncode", ParameterValue.from(value))
-          case CountryregionFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case CountryregionFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select countryregioncode, "name", modifieddate
-                    from person.countryregion
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(CountryregionRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
     SQL"""select countryregioncode, "name", modifieddate
           from person.countryregion
@@ -107,28 +85,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where countryregioncode = $countryregioncode
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(countryregioncode: CountryregionId, fieldValues: List[CountryregionFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CountryregionFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case CountryregionFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.countryregion
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where countryregioncode = {countryregioncode}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("countryregioncode", ParameterValue.from(countryregioncode)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)

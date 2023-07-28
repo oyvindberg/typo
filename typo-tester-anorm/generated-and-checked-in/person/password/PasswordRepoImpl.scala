@@ -68,30 +68,6 @@ object PasswordRepoImpl extends PasswordRepo {
           from person."password"
        """.as(PasswordRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]])(implicit c: Connection): List[PasswordRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PasswordFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PasswordFieldValue.passwordhash(value) => NamedParameter("passwordhash", ParameterValue.from(value))
-          case PasswordFieldValue.passwordsalt(value) => NamedParameter("passwordsalt", ParameterValue.from(value))
-          case PasswordFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PasswordFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-                    from person."password"
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PasswordRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
           from person."password"
@@ -118,30 +94,6 @@ object PasswordRepoImpl extends PasswordRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PasswordFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PasswordFieldValue.passwordhash(value) => NamedParameter("passwordhash", ParameterValue.from(value))
-          case PasswordFieldValue.passwordsalt(value) => NamedParameter("passwordsalt", ParameterValue.from(value))
-          case PasswordFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PasswordFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person."password"
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

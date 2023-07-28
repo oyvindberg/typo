@@ -9,24 +9,10 @@ package pd
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PdViewRepoImpl extends PdViewRepo {
   override def selectAll: Stream[ConnectionIO, PdViewRow] = {
     sql"""select "id", productdescriptionid, description, rowguid, modifieddate from pr.pd""".query[PdViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PdViewFieldOrIdValue[_]]): Stream[ConnectionIO, PdViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PdViewFieldValue.id(value) => fr""""id" = $value"""
-        case PdViewFieldValue.productdescriptionid(value) => fr"productdescriptionid = $value"
-        case PdViewFieldValue.description(value) => fr"description = $value"
-        case PdViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PdViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.pd $where".query[PdViewRow].stream
-  
   }
 }

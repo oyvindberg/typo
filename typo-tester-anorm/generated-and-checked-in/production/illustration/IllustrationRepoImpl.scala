@@ -64,28 +64,6 @@ object IllustrationRepoImpl extends IllustrationRepo {
           from production.illustration
        """.as(IllustrationRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]])(implicit c: Connection): List[IllustrationRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case IllustrationFieldValue.illustrationid(value) => NamedParameter("illustrationid", ParameterValue.from(value))
-          case IllustrationFieldValue.diagram(value) => NamedParameter("diagram", ParameterValue.from(value))
-          case IllustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select illustrationid, diagram, modifieddate
-                    from production.illustration
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(IllustrationRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate
           from production.illustration
@@ -110,28 +88,6 @@ object IllustrationRepoImpl extends IllustrationRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where illustrationid = $illustrationid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(illustrationid: IllustrationId, fieldValues: List[IllustrationFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case IllustrationFieldValue.diagram(value) => NamedParameter("diagram", ParameterValue.from(value))
-          case IllustrationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.illustration
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where illustrationid = {illustrationid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("illustrationid", ParameterValue.from(illustrationid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)

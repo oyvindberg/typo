@@ -9,10 +9,8 @@ package productmodelproductdescriptionculture
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -54,18 +52,6 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
   override def selectAll: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
     sql"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture".query[ProductmodelproductdescriptioncultureRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductmodelproductdescriptioncultureFieldOrIdValue[_]]): Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductmodelproductdescriptioncultureFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case ProductmodelproductdescriptioncultureFieldValue.productdescriptionid(value) => fr"productdescriptionid = $value"
-        case ProductmodelproductdescriptioncultureFieldValue.cultureid(value) => fr"cultureid = $value"
-        case ProductmodelproductdescriptioncultureFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productmodelproductdescriptionculture $where".query[ProductmodelproductdescriptioncultureRow].stream
-  
-  }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Option[ProductmodelproductdescriptioncultureRow]] = {
     sql"select productmodelid, productdescriptionid, cultureid, modifieddate from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".query[ProductmodelproductdescriptioncultureRow].option
   }
@@ -78,21 +64,6 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: ProductmodelproductdescriptioncultureId, fieldValues: List[ProductmodelproductdescriptioncultureFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductmodelproductdescriptioncultureFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productmodelproductdescriptionculture
-              $updates
-              where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)

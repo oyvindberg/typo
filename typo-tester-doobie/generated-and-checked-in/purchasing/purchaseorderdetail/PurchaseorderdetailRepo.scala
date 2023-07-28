@@ -15,9 +15,7 @@ trait PurchaseorderdetailRepo {
   def insert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow]
   def insert(unsaved: PurchaseorderdetailRowUnsaved): ConnectionIO[PurchaseorderdetailRow]
   def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow]
-  def selectByFieldValues(fieldValues: List[PurchaseorderdetailFieldOrIdValue[_]]): Stream[ConnectionIO, PurchaseorderdetailRow]
   def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]]
   def update(row: PurchaseorderdetailRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: PurchaseorderdetailId, fieldValues: List[PurchaseorderdetailFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow]
 }

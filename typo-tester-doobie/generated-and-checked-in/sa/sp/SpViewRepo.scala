@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait SpViewRepo {
   def selectAll: Stream[ConnectionIO, SpViewRow]
-  def selectByFieldValues(fieldValues: List[SpViewFieldOrIdValue[_]]): Stream[ConnectionIO, SpViewRow]
 }

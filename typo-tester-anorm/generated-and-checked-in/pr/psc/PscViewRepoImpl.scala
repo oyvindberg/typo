@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package psc
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,30 +15,5 @@ object PscViewRepoImpl extends PscViewRepo {
     SQL"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
           from pr.psc
        """.as(PscViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PscViewFieldOrIdValue[_]])(implicit c: Connection): List[PscViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PscViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PscViewFieldValue.productsubcategoryid(value) => NamedParameter("productsubcategoryid", ParameterValue.from(value))
-          case PscViewFieldValue.productcategoryid(value) => NamedParameter("productcategoryid", ParameterValue.from(value))
-          case PscViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case PscViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PscViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate
-                    from pr.psc
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PscViewRow.rowParser(1).*)
-    }
-  
   }
 }

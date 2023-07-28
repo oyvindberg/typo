@@ -9,10 +9,8 @@ package productlistpricehistory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -55,19 +53,6 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow] = {
     sql"select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory".query[ProductlistpricehistoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductlistpricehistoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductlistpricehistoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductlistpricehistoryFieldValue.productid(value) => fr"productid = $value"
-        case ProductlistpricehistoryFieldValue.startdate(value) => fr"startdate = $value"
-        case ProductlistpricehistoryFieldValue.enddate(value) => fr"enddate = $value"
-        case ProductlistpricehistoryFieldValue.listprice(value) => fr"listprice = $value"
-        case ProductlistpricehistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productlistpricehistory $where".query[ProductlistpricehistoryRow].stream
-  
-  }
   override def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]] = {
     sql"select productid, startdate, enddate, listprice, modifieddate from production.productlistpricehistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query[ProductlistpricehistoryRow].option
   }
@@ -82,23 +67,6 @@ object ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: ProductlistpricehistoryId, fieldValues: List[ProductlistpricehistoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductlistpricehistoryFieldValue.enddate(value) => fr"enddate = $value"
-            case ProductlistpricehistoryFieldValue.listprice(value) => fr"listprice = $value"
-            case ProductlistpricehistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productlistpricehistory
-              $updates
-              where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into production.productlistpricehistory(productid, startdate, enddate, listprice, modifieddate)

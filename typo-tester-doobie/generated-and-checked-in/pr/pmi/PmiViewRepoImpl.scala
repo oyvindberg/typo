@@ -9,22 +9,10 @@ package pmi
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PmiViewRepoImpl extends PmiViewRepo {
   override def selectAll: Stream[ConnectionIO, PmiViewRow] = {
     sql"select productmodelid, illustrationid, modifieddate from pr.pmi".query[PmiViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PmiViewFieldOrIdValue[_]]): Stream[ConnectionIO, PmiViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PmiViewFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case PmiViewFieldValue.illustrationid(value) => fr"illustrationid = $value"
-        case PmiViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.pmi $where".query[PmiViewRow].stream
-  
   }
 }

@@ -31,15 +31,6 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]]): Stream[ConnectionIO, CountryregionRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, CountryregionFieldValue.countryregioncode(value)) => acc.filter(_.countryregioncode == value)
-        case (acc, CountryregionFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, CountryregionFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]] = {
     delay(map.get(countryregioncode))
   }
@@ -53,24 +44,6 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
         case Some(_) =>
           map.put(row.countryregioncode, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(countryregioncode: CountryregionId, fieldValues: List[CountryregionFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(countryregioncode) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, CountryregionFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, CountryregionFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(countryregioncode, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

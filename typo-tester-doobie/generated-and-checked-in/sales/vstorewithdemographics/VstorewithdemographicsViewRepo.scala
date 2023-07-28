@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait VstorewithdemographicsViewRepo {
   def selectAll: Stream[ConnectionIO, VstorewithdemographicsViewRow]
-  def selectByFieldValues(fieldValues: List[VstorewithdemographicsViewFieldOrIdValue[_]]): Stream[ConnectionIO, VstorewithdemographicsViewRow]
 }

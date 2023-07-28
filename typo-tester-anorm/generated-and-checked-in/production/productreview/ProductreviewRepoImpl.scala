@@ -72,33 +72,6 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
           from production.productreview
        """.as(ProductreviewRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]])(implicit c: Connection): List[ProductreviewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductreviewFieldValue.productreviewid(value) => NamedParameter("productreviewid", ParameterValue.from(value))
-          case ProductreviewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ProductreviewFieldValue.reviewername(value) => NamedParameter("reviewername", ParameterValue.from(value))
-          case ProductreviewFieldValue.reviewdate(value) => NamedParameter("reviewdate", ParameterValue.from(value))
-          case ProductreviewFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case ProductreviewFieldValue.rating(value) => NamedParameter("rating", ParameterValue.from(value))
-          case ProductreviewFieldValue.comments(value) => NamedParameter("comments", ParameterValue.from(value))
-          case ProductreviewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
-                    from production.productreview
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ProductreviewRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(productreviewid: ProductreviewId)(implicit c: Connection): Option[ProductreviewRow] = {
     SQL"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from production.productreview
@@ -128,33 +101,6 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productreviewid = $productreviewid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(productreviewid: ProductreviewId, fieldValues: List[ProductreviewFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductreviewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ProductreviewFieldValue.reviewername(value) => NamedParameter("reviewername", ParameterValue.from(value))
-          case ProductreviewFieldValue.reviewdate(value) => NamedParameter("reviewdate", ParameterValue.from(value))
-          case ProductreviewFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case ProductreviewFieldValue.rating(value) => NamedParameter("rating", ParameterValue.from(value))
-          case ProductreviewFieldValue.comments(value) => NamedParameter("comments", ParameterValue.from(value))
-          case ProductreviewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.productreview
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where productreviewid = {productreviewid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("productreviewid", ParameterValue.from(productreviewid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)

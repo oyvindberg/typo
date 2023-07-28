@@ -31,21 +31,6 @@ class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[PurchaseorderdetailFieldOrIdValue[_]]): Stream[ConnectionIO, PurchaseorderdetailRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, PurchaseorderdetailFieldValue.purchaseorderid(value)) => acc.filter(_.purchaseorderid == value)
-        case (acc, PurchaseorderdetailFieldValue.purchaseorderdetailid(value)) => acc.filter(_.purchaseorderdetailid == value)
-        case (acc, PurchaseorderdetailFieldValue.duedate(value)) => acc.filter(_.duedate == value)
-        case (acc, PurchaseorderdetailFieldValue.orderqty(value)) => acc.filter(_.orderqty == value)
-        case (acc, PurchaseorderdetailFieldValue.productid(value)) => acc.filter(_.productid == value)
-        case (acc, PurchaseorderdetailFieldValue.unitprice(value)) => acc.filter(_.unitprice == value)
-        case (acc, PurchaseorderdetailFieldValue.receivedqty(value)) => acc.filter(_.receivedqty == value)
-        case (acc, PurchaseorderdetailFieldValue.rejectedqty(value)) => acc.filter(_.rejectedqty == value)
-        case (acc, PurchaseorderdetailFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]] = {
     delay(map.get(compositeId))
   }
@@ -56,29 +41,6 @@ class PurchaseorderdetailRepoMock(toRow: Function1[PurchaseorderdetailRowUnsaved
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: PurchaseorderdetailId, fieldValues: List[PurchaseorderdetailFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, PurchaseorderdetailFieldValue.duedate(value)) => acc.copy(duedate = value)
-            case (acc, PurchaseorderdetailFieldValue.orderqty(value)) => acc.copy(orderqty = value)
-            case (acc, PurchaseorderdetailFieldValue.productid(value)) => acc.copy(productid = value)
-            case (acc, PurchaseorderdetailFieldValue.unitprice(value)) => acc.copy(unitprice = value)
-            case (acc, PurchaseorderdetailFieldValue.receivedqty(value)) => acc.copy(receivedqty = value)
-            case (acc, PurchaseorderdetailFieldValue.rejectedqty(value)) => acc.copy(rejectedqty = value)
-            case (acc, PurchaseorderdetailFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

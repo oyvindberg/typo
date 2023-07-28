@@ -88,7 +88,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
         _ <- delay(assert(saved1 === saved2))
         // check field values
         newModifiedDate = saved1.modifieddate.minusDays(1)
-        _ <- repo.updateFieldValues(saved1.compositeId, List(BusinessentityaddressFieldValue.modifieddate(newModifiedDate)))
+        _ <- repo.update(saved1.copy(modifieddate = newModifiedDate))
         saved3 <- repo.selectAll.compile.toList.map {
           case List(x) => x
           case other   => throw new MatchError(other)

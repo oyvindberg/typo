@@ -16,9 +16,7 @@ trait PersonRepo {
   def insert(unsaved: PersonRow): ConnectionIO[PersonRow]
   def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow]
   def selectAll: Stream[ConnectionIO, PersonRow]
-  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]]): Stream[ConnectionIO, PersonRow]
   def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]]
   def update(row: PersonRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: PersonRow): ConnectionIO[PersonRow]
 }

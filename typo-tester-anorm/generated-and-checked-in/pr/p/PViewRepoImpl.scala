@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package p
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,50 +15,5 @@ object PViewRepoImpl extends PViewRepo {
     SQL"""select "id", productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
           from pr."p"
        """.as(PViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]])(implicit c: Connection): List[PViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case PViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case PViewFieldValue.productnumber(value) => NamedParameter("productnumber", ParameterValue.from(value))
-          case PViewFieldValue.makeflag(value) => NamedParameter("makeflag", ParameterValue.from(value))
-          case PViewFieldValue.finishedgoodsflag(value) => NamedParameter("finishedgoodsflag", ParameterValue.from(value))
-          case PViewFieldValue.color(value) => NamedParameter("color", ParameterValue.from(value))
-          case PViewFieldValue.safetystocklevel(value) => NamedParameter("safetystocklevel", ParameterValue.from(value))
-          case PViewFieldValue.reorderpoint(value) => NamedParameter("reorderpoint", ParameterValue.from(value))
-          case PViewFieldValue.standardcost(value) => NamedParameter("standardcost", ParameterValue.from(value))
-          case PViewFieldValue.listprice(value) => NamedParameter("listprice", ParameterValue.from(value))
-          case PViewFieldValue.size(value) => NamedParameter("size", ParameterValue.from(value))
-          case PViewFieldValue.sizeunitmeasurecode(value) => NamedParameter("sizeunitmeasurecode", ParameterValue.from(value))
-          case PViewFieldValue.weightunitmeasurecode(value) => NamedParameter("weightunitmeasurecode", ParameterValue.from(value))
-          case PViewFieldValue.weight(value) => NamedParameter("weight", ParameterValue.from(value))
-          case PViewFieldValue.daystomanufacture(value) => NamedParameter("daystomanufacture", ParameterValue.from(value))
-          case PViewFieldValue.productline(value) => NamedParameter("productline", ParameterValue.from(value))
-          case PViewFieldValue.`class`(value) => NamedParameter("class", ParameterValue.from(value))
-          case PViewFieldValue.style(value) => NamedParameter("style", ParameterValue.from(value))
-          case PViewFieldValue.productsubcategoryid(value) => NamedParameter("productsubcategoryid", ParameterValue.from(value))
-          case PViewFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))
-          case PViewFieldValue.sellstartdate(value) => NamedParameter("sellstartdate", ParameterValue.from(value))
-          case PViewFieldValue.sellenddate(value) => NamedParameter("sellenddate", ParameterValue.from(value))
-          case PViewFieldValue.discontinueddate(value) => NamedParameter("discontinueddate", ParameterValue.from(value))
-          case PViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate
-                    from pr."p"
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PViewRow.rowParser(1).*)
-    }
-  
   }
 }

@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait PodViewRepo {
   def selectAll: Stream[ConnectionIO, PodViewRow]
-  def selectByFieldValues(fieldValues: List[PodViewFieldOrIdValue[_]]): Stream[ConnectionIO, PodViewRow]
 }

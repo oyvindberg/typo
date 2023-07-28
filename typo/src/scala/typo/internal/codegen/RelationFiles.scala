@@ -51,22 +51,26 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
     sc.File(names.RowName, str, secondaryTypes = Nil)
   }
 
-  val FieldValueFile: sc.File = {
-    val members = {
-      names.cols.map { col =>
-        val parent = if (names.isIdColumn(col.dbName)) names.FieldOrIdValueName else names.FieldValueName
-        code"case class ${col.name}(override val value: ${col.tpe}) extends $parent(${sc.StrLit(col.dbName.value)}, value)"
+  val FieldValueFile: Option[sc.File] =
+    for {
+      fieldOrIdValueName <- names.FieldOrIdValueName
+      fieldValueName <- names.FieldValueName
+    } yield {
+      val members = {
+        names.cols.map { col =>
+          val parent = if (names.isIdColumn(col.dbName)) fieldOrIdValueName else fieldValueName
+          code"case class ${col.name}(override val value: ${col.tpe}) extends $parent(${sc.StrLit(col.dbName.value)}, value)"
+        }
       }
-    }
-    val str =
-      code"""sealed abstract class ${names.FieldOrIdValueName.name}[T](val name: String, val value: T)
-            |sealed abstract class ${names.FieldValueName.name}[T](name: String, value: T) extends ${names.FieldOrIdValueName.name}(name, value)
-            |
-            |${obj(names.FieldValueName.name, members.toList)}
-            |""".stripMargin
+      val str =
+        code"""sealed abstract class ${fieldOrIdValueName.name}[T](val name: String, val value: T)
+              |sealed abstract class ${fieldValueName.name}[T](name: String, value: T) extends ${fieldOrIdValueName.name}(name, value)
+              |
+              |${obj(fieldValueName.name, members.toList)}
+              |""".stripMargin
 
-    sc.File(names.FieldValueName, str, secondaryTypes = List(names.FieldOrIdValueName))
-  }
+      sc.File(fieldValueName, str, secondaryTypes = List(fieldOrIdValueName))
+    }
 
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val str =

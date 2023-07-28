@@ -14,10 +14,8 @@ trait PurchaseorderheaderRepo {
   def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
   def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow
   def selectAll(implicit c: Connection): List[PurchaseorderheaderRow]
-  def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderheaderRow]
   def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow]
   def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow]
   def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
-  def updateFieldValues(purchaseorderid: PurchaseorderheaderId, fieldValues: List[PurchaseorderheaderFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
 }

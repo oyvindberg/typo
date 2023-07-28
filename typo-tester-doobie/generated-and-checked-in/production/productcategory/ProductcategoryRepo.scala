@@ -15,10 +15,8 @@ trait ProductcategoryRepo {
   def insert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow]
   def insert(unsaved: ProductcategoryRowUnsaved): ConnectionIO[ProductcategoryRow]
   def selectAll: Stream[ConnectionIO, ProductcategoryRow]
-  def selectByFieldValues(fieldValues: List[ProductcategoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductcategoryRow]
   def selectById(productcategoryid: ProductcategoryId): ConnectionIO[Option[ProductcategoryRow]]
   def selectByIds(productcategoryids: Array[ProductcategoryId]): Stream[ConnectionIO, ProductcategoryRow]
   def update(row: ProductcategoryRow): ConnectionIO[Boolean]
-  def updateFieldValues(productcategoryid: ProductcategoryId, fieldValues: List[ProductcategoryFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow]
 }

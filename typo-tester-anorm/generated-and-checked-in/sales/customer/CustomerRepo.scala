@@ -14,10 +14,8 @@ trait CustomerRepo {
   def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow
   def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow
   def selectAll(implicit c: Connection): List[CustomerRow]
-  def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]])(implicit c: Connection): List[CustomerRow]
   def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow]
   def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow]
   def update(row: CustomerRow)(implicit c: Connection): Boolean
-  def updateFieldValues(customerid: CustomerId, fieldValues: List[CustomerFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow
 }

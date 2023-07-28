@@ -14,10 +14,8 @@ trait PhonenumbertypeRepo {
   def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
   def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow
   def selectAll(implicit c: Connection): List[PhonenumbertypeRow]
-  def selectByFieldValues(fieldValues: List[PhonenumbertypeFieldOrIdValue[_]])(implicit c: Connection): List[PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow]
   def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow]
   def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean
-  def updateFieldValues(phonenumbertypeid: PhonenumbertypeId, fieldValues: List[PhonenumbertypeFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
 }

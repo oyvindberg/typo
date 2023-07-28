@@ -27,14 +27,6 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
   override def selectAll(implicit c: Connection): List[SpecialofferproductRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[SpecialofferproductFieldOrIdValue[_]])(implicit c: Connection): List[SpecialofferproductRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, SpecialofferproductFieldValue.specialofferid(value)) => acc.filter(_.specialofferid == value)
-      case (acc, SpecialofferproductFieldValue.productid(value)) => acc.filter(_.productid == value)
-      case (acc, SpecialofferproductFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, SpecialofferproductFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
     map.get(compositeId)
   }
@@ -44,22 +36,6 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
       case Some(_) =>
         map.put(row.compositeId, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(compositeId: SpecialofferproductId, fieldValues: List[SpecialofferproductFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(compositeId) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, SpecialofferproductFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, SpecialofferproductFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

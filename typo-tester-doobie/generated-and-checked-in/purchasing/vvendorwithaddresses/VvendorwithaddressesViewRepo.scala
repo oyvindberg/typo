@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait VvendorwithaddressesViewRepo {
   def selectAll: Stream[ConnectionIO, VvendorwithaddressesViewRow]
-  def selectByFieldValues(fieldValues: List[VvendorwithaddressesViewFieldOrIdValue[_]]): Stream[ConnectionIO, VvendorwithaddressesViewRow]
 }

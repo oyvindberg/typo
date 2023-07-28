@@ -9,26 +9,10 @@ package sci
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SciViewRepoImpl extends SciViewRepo {
   override def selectAll: Stream[ConnectionIO, SciViewRow] = {
     sql"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sa.sci""".query[SciViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SciViewFieldOrIdValue[_]]): Stream[ConnectionIO, SciViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SciViewFieldValue.id(value) => fr""""id" = $value"""
-        case SciViewFieldValue.shoppingcartitemid(value) => fr"shoppingcartitemid = $value"
-        case SciViewFieldValue.shoppingcartid(value) => fr"shoppingcartid = $value"
-        case SciViewFieldValue.quantity(value) => fr"quantity = $value"
-        case SciViewFieldValue.productid(value) => fr"productid = $value"
-        case SciViewFieldValue.datecreated(value) => fr"datecreated = $value"
-        case SciViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.sci $where".query[SciViewRow].stream
-  
   }
 }

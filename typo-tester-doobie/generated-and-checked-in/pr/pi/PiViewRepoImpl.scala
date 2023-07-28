@@ -9,27 +9,10 @@ package pi
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PiViewRepoImpl extends PiViewRepo {
   override def selectAll: Stream[ConnectionIO, PiViewRow] = {
     sql"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate from pr.pi""".query[PiViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PiViewFieldOrIdValue[_]]): Stream[ConnectionIO, PiViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PiViewFieldValue.id(value) => fr""""id" = $value"""
-        case PiViewFieldValue.productid(value) => fr"productid = $value"
-        case PiViewFieldValue.locationid(value) => fr"locationid = $value"
-        case PiViewFieldValue.shelf(value) => fr"shelf = $value"
-        case PiViewFieldValue.bin(value) => fr"bin = $value"
-        case PiViewFieldValue.quantity(value) => fr"quantity = $value"
-        case PiViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PiViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.pi $where".query[PiViewRow].stream
-  
   }
 }

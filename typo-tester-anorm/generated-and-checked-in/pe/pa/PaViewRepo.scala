@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait PaViewRepo {
   def selectAll(implicit c: Connection): List[PaViewRow]
-  def selectByFieldValues(fieldValues: List[PaViewFieldOrIdValue[_]])(implicit c: Connection): List[PaViewRow]
 }

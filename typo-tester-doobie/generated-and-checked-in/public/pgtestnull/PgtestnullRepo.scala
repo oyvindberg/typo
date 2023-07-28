@@ -13,5 +13,4 @@ import fs2.Stream
 trait PgtestnullRepo {
   def insert(unsaved: PgtestnullRow): ConnectionIO[PgtestnullRow]
   def selectAll: Stream[ConnectionIO, PgtestnullRow]
-  def selectByFieldValues(fieldValues: List[PgtestnullFieldOrIdValue[_]]): Stream[ConnectionIO, PgtestnullRow]
 }

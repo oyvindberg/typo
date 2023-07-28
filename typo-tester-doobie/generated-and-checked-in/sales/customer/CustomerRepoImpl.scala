@@ -9,10 +9,8 @@ package customer
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -63,20 +61,6 @@ object CustomerRepoImpl extends CustomerRepo {
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
     sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer".query[CustomerRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]]): Stream[ConnectionIO, CustomerRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CustomerFieldValue.customerid(value) => fr"customerid = $value"
-        case CustomerFieldValue.personid(value) => fr"personid = $value"
-        case CustomerFieldValue.storeid(value) => fr"storeid = $value"
-        case CustomerFieldValue.territoryid(value) => fr"territoryid = $value"
-        case CustomerFieldValue.rowguid(value) => fr"rowguid = $value"
-        case CustomerFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.customer $where".query[CustomerRow].stream
-  
-  }
   override def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]] = {
     sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate from sales.customer where customerid = $customerid".query[CustomerRow].option
   }
@@ -96,25 +80,6 @@ object CustomerRepoImpl extends CustomerRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(customerid: CustomerId, fieldValues: List[CustomerFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case CustomerFieldValue.personid(value) => fr"personid = $value"
-            case CustomerFieldValue.storeid(value) => fr"storeid = $value"
-            case CustomerFieldValue.territoryid(value) => fr"territoryid = $value"
-            case CustomerFieldValue.rowguid(value) => fr"rowguid = $value"
-            case CustomerFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.customer
-              $updates
-              where customerid = $customerid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)

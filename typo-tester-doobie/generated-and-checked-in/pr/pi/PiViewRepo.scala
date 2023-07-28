@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait PiViewRepo {
   def selectAll: Stream[ConnectionIO, PiViewRow]
-  def selectByFieldValues(fieldValues: List[PiViewFieldOrIdValue[_]]): Stream[ConnectionIO, PiViewRow]
 }

@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package vstorewithaddresses
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,33 +15,5 @@ object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
     SQL"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
           from sales.vstorewithaddresses
        """.as(VstorewithaddressesViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VstorewithaddressesViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithaddressesViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VstorewithaddressesViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.addresstype(value) => NamedParameter("addresstype", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.addressline1(value) => NamedParameter("addressline1", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.addressline2(value) => NamedParameter("addressline2", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.city(value) => NamedParameter("city", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.stateprovincename(value) => NamedParameter("stateprovincename", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.postalcode(value) => NamedParameter("postalcode", ParameterValue.from(value))
-          case VstorewithaddressesViewFieldValue.countryregionname(value) => NamedParameter("countryregionname", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname
-                    from sales.vstorewithaddresses
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VstorewithaddressesViewRow.rowParser(1).*)
-    }
-  
   }
 }

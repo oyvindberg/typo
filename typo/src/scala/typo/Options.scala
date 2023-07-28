@@ -9,6 +9,7 @@ case class Options(
     nullabilityOverride: NullabilityOverride = NullabilityOverride.Empty,
     generateMockRepos: Selector = Selector.All,
     header: String = Options.header,
+    enableFieldValue: Boolean = false,
     debugTypes: Boolean = false
 )
 

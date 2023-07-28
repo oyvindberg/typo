@@ -9,29 +9,10 @@ package vemployeedepartment
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
   override def selectAll: Stream[ConnectionIO, VemployeedepartmentViewRow] = {
     sql"select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate from humanresources.vemployeedepartment".query[VemployeedepartmentViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VemployeedepartmentViewFieldOrIdValue[_]]): Stream[ConnectionIO, VemployeedepartmentViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VemployeedepartmentViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VemployeedepartmentViewFieldValue.title(value) => fr"title = $value"
-        case VemployeedepartmentViewFieldValue.firstname(value) => fr"firstname = $value"
-        case VemployeedepartmentViewFieldValue.middlename(value) => fr"middlename = $value"
-        case VemployeedepartmentViewFieldValue.lastname(value) => fr"lastname = $value"
-        case VemployeedepartmentViewFieldValue.suffix(value) => fr"suffix = $value"
-        case VemployeedepartmentViewFieldValue.jobtitle(value) => fr"jobtitle = $value"
-        case VemployeedepartmentViewFieldValue.department(value) => fr"department = $value"
-        case VemployeedepartmentViewFieldValue.groupname(value) => fr"groupname = $value"
-        case VemployeedepartmentViewFieldValue.startdate(value) => fr"startdate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.vemployeedepartment $where".query[VemployeedepartmentViewRow].stream
-  
   }
 }

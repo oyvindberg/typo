@@ -64,29 +64,6 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           from production.productproductphoto
        """.as(ProductproductphotoRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ProductproductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductproductphotoRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductproductphotoFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ProductproductphotoFieldValue.productphotoid(value) => NamedParameter("productphotoid", ParameterValue.from(value))
-          case ProductproductphotoFieldValue.primary(value) => NamedParameter("primary", ParameterValue.from(value))
-          case ProductproductphotoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productid, productphotoid, "primary", modifieddate
-                    from production.productproductphoto
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ProductproductphotoRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: ProductproductphotoId)(implicit c: Connection): Option[ProductproductphotoRow] = {
     SQL"""select productid, productphotoid, "primary", modifieddate
           from production.productproductphoto
@@ -100,28 +77,6 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: ProductproductphotoId, fieldValues: List[ProductproductphotoFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductproductphotoFieldValue.primary(value) => NamedParameter("primary", ParameterValue.from(value))
-          case ProductproductphotoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.productproductphoto
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where productid = {productid} AND productphotoid = {productphotoid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("productphotoid", ParameterValue.from(compositeId.productphotoid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)

@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package pr
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,33 +15,5 @@ object PrViewRepoImpl extends PrViewRepo {
     SQL"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from pr.pr
        """.as(PrViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PrViewFieldOrIdValue[_]])(implicit c: Connection): List[PrViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PrViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PrViewFieldValue.productreviewid(value) => NamedParameter("productreviewid", ParameterValue.from(value))
-          case PrViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case PrViewFieldValue.reviewername(value) => NamedParameter("reviewername", ParameterValue.from(value))
-          case PrViewFieldValue.reviewdate(value) => NamedParameter("reviewdate", ParameterValue.from(value))
-          case PrViewFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case PrViewFieldValue.rating(value) => NamedParameter("rating", ParameterValue.from(value))
-          case PrViewFieldValue.comments(value) => NamedParameter("comments", ParameterValue.from(value))
-          case PrViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
-                    from pr.pr
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PrViewRow.rowParser(1).*)
-    }
-  
   }
 }

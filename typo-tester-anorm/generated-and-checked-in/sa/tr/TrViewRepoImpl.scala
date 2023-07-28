@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package tr
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,32 +15,5 @@ object TrViewRepoImpl extends TrViewRepo {
     SQL"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sa.tr
        """.as(TrViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[TrViewFieldOrIdValue[_]])(implicit c: Connection): List[TrViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case TrViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case TrViewFieldValue.salestaxrateid(value) => NamedParameter("salestaxrateid", ParameterValue.from(value))
-          case TrViewFieldValue.stateprovinceid(value) => NamedParameter("stateprovinceid", ParameterValue.from(value))
-          case TrViewFieldValue.taxtype(value) => NamedParameter("taxtype", ParameterValue.from(value))
-          case TrViewFieldValue.taxrate(value) => NamedParameter("taxrate", ParameterValue.from(value))
-          case TrViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case TrViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case TrViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
-                    from sa.tr
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(TrViewRow.rowParser(1).*)
-    }
-  
   }
 }

@@ -9,23 +9,10 @@ package cu
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object CuViewRepoImpl extends CuViewRepo {
   override def selectAll: Stream[ConnectionIO, CuViewRow] = {
     sql"""select "id", currencycode, "name", modifieddate from sa.cu""".query[CuViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[CuViewFieldOrIdValue[_]]): Stream[ConnectionIO, CuViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CuViewFieldValue.id(value) => fr""""id" = $value"""
-        case CuViewFieldValue.currencycode(value) => fr"currencycode = $value"
-        case CuViewFieldValue.name(value) => fr""""name" = $value"""
-        case CuViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.cu $where".query[CuViewRow].stream
-  
   }
 }

@@ -83,38 +83,6 @@ object PersonRepoImpl extends PersonRepo {
           from person.person
        """.as(PersonRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PersonFieldValue.persontype(value) => NamedParameter("persontype", ParameterValue.from(value))
-          case PersonFieldValue.namestyle(value) => NamedParameter("namestyle", ParameterValue.from(value))
-          case PersonFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case PersonFieldValue.firstname(value) => NamedParameter("firstname", ParameterValue.from(value))
-          case PersonFieldValue.middlename(value) => NamedParameter("middlename", ParameterValue.from(value))
-          case PersonFieldValue.lastname(value) => NamedParameter("lastname", ParameterValue.from(value))
-          case PersonFieldValue.suffix(value) => NamedParameter("suffix", ParameterValue.from(value))
-          case PersonFieldValue.emailpromotion(value) => NamedParameter("emailpromotion", ParameterValue.from(value))
-          case PersonFieldValue.additionalcontactinfo(value) => NamedParameter("additionalcontactinfo", ParameterValue.from(value))
-          case PersonFieldValue.demographics(value) => NamedParameter("demographics", ParameterValue.from(value))
-          case PersonFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
-                    from person.person
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PersonRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
           from person.person
@@ -149,38 +117,6 @@ object PersonRepoImpl extends PersonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonFieldValue.persontype(value) => NamedParameter("persontype", ParameterValue.from(value))
-          case PersonFieldValue.namestyle(value) => NamedParameter("namestyle", ParameterValue.from(value))
-          case PersonFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case PersonFieldValue.firstname(value) => NamedParameter("firstname", ParameterValue.from(value))
-          case PersonFieldValue.middlename(value) => NamedParameter("middlename", ParameterValue.from(value))
-          case PersonFieldValue.lastname(value) => NamedParameter("lastname", ParameterValue.from(value))
-          case PersonFieldValue.suffix(value) => NamedParameter("suffix", ParameterValue.from(value))
-          case PersonFieldValue.emailpromotion(value) => NamedParameter("emailpromotion", ParameterValue.from(value))
-          case PersonFieldValue.additionalcontactinfo(value) => NamedParameter("additionalcontactinfo", ParameterValue.from(value))
-          case PersonFieldValue.demographics(value) => NamedParameter("demographics", ParameterValue.from(value))
-          case PersonFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.person
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)

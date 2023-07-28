@@ -85,38 +85,6 @@ object DocumentRepoImpl extends DocumentRepo {
           from production."document"
        """.as(DocumentRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]])(implicit c: Connection): List[DocumentRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case DocumentFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case DocumentFieldValue.owner(value) => NamedParameter("owner", ParameterValue.from(value))
-          case DocumentFieldValue.folderflag(value) => NamedParameter("folderflag", ParameterValue.from(value))
-          case DocumentFieldValue.filename(value) => NamedParameter("filename", ParameterValue.from(value))
-          case DocumentFieldValue.fileextension(value) => NamedParameter("fileextension", ParameterValue.from(value))
-          case DocumentFieldValue.revision(value) => NamedParameter("revision", ParameterValue.from(value))
-          case DocumentFieldValue.changenumber(value) => NamedParameter("changenumber", ParameterValue.from(value))
-          case DocumentFieldValue.status(value) => NamedParameter("status", ParameterValue.from(value))
-          case DocumentFieldValue.documentsummary(value) => NamedParameter("documentsummary", ParameterValue.from(value))
-          case DocumentFieldValue.document(value) => NamedParameter("document", ParameterValue.from(value))
-          case DocumentFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case DocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-          case DocumentFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
-                    from production."document"
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(DocumentRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow] = {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
           from production."document"
@@ -133,9 +101,6 @@ object DocumentRepoImpl extends DocumentRepo {
           where documentnode = ANY($documentnodes)
        """.as(DocumentRow.rowParser(1).*)
   
-  }
-  override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
-    selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).headOption
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
     val documentnode = row.documentnode
@@ -154,38 +119,6 @@ object DocumentRepoImpl extends DocumentRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where documentnode = $documentnode
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(documentnode: DocumentId, fieldValues: List[DocumentFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case DocumentFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case DocumentFieldValue.owner(value) => NamedParameter("owner", ParameterValue.from(value))
-          case DocumentFieldValue.folderflag(value) => NamedParameter("folderflag", ParameterValue.from(value))
-          case DocumentFieldValue.filename(value) => NamedParameter("filename", ParameterValue.from(value))
-          case DocumentFieldValue.fileextension(value) => NamedParameter("fileextension", ParameterValue.from(value))
-          case DocumentFieldValue.revision(value) => NamedParameter("revision", ParameterValue.from(value))
-          case DocumentFieldValue.changenumber(value) => NamedParameter("changenumber", ParameterValue.from(value))
-          case DocumentFieldValue.status(value) => NamedParameter("status", ParameterValue.from(value))
-          case DocumentFieldValue.documentsummary(value) => NamedParameter("documentsummary", ParameterValue.from(value))
-          case DocumentFieldValue.document(value) => NamedParameter("document", ParameterValue.from(value))
-          case DocumentFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case DocumentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production."document"
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where documentnode = {documentnode}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("documentnode", ParameterValue.from(documentnode)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     SQL"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)

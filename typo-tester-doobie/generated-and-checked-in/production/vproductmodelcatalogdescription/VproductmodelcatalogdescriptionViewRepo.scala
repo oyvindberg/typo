@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait VproductmodelcatalogdescriptionViewRepo {
   def selectAll: Stream[ConnectionIO, VproductmodelcatalogdescriptionViewRow]
-  def selectByFieldValues(fieldValues: List[VproductmodelcatalogdescriptionViewFieldOrIdValue[_]]): Stream[ConnectionIO, VproductmodelcatalogdescriptionViewRow]
 }

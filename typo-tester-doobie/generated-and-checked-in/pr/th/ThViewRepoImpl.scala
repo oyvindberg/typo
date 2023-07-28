@@ -9,29 +9,10 @@ package th
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object ThViewRepoImpl extends ThViewRepo {
   override def selectAll: Stream[ConnectionIO, ThViewRow] = {
     sql"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from pr.th""".query[ThViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[ThViewFieldOrIdValue[_]]): Stream[ConnectionIO, ThViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ThViewFieldValue.id(value) => fr""""id" = $value"""
-        case ThViewFieldValue.transactionid(value) => fr"transactionid = $value"
-        case ThViewFieldValue.productid(value) => fr"productid = $value"
-        case ThViewFieldValue.referenceorderid(value) => fr"referenceorderid = $value"
-        case ThViewFieldValue.referenceorderlineid(value) => fr"referenceorderlineid = $value"
-        case ThViewFieldValue.transactiondate(value) => fr"transactiondate = $value"
-        case ThViewFieldValue.transactiontype(value) => fr"transactiontype = $value"
-        case ThViewFieldValue.quantity(value) => fr"quantity = $value"
-        case ThViewFieldValue.actualcost(value) => fr"actualcost = $value"
-        case ThViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.th $where".query[ThViewRow].stream
-  
   }
 }

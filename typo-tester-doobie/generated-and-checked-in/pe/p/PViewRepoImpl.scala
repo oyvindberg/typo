@@ -9,33 +9,10 @@ package p
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll: Stream[ConnectionIO, PViewRow] = {
     sql"""select "id", businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from pe."p"""".query[PViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]]): Stream[ConnectionIO, PViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PViewFieldValue.id(value) => fr""""id" = $value"""
-        case PViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case PViewFieldValue.persontype(value) => fr"persontype = $value"
-        case PViewFieldValue.namestyle(value) => fr"namestyle = $value"
-        case PViewFieldValue.title(value) => fr"title = $value"
-        case PViewFieldValue.firstname(value) => fr"firstname = $value"
-        case PViewFieldValue.middlename(value) => fr"middlename = $value"
-        case PViewFieldValue.lastname(value) => fr"lastname = $value"
-        case PViewFieldValue.suffix(value) => fr"suffix = $value"
-        case PViewFieldValue.emailpromotion(value) => fr"emailpromotion = $value"
-        case PViewFieldValue.additionalcontactinfo(value) => fr"additionalcontactinfo = $value"
-        case PViewFieldValue.demographics(value) => fr"demographics = $value"
-        case PViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"""select * from pe."p" $where""".query[PViewRow].stream
-  
   }
 }

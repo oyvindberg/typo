@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait UmViewRepo {
   def selectAll: Stream[ConnectionIO, UmViewRow]
-  def selectByFieldValues(fieldValues: List[UmViewFieldOrIdValue[_]]): Stream[ConnectionIO, UmViewRow]
 }

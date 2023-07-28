@@ -32,27 +32,6 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[EmployeeFieldOrIdValue[_]]): Stream[ConnectionIO, EmployeeRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, EmployeeFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, EmployeeFieldValue.nationalidnumber(value)) => acc.filter(_.nationalidnumber == value)
-        case (acc, EmployeeFieldValue.loginid(value)) => acc.filter(_.loginid == value)
-        case (acc, EmployeeFieldValue.jobtitle(value)) => acc.filter(_.jobtitle == value)
-        case (acc, EmployeeFieldValue.birthdate(value)) => acc.filter(_.birthdate == value)
-        case (acc, EmployeeFieldValue.maritalstatus(value)) => acc.filter(_.maritalstatus == value)
-        case (acc, EmployeeFieldValue.gender(value)) => acc.filter(_.gender == value)
-        case (acc, EmployeeFieldValue.hiredate(value)) => acc.filter(_.hiredate == value)
-        case (acc, EmployeeFieldValue.salariedflag(value)) => acc.filter(_.salariedflag == value)
-        case (acc, EmployeeFieldValue.vacationhours(value)) => acc.filter(_.vacationhours == value)
-        case (acc, EmployeeFieldValue.sickleavehours(value)) => acc.filter(_.sickleavehours == value)
-        case (acc, EmployeeFieldValue.currentflag(value)) => acc.filter(_.currentflag == value)
-        case (acc, EmployeeFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, EmployeeFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-        case (acc, EmployeeFieldValue.organizationnode(value)) => acc.filter(_.organizationnode == value)
-      }.toList
-    }
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]] = {
     delay(map.get(businessentityid))
   }
@@ -66,36 +45,6 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
         case Some(_) =>
           map.put(row.businessentityid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[EmployeeFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(businessentityid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, EmployeeFieldValue.nationalidnumber(value)) => acc.copy(nationalidnumber = value)
-            case (acc, EmployeeFieldValue.loginid(value)) => acc.copy(loginid = value)
-            case (acc, EmployeeFieldValue.jobtitle(value)) => acc.copy(jobtitle = value)
-            case (acc, EmployeeFieldValue.birthdate(value)) => acc.copy(birthdate = value)
-            case (acc, EmployeeFieldValue.maritalstatus(value)) => acc.copy(maritalstatus = value)
-            case (acc, EmployeeFieldValue.gender(value)) => acc.copy(gender = value)
-            case (acc, EmployeeFieldValue.hiredate(value)) => acc.copy(hiredate = value)
-            case (acc, EmployeeFieldValue.salariedflag(value)) => acc.copy(salariedflag = value)
-            case (acc, EmployeeFieldValue.vacationhours(value)) => acc.copy(vacationhours = value)
-            case (acc, EmployeeFieldValue.sickleavehours(value)) => acc.copy(sickleavehours = value)
-            case (acc, EmployeeFieldValue.currentflag(value)) => acc.copy(currentflag = value)
-            case (acc, EmployeeFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, EmployeeFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-            case (acc, EmployeeFieldValue.organizationnode(value)) => acc.copy(organizationnode = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(businessentityid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

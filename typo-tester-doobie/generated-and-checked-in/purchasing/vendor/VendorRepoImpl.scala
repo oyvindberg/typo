@@ -11,10 +11,8 @@ import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -66,22 +64,6 @@ object VendorRepoImpl extends VendorRepo {
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
     sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor""".query[VendorRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]]): Stream[ConnectionIO, VendorRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VendorFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VendorFieldValue.accountnumber(value) => fr"accountnumber = $value"
-        case VendorFieldValue.name(value) => fr""""name" = $value"""
-        case VendorFieldValue.creditrating(value) => fr"creditrating = $value"
-        case VendorFieldValue.preferredvendorstatus(value) => fr"preferredvendorstatus = $value"
-        case VendorFieldValue.activeflag(value) => fr"activeflag = $value"
-        case VendorFieldValue.purchasingwebserviceurl(value) => fr"purchasingwebserviceurl = $value"
-        case VendorFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from purchasing.vendor $where".query[VendorRow].stream
-  
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[VendorRow]] = {
     sql"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from purchasing.vendor where businessentityid = $businessentityid""".query[VendorRow].option
   }
@@ -103,27 +85,6 @@ object VendorRepoImpl extends VendorRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[VendorFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case VendorFieldValue.accountnumber(value) => fr"accountnumber = $value"
-            case VendorFieldValue.name(value) => fr""""name" = $value"""
-            case VendorFieldValue.creditrating(value) => fr"creditrating = $value"
-            case VendorFieldValue.preferredvendorstatus(value) => fr"preferredvendorstatus = $value"
-            case VendorFieldValue.activeflag(value) => fr"activeflag = $value"
-            case VendorFieldValue.purchasingwebserviceurl(value) => fr"purchasingwebserviceurl = $value"
-            case VendorFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update purchasing.vendor
-              $updates
-              where businessentityid = $businessentityid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)

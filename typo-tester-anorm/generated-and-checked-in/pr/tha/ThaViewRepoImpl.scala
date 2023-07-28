@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package tha
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,34 +15,5 @@ object ThaViewRepoImpl extends ThaViewRepo {
     SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from pr.tha
        """.as(ThaViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[ThaViewFieldOrIdValue[_]])(implicit c: Connection): List[ThaViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ThaViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case ThaViewFieldValue.transactionid(value) => NamedParameter("transactionid", ParameterValue.from(value))
-          case ThaViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ThaViewFieldValue.referenceorderid(value) => NamedParameter("referenceorderid", ParameterValue.from(value))
-          case ThaViewFieldValue.referenceorderlineid(value) => NamedParameter("referenceorderlineid", ParameterValue.from(value))
-          case ThaViewFieldValue.transactiondate(value) => NamedParameter("transactiondate", ParameterValue.from(value))
-          case ThaViewFieldValue.transactiontype(value) => NamedParameter("transactiontype", ParameterValue.from(value))
-          case ThaViewFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case ThaViewFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
-          case ThaViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
-                    from pr.tha
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ThaViewRow.rowParser(1).*)
-    }
-  
   }
 }

@@ -9,10 +9,8 @@ package compositepk
 package person
 
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import testdb.hardcoded.Defaulted
 
@@ -56,17 +54,6 @@ object PersonRepoImpl extends PersonRepo {
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "one", two, "name" from compositepk.person""".query[PersonRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]]): Stream[ConnectionIO, PersonRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PersonFieldValue.one(value) => fr""""one" = $value"""
-        case PersonFieldValue.two(value) => fr"two = $value"
-        case PersonFieldValue.name(value) => fr""""name" = $value"""
-      } :_*
-    )
-    sql"select * from compositepk.person $where".query[PersonRow].stream
-  
-  }
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
     sql"""select "one", two, "name" from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".query[PersonRow].option
   }
@@ -79,21 +66,6 @@ object PersonRepoImpl extends PersonRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PersonFieldValue.name(value) => fr""""name" = $value"""
-          } :_*
-        )
-        sql"""update compositepk.person
-              $updates
-              where "one" = ${compositeId.one} AND two = ${compositeId.two}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", two, "name")

@@ -27,17 +27,6 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, SalestaxrateFieldValue.salestaxrateid(value)) => acc.filter(_.salestaxrateid == value)
-      case (acc, SalestaxrateFieldValue.stateprovinceid(value)) => acc.filter(_.stateprovinceid == value)
-      case (acc, SalestaxrateFieldValue.taxtype(value)) => acc.filter(_.taxtype == value)
-      case (acc, SalestaxrateFieldValue.taxrate(value)) => acc.filter(_.taxrate == value)
-      case (acc, SalestaxrateFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, SalestaxrateFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, SalestaxrateFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
     map.get(salestaxrateid)
   }
@@ -50,26 +39,6 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
       case Some(_) =>
         map.put(row.salestaxrateid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(salestaxrateid: SalestaxrateId, fieldValues: List[SalestaxrateFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(salestaxrateid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, SalestaxrateFieldValue.stateprovinceid(value)) => acc.copy(stateprovinceid = value)
-          case (acc, SalestaxrateFieldValue.taxtype(value)) => acc.copy(taxtype = value)
-          case (acc, SalestaxrateFieldValue.taxrate(value)) => acc.copy(taxrate = value)
-          case (acc, SalestaxrateFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, SalestaxrateFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, SalestaxrateFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(salestaxrateid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

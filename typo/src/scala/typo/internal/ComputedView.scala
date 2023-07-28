@@ -3,7 +3,7 @@ package internal
 
 import typo.internal.rewriteDependentData.Eval
 
-case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, HasSource]) extends HasSource {
+case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, HasSource], enableFieldValue: Boolean) extends HasSource {
   val source = Source.View(view.name, view.isMaterialized)
   val cols: NonEmptyList[ComputedColumn] =
     view.cols.map { dbCol =>
@@ -35,18 +35,24 @@ case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
     tpe
   }
 
-  val names = ComputedNames(naming, source, cols, maybeId = None)
+  val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue)
 
   val repoMethods: NonEmptyList[RepoMethod] = {
-    val fieldValuesParam = sc.Param(
-      sc.Ident("fieldValues"),
-      sc.Type.List.of(names.FieldOrIdValueName.of(sc.Type.Wildcard)),
-      None
-    )
+    val maybeSelectByFieldValues = for {
+      fieldOrIdValueName <- names.FieldOrIdValueName
+      fieldValueName <- names.FieldValueName
+    } yield {
+      val fieldValuesParam = sc.Param(
+        sc.Ident("fieldValues"),
+        sc.Type.List.of(fieldOrIdValueName.of(sc.Type.Wildcard)),
+        None
+      )
+      RepoMethod.SelectByFieldValues(view.name, cols, fieldValueName, fieldValuesParam, names.RowName)
+    }
 
     NonEmptyList(
       RepoMethod.SelectAll(view.name, cols, names.RowName),
-      RepoMethod.SelectByFieldValues(view.name, cols, names.FieldValueName, fieldValuesParam, names.RowName)
+      maybeSelectByFieldValues.toList
     )
   }
 }

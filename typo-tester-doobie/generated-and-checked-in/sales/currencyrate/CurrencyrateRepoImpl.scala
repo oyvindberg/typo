@@ -9,10 +9,8 @@ package currencyrate
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -60,21 +58,6 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
     sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate".query[CurrencyrateRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]]): Stream[ConnectionIO, CurrencyrateRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CurrencyrateFieldValue.currencyrateid(value) => fr"currencyrateid = $value"
-        case CurrencyrateFieldValue.currencyratedate(value) => fr"currencyratedate = $value"
-        case CurrencyrateFieldValue.fromcurrencycode(value) => fr"fromcurrencycode = $value"
-        case CurrencyrateFieldValue.tocurrencycode(value) => fr"tocurrencycode = $value"
-        case CurrencyrateFieldValue.averagerate(value) => fr"averagerate = $value"
-        case CurrencyrateFieldValue.endofdayrate(value) => fr"endofdayrate = $value"
-        case CurrencyrateFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.currencyrate $where".query[CurrencyrateRow].stream
-  
-  }
   override def selectById(currencyrateid: CurrencyrateId): ConnectionIO[Option[CurrencyrateRow]] = {
     sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sales.currencyrate where currencyrateid = $currencyrateid".query[CurrencyrateRow].option
   }
@@ -95,26 +78,6 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(currencyrateid: CurrencyrateId, fieldValues: List[CurrencyrateFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case CurrencyrateFieldValue.currencyratedate(value) => fr"currencyratedate = $value"
-            case CurrencyrateFieldValue.fromcurrencycode(value) => fr"fromcurrencycode = $value"
-            case CurrencyrateFieldValue.tocurrencycode(value) => fr"tocurrencycode = $value"
-            case CurrencyrateFieldValue.averagerate(value) => fr"averagerate = $value"
-            case CurrencyrateFieldValue.endofdayrate(value) => fr"endofdayrate = $value"
-            case CurrencyrateFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.currencyrate
-              $updates
-              where currencyrateid = $currencyrateid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)

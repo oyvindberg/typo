@@ -64,28 +64,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
           from production.scrapreason
        """.as(ScrapreasonRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]])(implicit c: Connection): List[ScrapreasonRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ScrapreasonFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
-          case ScrapreasonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ScrapreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select scrapreasonid, "name", modifieddate
-                    from production.scrapreason
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ScrapreasonRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow] = {
     SQL"""select scrapreasonid, "name", modifieddate
           from production.scrapreason
@@ -110,28 +88,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where scrapreasonid = $scrapreasonid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(scrapreasonid: ScrapreasonId, fieldValues: List[ScrapreasonFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ScrapreasonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ScrapreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.scrapreason
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where scrapreasonid = {scrapreasonid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("scrapreasonid", ParameterValue.from(scrapreasonid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)

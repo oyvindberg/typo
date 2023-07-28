@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package vsalespersonsalesbyfiscalyearsdata
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,30 +15,5 @@ object VsalespersonsalesbyfiscalyearsdataViewRepoImpl extends Vsalespersonsalesb
     SQL"""select salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear
           from sales.vsalespersonsalesbyfiscalyearsdata
        """.as(VsalespersonsalesbyfiscalyearsdataViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VsalespersonsalesbyfiscalyearsdataViewFieldOrIdValue[_]])(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsdataViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VsalespersonsalesbyfiscalyearsdataViewFieldValue.salespersonid(value) => NamedParameter("salespersonid", ParameterValue.from(value))
-          case VsalespersonsalesbyfiscalyearsdataViewFieldValue.fullname(value) => NamedParameter("fullname", ParameterValue.from(value))
-          case VsalespersonsalesbyfiscalyearsdataViewFieldValue.jobtitle(value) => NamedParameter("jobtitle", ParameterValue.from(value))
-          case VsalespersonsalesbyfiscalyearsdataViewFieldValue.salesterritory(value) => NamedParameter("salesterritory", ParameterValue.from(value))
-          case VsalespersonsalesbyfiscalyearsdataViewFieldValue.salestotal(value) => NamedParameter("salestotal", ParameterValue.from(value))
-          case VsalespersonsalesbyfiscalyearsdataViewFieldValue.fiscalyear(value) => NamedParameter("fiscalyear", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear
-                    from sales.vsalespersonsalesbyfiscalyearsdata
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VsalespersonsalesbyfiscalyearsdataViewRow.rowParser(1).*)
-    }
-  
   }
 }

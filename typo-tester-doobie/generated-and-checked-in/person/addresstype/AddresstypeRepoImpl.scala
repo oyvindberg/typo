@@ -9,10 +9,8 @@ package addresstype
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -61,18 +59,6 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
     sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype""".query[AddresstypeRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]]): Stream[ConnectionIO, AddresstypeRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case AddresstypeFieldValue.addresstypeid(value) => fr"addresstypeid = $value"
-        case AddresstypeFieldValue.name(value) => fr""""name" = $value"""
-        case AddresstypeFieldValue.rowguid(value) => fr"rowguid = $value"
-        case AddresstypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.addresstype $where".query[AddresstypeRow].stream
-  
-  }
   override def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]] = {
     sql"""select addresstypeid, "name", rowguid, modifieddate from person.addresstype where addresstypeid = $addresstypeid""".query[AddresstypeRow].option
   }
@@ -90,23 +76,6 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(addresstypeid: AddresstypeId, fieldValues: List[AddresstypeFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case AddresstypeFieldValue.name(value) => fr""""name" = $value"""
-            case AddresstypeFieldValue.rowguid(value) => fr"rowguid = $value"
-            case AddresstypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.addresstype
-              $updates
-              where addresstypeid = $addresstypeid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)

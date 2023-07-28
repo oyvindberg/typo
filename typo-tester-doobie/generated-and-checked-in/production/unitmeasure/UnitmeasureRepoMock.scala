@@ -31,15 +31,6 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]]): Stream[ConnectionIO, UnitmeasureRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, UnitmeasureFieldValue.unitmeasurecode(value)) => acc.filter(_.unitmeasurecode == value)
-        case (acc, UnitmeasureFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, UnitmeasureFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]] = {
     delay(map.get(unitmeasurecode))
   }
@@ -53,24 +44,6 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
         case Some(_) =>
           map.put(row.unitmeasurecode, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(unitmeasurecode: UnitmeasureId, fieldValues: List[UnitmeasureFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(unitmeasurecode) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, UnitmeasureFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, UnitmeasureFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(unitmeasurecode, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

@@ -15,9 +15,7 @@ trait SpecialofferproductRepo {
   def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow]
   def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow]
   def selectAll: Stream[ConnectionIO, SpecialofferproductRow]
-  def selectByFieldValues(fieldValues: List[SpecialofferproductFieldOrIdValue[_]]): Stream[ConnectionIO, SpecialofferproductRow]
   def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]]
   def update(row: SpecialofferproductRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: SpecialofferproductId, fieldValues: List[SpecialofferproductFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow]
 }

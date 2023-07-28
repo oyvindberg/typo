@@ -31,16 +31,6 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]]): Stream[ConnectionIO, AddresstypeRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, AddresstypeFieldValue.addresstypeid(value)) => acc.filter(_.addresstypeid == value)
-        case (acc, AddresstypeFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, AddresstypeFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, AddresstypeFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]] = {
     delay(map.get(addresstypeid))
   }
@@ -54,25 +44,6 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
         case Some(_) =>
           map.put(row.addresstypeid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(addresstypeid: AddresstypeId, fieldValues: List[AddresstypeFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(addresstypeid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, AddresstypeFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, AddresstypeFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, AddresstypeFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(addresstypeid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

@@ -27,13 +27,6 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, CultureFieldValue.cultureid(value)) => acc.filter(_.cultureid == value)
-      case (acc, CultureFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, CultureFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
     map.get(cultureid)
   }
@@ -46,22 +39,6 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
       case Some(_) =>
         map.put(row.cultureid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(cultureid: CultureId, fieldValues: List[CultureFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(cultureid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, CultureFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, CultureFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(cultureid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

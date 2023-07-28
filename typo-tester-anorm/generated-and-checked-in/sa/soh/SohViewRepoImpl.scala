@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package soh
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,50 +15,5 @@ object SohViewRepoImpl extends SohViewRepo {
     SQL"""select "id", salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
           from sa.soh
        """.as(SohViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SohViewFieldOrIdValue[_]])(implicit c: Connection): List[SohViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SohViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SohViewFieldValue.salesorderid(value) => NamedParameter("salesorderid", ParameterValue.from(value))
-          case SohViewFieldValue.revisionnumber(value) => NamedParameter("revisionnumber", ParameterValue.from(value))
-          case SohViewFieldValue.orderdate(value) => NamedParameter("orderdate", ParameterValue.from(value))
-          case SohViewFieldValue.duedate(value) => NamedParameter("duedate", ParameterValue.from(value))
-          case SohViewFieldValue.shipdate(value) => NamedParameter("shipdate", ParameterValue.from(value))
-          case SohViewFieldValue.status(value) => NamedParameter("status", ParameterValue.from(value))
-          case SohViewFieldValue.onlineorderflag(value) => NamedParameter("onlineorderflag", ParameterValue.from(value))
-          case SohViewFieldValue.purchaseordernumber(value) => NamedParameter("purchaseordernumber", ParameterValue.from(value))
-          case SohViewFieldValue.accountnumber(value) => NamedParameter("accountnumber", ParameterValue.from(value))
-          case SohViewFieldValue.customerid(value) => NamedParameter("customerid", ParameterValue.from(value))
-          case SohViewFieldValue.salespersonid(value) => NamedParameter("salespersonid", ParameterValue.from(value))
-          case SohViewFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case SohViewFieldValue.billtoaddressid(value) => NamedParameter("billtoaddressid", ParameterValue.from(value))
-          case SohViewFieldValue.shiptoaddressid(value) => NamedParameter("shiptoaddressid", ParameterValue.from(value))
-          case SohViewFieldValue.shipmethodid(value) => NamedParameter("shipmethodid", ParameterValue.from(value))
-          case SohViewFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
-          case SohViewFieldValue.creditcardapprovalcode(value) => NamedParameter("creditcardapprovalcode", ParameterValue.from(value))
-          case SohViewFieldValue.currencyrateid(value) => NamedParameter("currencyrateid", ParameterValue.from(value))
-          case SohViewFieldValue.subtotal(value) => NamedParameter("subtotal", ParameterValue.from(value))
-          case SohViewFieldValue.taxamt(value) => NamedParameter("taxamt", ParameterValue.from(value))
-          case SohViewFieldValue.freight(value) => NamedParameter("freight", ParameterValue.from(value))
-          case SohViewFieldValue.totaldue(value) => NamedParameter("totaldue", ParameterValue.from(value))
-          case SohViewFieldValue.comment(value) => NamedParameter("comment", ParameterValue.from(value))
-          case SohViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SohViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
-                    from sa.soh
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SohViewRow.rowParser(1).*)
-    }
-  
   }
 }

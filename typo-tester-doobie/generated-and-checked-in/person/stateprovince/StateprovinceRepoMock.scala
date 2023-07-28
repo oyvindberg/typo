@@ -31,20 +31,6 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]]): Stream[ConnectionIO, StateprovinceRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, StateprovinceFieldValue.stateprovinceid(value)) => acc.filter(_.stateprovinceid == value)
-        case (acc, StateprovinceFieldValue.stateprovincecode(value)) => acc.filter(_.stateprovincecode == value)
-        case (acc, StateprovinceFieldValue.countryregioncode(value)) => acc.filter(_.countryregioncode == value)
-        case (acc, StateprovinceFieldValue.isonlystateprovinceflag(value)) => acc.filter(_.isonlystateprovinceflag == value)
-        case (acc, StateprovinceFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, StateprovinceFieldValue.territoryid(value)) => acc.filter(_.territoryid == value)
-        case (acc, StateprovinceFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, StateprovinceFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]] = {
     delay(map.get(stateprovinceid))
   }
@@ -58,29 +44,6 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
         case Some(_) =>
           map.put(row.stateprovinceid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(stateprovinceid: StateprovinceId, fieldValues: List[StateprovinceFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(stateprovinceid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, StateprovinceFieldValue.stateprovincecode(value)) => acc.copy(stateprovincecode = value)
-            case (acc, StateprovinceFieldValue.countryregioncode(value)) => acc.copy(countryregioncode = value)
-            case (acc, StateprovinceFieldValue.isonlystateprovinceflag(value)) => acc.copy(isonlystateprovinceflag = value)
-            case (acc, StateprovinceFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, StateprovinceFieldValue.territoryid(value)) => acc.copy(territoryid = value)
-            case (acc, StateprovinceFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, StateprovinceFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(stateprovinceid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

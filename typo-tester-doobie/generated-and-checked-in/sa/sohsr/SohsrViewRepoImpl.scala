@@ -9,22 +9,10 @@ package sohsr
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SohsrViewRepoImpl extends SohsrViewRepo {
   override def selectAll: Stream[ConnectionIO, SohsrViewRow] = {
     sql"select salesorderid, salesreasonid, modifieddate from sa.sohsr".query[SohsrViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SohsrViewFieldOrIdValue[_]]): Stream[ConnectionIO, SohsrViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SohsrViewFieldValue.salesorderid(value) => fr"salesorderid = $value"
-        case SohsrViewFieldValue.salesreasonid(value) => fr"salesreasonid = $value"
-        case SohsrViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.sohsr $where".query[SohsrViewRow].stream
-  
   }
 }

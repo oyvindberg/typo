@@ -9,10 +9,8 @@ package productcategory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -61,18 +59,6 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def selectAll: Stream[ConnectionIO, ProductcategoryRow] = {
     sql"""select productcategoryid, "name", rowguid, modifieddate from production.productcategory""".query[ProductcategoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductcategoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductcategoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductcategoryFieldValue.productcategoryid(value) => fr"productcategoryid = $value"
-        case ProductcategoryFieldValue.name(value) => fr""""name" = $value"""
-        case ProductcategoryFieldValue.rowguid(value) => fr"rowguid = $value"
-        case ProductcategoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productcategory $where".query[ProductcategoryRow].stream
-  
-  }
   override def selectById(productcategoryid: ProductcategoryId): ConnectionIO[Option[ProductcategoryRow]] = {
     sql"""select productcategoryid, "name", rowguid, modifieddate from production.productcategory where productcategoryid = $productcategoryid""".query[ProductcategoryRow].option
   }
@@ -90,23 +76,6 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(productcategoryid: ProductcategoryId, fieldValues: List[ProductcategoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductcategoryFieldValue.name(value) => fr""""name" = $value"""
-            case ProductcategoryFieldValue.rowguid(value) => fr"rowguid = $value"
-            case ProductcategoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productcategory
-              $updates
-              where productcategoryid = $productcategoryid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)

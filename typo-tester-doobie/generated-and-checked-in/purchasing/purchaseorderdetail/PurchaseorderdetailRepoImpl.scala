@@ -9,10 +9,8 @@ package purchaseorderdetail
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -62,23 +60,6 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
     sql"select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail".query[PurchaseorderdetailRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PurchaseorderdetailFieldOrIdValue[_]]): Stream[ConnectionIO, PurchaseorderdetailRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PurchaseorderdetailFieldValue.purchaseorderid(value) => fr"purchaseorderid = $value"
-        case PurchaseorderdetailFieldValue.purchaseorderdetailid(value) => fr"purchaseorderdetailid = $value"
-        case PurchaseorderdetailFieldValue.duedate(value) => fr"duedate = $value"
-        case PurchaseorderdetailFieldValue.orderqty(value) => fr"orderqty = $value"
-        case PurchaseorderdetailFieldValue.productid(value) => fr"productid = $value"
-        case PurchaseorderdetailFieldValue.unitprice(value) => fr"unitprice = $value"
-        case PurchaseorderdetailFieldValue.receivedqty(value) => fr"receivedqty = $value"
-        case PurchaseorderdetailFieldValue.rejectedqty(value) => fr"rejectedqty = $value"
-        case PurchaseorderdetailFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from purchasing.purchaseorderdetail $where".query[PurchaseorderdetailRow].stream
-  
-  }
   override def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]] = {
     sql"select purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".query[PurchaseorderdetailRow].option
   }
@@ -97,27 +78,6 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: PurchaseorderdetailId, fieldValues: List[PurchaseorderdetailFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PurchaseorderdetailFieldValue.duedate(value) => fr"duedate = $value"
-            case PurchaseorderdetailFieldValue.orderqty(value) => fr"orderqty = $value"
-            case PurchaseorderdetailFieldValue.productid(value) => fr"productid = $value"
-            case PurchaseorderdetailFieldValue.unitprice(value) => fr"unitprice = $value"
-            case PurchaseorderdetailFieldValue.receivedqty(value) => fr"receivedqty = $value"
-            case PurchaseorderdetailFieldValue.rejectedqty(value) => fr"rejectedqty = $value"
-            case PurchaseorderdetailFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update purchasing.purchaseorderdetail
-              $updates
-              where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)

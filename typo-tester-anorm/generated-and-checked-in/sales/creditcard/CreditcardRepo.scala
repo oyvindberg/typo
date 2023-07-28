@@ -14,10 +14,8 @@ trait CreditcardRepo {
   def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow
   def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow
   def selectAll(implicit c: Connection): List[CreditcardRow]
-  def selectByFieldValues(fieldValues: List[CreditcardFieldOrIdValue[_]])(implicit c: Connection): List[CreditcardRow]
   def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow]
   def selectByIds(creditcardids: Array[CreditcardId])(implicit c: Connection): List[CreditcardRow]
   def update(row: CreditcardRow)(implicit c: Connection): Boolean
-  def updateFieldValues(creditcardid: CreditcardId, fieldValues: List[CreditcardFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow
 }

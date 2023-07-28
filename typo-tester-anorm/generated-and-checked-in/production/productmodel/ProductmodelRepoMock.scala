@@ -27,16 +27,6 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[ProductmodelFieldOrIdValue[_]])(implicit c: Connection): List[ProductmodelRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, ProductmodelFieldValue.productmodelid(value)) => acc.filter(_.productmodelid == value)
-      case (acc, ProductmodelFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, ProductmodelFieldValue.catalogdescription(value)) => acc.filter(_.catalogdescription == value)
-      case (acc, ProductmodelFieldValue.instructions(value)) => acc.filter(_.instructions == value)
-      case (acc, ProductmodelFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, ProductmodelFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(productmodelid: ProductmodelId)(implicit c: Connection): Option[ProductmodelRow] = {
     map.get(productmodelid)
   }
@@ -49,25 +39,6 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
       case Some(_) =>
         map.put(row.productmodelid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(productmodelid: ProductmodelId, fieldValues: List[ProductmodelFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(productmodelid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, ProductmodelFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, ProductmodelFieldValue.catalogdescription(value)) => acc.copy(catalogdescription = value)
-          case (acc, ProductmodelFieldValue.instructions(value)) => acc.copy(instructions = value)
-          case (acc, ProductmodelFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, ProductmodelFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(productmodelid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

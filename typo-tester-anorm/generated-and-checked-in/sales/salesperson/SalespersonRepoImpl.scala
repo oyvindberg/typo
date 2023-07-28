@@ -84,34 +84,6 @@ object SalespersonRepoImpl extends SalespersonRepo {
           from sales.salesperson
        """.as(SalespersonRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalespersonFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case SalespersonFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case SalespersonFieldValue.salesquota(value) => NamedParameter("salesquota", ParameterValue.from(value))
-          case SalespersonFieldValue.bonus(value) => NamedParameter("bonus", ParameterValue.from(value))
-          case SalespersonFieldValue.commissionpct(value) => NamedParameter("commissionpct", ParameterValue.from(value))
-          case SalespersonFieldValue.salesytd(value) => NamedParameter("salesytd", ParameterValue.from(value))
-          case SalespersonFieldValue.saleslastyear(value) => NamedParameter("saleslastyear", ParameterValue.from(value))
-          case SalespersonFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalespersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
-                    from sales.salesperson
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SalespersonRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[SalespersonRow] = {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sales.salesperson
@@ -142,34 +114,6 @@ object SalespersonRepoImpl extends SalespersonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[SalespersonFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalespersonFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case SalespersonFieldValue.salesquota(value) => NamedParameter("salesquota", ParameterValue.from(value))
-          case SalespersonFieldValue.bonus(value) => NamedParameter("bonus", ParameterValue.from(value))
-          case SalespersonFieldValue.commissionpct(value) => NamedParameter("commissionpct", ParameterValue.from(value))
-          case SalespersonFieldValue.salesytd(value) => NamedParameter("salesytd", ParameterValue.from(value))
-          case SalespersonFieldValue.saleslastyear(value) => NamedParameter("saleslastyear", ParameterValue.from(value))
-          case SalespersonFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalespersonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.salesperson
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     SQL"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)

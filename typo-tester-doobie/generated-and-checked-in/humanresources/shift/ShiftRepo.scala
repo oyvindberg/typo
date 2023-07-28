@@ -15,10 +15,8 @@ trait ShiftRepo {
   def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow]
   def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow]
   def selectAll: Stream[ConnectionIO, ShiftRow]
-  def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]]): Stream[ConnectionIO, ShiftRow]
   def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]]
   def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow]
   def update(row: ShiftRow): ConnectionIO[Boolean]
-  def updateFieldValues(shiftid: ShiftId, fieldValues: List[ShiftFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow]
 }

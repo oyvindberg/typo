@@ -15,10 +15,8 @@ trait ShipmethodRepo {
   def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
   def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow]
   def selectAll: Stream[ConnectionIO, ShipmethodRow]
-  def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]]): Stream[ConnectionIO, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]]
   def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow]
   def update(row: ShipmethodRow): ConnectionIO[Boolean]
-  def updateFieldValues(shipmethodid: ShipmethodId, fieldValues: List[ShipmethodFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
 }

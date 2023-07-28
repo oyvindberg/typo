@@ -9,26 +9,10 @@ package pm
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PmViewRepoImpl extends PmViewRepo {
   override def selectAll: Stream[ConnectionIO, PmViewRow] = {
     sql"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate from pr.pm""".query[PmViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PmViewFieldOrIdValue[_]]): Stream[ConnectionIO, PmViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PmViewFieldValue.id(value) => fr""""id" = $value"""
-        case PmViewFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case PmViewFieldValue.name(value) => fr""""name" = $value"""
-        case PmViewFieldValue.catalogdescription(value) => fr"catalogdescription = $value"
-        case PmViewFieldValue.instructions(value) => fr"instructions = $value"
-        case PmViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PmViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.pm $where".query[PmViewRow].stream
-  
   }
 }

@@ -14,9 +14,7 @@ trait WorkorderroutingRepo {
   def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
   def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow
   def selectAll(implicit c: Connection): List[WorkorderroutingRow]
-  def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow]
   def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean
-  def updateFieldValues(compositeId: WorkorderroutingId, fieldValues: List[WorkorderroutingFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
 }

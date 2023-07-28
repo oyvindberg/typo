@@ -74,33 +74,6 @@ object VendorRepoImpl extends VendorRepo {
           from purchasing.vendor
        """.as(VendorRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VendorFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case VendorFieldValue.accountnumber(value) => NamedParameter("accountnumber", ParameterValue.from(value))
-          case VendorFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case VendorFieldValue.creditrating(value) => NamedParameter("creditrating", ParameterValue.from(value))
-          case VendorFieldValue.preferredvendorstatus(value) => NamedParameter("preferredvendorstatus", ParameterValue.from(value))
-          case VendorFieldValue.activeflag(value) => NamedParameter("activeflag", ParameterValue.from(value))
-          case VendorFieldValue.purchasingwebserviceurl(value) => NamedParameter("purchasingwebserviceurl", ParameterValue.from(value))
-          case VendorFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
-                    from purchasing.vendor
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VendorRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow] = {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
@@ -130,33 +103,6 @@ object VendorRepoImpl extends VendorRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[VendorFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VendorFieldValue.accountnumber(value) => NamedParameter("accountnumber", ParameterValue.from(value))
-          case VendorFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case VendorFieldValue.creditrating(value) => NamedParameter("creditrating", ParameterValue.from(value))
-          case VendorFieldValue.preferredvendorstatus(value) => NamedParameter("preferredvendorstatus", ParameterValue.from(value))
-          case VendorFieldValue.activeflag(value) => NamedParameter("activeflag", ParameterValue.from(value))
-          case VendorFieldValue.purchasingwebserviceurl(value) => NamedParameter("purchasingwebserviceurl", ParameterValue.from(value))
-          case VendorFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update purchasing.vendor
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)

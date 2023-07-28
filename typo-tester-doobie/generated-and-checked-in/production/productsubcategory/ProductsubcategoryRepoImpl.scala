@@ -9,10 +9,8 @@ package productsubcategory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -62,19 +60,6 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
     sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate from production.productsubcategory""".query[ProductsubcategoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductsubcategoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductsubcategoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductsubcategoryFieldValue.productsubcategoryid(value) => fr"productsubcategoryid = $value"
-        case ProductsubcategoryFieldValue.productcategoryid(value) => fr"productcategoryid = $value"
-        case ProductsubcategoryFieldValue.name(value) => fr""""name" = $value"""
-        case ProductsubcategoryFieldValue.rowguid(value) => fr"rowguid = $value"
-        case ProductsubcategoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productsubcategory $where".query[ProductsubcategoryRow].stream
-  
-  }
   override def selectById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Option[ProductsubcategoryRow]] = {
     sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate from production.productsubcategory where productsubcategoryid = $productsubcategoryid""".query[ProductsubcategoryRow].option
   }
@@ -93,24 +78,6 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(productsubcategoryid: ProductsubcategoryId, fieldValues: List[ProductsubcategoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductsubcategoryFieldValue.productcategoryid(value) => fr"productcategoryid = $value"
-            case ProductsubcategoryFieldValue.name(value) => fr""""name" = $value"""
-            case ProductsubcategoryFieldValue.rowguid(value) => fr"rowguid = $value"
-            case ProductsubcategoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productsubcategory
-              $updates
-              where productsubcategoryid = $productsubcategoryid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)

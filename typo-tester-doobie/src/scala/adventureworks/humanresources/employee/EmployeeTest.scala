@@ -91,7 +91,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
         saved2 = unsaved.toRow(???, ???, ???, ???, ???, ???, ???)
         _ <- delay(assert(saved1 === saved2))
         // check field values
-        _ <- repo.updateFieldValues(saved1.businessentityid, List(EmployeeFieldValue.gender("M")))
+        _ <- repo.update(saved1.copy(gender = "M"))
         saved3_1 <- repo.selectAll.compile.lastOrError
         saved3_2 <- repo.selectByIds(Array(saved1.businessentityid, BusinessentityId(22))).compile.lastOrError
         _ <- delay(assert(saved3_1 === saved3_2))

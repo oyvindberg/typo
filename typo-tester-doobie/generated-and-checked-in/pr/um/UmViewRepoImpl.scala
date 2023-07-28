@@ -9,23 +9,10 @@ package um
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object UmViewRepoImpl extends UmViewRepo {
   override def selectAll: Stream[ConnectionIO, UmViewRow] = {
     sql"""select "id", unitmeasurecode, "name", modifieddate from pr.um""".query[UmViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[UmViewFieldOrIdValue[_]]): Stream[ConnectionIO, UmViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case UmViewFieldValue.id(value) => fr""""id" = $value"""
-        case UmViewFieldValue.unitmeasurecode(value) => fr"unitmeasurecode = $value"
-        case UmViewFieldValue.name(value) => fr""""name" = $value"""
-        case UmViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.um $where".query[UmViewRow].stream
-  
   }
 }

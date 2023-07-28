@@ -15,10 +15,8 @@ trait DepartmentRepo {
   def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
   def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow]
   def selectAll: Stream[ConnectionIO, DepartmentRow]
-  def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]]): Stream[ConnectionIO, DepartmentRow]
   def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]]
   def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow]
   def update(row: DepartmentRow): ConnectionIO[Boolean]
-  def updateFieldValues(departmentid: DepartmentId, fieldValues: List[DepartmentFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
 }

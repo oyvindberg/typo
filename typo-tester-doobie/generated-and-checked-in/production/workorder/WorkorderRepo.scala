@@ -15,10 +15,8 @@ trait WorkorderRepo {
   def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
   def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow]
   def selectAll: Stream[ConnectionIO, WorkorderRow]
-  def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]]): Stream[ConnectionIO, WorkorderRow]
   def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]]
   def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow]
   def update(row: WorkorderRow): ConnectionIO[Boolean]
-  def updateFieldValues(workorderid: WorkorderId, fieldValues: List[WorkorderFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
 }

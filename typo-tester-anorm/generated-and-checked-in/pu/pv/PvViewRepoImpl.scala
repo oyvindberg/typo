@@ -7,8 +7,6 @@ package adventureworks
 package pu
 package pv
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,36 +15,5 @@ object PvViewRepoImpl extends PvViewRepo {
     SQL"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
           from pu.pv
        """.as(PvViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PvViewFieldOrIdValue[_]])(implicit c: Connection): List[PvViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PvViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PvViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case PvViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PvViewFieldValue.averageleadtime(value) => NamedParameter("averageleadtime", ParameterValue.from(value))
-          case PvViewFieldValue.standardprice(value) => NamedParameter("standardprice", ParameterValue.from(value))
-          case PvViewFieldValue.lastreceiptcost(value) => NamedParameter("lastreceiptcost", ParameterValue.from(value))
-          case PvViewFieldValue.lastreceiptdate(value) => NamedParameter("lastreceiptdate", ParameterValue.from(value))
-          case PvViewFieldValue.minorderqty(value) => NamedParameter("minorderqty", ParameterValue.from(value))
-          case PvViewFieldValue.maxorderqty(value) => NamedParameter("maxorderqty", ParameterValue.from(value))
-          case PvViewFieldValue.onorderqty(value) => NamedParameter("onorderqty", ParameterValue.from(value))
-          case PvViewFieldValue.unitmeasurecode(value) => NamedParameter("unitmeasurecode", ParameterValue.from(value))
-          case PvViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate
-                    from pu.pv
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PvViewRow.rowParser(1).*)
-    }
-  
   }
 }

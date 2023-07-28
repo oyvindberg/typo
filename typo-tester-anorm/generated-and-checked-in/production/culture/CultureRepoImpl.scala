@@ -61,28 +61,6 @@ object CultureRepoImpl extends CultureRepo {
           from production.culture
        """.as(CultureRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]])(implicit c: Connection): List[CultureRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CultureFieldValue.cultureid(value) => NamedParameter("cultureid", ParameterValue.from(value))
-          case CultureFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case CultureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select cultureid, "name", modifieddate
-                    from production.culture
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(CultureRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
     SQL"""select cultureid, "name", modifieddate
           from production.culture
@@ -107,28 +85,6 @@ object CultureRepoImpl extends CultureRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where cultureid = $cultureid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(cultureid: CultureId, fieldValues: List[CultureFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CultureFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case CultureFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.culture
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where cultureid = {cultureid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("cultureid", ParameterValue.from(cultureid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture(cultureid, "name", modifieddate)

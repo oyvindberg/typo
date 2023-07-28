@@ -14,9 +14,7 @@ trait BusinessentitycontactRepo {
   def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow
   def insert(unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): BusinessentitycontactRow
   def selectAll(implicit c: Connection): List[BusinessentitycontactRow]
-  def selectByFieldValues(fieldValues: List[BusinessentitycontactFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow]
   def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean
-  def updateFieldValues(compositeId: BusinessentitycontactId, fieldValues: List[BusinessentitycontactFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow
 }

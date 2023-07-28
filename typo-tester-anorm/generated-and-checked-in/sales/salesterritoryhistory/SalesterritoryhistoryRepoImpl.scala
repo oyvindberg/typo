@@ -66,31 +66,6 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           from sales.salesterritoryhistory
        """.as(SalesterritoryhistoryRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[SalesterritoryhistoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryhistoryRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalesterritoryhistoryFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case SalesterritoryhistoryFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case SalesterritoryhistoryFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case SalesterritoryhistoryFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case SalesterritoryhistoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalesterritoryhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
-                    from sales.salesterritoryhistory
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SalesterritoryhistoryRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
     SQL"""select businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
           from sales.salesterritoryhistory
@@ -105,29 +80,6 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: SalesterritoryhistoryId, fieldValues: List[SalesterritoryhistoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalesterritoryhistoryFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case SalesterritoryhistoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalesterritoryhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.salesterritoryhistory
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid} AND startdate = {startdate} AND territoryid = {territoryid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("startdate", ParameterValue.from(compositeId.startdate)), NamedParameter("territoryid", ParameterValue.from(compositeId.territoryid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
     SQL"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)

@@ -9,24 +9,10 @@ package jc
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object JcViewRepoImpl extends JcViewRepo {
   override def selectAll: Stream[ConnectionIO, JcViewRow] = {
     sql"""select "id", jobcandidateid, businessentityid, resume, modifieddate from hr.jc""".query[JcViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[JcViewFieldOrIdValue[_]]): Stream[ConnectionIO, JcViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case JcViewFieldValue.id(value) => fr""""id" = $value"""
-        case JcViewFieldValue.jobcandidateid(value) => fr"jobcandidateid = $value"
-        case JcViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case JcViewFieldValue.resume(value) => fr"resume = $value"
-        case JcViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from hr.jc $where".query[JcViewRow].stream
-  
   }
 }

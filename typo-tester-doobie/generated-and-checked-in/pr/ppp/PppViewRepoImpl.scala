@@ -9,23 +9,10 @@ package ppp
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PppViewRepoImpl extends PppViewRepo {
   override def selectAll: Stream[ConnectionIO, PppViewRow] = {
     sql"""select productid, productphotoid, "primary", modifieddate from pr.ppp""".query[PppViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PppViewFieldOrIdValue[_]]): Stream[ConnectionIO, PppViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PppViewFieldValue.productid(value) => fr"productid = $value"
-        case PppViewFieldValue.productphotoid(value) => fr"productphotoid = $value"
-        case PppViewFieldValue.primary(value) => fr""""primary" = $value"""
-        case PppViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.ppp $where".query[PppViewRow].stream
-  
   }
 }

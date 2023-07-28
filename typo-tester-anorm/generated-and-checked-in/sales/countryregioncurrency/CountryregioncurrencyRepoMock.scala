@@ -27,13 +27,6 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[CountryregioncurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CountryregioncurrencyRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, CountryregioncurrencyFieldValue.countryregioncode(value)) => acc.filter(_.countryregioncode == value)
-      case (acc, CountryregioncurrencyFieldValue.currencycode(value)) => acc.filter(_.currencycode == value)
-      case (acc, CountryregioncurrencyFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
     map.get(compositeId)
   }
@@ -43,21 +36,6 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
       case Some(_) =>
         map.put(row.compositeId, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(compositeId: CountryregioncurrencyId, fieldValues: List[CountryregioncurrencyFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(compositeId) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, CountryregioncurrencyFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

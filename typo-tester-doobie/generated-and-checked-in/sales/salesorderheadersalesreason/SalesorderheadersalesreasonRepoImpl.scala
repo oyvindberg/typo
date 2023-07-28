@@ -9,10 +9,8 @@ package salesorderheadersalesreason
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -53,17 +51,6 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
   override def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
     sql"select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason".query[SalesorderheadersalesreasonRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalesorderheadersalesreasonFieldOrIdValue[_]]): Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalesorderheadersalesreasonFieldValue.salesorderid(value) => fr"salesorderid = $value"
-        case SalesorderheadersalesreasonFieldValue.salesreasonid(value) => fr"salesreasonid = $value"
-        case SalesorderheadersalesreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salesorderheadersalesreason $where".query[SalesorderheadersalesreasonRow].stream
-  
-  }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
     sql"select salesorderid, salesreasonid, modifieddate from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".query[SalesorderheadersalesreasonRow].option
   }
@@ -76,21 +63,6 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: SalesorderheadersalesreasonId, fieldValues: List[SalesorderheadersalesreasonFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalesorderheadersalesreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salesorderheadersalesreason
-              $updates
-              where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)

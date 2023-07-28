@@ -9,10 +9,8 @@ package jobcandidate
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -57,18 +55,6 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
     sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate".query[JobcandidateRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]]): Stream[ConnectionIO, JobcandidateRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case JobcandidateFieldValue.jobcandidateid(value) => fr"jobcandidateid = $value"
-        case JobcandidateFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case JobcandidateFieldValue.resume(value) => fr"resume = $value"
-        case JobcandidateFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.jobcandidate $where".query[JobcandidateRow].stream
-  
-  }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
     sql"select jobcandidateid, businessentityid, resume, modifieddate from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".query[JobcandidateRow].option
   }
@@ -86,23 +72,6 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(jobcandidateid: JobcandidateId, fieldValues: List[JobcandidateFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case JobcandidateFieldValue.businessentityid(value) => fr"businessentityid = $value"
-            case JobcandidateFieldValue.resume(value) => fr"resume = $value"
-            case JobcandidateFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update humanresources.jobcandidate
-              $updates
-              where jobcandidateid = $jobcandidateid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)

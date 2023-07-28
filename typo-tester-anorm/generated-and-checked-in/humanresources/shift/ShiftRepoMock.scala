@@ -27,15 +27,6 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]])(implicit c: Connection): List[ShiftRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, ShiftFieldValue.shiftid(value)) => acc.filter(_.shiftid == value)
-      case (acc, ShiftFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, ShiftFieldValue.starttime(value)) => acc.filter(_.starttime == value)
-      case (acc, ShiftFieldValue.endtime(value)) => acc.filter(_.endtime == value)
-      case (acc, ShiftFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow] = {
     map.get(shiftid)
   }
@@ -48,24 +39,6 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       case Some(_) =>
         map.put(row.shiftid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(shiftid: ShiftId, fieldValues: List[ShiftFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(shiftid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, ShiftFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, ShiftFieldValue.starttime(value)) => acc.copy(starttime = value)
-          case (acc, ShiftFieldValue.endtime(value)) => acc.copy(endtime = value)
-          case (acc, ShiftFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(shiftid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

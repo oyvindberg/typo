@@ -9,23 +9,10 @@ package pcc
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PccViewRepoImpl extends PccViewRepo {
   override def selectAll: Stream[ConnectionIO, PccViewRow] = {
     sql"""select "id", businessentityid, creditcardid, modifieddate from sa.pcc""".query[PccViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PccViewFieldOrIdValue[_]]): Stream[ConnectionIO, PccViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PccViewFieldValue.id(value) => fr""""id" = $value"""
-        case PccViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case PccViewFieldValue.creditcardid(value) => fr"creditcardid = $value"
-        case PccViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.pcc $where".query[PccViewRow].stream
-  
   }
 }

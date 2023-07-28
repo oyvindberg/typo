@@ -9,10 +9,8 @@ package shift
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -58,19 +56,6 @@ object ShiftRepoImpl extends ShiftRepo {
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
     sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift""".query[ShiftRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]]): Stream[ConnectionIO, ShiftRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ShiftFieldValue.shiftid(value) => fr"shiftid = $value"
-        case ShiftFieldValue.name(value) => fr""""name" = $value"""
-        case ShiftFieldValue.starttime(value) => fr"starttime = $value"
-        case ShiftFieldValue.endtime(value) => fr"endtime = $value"
-        case ShiftFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.shift $where".query[ShiftRow].stream
-  
-  }
   override def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = {
     sql"""select shiftid, "name", starttime, endtime, modifieddate from humanresources.shift where shiftid = $shiftid""".query[ShiftRow].option
   }
@@ -89,24 +74,6 @@ object ShiftRepoImpl extends ShiftRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(shiftid: ShiftId, fieldValues: List[ShiftFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ShiftFieldValue.name(value) => fr""""name" = $value"""
-            case ShiftFieldValue.starttime(value) => fr"starttime = $value"
-            case ShiftFieldValue.endtime(value) => fr"endtime = $value"
-            case ShiftFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update humanresources.shift
-              $updates
-              where shiftid = $shiftid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)

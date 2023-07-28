@@ -9,10 +9,8 @@ package personphone
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -54,18 +52,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
     sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone".query[PersonphoneRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]]): Stream[ConnectionIO, PersonphoneRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PersonphoneFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case PersonphoneFieldValue.phonenumber(value) => fr"phonenumber = $value"
-        case PersonphoneFieldValue.phonenumbertypeid(value) => fr"phonenumbertypeid = $value"
-        case PersonphoneFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.personphone $where".query[PersonphoneRow].stream
-  
-  }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
     sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".query[PersonphoneRow].option
   }
@@ -78,21 +64,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: PersonphoneId, fieldValues: List[PersonphoneFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PersonphoneFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.personphone
-              $updates
-              where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)

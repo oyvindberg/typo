@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package sod
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,35 +15,5 @@ object SodViewRepoImpl extends SodViewRepo {
     SQL"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
           from sa.sod
        """.as(SodViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SodViewFieldOrIdValue[_]])(implicit c: Connection): List[SodViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SodViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SodViewFieldValue.salesorderid(value) => NamedParameter("salesorderid", ParameterValue.from(value))
-          case SodViewFieldValue.salesorderdetailid(value) => NamedParameter("salesorderdetailid", ParameterValue.from(value))
-          case SodViewFieldValue.carriertrackingnumber(value) => NamedParameter("carriertrackingnumber", ParameterValue.from(value))
-          case SodViewFieldValue.orderqty(value) => NamedParameter("orderqty", ParameterValue.from(value))
-          case SodViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case SodViewFieldValue.specialofferid(value) => NamedParameter("specialofferid", ParameterValue.from(value))
-          case SodViewFieldValue.unitprice(value) => NamedParameter("unitprice", ParameterValue.from(value))
-          case SodViewFieldValue.unitpricediscount(value) => NamedParameter("unitpricediscount", ParameterValue.from(value))
-          case SodViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SodViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
-                    from sa.sod
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SodViewRow.rowParser(1).*)
-    }
-  
   }
 }

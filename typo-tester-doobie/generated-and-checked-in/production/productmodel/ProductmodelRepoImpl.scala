@@ -9,10 +9,8 @@ package productmodel
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -63,20 +61,6 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
     sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate from production.productmodel""".query[ProductmodelRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductmodelFieldOrIdValue[_]]): Stream[ConnectionIO, ProductmodelRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductmodelFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case ProductmodelFieldValue.name(value) => fr""""name" = $value"""
-        case ProductmodelFieldValue.catalogdescription(value) => fr"catalogdescription = $value"
-        case ProductmodelFieldValue.instructions(value) => fr"instructions = $value"
-        case ProductmodelFieldValue.rowguid(value) => fr"rowguid = $value"
-        case ProductmodelFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productmodel $where".query[ProductmodelRow].stream
-  
-  }
   override def selectById(productmodelid: ProductmodelId): ConnectionIO[Option[ProductmodelRow]] = {
     sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate from production.productmodel where productmodelid = $productmodelid""".query[ProductmodelRow].option
   }
@@ -96,25 +80,6 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(productmodelid: ProductmodelId, fieldValues: List[ProductmodelFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductmodelFieldValue.name(value) => fr""""name" = $value"""
-            case ProductmodelFieldValue.catalogdescription(value) => fr"catalogdescription = $value"
-            case ProductmodelFieldValue.instructions(value) => fr"instructions = $value"
-            case ProductmodelFieldValue.rowguid(value) => fr"rowguid = $value"
-            case ProductmodelFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productmodel
-              $updates
-              where productmodelid = $productmodelid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
     sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)

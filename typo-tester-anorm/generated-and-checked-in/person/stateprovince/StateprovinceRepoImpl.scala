@@ -77,33 +77,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           from person.stateprovince
        """.as(StateprovinceRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case StateprovinceFieldValue.stateprovinceid(value) => NamedParameter("stateprovinceid", ParameterValue.from(value))
-          case StateprovinceFieldValue.stateprovincecode(value) => NamedParameter("stateprovincecode", ParameterValue.from(value))
-          case StateprovinceFieldValue.countryregioncode(value) => NamedParameter("countryregioncode", ParameterValue.from(value))
-          case StateprovinceFieldValue.isonlystateprovinceflag(value) => NamedParameter("isonlystateprovinceflag", ParameterValue.from(value))
-          case StateprovinceFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case StateprovinceFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case StateprovinceFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case StateprovinceFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
-                    from person.stateprovince
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(StateprovinceRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow] = {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
@@ -133,33 +106,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where stateprovinceid = $stateprovinceid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(stateprovinceid: StateprovinceId, fieldValues: List[StateprovinceFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case StateprovinceFieldValue.stateprovincecode(value) => NamedParameter("stateprovincecode", ParameterValue.from(value))
-          case StateprovinceFieldValue.countryregioncode(value) => NamedParameter("countryregioncode", ParameterValue.from(value))
-          case StateprovinceFieldValue.isonlystateprovinceflag(value) => NamedParameter("isonlystateprovinceflag", ParameterValue.from(value))
-          case StateprovinceFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case StateprovinceFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case StateprovinceFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case StateprovinceFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.stateprovince
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where stateprovinceid = {stateprovinceid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("stateprovinceid", ParameterValue.from(stateprovinceid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)

@@ -9,23 +9,10 @@ package sr
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SrViewRepoImpl extends SrViewRepo {
   override def selectAll: Stream[ConnectionIO, SrViewRow] = {
     sql"""select "id", scrapreasonid, "name", modifieddate from pr.sr""".query[SrViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SrViewFieldOrIdValue[_]]): Stream[ConnectionIO, SrViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SrViewFieldValue.id(value) => fr""""id" = $value"""
-        case SrViewFieldValue.scrapreasonid(value) => fr"scrapreasonid = $value"
-        case SrViewFieldValue.name(value) => fr""""name" = $value"""
-        case SrViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.sr $where".query[SrViewRow].stream
-  
   }
 }

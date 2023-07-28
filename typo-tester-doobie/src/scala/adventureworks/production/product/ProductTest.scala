@@ -78,7 +78,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
         // check field values
         newModifiedDate = saved1.modifieddate.minusDays(1)
-        _ <- repo.updateFieldValues(saved1.productid, List(ProductFieldValue.modifieddate(newModifiedDate)))
+        _ <- repo.update(saved1.copy(modifieddate = newModifiedDate))
         saved3 <- repo.selectAll.compile.toList.map {
           case List(x) => x
           case other   => throw new MatchError(other)

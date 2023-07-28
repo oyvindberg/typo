@@ -31,15 +31,6 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[PersoncreditcardFieldOrIdValue[_]]): Stream[ConnectionIO, PersoncreditcardRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, PersoncreditcardFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, PersoncreditcardFieldValue.creditcardid(value)) => acc.filter(_.creditcardid == value)
-        case (acc, PersoncreditcardFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
     delay(map.get(compositeId))
   }
@@ -50,23 +41,6 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: PersoncreditcardId, fieldValues: List[PersoncreditcardFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, PersoncreditcardFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

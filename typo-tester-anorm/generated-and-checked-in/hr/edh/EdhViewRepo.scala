@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait EdhViewRepo {
   def selectAll(implicit c: Connection): List[EdhViewRow]
-  def selectByFieldValues(fieldValues: List[EdhViewFieldOrIdValue[_]])(implicit c: Connection): List[EdhViewRow]
 }

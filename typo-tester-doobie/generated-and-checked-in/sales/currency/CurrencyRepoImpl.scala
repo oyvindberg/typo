@@ -9,10 +9,8 @@ package currency
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -53,17 +51,6 @@ object CurrencyRepoImpl extends CurrencyRepo {
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
     sql"""select currencycode, "name", modifieddate from sales.currency""".query[CurrencyRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[CurrencyFieldOrIdValue[_]]): Stream[ConnectionIO, CurrencyRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CurrencyFieldValue.currencycode(value) => fr"currencycode = $value"
-        case CurrencyFieldValue.name(value) => fr""""name" = $value"""
-        case CurrencyFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.currency $where".query[CurrencyRow].stream
-  
-  }
   override def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]] = {
     sql"""select currencycode, "name", modifieddate from sales.currency where currencycode = $currencycode""".query[CurrencyRow].option
   }
@@ -80,22 +67,6 @@ object CurrencyRepoImpl extends CurrencyRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(currencycode: CurrencyId, fieldValues: List[CurrencyFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case CurrencyFieldValue.name(value) => fr""""name" = $value"""
-            case CurrencyFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.currency
-              $updates
-              where currencycode = $currencycode
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)

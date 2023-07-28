@@ -31,19 +31,6 @@ class ProductinventoryRepoMock(toRow: Function1[ProductinventoryRowUnsaved, Prod
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ProductinventoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductinventoryRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ProductinventoryFieldValue.productid(value)) => acc.filter(_.productid == value)
-        case (acc, ProductinventoryFieldValue.locationid(value)) => acc.filter(_.locationid == value)
-        case (acc, ProductinventoryFieldValue.shelf(value)) => acc.filter(_.shelf == value)
-        case (acc, ProductinventoryFieldValue.bin(value)) => acc.filter(_.bin == value)
-        case (acc, ProductinventoryFieldValue.quantity(value)) => acc.filter(_.quantity == value)
-        case (acc, ProductinventoryFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, ProductinventoryFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]] = {
     delay(map.get(compositeId))
   }
@@ -54,27 +41,6 @@ class ProductinventoryRepoMock(toRow: Function1[ProductinventoryRowUnsaved, Prod
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: ProductinventoryId, fieldValues: List[ProductinventoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ProductinventoryFieldValue.shelf(value)) => acc.copy(shelf = value)
-            case (acc, ProductinventoryFieldValue.bin(value)) => acc.copy(bin = value)
-            case (acc, ProductinventoryFieldValue.quantity(value)) => acc.copy(quantity = value)
-            case (acc, ProductinventoryFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, ProductinventoryFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

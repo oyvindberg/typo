@@ -7,8 +7,6 @@ package adventureworks
 package person
 package vadditionalcontactinfo
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,41 +15,5 @@ object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo
     SQL"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate
           from person.vadditionalcontactinfo
        """.as(VadditionalcontactinfoViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VadditionalcontactinfoViewFieldOrIdValue[_]])(implicit c: Connection): List[VadditionalcontactinfoViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VadditionalcontactinfoViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.firstname(value) => NamedParameter("firstname", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.middlename(value) => NamedParameter("middlename", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.lastname(value) => NamedParameter("lastname", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.telephonenumber(value) => NamedParameter("telephonenumber", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.telephonespecialinstructions(value) => NamedParameter("telephonespecialinstructions", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.street(value) => NamedParameter("street", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.city(value) => NamedParameter("city", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.stateprovince(value) => NamedParameter("stateprovince", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.postalcode(value) => NamedParameter("postalcode", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.countryregion(value) => NamedParameter("countryregion", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.homeaddressspecialinstructions(value) => NamedParameter("homeaddressspecialinstructions", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.emailspecialinstructions(value) => NamedParameter("emailspecialinstructions", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.emailtelephonenumber(value) => NamedParameter("emailtelephonenumber", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case VadditionalcontactinfoViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate
-                    from person.vadditionalcontactinfo
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VadditionalcontactinfoViewRow.rowParser(1).*)
-    }
-  
   }
 }

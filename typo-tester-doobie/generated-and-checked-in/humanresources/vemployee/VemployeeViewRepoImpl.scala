@@ -9,37 +9,10 @@ package vemployee
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VemployeeViewRepoImpl extends VemployeeViewRepo {
   override def selectAll: Stream[ConnectionIO, VemployeeViewRow] = {
     sql"select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, additionalcontactinfo from humanresources.vemployee".query[VemployeeViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VemployeeViewFieldOrIdValue[_]]): Stream[ConnectionIO, VemployeeViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VemployeeViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VemployeeViewFieldValue.title(value) => fr"title = $value"
-        case VemployeeViewFieldValue.firstname(value) => fr"firstname = $value"
-        case VemployeeViewFieldValue.middlename(value) => fr"middlename = $value"
-        case VemployeeViewFieldValue.lastname(value) => fr"lastname = $value"
-        case VemployeeViewFieldValue.suffix(value) => fr"suffix = $value"
-        case VemployeeViewFieldValue.jobtitle(value) => fr"jobtitle = $value"
-        case VemployeeViewFieldValue.phonenumber(value) => fr"phonenumber = $value"
-        case VemployeeViewFieldValue.phonenumbertype(value) => fr"phonenumbertype = $value"
-        case VemployeeViewFieldValue.emailaddress(value) => fr"emailaddress = $value"
-        case VemployeeViewFieldValue.emailpromotion(value) => fr"emailpromotion = $value"
-        case VemployeeViewFieldValue.addressline1(value) => fr"addressline1 = $value"
-        case VemployeeViewFieldValue.addressline2(value) => fr"addressline2 = $value"
-        case VemployeeViewFieldValue.city(value) => fr"city = $value"
-        case VemployeeViewFieldValue.stateprovincename(value) => fr"stateprovincename = $value"
-        case VemployeeViewFieldValue.postalcode(value) => fr"postalcode = $value"
-        case VemployeeViewFieldValue.countryregionname(value) => fr"countryregionname = $value"
-        case VemployeeViewFieldValue.additionalcontactinfo(value) => fr"additionalcontactinfo = $value"
-      } :_*
-    )
-    sql"select * from humanresources.vemployee $where".query[VemployeeViewRow].stream
-  
   }
 }

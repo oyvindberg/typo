@@ -32,21 +32,6 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]]): Stream[ConnectionIO, SalespersonRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, SalespersonFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, SalespersonFieldValue.territoryid(value)) => acc.filter(_.territoryid == value)
-        case (acc, SalespersonFieldValue.salesquota(value)) => acc.filter(_.salesquota == value)
-        case (acc, SalespersonFieldValue.bonus(value)) => acc.filter(_.bonus == value)
-        case (acc, SalespersonFieldValue.commissionpct(value)) => acc.filter(_.commissionpct == value)
-        case (acc, SalespersonFieldValue.salesytd(value)) => acc.filter(_.salesytd == value)
-        case (acc, SalespersonFieldValue.saleslastyear(value)) => acc.filter(_.saleslastyear == value)
-        case (acc, SalespersonFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, SalespersonFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[SalespersonRow]] = {
     delay(map.get(businessentityid))
   }
@@ -60,30 +45,6 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
         case Some(_) =>
           map.put(row.businessentityid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[SalespersonFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(businessentityid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, SalespersonFieldValue.territoryid(value)) => acc.copy(territoryid = value)
-            case (acc, SalespersonFieldValue.salesquota(value)) => acc.copy(salesquota = value)
-            case (acc, SalespersonFieldValue.bonus(value)) => acc.copy(bonus = value)
-            case (acc, SalespersonFieldValue.commissionpct(value)) => acc.copy(commissionpct = value)
-            case (acc, SalespersonFieldValue.salesytd(value)) => acc.copy(salesytd = value)
-            case (acc, SalespersonFieldValue.saleslastyear(value)) => acc.copy(saleslastyear = value)
-            case (acc, SalespersonFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, SalespersonFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(businessentityid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

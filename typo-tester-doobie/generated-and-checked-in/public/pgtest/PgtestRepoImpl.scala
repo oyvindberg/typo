@@ -9,7 +9,6 @@ package pgtest
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PgtestRepoImpl extends PgtestRepo {
@@ -21,41 +20,5 @@ object PgtestRepoImpl extends PgtestRepo {
   }
   override def selectAll: Stream[ConnectionIO, PgtestRow] = {
     sql"""select box, circle, line, lseg, "path", point, polygon, "interval", money, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets from "public".pgtest""".query[PgtestRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PgtestFieldOrIdValue[_]]): Stream[ConnectionIO, PgtestRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PgtestFieldValue.box(value) => fr"box = $value"
-        case PgtestFieldValue.circle(value) => fr"circle = $value"
-        case PgtestFieldValue.line(value) => fr"line = $value"
-        case PgtestFieldValue.lseg(value) => fr"lseg = $value"
-        case PgtestFieldValue.path(value) => fr""""path" = $value"""
-        case PgtestFieldValue.point(value) => fr"point = $value"
-        case PgtestFieldValue.polygon(value) => fr"polygon = $value"
-        case PgtestFieldValue.interval(value) => fr""""interval" = $value"""
-        case PgtestFieldValue.money(value) => fr"money = $value"
-        case PgtestFieldValue.xml(value) => fr""""xml" = $value"""
-        case PgtestFieldValue.json(value) => fr"json = $value"
-        case PgtestFieldValue.jsonb(value) => fr"jsonb = $value"
-        case PgtestFieldValue.hstore(value) => fr"hstore = $value"
-        case PgtestFieldValue.inet(value) => fr"inet = $value"
-        case PgtestFieldValue.boxes(value) => fr"boxes = $value"
-        case PgtestFieldValue.circlees(value) => fr"circlees = $value"
-        case PgtestFieldValue.linees(value) => fr"linees = $value"
-        case PgtestFieldValue.lseges(value) => fr"lseges = $value"
-        case PgtestFieldValue.pathes(value) => fr"pathes = $value"
-        case PgtestFieldValue.pointes(value) => fr"pointes = $value"
-        case PgtestFieldValue.polygones(value) => fr"polygones = $value"
-        case PgtestFieldValue.intervales(value) => fr"intervales = $value"
-        case PgtestFieldValue.moneyes(value) => fr"moneyes = $value"
-        case PgtestFieldValue.xmles(value) => fr"xmles = $value"
-        case PgtestFieldValue.jsones(value) => fr"jsones = $value"
-        case PgtestFieldValue.jsonbes(value) => fr"jsonbes = $value"
-        case PgtestFieldValue.hstores(value) => fr"hstores = $value"
-        case PgtestFieldValue.inets(value) => fr"inets = $value"
-      } :_*
-    )
-    sql"""select * from "public".pgtest $where""".query[PgtestRow].stream
-  
   }
 }

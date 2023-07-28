@@ -31,17 +31,6 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   override def selectAll: Stream[ConnectionIO, BusinessentitycontactRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[BusinessentitycontactFieldOrIdValue[_]]): Stream[ConnectionIO, BusinessentitycontactRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, BusinessentitycontactFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, BusinessentitycontactFieldValue.personid(value)) => acc.filter(_.personid == value)
-        case (acc, BusinessentitycontactFieldValue.contacttypeid(value)) => acc.filter(_.contacttypeid == value)
-        case (acc, BusinessentitycontactFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, BusinessentitycontactFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]] = {
     delay(map.get(compositeId))
   }
@@ -52,24 +41,6 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: BusinessentitycontactId, fieldValues: List[BusinessentitycontactFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, BusinessentitycontactFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, BusinessentitycontactFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

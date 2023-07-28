@@ -15,10 +15,8 @@ trait LocationRepo {
   def insert(unsaved: LocationRow): ConnectionIO[LocationRow]
   def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow]
   def selectAll: Stream[ConnectionIO, LocationRow]
-  def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]]): Stream[ConnectionIO, LocationRow]
   def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]]
   def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow]
   def update(row: LocationRow): ConnectionIO[Boolean]
-  def updateFieldValues(locationid: LocationId, fieldValues: List[LocationFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: LocationRow): ConnectionIO[LocationRow]
 }

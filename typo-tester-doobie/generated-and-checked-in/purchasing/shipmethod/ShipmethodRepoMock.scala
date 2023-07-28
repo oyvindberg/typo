@@ -31,18 +31,6 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]]): Stream[ConnectionIO, ShipmethodRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ShipmethodFieldValue.shipmethodid(value)) => acc.filter(_.shipmethodid == value)
-        case (acc, ShipmethodFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, ShipmethodFieldValue.shipbase(value)) => acc.filter(_.shipbase == value)
-        case (acc, ShipmethodFieldValue.shiprate(value)) => acc.filter(_.shiprate == value)
-        case (acc, ShipmethodFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, ShipmethodFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]] = {
     delay(map.get(shipmethodid))
   }
@@ -56,27 +44,6 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
         case Some(_) =>
           map.put(row.shipmethodid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(shipmethodid: ShipmethodId, fieldValues: List[ShipmethodFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(shipmethodid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ShipmethodFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, ShipmethodFieldValue.shipbase(value)) => acc.copy(shipbase = value)
-            case (acc, ShipmethodFieldValue.shiprate(value)) => acc.copy(shiprate = value)
-            case (acc, ShipmethodFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, ShipmethodFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(shipmethodid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

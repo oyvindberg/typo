@@ -78,7 +78,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
       // check field values
       val newModifiedDate = saved1.modifieddate.minusDays(1)
-      repo.updateFieldValues(saved1.productid, List(ProductFieldValue.modifieddate(newModifiedDate)))
+      repo.update(saved1.copy(modifieddate = newModifiedDate))
       val List(saved3) = repo.selectAll: @unchecked
       assert(saved3.modifieddate == newModifiedDate)
       val true = repo.update(saved3.copy(size = None)): @unchecked

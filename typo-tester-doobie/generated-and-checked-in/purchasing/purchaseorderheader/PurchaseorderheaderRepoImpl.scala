@@ -9,10 +9,8 @@ package purchaseorderheader
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -83,26 +81,6 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
     sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader".query[PurchaseorderheaderRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PurchaseorderheaderFieldValue.purchaseorderid(value) => fr"purchaseorderid = $value"
-        case PurchaseorderheaderFieldValue.revisionnumber(value) => fr"revisionnumber = $value"
-        case PurchaseorderheaderFieldValue.status(value) => fr"status = $value"
-        case PurchaseorderheaderFieldValue.employeeid(value) => fr"employeeid = $value"
-        case PurchaseorderheaderFieldValue.vendorid(value) => fr"vendorid = $value"
-        case PurchaseorderheaderFieldValue.shipmethodid(value) => fr"shipmethodid = $value"
-        case PurchaseorderheaderFieldValue.orderdate(value) => fr"orderdate = $value"
-        case PurchaseorderheaderFieldValue.shipdate(value) => fr"shipdate = $value"
-        case PurchaseorderheaderFieldValue.subtotal(value) => fr"subtotal = $value"
-        case PurchaseorderheaderFieldValue.taxamt(value) => fr"taxamt = $value"
-        case PurchaseorderheaderFieldValue.freight(value) => fr"freight = $value"
-        case PurchaseorderheaderFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from purchasing.purchaseorderheader $where".query[PurchaseorderheaderRow].stream
-  
-  }
   override def selectById(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Option[PurchaseorderheaderRow]] = {
     sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".query[PurchaseorderheaderRow].option
   }
@@ -128,31 +106,6 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(purchaseorderid: PurchaseorderheaderId, fieldValues: List[PurchaseorderheaderFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PurchaseorderheaderFieldValue.revisionnumber(value) => fr"revisionnumber = $value"
-            case PurchaseorderheaderFieldValue.status(value) => fr"status = $value"
-            case PurchaseorderheaderFieldValue.employeeid(value) => fr"employeeid = $value"
-            case PurchaseorderheaderFieldValue.vendorid(value) => fr"vendorid = $value"
-            case PurchaseorderheaderFieldValue.shipmethodid(value) => fr"shipmethodid = $value"
-            case PurchaseorderheaderFieldValue.orderdate(value) => fr"orderdate = $value"
-            case PurchaseorderheaderFieldValue.shipdate(value) => fr"shipdate = $value"
-            case PurchaseorderheaderFieldValue.subtotal(value) => fr"subtotal = $value"
-            case PurchaseorderheaderFieldValue.taxamt(value) => fr"taxamt = $value"
-            case PurchaseorderheaderFieldValue.freight(value) => fr"freight = $value"
-            case PurchaseorderheaderFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update purchasing.purchaseorderheader
-              $updates
-              where purchaseorderid = $purchaseorderid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)

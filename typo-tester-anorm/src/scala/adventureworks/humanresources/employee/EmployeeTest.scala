@@ -66,7 +66,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(saved1 === saved2)
 
       // check field values
-      repo.updateFieldValues(saved1.businessentityid, List(EmployeeFieldValue.gender("M")))
+      repo.update(saved1.copy(gender = "M"))
       val List(saved3) = repo.selectAll: @unchecked
       val List(`saved3`) = repo.selectByIds(Array(saved1.businessentityid, BusinessentityId(22))): @unchecked
       assert(saved3.gender == "M")

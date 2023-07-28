@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait VstorewithcontactsViewRepo {
   def selectAll(implicit c: Connection): List[VstorewithcontactsViewRow]
-  def selectByFieldValues(fieldValues: List[VstorewithcontactsViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithcontactsViewRow]
 }

@@ -9,10 +9,8 @@ package productdescription
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -61,18 +59,6 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def selectAll: Stream[ConnectionIO, ProductdescriptionRow] = {
     sql"select productdescriptionid, description, rowguid, modifieddate from production.productdescription".query[ProductdescriptionRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductdescriptionFieldOrIdValue[_]]): Stream[ConnectionIO, ProductdescriptionRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductdescriptionFieldValue.productdescriptionid(value) => fr"productdescriptionid = $value"
-        case ProductdescriptionFieldValue.description(value) => fr"description = $value"
-        case ProductdescriptionFieldValue.rowguid(value) => fr"rowguid = $value"
-        case ProductdescriptionFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productdescription $where".query[ProductdescriptionRow].stream
-  
-  }
   override def selectById(productdescriptionid: ProductdescriptionId): ConnectionIO[Option[ProductdescriptionRow]] = {
     sql"select productdescriptionid, description, rowguid, modifieddate from production.productdescription where productdescriptionid = $productdescriptionid".query[ProductdescriptionRow].option
   }
@@ -90,23 +76,6 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(productdescriptionid: ProductdescriptionId, fieldValues: List[ProductdescriptionFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductdescriptionFieldValue.description(value) => fr"description = $value"
-            case ProductdescriptionFieldValue.rowguid(value) => fr"rowguid = $value"
-            case ProductdescriptionFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productdescription
-              $updates
-              where productdescriptionid = $productdescriptionid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into production.productdescription(productdescriptionid, description, rowguid, modifieddate)

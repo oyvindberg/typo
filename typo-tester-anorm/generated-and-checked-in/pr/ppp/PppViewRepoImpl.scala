@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package ppp
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,28 +15,5 @@ object PppViewRepoImpl extends PppViewRepo {
     SQL"""select productid, productphotoid, "primary", modifieddate
           from pr.ppp
        """.as(PppViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PppViewFieldOrIdValue[_]])(implicit c: Connection): List[PppViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PppViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case PppViewFieldValue.productphotoid(value) => NamedParameter("productphotoid", ParameterValue.from(value))
-          case PppViewFieldValue.primary(value) => NamedParameter("primary", ParameterValue.from(value))
-          case PppViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productid, productphotoid, "primary", modifieddate
-                    from pr.ppp
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PppViewRow.rowParser(1).*)
-    }
-  
   }
 }

@@ -72,30 +72,6 @@ object LocationRepoImpl extends LocationRepo {
           from production."location"
        """.as(LocationRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case LocationFieldValue.locationid(value) => NamedParameter("locationid", ParameterValue.from(value))
-          case LocationFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case LocationFieldValue.costrate(value) => NamedParameter("costrate", ParameterValue.from(value))
-          case LocationFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
-          case LocationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select locationid, "name", costrate, availability, modifieddate
-                    from production."location"
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(LocationRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
     SQL"""select locationid, "name", costrate, availability, modifieddate
           from production."location"
@@ -122,30 +98,6 @@ object LocationRepoImpl extends LocationRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where locationid = $locationid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(locationid: LocationId, fieldValues: List[LocationFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case LocationFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case LocationFieldValue.costrate(value) => NamedParameter("costrate", ParameterValue.from(value))
-          case LocationFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
-          case LocationFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production."location"
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where locationid = {locationid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("locationid", ParameterValue.from(locationid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)

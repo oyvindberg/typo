@@ -31,21 +31,6 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]]): Stream[ConnectionIO, BillofmaterialsRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, BillofmaterialsFieldValue.billofmaterialsid(value)) => acc.filter(_.billofmaterialsid == value)
-        case (acc, BillofmaterialsFieldValue.productassemblyid(value)) => acc.filter(_.productassemblyid == value)
-        case (acc, BillofmaterialsFieldValue.componentid(value)) => acc.filter(_.componentid == value)
-        case (acc, BillofmaterialsFieldValue.startdate(value)) => acc.filter(_.startdate == value)
-        case (acc, BillofmaterialsFieldValue.enddate(value)) => acc.filter(_.enddate == value)
-        case (acc, BillofmaterialsFieldValue.unitmeasurecode(value)) => acc.filter(_.unitmeasurecode == value)
-        case (acc, BillofmaterialsFieldValue.bomlevel(value)) => acc.filter(_.bomlevel == value)
-        case (acc, BillofmaterialsFieldValue.perassemblyqty(value)) => acc.filter(_.perassemblyqty == value)
-        case (acc, BillofmaterialsFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(billofmaterialsid: BillofmaterialsId): ConnectionIO[Option[BillofmaterialsRow]] = {
     delay(map.get(billofmaterialsid))
   }
@@ -59,30 +44,6 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
         case Some(_) =>
           map.put(row.billofmaterialsid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(billofmaterialsid: BillofmaterialsId, fieldValues: List[BillofmaterialsFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(billofmaterialsid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, BillofmaterialsFieldValue.productassemblyid(value)) => acc.copy(productassemblyid = value)
-            case (acc, BillofmaterialsFieldValue.componentid(value)) => acc.copy(componentid = value)
-            case (acc, BillofmaterialsFieldValue.startdate(value)) => acc.copy(startdate = value)
-            case (acc, BillofmaterialsFieldValue.enddate(value)) => acc.copy(enddate = value)
-            case (acc, BillofmaterialsFieldValue.unitmeasurecode(value)) => acc.copy(unitmeasurecode = value)
-            case (acc, BillofmaterialsFieldValue.bomlevel(value)) => acc.copy(bomlevel = value)
-            case (acc, BillofmaterialsFieldValue.perassemblyqty(value)) => acc.copy(perassemblyqty = value)
-            case (acc, BillofmaterialsFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(billofmaterialsid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

@@ -9,10 +9,8 @@ package productreview
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -64,22 +62,6 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
     sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview""".query[ProductreviewRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]]): Stream[ConnectionIO, ProductreviewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductreviewFieldValue.productreviewid(value) => fr"productreviewid = $value"
-        case ProductreviewFieldValue.productid(value) => fr"productid = $value"
-        case ProductreviewFieldValue.reviewername(value) => fr"reviewername = $value"
-        case ProductreviewFieldValue.reviewdate(value) => fr"reviewdate = $value"
-        case ProductreviewFieldValue.emailaddress(value) => fr"emailaddress = $value"
-        case ProductreviewFieldValue.rating(value) => fr"rating = $value"
-        case ProductreviewFieldValue.comments(value) => fr""""comments" = $value"""
-        case ProductreviewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productreview $where".query[ProductreviewRow].stream
-  
-  }
   override def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]] = {
     sql"""select productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from production.productreview where productreviewid = $productreviewid""".query[ProductreviewRow].option
   }
@@ -101,27 +83,6 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(productreviewid: ProductreviewId, fieldValues: List[ProductreviewFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductreviewFieldValue.productid(value) => fr"productid = $value"
-            case ProductreviewFieldValue.reviewername(value) => fr"reviewername = $value"
-            case ProductreviewFieldValue.reviewdate(value) => fr"reviewdate = $value"
-            case ProductreviewFieldValue.emailaddress(value) => fr"emailaddress = $value"
-            case ProductreviewFieldValue.rating(value) => fr"rating = $value"
-            case ProductreviewFieldValue.comments(value) => fr""""comments" = $value"""
-            case ProductreviewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productreview
-              $updates
-              where productreviewid = $productreviewid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)

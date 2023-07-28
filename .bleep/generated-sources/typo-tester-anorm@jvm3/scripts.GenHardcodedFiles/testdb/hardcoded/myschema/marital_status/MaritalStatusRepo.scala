@@ -14,7 +14,6 @@ trait MaritalStatusRepo {
   def delete(id: MaritalStatusId)(implicit c: Connection): Boolean
   def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow
   def selectAll(implicit c: Connection): List[MaritalStatusRow]
-  def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow]
   def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow]
   def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow

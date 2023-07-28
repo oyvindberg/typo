@@ -9,10 +9,8 @@ package workorderrouting
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -62,26 +60,6 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
     sql"select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting".query[WorkorderroutingRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]]): Stream[ConnectionIO, WorkorderroutingRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case WorkorderroutingFieldValue.workorderid(value) => fr"workorderid = $value"
-        case WorkorderroutingFieldValue.productid(value) => fr"productid = $value"
-        case WorkorderroutingFieldValue.operationsequence(value) => fr"operationsequence = $value"
-        case WorkorderroutingFieldValue.locationid(value) => fr"locationid = $value"
-        case WorkorderroutingFieldValue.scheduledstartdate(value) => fr"scheduledstartdate = $value"
-        case WorkorderroutingFieldValue.scheduledenddate(value) => fr"scheduledenddate = $value"
-        case WorkorderroutingFieldValue.actualstartdate(value) => fr"actualstartdate = $value"
-        case WorkorderroutingFieldValue.actualenddate(value) => fr"actualenddate = $value"
-        case WorkorderroutingFieldValue.actualresourcehrs(value) => fr"actualresourcehrs = $value"
-        case WorkorderroutingFieldValue.plannedcost(value) => fr"plannedcost = $value"
-        case WorkorderroutingFieldValue.actualcost(value) => fr"actualcost = $value"
-        case WorkorderroutingFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.workorderrouting $where".query[WorkorderroutingRow].stream
-  
-  }
   override def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]] = {
     sql"select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from production.workorderrouting where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}".query[WorkorderroutingRow].option
   }
@@ -102,29 +80,6 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: WorkorderroutingId, fieldValues: List[WorkorderroutingFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case WorkorderroutingFieldValue.locationid(value) => fr"locationid = $value"
-            case WorkorderroutingFieldValue.scheduledstartdate(value) => fr"scheduledstartdate = $value"
-            case WorkorderroutingFieldValue.scheduledenddate(value) => fr"scheduledenddate = $value"
-            case WorkorderroutingFieldValue.actualstartdate(value) => fr"actualstartdate = $value"
-            case WorkorderroutingFieldValue.actualenddate(value) => fr"actualenddate = $value"
-            case WorkorderroutingFieldValue.actualresourcehrs(value) => fr"actualresourcehrs = $value"
-            case WorkorderroutingFieldValue.plannedcost(value) => fr"plannedcost = $value"
-            case WorkorderroutingFieldValue.actualcost(value) => fr"actualcost = $value"
-            case WorkorderroutingFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.workorderrouting
-              $updates
-              where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)

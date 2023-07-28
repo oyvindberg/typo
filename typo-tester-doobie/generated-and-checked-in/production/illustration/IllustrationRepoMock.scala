@@ -31,15 +31,6 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]]): Stream[ConnectionIO, IllustrationRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, IllustrationFieldValue.illustrationid(value)) => acc.filter(_.illustrationid == value)
-        case (acc, IllustrationFieldValue.diagram(value)) => acc.filter(_.diagram == value)
-        case (acc, IllustrationFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]] = {
     delay(map.get(illustrationid))
   }
@@ -53,24 +44,6 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
         case Some(_) =>
           map.put(row.illustrationid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(illustrationid: IllustrationId, fieldValues: List[IllustrationFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(illustrationid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, IllustrationFieldValue.diagram(value)) => acc.copy(diagram = value)
-            case (acc, IllustrationFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(illustrationid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

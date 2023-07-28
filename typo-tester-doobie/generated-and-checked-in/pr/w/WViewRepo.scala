@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait WViewRepo {
   def selectAll: Stream[ConnectionIO, WViewRow]
-  def selectByFieldValues(fieldValues: List[WViewFieldOrIdValue[_]]): Stream[ConnectionIO, WViewRow]
 }

@@ -9,10 +9,8 @@ package address
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -66,23 +64,6 @@ object AddressRepoImpl extends AddressRepo {
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
     sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address".query[AddressRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]]): Stream[ConnectionIO, AddressRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case AddressFieldValue.addressid(value) => fr"addressid = $value"
-        case AddressFieldValue.addressline1(value) => fr"addressline1 = $value"
-        case AddressFieldValue.addressline2(value) => fr"addressline2 = $value"
-        case AddressFieldValue.city(value) => fr"city = $value"
-        case AddressFieldValue.stateprovinceid(value) => fr"stateprovinceid = $value"
-        case AddressFieldValue.postalcode(value) => fr"postalcode = $value"
-        case AddressFieldValue.spatiallocation(value) => fr"spatiallocation = $value"
-        case AddressFieldValue.rowguid(value) => fr"rowguid = $value"
-        case AddressFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.address $where".query[AddressRow].stream
-  
-  }
   override def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]] = {
     sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate from person.address where addressid = $addressid".query[AddressRow].option
   }
@@ -105,28 +86,6 @@ object AddressRepoImpl extends AddressRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(addressid: AddressId, fieldValues: List[AddressFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case AddressFieldValue.addressline1(value) => fr"addressline1 = $value"
-            case AddressFieldValue.addressline2(value) => fr"addressline2 = $value"
-            case AddressFieldValue.city(value) => fr"city = $value"
-            case AddressFieldValue.stateprovinceid(value) => fr"stateprovinceid = $value"
-            case AddressFieldValue.postalcode(value) => fr"postalcode = $value"
-            case AddressFieldValue.spatiallocation(value) => fr"spatiallocation = $value"
-            case AddressFieldValue.rowguid(value) => fr"rowguid = $value"
-            case AddressFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.address
-              $updates
-              where addressid = $addressid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into person.address(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)

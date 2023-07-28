@@ -11,10 +11,8 @@ import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -86,29 +84,6 @@ object EmployeeRepoImpl extends EmployeeRepo {
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
     sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee".query[EmployeeRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[EmployeeFieldOrIdValue[_]]): Stream[ConnectionIO, EmployeeRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EmployeeFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EmployeeFieldValue.nationalidnumber(value) => fr"nationalidnumber = $value"
-        case EmployeeFieldValue.loginid(value) => fr"loginid = $value"
-        case EmployeeFieldValue.jobtitle(value) => fr"jobtitle = $value"
-        case EmployeeFieldValue.birthdate(value) => fr"birthdate = $value"
-        case EmployeeFieldValue.maritalstatus(value) => fr"maritalstatus = $value"
-        case EmployeeFieldValue.gender(value) => fr"gender = $value"
-        case EmployeeFieldValue.hiredate(value) => fr"hiredate = $value"
-        case EmployeeFieldValue.salariedflag(value) => fr"salariedflag = $value"
-        case EmployeeFieldValue.vacationhours(value) => fr"vacationhours = $value"
-        case EmployeeFieldValue.sickleavehours(value) => fr"sickleavehours = $value"
-        case EmployeeFieldValue.currentflag(value) => fr"currentflag = $value"
-        case EmployeeFieldValue.rowguid(value) => fr"rowguid = $value"
-        case EmployeeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-        case EmployeeFieldValue.organizationnode(value) => fr"organizationnode = $value"
-      } :_*
-    )
-    sql"select * from humanresources.employee $where".query[EmployeeRow].stream
-  
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]] = {
     sql"select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from humanresources.employee where businessentityid = $businessentityid".query[EmployeeRow].option
   }
@@ -137,34 +112,6 @@ object EmployeeRepoImpl extends EmployeeRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[EmployeeFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case EmployeeFieldValue.nationalidnumber(value) => fr"nationalidnumber = $value"
-            case EmployeeFieldValue.loginid(value) => fr"loginid = $value"
-            case EmployeeFieldValue.jobtitle(value) => fr"jobtitle = $value"
-            case EmployeeFieldValue.birthdate(value) => fr"birthdate = $value"
-            case EmployeeFieldValue.maritalstatus(value) => fr"maritalstatus = $value"
-            case EmployeeFieldValue.gender(value) => fr"gender = $value"
-            case EmployeeFieldValue.hiredate(value) => fr"hiredate = $value"
-            case EmployeeFieldValue.salariedflag(value) => fr"salariedflag = $value"
-            case EmployeeFieldValue.vacationhours(value) => fr"vacationhours = $value"
-            case EmployeeFieldValue.sickleavehours(value) => fr"sickleavehours = $value"
-            case EmployeeFieldValue.currentflag(value) => fr"currentflag = $value"
-            case EmployeeFieldValue.rowguid(value) => fr"rowguid = $value"
-            case EmployeeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-            case EmployeeFieldValue.organizationnode(value) => fr"organizationnode = $value"
-          } :_*
-        )
-        sql"""update humanresources.employee
-              $updates
-              where businessentityid = $businessentityid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)

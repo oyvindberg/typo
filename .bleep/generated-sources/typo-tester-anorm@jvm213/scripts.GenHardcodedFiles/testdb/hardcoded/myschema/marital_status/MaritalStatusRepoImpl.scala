@@ -8,8 +8,6 @@ package hardcoded
 package myschema
 package marital_status
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
@@ -31,26 +29,6 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     SQL"""select "id"
           from myschema.marital_status
        """.as(MaritalStatusRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id"
-                    from myschema.marital_status
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(MaritalStatusRow.rowParser(1).*)
-    }
-  
   }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
     SQL"""select "id"

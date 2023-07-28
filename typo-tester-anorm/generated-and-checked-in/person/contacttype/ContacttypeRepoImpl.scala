@@ -64,28 +64,6 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           from person.contacttype
        """.as(ContacttypeRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ContacttypeFieldValue.contacttypeid(value) => NamedParameter("contacttypeid", ParameterValue.from(value))
-          case ContacttypeFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ContacttypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select contacttypeid, "name", modifieddate
-                    from person.contacttype
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ContacttypeRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
     SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
@@ -110,28 +88,6 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where contacttypeid = $contacttypeid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(contacttypeid: ContacttypeId, fieldValues: List[ContacttypeFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ContacttypeFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ContacttypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.contacttype
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where contacttypeid = {contacttypeid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("contacttypeid", ParameterValue.from(contacttypeid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype(contacttypeid, "name", modifieddate)

@@ -9,10 +9,8 @@ package productphoto
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -59,20 +57,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
   override def selectAll: Stream[ConnectionIO, ProductphotoRow] = {
     sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto".query[ProductphotoRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductphotoFieldOrIdValue[_]]): Stream[ConnectionIO, ProductphotoRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductphotoFieldValue.productphotoid(value) => fr"productphotoid = $value"
-        case ProductphotoFieldValue.thumbnailphoto(value) => fr"thumbnailphoto = $value"
-        case ProductphotoFieldValue.thumbnailphotofilename(value) => fr"thumbnailphotofilename = $value"
-        case ProductphotoFieldValue.largephoto(value) => fr"largephoto = $value"
-        case ProductphotoFieldValue.largephotofilename(value) => fr"largephotofilename = $value"
-        case ProductphotoFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productphoto $where".query[ProductphotoRow].stream
-  
-  }
   override def selectById(productphotoid: ProductphotoId): ConnectionIO[Option[ProductphotoRow]] = {
     sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate from production.productphoto where productphotoid = $productphotoid".query[ProductphotoRow].option
   }
@@ -92,25 +76,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(productphotoid: ProductphotoId, fieldValues: List[ProductphotoFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductphotoFieldValue.thumbnailphoto(value) => fr"thumbnailphoto = $value"
-            case ProductphotoFieldValue.thumbnailphotofilename(value) => fr"thumbnailphotofilename = $value"
-            case ProductphotoFieldValue.largephoto(value) => fr"largephoto = $value"
-            case ProductphotoFieldValue.largephotofilename(value) => fr"largephotofilename = $value"
-            case ProductphotoFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productphoto
-              $updates
-              where productphotoid = $productphotoid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)

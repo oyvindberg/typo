@@ -9,10 +9,8 @@ package salestaxrate
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -67,21 +65,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
     sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate""".query[SalestaxrateRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]]): Stream[ConnectionIO, SalestaxrateRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalestaxrateFieldValue.salestaxrateid(value) => fr"salestaxrateid = $value"
-        case SalestaxrateFieldValue.stateprovinceid(value) => fr"stateprovinceid = $value"
-        case SalestaxrateFieldValue.taxtype(value) => fr"taxtype = $value"
-        case SalestaxrateFieldValue.taxrate(value) => fr"taxrate = $value"
-        case SalestaxrateFieldValue.name(value) => fr""""name" = $value"""
-        case SalestaxrateFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SalestaxrateFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salestaxrate $where".query[SalestaxrateRow].stream
-  
-  }
   override def selectById(salestaxrateid: SalestaxrateId): ConnectionIO[Option[SalestaxrateRow]] = {
     sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate from sales.salestaxrate where salestaxrateid = $salestaxrateid""".query[SalestaxrateRow].option
   }
@@ -102,26 +85,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(salestaxrateid: SalestaxrateId, fieldValues: List[SalestaxrateFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalestaxrateFieldValue.stateprovinceid(value) => fr"stateprovinceid = $value"
-            case SalestaxrateFieldValue.taxtype(value) => fr"taxtype = $value"
-            case SalestaxrateFieldValue.taxrate(value) => fr"taxrate = $value"
-            case SalestaxrateFieldValue.name(value) => fr""""name" = $value"""
-            case SalestaxrateFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SalestaxrateFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salestaxrate
-              $updates
-              where salestaxrateid = $salestaxrateid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)

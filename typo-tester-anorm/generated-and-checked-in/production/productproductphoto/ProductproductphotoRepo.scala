@@ -14,9 +14,7 @@ trait ProductproductphotoRepo {
   def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow
   def insert(unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): ProductproductphotoRow
   def selectAll(implicit c: Connection): List[ProductproductphotoRow]
-  def selectByFieldValues(fieldValues: List[ProductproductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductproductphotoRow]
   def selectById(compositeId: ProductproductphotoId)(implicit c: Connection): Option[ProductproductphotoRow]
   def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean
-  def updateFieldValues(compositeId: ProductproductphotoId, fieldValues: List[ProductproductphotoFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow
 }

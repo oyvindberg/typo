@@ -9,35 +9,10 @@ package e
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object EViewRepoImpl extends EViewRepo {
   override def selectAll: Stream[ConnectionIO, EViewRow] = {
     sql"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode from hr.e""".query[EViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[EViewFieldOrIdValue[_]]): Stream[ConnectionIO, EViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EViewFieldValue.id(value) => fr""""id" = $value"""
-        case EViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EViewFieldValue.nationalidnumber(value) => fr"nationalidnumber = $value"
-        case EViewFieldValue.loginid(value) => fr"loginid = $value"
-        case EViewFieldValue.jobtitle(value) => fr"jobtitle = $value"
-        case EViewFieldValue.birthdate(value) => fr"birthdate = $value"
-        case EViewFieldValue.maritalstatus(value) => fr"maritalstatus = $value"
-        case EViewFieldValue.gender(value) => fr"gender = $value"
-        case EViewFieldValue.hiredate(value) => fr"hiredate = $value"
-        case EViewFieldValue.salariedflag(value) => fr"salariedflag = $value"
-        case EViewFieldValue.vacationhours(value) => fr"vacationhours = $value"
-        case EViewFieldValue.sickleavehours(value) => fr"sickleavehours = $value"
-        case EViewFieldValue.currentflag(value) => fr"currentflag = $value"
-        case EViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case EViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-        case EViewFieldValue.organizationnode(value) => fr"organizationnode = $value"
-      } :_*
-    )
-    sql"select * from hr.e $where".query[EViewRow].stream
-  
   }
 }

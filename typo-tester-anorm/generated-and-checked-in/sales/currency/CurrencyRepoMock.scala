@@ -27,13 +27,6 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[CurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, CurrencyFieldValue.currencycode(value)) => acc.filter(_.currencycode == value)
-      case (acc, CurrencyFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, CurrencyFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow] = {
     map.get(currencycode)
   }
@@ -46,22 +39,6 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
       case Some(_) =>
         map.put(row.currencycode, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(currencycode: CurrencyId, fieldValues: List[CurrencyFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(currencycode) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, CurrencyFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, CurrencyFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(currencycode, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

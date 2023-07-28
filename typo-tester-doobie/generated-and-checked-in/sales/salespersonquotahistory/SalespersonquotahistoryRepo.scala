@@ -15,9 +15,7 @@ trait SalespersonquotahistoryRepo {
   def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow]
   def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow]
   def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow]
-  def selectByFieldValues(fieldValues: List[SalespersonquotahistoryFieldOrIdValue[_]]): Stream[ConnectionIO, SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]]
   def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: SalespersonquotahistoryId, fieldValues: List[SalespersonquotahistoryFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow]
 }

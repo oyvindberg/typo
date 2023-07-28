@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait VsalespersonsalesbyfiscalyearsdataViewRepo {
   def selectAll: Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsdataViewRow]
-  def selectByFieldValues(fieldValues: List[VsalespersonsalesbyfiscalyearsdataViewFieldOrIdValue[_]]): Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsdataViewRow]
 }

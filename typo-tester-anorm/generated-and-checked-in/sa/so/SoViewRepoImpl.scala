@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package so
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,36 +15,5 @@ object SoViewRepoImpl extends SoViewRepo {
     SQL"""select "id", specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
           from sa.so
        """.as(SoViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SoViewFieldOrIdValue[_]])(implicit c: Connection): List[SoViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SoViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SoViewFieldValue.specialofferid(value) => NamedParameter("specialofferid", ParameterValue.from(value))
-          case SoViewFieldValue.description(value) => NamedParameter("description", ParameterValue.from(value))
-          case SoViewFieldValue.discountpct(value) => NamedParameter("discountpct", ParameterValue.from(value))
-          case SoViewFieldValue.`type`(value) => NamedParameter("type", ParameterValue.from(value))
-          case SoViewFieldValue.category(value) => NamedParameter("category", ParameterValue.from(value))
-          case SoViewFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case SoViewFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case SoViewFieldValue.minqty(value) => NamedParameter("minqty", ParameterValue.from(value))
-          case SoViewFieldValue.maxqty(value) => NamedParameter("maxqty", ParameterValue.from(value))
-          case SoViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SoViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate
-                    from sa.so
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SoViewRow.rowParser(1).*)
-    }
-  
   }
 }

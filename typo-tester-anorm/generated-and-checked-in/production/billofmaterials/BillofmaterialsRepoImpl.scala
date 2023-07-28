@@ -76,34 +76,6 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           from production.billofmaterials
        """.as(BillofmaterialsRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]])(implicit c: Connection): List[BillofmaterialsRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case BillofmaterialsFieldValue.billofmaterialsid(value) => NamedParameter("billofmaterialsid", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.productassemblyid(value) => NamedParameter("productassemblyid", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.componentid(value) => NamedParameter("componentid", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.unitmeasurecode(value) => NamedParameter("unitmeasurecode", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.bomlevel(value) => NamedParameter("bomlevel", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.perassemblyqty(value) => NamedParameter("perassemblyqty", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
-                    from production.billofmaterials
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(BillofmaterialsRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow] = {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
           from production.billofmaterials
@@ -134,34 +106,6 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where billofmaterialsid = $billofmaterialsid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(billofmaterialsid: BillofmaterialsId, fieldValues: List[BillofmaterialsFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case BillofmaterialsFieldValue.productassemblyid(value) => NamedParameter("productassemblyid", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.componentid(value) => NamedParameter("componentid", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.unitmeasurecode(value) => NamedParameter("unitmeasurecode", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.bomlevel(value) => NamedParameter("bomlevel", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.perassemblyqty(value) => NamedParameter("perassemblyqty", ParameterValue.from(value))
-          case BillofmaterialsFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.billofmaterials
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where billofmaterialsid = {billofmaterialsid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("billofmaterialsid", ParameterValue.from(billofmaterialsid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)

@@ -32,20 +32,6 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]]): Stream[ConnectionIO, VendorRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, VendorFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, VendorFieldValue.accountnumber(value)) => acc.filter(_.accountnumber == value)
-        case (acc, VendorFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, VendorFieldValue.creditrating(value)) => acc.filter(_.creditrating == value)
-        case (acc, VendorFieldValue.preferredvendorstatus(value)) => acc.filter(_.preferredvendorstatus == value)
-        case (acc, VendorFieldValue.activeflag(value)) => acc.filter(_.activeflag == value)
-        case (acc, VendorFieldValue.purchasingwebserviceurl(value)) => acc.filter(_.purchasingwebserviceurl == value)
-        case (acc, VendorFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[VendorRow]] = {
     delay(map.get(businessentityid))
   }
@@ -59,29 +45,6 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
         case Some(_) =>
           map.put(row.businessentityid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[VendorFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(businessentityid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, VendorFieldValue.accountnumber(value)) => acc.copy(accountnumber = value)
-            case (acc, VendorFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, VendorFieldValue.creditrating(value)) => acc.copy(creditrating = value)
-            case (acc, VendorFieldValue.preferredvendorstatus(value)) => acc.copy(preferredvendorstatus = value)
-            case (acc, VendorFieldValue.activeflag(value)) => acc.copy(activeflag = value)
-            case (acc, VendorFieldValue.purchasingwebserviceurl(value)) => acc.copy(purchasingwebserviceurl = value)
-            case (acc, VendorFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(businessentityid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

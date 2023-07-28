@@ -9,10 +9,8 @@ package countryregioncurrency
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -53,17 +51,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow] = {
     sql"select countryregioncode, currencycode, modifieddate from sales.countryregioncurrency".query[CountryregioncurrencyRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[CountryregioncurrencyFieldOrIdValue[_]]): Stream[ConnectionIO, CountryregioncurrencyRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CountryregioncurrencyFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-        case CountryregioncurrencyFieldValue.currencycode(value) => fr"currencycode = $value"
-        case CountryregioncurrencyFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.countryregioncurrency $where".query[CountryregioncurrencyRow].stream
-  
-  }
   override def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]] = {
     sql"select countryregioncode, currencycode, modifieddate from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".query[CountryregioncurrencyRow].option
   }
@@ -76,21 +63,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: CountryregioncurrencyId, fieldValues: List[CountryregioncurrencyFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case CountryregioncurrencyFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.countryregioncurrency
-              $updates
-              where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)

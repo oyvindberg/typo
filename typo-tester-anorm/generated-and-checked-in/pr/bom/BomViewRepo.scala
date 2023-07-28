@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait BomViewRepo {
   def selectAll(implicit c: Connection): List[BomViewRow]
-  def selectByFieldValues(fieldValues: List[BomViewFieldOrIdValue[_]])(implicit c: Connection): List[BomViewRow]
 }

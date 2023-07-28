@@ -9,26 +9,10 @@ package edh
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object EdhViewRepoImpl extends EdhViewRepo {
   override def selectAll: Stream[ConnectionIO, EdhViewRow] = {
     sql"""select "id", businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from hr.edh""".query[EdhViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[EdhViewFieldOrIdValue[_]]): Stream[ConnectionIO, EdhViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EdhViewFieldValue.id(value) => fr""""id" = $value"""
-        case EdhViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EdhViewFieldValue.departmentid(value) => fr"departmentid = $value"
-        case EdhViewFieldValue.shiftid(value) => fr"shiftid = $value"
-        case EdhViewFieldValue.startdate(value) => fr"startdate = $value"
-        case EdhViewFieldValue.enddate(value) => fr"enddate = $value"
-        case EdhViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from hr.edh $where".query[EdhViewRow].stream
-  
   }
 }

@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait BomViewRepo {
   def selectAll: Stream[ConnectionIO, BomViewRow]
-  def selectByFieldValues(fieldValues: List[BomViewFieldOrIdValue[_]]): Stream[ConnectionIO, BomViewRow]
 }

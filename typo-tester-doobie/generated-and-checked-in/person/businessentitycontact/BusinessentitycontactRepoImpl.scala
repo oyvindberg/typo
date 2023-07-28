@@ -9,10 +9,8 @@ package businessentitycontact
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -59,19 +57,6 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def selectAll: Stream[ConnectionIO, BusinessentitycontactRow] = {
     sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact".query[BusinessentitycontactRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[BusinessentitycontactFieldOrIdValue[_]]): Stream[ConnectionIO, BusinessentitycontactRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case BusinessentitycontactFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case BusinessentitycontactFieldValue.personid(value) => fr"personid = $value"
-        case BusinessentitycontactFieldValue.contacttypeid(value) => fr"contacttypeid = $value"
-        case BusinessentitycontactFieldValue.rowguid(value) => fr"rowguid = $value"
-        case BusinessentitycontactFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.businessentitycontact $where".query[BusinessentitycontactRow].stream
-  
-  }
   override def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]] = {
     sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate from person.businessentitycontact where businessentityid = ${compositeId.businessentityid} AND personid = ${compositeId.personid} AND contacttypeid = ${compositeId.contacttypeid}".query[BusinessentitycontactRow].option
   }
@@ -85,22 +70,6 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: BusinessentitycontactId, fieldValues: List[BusinessentitycontactFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case BusinessentitycontactFieldValue.rowguid(value) => fr"rowguid = $value"
-            case BusinessentitycontactFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.businessentitycontact
-              $updates
-              where businessentityid = ${compositeId.businessentityid} AND personid = ${compositeId.personid} AND contacttypeid = ${compositeId.contacttypeid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow] = {
     sql"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, rowguid, modifieddate)

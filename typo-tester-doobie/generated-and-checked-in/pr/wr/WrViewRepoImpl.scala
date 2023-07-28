@@ -9,32 +9,10 @@ package wr
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object WrViewRepoImpl extends WrViewRepo {
   override def selectAll: Stream[ConnectionIO, WrViewRow] = {
     sql"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate from pr.wr""".query[WrViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[WrViewFieldOrIdValue[_]]): Stream[ConnectionIO, WrViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case WrViewFieldValue.id(value) => fr""""id" = $value"""
-        case WrViewFieldValue.workorderid(value) => fr"workorderid = $value"
-        case WrViewFieldValue.productid(value) => fr"productid = $value"
-        case WrViewFieldValue.operationsequence(value) => fr"operationsequence = $value"
-        case WrViewFieldValue.locationid(value) => fr"locationid = $value"
-        case WrViewFieldValue.scheduledstartdate(value) => fr"scheduledstartdate = $value"
-        case WrViewFieldValue.scheduledenddate(value) => fr"scheduledenddate = $value"
-        case WrViewFieldValue.actualstartdate(value) => fr"actualstartdate = $value"
-        case WrViewFieldValue.actualenddate(value) => fr"actualenddate = $value"
-        case WrViewFieldValue.actualresourcehrs(value) => fr"actualresourcehrs = $value"
-        case WrViewFieldValue.plannedcost(value) => fr"plannedcost = $value"
-        case WrViewFieldValue.actualcost(value) => fr"actualcost = $value"
-        case WrViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.wr $where".query[WrViewRow].stream
-  
   }
 }

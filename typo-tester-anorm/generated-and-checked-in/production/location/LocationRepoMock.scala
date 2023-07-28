@@ -27,15 +27,6 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   override def selectAll(implicit c: Connection): List[LocationRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]])(implicit c: Connection): List[LocationRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, LocationFieldValue.locationid(value)) => acc.filter(_.locationid == value)
-      case (acc, LocationFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, LocationFieldValue.costrate(value)) => acc.filter(_.costrate == value)
-      case (acc, LocationFieldValue.availability(value)) => acc.filter(_.availability == value)
-      case (acc, LocationFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
     map.get(locationid)
   }
@@ -48,24 +39,6 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
       case Some(_) =>
         map.put(row.locationid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(locationid: LocationId, fieldValues: List[LocationFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(locationid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, LocationFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, LocationFieldValue.costrate(value)) => acc.copy(costrate = value)
-          case (acc, LocationFieldValue.availability(value)) => acc.copy(availability = value)
-          case (acc, LocationFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(locationid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

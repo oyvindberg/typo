@@ -23,7 +23,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
         saved2 = unsaved.toRow(departmentidDefault = saved1.departmentid, modifieddateDefault = saved1.modifieddate)
         _ <- delay(assert(saved1 === saved2))
         // check field values
-        _ <- repo.updateFieldValues(saved1.departmentid, List(DepartmentFieldValue.name(Name("baz"))))
+        _ <- repo.update(saved1.copy(name = Name("baz")))
         saved3 <- repo.selectAll.compile.lastOrError
         _ <- delay(assert(saved3.name == Name("baz")))
         // delete

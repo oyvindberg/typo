@@ -9,24 +9,10 @@ package d
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object DViewRepoImpl extends DViewRepo {
   override def selectAll: Stream[ConnectionIO, DViewRow] = {
     sql"""select "id", departmentid, "name", groupname, modifieddate from hr.d""".query[DViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[DViewFieldOrIdValue[_]]): Stream[ConnectionIO, DViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case DViewFieldValue.id(value) => fr""""id" = $value"""
-        case DViewFieldValue.departmentid(value) => fr"departmentid = $value"
-        case DViewFieldValue.name(value) => fr""""name" = $value"""
-        case DViewFieldValue.groupname(value) => fr"groupname = $value"
-        case DViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from hr.d $where".query[DViewRow].stream
-  
   }
 }

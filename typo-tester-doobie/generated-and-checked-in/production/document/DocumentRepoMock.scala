@@ -10,7 +10,6 @@ package document
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
-import java.util.UUID
 
 class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
                        map: scala.collection.mutable.Map[DocumentId, DocumentRow] = scala.collection.mutable.Map.empty) extends DocumentRepo {
@@ -32,33 +31,11 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]]): Stream[ConnectionIO, DocumentRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, DocumentFieldValue.title(value)) => acc.filter(_.title == value)
-        case (acc, DocumentFieldValue.owner(value)) => acc.filter(_.owner == value)
-        case (acc, DocumentFieldValue.folderflag(value)) => acc.filter(_.folderflag == value)
-        case (acc, DocumentFieldValue.filename(value)) => acc.filter(_.filename == value)
-        case (acc, DocumentFieldValue.fileextension(value)) => acc.filter(_.fileextension == value)
-        case (acc, DocumentFieldValue.revision(value)) => acc.filter(_.revision == value)
-        case (acc, DocumentFieldValue.changenumber(value)) => acc.filter(_.changenumber == value)
-        case (acc, DocumentFieldValue.status(value)) => acc.filter(_.status == value)
-        case (acc, DocumentFieldValue.documentsummary(value)) => acc.filter(_.documentsummary == value)
-        case (acc, DocumentFieldValue.document(value)) => acc.filter(_.document == value)
-        case (acc, DocumentFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, DocumentFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-        case (acc, DocumentFieldValue.documentnode(value)) => acc.filter(_.documentnode == value)
-      }.toList
-    }
-  }
   override def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]] = {
     delay(map.get(documentnode))
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
     Stream.emits(documentnodes.flatMap(map.get).toList)
-  }
-  override def selectByUnique(rowguid: UUID): ConnectionIO[Option[DocumentRow]] = {
-    selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).compile.last
   }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     delay {
@@ -67,34 +44,6 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
         case Some(_) =>
           map.put(row.documentnode, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(documentnode: DocumentId, fieldValues: List[DocumentFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(documentnode) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, DocumentFieldValue.title(value)) => acc.copy(title = value)
-            case (acc, DocumentFieldValue.owner(value)) => acc.copy(owner = value)
-            case (acc, DocumentFieldValue.folderflag(value)) => acc.copy(folderflag = value)
-            case (acc, DocumentFieldValue.filename(value)) => acc.copy(filename = value)
-            case (acc, DocumentFieldValue.fileextension(value)) => acc.copy(fileextension = value)
-            case (acc, DocumentFieldValue.revision(value)) => acc.copy(revision = value)
-            case (acc, DocumentFieldValue.changenumber(value)) => acc.copy(changenumber = value)
-            case (acc, DocumentFieldValue.status(value)) => acc.copy(status = value)
-            case (acc, DocumentFieldValue.documentsummary(value)) => acc.copy(documentsummary = value)
-            case (acc, DocumentFieldValue.document(value)) => acc.copy(document = value)
-            case (acc, DocumentFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, DocumentFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(documentnode, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

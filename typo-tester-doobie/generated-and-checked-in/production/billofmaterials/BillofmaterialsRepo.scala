@@ -15,10 +15,8 @@ trait BillofmaterialsRepo {
   def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow]
   def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow]
   def selectAll: Stream[ConnectionIO, BillofmaterialsRow]
-  def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]]): Stream[ConnectionIO, BillofmaterialsRow]
   def selectById(billofmaterialsid: BillofmaterialsId): ConnectionIO[Option[BillofmaterialsRow]]
   def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): Stream[ConnectionIO, BillofmaterialsRow]
   def update(row: BillofmaterialsRow): ConnectionIO[Boolean]
-  def updateFieldValues(billofmaterialsid: BillofmaterialsId, fieldValues: List[BillofmaterialsFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow]
 }

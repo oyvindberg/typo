@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package pi
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,32 +15,5 @@ object PiViewRepoImpl extends PiViewRepo {
     SQL"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate
           from pr.pi
        """.as(PiViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PiViewFieldOrIdValue[_]])(implicit c: Connection): List[PiViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PiViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PiViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case PiViewFieldValue.locationid(value) => NamedParameter("locationid", ParameterValue.from(value))
-          case PiViewFieldValue.shelf(value) => NamedParameter("shelf", ParameterValue.from(value))
-          case PiViewFieldValue.bin(value) => NamedParameter("bin", ParameterValue.from(value))
-          case PiViewFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case PiViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PiViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate
-                    from pr.pi
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PiViewRow.rowParser(1).*)
-    }
-  
   }
 }

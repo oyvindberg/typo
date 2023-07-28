@@ -27,15 +27,6 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
   override def selectAll(implicit c: Connection): List[ProductcosthistoryRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcosthistoryRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, ProductcosthistoryFieldValue.productid(value)) => acc.filter(_.productid == value)
-      case (acc, ProductcosthistoryFieldValue.startdate(value)) => acc.filter(_.startdate == value)
-      case (acc, ProductcosthistoryFieldValue.enddate(value)) => acc.filter(_.enddate == value)
-      case (acc, ProductcosthistoryFieldValue.standardcost(value)) => acc.filter(_.standardcost == value)
-      case (acc, ProductcosthistoryFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow] = {
     map.get(compositeId)
   }
@@ -45,23 +36,6 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
       case Some(_) =>
         map.put(row.compositeId, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(compositeId: ProductcosthistoryId, fieldValues: List[ProductcosthistoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(compositeId) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, ProductcosthistoryFieldValue.enddate(value)) => acc.copy(enddate = value)
-          case (acc, ProductcosthistoryFieldValue.standardcost(value)) => acc.copy(standardcost = value)
-          case (acc, ProductcosthistoryFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

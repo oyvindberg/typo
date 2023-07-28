@@ -9,25 +9,10 @@ package e
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object EViewRepoImpl extends EViewRepo {
   override def selectAll: Stream[ConnectionIO, EViewRow] = {
     sql"""select "id", businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from pe.e""".query[EViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[EViewFieldOrIdValue[_]]): Stream[ConnectionIO, EViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EViewFieldValue.id(value) => fr""""id" = $value"""
-        case EViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EViewFieldValue.emailaddressid(value) => fr"emailaddressid = $value"
-        case EViewFieldValue.emailaddress(value) => fr"emailaddress = $value"
-        case EViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case EViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pe.e $where".query[EViewRow].stream
-  
   }
 }

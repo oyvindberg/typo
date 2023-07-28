@@ -166,7 +166,7 @@ case class TableFiles(table: ComputedTable, options: InternalOptions) {
       repoMethods <- table.repoMethods
       dbLib <- options.dbLib
     } yield relation.RepoImplFile(dbLib, repoMethods),
-    Some(relation.FieldValueFile),
+    relation.FieldValueFile,
     maybeMockRepo,
     IdFile
     // JoinedRowFile

@@ -75,32 +75,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
           from sales.salestaxrate
        """.as(SalestaxrateRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]])(implicit c: Connection): List[SalestaxrateRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalestaxrateFieldValue.salestaxrateid(value) => NamedParameter("salestaxrateid", ParameterValue.from(value))
-          case SalestaxrateFieldValue.stateprovinceid(value) => NamedParameter("stateprovinceid", ParameterValue.from(value))
-          case SalestaxrateFieldValue.taxtype(value) => NamedParameter("taxtype", ParameterValue.from(value))
-          case SalestaxrateFieldValue.taxrate(value) => NamedParameter("taxrate", ParameterValue.from(value))
-          case SalestaxrateFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SalestaxrateFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalestaxrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
-                    from sales.salestaxrate
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SalestaxrateRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate
           from sales.salestaxrate
@@ -129,32 +103,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where salestaxrateid = $salestaxrateid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(salestaxrateid: SalestaxrateId, fieldValues: List[SalestaxrateFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalestaxrateFieldValue.stateprovinceid(value) => NamedParameter("stateprovinceid", ParameterValue.from(value))
-          case SalestaxrateFieldValue.taxtype(value) => NamedParameter("taxtype", ParameterValue.from(value))
-          case SalestaxrateFieldValue.taxrate(value) => NamedParameter("taxrate", ParameterValue.from(value))
-          case SalestaxrateFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SalestaxrateFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalestaxrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.salestaxrate
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where salestaxrateid = {salestaxrateid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("salestaxrateid", ParameterValue.from(salestaxrateid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)

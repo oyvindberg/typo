@@ -15,9 +15,7 @@ trait ProductmodelillustrationRepo {
   def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow]
   def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow]
   def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow]
-  def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]]): Stream[ConnectionIO, ProductmodelillustrationRow]
   def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]]
   def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: ProductmodelillustrationId, fieldValues: List[ProductmodelillustrationFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow]
 }

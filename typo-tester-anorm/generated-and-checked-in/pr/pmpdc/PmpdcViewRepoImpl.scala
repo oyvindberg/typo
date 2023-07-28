@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package pmpdc
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,28 +15,5 @@ object PmpdcViewRepoImpl extends PmpdcViewRepo {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate
           from pr.pmpdc
        """.as(PmpdcViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PmpdcViewFieldOrIdValue[_]])(implicit c: Connection): List[PmpdcViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PmpdcViewFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))
-          case PmpdcViewFieldValue.productdescriptionid(value) => NamedParameter("productdescriptionid", ParameterValue.from(value))
-          case PmpdcViewFieldValue.cultureid(value) => NamedParameter("cultureid", ParameterValue.from(value))
-          case PmpdcViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productmodelid, productdescriptionid, cultureid, modifieddate
-                    from pr.pmpdc
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PmpdcViewRow.rowParser(1).*)
-    }
-  
   }
 }

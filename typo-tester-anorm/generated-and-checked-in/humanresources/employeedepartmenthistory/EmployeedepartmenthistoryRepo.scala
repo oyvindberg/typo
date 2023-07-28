@@ -14,9 +14,7 @@ trait EmployeedepartmenthistoryRepo {
   def insert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow
   def insert(unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow
   def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow]
-  def selectByFieldValues(fieldValues: List[EmployeedepartmenthistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeedepartmenthistoryRow]
   def selectById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Option[EmployeedepartmenthistoryRow]
   def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean
-  def updateFieldValues(compositeId: EmployeedepartmenthistoryId, fieldValues: List[EmployeedepartmenthistoryFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow
 }

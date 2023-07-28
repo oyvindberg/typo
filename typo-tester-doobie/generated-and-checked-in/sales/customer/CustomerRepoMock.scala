@@ -31,18 +31,6 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]]): Stream[ConnectionIO, CustomerRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, CustomerFieldValue.customerid(value)) => acc.filter(_.customerid == value)
-        case (acc, CustomerFieldValue.personid(value)) => acc.filter(_.personid == value)
-        case (acc, CustomerFieldValue.storeid(value)) => acc.filter(_.storeid == value)
-        case (acc, CustomerFieldValue.territoryid(value)) => acc.filter(_.territoryid == value)
-        case (acc, CustomerFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, CustomerFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]] = {
     delay(map.get(customerid))
   }
@@ -56,27 +44,6 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
         case Some(_) =>
           map.put(row.customerid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(customerid: CustomerId, fieldValues: List[CustomerFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(customerid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, CustomerFieldValue.personid(value)) => acc.copy(personid = value)
-            case (acc, CustomerFieldValue.storeid(value)) => acc.copy(storeid = value)
-            case (acc, CustomerFieldValue.territoryid(value)) => acc.copy(territoryid = value)
-            case (acc, CustomerFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, CustomerFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(customerid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

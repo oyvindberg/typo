@@ -27,22 +27,6 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, WorkorderroutingFieldValue.workorderid(value)) => acc.filter(_.workorderid == value)
-      case (acc, WorkorderroutingFieldValue.productid(value)) => acc.filter(_.productid == value)
-      case (acc, WorkorderroutingFieldValue.operationsequence(value)) => acc.filter(_.operationsequence == value)
-      case (acc, WorkorderroutingFieldValue.locationid(value)) => acc.filter(_.locationid == value)
-      case (acc, WorkorderroutingFieldValue.scheduledstartdate(value)) => acc.filter(_.scheduledstartdate == value)
-      case (acc, WorkorderroutingFieldValue.scheduledenddate(value)) => acc.filter(_.scheduledenddate == value)
-      case (acc, WorkorderroutingFieldValue.actualstartdate(value)) => acc.filter(_.actualstartdate == value)
-      case (acc, WorkorderroutingFieldValue.actualenddate(value)) => acc.filter(_.actualenddate == value)
-      case (acc, WorkorderroutingFieldValue.actualresourcehrs(value)) => acc.filter(_.actualresourcehrs == value)
-      case (acc, WorkorderroutingFieldValue.plannedcost(value)) => acc.filter(_.plannedcost == value)
-      case (acc, WorkorderroutingFieldValue.actualcost(value)) => acc.filter(_.actualcost == value)
-      case (acc, WorkorderroutingFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
     map.get(compositeId)
   }
@@ -52,29 +36,6 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
       case Some(_) =>
         map.put(row.compositeId, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(compositeId: WorkorderroutingId, fieldValues: List[WorkorderroutingFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(compositeId) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, WorkorderroutingFieldValue.locationid(value)) => acc.copy(locationid = value)
-          case (acc, WorkorderroutingFieldValue.scheduledstartdate(value)) => acc.copy(scheduledstartdate = value)
-          case (acc, WorkorderroutingFieldValue.scheduledenddate(value)) => acc.copy(scheduledenddate = value)
-          case (acc, WorkorderroutingFieldValue.actualstartdate(value)) => acc.copy(actualstartdate = value)
-          case (acc, WorkorderroutingFieldValue.actualenddate(value)) => acc.copy(actualenddate = value)
-          case (acc, WorkorderroutingFieldValue.actualresourcehrs(value)) => acc.copy(actualresourcehrs = value)
-          case (acc, WorkorderroutingFieldValue.plannedcost(value)) => acc.copy(plannedcost = value)
-          case (acc, WorkorderroutingFieldValue.actualcost(value)) => acc.copy(actualcost = value)
-          case (acc, WorkorderroutingFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

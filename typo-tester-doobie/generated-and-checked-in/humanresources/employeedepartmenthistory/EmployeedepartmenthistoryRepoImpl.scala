@@ -9,10 +9,8 @@ package employeedepartmenthistory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -56,20 +54,6 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
     sql"select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from humanresources.employeedepartmenthistory".query[EmployeedepartmenthistoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[EmployeedepartmenthistoryFieldOrIdValue[_]]): Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EmployeedepartmenthistoryFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EmployeedepartmenthistoryFieldValue.departmentid(value) => fr"departmentid = $value"
-        case EmployeedepartmenthistoryFieldValue.shiftid(value) => fr"shiftid = $value"
-        case EmployeedepartmenthistoryFieldValue.startdate(value) => fr"startdate = $value"
-        case EmployeedepartmenthistoryFieldValue.enddate(value) => fr"enddate = $value"
-        case EmployeedepartmenthistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.employeedepartmenthistory $where".query[EmployeedepartmenthistoryRow].stream
-  
-  }
   override def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]] = {
     sql"select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}".query[EmployeedepartmenthistoryRow].option
   }
@@ -83,22 +67,6 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: EmployeedepartmenthistoryId, fieldValues: List[EmployeedepartmenthistoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case EmployeedepartmenthistoryFieldValue.enddate(value) => fr"enddate = $value"
-            case EmployeedepartmenthistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update humanresources.employeedepartmenthistory
-              $updates
-              where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)

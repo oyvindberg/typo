@@ -15,10 +15,8 @@ trait CurrencyrateRepo {
   def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
   def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow]
   def selectAll: Stream[ConnectionIO, CurrencyrateRow]
-  def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]]): Stream[ConnectionIO, CurrencyrateRow]
   def selectById(currencyrateid: CurrencyrateId): ConnectionIO[Option[CurrencyrateRow]]
   def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow]
   def update(row: CurrencyrateRow): ConnectionIO[Boolean]
-  def updateFieldValues(currencyrateid: CurrencyrateId, fieldValues: List[CurrencyrateFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
 }

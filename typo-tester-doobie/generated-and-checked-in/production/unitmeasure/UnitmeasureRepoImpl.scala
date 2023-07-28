@@ -9,10 +9,8 @@ package unitmeasure
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -53,17 +51,6 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
     sql"""select unitmeasurecode, "name", modifieddate from production.unitmeasure""".query[UnitmeasureRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]]): Stream[ConnectionIO, UnitmeasureRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case UnitmeasureFieldValue.unitmeasurecode(value) => fr"unitmeasurecode = $value"
-        case UnitmeasureFieldValue.name(value) => fr""""name" = $value"""
-        case UnitmeasureFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.unitmeasure $where".query[UnitmeasureRow].stream
-  
-  }
   override def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]] = {
     sql"""select unitmeasurecode, "name", modifieddate from production.unitmeasure where unitmeasurecode = $unitmeasurecode""".query[UnitmeasureRow].option
   }
@@ -80,22 +67,6 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(unitmeasurecode: UnitmeasureId, fieldValues: List[UnitmeasureFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case UnitmeasureFieldValue.name(value) => fr""""name" = $value"""
-            case UnitmeasureFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.unitmeasure
-              $updates
-              where unitmeasurecode = $unitmeasurecode
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)

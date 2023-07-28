@@ -9,25 +9,10 @@ package plph
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PlphViewRepoImpl extends PlphViewRepo {
   override def selectAll: Stream[ConnectionIO, PlphViewRow] = {
     sql"""select "id", productid, startdate, enddate, listprice, modifieddate from pr.plph""".query[PlphViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PlphViewFieldOrIdValue[_]]): Stream[ConnectionIO, PlphViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PlphViewFieldValue.id(value) => fr""""id" = $value"""
-        case PlphViewFieldValue.productid(value) => fr"productid = $value"
-        case PlphViewFieldValue.startdate(value) => fr"startdate = $value"
-        case PlphViewFieldValue.enddate(value) => fr"enddate = $value"
-        case PlphViewFieldValue.listprice(value) => fr"listprice = $value"
-        case PlphViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.plph $where".query[PlphViewRow].stream
-  
   }
 }

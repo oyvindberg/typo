@@ -15,10 +15,8 @@ trait EmployeeRepo {
   def insert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow
   def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow
   def selectAll(implicit c: Connection): List[EmployeeRow]
-  def selectByFieldValues(fieldValues: List[EmployeeFieldOrIdValue[_]])(implicit c: Connection): List[EmployeeRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[EmployeeRow]
   def update(row: EmployeeRow)(implicit c: Connection): Boolean
-  def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[EmployeeFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow
 }

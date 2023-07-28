@@ -9,10 +9,8 @@ package shoppingcartitem
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -65,20 +63,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
     sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem".query[ShoppingcartitemRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]]): Stream[ConnectionIO, ShoppingcartitemRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ShoppingcartitemFieldValue.shoppingcartitemid(value) => fr"shoppingcartitemid = $value"
-        case ShoppingcartitemFieldValue.shoppingcartid(value) => fr"shoppingcartid = $value"
-        case ShoppingcartitemFieldValue.quantity(value) => fr"quantity = $value"
-        case ShoppingcartitemFieldValue.productid(value) => fr"productid = $value"
-        case ShoppingcartitemFieldValue.datecreated(value) => fr"datecreated = $value"
-        case ShoppingcartitemFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.shoppingcartitem $where".query[ShoppingcartitemRow].stream
-  
-  }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]] = {
     sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate from sales.shoppingcartitem where shoppingcartitemid = $shoppingcartitemid".query[ShoppingcartitemRow].option
   }
@@ -98,25 +82,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(shoppingcartitemid: ShoppingcartitemId, fieldValues: List[ShoppingcartitemFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ShoppingcartitemFieldValue.shoppingcartid(value) => fr"shoppingcartid = $value"
-            case ShoppingcartitemFieldValue.quantity(value) => fr"quantity = $value"
-            case ShoppingcartitemFieldValue.productid(value) => fr"productid = $value"
-            case ShoppingcartitemFieldValue.datecreated(value) => fr"datecreated = $value"
-            case ShoppingcartitemFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.shoppingcartitem
-              $updates
-              where shoppingcartitemid = $shoppingcartitemid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)

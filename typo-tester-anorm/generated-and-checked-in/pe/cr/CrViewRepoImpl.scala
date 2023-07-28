@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package cr
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,27 +15,5 @@ object CrViewRepoImpl extends CrViewRepo {
     SQL"""select countryregioncode, "name", modifieddate
           from pe.cr
        """.as(CrViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[CrViewFieldOrIdValue[_]])(implicit c: Connection): List[CrViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CrViewFieldValue.countryregioncode(value) => NamedParameter("countryregioncode", ParameterValue.from(value))
-          case CrViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case CrViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select countryregioncode, "name", modifieddate
-                    from pe.cr
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(CrViewRow.rowParser(1).*)
-    }
-  
   }
 }

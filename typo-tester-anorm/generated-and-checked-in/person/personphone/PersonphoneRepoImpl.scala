@@ -60,29 +60,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           from person.personphone
        """.as(PersonphoneRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]])(implicit c: Connection): List[PersonphoneRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonphoneFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PersonphoneFieldValue.phonenumber(value) => NamedParameter("phonenumber", ParameterValue.from(value))
-          case PersonphoneFieldValue.phonenumbertypeid(value) => NamedParameter("phonenumbertypeid", ParameterValue.from(value))
-          case PersonphoneFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
-                    from person.personphone
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PersonphoneRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow] = {
     SQL"""select businessentityid, phonenumber, phonenumbertypeid, modifieddate
           from person.personphone
@@ -95,27 +72,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: PersonphoneId, fieldValues: List[PersonphoneFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonphoneFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.personphone
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid} AND phonenumber = {phonenumber} AND phonenumbertypeid = {phonenumbertypeid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("phonenumber", ParameterValue.from(compositeId.phonenumber)), NamedParameter("phonenumbertypeid", ParameterValue.from(compositeId.phonenumbertypeid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)

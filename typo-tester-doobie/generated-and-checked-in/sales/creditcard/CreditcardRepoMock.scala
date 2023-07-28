@@ -31,18 +31,6 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[CreditcardFieldOrIdValue[_]]): Stream[ConnectionIO, CreditcardRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, CreditcardFieldValue.creditcardid(value)) => acc.filter(_.creditcardid == value)
-        case (acc, CreditcardFieldValue.cardtype(value)) => acc.filter(_.cardtype == value)
-        case (acc, CreditcardFieldValue.cardnumber(value)) => acc.filter(_.cardnumber == value)
-        case (acc, CreditcardFieldValue.expmonth(value)) => acc.filter(_.expmonth == value)
-        case (acc, CreditcardFieldValue.expyear(value)) => acc.filter(_.expyear == value)
-        case (acc, CreditcardFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(creditcardid: CreditcardId): ConnectionIO[Option[CreditcardRow]] = {
     delay(map.get(creditcardid))
   }
@@ -56,27 +44,6 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
         case Some(_) =>
           map.put(row.creditcardid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(creditcardid: CreditcardId, fieldValues: List[CreditcardFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(creditcardid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, CreditcardFieldValue.cardtype(value)) => acc.copy(cardtype = value)
-            case (acc, CreditcardFieldValue.cardnumber(value)) => acc.copy(cardnumber = value)
-            case (acc, CreditcardFieldValue.expmonth(value)) => acc.copy(expmonth = value)
-            case (acc, CreditcardFieldValue.expyear(value)) => acc.copy(expyear = value)
-            case (acc, CreditcardFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(creditcardid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

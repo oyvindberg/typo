@@ -10,7 +10,6 @@ package marital_status
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object MaritalStatusRepoImpl extends MaritalStatusRepo {
@@ -25,15 +24,6 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   }
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status""".query[MaritalStatusRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]]): Stream[ConnectionIO, MaritalStatusRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case MaritalStatusFieldValue.id(value) => fr""""id" = $value"""
-      } :_*
-    )
-    sql"select * from myschema.marital_status $where".query[MaritalStatusRow].stream
-  
   }
   override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
     sql"""select "id" from myschema.marital_status where "id" = $id""".query[MaritalStatusRow].option

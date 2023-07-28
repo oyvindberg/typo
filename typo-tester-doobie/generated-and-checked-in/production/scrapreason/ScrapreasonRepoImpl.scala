@@ -9,10 +9,8 @@ package scrapreason
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -56,17 +54,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
     sql"""select scrapreasonid, "name", modifieddate from production.scrapreason""".query[ScrapreasonRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]]): Stream[ConnectionIO, ScrapreasonRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ScrapreasonFieldValue.scrapreasonid(value) => fr"scrapreasonid = $value"
-        case ScrapreasonFieldValue.name(value) => fr""""name" = $value"""
-        case ScrapreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.scrapreason $where".query[ScrapreasonRow].stream
-  
-  }
   override def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]] = {
     sql"""select scrapreasonid, "name", modifieddate from production.scrapreason where scrapreasonid = $scrapreasonid""".query[ScrapreasonRow].option
   }
@@ -83,22 +70,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(scrapreasonid: ScrapreasonId, fieldValues: List[ScrapreasonFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ScrapreasonFieldValue.name(value) => fr""""name" = $value"""
-            case ScrapreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.scrapreason
-              $updates
-              where scrapreasonid = $scrapreasonid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)

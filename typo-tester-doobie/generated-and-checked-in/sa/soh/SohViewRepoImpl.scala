@@ -9,45 +9,10 @@ package soh
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SohViewRepoImpl extends SohViewRepo {
   override def selectAll: Stream[ConnectionIO, SohViewRow] = {
     sql"""select "id", salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate from sa.soh""".query[SohViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SohViewFieldOrIdValue[_]]): Stream[ConnectionIO, SohViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SohViewFieldValue.id(value) => fr""""id" = $value"""
-        case SohViewFieldValue.salesorderid(value) => fr"salesorderid = $value"
-        case SohViewFieldValue.revisionnumber(value) => fr"revisionnumber = $value"
-        case SohViewFieldValue.orderdate(value) => fr"orderdate = $value"
-        case SohViewFieldValue.duedate(value) => fr"duedate = $value"
-        case SohViewFieldValue.shipdate(value) => fr"shipdate = $value"
-        case SohViewFieldValue.status(value) => fr"status = $value"
-        case SohViewFieldValue.onlineorderflag(value) => fr"onlineorderflag = $value"
-        case SohViewFieldValue.purchaseordernumber(value) => fr"purchaseordernumber = $value"
-        case SohViewFieldValue.accountnumber(value) => fr"accountnumber = $value"
-        case SohViewFieldValue.customerid(value) => fr"customerid = $value"
-        case SohViewFieldValue.salespersonid(value) => fr"salespersonid = $value"
-        case SohViewFieldValue.territoryid(value) => fr"territoryid = $value"
-        case SohViewFieldValue.billtoaddressid(value) => fr"billtoaddressid = $value"
-        case SohViewFieldValue.shiptoaddressid(value) => fr"shiptoaddressid = $value"
-        case SohViewFieldValue.shipmethodid(value) => fr"shipmethodid = $value"
-        case SohViewFieldValue.creditcardid(value) => fr"creditcardid = $value"
-        case SohViewFieldValue.creditcardapprovalcode(value) => fr"creditcardapprovalcode = $value"
-        case SohViewFieldValue.currencyrateid(value) => fr"currencyrateid = $value"
-        case SohViewFieldValue.subtotal(value) => fr"subtotal = $value"
-        case SohViewFieldValue.taxamt(value) => fr"taxamt = $value"
-        case SohViewFieldValue.freight(value) => fr"freight = $value"
-        case SohViewFieldValue.totaldue(value) => fr"totaldue = $value"
-        case SohViewFieldValue.comment(value) => fr""""comment" = $value"""
-        case SohViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SohViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.soh $where".query[SohViewRow].stream
-  
   }
 }

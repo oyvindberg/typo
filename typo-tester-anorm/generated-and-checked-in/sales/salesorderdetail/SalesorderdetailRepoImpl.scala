@@ -76,35 +76,6 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           from sales.salesorderdetail
        """.as(SalesorderdetailRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[SalesorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderdetailRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalesorderdetailFieldValue.salesorderid(value) => NamedParameter("salesorderid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.salesorderdetailid(value) => NamedParameter("salesorderdetailid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.carriertrackingnumber(value) => NamedParameter("carriertrackingnumber", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.orderqty(value) => NamedParameter("orderqty", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.specialofferid(value) => NamedParameter("specialofferid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.unitprice(value) => NamedParameter("unitprice", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.unitpricediscount(value) => NamedParameter("unitpricediscount", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
-                    from sales.salesorderdetail
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SalesorderdetailRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: SalesorderdetailId)(implicit c: Connection): Option[SalesorderdetailRow] = {
     SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
           from sales.salesorderdetail
@@ -124,34 +95,6 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: SalesorderdetailId, fieldValues: List[SalesorderdetailFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalesorderdetailFieldValue.carriertrackingnumber(value) => NamedParameter("carriertrackingnumber", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.orderqty(value) => NamedParameter("orderqty", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.specialofferid(value) => NamedParameter("specialofferid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.unitprice(value) => NamedParameter("unitprice", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.unitpricediscount(value) => NamedParameter("unitpricediscount", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SalesorderdetailFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.salesorderdetail
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where salesorderid = {salesorderid} AND salesorderdetailid = {salesorderdetailid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("salesorderid", ParameterValue.from(compositeId.salesorderid)), NamedParameter("salesorderdetailid", ParameterValue.from(compositeId.salesorderdetailid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     SQL"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)

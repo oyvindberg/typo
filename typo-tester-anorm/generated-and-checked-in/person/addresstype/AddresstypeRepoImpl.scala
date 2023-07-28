@@ -69,29 +69,6 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           from person.addresstype
        """.as(AddresstypeRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]])(implicit c: Connection): List[AddresstypeRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case AddresstypeFieldValue.addresstypeid(value) => NamedParameter("addresstypeid", ParameterValue.from(value))
-          case AddresstypeFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case AddresstypeFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case AddresstypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select addresstypeid, "name", rowguid, modifieddate
-                    from person.addresstype
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(AddresstypeRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(addresstypeid: AddresstypeId)(implicit c: Connection): Option[AddresstypeRow] = {
     SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
@@ -117,29 +94,6 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where addresstypeid = $addresstypeid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(addresstypeid: AddresstypeId, fieldValues: List[AddresstypeFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case AddresstypeFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case AddresstypeFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case AddresstypeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.addresstype
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where addresstypeid = {addresstypeid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("addresstypeid", ParameterValue.from(addresstypeid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)

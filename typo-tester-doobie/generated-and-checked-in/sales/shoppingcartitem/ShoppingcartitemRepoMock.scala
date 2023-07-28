@@ -31,18 +31,6 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]]): Stream[ConnectionIO, ShoppingcartitemRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ShoppingcartitemFieldValue.shoppingcartitemid(value)) => acc.filter(_.shoppingcartitemid == value)
-        case (acc, ShoppingcartitemFieldValue.shoppingcartid(value)) => acc.filter(_.shoppingcartid == value)
-        case (acc, ShoppingcartitemFieldValue.quantity(value)) => acc.filter(_.quantity == value)
-        case (acc, ShoppingcartitemFieldValue.productid(value)) => acc.filter(_.productid == value)
-        case (acc, ShoppingcartitemFieldValue.datecreated(value)) => acc.filter(_.datecreated == value)
-        case (acc, ShoppingcartitemFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]] = {
     delay(map.get(shoppingcartitemid))
   }
@@ -56,27 +44,6 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
         case Some(_) =>
           map.put(row.shoppingcartitemid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(shoppingcartitemid: ShoppingcartitemId, fieldValues: List[ShoppingcartitemFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(shoppingcartitemid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ShoppingcartitemFieldValue.shoppingcartid(value)) => acc.copy(shoppingcartid = value)
-            case (acc, ShoppingcartitemFieldValue.quantity(value)) => acc.copy(quantity = value)
-            case (acc, ShoppingcartitemFieldValue.productid(value)) => acc.copy(productid = value)
-            case (acc, ShoppingcartitemFieldValue.datecreated(value)) => acc.copy(datecreated = value)
-            case (acc, ShoppingcartitemFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(shoppingcartitemid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

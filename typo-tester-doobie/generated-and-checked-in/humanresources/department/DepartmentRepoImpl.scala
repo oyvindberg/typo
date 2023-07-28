@@ -9,10 +9,8 @@ package department
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -57,18 +55,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
     sql"""select departmentid, "name", groupname, modifieddate from humanresources.department""".query[DepartmentRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]]): Stream[ConnectionIO, DepartmentRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case DepartmentFieldValue.departmentid(value) => fr"departmentid = $value"
-        case DepartmentFieldValue.name(value) => fr""""name" = $value"""
-        case DepartmentFieldValue.groupname(value) => fr"groupname = $value"
-        case DepartmentFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.department $where".query[DepartmentRow].stream
-  
-  }
   override def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]] = {
     sql"""select departmentid, "name", groupname, modifieddate from humanresources.department where departmentid = $departmentid""".query[DepartmentRow].option
   }
@@ -86,23 +72,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(departmentid: DepartmentId, fieldValues: List[DepartmentFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case DepartmentFieldValue.name(value) => fr""""name" = $value"""
-            case DepartmentFieldValue.groupname(value) => fr"groupname = $value"
-            case DepartmentFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update humanresources.department
-              $updates
-              where departmentid = $departmentid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)

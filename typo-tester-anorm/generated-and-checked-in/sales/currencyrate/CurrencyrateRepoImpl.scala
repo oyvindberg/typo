@@ -68,32 +68,6 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
           from sales.currencyrate
        """.as(CurrencyrateRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[CurrencyrateFieldOrIdValue[_]])(implicit c: Connection): List[CurrencyrateRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CurrencyrateFieldValue.currencyrateid(value) => NamedParameter("currencyrateid", ParameterValue.from(value))
-          case CurrencyrateFieldValue.currencyratedate(value) => NamedParameter("currencyratedate", ParameterValue.from(value))
-          case CurrencyrateFieldValue.fromcurrencycode(value) => NamedParameter("fromcurrencycode", ParameterValue.from(value))
-          case CurrencyrateFieldValue.tocurrencycode(value) => NamedParameter("tocurrencycode", ParameterValue.from(value))
-          case CurrencyrateFieldValue.averagerate(value) => NamedParameter("averagerate", ParameterValue.from(value))
-          case CurrencyrateFieldValue.endofdayrate(value) => NamedParameter("endofdayrate", ParameterValue.from(value))
-          case CurrencyrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
-                    from sales.currencyrate
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(CurrencyrateRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(currencyrateid: CurrencyrateId)(implicit c: Connection): Option[CurrencyrateRow] = {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sales.currencyrate
@@ -122,32 +96,6 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where currencyrateid = $currencyrateid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(currencyrateid: CurrencyrateId, fieldValues: List[CurrencyrateFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CurrencyrateFieldValue.currencyratedate(value) => NamedParameter("currencyratedate", ParameterValue.from(value))
-          case CurrencyrateFieldValue.fromcurrencycode(value) => NamedParameter("fromcurrencycode", ParameterValue.from(value))
-          case CurrencyrateFieldValue.tocurrencycode(value) => NamedParameter("tocurrencycode", ParameterValue.from(value))
-          case CurrencyrateFieldValue.averagerate(value) => NamedParameter("averagerate", ParameterValue.from(value))
-          case CurrencyrateFieldValue.endofdayrate(value) => NamedParameter("endofdayrate", ParameterValue.from(value))
-          case CurrencyrateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.currencyrate
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where currencyrateid = {currencyrateid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("currencyrateid", ParameterValue.from(currencyrateid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     SQL"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)

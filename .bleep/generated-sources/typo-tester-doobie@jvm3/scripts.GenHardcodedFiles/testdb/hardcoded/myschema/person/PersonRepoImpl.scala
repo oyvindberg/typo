@@ -9,10 +9,8 @@ package myschema
 package person
 
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Sector
@@ -69,25 +67,6 @@ object PersonRepoImpl extends PersonRepo {
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".query[PersonRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]]): Stream[ConnectionIO, PersonRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PersonFieldValue.id(value) => fr""""id" = $value"""
-        case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = $value"
-        case PersonFieldValue.name(value) => fr""""name" = $value"""
-        case PersonFieldValue.nickName(value) => fr"nick_name = $value"
-        case PersonFieldValue.blogUrl(value) => fr"blog_url = $value"
-        case PersonFieldValue.email(value) => fr"email = $value"
-        case PersonFieldValue.phone(value) => fr"phone = $value"
-        case PersonFieldValue.likesPizza(value) => fr"likes_pizza = $value"
-        case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = $value"
-        case PersonFieldValue.workEmail(value) => fr"work_email = $value"
-        case PersonFieldValue.sector(value) => fr"sector = $value"
-      } :_*
-    )
-    sql"select * from myschema.person $where".query[PersonRow].stream
-  
-  }
   override def selectById(id: PersonId): ConnectionIO[Option[PersonRow]] = {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = $id""".query[PersonRow].option
   }
@@ -112,30 +91,6 @@ object PersonRepoImpl extends PersonRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = $value"
-            case PersonFieldValue.name(value) => fr""""name" = $value"""
-            case PersonFieldValue.nickName(value) => fr"nick_name = $value"
-            case PersonFieldValue.blogUrl(value) => fr"blog_url = $value"
-            case PersonFieldValue.email(value) => fr"email = $value"
-            case PersonFieldValue.phone(value) => fr"phone = $value"
-            case PersonFieldValue.likesPizza(value) => fr"likes_pizza = $value"
-            case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = $value"
-            case PersonFieldValue.workEmail(value) => fr"work_email = $value"
-            case PersonFieldValue.sector(value) => fr"sector = $value"
-          } :_*
-        )
-        sql"""update myschema.person
-              $updates
-              where "id" = $id
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)

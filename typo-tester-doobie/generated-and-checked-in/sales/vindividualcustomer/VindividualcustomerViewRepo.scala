@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait VindividualcustomerViewRepo {
   def selectAll: Stream[ConnectionIO, VindividualcustomerViewRow]
-  def selectByFieldValues(fieldValues: List[VindividualcustomerViewFieldOrIdValue[_]]): Stream[ConnectionIO, VindividualcustomerViewRow]
 }

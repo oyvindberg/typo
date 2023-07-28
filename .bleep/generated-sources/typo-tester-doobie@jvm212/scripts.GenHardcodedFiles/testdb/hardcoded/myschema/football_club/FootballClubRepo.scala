@@ -15,10 +15,8 @@ trait FootballClubRepo {
   def delete(id: FootballClubId): ConnectionIO[Boolean]
   def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
   def selectAll: Stream[ConnectionIO, FootballClubRow]
-  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]]): Stream[ConnectionIO, FootballClubRow]
   def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow]
   def update(row: FootballClubRow): ConnectionIO[Boolean]
-  def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
 }

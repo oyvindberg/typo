@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package sr
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,28 +15,5 @@ object SrViewRepoImpl extends SrViewRepo {
     SQL"""select "id", scrapreasonid, "name", modifieddate
           from pr.sr
        """.as(SrViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SrViewFieldOrIdValue[_]])(implicit c: Connection): List[SrViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SrViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SrViewFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
-          case SrViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SrViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", scrapreasonid, "name", modifieddate
-                    from pr.sr
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SrViewRow.rowParser(1).*)
-    }
-  
   }
 }

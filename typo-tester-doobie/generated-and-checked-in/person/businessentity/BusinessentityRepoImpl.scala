@@ -9,10 +9,8 @@ package businessentity
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -60,17 +58,6 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
     sql"select businessentityid, rowguid, modifieddate from person.businessentity".query[BusinessentityRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[BusinessentityFieldOrIdValue[_]]): Stream[ConnectionIO, BusinessentityRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case BusinessentityFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case BusinessentityFieldValue.rowguid(value) => fr"rowguid = $value"
-        case BusinessentityFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.businessentity $where".query[BusinessentityRow].stream
-  
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[BusinessentityRow]] = {
     sql"select businessentityid, rowguid, modifieddate from person.businessentity where businessentityid = $businessentityid".query[BusinessentityRow].option
   }
@@ -87,22 +74,6 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[BusinessentityFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case BusinessentityFieldValue.rowguid(value) => fr"rowguid = $value"
-            case BusinessentityFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.businessentity
-              $updates
-              where businessentityid = $businessentityid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity(businessentityid, rowguid, modifieddate)

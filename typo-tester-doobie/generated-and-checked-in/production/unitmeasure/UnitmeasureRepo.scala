@@ -15,10 +15,8 @@ trait UnitmeasureRepo {
   def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]
   def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow]
   def selectAll: Stream[ConnectionIO, UnitmeasureRow]
-  def selectByFieldValues(fieldValues: List[UnitmeasureFieldOrIdValue[_]]): Stream[ConnectionIO, UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]]
   def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow]
   def update(row: UnitmeasureRow): ConnectionIO[Boolean]
-  def updateFieldValues(unitmeasurecode: UnitmeasureId, fieldValues: List[UnitmeasureFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]
 }

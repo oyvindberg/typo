@@ -9,29 +9,10 @@ package sp
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SpViewRepoImpl extends SpViewRepo {
   override def selectAll: Stream[ConnectionIO, SpViewRow] = {
     sql"""select "id", businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sa.sp""".query[SpViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SpViewFieldOrIdValue[_]]): Stream[ConnectionIO, SpViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SpViewFieldValue.id(value) => fr""""id" = $value"""
-        case SpViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case SpViewFieldValue.territoryid(value) => fr"territoryid = $value"
-        case SpViewFieldValue.salesquota(value) => fr"salesquota = $value"
-        case SpViewFieldValue.bonus(value) => fr"bonus = $value"
-        case SpViewFieldValue.commissionpct(value) => fr"commissionpct = $value"
-        case SpViewFieldValue.salesytd(value) => fr"salesytd = $value"
-        case SpViewFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
-        case SpViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SpViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.sp $where".query[SpViewRow].stream
-  
   }
 }

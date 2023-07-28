@@ -9,23 +9,10 @@ package pdoc
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PdocViewRepoImpl extends PdocViewRepo {
   override def selectAll: Stream[ConnectionIO, PdocViewRow] = {
     sql"""select "id", productid, modifieddate, documentnode from pr.pdoc""".query[PdocViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PdocViewFieldOrIdValue[_]]): Stream[ConnectionIO, PdocViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PdocViewFieldValue.id(value) => fr""""id" = $value"""
-        case PdocViewFieldValue.productid(value) => fr"productid = $value"
-        case PdocViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-        case PdocViewFieldValue.documentnode(value) => fr"documentnode = $value"
-      } :_*
-    )
-    sql"select * from pr.pdoc $where".query[PdocViewRow].stream
-  
   }
 }

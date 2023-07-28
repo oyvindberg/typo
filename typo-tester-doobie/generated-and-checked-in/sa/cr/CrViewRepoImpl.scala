@@ -9,26 +9,10 @@ package cr
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object CrViewRepoImpl extends CrViewRepo {
   override def selectAll: Stream[ConnectionIO, CrViewRow] = {
     sql"select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate from sa.cr".query[CrViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[CrViewFieldOrIdValue[_]]): Stream[ConnectionIO, CrViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CrViewFieldValue.currencyrateid(value) => fr"currencyrateid = $value"
-        case CrViewFieldValue.currencyratedate(value) => fr"currencyratedate = $value"
-        case CrViewFieldValue.fromcurrencycode(value) => fr"fromcurrencycode = $value"
-        case CrViewFieldValue.tocurrencycode(value) => fr"tocurrencycode = $value"
-        case CrViewFieldValue.averagerate(value) => fr"averagerate = $value"
-        case CrViewFieldValue.endofdayrate(value) => fr"endofdayrate = $value"
-        case CrViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.cr $where".query[CrViewRow].stream
-  
   }
 }

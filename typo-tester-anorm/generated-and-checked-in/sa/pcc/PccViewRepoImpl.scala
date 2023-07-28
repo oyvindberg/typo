@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package pcc
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,28 +15,5 @@ object PccViewRepoImpl extends PccViewRepo {
     SQL"""select "id", businessentityid, creditcardid, modifieddate
           from sa.pcc
        """.as(PccViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PccViewFieldOrIdValue[_]])(implicit c: Connection): List[PccViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PccViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PccViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PccViewFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
-          case PccViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, creditcardid, modifieddate
-                    from sa.pcc
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PccViewRow.rowParser(1).*)
-    }
-  
   }
 }

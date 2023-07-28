@@ -28,13 +28,6 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]]): Stream[ConnectionIO, MaritalStatusRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, MaritalStatusFieldValue.id(value)) => acc.filter(_.id == value)
-      }.toList
-    }
-  }
   override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
     delay(map.get(id))
   }

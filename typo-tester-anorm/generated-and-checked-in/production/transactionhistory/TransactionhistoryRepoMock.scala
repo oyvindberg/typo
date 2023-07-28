@@ -27,19 +27,6 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
   override def selectAll(implicit c: Connection): List[TransactionhistoryRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, TransactionhistoryFieldValue.transactionid(value)) => acc.filter(_.transactionid == value)
-      case (acc, TransactionhistoryFieldValue.productid(value)) => acc.filter(_.productid == value)
-      case (acc, TransactionhistoryFieldValue.referenceorderid(value)) => acc.filter(_.referenceorderid == value)
-      case (acc, TransactionhistoryFieldValue.referenceorderlineid(value)) => acc.filter(_.referenceorderlineid == value)
-      case (acc, TransactionhistoryFieldValue.transactiondate(value)) => acc.filter(_.transactiondate == value)
-      case (acc, TransactionhistoryFieldValue.transactiontype(value)) => acc.filter(_.transactiontype == value)
-      case (acc, TransactionhistoryFieldValue.quantity(value)) => acc.filter(_.quantity == value)
-      case (acc, TransactionhistoryFieldValue.actualcost(value)) => acc.filter(_.actualcost == value)
-      case (acc, TransactionhistoryFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
     map.get(transactionid)
   }
@@ -52,28 +39,6 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
       case Some(_) =>
         map.put(row.transactionid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(transactionid: TransactionhistoryId, fieldValues: List[TransactionhistoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(transactionid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, TransactionhistoryFieldValue.productid(value)) => acc.copy(productid = value)
-          case (acc, TransactionhistoryFieldValue.referenceorderid(value)) => acc.copy(referenceorderid = value)
-          case (acc, TransactionhistoryFieldValue.referenceorderlineid(value)) => acc.copy(referenceorderlineid = value)
-          case (acc, TransactionhistoryFieldValue.transactiondate(value)) => acc.copy(transactiondate = value)
-          case (acc, TransactionhistoryFieldValue.transactiontype(value)) => acc.copy(transactiontype = value)
-          case (acc, TransactionhistoryFieldValue.quantity(value)) => acc.copy(quantity = value)
-          case (acc, TransactionhistoryFieldValue.actualcost(value)) => acc.copy(actualcost = value)
-          case (acc, TransactionhistoryFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(transactionid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

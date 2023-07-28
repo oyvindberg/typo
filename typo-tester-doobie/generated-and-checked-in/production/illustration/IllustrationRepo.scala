@@ -15,10 +15,8 @@ trait IllustrationRepo {
   def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
   def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow]
   def selectAll: Stream[ConnectionIO, IllustrationRow]
-  def selectByFieldValues(fieldValues: List[IllustrationFieldOrIdValue[_]]): Stream[ConnectionIO, IllustrationRow]
   def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]]
   def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow]
   def update(row: IllustrationRow): ConnectionIO[Boolean]
-  def updateFieldValues(illustrationid: IllustrationId, fieldValues: List[IllustrationFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
 }

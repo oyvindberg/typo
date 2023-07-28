@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait PodViewRepo {
   def selectAll(implicit c: Connection): List[PodViewRow]
-  def selectByFieldValues(fieldValues: List[PodViewFieldOrIdValue[_]])(implicit c: Connection): List[PodViewRow]
 }

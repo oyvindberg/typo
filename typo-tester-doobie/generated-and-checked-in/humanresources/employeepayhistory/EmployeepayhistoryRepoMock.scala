@@ -31,17 +31,6 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]]): Stream[ConnectionIO, EmployeepayhistoryRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, EmployeepayhistoryFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, EmployeepayhistoryFieldValue.ratechangedate(value)) => acc.filter(_.ratechangedate == value)
-        case (acc, EmployeepayhistoryFieldValue.rate(value)) => acc.filter(_.rate == value)
-        case (acc, EmployeepayhistoryFieldValue.payfrequency(value)) => acc.filter(_.payfrequency == value)
-        case (acc, EmployeepayhistoryFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
     delay(map.get(compositeId))
   }
@@ -52,25 +41,6 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: EmployeepayhistoryId, fieldValues: List[EmployeepayhistoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, EmployeepayhistoryFieldValue.rate(value)) => acc.copy(rate = value)
-            case (acc, EmployeepayhistoryFieldValue.payfrequency(value)) => acc.copy(payfrequency = value)
-            case (acc, EmployeepayhistoryFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }
