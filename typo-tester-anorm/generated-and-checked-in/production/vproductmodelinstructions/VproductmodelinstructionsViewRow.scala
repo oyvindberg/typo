@@ -41,21 +41,21 @@ case class VproductmodelinstructionsViewRow(
 )
 
 object VproductmodelinstructionsViewRow {
-  val rowParser: RowParser[VproductmodelinstructionsViewRow] =
+  def rowParser(idx: Int): RowParser[VproductmodelinstructionsViewRow] =
     RowParser[VproductmodelinstructionsViewRow] { row =>
       Success(
         VproductmodelinstructionsViewRow(
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          name = row[Option[Name]]("name"),
-          instructions = row[Option[TypoXml]]("instructions"),
-          LocationID = row[Option[Int]]("LocationID"),
-          SetupHours = row[Option[BigDecimal]]("SetupHours"),
-          MachineHours = row[Option[BigDecimal]]("MachineHours"),
-          LaborHours = row[Option[BigDecimal]]("LaborHours"),
-          LotSize = row[Option[Int]]("LotSize"),
-          Step = row[Option[/* max 1024 chars */ String]]("Step"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          productmodelid = row[Option[ProductmodelId]](idx + 0),
+          name = row[Option[Name]](idx + 1),
+          instructions = row[Option[TypoXml]](idx + 2),
+          LocationID = row[Option[Int]](idx + 3),
+          SetupHours = row[Option[BigDecimal]](idx + 4),
+          MachineHours = row[Option[BigDecimal]](idx + 5),
+          LaborHours = row[Option[BigDecimal]](idx + 6),
+          LotSize = row[Option[Int]](idx + 7),
+          Step = row[Option[/* max 1024 chars */ String]](idx + 8),
+          rowguid = row[Option[UUID]](idx + 9),
+          modifieddate = row[Option[LocalDateTime]](idx + 10)
         )
       )
     }

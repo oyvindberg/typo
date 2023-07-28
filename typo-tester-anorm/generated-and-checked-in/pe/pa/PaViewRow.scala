@@ -34,16 +34,16 @@ case class PaViewRow(
 )
 
 object PaViewRow {
-  val rowParser: RowParser[PaViewRow] =
+  def rowParser(idx: Int): RowParser[PaViewRow] =
     RowParser[PaViewRow] { row =>
       Success(
         PaViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          passwordhash = row[Option[/* max 128 chars */ String]]("passwordhash"),
-          passwordsalt = row[Option[/* max 10 chars */ String]]("passwordsalt"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          passwordhash = row[Option[/* max 128 chars */ String]](idx + 2),
+          passwordsalt = row[Option[/* max 10 chars */ String]](idx + 3),
+          rowguid = row[Option[UUID]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

@@ -16,7 +16,7 @@ object EViewRepoImpl extends EViewRepo {
   override def selectAll(implicit c: Connection): List[EViewRow] = {
     SQL"""select "id", businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
           from pe.e
-       """.as(EViewRow.rowParser.*)
+       """.as(EViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[EViewFieldOrIdValue[_]])(implicit c: Connection): List[EViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object EViewRepoImpl extends EViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EViewRow.rowParser.*)
+          .as(EViewRow.rowParser(1).*)
     }
   
   }

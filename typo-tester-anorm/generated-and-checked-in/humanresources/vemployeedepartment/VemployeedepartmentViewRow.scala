@@ -42,20 +42,20 @@ case class VemployeedepartmentViewRow(
 )
 
 object VemployeedepartmentViewRow {
-  val rowParser: RowParser[VemployeedepartmentViewRow] =
+  def rowParser(idx: Int): RowParser[VemployeedepartmentViewRow] =
     RowParser[VemployeedepartmentViewRow] { row =>
       Success(
         VemployeedepartmentViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          jobtitle = row[Option[/* max 50 chars */ String]]("jobtitle"),
-          department = row[Option[Name]]("department"),
-          groupname = row[Option[Name]]("groupname"),
-          startdate = row[Option[LocalDate]]("startdate")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          title = row[Option[/* max 8 chars */ String]](idx + 1),
+          firstname = row[Option[Name]](idx + 2),
+          middlename = row[Option[Name]](idx + 3),
+          lastname = row[Option[Name]](idx + 4),
+          suffix = row[Option[/* max 10 chars */ String]](idx + 5),
+          jobtitle = row[Option[/* max 50 chars */ String]](idx + 6),
+          department = row[Option[Name]](idx + 7),
+          groupname = row[Option[Name]](idx + 8),
+          startdate = row[Option[LocalDate]](idx + 9)
         )
       )
     }

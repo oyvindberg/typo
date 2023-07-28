@@ -50,22 +50,22 @@ case class WorkorderroutingRow(
  }
 
 object WorkorderroutingRow {
-  val rowParser: RowParser[WorkorderroutingRow] =
+  def rowParser(idx: Int): RowParser[WorkorderroutingRow] =
     RowParser[WorkorderroutingRow] { row =>
       Success(
         WorkorderroutingRow(
-          workorderid = row[WorkorderId]("workorderid"),
-          productid = row[Int]("productid"),
-          operationsequence = row[Int]("operationsequence"),
-          locationid = row[LocationId]("locationid"),
-          scheduledstartdate = row[LocalDateTime]("scheduledstartdate"),
-          scheduledenddate = row[LocalDateTime]("scheduledenddate"),
-          actualstartdate = row[Option[LocalDateTime]]("actualstartdate"),
-          actualenddate = row[Option[LocalDateTime]]("actualenddate"),
-          actualresourcehrs = row[Option[BigDecimal]]("actualresourcehrs"),
-          plannedcost = row[BigDecimal]("plannedcost"),
-          actualcost = row[Option[BigDecimal]]("actualcost"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          workorderid = row[WorkorderId](idx + 0),
+          productid = row[Int](idx + 1),
+          operationsequence = row[Int](idx + 2),
+          locationid = row[LocationId](idx + 3),
+          scheduledstartdate = row[LocalDateTime](idx + 4),
+          scheduledenddate = row[LocalDateTime](idx + 5),
+          actualstartdate = row[Option[LocalDateTime]](idx + 6),
+          actualenddate = row[Option[LocalDateTime]](idx + 7),
+          actualresourcehrs = row[Option[BigDecimal]](idx + 8),
+          plannedcost = row[BigDecimal](idx + 9),
+          actualcost = row[Option[BigDecimal]](idx + 10),
+          modifieddate = row[LocalDateTime](idx + 11)
         )
       )
     }

@@ -16,7 +16,7 @@ object VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRe
   override def selectAll(implicit c: Connection): List[VjobcandidateemploymentViewRow] = {
     SQL"""select jobcandidateid, "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City"
           from humanresources.vjobcandidateemployment
-       """.as(VjobcandidateemploymentViewRow.rowParser.*)
+       """.as(VjobcandidateemploymentViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VjobcandidateemploymentViewFieldOrIdValue[_]])(implicit c: Connection): List[VjobcandidateemploymentViewRow] = {
     fieldValues match {
@@ -44,7 +44,7 @@ object VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRe
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VjobcandidateemploymentViewRow.rowParser.*)
+          .as(VjobcandidateemploymentViewRow.rowParser(1).*)
     }
   
   }

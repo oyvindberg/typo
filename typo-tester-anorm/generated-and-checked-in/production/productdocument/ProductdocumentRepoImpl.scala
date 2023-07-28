@@ -24,7 +24,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           values (${unsaved.productid}::int4, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
           returning productid, modifieddate, documentnode
        """
-      .executeInsert(ProductdocumentRow.rowParser.single)
+      .executeInsert(ProductdocumentRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow = {
@@ -44,7 +44,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
       SQL"""insert into production.productdocument default values
             returning productid, modifieddate, documentnode
          """
-        .executeInsert(ProductdocumentRow.rowParser.single)
+        .executeInsert(ProductdocumentRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productdocument(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -54,14 +54,14 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ProductdocumentRow.rowParser.single)
+        .executeInsert(ProductdocumentRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
     SQL"""select productid, modifieddate, documentnode
           from production.productdocument
-       """.as(ProductdocumentRow.rowParser.*)
+       """.as(ProductdocumentRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]])(implicit c: Connection): List[ProductdocumentRow] = {
     fieldValues match {
@@ -81,7 +81,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductdocumentRow.rowParser.*)
+          .as(ProductdocumentRow.rowParser(1).*)
     }
   
   }
@@ -89,7 +89,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     SQL"""select productid, modifieddate, documentnode
           from production.productdocument
           where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
-       """.as(ProductdocumentRow.rowParser.singleOpt)
+       """.as(ProductdocumentRow.rowParser(1).singleOpt)
   }
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -131,7 +131,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productid, modifieddate, documentnode
        """
-      .executeInsert(ProductdocumentRow.rowParser.single)
+      .executeInsert(ProductdocumentRow.rowParser(1).single)
   
   }
 }

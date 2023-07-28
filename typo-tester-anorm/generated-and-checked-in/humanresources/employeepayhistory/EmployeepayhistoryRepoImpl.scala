@@ -23,7 +23,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.ratechangedate}::timestamp, ${unsaved.rate}::numeric, ${unsaved.payfrequency}::int2, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
        """
-      .executeInsert(EmployeepayhistoryRow.rowParser.single)
+      .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
   
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow = {
@@ -42,7 +42,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       SQL"""insert into humanresources.employeepayhistory default values
             returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
          """
-        .executeInsert(EmployeepayhistoryRow.rowParser.single)
+        .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.employeepayhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -52,14 +52,14 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(EmployeepayhistoryRow.rowParser.single)
+        .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
     SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate
           from humanresources.employeepayhistory
-       """.as(EmployeepayhistoryRow.rowParser.*)
+       """.as(EmployeepayhistoryRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeepayhistoryRow] = {
     fieldValues match {
@@ -81,7 +81,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EmployeepayhistoryRow.rowParser.*)
+          .as(EmployeepayhistoryRow.rowParser(1).*)
     }
   
   }
@@ -89,7 +89,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     SQL"""select businessentityid, ratechangedate, rate, payfrequency, modifieddate
           from humanresources.employeepayhistory
           where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
-       """.as(EmployeepayhistoryRow.rowParser.singleOpt)
+       """.as(EmployeepayhistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -139,7 +139,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, ratechangedate, rate, payfrequency, modifieddate
        """
-      .executeInsert(EmployeepayhistoryRow.rowParser.single)
+      .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
   
   }
 }

@@ -37,16 +37,16 @@ case class StoreRow(
 )
 
 object StoreRow {
-  val rowParser: RowParser[StoreRow] =
+  def rowParser(idx: Int): RowParser[StoreRow] =
     RowParser[StoreRow] { row =>
       Success(
         StoreRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          name = row[Name]("name"),
-          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          name = row[Name](idx + 1),
+          salespersonid = row[Option[BusinessentityId]](idx + 2),
+          demographics = row[Option[TypoXml]](idx + 3),
+          rowguid = row[UUID](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

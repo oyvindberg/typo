@@ -23,12 +23,12 @@ case class FootballClubRow(
 )
 
 object FootballClubRow {
-  val rowParser: RowParser[FootballClubRow] =
+  def rowParser(idx: Int): RowParser[FootballClubRow] =
     RowParser[FootballClubRow] { row =>
       Success(
         FootballClubRow(
-          id = row[FootballClubId]("id"),
-          name = row[/* max 100 chars */ String]("name")
+          id = row[FootballClubId](idx + 0),
+          name = row[/* max 100 chars */ String](idx + 1)
         )
       )
     }

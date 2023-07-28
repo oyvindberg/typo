@@ -32,13 +32,13 @@ case class CountryregioncurrencyRow(
  }
 
 object CountryregioncurrencyRow {
-  val rowParser: RowParser[CountryregioncurrencyRow] =
+  def rowParser(idx: Int): RowParser[CountryregioncurrencyRow] =
     RowParser[CountryregioncurrencyRow] { row =>
       Success(
         CountryregioncurrencyRow(
-          countryregioncode = row[CountryregionId]("countryregioncode"),
-          currencycode = row[CurrencyId]("currencycode"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          countryregioncode = row[CountryregionId](idx + 0),
+          currencycode = row[CurrencyId](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

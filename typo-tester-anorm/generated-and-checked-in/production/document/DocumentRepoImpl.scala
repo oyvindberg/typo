@@ -27,7 +27,7 @@ object DocumentRepoImpl extends DocumentRepo {
           values (${unsaved.title}, ${unsaved.owner}::int4, ${unsaved.folderflag}::"public"."Flag", ${unsaved.filename}, ${unsaved.fileextension}, ${unsaved.revision}::bpchar, ${unsaved.changenumber}::int4, ${unsaved.status}::int2, ${unsaved.documentsummary}, ${unsaved.document}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
        """
-      .executeInsert(DocumentRow.rowParser.single)
+      .executeInsert(DocumentRow.rowParser(1).single)
   
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
@@ -66,7 +66,7 @@ object DocumentRepoImpl extends DocumentRepo {
       SQL"""insert into production."document" default values
             returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
          """
-        .executeInsert(DocumentRow.rowParser.single)
+        .executeInsert(DocumentRow.rowParser(1).single)
     } else {
       val q = s"""insert into production."document"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -76,14 +76,14 @@ object DocumentRepoImpl extends DocumentRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(DocumentRow.rowParser.single)
+        .executeInsert(DocumentRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
           from production."document"
-       """.as(DocumentRow.rowParser.*)
+       """.as(DocumentRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]])(implicit c: Connection): List[DocumentRow] = {
     fieldValues match {
@@ -113,7 +113,7 @@ object DocumentRepoImpl extends DocumentRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(DocumentRow.rowParser.*)
+          .as(DocumentRow.rowParser(1).*)
     }
   
   }
@@ -121,7 +121,7 @@ object DocumentRepoImpl extends DocumentRepo {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
           from production."document"
           where documentnode = $documentnode
-       """.as(DocumentRow.rowParser.singleOpt)
+       """.as(DocumentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow] = {
     implicit val toStatement: ToStatement[Array[DocumentId]] =
@@ -131,7 +131,7 @@ object DocumentRepoImpl extends DocumentRepo {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
           from production."document"
           where documentnode = ANY($documentnodes)
-       """.as(DocumentRow.rowParser.*)
+       """.as(DocumentRow.rowParser(1).*)
   
   }
   override def selectByUnique(rowguid: UUID)(implicit c: Connection): Option[DocumentRow] = {
@@ -220,7 +220,7 @@ object DocumentRepoImpl extends DocumentRepo {
             modifieddate = EXCLUDED.modifieddate
           returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode
        """
-      .executeInsert(DocumentRow.rowParser.single)
+      .executeInsert(DocumentRow.rowParser(1).single)
   
   }
 }

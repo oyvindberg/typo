@@ -42,26 +42,26 @@ case class VjobcandidateViewRow(
 )
 
 object VjobcandidateViewRow {
-  val rowParser: RowParser[VjobcandidateViewRow] =
+  def rowParser(idx: Int): RowParser[VjobcandidateViewRow] =
     RowParser[VjobcandidateViewRow] { row =>
       Success(
         VjobcandidateViewRow(
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          `Name.Prefix` = row[Option[/* max 30 chars */ String]]("Name.Prefix"),
-          `Name.First` = row[Option[/* max 30 chars */ String]]("Name.First"),
-          `Name.Middle` = row[Option[/* max 30 chars */ String]]("Name.Middle"),
-          `Name.Last` = row[Option[/* max 30 chars */ String]]("Name.Last"),
-          `Name.Suffix` = row[Option[/* max 30 chars */ String]]("Name.Suffix"),
-          Skills = row[Option[String]]("Skills"),
-          `Addr.Type` = row[Option[/* max 30 chars */ String]]("Addr.Type"),
-          `Addr.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]]("Addr.Loc.CountryRegion"),
-          `Addr.Loc.State` = row[Option[/* max 100 chars */ String]]("Addr.Loc.State"),
-          `Addr.Loc.City` = row[Option[/* max 100 chars */ String]]("Addr.Loc.City"),
-          `Addr.PostalCode` = row[Option[/* max 20 chars */ String]]("Addr.PostalCode"),
-          EMail = row[Option[String]]("EMail"),
-          WebSite = row[Option[String]]("WebSite"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          jobcandidateid = row[Option[JobcandidateId]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          `Name.Prefix` = row[Option[/* max 30 chars */ String]](idx + 2),
+          `Name.First` = row[Option[/* max 30 chars */ String]](idx + 3),
+          `Name.Middle` = row[Option[/* max 30 chars */ String]](idx + 4),
+          `Name.Last` = row[Option[/* max 30 chars */ String]](idx + 5),
+          `Name.Suffix` = row[Option[/* max 30 chars */ String]](idx + 6),
+          Skills = row[Option[String]](idx + 7),
+          `Addr.Type` = row[Option[/* max 30 chars */ String]](idx + 8),
+          `Addr.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]](idx + 9),
+          `Addr.Loc.State` = row[Option[/* max 100 chars */ String]](idx + 10),
+          `Addr.Loc.City` = row[Option[/* max 100 chars */ String]](idx + 11),
+          `Addr.PostalCode` = row[Option[/* max 20 chars */ String]](idx + 12),
+          EMail = row[Option[String]](idx + 13),
+          WebSite = row[Option[String]](idx + 14),
+          modifieddate = row[Option[LocalDateTime]](idx + 15)
         )
       )
     }

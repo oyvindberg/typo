@@ -16,7 +16,7 @@ object VsalespersonsalesbyfiscalyearsViewRepoImpl extends Vsalespersonsalesbyfis
   override def selectAll(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsViewRow] = {
     SQL"""select SalesPersonID, FullName, JobTitle, SalesTerritory, 2012, 2013, 2014
           from sales.vsalespersonsalesbyfiscalyears
-       """.as(VsalespersonsalesbyfiscalyearsViewRow.rowParser.*)
+       """.as(VsalespersonsalesbyfiscalyearsViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VsalespersonsalesbyfiscalyearsViewFieldOrIdValue[_]])(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsViewRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object VsalespersonsalesbyfiscalyearsViewRepoImpl extends Vsalespersonsalesbyfis
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VsalespersonsalesbyfiscalyearsViewRow.rowParser.*)
+          .as(VsalespersonsalesbyfiscalyearsViewRow.rowParser(1).*)
     }
   
   }

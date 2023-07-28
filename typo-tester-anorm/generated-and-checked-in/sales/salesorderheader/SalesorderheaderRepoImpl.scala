@@ -27,7 +27,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           values (${unsaved.salesorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.orderdate}::timestamp, ${unsaved.duedate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.status}::int2, ${unsaved.onlineorderflag}::"public"."Flag", ${unsaved.purchaseordernumber}::"public".OrderNumber, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.customerid}::int4, ${unsaved.salespersonid}::int4, ${unsaved.territoryid}::int4, ${unsaved.billtoaddressid}::int4, ${unsaved.shiptoaddressid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.creditcardapprovalcode}, ${unsaved.currencyrateid}::int4, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.totaldue}::numeric, ${unsaved.comment}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
        """
-      .executeInsert(SalesorderheaderRow.rowParser.single)
+      .executeInsert(SalesorderheaderRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
@@ -93,7 +93,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       SQL"""insert into sales.salesorderheader default values
             returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
          """
-        .executeInsert(SalesorderheaderRow.rowParser.single)
+        .executeInsert(SalesorderheaderRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesorderheader(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -103,14 +103,14 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SalesorderheaderRow.rowParser.single)
+        .executeInsert(SalesorderheaderRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
           from sales.salesorderheader
-       """.as(SalesorderheaderRow.rowParser.*)
+       """.as(SalesorderheaderRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SalesorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderheaderRow] = {
     fieldValues match {
@@ -152,7 +152,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesorderheaderRow.rowParser.*)
+          .as(SalesorderheaderRow.rowParser(1).*)
     }
   
   }
@@ -160,7 +160,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
           from sales.salesorderheader
           where salesorderid = $salesorderid
-       """.as(SalesorderheaderRow.rowParser.singleOpt)
+       """.as(SalesorderheaderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow] = {
     implicit val toStatement: ToStatement[Array[SalesorderheaderId]] =
@@ -170,7 +170,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     SQL"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
           from sales.salesorderheader
           where salesorderid = ANY($salesorderids)
-       """.as(SalesorderheaderRow.rowParser.*)
+       """.as(SalesorderheaderRow.rowParser(1).*)
   
   }
   override def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean = {
@@ -304,7 +304,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
             modifieddate = EXCLUDED.modifieddate
           returning salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate
        """
-      .executeInsert(SalesorderheaderRow.rowParser.single)
+      .executeInsert(SalesorderheaderRow.rowParser(1).single)
   
   }
 }

@@ -16,7 +16,7 @@ object PcViewRepoImpl extends PcViewRepo {
   override def selectAll(implicit c: Connection): List[PcViewRow] = {
     SQL"""select "id", productcategoryid, "name", rowguid, modifieddate
           from pr.pc
-       """.as(PcViewRow.rowParser.*)
+       """.as(PcViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PcViewFieldOrIdValue[_]])(implicit c: Connection): List[PcViewRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PcViewRepoImpl extends PcViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PcViewRow.rowParser.*)
+          .as(PcViewRow.rowParser(1).*)
     }
   
   }

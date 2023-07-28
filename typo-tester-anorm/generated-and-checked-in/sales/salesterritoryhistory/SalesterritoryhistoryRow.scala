@@ -38,16 +38,16 @@ case class SalesterritoryhistoryRow(
  }
 
 object SalesterritoryhistoryRow {
-  val rowParser: RowParser[SalesterritoryhistoryRow] =
+  def rowParser(idx: Int): RowParser[SalesterritoryhistoryRow] =
     RowParser[SalesterritoryhistoryRow] { row =>
       Success(
         SalesterritoryhistoryRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          territoryid = row[SalesterritoryId]("territoryid"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          territoryid = row[SalesterritoryId](idx + 1),
+          startdate = row[LocalDateTime](idx + 2),
+          enddate = row[Option[LocalDateTime]](idx + 3),
+          rowguid = row[UUID](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

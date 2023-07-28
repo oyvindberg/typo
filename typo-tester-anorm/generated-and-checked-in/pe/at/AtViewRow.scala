@@ -33,15 +33,15 @@ case class AtViewRow(
 )
 
 object AtViewRow {
-  val rowParser: RowParser[AtViewRow] =
+  def rowParser(idx: Int): RowParser[AtViewRow] =
     RowParser[AtViewRow] { row =>
       Success(
         AtViewRow(
-          id = row[Option[Int]]("id"),
-          addresstypeid = row[Option[AddresstypeId]]("addresstypeid"),
-          name = row[Option[Name]]("name"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          addresstypeid = row[Option[AddresstypeId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          rowguid = row[Option[UUID]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

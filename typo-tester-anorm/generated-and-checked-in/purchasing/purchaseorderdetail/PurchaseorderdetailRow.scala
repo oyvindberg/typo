@@ -44,19 +44,19 @@ case class PurchaseorderdetailRow(
  }
 
 object PurchaseorderdetailRow {
-  val rowParser: RowParser[PurchaseorderdetailRow] =
+  def rowParser(idx: Int): RowParser[PurchaseorderdetailRow] =
     RowParser[PurchaseorderdetailRow] { row =>
       Success(
         PurchaseorderdetailRow(
-          purchaseorderid = row[PurchaseorderheaderId]("purchaseorderid"),
-          purchaseorderdetailid = row[Int]("purchaseorderdetailid"),
-          duedate = row[LocalDateTime]("duedate"),
-          orderqty = row[Int]("orderqty"),
-          productid = row[ProductId]("productid"),
-          unitprice = row[BigDecimal]("unitprice"),
-          receivedqty = row[BigDecimal]("receivedqty"),
-          rejectedqty = row[BigDecimal]("rejectedqty"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          purchaseorderid = row[PurchaseorderheaderId](idx + 0),
+          purchaseorderdetailid = row[Int](idx + 1),
+          duedate = row[LocalDateTime](idx + 2),
+          orderqty = row[Int](idx + 3),
+          productid = row[ProductId](idx + 4),
+          unitprice = row[BigDecimal](idx + 5),
+          receivedqty = row[BigDecimal](idx + 6),
+          rejectedqty = row[BigDecimal](idx + 7),
+          modifieddate = row[LocalDateTime](idx + 8)
         )
       )
     }

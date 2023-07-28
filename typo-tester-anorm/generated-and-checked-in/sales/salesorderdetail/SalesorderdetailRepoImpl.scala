@@ -24,7 +24,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           values (${unsaved.salesorderid}::int4, ${unsaved.salesorderdetailid}::int4, ${unsaved.carriertrackingnumber}, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.specialofferid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.unitpricediscount}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
        """
-      .executeInsert(SalesorderdetailRow.rowParser.single)
+      .executeInsert(SalesorderdetailRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
@@ -57,7 +57,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       SQL"""insert into sales.salesorderdetail default values
             returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
          """
-        .executeInsert(SalesorderdetailRow.rowParser.single)
+        .executeInsert(SalesorderdetailRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesorderdetail(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -67,14 +67,14 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SalesorderdetailRow.rowParser.single)
+        .executeInsert(SalesorderdetailRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
     SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
           from sales.salesorderdetail
-       """.as(SalesorderdetailRow.rowParser.*)
+       """.as(SalesorderdetailRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SalesorderdetailFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderdetailRow] = {
     fieldValues match {
@@ -101,7 +101,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesorderdetailRow.rowParser.*)
+          .as(SalesorderdetailRow.rowParser(1).*)
     }
   
   }
@@ -109,7 +109,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
           from sales.salesorderdetail
           where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
-       """.as(SalesorderdetailRow.rowParser.singleOpt)
+       """.as(SalesorderdetailRow.rowParser(1).singleOpt)
   }
   override def update(row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -179,7 +179,7 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             modifieddate = EXCLUDED.modifieddate
           returning salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate
        """
-      .executeInsert(SalesorderdetailRow.rowParser.single)
+      .executeInsert(SalesorderdetailRow.rowParser(1).single)
   
   }
 }

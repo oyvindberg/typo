@@ -16,7 +16,7 @@ object UmViewRepoImpl extends UmViewRepo {
   override def selectAll(implicit c: Connection): List[UmViewRow] = {
     SQL"""select "id", unitmeasurecode, "name", modifieddate
           from pr.um
-       """.as(UmViewRow.rowParser.*)
+       """.as(UmViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[UmViewFieldOrIdValue[_]])(implicit c: Connection): List[UmViewRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object UmViewRepoImpl extends UmViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(UmViewRow.rowParser.*)
+          .as(UmViewRow.rowParser(1).*)
     }
   
   }

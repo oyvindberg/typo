@@ -37,17 +37,17 @@ case class SthViewRow(
 )
 
 object SthViewRow {
-  val rowParser: RowParser[SthViewRow] =
+  def rowParser(idx: Int): RowParser[SthViewRow] =
     RowParser[SthViewRow] { row =>
       Success(
         SthViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          territoryid = row[Option[SalesterritoryId]](idx + 2),
+          startdate = row[Option[LocalDateTime]](idx + 3),
+          enddate = row[Option[LocalDateTime]](idx + 4),
+          rowguid = row[Option[UUID]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

@@ -51,23 +51,23 @@ case class PersonRow(
 )
 
 object PersonRow {
-  val rowParser: RowParser[PersonRow] =
+  def rowParser(idx: Int): RowParser[PersonRow] =
     RowParser[PersonRow] { row =>
       Success(
         PersonRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          persontype = row[/* bpchar */ String]("persontype"),
-          namestyle = row[NameStyle]("namestyle"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Name]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Name]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          emailpromotion = row[Int]("emailpromotion"),
-          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          persontype = row[/* bpchar */ String](idx + 1),
+          namestyle = row[NameStyle](idx + 2),
+          title = row[Option[/* max 8 chars */ String]](idx + 3),
+          firstname = row[Name](idx + 4),
+          middlename = row[Option[Name]](idx + 5),
+          lastname = row[Name](idx + 6),
+          suffix = row[Option[/* max 10 chars */ String]](idx + 7),
+          emailpromotion = row[Int](idx + 8),
+          additionalcontactinfo = row[Option[TypoXml]](idx + 9),
+          demographics = row[Option[TypoXml]](idx + 10),
+          rowguid = row[UUID](idx + 11),
+          modifieddate = row[LocalDateTime](idx + 12)
         )
       )
     }

@@ -35,16 +35,16 @@ case class SViewRow(
 )
 
 object SViewRow {
-  val rowParser: RowParser[SViewRow] =
+  def rowParser(idx: Int): RowParser[SViewRow] =
     RowParser[SViewRow] { row =>
       Success(
         SViewRow(
-          id = row[Option[Int]]("id"),
-          shiftid = row[Option[ShiftId]]("shiftid"),
-          name = row[Option[Name]]("name"),
-          starttime = row[Option[LocalTime]]("starttime"),
-          endtime = row[Option[LocalTime]]("endtime"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          shiftid = row[Option[ShiftId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          starttime = row[Option[LocalTime]](idx + 3),
+          endtime = row[Option[LocalTime]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

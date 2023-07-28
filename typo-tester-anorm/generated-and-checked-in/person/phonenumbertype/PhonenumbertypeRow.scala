@@ -27,13 +27,13 @@ case class PhonenumbertypeRow(
 )
 
 object PhonenumbertypeRow {
-  val rowParser: RowParser[PhonenumbertypeRow] =
+  def rowParser(idx: Int): RowParser[PhonenumbertypeRow] =
     RowParser[PhonenumbertypeRow] { row =>
       Success(
         PhonenumbertypeRow(
-          phonenumbertypeid = row[PhonenumbertypeId]("phonenumbertypeid"),
-          name = row[Name]("name"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          phonenumbertypeid = row[PhonenumbertypeId](idx + 0),
+          name = row[Name](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

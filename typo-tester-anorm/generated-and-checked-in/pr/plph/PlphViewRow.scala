@@ -33,16 +33,16 @@ case class PlphViewRow(
 )
 
 object PlphViewRow {
-  val rowParser: RowParser[PlphViewRow] =
+  def rowParser(idx: Int): RowParser[PlphViewRow] =
     RowParser[PlphViewRow] { row =>
       Success(
         PlphViewRow(
-          id = row[Option[Int]]("id"),
-          productid = row[Option[ProductId]]("productid"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          listprice = row[Option[BigDecimal]]("listprice"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productid = row[Option[ProductId]](idx + 1),
+          startdate = row[Option[LocalDateTime]](idx + 2),
+          enddate = row[Option[LocalDateTime]](idx + 3),
+          listprice = row[Option[BigDecimal]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

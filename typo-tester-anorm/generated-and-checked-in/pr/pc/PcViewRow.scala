@@ -33,15 +33,15 @@ case class PcViewRow(
 )
 
 object PcViewRow {
-  val rowParser: RowParser[PcViewRow] =
+  def rowParser(idx: Int): RowParser[PcViewRow] =
     RowParser[PcViewRow] { row =>
       Success(
         PcViewRow(
-          id = row[Option[Int]]("id"),
-          productcategoryid = row[Option[ProductcategoryId]]("productcategoryid"),
-          name = row[Option[Name]]("name"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productcategoryid = row[Option[ProductcategoryId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          rowguid = row[Option[UUID]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

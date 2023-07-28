@@ -27,7 +27,7 @@ object VendorRepoImpl extends VendorRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.accountnumber}::"public".AccountNumber, ${unsaved.name}::"public"."Name", ${unsaved.creditrating}::int2, ${unsaved.preferredvendorstatus}::"public"."Flag", ${unsaved.activeflag}::"public"."Flag", ${unsaved.purchasingwebserviceurl}, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
        """
-      .executeInsert(VendorRow.rowParser.single)
+      .executeInsert(VendorRow.rowParser(1).single)
   
   }
   override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
@@ -55,7 +55,7 @@ object VendorRepoImpl extends VendorRepo {
       SQL"""insert into purchasing.vendor default values
             returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
          """
-        .executeInsert(VendorRow.rowParser.single)
+        .executeInsert(VendorRow.rowParser(1).single)
     } else {
       val q = s"""insert into purchasing.vendor(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -65,14 +65,14 @@ object VendorRepoImpl extends VendorRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(VendorRow.rowParser.single)
+        .executeInsert(VendorRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
-       """.as(VendorRow.rowParser.*)
+       """.as(VendorRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VendorFieldOrIdValue[_]])(implicit c: Connection): List[VendorRow] = {
     fieldValues match {
@@ -97,7 +97,7 @@ object VendorRepoImpl extends VendorRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VendorRow.rowParser.*)
+          .as(VendorRow.rowParser(1).*)
     }
   
   }
@@ -105,7 +105,7 @@ object VendorRepoImpl extends VendorRepo {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
           where businessentityid = $businessentityid
-       """.as(VendorRow.rowParser.singleOpt)
+       """.as(VendorRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -115,7 +115,7 @@ object VendorRepoImpl extends VendorRepo {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from purchasing.vendor
           where businessentityid = ANY($businessentityids)
-       """.as(VendorRow.rowParser.*)
+       """.as(VendorRow.rowParser(1).*)
   
   }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
@@ -181,7 +181,7 @@ object VendorRepoImpl extends VendorRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
        """
-      .executeInsert(VendorRow.rowParser.single)
+      .executeInsert(VendorRow.rowParser(1).single)
   
   }
 }

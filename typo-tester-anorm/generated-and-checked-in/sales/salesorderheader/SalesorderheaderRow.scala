@@ -88,35 +88,35 @@ case class SalesorderheaderRow(
 )
 
 object SalesorderheaderRow {
-  val rowParser: RowParser[SalesorderheaderRow] =
+  def rowParser(idx: Int): RowParser[SalesorderheaderRow] =
     RowParser[SalesorderheaderRow] { row =>
       Success(
         SalesorderheaderRow(
-          salesorderid = row[SalesorderheaderId]("salesorderid"),
-          revisionnumber = row[Int]("revisionnumber"),
-          orderdate = row[LocalDateTime]("orderdate"),
-          duedate = row[LocalDateTime]("duedate"),
-          shipdate = row[Option[LocalDateTime]]("shipdate"),
-          status = row[Int]("status"),
-          onlineorderflag = row[Flag]("onlineorderflag"),
-          purchaseordernumber = row[Option[OrderNumber]]("purchaseordernumber"),
-          accountnumber = row[Option[AccountNumber]]("accountnumber"),
-          customerid = row[CustomerId]("customerid"),
-          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          billtoaddressid = row[AddressId]("billtoaddressid"),
-          shiptoaddressid = row[AddressId]("shiptoaddressid"),
-          shipmethodid = row[ShipmethodId]("shipmethodid"),
-          creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          creditcardapprovalcode = row[Option[/* max 15 chars */ String]]("creditcardapprovalcode"),
-          currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
-          subtotal = row[BigDecimal]("subtotal"),
-          taxamt = row[BigDecimal]("taxamt"),
-          freight = row[BigDecimal]("freight"),
-          totaldue = row[Option[BigDecimal]]("totaldue"),
-          comment = row[Option[/* max 128 chars */ String]]("comment"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          salesorderid = row[SalesorderheaderId](idx + 0),
+          revisionnumber = row[Int](idx + 1),
+          orderdate = row[LocalDateTime](idx + 2),
+          duedate = row[LocalDateTime](idx + 3),
+          shipdate = row[Option[LocalDateTime]](idx + 4),
+          status = row[Int](idx + 5),
+          onlineorderflag = row[Flag](idx + 6),
+          purchaseordernumber = row[Option[OrderNumber]](idx + 7),
+          accountnumber = row[Option[AccountNumber]](idx + 8),
+          customerid = row[CustomerId](idx + 9),
+          salespersonid = row[Option[BusinessentityId]](idx + 10),
+          territoryid = row[Option[SalesterritoryId]](idx + 11),
+          billtoaddressid = row[AddressId](idx + 12),
+          shiptoaddressid = row[AddressId](idx + 13),
+          shipmethodid = row[ShipmethodId](idx + 14),
+          creditcardid = row[Option[CreditcardId]](idx + 15),
+          creditcardapprovalcode = row[Option[/* max 15 chars */ String]](idx + 16),
+          currencyrateid = row[Option[CurrencyrateId]](idx + 17),
+          subtotal = row[BigDecimal](idx + 18),
+          taxamt = row[BigDecimal](idx + 19),
+          freight = row[BigDecimal](idx + 20),
+          totaldue = row[Option[BigDecimal]](idx + 21),
+          comment = row[Option[/* max 128 chars */ String]](idx + 22),
+          rowguid = row[UUID](idx + 23),
+          modifieddate = row[LocalDateTime](idx + 24)
         )
       )
     }

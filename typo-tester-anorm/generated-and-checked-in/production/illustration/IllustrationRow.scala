@@ -27,13 +27,13 @@ case class IllustrationRow(
 )
 
 object IllustrationRow {
-  val rowParser: RowParser[IllustrationRow] =
+  def rowParser(idx: Int): RowParser[IllustrationRow] =
     RowParser[IllustrationRow] { row =>
       Success(
         IllustrationRow(
-          illustrationid = row[IllustrationId]("illustrationid"),
-          diagram = row[Option[TypoXml]]("diagram"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          illustrationid = row[IllustrationId](idx + 0),
+          diagram = row[Option[TypoXml]](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

@@ -41,20 +41,20 @@ case class ThaViewRow(
 )
 
 object ThaViewRow {
-  val rowParser: RowParser[ThaViewRow] =
+  def rowParser(idx: Int): RowParser[ThaViewRow] =
     RowParser[ThaViewRow] { row =>
       Success(
         ThaViewRow(
-          id = row[Option[Int]]("id"),
-          transactionid = row[Option[TransactionhistoryarchiveId]]("transactionid"),
-          productid = row[Option[Int]]("productid"),
-          referenceorderid = row[Option[Int]]("referenceorderid"),
-          referenceorderlineid = row[Option[Int]]("referenceorderlineid"),
-          transactiondate = row[Option[LocalDateTime]]("transactiondate"),
-          transactiontype = row[Option[/* bpchar */ String]]("transactiontype"),
-          quantity = row[Option[Int]]("quantity"),
-          actualcost = row[Option[BigDecimal]]("actualcost"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          transactionid = row[Option[TransactionhistoryarchiveId]](idx + 1),
+          productid = row[Option[Int]](idx + 2),
+          referenceorderid = row[Option[Int]](idx + 3),
+          referenceorderlineid = row[Option[Int]](idx + 4),
+          transactiondate = row[Option[LocalDateTime]](idx + 5),
+          transactiontype = row[Option[/* bpchar */ String]](idx + 6),
+          quantity = row[Option[Int]](idx + 7),
+          actualcost = row[Option[BigDecimal]](idx + 8),
+          modifieddate = row[Option[LocalDateTime]](idx + 9)
         )
       )
     }

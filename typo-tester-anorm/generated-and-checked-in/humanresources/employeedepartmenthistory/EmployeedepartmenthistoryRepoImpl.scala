@@ -23,7 +23,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.departmentid}::int2, ${unsaved.shiftid}::int2, ${unsaved.startdate}::date, ${unsaved.enddate}::date, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
        """
-      .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
+      .executeInsert(EmployeedepartmenthistoryRow.rowParser(1).single)
   
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow = {
@@ -43,7 +43,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       SQL"""insert into humanresources.employeedepartmenthistory default values
             returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
          """
-        .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
+        .executeInsert(EmployeedepartmenthistoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.employeedepartmenthistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -53,14 +53,14 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
+        .executeInsert(EmployeedepartmenthistoryRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from humanresources.employeedepartmenthistory
-       """.as(EmployeedepartmenthistoryRow.rowParser.*)
+       """.as(EmployeedepartmenthistoryRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[EmployeedepartmenthistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     fieldValues match {
@@ -83,7 +83,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EmployeedepartmenthistoryRow.rowParser.*)
+          .as(EmployeedepartmenthistoryRow.rowParser(1).*)
     }
   
   }
@@ -91,7 +91,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     SQL"""select businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from humanresources.employeedepartmenthistory
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}
-       """.as(EmployeedepartmenthistoryRow.rowParser.singleOpt)
+       """.as(EmployeedepartmenthistoryRow.rowParser(1).singleOpt)
   }
   override def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -139,7 +139,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
        """
-      .executeInsert(EmployeedepartmenthistoryRow.rowParser.single)
+      .executeInsert(EmployeedepartmenthistoryRow.rowParser(1).single)
   
   }
 }

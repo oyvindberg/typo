@@ -42,19 +42,19 @@ case class WorkorderRow(
 )
 
 object WorkorderRow {
-  val rowParser: RowParser[WorkorderRow] =
+  def rowParser(idx: Int): RowParser[WorkorderRow] =
     RowParser[WorkorderRow] { row =>
       Success(
         WorkorderRow(
-          workorderid = row[WorkorderId]("workorderid"),
-          productid = row[ProductId]("productid"),
-          orderqty = row[Int]("orderqty"),
-          scrappedqty = row[Int]("scrappedqty"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          duedate = row[LocalDateTime]("duedate"),
-          scrapreasonid = row[Option[ScrapreasonId]]("scrapreasonid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          workorderid = row[WorkorderId](idx + 0),
+          productid = row[ProductId](idx + 1),
+          orderqty = row[Int](idx + 2),
+          scrappedqty = row[Int](idx + 3),
+          startdate = row[LocalDateTime](idx + 4),
+          enddate = row[Option[LocalDateTime]](idx + 5),
+          duedate = row[LocalDateTime](idx + 6),
+          scrapreasonid = row[Option[ScrapreasonId]](idx + 7),
+          modifieddate = row[LocalDateTime](idx + 8)
         )
       )
     }

@@ -30,14 +30,14 @@ case class CViewRow(
 )
 
 object CViewRow {
-  val rowParser: RowParser[CViewRow] =
+  def rowParser(idx: Int): RowParser[CViewRow] =
     RowParser[CViewRow] { row =>
       Success(
         CViewRow(
-          id = row[Option[/* bpchar */ String]]("id"),
-          cultureid = row[Option[CultureId]]("cultureid"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[/* bpchar */ String]](idx + 0),
+          cultureid = row[Option[CultureId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

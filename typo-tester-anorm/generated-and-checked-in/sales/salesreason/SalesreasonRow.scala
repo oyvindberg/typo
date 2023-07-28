@@ -29,14 +29,14 @@ case class SalesreasonRow(
 )
 
 object SalesreasonRow {
-  val rowParser: RowParser[SalesreasonRow] =
+  def rowParser(idx: Int): RowParser[SalesreasonRow] =
     RowParser[SalesreasonRow] { row =>
       Success(
         SalesreasonRow(
-          salesreasonid = row[SalesreasonId]("salesreasonid"),
-          name = row[Name]("name"),
-          reasontype = row[Name]("reasontype"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          salesreasonid = row[SalesreasonId](idx + 0),
+          name = row[Name](idx + 1),
+          reasontype = row[Name](idx + 2),
+          modifieddate = row[LocalDateTime](idx + 3)
         )
       )
     }

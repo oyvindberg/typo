@@ -26,7 +26,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
           values (${unsaved.addresstypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addresstypeid, "name", rowguid, modifieddate
        """
-      .executeInsert(AddresstypeRow.rowParser.single)
+      .executeInsert(AddresstypeRow.rowParser(1).single)
   
   }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
@@ -50,7 +50,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       SQL"""insert into person.addresstype default values
             returning addresstypeid, "name", rowguid, modifieddate
          """
-        .executeInsert(AddresstypeRow.rowParser.single)
+        .executeInsert(AddresstypeRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.addresstype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -60,14 +60,14 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(AddresstypeRow.rowParser.single)
+        .executeInsert(AddresstypeRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
     SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
-       """.as(AddresstypeRow.rowParser.*)
+       """.as(AddresstypeRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]])(implicit c: Connection): List[AddresstypeRow] = {
     fieldValues match {
@@ -88,7 +88,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(AddresstypeRow.rowParser.*)
+          .as(AddresstypeRow.rowParser(1).*)
     }
   
   }
@@ -96,7 +96,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
           where addresstypeid = $addresstypeid
-       """.as(AddresstypeRow.rowParser.singleOpt)
+       """.as(AddresstypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): List[AddresstypeRow] = {
     implicit val toStatement: ToStatement[Array[AddresstypeId]] =
@@ -106,7 +106,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     SQL"""select addresstypeid, "name", rowguid, modifieddate
           from person.addresstype
           where addresstypeid = ANY($addresstypeids)
-       """.as(AddresstypeRow.rowParser.*)
+       """.as(AddresstypeRow.rowParser(1).*)
   
   }
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
@@ -156,7 +156,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
             modifieddate = EXCLUDED.modifieddate
           returning addresstypeid, "name", rowguid, modifieddate
        """
-      .executeInsert(AddresstypeRow.rowParser.single)
+      .executeInsert(AddresstypeRow.rowParser(1).single)
   
   }
 }

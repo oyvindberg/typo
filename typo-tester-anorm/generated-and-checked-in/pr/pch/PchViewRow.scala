@@ -33,16 +33,16 @@ case class PchViewRow(
 )
 
 object PchViewRow {
-  val rowParser: RowParser[PchViewRow] =
+  def rowParser(idx: Int): RowParser[PchViewRow] =
     RowParser[PchViewRow] { row =>
       Success(
         PchViewRow(
-          id = row[Option[Int]]("id"),
-          productid = row[Option[ProductId]]("productid"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          standardcost = row[Option[BigDecimal]]("standardcost"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productid = row[Option[ProductId]](idx + 1),
+          startdate = row[Option[LocalDateTime]](idx + 2),
+          enddate = row[Option[LocalDateTime]](idx + 3),
+          standardcost = row[Option[BigDecimal]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

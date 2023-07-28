@@ -42,20 +42,20 @@ case class PodViewRow(
 )
 
 object PodViewRow {
-  val rowParser: RowParser[PodViewRow] =
+  def rowParser(idx: Int): RowParser[PodViewRow] =
     RowParser[PodViewRow] { row =>
       Success(
         PodViewRow(
-          id = row[Option[Int]]("id"),
-          purchaseorderid = row[Option[PurchaseorderheaderId]]("purchaseorderid"),
-          purchaseorderdetailid = row[Option[Int]]("purchaseorderdetailid"),
-          duedate = row[Option[LocalDateTime]]("duedate"),
-          orderqty = row[Option[Int]]("orderqty"),
-          productid = row[Option[ProductId]]("productid"),
-          unitprice = row[Option[BigDecimal]]("unitprice"),
-          receivedqty = row[Option[BigDecimal]]("receivedqty"),
-          rejectedqty = row[Option[BigDecimal]]("rejectedqty"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          purchaseorderid = row[Option[PurchaseorderheaderId]](idx + 1),
+          purchaseorderdetailid = row[Option[Int]](idx + 2),
+          duedate = row[Option[LocalDateTime]](idx + 3),
+          orderqty = row[Option[Int]](idx + 4),
+          productid = row[Option[ProductId]](idx + 5),
+          unitprice = row[Option[BigDecimal]](idx + 6),
+          receivedqty = row[Option[BigDecimal]](idx + 7),
+          rejectedqty = row[Option[BigDecimal]](idx + 8),
+          modifieddate = row[Option[LocalDateTime]](idx + 9)
         )
       )
     }

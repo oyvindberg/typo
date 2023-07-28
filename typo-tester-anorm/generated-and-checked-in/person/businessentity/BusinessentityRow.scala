@@ -26,13 +26,13 @@ case class BusinessentityRow(
 )
 
 object BusinessentityRow {
-  val rowParser: RowParser[BusinessentityRow] =
+  def rowParser(idx: Int): RowParser[BusinessentityRow] =
     RowParser[BusinessentityRow] { row =>
       Success(
         BusinessentityRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          rowguid = row[UUID](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

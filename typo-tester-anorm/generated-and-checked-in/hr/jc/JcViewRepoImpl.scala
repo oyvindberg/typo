@@ -16,7 +16,7 @@ object JcViewRepoImpl extends JcViewRepo {
   override def selectAll(implicit c: Connection): List[JcViewRow] = {
     SQL"""select "id", jobcandidateid, businessentityid, resume, modifieddate
           from hr.jc
-       """.as(JcViewRow.rowParser.*)
+       """.as(JcViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[JcViewFieldOrIdValue[_]])(implicit c: Connection): List[JcViewRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object JcViewRepoImpl extends JcViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(JcViewRow.rowParser.*)
+          .as(JcViewRow.rowParser(1).*)
     }
   
   }

@@ -25,7 +25,7 @@ object ShiftRepoImpl extends ShiftRepo {
           values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
           returning shiftid, "name", starttime, endtime, modifieddate
        """
-      .executeInsert(ShiftRow.rowParser.single)
+      .executeInsert(ShiftRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
@@ -47,7 +47,7 @@ object ShiftRepoImpl extends ShiftRepo {
       SQL"""insert into humanresources.shift default values
             returning shiftid, "name", starttime, endtime, modifieddate
          """
-        .executeInsert(ShiftRow.rowParser.single)
+        .executeInsert(ShiftRow.rowParser(1).single)
     } else {
       val q = s"""insert into humanresources.shift(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -57,14 +57,14 @@ object ShiftRepoImpl extends ShiftRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ShiftRow.rowParser.single)
+        .executeInsert(ShiftRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
-       """.as(ShiftRow.rowParser.*)
+       """.as(ShiftRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]])(implicit c: Connection): List[ShiftRow] = {
     fieldValues match {
@@ -86,7 +86,7 @@ object ShiftRepoImpl extends ShiftRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ShiftRow.rowParser.*)
+          .as(ShiftRow.rowParser(1).*)
     }
   
   }
@@ -94,7 +94,7 @@ object ShiftRepoImpl extends ShiftRepo {
     SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
           where shiftid = $shiftid
-       """.as(ShiftRow.rowParser.singleOpt)
+       """.as(ShiftRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow] = {
     implicit val toStatement: ToStatement[Array[ShiftId]] =
@@ -104,7 +104,7 @@ object ShiftRepoImpl extends ShiftRepo {
     SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
           where shiftid = ANY($shiftids)
-       """.as(ShiftRow.rowParser.*)
+       """.as(ShiftRow.rowParser(1).*)
   
   }
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
@@ -158,7 +158,7 @@ object ShiftRepoImpl extends ShiftRepo {
             modifieddate = EXCLUDED.modifieddate
           returning shiftid, "name", starttime, endtime, modifieddate
        """
-      .executeInsert(ShiftRow.rowParser.single)
+      .executeInsert(ShiftRow.rowParser(1).single)
   
   }
 }

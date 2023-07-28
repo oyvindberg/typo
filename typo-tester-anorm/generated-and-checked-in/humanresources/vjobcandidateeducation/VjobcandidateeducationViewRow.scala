@@ -36,23 +36,23 @@ case class VjobcandidateeducationViewRow(
 )
 
 object VjobcandidateeducationViewRow {
-  val rowParser: RowParser[VjobcandidateeducationViewRow] =
+  def rowParser(idx: Int): RowParser[VjobcandidateeducationViewRow] =
     RowParser[VjobcandidateeducationViewRow] { row =>
       Success(
         VjobcandidateeducationViewRow(
-          jobcandidateid = row[Option[JobcandidateId]]("jobcandidateid"),
-          `Edu.Level` = row[Option[/* max 50 chars */ String]]("Edu.Level"),
-          `Edu.StartDate` = row[Option[LocalDate]]("Edu.StartDate"),
-          `Edu.EndDate` = row[Option[LocalDate]]("Edu.EndDate"),
-          `Edu.Degree` = row[Option[/* max 50 chars */ String]]("Edu.Degree"),
-          `Edu.Major` = row[Option[/* max 50 chars */ String]]("Edu.Major"),
-          `Edu.Minor` = row[Option[/* max 50 chars */ String]]("Edu.Minor"),
-          `Edu.GPA` = row[Option[/* max 5 chars */ String]]("Edu.GPA"),
-          `Edu.GPAScale` = row[Option[/* max 5 chars */ String]]("Edu.GPAScale"),
-          `Edu.School` = row[Option[/* max 100 chars */ String]]("Edu.School"),
-          `Edu.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]]("Edu.Loc.CountryRegion"),
-          `Edu.Loc.State` = row[Option[/* max 100 chars */ String]]("Edu.Loc.State"),
-          `Edu.Loc.City` = row[Option[/* max 100 chars */ String]]("Edu.Loc.City")
+          jobcandidateid = row[Option[JobcandidateId]](idx + 0),
+          `Edu.Level` = row[Option[/* max 50 chars */ String]](idx + 1),
+          `Edu.StartDate` = row[Option[LocalDate]](idx + 2),
+          `Edu.EndDate` = row[Option[LocalDate]](idx + 3),
+          `Edu.Degree` = row[Option[/* max 50 chars */ String]](idx + 4),
+          `Edu.Major` = row[Option[/* max 50 chars */ String]](idx + 5),
+          `Edu.Minor` = row[Option[/* max 50 chars */ String]](idx + 6),
+          `Edu.GPA` = row[Option[/* max 5 chars */ String]](idx + 7),
+          `Edu.GPAScale` = row[Option[/* max 5 chars */ String]](idx + 8),
+          `Edu.School` = row[Option[/* max 100 chars */ String]](idx + 9),
+          `Edu.Loc.CountryRegion` = row[Option[/* max 100 chars */ String]](idx + 10),
+          `Edu.Loc.State` = row[Option[/* max 100 chars */ String]](idx + 11),
+          `Edu.Loc.City` = row[Option[/* max 100 chars */ String]](idx + 12)
         )
       )
     }

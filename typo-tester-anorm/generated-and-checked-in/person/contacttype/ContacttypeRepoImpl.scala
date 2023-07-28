@@ -25,7 +25,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
           values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning contacttypeid, "name", modifieddate
        """
-      .executeInsert(ContacttypeRow.rowParser.single)
+      .executeInsert(ContacttypeRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
@@ -45,7 +45,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       SQL"""insert into person.contacttype default values
             returning contacttypeid, "name", modifieddate
          """
-        .executeInsert(ContacttypeRow.rowParser.single)
+        .executeInsert(ContacttypeRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.contacttype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -55,14 +55,14 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ContacttypeRow.rowParser.single)
+        .executeInsert(ContacttypeRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
     SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
-       """.as(ContacttypeRow.rowParser.*)
+       """.as(ContacttypeRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]])(implicit c: Connection): List[ContacttypeRow] = {
     fieldValues match {
@@ -82,7 +82,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ContacttypeRow.rowParser.*)
+          .as(ContacttypeRow.rowParser(1).*)
     }
   
   }
@@ -90,7 +90,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
           where contacttypeid = $contacttypeid
-       """.as(ContacttypeRow.rowParser.singleOpt)
+       """.as(ContacttypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
     implicit val toStatement: ToStatement[Array[ContacttypeId]] =
@@ -100,7 +100,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     SQL"""select contacttypeid, "name", modifieddate
           from person.contacttype
           where contacttypeid = ANY($contacttypeids)
-       """.as(ContacttypeRow.rowParser.*)
+       """.as(ContacttypeRow.rowParser(1).*)
   
   }
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
@@ -146,7 +146,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
             modifieddate = EXCLUDED.modifieddate
           returning contacttypeid, "name", modifieddate
        """
-      .executeInsert(ContacttypeRow.rowParser.single)
+      .executeInsert(ContacttypeRow.rowParser(1).single)
   
   }
 }

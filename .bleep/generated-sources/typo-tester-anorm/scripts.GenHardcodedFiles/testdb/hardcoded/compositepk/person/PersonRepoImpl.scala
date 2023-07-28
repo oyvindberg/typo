@@ -23,7 +23,7 @@ object PersonRepoImpl extends PersonRepo {
           values (${unsaved.one}::int8, ${unsaved.two}, ${unsaved.name})
           returning "one", two, "name"
        """
-      .executeInsert(PersonRow.rowParser.single)
+      .executeInsert(PersonRow.rowParser(1).single)
   
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
@@ -43,7 +43,7 @@ object PersonRepoImpl extends PersonRepo {
       SQL"""insert into compositepk.person default values
             returning "one", two, "name"
          """
-        .executeInsert(PersonRow.rowParser.single)
+        .executeInsert(PersonRow.rowParser(1).single)
     } else {
       val q = s"""insert into compositepk.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -53,14 +53,14 @@ object PersonRepoImpl extends PersonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(PersonRow.rowParser.single)
+        .executeInsert(PersonRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "one", two, "name"
           from compositepk.person
-       """.as(PersonRow.rowParser.*)
+       """.as(PersonRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -80,7 +80,7 @@ object PersonRepoImpl extends PersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PersonRow.rowParser.*)
+          .as(PersonRow.rowParser(1).*)
     }
   
   }
@@ -88,7 +88,7 @@ object PersonRepoImpl extends PersonRepo {
     SQL"""select "one", two, "name"
           from compositepk.person
           where "one" = ${compositeId.one} AND two = ${compositeId.two}
-       """.as(PersonRow.rowParser.singleOpt)
+       """.as(PersonRow.rowParser(1).singleOpt)
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -130,7 +130,7 @@ object PersonRepoImpl extends PersonRepo {
             "name" = EXCLUDED."name"
           returning "one", two, "name"
        """
-      .executeInsert(PersonRow.rowParser.single)
+      .executeInsert(PersonRow.rowParser(1).single)
   
   }
 }

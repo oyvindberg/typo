@@ -48,23 +48,23 @@ case class WrViewRow(
 )
 
 object WrViewRow {
-  val rowParser: RowParser[WrViewRow] =
+  def rowParser(idx: Int): RowParser[WrViewRow] =
     RowParser[WrViewRow] { row =>
       Success(
         WrViewRow(
-          id = row[Option[Int]]("id"),
-          workorderid = row[Option[WorkorderId]]("workorderid"),
-          productid = row[Option[Int]]("productid"),
-          operationsequence = row[Option[Int]]("operationsequence"),
-          locationid = row[Option[LocationId]]("locationid"),
-          scheduledstartdate = row[Option[LocalDateTime]]("scheduledstartdate"),
-          scheduledenddate = row[Option[LocalDateTime]]("scheduledenddate"),
-          actualstartdate = row[Option[LocalDateTime]]("actualstartdate"),
-          actualenddate = row[Option[LocalDateTime]]("actualenddate"),
-          actualresourcehrs = row[Option[BigDecimal]]("actualresourcehrs"),
-          plannedcost = row[Option[BigDecimal]]("plannedcost"),
-          actualcost = row[Option[BigDecimal]]("actualcost"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          workorderid = row[Option[WorkorderId]](idx + 1),
+          productid = row[Option[Int]](idx + 2),
+          operationsequence = row[Option[Int]](idx + 3),
+          locationid = row[Option[LocationId]](idx + 4),
+          scheduledstartdate = row[Option[LocalDateTime]](idx + 5),
+          scheduledenddate = row[Option[LocalDateTime]](idx + 6),
+          actualstartdate = row[Option[LocalDateTime]](idx + 7),
+          actualenddate = row[Option[LocalDateTime]](idx + 8),
+          actualresourcehrs = row[Option[BigDecimal]](idx + 9),
+          plannedcost = row[Option[BigDecimal]](idx + 10),
+          actualcost = row[Option[BigDecimal]](idx + 11),
+          modifieddate = row[Option[LocalDateTime]](idx + 12)
         )
       )
     }

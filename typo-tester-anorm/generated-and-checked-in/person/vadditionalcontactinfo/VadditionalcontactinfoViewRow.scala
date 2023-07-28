@@ -48,27 +48,27 @@ case class VadditionalcontactinfoViewRow(
 )
 
 object VadditionalcontactinfoViewRow {
-  val rowParser: RowParser[VadditionalcontactinfoViewRow] =
+  def rowParser(idx: Int): RowParser[VadditionalcontactinfoViewRow] =
     RowParser[VadditionalcontactinfoViewRow] { row =>
       Success(
         VadditionalcontactinfoViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          telephonenumber = row[Option[TypoXml]]("telephonenumber"),
-          telephonespecialinstructions = row[Option[String]]("telephonespecialinstructions"),
-          street = row[Option[TypoXml]]("street"),
-          city = row[Option[TypoXml]]("city"),
-          stateprovince = row[Option[TypoXml]]("stateprovince"),
-          postalcode = row[Option[TypoXml]]("postalcode"),
-          countryregion = row[Option[TypoXml]]("countryregion"),
-          homeaddressspecialinstructions = row[Option[TypoXml]]("homeaddressspecialinstructions"),
-          emailaddress = row[Option[TypoXml]]("emailaddress"),
-          emailspecialinstructions = row[Option[String]]("emailspecialinstructions"),
-          emailtelephonenumber = row[Option[TypoXml]]("emailtelephonenumber"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          firstname = row[Option[Name]](idx + 1),
+          middlename = row[Option[Name]](idx + 2),
+          lastname = row[Option[Name]](idx + 3),
+          telephonenumber = row[Option[TypoXml]](idx + 4),
+          telephonespecialinstructions = row[Option[String]](idx + 5),
+          street = row[Option[TypoXml]](idx + 6),
+          city = row[Option[TypoXml]](idx + 7),
+          stateprovince = row[Option[TypoXml]](idx + 8),
+          postalcode = row[Option[TypoXml]](idx + 9),
+          countryregion = row[Option[TypoXml]](idx + 10),
+          homeaddressspecialinstructions = row[Option[TypoXml]](idx + 11),
+          emailaddress = row[Option[TypoXml]](idx + 12),
+          emailspecialinstructions = row[Option[String]](idx + 13),
+          emailtelephonenumber = row[Option[TypoXml]](idx + 14),
+          rowguid = row[Option[UUID]](idx + 15),
+          modifieddate = row[Option[LocalDateTime]](idx + 16)
         )
       )
     }

@@ -44,19 +44,19 @@ case class SpViewRow(
 )
 
 object SpViewRow {
-  val rowParser: RowParser[SpViewRow] =
+  def rowParser(idx: Int): RowParser[SpViewRow] =
     RowParser[SpViewRow] { row =>
       Success(
         SpViewRow(
-          id = row[Option[Int]]("id"),
-          stateprovinceid = row[Option[StateprovinceId]]("stateprovinceid"),
-          stateprovincecode = row[Option[/* bpchar */ String]]("stateprovincecode"),
-          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
-          isonlystateprovinceflag = row[Flag]("isonlystateprovinceflag"),
-          name = row[Option[Name]]("name"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          stateprovinceid = row[Option[StateprovinceId]](idx + 1),
+          stateprovincecode = row[Option[/* bpchar */ String]](idx + 2),
+          countryregioncode = row[Option[CountryregionId]](idx + 3),
+          isonlystateprovinceflag = row[Flag](idx + 4),
+          name = row[Option[Name]](idx + 5),
+          territoryid = row[Option[SalesterritoryId]](idx + 6),
+          rowguid = row[Option[UUID]](idx + 7),
+          modifieddate = row[Option[LocalDateTime]](idx + 8)
         )
       )
     }

@@ -34,16 +34,16 @@ case class ShoppingcartitemRow(
 )
 
 object ShoppingcartitemRow {
-  val rowParser: RowParser[ShoppingcartitemRow] =
+  def rowParser(idx: Int): RowParser[ShoppingcartitemRow] =
     RowParser[ShoppingcartitemRow] { row =>
       Success(
         ShoppingcartitemRow(
-          shoppingcartitemid = row[ShoppingcartitemId]("shoppingcartitemid"),
-          shoppingcartid = row[/* max 50 chars */ String]("shoppingcartid"),
-          quantity = row[Int]("quantity"),
-          productid = row[ProductId]("productid"),
-          datecreated = row[LocalDateTime]("datecreated"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          shoppingcartitemid = row[ShoppingcartitemId](idx + 0),
+          shoppingcartid = row[/* max 50 chars */ String](idx + 1),
+          quantity = row[Int](idx + 2),
+          productid = row[ProductId](idx + 3),
+          datecreated = row[LocalDateTime](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

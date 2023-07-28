@@ -38,17 +38,17 @@ case class SViewRow(
 )
 
 object SViewRow {
-  val rowParser: RowParser[SViewRow] =
+  def rowParser(idx: Int): RowParser[SViewRow] =
     RowParser[SViewRow] { row =>
       Success(
         SViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          name = row[Option[Name]]("name"),
-          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          salespersonid = row[Option[BusinessentityId]](idx + 3),
+          demographics = row[Option[TypoXml]](idx + 4),
+          rowguid = row[Option[UUID]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

@@ -16,7 +16,7 @@ object PrViewRepoImpl extends PrViewRepo {
   override def selectAll(implicit c: Connection): List[PrViewRow] = {
     SQL"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate
           from pr.pr
-       """.as(PrViewRow.rowParser.*)
+       """.as(PrViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PrViewFieldOrIdValue[_]])(implicit c: Connection): List[PrViewRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object PrViewRepoImpl extends PrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PrViewRow.rowParser.*)
+          .as(PrViewRow.rowParser(1).*)
     }
   
   }

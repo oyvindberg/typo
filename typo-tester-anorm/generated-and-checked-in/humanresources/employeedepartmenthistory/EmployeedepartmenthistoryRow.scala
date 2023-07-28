@@ -41,16 +41,16 @@ case class EmployeedepartmenthistoryRow(
  }
 
 object EmployeedepartmenthistoryRow {
-  val rowParser: RowParser[EmployeedepartmenthistoryRow] =
+  def rowParser(idx: Int): RowParser[EmployeedepartmenthistoryRow] =
     RowParser[EmployeedepartmenthistoryRow] { row =>
       Success(
         EmployeedepartmenthistoryRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          departmentid = row[DepartmentId]("departmentid"),
-          shiftid = row[ShiftId]("shiftid"),
-          startdate = row[LocalDate]("startdate"),
-          enddate = row[Option[LocalDate]]("enddate"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          departmentid = row[DepartmentId](idx + 1),
+          shiftid = row[ShiftId](idx + 2),
+          startdate = row[LocalDate](idx + 3),
+          enddate = row[Option[LocalDate]](idx + 4),
+          modifieddate = row[LocalDateTime](idx + 5)
         )
       )
     }

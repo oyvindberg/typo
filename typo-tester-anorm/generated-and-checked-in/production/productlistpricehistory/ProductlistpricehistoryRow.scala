@@ -34,15 +34,15 @@ case class ProductlistpricehistoryRow(
  }
 
 object ProductlistpricehistoryRow {
-  val rowParser: RowParser[ProductlistpricehistoryRow] =
+  def rowParser(idx: Int): RowParser[ProductlistpricehistoryRow] =
     RowParser[ProductlistpricehistoryRow] { row =>
       Success(
         ProductlistpricehistoryRow(
-          productid = row[ProductId]("productid"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          listprice = row[BigDecimal]("listprice"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productid = row[ProductId](idx + 0),
+          startdate = row[LocalDateTime](idx + 1),
+          enddate = row[Option[LocalDateTime]](idx + 2),
+          listprice = row[BigDecimal](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

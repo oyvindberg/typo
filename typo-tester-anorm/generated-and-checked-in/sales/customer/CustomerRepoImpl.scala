@@ -26,7 +26,7 @@ object CustomerRepoImpl extends CustomerRepo {
           values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate
        """
-      .executeInsert(CustomerRow.rowParser.single)
+      .executeInsert(CustomerRow.rowParser(1).single)
   
   }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
@@ -52,7 +52,7 @@ object CustomerRepoImpl extends CustomerRepo {
       SQL"""insert into sales.customer default values
             returning customerid, personid, storeid, territoryid, rowguid, modifieddate
          """
-        .executeInsert(CustomerRow.rowParser.single)
+        .executeInsert(CustomerRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.customer(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -62,14 +62,14 @@ object CustomerRepoImpl extends CustomerRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(CustomerRow.rowParser.single)
+        .executeInsert(CustomerRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
     SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate
           from sales.customer
-       """.as(CustomerRow.rowParser.*)
+       """.as(CustomerRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]])(implicit c: Connection): List[CustomerRow] = {
     fieldValues match {
@@ -92,7 +92,7 @@ object CustomerRepoImpl extends CustomerRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CustomerRow.rowParser.*)
+          .as(CustomerRow.rowParser(1).*)
     }
   
   }
@@ -100,7 +100,7 @@ object CustomerRepoImpl extends CustomerRepo {
     SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate
           from sales.customer
           where customerid = $customerid
-       """.as(CustomerRow.rowParser.singleOpt)
+       """.as(CustomerRow.rowParser(1).singleOpt)
   }
   override def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow] = {
     implicit val toStatement: ToStatement[Array[CustomerId]] =
@@ -110,7 +110,7 @@ object CustomerRepoImpl extends CustomerRepo {
     SQL"""select customerid, personid, storeid, territoryid, rowguid, modifieddate
           from sales.customer
           where customerid = ANY($customerids)
-       """.as(CustomerRow.rowParser.*)
+       """.as(CustomerRow.rowParser(1).*)
   
   }
   override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
@@ -168,7 +168,7 @@ object CustomerRepoImpl extends CustomerRepo {
             modifieddate = EXCLUDED.modifieddate
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate
        """
-      .executeInsert(CustomerRow.rowParser.single)
+      .executeInsert(CustomerRow.rowParser(1).single)
   
   }
 }

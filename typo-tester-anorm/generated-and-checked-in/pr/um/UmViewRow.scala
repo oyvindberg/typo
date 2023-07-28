@@ -30,14 +30,14 @@ case class UmViewRow(
 )
 
 object UmViewRow {
-  val rowParser: RowParser[UmViewRow] =
+  def rowParser(idx: Int): RowParser[UmViewRow] =
     RowParser[UmViewRow] { row =>
       Success(
         UmViewRow(
-          id = row[Option[/* bpchar */ String]]("id"),
-          unitmeasurecode = row[Option[UnitmeasureId]]("unitmeasurecode"),
-          name = row[Option[Name]]("name"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[/* bpchar */ String]](idx + 0),
+          unitmeasurecode = row[Option[UnitmeasureId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

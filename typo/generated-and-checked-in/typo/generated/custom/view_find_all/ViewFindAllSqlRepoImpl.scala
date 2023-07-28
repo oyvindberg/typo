@@ -30,7 +30,7 @@ object ViewFindAllSqlRepoImpl extends ViewFindAllSqlRepo {
               AND c.relkind in ('m'::"char", 'v'::char)
             order by 1, 2, 3
          """
-    sql.as(ViewFindAllSqlRow.rowParser.*)
+    sql.as(ViewFindAllSqlRow.rowParser(1).*)
   
   }
 }

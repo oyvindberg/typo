@@ -30,7 +30,7 @@ object CommentsSqlRepoImpl extends CommentsSqlRepo {
                         c.table_name = st.relname
                 )
          """
-    sql.as(CommentsSqlRow.rowParser.*)
+    sql.as(CommentsSqlRow.rowParser(1).*)
   
   }
 }

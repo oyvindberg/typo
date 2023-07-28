@@ -31,14 +31,14 @@ case class JobcandidateRow(
 )
 
 object JobcandidateRow {
-  val rowParser: RowParser[JobcandidateRow] =
+  def rowParser(idx: Int): RowParser[JobcandidateRow] =
     RowParser[JobcandidateRow] { row =>
       Success(
         JobcandidateRow(
-          jobcandidateid = row[JobcandidateId]("jobcandidateid"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          resume = row[Option[TypoXml]]("resume"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          jobcandidateid = row[JobcandidateId](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          resume = row[Option[TypoXml]](idx + 2),
+          modifieddate = row[LocalDateTime](idx + 3)
         )
       )
     }

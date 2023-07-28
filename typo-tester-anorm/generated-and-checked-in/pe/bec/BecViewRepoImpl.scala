@@ -16,7 +16,7 @@ object BecViewRepoImpl extends BecViewRepo {
   override def selectAll(implicit c: Connection): List[BecViewRow] = {
     SQL"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate
           from pe.bec
-       """.as(BecViewRow.rowParser.*)
+       """.as(BecViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[BecViewFieldOrIdValue[_]])(implicit c: Connection): List[BecViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object BecViewRepoImpl extends BecViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BecViewRow.rowParser.*)
+          .as(BecViewRow.rowParser(1).*)
     }
   
   }

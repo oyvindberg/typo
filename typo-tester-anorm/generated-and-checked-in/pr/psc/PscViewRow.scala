@@ -36,16 +36,16 @@ case class PscViewRow(
 )
 
 object PscViewRow {
-  val rowParser: RowParser[PscViewRow] =
+  def rowParser(idx: Int): RowParser[PscViewRow] =
     RowParser[PscViewRow] { row =>
       Success(
         PscViewRow(
-          id = row[Option[Int]]("id"),
-          productsubcategoryid = row[Option[ProductsubcategoryId]]("productsubcategoryid"),
-          productcategoryid = row[Option[ProductcategoryId]]("productcategoryid"),
-          name = row[Option[Name]]("name"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productsubcategoryid = row[Option[ProductsubcategoryId]](idx + 1),
+          productcategoryid = row[Option[ProductcategoryId]](idx + 2),
+          name = row[Option[Name]](idx + 3),
+          rowguid = row[Option[UUID]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

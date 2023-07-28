@@ -30,14 +30,14 @@ case class BeViewRow(
 )
 
 object BeViewRow {
-  val rowParser: RowParser[BeViewRow] =
+  def rowParser(idx: Int): RowParser[BeViewRow] =
     RowParser[BeViewRow] { row =>
       Success(
         BeViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          rowguid = row[Option[UUID]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

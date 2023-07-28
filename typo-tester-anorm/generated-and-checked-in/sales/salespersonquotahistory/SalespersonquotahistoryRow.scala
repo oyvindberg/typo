@@ -34,15 +34,15 @@ case class SalespersonquotahistoryRow(
  }
 
 object SalespersonquotahistoryRow {
-  val rowParser: RowParser[SalespersonquotahistoryRow] =
+  def rowParser(idx: Int): RowParser[SalespersonquotahistoryRow] =
     RowParser[SalespersonquotahistoryRow] { row =>
       Success(
         SalespersonquotahistoryRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          quotadate = row[LocalDateTime]("quotadate"),
-          salesquota = row[BigDecimal]("salesquota"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          quotadate = row[LocalDateTime](idx + 1),
+          salesquota = row[BigDecimal](idx + 2),
+          rowguid = row[UUID](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

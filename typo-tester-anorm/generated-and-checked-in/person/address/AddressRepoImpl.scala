@@ -26,7 +26,7 @@ object AddressRepoImpl extends AddressRepo {
           values (${unsaved.addressid}::int4, ${unsaved.addressline1}, ${unsaved.addressline2}, ${unsaved.city}, ${unsaved.stateprovinceid}::int4, ${unsaved.postalcode}, ${unsaved.spatiallocation}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
        """
-      .executeInsert(AddressRow.rowParser.single)
+      .executeInsert(AddressRow.rowParser(1).single)
   
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
@@ -55,7 +55,7 @@ object AddressRepoImpl extends AddressRepo {
       SQL"""insert into person.address default values
             returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
          """
-        .executeInsert(AddressRow.rowParser.single)
+        .executeInsert(AddressRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.address(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -65,14 +65,14 @@ object AddressRepoImpl extends AddressRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(AddressRow.rowParser.single)
+        .executeInsert(AddressRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
-       """.as(AddressRow.rowParser.*)
+       """.as(AddressRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow] = {
     fieldValues match {
@@ -98,7 +98,7 @@ object AddressRepoImpl extends AddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(AddressRow.rowParser.*)
+          .as(AddressRow.rowParser(1).*)
     }
   
   }
@@ -106,7 +106,7 @@ object AddressRepoImpl extends AddressRepo {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
           where addressid = $addressid
-       """.as(AddressRow.rowParser.singleOpt)
+       """.as(AddressRow.rowParser(1).singleOpt)
   }
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
     implicit val toStatement: ToStatement[Array[AddressId]] =
@@ -116,7 +116,7 @@ object AddressRepoImpl extends AddressRepo {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
           where addressid = ANY($addressids)
-       """.as(AddressRow.rowParser.*)
+       """.as(AddressRow.rowParser(1).*)
   
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
@@ -186,7 +186,7 @@ object AddressRepoImpl extends AddressRepo {
             modifieddate = EXCLUDED.modifieddate
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
        """
-      .executeInsert(AddressRow.rowParser.single)
+      .executeInsert(AddressRow.rowParser(1).single)
   
   }
 }

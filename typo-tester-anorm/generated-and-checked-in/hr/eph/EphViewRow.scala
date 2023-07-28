@@ -33,16 +33,16 @@ case class EphViewRow(
 )
 
 object EphViewRow {
-  val rowParser: RowParser[EphViewRow] =
+  def rowParser(idx: Int): RowParser[EphViewRow] =
     RowParser[EphViewRow] { row =>
       Success(
         EphViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          ratechangedate = row[Option[LocalDateTime]]("ratechangedate"),
-          rate = row[Option[BigDecimal]]("rate"),
-          payfrequency = row[Option[Int]]("payfrequency"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          ratechangedate = row[Option[LocalDateTime]](idx + 2),
+          rate = row[Option[BigDecimal]](idx + 3),
+          payfrequency = row[Option[Int]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

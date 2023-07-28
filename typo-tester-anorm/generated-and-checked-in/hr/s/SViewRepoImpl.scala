@@ -16,7 +16,7 @@ object SViewRepoImpl extends SViewRepo {
   override def selectAll(implicit c: Connection): List[SViewRow] = {
     SQL"""select "id", shiftid, "name", starttime, endtime, modifieddate
           from hr.s
-       """.as(SViewRow.rowParser.*)
+       """.as(SViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SViewFieldOrIdValue[_]])(implicit c: Connection): List[SViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object SViewRepoImpl extends SViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SViewRow.rowParser.*)
+          .as(SViewRow.rowParser(1).*)
     }
   
   }

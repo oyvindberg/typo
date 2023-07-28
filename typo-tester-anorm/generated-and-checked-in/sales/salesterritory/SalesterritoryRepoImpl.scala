@@ -26,7 +26,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
           values (${unsaved.territoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.countryregioncode}, ${unsaved.group}, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.costytd}::numeric, ${unsaved.costlastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
        """
-      .executeInsert(SalesterritoryRow.rowParser.single)
+      .executeInsert(SalesterritoryRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
@@ -68,7 +68,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       SQL"""insert into sales.salesterritory default values
             returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
          """
-        .executeInsert(SalesterritoryRow.rowParser.single)
+        .executeInsert(SalesterritoryRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesterritory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -78,14 +78,14 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SalesterritoryRow.rowParser.single)
+        .executeInsert(SalesterritoryRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
-       """.as(SalesterritoryRow.rowParser.*)
+       """.as(SalesterritoryRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SalesterritoryFieldOrIdValue[_]])(implicit c: Connection): List[SalesterritoryRow] = {
     fieldValues match {
@@ -112,7 +112,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesterritoryRow.rowParser.*)
+          .as(SalesterritoryRow.rowParser(1).*)
     }
   
   }
@@ -120,7 +120,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
           where territoryid = $territoryid
-       """.as(SalesterritoryRow.rowParser.singleOpt)
+       """.as(SalesterritoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
     implicit val toStatement: ToStatement[Array[SalesterritoryId]] =
@@ -130,7 +130,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     SQL"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
           from sales.salesterritory
           where territoryid = ANY($territoryids)
-       """.as(SalesterritoryRow.rowParser.*)
+       """.as(SalesterritoryRow.rowParser(1).*)
   
   }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
@@ -204,7 +204,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
             modifieddate = EXCLUDED.modifieddate
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate
        """
-      .executeInsert(SalesterritoryRow.rowParser.single)
+      .executeInsert(SalesterritoryRow.rowParser(1).single)
   
   }
 }

@@ -43,20 +43,20 @@ case class SpViewRow(
 )
 
 object SpViewRow {
-  val rowParser: RowParser[SpViewRow] =
+  def rowParser(idx: Int): RowParser[SpViewRow] =
     RowParser[SpViewRow] { row =>
       Success(
         SpViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          salesquota = row[Option[BigDecimal]]("salesquota"),
-          bonus = row[Option[BigDecimal]]("bonus"),
-          commissionpct = row[Option[BigDecimal]]("commissionpct"),
-          salesytd = row[Option[BigDecimal]]("salesytd"),
-          saleslastyear = row[Option[BigDecimal]]("saleslastyear"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          territoryid = row[Option[SalesterritoryId]](idx + 2),
+          salesquota = row[Option[BigDecimal]](idx + 3),
+          bonus = row[Option[BigDecimal]](idx + 4),
+          commissionpct = row[Option[BigDecimal]](idx + 5),
+          salesytd = row[Option[BigDecimal]](idx + 6),
+          saleslastyear = row[Option[BigDecimal]](idx + 7),
+          rowguid = row[Option[UUID]](idx + 8),
+          modifieddate = row[Option[LocalDateTime]](idx + 9)
         )
       )
     }

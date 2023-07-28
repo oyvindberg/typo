@@ -25,7 +25,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
        """
-      .executeInsert(ProductphotoRow.rowParser.single)
+      .executeInsert(ProductphotoRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
@@ -48,7 +48,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       SQL"""insert into production.productphoto default values
             returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
          """
-        .executeInsert(ProductphotoRow.rowParser.single)
+        .executeInsert(ProductphotoRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -58,14 +58,14 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ProductphotoRow.rowParser.single)
+        .executeInsert(ProductphotoRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
-       """.as(ProductphotoRow.rowParser.*)
+       """.as(ProductphotoRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ProductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductphotoRow] = {
     fieldValues match {
@@ -88,7 +88,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductphotoRow.rowParser.*)
+          .as(ProductphotoRow.rowParser(1).*)
     }
   
   }
@@ -96,7 +96,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
           where productphotoid = $productphotoid
-       """.as(ProductphotoRow.rowParser.singleOpt)
+       """.as(ProductphotoRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
     implicit val toStatement: ToStatement[Array[ProductphotoId]] =
@@ -106,7 +106,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
           where productphotoid = ANY($productphotoids)
-       """.as(ProductphotoRow.rowParser.*)
+       """.as(ProductphotoRow.rowParser(1).*)
   
   }
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
@@ -164,7 +164,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
        """
-      .executeInsert(ProductphotoRow.rowParser.single)
+      .executeInsert(ProductphotoRow.rowParser(1).single)
   
   }
 }

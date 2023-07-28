@@ -25,7 +25,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate
        """
-      .executeInsert(SalesreasonRow.rowParser.single)
+      .executeInsert(SalesreasonRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
@@ -46,7 +46,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       SQL"""insert into sales.salesreason default values
             returning salesreasonid, "name", reasontype, modifieddate
          """
-        .executeInsert(SalesreasonRow.rowParser.single)
+        .executeInsert(SalesreasonRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -56,14 +56,14 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SalesreasonRow.rowParser.single)
+        .executeInsert(SalesreasonRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
-       """.as(SalesreasonRow.rowParser.*)
+       """.as(SalesreasonRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesreasonRow] = {
     fieldValues match {
@@ -84,7 +84,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalesreasonRow.rowParser.*)
+          .as(SalesreasonRow.rowParser(1).*)
     }
   
   }
@@ -92,7 +92,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
           where salesreasonid = $salesreasonid
-       """.as(SalesreasonRow.rowParser.singleOpt)
+       """.as(SalesreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     implicit val toStatement: ToStatement[Array[SalesreasonId]] =
@@ -102,7 +102,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
           where salesreasonid = ANY($salesreasonids)
-       """.as(SalesreasonRow.rowParser.*)
+       """.as(SalesreasonRow.rowParser(1).*)
   
   }
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
@@ -152,7 +152,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             modifieddate = EXCLUDED.modifieddate
           returning salesreasonid, "name", reasontype, modifieddate
        """
-      .executeInsert(SalesreasonRow.rowParser.single)
+      .executeInsert(SalesreasonRow.rowParser(1).single)
   
   }
 }

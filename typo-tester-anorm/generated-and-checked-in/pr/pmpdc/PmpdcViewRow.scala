@@ -32,14 +32,14 @@ case class PmpdcViewRow(
 )
 
 object PmpdcViewRow {
-  val rowParser: RowParser[PmpdcViewRow] =
+  def rowParser(idx: Int): RowParser[PmpdcViewRow] =
     RowParser[PmpdcViewRow] { row =>
       Success(
         PmpdcViewRow(
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          productdescriptionid = row[Option[ProductdescriptionId]]("productdescriptionid"),
-          cultureid = row[Option[CultureId]]("cultureid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          productmodelid = row[Option[ProductmodelId]](idx + 0),
+          productdescriptionid = row[Option[ProductdescriptionId]](idx + 1),
+          cultureid = row[Option[CultureId]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

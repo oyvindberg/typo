@@ -62,38 +62,38 @@ case class PgtestnullRow(
 )
 
 object PgtestnullRow {
-  val rowParser: RowParser[PgtestnullRow] =
+  def rowParser(idx: Int): RowParser[PgtestnullRow] =
     RowParser[PgtestnullRow] { row =>
       Success(
         PgtestnullRow(
-          box = row[Option[TypoBox]]("box"),
-          circle = row[Option[TypoCircle]]("circle"),
-          line = row[Option[TypoLine]]("line"),
-          lseg = row[Option[TypoLineSegment]]("lseg"),
-          path = row[Option[TypoPath]]("path"),
-          point = row[Option[TypoPoint]]("point"),
-          polygon = row[Option[TypoPolygon]]("polygon"),
-          interval = row[Option[TypoInterval]]("interval"),
-          money = row[Option[TypoMoney]]("money"),
-          xml = row[Option[TypoXml]]("xml"),
-          json = row[Option[TypoJson]]("json"),
-          jsonb = row[Option[TypoJsonb]]("jsonb"),
-          hstore = row[Option[TypoHStore]]("hstore"),
-          inet = row[Option[TypoInet]]("inet"),
-          boxes = row[Option[Array[TypoBox]]]("boxes"),
-          circlees = row[Option[Array[TypoCircle]]]("circlees"),
-          linees = row[Option[Array[TypoLine]]]("linees"),
-          lseges = row[Option[Array[TypoLineSegment]]]("lseges"),
-          pathes = row[Option[Array[TypoPath]]]("pathes"),
-          pointes = row[Option[Array[TypoPoint]]]("pointes"),
-          polygones = row[Option[Array[TypoPolygon]]]("polygones"),
-          intervales = row[Option[Array[TypoInterval]]]("intervales"),
-          moneyes = row[Option[Array[TypoMoney]]]("moneyes"),
-          xmles = row[Option[Array[TypoXml]]]("xmles"),
-          jsones = row[Option[Array[TypoJson]]]("jsones"),
-          jsonbes = row[Option[Array[TypoJsonb]]]("jsonbes"),
-          hstores = row[Option[Array[TypoHStore]]]("hstores"),
-          inets = row[Option[Array[TypoInet]]]("inets")
+          box = row[Option[TypoBox]](idx + 0),
+          circle = row[Option[TypoCircle]](idx + 1),
+          line = row[Option[TypoLine]](idx + 2),
+          lseg = row[Option[TypoLineSegment]](idx + 3),
+          path = row[Option[TypoPath]](idx + 4),
+          point = row[Option[TypoPoint]](idx + 5),
+          polygon = row[Option[TypoPolygon]](idx + 6),
+          interval = row[Option[TypoInterval]](idx + 7),
+          money = row[Option[TypoMoney]](idx + 8),
+          xml = row[Option[TypoXml]](idx + 9),
+          json = row[Option[TypoJson]](idx + 10),
+          jsonb = row[Option[TypoJsonb]](idx + 11),
+          hstore = row[Option[TypoHStore]](idx + 12),
+          inet = row[Option[TypoInet]](idx + 13),
+          boxes = row[Option[Array[TypoBox]]](idx + 14),
+          circlees = row[Option[Array[TypoCircle]]](idx + 15),
+          linees = row[Option[Array[TypoLine]]](idx + 16),
+          lseges = row[Option[Array[TypoLineSegment]]](idx + 17),
+          pathes = row[Option[Array[TypoPath]]](idx + 18),
+          pointes = row[Option[Array[TypoPoint]]](idx + 19),
+          polygones = row[Option[Array[TypoPolygon]]](idx + 20),
+          intervales = row[Option[Array[TypoInterval]]](idx + 21),
+          moneyes = row[Option[Array[TypoMoney]]](idx + 22),
+          xmles = row[Option[Array[TypoXml]]](idx + 23),
+          jsones = row[Option[Array[TypoJson]]](idx + 24),
+          jsonbes = row[Option[Array[TypoJsonb]]](idx + 25),
+          hstores = row[Option[Array[TypoHStore]]](idx + 26),
+          inets = row[Option[Array[TypoInet]]](idx + 27)
         )
       )
     }

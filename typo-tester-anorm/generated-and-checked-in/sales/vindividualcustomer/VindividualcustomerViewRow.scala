@@ -56,28 +56,28 @@ case class VindividualcustomerViewRow(
 )
 
 object VindividualcustomerViewRow {
-  val rowParser: RowParser[VindividualcustomerViewRow] =
+  def rowParser(idx: Int): RowParser[VindividualcustomerViewRow] =
     RowParser[VindividualcustomerViewRow] { row =>
       Success(
         VindividualcustomerViewRow(
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          phonenumber = row[Option[Phone]]("phonenumber"),
-          phonenumbertype = row[Option[Name]]("phonenumbertype"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          emailpromotion = row[Option[Int]]("emailpromotion"),
-          addresstype = row[Option[Name]]("addresstype"),
-          addressline1 = row[Option[/* max 60 chars */ String]]("addressline1"),
-          addressline2 = row[Option[/* max 60 chars */ String]]("addressline2"),
-          city = row[Option[/* max 30 chars */ String]]("city"),
-          stateprovincename = row[Option[Name]]("stateprovincename"),
-          postalcode = row[Option[/* max 15 chars */ String]]("postalcode"),
-          countryregionname = row[Option[Name]]("countryregionname"),
-          demographics = row[Option[TypoXml]]("demographics")
+          businessentityid = row[Option[BusinessentityId]](idx + 0),
+          title = row[Option[/* max 8 chars */ String]](idx + 1),
+          firstname = row[Option[Name]](idx + 2),
+          middlename = row[Option[Name]](idx + 3),
+          lastname = row[Option[Name]](idx + 4),
+          suffix = row[Option[/* max 10 chars */ String]](idx + 5),
+          phonenumber = row[Option[Phone]](idx + 6),
+          phonenumbertype = row[Option[Name]](idx + 7),
+          emailaddress = row[Option[/* max 50 chars */ String]](idx + 8),
+          emailpromotion = row[Option[Int]](idx + 9),
+          addresstype = row[Option[Name]](idx + 10),
+          addressline1 = row[Option[/* max 60 chars */ String]](idx + 11),
+          addressline2 = row[Option[/* max 60 chars */ String]](idx + 12),
+          city = row[Option[/* max 30 chars */ String]](idx + 13),
+          stateprovincename = row[Option[Name]](idx + 14),
+          postalcode = row[Option[/* max 15 chars */ String]](idx + 15),
+          countryregionname = row[Option[Name]](idx + 16),
+          demographics = row[Option[TypoXml]](idx + 17)
         )
       )
     }

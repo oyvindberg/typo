@@ -16,7 +16,7 @@ object PchViewRepoImpl extends PchViewRepo {
   override def selectAll(implicit c: Connection): List[PchViewRow] = {
     SQL"""select "id", productid, startdate, enddate, standardcost, modifieddate
           from pr.pch
-       """.as(PchViewRow.rowParser.*)
+       """.as(PchViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PchViewFieldOrIdValue[_]])(implicit c: Connection): List[PchViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PchViewRepoImpl extends PchViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PchViewRow.rowParser.*)
+          .as(PchViewRow.rowParser(1).*)
     }
   
   }

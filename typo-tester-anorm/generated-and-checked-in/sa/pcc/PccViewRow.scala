@@ -30,14 +30,14 @@ case class PccViewRow(
 )
 
 object PccViewRow {
-  val rowParser: RowParser[PccViewRow] =
+  def rowParser(idx: Int): RowParser[PccViewRow] =
     RowParser[PccViewRow] { row =>
       Success(
         PccViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          creditcardid = row[Option[CreditcardId]]("creditcardid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          creditcardid = row[Option[CreditcardId]](idx + 2),
+          modifieddate = row[Option[LocalDateTime]](idx + 3)
         )
       )
     }

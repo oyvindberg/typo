@@ -16,7 +16,7 @@ object PlphViewRepoImpl extends PlphViewRepo {
   override def selectAll(implicit c: Connection): List[PlphViewRow] = {
     SQL"""select "id", productid, startdate, enddate, listprice, modifieddate
           from pr.plph
-       """.as(PlphViewRow.rowParser.*)
+       """.as(PlphViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PlphViewFieldOrIdValue[_]])(implicit c: Connection): List[PlphViewRow] = {
     fieldValues match {
@@ -39,7 +39,7 @@ object PlphViewRepoImpl extends PlphViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PlphViewRow.rowParser.*)
+          .as(PlphViewRow.rowParser(1).*)
     }
   
   }

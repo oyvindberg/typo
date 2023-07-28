@@ -24,7 +24,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.addressid}::int4, ${unsaved.addresstypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
        """
-      .executeInsert(BusinessentityaddressRow.rowParser.single)
+      .executeInsert(BusinessentityaddressRow.rowParser(1).single)
   
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved)(implicit c: Connection): BusinessentityaddressRow = {
@@ -46,7 +46,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
       SQL"""insert into person.businessentityaddress default values
             returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
          """
-        .executeInsert(BusinessentityaddressRow.rowParser.single)
+        .executeInsert(BusinessentityaddressRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.businessentityaddress(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -56,14 +56,14 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(BusinessentityaddressRow.rowParser.single)
+        .executeInsert(BusinessentityaddressRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[BusinessentityaddressRow] = {
     SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate
           from person.businessentityaddress
-       """.as(BusinessentityaddressRow.rowParser.*)
+       """.as(BusinessentityaddressRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[BusinessentityaddressFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityaddressRow] = {
     fieldValues match {
@@ -85,7 +85,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BusinessentityaddressRow.rowParser.*)
+          .as(BusinessentityaddressRow.rowParser(1).*)
     }
   
   }
@@ -93,7 +93,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     SQL"""select businessentityid, addressid, addresstypeid, rowguid, modifieddate
           from person.businessentityaddress
           where businessentityid = ${compositeId.businessentityid} AND addressid = ${compositeId.addressid} AND addresstypeid = ${compositeId.addresstypeid}
-       """.as(BusinessentityaddressRow.rowParser.singleOpt)
+       """.as(BusinessentityaddressRow.rowParser(1).singleOpt)
   }
   override def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -140,7 +140,7 @@ object BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, addressid, addresstypeid, rowguid, modifieddate
        """
-      .executeInsert(BusinessentityaddressRow.rowParser.single)
+      .executeInsert(BusinessentityaddressRow.rowParser(1).single)
   
   }
 }

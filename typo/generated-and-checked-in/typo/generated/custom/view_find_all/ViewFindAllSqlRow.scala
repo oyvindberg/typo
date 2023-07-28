@@ -36,15 +36,15 @@ case class ViewFindAllSqlRow(
 )
 
 object ViewFindAllSqlRow {
-  val rowParser: RowParser[ViewFindAllSqlRow] =
+  def rowParser(idx: Int): RowParser[ViewFindAllSqlRow] =
     RowParser[ViewFindAllSqlRow] { row =>
       Success(
         ViewFindAllSqlRow(
-          tableOid = row[PgNamespaceId]("table_oid"),
-          tableSchema = row[/* nullability unknown */ Option[String]]("table_schema"),
-          tableName = row[/* nullability unknown */ Option[String]]("table_name"),
-          relkind = row[String]("relkind"),
-          viewDefinition = row[/* nullability unknown */ Option[String]]("view_definition")
+          tableOid = row[PgNamespaceId](idx + 0),
+          tableSchema = row[/* nullability unknown */ Option[String]](idx + 1),
+          tableName = row[/* nullability unknown */ Option[String]](idx + 2),
+          relkind = row[String](idx + 3),
+          viewDefinition = row[/* nullability unknown */ Option[String]](idx + 4)
         )
       )
     }

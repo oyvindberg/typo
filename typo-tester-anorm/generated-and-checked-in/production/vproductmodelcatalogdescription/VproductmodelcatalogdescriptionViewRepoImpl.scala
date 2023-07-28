@@ -16,7 +16,7 @@ object VproductmodelcatalogdescriptionViewRepoImpl extends Vproductmodelcatalogd
   override def selectAll(implicit c: Connection): List[VproductmodelcatalogdescriptionViewRow] = {
     SQL"""select productmodelid, "name", Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, "style", riderexperience, rowguid, modifieddate
           from production.vproductmodelcatalogdescription
-       """.as(VproductmodelcatalogdescriptionViewRow.rowParser.*)
+       """.as(VproductmodelcatalogdescriptionViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VproductmodelcatalogdescriptionViewFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelcatalogdescriptionViewRow] = {
     fieldValues match {
@@ -58,7 +58,7 @@ object VproductmodelcatalogdescriptionViewRepoImpl extends Vproductmodelcatalogd
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VproductmodelcatalogdescriptionViewRow.rowParser.*)
+          .as(VproductmodelcatalogdescriptionViewRow.rowParser(1).*)
     }
   
   }

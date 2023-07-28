@@ -32,15 +32,15 @@ case class PdViewRow(
 )
 
 object PdViewRow {
-  val rowParser: RowParser[PdViewRow] =
+  def rowParser(idx: Int): RowParser[PdViewRow] =
     RowParser[PdViewRow] { row =>
       Success(
         PdViewRow(
-          id = row[Option[Int]]("id"),
-          productdescriptionid = row[Option[ProductdescriptionId]]("productdescriptionid"),
-          description = row[Option[/* max 400 chars */ String]]("description"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          productdescriptionid = row[Option[ProductdescriptionId]](idx + 1),
+          description = row[Option[/* max 400 chars */ String]](idx + 2),
+          rowguid = row[Option[UUID]](idx + 3),
+          modifieddate = row[Option[LocalDateTime]](idx + 4)
         )
       )
     }

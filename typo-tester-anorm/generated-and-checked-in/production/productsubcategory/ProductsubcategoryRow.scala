@@ -33,15 +33,15 @@ case class ProductsubcategoryRow(
 )
 
 object ProductsubcategoryRow {
-  val rowParser: RowParser[ProductsubcategoryRow] =
+  def rowParser(idx: Int): RowParser[ProductsubcategoryRow] =
     RowParser[ProductsubcategoryRow] { row =>
       Success(
         ProductsubcategoryRow(
-          productsubcategoryid = row[ProductsubcategoryId]("productsubcategoryid"),
-          productcategoryid = row[ProductcategoryId]("productcategoryid"),
-          name = row[Name]("name"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productsubcategoryid = row[ProductsubcategoryId](idx + 0),
+          productcategoryid = row[ProductcategoryId](idx + 1),
+          name = row[Name](idx + 2),
+          rowguid = row[UUID](idx + 3),
+          modifieddate = row[LocalDateTime](idx + 4)
         )
       )
     }

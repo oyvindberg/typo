@@ -16,7 +16,7 @@ object CrcViewRepoImpl extends CrcViewRepo {
   override def selectAll(implicit c: Connection): List[CrcViewRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate
           from sa.crc
-       """.as(CrcViewRow.rowParser.*)
+       """.as(CrcViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CrcViewFieldOrIdValue[_]])(implicit c: Connection): List[CrcViewRow] = {
     fieldValues match {
@@ -36,7 +36,7 @@ object CrcViewRepoImpl extends CrcViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CrcViewRow.rowParser.*)
+          .as(CrcViewRow.rowParser(1).*)
     }
   
   }

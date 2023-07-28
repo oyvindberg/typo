@@ -39,19 +39,19 @@ case class PersonDetailSqlRow(
 )
 
 object PersonDetailSqlRow {
-  val rowParser: RowParser[PersonDetailSqlRow] =
+  def rowParser(idx: Int): RowParser[PersonDetailSqlRow] =
     RowParser[PersonDetailSqlRow] { row =>
       Success(
         PersonDetailSqlRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Name]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Name]("lastname"),
-          jobtitle = row[/* max 50 chars */ String]("jobtitle"),
-          addressline1 = row[/* max 60 chars */ String]("addressline1"),
-          city = row[/* max 30 chars */ String]("city"),
-          postalcode = row[/* max 15 chars */ String]("postalcode")
+          businessentityid = row[BusinessentityId](idx + 0),
+          title = row[Option[/* max 8 chars */ String]](idx + 1),
+          firstname = row[Name](idx + 2),
+          middlename = row[Option[Name]](idx + 3),
+          lastname = row[Name](idx + 4),
+          jobtitle = row[/* max 50 chars */ String](idx + 5),
+          addressline1 = row[/* max 60 chars */ String](idx + 6),
+          city = row[/* max 30 chars */ String](idx + 7),
+          postalcode = row[/* max 15 chars */ String](idx + 8)
         )
       )
     }

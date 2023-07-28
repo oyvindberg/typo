@@ -27,7 +27,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
           values (${unsaved.stateprovinceid}::int4, ${unsaved.stateprovincecode}::bpchar, ${unsaved.countryregioncode}, ${unsaved.isonlystateprovinceflag}::"public"."Flag", ${unsaved.name}::"public"."Name", ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
        """
-      .executeInsert(StateprovinceRow.rowParser.single)
+      .executeInsert(StateprovinceRow.rowParser(1).single)
   
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
@@ -58,7 +58,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       SQL"""insert into person.stateprovince default values
             returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
          """
-        .executeInsert(StateprovinceRow.rowParser.single)
+        .executeInsert(StateprovinceRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.stateprovince(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -68,14 +68,14 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(StateprovinceRow.rowParser.single)
+        .executeInsert(StateprovinceRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[StateprovinceRow] = {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
-       """.as(StateprovinceRow.rowParser.*)
+       """.as(StateprovinceRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow] = {
     fieldValues match {
@@ -100,7 +100,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(StateprovinceRow.rowParser.*)
+          .as(StateprovinceRow.rowParser(1).*)
     }
   
   }
@@ -108,7 +108,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
           where stateprovinceid = $stateprovinceid
-       """.as(StateprovinceRow.rowParser.singleOpt)
+       """.as(StateprovinceRow.rowParser(1).singleOpt)
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
     implicit val toStatement: ToStatement[Array[StateprovinceId]] =
@@ -118,7 +118,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     SQL"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from person.stateprovince
           where stateprovinceid = ANY($stateprovinceids)
-       """.as(StateprovinceRow.rowParser.*)
+       """.as(StateprovinceRow.rowParser(1).*)
   
   }
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
@@ -184,7 +184,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             modifieddate = EXCLUDED.modifieddate
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
        """
-      .executeInsert(StateprovinceRow.rowParser.single)
+      .executeInsert(StateprovinceRow.rowParser(1).single)
   
   }
 }

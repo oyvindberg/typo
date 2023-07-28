@@ -16,7 +16,7 @@ object PppViewRepoImpl extends PppViewRepo {
   override def selectAll(implicit c: Connection): List[PppViewRow] = {
     SQL"""select productid, productphotoid, "primary", modifieddate
           from pr.ppp
-       """.as(PppViewRow.rowParser.*)
+       """.as(PppViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PppViewFieldOrIdValue[_]])(implicit c: Connection): List[PppViewRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PppViewRepoImpl extends PppViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PppViewRow.rowParser.*)
+          .as(PppViewRow.rowParser(1).*)
     }
   
   }

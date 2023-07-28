@@ -53,35 +53,35 @@ case class VproductmodelcatalogdescriptionViewRow(
 )
 
 object VproductmodelcatalogdescriptionViewRow {
-  val rowParser: RowParser[VproductmodelcatalogdescriptionViewRow] =
+  def rowParser(idx: Int): RowParser[VproductmodelcatalogdescriptionViewRow] =
     RowParser[VproductmodelcatalogdescriptionViewRow] { row =>
       Success(
         VproductmodelcatalogdescriptionViewRow(
-          productmodelid = row[Option[ProductmodelId]]("productmodelid"),
-          name = row[Option[Name]]("name"),
-          Summary = row[Option[String]]("Summary"),
-          manufacturer = row[Option[String]]("manufacturer"),
-          copyright = row[Option[/* max 30 chars */ String]]("copyright"),
-          producturl = row[Option[/* max 256 chars */ String]]("producturl"),
-          warrantyperiod = row[Option[/* max 256 chars */ String]]("warrantyperiod"),
-          warrantydescription = row[Option[/* max 256 chars */ String]]("warrantydescription"),
-          noofyears = row[Option[/* max 256 chars */ String]]("noofyears"),
-          maintenancedescription = row[Option[/* max 256 chars */ String]]("maintenancedescription"),
-          wheel = row[Option[/* max 256 chars */ String]]("wheel"),
-          saddle = row[Option[/* max 256 chars */ String]]("saddle"),
-          pedal = row[Option[/* max 256 chars */ String]]("pedal"),
-          bikeframe = row[Option[String]]("bikeframe"),
-          crankset = row[Option[/* max 256 chars */ String]]("crankset"),
-          pictureangle = row[Option[/* max 256 chars */ String]]("pictureangle"),
-          picturesize = row[Option[/* max 256 chars */ String]]("picturesize"),
-          productphotoid = row[Option[/* max 256 chars */ String]]("productphotoid"),
-          material = row[Option[/* max 256 chars */ String]]("material"),
-          color = row[Option[/* max 256 chars */ String]]("color"),
-          productline = row[Option[/* max 256 chars */ String]]("productline"),
-          style = row[Option[/* max 256 chars */ String]]("style"),
-          riderexperience = row[Option[/* max 1024 chars */ String]]("riderexperience"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          productmodelid = row[Option[ProductmodelId]](idx + 0),
+          name = row[Option[Name]](idx + 1),
+          Summary = row[Option[String]](idx + 2),
+          manufacturer = row[Option[String]](idx + 3),
+          copyright = row[Option[/* max 30 chars */ String]](idx + 4),
+          producturl = row[Option[/* max 256 chars */ String]](idx + 5),
+          warrantyperiod = row[Option[/* max 256 chars */ String]](idx + 6),
+          warrantydescription = row[Option[/* max 256 chars */ String]](idx + 7),
+          noofyears = row[Option[/* max 256 chars */ String]](idx + 8),
+          maintenancedescription = row[Option[/* max 256 chars */ String]](idx + 9),
+          wheel = row[Option[/* max 256 chars */ String]](idx + 10),
+          saddle = row[Option[/* max 256 chars */ String]](idx + 11),
+          pedal = row[Option[/* max 256 chars */ String]](idx + 12),
+          bikeframe = row[Option[String]](idx + 13),
+          crankset = row[Option[/* max 256 chars */ String]](idx + 14),
+          pictureangle = row[Option[/* max 256 chars */ String]](idx + 15),
+          picturesize = row[Option[/* max 256 chars */ String]](idx + 16),
+          productphotoid = row[Option[/* max 256 chars */ String]](idx + 17),
+          material = row[Option[/* max 256 chars */ String]](idx + 18),
+          color = row[Option[/* max 256 chars */ String]](idx + 19),
+          productline = row[Option[/* max 256 chars */ String]](idx + 20),
+          style = row[Option[/* max 256 chars */ String]](idx + 21),
+          riderexperience = row[Option[/* max 1024 chars */ String]](idx + 22),
+          rowguid = row[Option[UUID]](idx + 23),
+          modifieddate = row[Option[LocalDateTime]](idx + 24)
         )
       )
     }

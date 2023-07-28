@@ -34,16 +34,16 @@ case class EViewRow(
 )
 
 object EViewRow {
-  val rowParser: RowParser[EViewRow] =
+  def rowParser(idx: Int): RowParser[EViewRow] =
     RowParser[EViewRow] { row =>
       Success(
         EViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          emailaddressid = row[Option[Int]]("emailaddressid"),
-          emailaddress = row[Option[/* max 50 chars */ String]]("emailaddress"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          emailaddressid = row[Option[Int]](idx + 2),
+          emailaddress = row[Option[/* max 50 chars */ String]](idx + 3),
+          rowguid = row[Option[UUID]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

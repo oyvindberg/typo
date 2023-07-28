@@ -56,26 +56,26 @@ case class EViewRow(
 )
 
 object EViewRow {
-  val rowParser: RowParser[EViewRow] =
+  def rowParser(idx: Int): RowParser[EViewRow] =
     RowParser[EViewRow] { row =>
       Success(
         EViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          nationalidnumber = row[Option[/* max 15 chars */ String]]("nationalidnumber"),
-          loginid = row[Option[/* max 256 chars */ String]]("loginid"),
-          jobtitle = row[Option[/* max 50 chars */ String]]("jobtitle"),
-          birthdate = row[Option[LocalDate]]("birthdate"),
-          maritalstatus = row[Option[/* bpchar */ String]]("maritalstatus"),
-          gender = row[Option[/* bpchar */ String]]("gender"),
-          hiredate = row[Option[LocalDate]]("hiredate"),
-          salariedflag = row[Flag]("salariedflag"),
-          vacationhours = row[Option[Int]]("vacationhours"),
-          sickleavehours = row[Option[Int]]("sickleavehours"),
-          currentflag = row[Flag]("currentflag"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
-          organizationnode = row[Option[String]]("organizationnode")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          nationalidnumber = row[Option[/* max 15 chars */ String]](idx + 2),
+          loginid = row[Option[/* max 256 chars */ String]](idx + 3),
+          jobtitle = row[Option[/* max 50 chars */ String]](idx + 4),
+          birthdate = row[Option[LocalDate]](idx + 5),
+          maritalstatus = row[Option[/* bpchar */ String]](idx + 6),
+          gender = row[Option[/* bpchar */ String]](idx + 7),
+          hiredate = row[Option[LocalDate]](idx + 8),
+          salariedflag = row[Flag](idx + 9),
+          vacationhours = row[Option[Int]](idx + 10),
+          sickleavehours = row[Option[Int]](idx + 11),
+          currentflag = row[Flag](idx + 12),
+          rowguid = row[Option[UUID]](idx + 13),
+          modifieddate = row[Option[LocalDateTime]](idx + 14),
+          organizationnode = row[Option[String]](idx + 15)
         )
       )
     }

@@ -25,7 +25,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
           values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning countryregioncode, "name", modifieddate
        """
-      .executeInsert(CountryregionRow.rowParser.single)
+      .executeInsert(CountryregionRow.rowParser(1).single)
   
   }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
@@ -42,7 +42,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
       SQL"""insert into person.countryregion default values
             returning countryregioncode, "name", modifieddate
          """
-        .executeInsert(CountryregionRow.rowParser.single)
+        .executeInsert(CountryregionRow.rowParser(1).single)
     } else {
       val q = s"""insert into person.countryregion(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -52,14 +52,14 @@ object CountryregionRepoImpl extends CountryregionRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(CountryregionRow.rowParser.single)
+        .executeInsert(CountryregionRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select countryregioncode, "name", modifieddate
           from person.countryregion
-       """.as(CountryregionRow.rowParser.*)
+       """.as(CountryregionRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]])(implicit c: Connection): List[CountryregionRow] = {
     fieldValues match {
@@ -79,7 +79,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CountryregionRow.rowParser.*)
+          .as(CountryregionRow.rowParser(1).*)
     }
   
   }
@@ -87,7 +87,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     SQL"""select countryregioncode, "name", modifieddate
           from person.countryregion
           where countryregioncode = $countryregioncode
-       """.as(CountryregionRow.rowParser.singleOpt)
+       """.as(CountryregionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
     implicit val toStatement: ToStatement[Array[CountryregionId]] =
@@ -97,7 +97,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     SQL"""select countryregioncode, "name", modifieddate
           from person.countryregion
           where countryregioncode = ANY($countryregioncodes)
-       """.as(CountryregionRow.rowParser.*)
+       """.as(CountryregionRow.rowParser(1).*)
   
   }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
@@ -143,7 +143,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
             modifieddate = EXCLUDED.modifieddate
           returning countryregioncode, "name", modifieddate
        """
-      .executeInsert(CountryregionRow.rowParser.single)
+      .executeInsert(CountryregionRow.rowParser(1).single)
   
   }
 }

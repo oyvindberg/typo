@@ -16,7 +16,7 @@ object PohViewRepoImpl extends PohViewRepo {
   override def selectAll(implicit c: Connection): List[PohViewRow] = {
     SQL"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from pu.poh
-       """.as(PohViewRow.rowParser.*)
+       """.as(PohViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PohViewFieldOrIdValue[_]])(implicit c: Connection): List[PohViewRow] = {
     fieldValues match {
@@ -46,7 +46,7 @@ object PohViewRepoImpl extends PohViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PohViewRow.rowParser.*)
+          .as(PohViewRow.rowParser(1).*)
     }
   
   }

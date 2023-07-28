@@ -16,7 +16,7 @@ object VemployeeViewRepoImpl extends VemployeeViewRepo {
   override def selectAll(implicit c: Connection): List[VemployeeViewRow] = {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, additionalcontactinfo
           from humanresources.vemployee
-       """.as(VemployeeViewRow.rowParser.*)
+       """.as(VemployeeViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VemployeeViewFieldOrIdValue[_]])(implicit c: Connection): List[VemployeeViewRow] = {
     fieldValues match {
@@ -51,7 +51,7 @@ object VemployeeViewRepoImpl extends VemployeeViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VemployeeViewRow.rowParser.*)
+          .as(VemployeeViewRow.rowParser(1).*)
     }
   
   }

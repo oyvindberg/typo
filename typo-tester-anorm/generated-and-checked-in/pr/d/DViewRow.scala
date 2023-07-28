@@ -51,23 +51,23 @@ case class DViewRow(
 )
 
 object DViewRow {
-  val rowParser: RowParser[DViewRow] =
+  def rowParser(idx: Int): RowParser[DViewRow] =
     RowParser[DViewRow] { row =>
       Success(
         DViewRow(
-          title = row[Option[/* max 50 chars */ String]]("title"),
-          owner = row[Option[BusinessentityId]]("owner"),
-          folderflag = row[Flag]("folderflag"),
-          filename = row[Option[/* max 400 chars */ String]]("filename"),
-          fileextension = row[Option[/* max 8 chars */ String]]("fileextension"),
-          revision = row[Option[/* bpchar */ String]]("revision"),
-          changenumber = row[Option[Int]]("changenumber"),
-          status = row[Option[Int]]("status"),
-          documentsummary = row[Option[String]]("documentsummary"),
-          document = row[Option[Byte]]("document"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate"),
-          documentnode = row[Option[DocumentId]]("documentnode")
+          title = row[Option[/* max 50 chars */ String]](idx + 0),
+          owner = row[Option[BusinessentityId]](idx + 1),
+          folderflag = row[Flag](idx + 2),
+          filename = row[Option[/* max 400 chars */ String]](idx + 3),
+          fileextension = row[Option[/* max 8 chars */ String]](idx + 4),
+          revision = row[Option[/* bpchar */ String]](idx + 5),
+          changenumber = row[Option[Int]](idx + 6),
+          status = row[Option[Int]](idx + 7),
+          documentsummary = row[Option[String]](idx + 8),
+          document = row[Option[Byte]](idx + 9),
+          rowguid = row[Option[UUID]](idx + 10),
+          modifieddate = row[Option[LocalDateTime]](idx + 11),
+          documentnode = row[Option[DocumentId]](idx + 12)
         )
       )
     }

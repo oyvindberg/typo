@@ -16,7 +16,7 @@ object VemployeedepartmenthistoryViewRepoImpl extends Vemployeedepartmenthistory
   override def selectAll(implicit c: Connection): List[VemployeedepartmenthistoryViewRow] = {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate
           from humanresources.vemployeedepartmenthistory
-       """.as(VemployeedepartmenthistoryViewRow.rowParser.*)
+       """.as(VemployeedepartmenthistoryViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VemployeedepartmenthistoryViewFieldOrIdValue[_]])(implicit c: Connection): List[VemployeedepartmenthistoryViewRow] = {
     fieldValues match {
@@ -44,7 +44,7 @@ object VemployeedepartmenthistoryViewRepoImpl extends Vemployeedepartmenthistory
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VemployeedepartmenthistoryViewRow.rowParser.*)
+          .as(VemployeedepartmenthistoryViewRow.rowParser(1).*)
     }
   
   }

@@ -16,7 +16,7 @@ object CViewRepoImpl extends CViewRepo {
   override def selectAll(implicit c: Connection): List[CViewRow] = {
     SQL"""select "id", cultureid, "name", modifieddate
           from pr."c"
-       """.as(CViewRow.rowParser.*)
+       """.as(CViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CViewFieldOrIdValue[_]])(implicit c: Connection): List[CViewRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object CViewRepoImpl extends CViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CViewRow.rowParser.*)
+          .as(CViewRow.rowParser(1).*)
     }
   
   }

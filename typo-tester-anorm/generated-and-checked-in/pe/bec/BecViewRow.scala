@@ -35,16 +35,16 @@ case class BecViewRow(
 )
 
 object BecViewRow {
-  val rowParser: RowParser[BecViewRow] =
+  def rowParser(idx: Int): RowParser[BecViewRow] =
     RowParser[BecViewRow] { row =>
       Success(
         BecViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          personid = row[Option[BusinessentityId]]("personid"),
-          contacttypeid = row[Option[ContacttypeId]]("contacttypeid"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          personid = row[Option[BusinessentityId]](idx + 2),
+          contacttypeid = row[Option[ContacttypeId]](idx + 3),
+          rowguid = row[Option[UUID]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

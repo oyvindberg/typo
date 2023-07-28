@@ -46,21 +46,21 @@ case class SodViewRow(
 )
 
 object SodViewRow {
-  val rowParser: RowParser[SodViewRow] =
+  def rowParser(idx: Int): RowParser[SodViewRow] =
     RowParser[SodViewRow] { row =>
       Success(
         SodViewRow(
-          id = row[Option[Int]]("id"),
-          salesorderid = row[Option[SalesorderheaderId]]("salesorderid"),
-          salesorderdetailid = row[Option[Int]]("salesorderdetailid"),
-          carriertrackingnumber = row[Option[/* max 25 chars */ String]]("carriertrackingnumber"),
-          orderqty = row[Option[Int]]("orderqty"),
-          productid = row[Option[ProductId]]("productid"),
-          specialofferid = row[Option[SpecialofferId]]("specialofferid"),
-          unitprice = row[Option[BigDecimal]]("unitprice"),
-          unitpricediscount = row[Option[BigDecimal]]("unitpricediscount"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          salesorderid = row[Option[SalesorderheaderId]](idx + 1),
+          salesorderdetailid = row[Option[Int]](idx + 2),
+          carriertrackingnumber = row[Option[/* max 25 chars */ String]](idx + 3),
+          orderqty = row[Option[Int]](idx + 4),
+          productid = row[Option[ProductId]](idx + 5),
+          specialofferid = row[Option[SpecialofferId]](idx + 6),
+          unitprice = row[Option[BigDecimal]](idx + 7),
+          unitpricediscount = row[Option[BigDecimal]](idx + 8),
+          rowguid = row[Option[UUID]](idx + 9),
+          modifieddate = row[Option[LocalDateTime]](idx + 10)
         )
       )
     }

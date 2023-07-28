@@ -32,14 +32,14 @@ case class PgNamespaceRow(
 )
 
 object PgNamespaceRow {
-  val rowParser: RowParser[PgNamespaceRow] =
+  def rowParser(idx: Int): RowParser[PgNamespaceRow] =
     RowParser[PgNamespaceRow] { row =>
       Success(
         PgNamespaceRow(
-          oid = row[PgNamespaceId]("oid"),
-          nspname = row[String]("nspname"),
-          nspowner = row[/* oid */ Long]("nspowner"),
-          nspacl = row[Option[Array[TypoAclItem]]]("nspacl")
+          oid = row[PgNamespaceId](idx + 0),
+          nspname = row[String](idx + 1),
+          nspowner = row[/* oid */ Long](idx + 2),
+          nspacl = row[Option[Array[TypoAclItem]]](idx + 3)
         )
       )
     }

@@ -42,19 +42,19 @@ case class SalespersonRow(
 )
 
 object SalespersonRow {
-  val rowParser: RowParser[SalespersonRow] =
+  def rowParser(idx: Int): RowParser[SalespersonRow] =
     RowParser[SalespersonRow] { row =>
       Success(
         SalespersonRow(
-          businessentityid = row[BusinessentityId]("businessentityid"),
-          territoryid = row[Option[SalesterritoryId]]("territoryid"),
-          salesquota = row[Option[BigDecimal]]("salesquota"),
-          bonus = row[BigDecimal]("bonus"),
-          commissionpct = row[BigDecimal]("commissionpct"),
-          salesytd = row[BigDecimal]("salesytd"),
-          saleslastyear = row[BigDecimal]("saleslastyear"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          businessentityid = row[BusinessentityId](idx + 0),
+          territoryid = row[Option[SalesterritoryId]](idx + 1),
+          salesquota = row[Option[BigDecimal]](idx + 2),
+          bonus = row[BigDecimal](idx + 3),
+          commissionpct = row[BigDecimal](idx + 4),
+          salesytd = row[BigDecimal](idx + 5),
+          saleslastyear = row[BigDecimal](idx + 6),
+          rowguid = row[UUID](idx + 7),
+          modifieddate = row[LocalDateTime](idx + 8)
         )
       )
     }

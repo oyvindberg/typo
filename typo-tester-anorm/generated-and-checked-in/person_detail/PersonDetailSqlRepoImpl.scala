@@ -28,7 +28,7 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.address a ON a.addressid = bea.addressid
             where s.businessentityid = $businessentityid
          """
-    sql.as(PersonDetailSqlRow.rowParser.*)
+    sql.as(PersonDetailSqlRow.rowParser(1).*)
   
   }
 }

@@ -34,16 +34,16 @@ case class SpqhViewRow(
 )
 
 object SpqhViewRow {
-  val rowParser: RowParser[SpqhViewRow] =
+  def rowParser(idx: Int): RowParser[SpqhViewRow] =
     RowParser[SpqhViewRow] { row =>
       Success(
         SpqhViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          quotadate = row[Option[LocalDateTime]]("quotadate"),
-          salesquota = row[Option[BigDecimal]]("salesquota"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          quotadate = row[Option[LocalDateTime]](idx + 2),
+          salesquota = row[Option[BigDecimal]](idx + 3),
+          rowguid = row[Option[UUID]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

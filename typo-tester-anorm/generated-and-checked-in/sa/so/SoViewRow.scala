@@ -46,22 +46,22 @@ case class SoViewRow(
 )
 
 object SoViewRow {
-  val rowParser: RowParser[SoViewRow] =
+  def rowParser(idx: Int): RowParser[SoViewRow] =
     RowParser[SoViewRow] { row =>
       Success(
         SoViewRow(
-          id = row[Option[Int]]("id"),
-          specialofferid = row[Option[SpecialofferId]]("specialofferid"),
-          description = row[Option[/* max 255 chars */ String]]("description"),
-          discountpct = row[Option[BigDecimal]]("discountpct"),
-          `type` = row[Option[/* max 50 chars */ String]]("type"),
-          category = row[Option[/* max 50 chars */ String]]("category"),
-          startdate = row[Option[LocalDateTime]]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          minqty = row[Option[Int]]("minqty"),
-          maxqty = row[Option[Int]]("maxqty"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          specialofferid = row[Option[SpecialofferId]](idx + 1),
+          description = row[Option[/* max 255 chars */ String]](idx + 2),
+          discountpct = row[Option[BigDecimal]](idx + 3),
+          `type` = row[Option[/* max 50 chars */ String]](idx + 4),
+          category = row[Option[/* max 50 chars */ String]](idx + 5),
+          startdate = row[Option[LocalDateTime]](idx + 6),
+          enddate = row[Option[LocalDateTime]](idx + 7),
+          minqty = row[Option[Int]](idx + 8),
+          maxqty = row[Option[Int]](idx + 9),
+          rowguid = row[Option[UUID]](idx + 10),
+          modifieddate = row[Option[LocalDateTime]](idx + 11)
         )
       )
     }

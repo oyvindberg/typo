@@ -19,7 +19,7 @@ object DbLibAnorm extends DbLib {
   val TypeDoesNotMatch = sc.Type.Qualified("anorm.TypeDoesNotMatch")
 
   val rowParserIdent = sc.Ident("rowParser")
-  def rowParserFor(rowType: sc.Type) = code"$rowType.$rowParserIdent"
+  def rowParserFor(rowType: sc.Type) = code"$rowType.$rowParserIdent(1)"
 
   def SQL(content: sc.Code) =
     sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
@@ -406,8 +406,8 @@ object DbLibAnorm extends DbLib {
 
   def rowInstances(maybeId: Option[IdComputed], tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): List[sc.Code] = {
     val rowParser = {
-      val mappedValues = cols.map { x => code"${x.name} = row[${x.tpe}](${sc.StrLit(x.dbName.value)})" }
-      code"""|val $rowParserIdent: ${RowParser.of(tpe)} =
+      val mappedValues = cols.zipWithIndex.map { case (x, num) => code"${x.name} = row[${x.tpe}](idx + $num)" }
+      code"""|def $rowParserIdent(idx: Int): ${RowParser.of(tpe)} =
              |  ${RowParser.of(tpe)} { row =>
              |    $Success(
              |      $tpe(

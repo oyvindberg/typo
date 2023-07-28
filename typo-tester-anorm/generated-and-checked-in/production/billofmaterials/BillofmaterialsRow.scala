@@ -43,19 +43,19 @@ case class BillofmaterialsRow(
 )
 
 object BillofmaterialsRow {
-  val rowParser: RowParser[BillofmaterialsRow] =
+  def rowParser(idx: Int): RowParser[BillofmaterialsRow] =
     RowParser[BillofmaterialsRow] { row =>
       Success(
         BillofmaterialsRow(
-          billofmaterialsid = row[BillofmaterialsId]("billofmaterialsid"),
-          productassemblyid = row[Option[ProductId]]("productassemblyid"),
-          componentid = row[ProductId]("componentid"),
-          startdate = row[LocalDateTime]("startdate"),
-          enddate = row[Option[LocalDateTime]]("enddate"),
-          unitmeasurecode = row[UnitmeasureId]("unitmeasurecode"),
-          bomlevel = row[Int]("bomlevel"),
-          perassemblyqty = row[BigDecimal]("perassemblyqty"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          billofmaterialsid = row[BillofmaterialsId](idx + 0),
+          productassemblyid = row[Option[ProductId]](idx + 1),
+          componentid = row[ProductId](idx + 2),
+          startdate = row[LocalDateTime](idx + 3),
+          enddate = row[Option[LocalDateTime]](idx + 4),
+          unitmeasurecode = row[UnitmeasureId](idx + 5),
+          bomlevel = row[Int](idx + 6),
+          perassemblyqty = row[BigDecimal](idx + 7),
+          modifieddate = row[LocalDateTime](idx + 8)
         )
       )
     }

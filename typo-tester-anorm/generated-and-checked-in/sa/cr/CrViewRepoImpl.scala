@@ -16,7 +16,7 @@ object CrViewRepoImpl extends CrViewRepo {
   override def selectAll(implicit c: Connection): List[CrViewRow] = {
     SQL"""select currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate
           from sa.cr
-       """.as(CrViewRow.rowParser.*)
+       """.as(CrViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[CrViewFieldOrIdValue[_]])(implicit c: Connection): List[CrViewRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object CrViewRepoImpl extends CrViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(CrViewRow.rowParser.*)
+          .as(CrViewRow.rowParser(1).*)
     }
   
   }

@@ -23,7 +23,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           values (${unsaved.workorderid}::int4, ${unsaved.productid}::int4, ${unsaved.operationsequence}::int2, ${unsaved.locationid}::int2, ${unsaved.scheduledstartdate}::timestamp, ${unsaved.scheduledenddate}::timestamp, ${unsaved.actualstartdate}::timestamp, ${unsaved.actualenddate}::timestamp, ${unsaved.actualresourcehrs}::numeric, ${unsaved.plannedcost}::numeric, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
        """
-      .executeInsert(WorkorderroutingRow.rowParser.single)
+      .executeInsert(WorkorderroutingRow.rowParser(1).single)
   
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
@@ -49,7 +49,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       SQL"""insert into production.workorderrouting default values
             returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
          """
-        .executeInsert(WorkorderroutingRow.rowParser.single)
+        .executeInsert(WorkorderroutingRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.workorderrouting(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -59,14 +59,14 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(WorkorderroutingRow.rowParser.single)
+        .executeInsert(WorkorderroutingRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from production.workorderrouting
-       """.as(WorkorderroutingRow.rowParser.*)
+       """.as(WorkorderroutingRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow] = {
     fieldValues match {
@@ -95,7 +95,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(WorkorderroutingRow.rowParser.*)
+          .as(WorkorderroutingRow.rowParser(1).*)
     }
   
   }
@@ -103,7 +103,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from production.workorderrouting
           where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
-       """.as(WorkorderroutingRow.rowParser.singleOpt)
+       """.as(WorkorderroutingRow.rowParser(1).singleOpt)
   }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
@@ -178,7 +178,7 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             modifieddate = EXCLUDED.modifieddate
           returning workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
        """
-      .executeInsert(WorkorderroutingRow.rowParser.single)
+      .executeInsert(WorkorderroutingRow.rowParser(1).single)
   
   }
 }

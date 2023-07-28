@@ -32,13 +32,13 @@ case class ProductmodelillustrationRow(
  }
 
 object ProductmodelillustrationRow {
-  val rowParser: RowParser[ProductmodelillustrationRow] =
+  def rowParser(idx: Int): RowParser[ProductmodelillustrationRow] =
     RowParser[ProductmodelillustrationRow] { row =>
       Success(
         ProductmodelillustrationRow(
-          productmodelid = row[ProductmodelId]("productmodelid"),
-          illustrationid = row[IllustrationId]("illustrationid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          productmodelid = row[ProductmodelId](idx + 0),
+          illustrationid = row[IllustrationId](idx + 1),
+          modifieddate = row[LocalDateTime](idx + 2)
         )
       )
     }

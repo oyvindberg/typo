@@ -37,17 +37,17 @@ case class CrViewRow(
 )
 
 object CrViewRow {
-  val rowParser: RowParser[CrViewRow] =
+  def rowParser(idx: Int): RowParser[CrViewRow] =
     RowParser[CrViewRow] { row =>
       Success(
         CrViewRow(
-          currencyrateid = row[Option[CurrencyrateId]]("currencyrateid"),
-          currencyratedate = row[Option[LocalDateTime]]("currencyratedate"),
-          fromcurrencycode = row[Option[CurrencyId]]("fromcurrencycode"),
-          tocurrencycode = row[Option[CurrencyId]]("tocurrencycode"),
-          averagerate = row[Option[BigDecimal]]("averagerate"),
-          endofdayrate = row[Option[BigDecimal]]("endofdayrate"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          currencyrateid = row[Option[CurrencyrateId]](idx + 0),
+          currencyratedate = row[Option[LocalDateTime]](idx + 1),
+          fromcurrencycode = row[Option[CurrencyId]](idx + 2),
+          tocurrencycode = row[Option[CurrencyId]](idx + 3),
+          averagerate = row[Option[BigDecimal]](idx + 4),
+          endofdayrate = row[Option[BigDecimal]](idx + 5),
+          modifieddate = row[Option[LocalDateTime]](idx + 6)
         )
       )
     }

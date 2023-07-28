@@ -16,7 +16,7 @@ object ThaViewRepoImpl extends ThaViewRepo {
   override def selectAll(implicit c: Connection): List[ThaViewRow] = {
     SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from pr.tha
-       """.as(ThaViewRow.rowParser.*)
+       """.as(ThaViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ThaViewFieldOrIdValue[_]])(implicit c: Connection): List[ThaViewRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object ThaViewRepoImpl extends ThaViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ThaViewRow.rowParser.*)
+          .as(ThaViewRow.rowParser(1).*)
     }
   
   }

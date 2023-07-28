@@ -43,20 +43,20 @@ case class SalesterritoryRow(
 )
 
 object SalesterritoryRow {
-  val rowParser: RowParser[SalesterritoryRow] =
+  def rowParser(idx: Int): RowParser[SalesterritoryRow] =
     RowParser[SalesterritoryRow] { row =>
       Success(
         SalesterritoryRow(
-          territoryid = row[SalesterritoryId]("territoryid"),
-          name = row[Name]("name"),
-          countryregioncode = row[CountryregionId]("countryregioncode"),
-          group = row[/* max 50 chars */ String]("group"),
-          salesytd = row[BigDecimal]("salesytd"),
-          saleslastyear = row[BigDecimal]("saleslastyear"),
-          costytd = row[BigDecimal]("costytd"),
-          costlastyear = row[BigDecimal]("costlastyear"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          territoryid = row[SalesterritoryId](idx + 0),
+          name = row[Name](idx + 1),
+          countryregioncode = row[CountryregionId](idx + 2),
+          group = row[/* max 50 chars */ String](idx + 3),
+          salesytd = row[BigDecimal](idx + 4),
+          saleslastyear = row[BigDecimal](idx + 5),
+          costytd = row[BigDecimal](idx + 6),
+          costlastyear = row[BigDecimal](idx + 7),
+          rowguid = row[UUID](idx + 8),
+          modifieddate = row[LocalDateTime](idx + 9)
         )
       )
     }

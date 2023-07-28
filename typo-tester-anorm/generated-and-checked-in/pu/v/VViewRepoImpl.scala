@@ -16,7 +16,7 @@ object VViewRepoImpl extends VViewRepo {
   override def selectAll(implicit c: Connection): List[VViewRow] = {
     SQL"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate
           from pu.v
-       """.as(VViewRow.rowParser.*)
+       """.as(VViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[VViewFieldOrIdValue[_]])(implicit c: Connection): List[VViewRow] = {
     fieldValues match {
@@ -42,7 +42,7 @@ object VViewRepoImpl extends VViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(VViewRow.rowParser.*)
+          .as(VViewRow.rowParser(1).*)
     }
   
   }

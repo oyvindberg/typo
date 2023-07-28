@@ -16,7 +16,7 @@ object BomViewRepoImpl extends BomViewRepo {
   override def selectAll(implicit c: Connection): List[BomViewRow] = {
     SQL"""select "id", billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate
           from pr."bom"
-       """.as(BomViewRow.rowParser.*)
+       """.as(BomViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[BomViewFieldOrIdValue[_]])(implicit c: Connection): List[BomViewRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object BomViewRepoImpl extends BomViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(BomViewRow.rowParser.*)
+          .as(BomViewRow.rowParser(1).*)
     }
   
   }

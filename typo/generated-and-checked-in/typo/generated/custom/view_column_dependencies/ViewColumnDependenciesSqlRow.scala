@@ -37,15 +37,15 @@ case class ViewColumnDependenciesSqlRow(
 )
 
 object ViewColumnDependenciesSqlRow {
-  val rowParser: RowParser[ViewColumnDependenciesSqlRow] =
+  def rowParser(idx: Int): RowParser[ViewColumnDependenciesSqlRow] =
     RowParser[ViewColumnDependenciesSqlRow] { row =>
       Success(
         ViewColumnDependenciesSqlRow(
-          viewSchema = row[/* nullability unknown */ Option[TypoRegnamespace]]("view_schema"),
-          viewName = row[String]("view_name"),
-          tableSchema = row[/* nullability unknown */ Option[TypoRegnamespace]]("table_schema"),
-          tableName = row[String]("table_name"),
-          columnName = row[String]("column_name")
+          viewSchema = row[/* nullability unknown */ Option[TypoRegnamespace]](idx + 0),
+          viewName = row[String](idx + 1),
+          tableSchema = row[/* nullability unknown */ Option[TypoRegnamespace]](idx + 2),
+          tableName = row[String](idx + 3),
+          columnName = row[String](idx + 4)
         )
       )
     }

@@ -62,38 +62,38 @@ case class PgtestRow(
 )
 
 object PgtestRow {
-  val rowParser: RowParser[PgtestRow] =
+  def rowParser(idx: Int): RowParser[PgtestRow] =
     RowParser[PgtestRow] { row =>
       Success(
         PgtestRow(
-          box = row[TypoBox]("box"),
-          circle = row[TypoCircle]("circle"),
-          line = row[TypoLine]("line"),
-          lseg = row[TypoLineSegment]("lseg"),
-          path = row[TypoPath]("path"),
-          point = row[TypoPoint]("point"),
-          polygon = row[TypoPolygon]("polygon"),
-          interval = row[TypoInterval]("interval"),
-          money = row[TypoMoney]("money"),
-          xml = row[TypoXml]("xml"),
-          json = row[TypoJson]("json"),
-          jsonb = row[TypoJsonb]("jsonb"),
-          hstore = row[TypoHStore]("hstore"),
-          inet = row[TypoInet]("inet"),
-          boxes = row[Array[TypoBox]]("boxes"),
-          circlees = row[Array[TypoCircle]]("circlees"),
-          linees = row[Array[TypoLine]]("linees"),
-          lseges = row[Array[TypoLineSegment]]("lseges"),
-          pathes = row[Array[TypoPath]]("pathes"),
-          pointes = row[Array[TypoPoint]]("pointes"),
-          polygones = row[Array[TypoPolygon]]("polygones"),
-          intervales = row[Array[TypoInterval]]("intervales"),
-          moneyes = row[Array[TypoMoney]]("moneyes"),
-          xmles = row[Array[TypoXml]]("xmles"),
-          jsones = row[Array[TypoJson]]("jsones"),
-          jsonbes = row[Array[TypoJsonb]]("jsonbes"),
-          hstores = row[Array[TypoHStore]]("hstores"),
-          inets = row[Array[TypoInet]]("inets")
+          box = row[TypoBox](idx + 0),
+          circle = row[TypoCircle](idx + 1),
+          line = row[TypoLine](idx + 2),
+          lseg = row[TypoLineSegment](idx + 3),
+          path = row[TypoPath](idx + 4),
+          point = row[TypoPoint](idx + 5),
+          polygon = row[TypoPolygon](idx + 6),
+          interval = row[TypoInterval](idx + 7),
+          money = row[TypoMoney](idx + 8),
+          xml = row[TypoXml](idx + 9),
+          json = row[TypoJson](idx + 10),
+          jsonb = row[TypoJsonb](idx + 11),
+          hstore = row[TypoHStore](idx + 12),
+          inet = row[TypoInet](idx + 13),
+          boxes = row[Array[TypoBox]](idx + 14),
+          circlees = row[Array[TypoCircle]](idx + 15),
+          linees = row[Array[TypoLine]](idx + 16),
+          lseges = row[Array[TypoLineSegment]](idx + 17),
+          pathes = row[Array[TypoPath]](idx + 18),
+          pointes = row[Array[TypoPoint]](idx + 19),
+          polygones = row[Array[TypoPolygon]](idx + 20),
+          intervales = row[Array[TypoInterval]](idx + 21),
+          moneyes = row[Array[TypoMoney]](idx + 22),
+          xmles = row[Array[TypoXml]](idx + 23),
+          jsones = row[Array[TypoJson]](idx + 24),
+          jsonbes = row[Array[TypoJsonb]](idx + 25),
+          hstores = row[Array[TypoHStore]](idx + 26),
+          inets = row[Array[TypoInet]](idx + 27)
         )
       )
     }

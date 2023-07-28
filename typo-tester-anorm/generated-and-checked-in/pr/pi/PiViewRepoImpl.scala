@@ -16,7 +16,7 @@ object PiViewRepoImpl extends PiViewRepo {
   override def selectAll(implicit c: Connection): List[PiViewRow] = {
     SQL"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate
           from pr.pi
-       """.as(PiViewRow.rowParser.*)
+       """.as(PiViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PiViewFieldOrIdValue[_]])(implicit c: Connection): List[PiViewRow] = {
     fieldValues match {
@@ -41,7 +41,7 @@ object PiViewRepoImpl extends PiViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PiViewRow.rowParser.*)
+          .as(PiViewRow.rowParser(1).*)
     }
   
   }

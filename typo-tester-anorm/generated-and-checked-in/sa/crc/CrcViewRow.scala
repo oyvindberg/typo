@@ -29,13 +29,13 @@ case class CrcViewRow(
 )
 
 object CrcViewRow {
-  val rowParser: RowParser[CrcViewRow] =
+  def rowParser(idx: Int): RowParser[CrcViewRow] =
     RowParser[CrcViewRow] { row =>
       Success(
         CrcViewRow(
-          countryregioncode = row[Option[CountryregionId]]("countryregioncode"),
-          currencycode = row[Option[CurrencyId]]("currencycode"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          countryregioncode = row[Option[CountryregionId]](idx + 0),
+          currencycode = row[Option[CurrencyId]](idx + 1),
+          modifieddate = row[Option[LocalDateTime]](idx + 2)
         )
       )
     }

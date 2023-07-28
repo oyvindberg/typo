@@ -26,7 +26,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
           values (${unsaved.productdescriptionid}::int4, ${unsaved.description}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productdescriptionid, description, rowguid, modifieddate
        """
-      .executeInsert(ProductdescriptionRow.rowParser.single)
+      .executeInsert(ProductdescriptionRow.rowParser(1).single)
   
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow = {
@@ -50,7 +50,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       SQL"""insert into production.productdescription default values
             returning productdescriptionid, description, rowguid, modifieddate
          """
-        .executeInsert(ProductdescriptionRow.rowParser.single)
+        .executeInsert(ProductdescriptionRow.rowParser(1).single)
     } else {
       val q = s"""insert into production.productdescription(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -60,14 +60,14 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(ProductdescriptionRow.rowParser.single)
+        .executeInsert(ProductdescriptionRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[ProductdescriptionRow] = {
     SQL"""select productdescriptionid, description, rowguid, modifieddate
           from production.productdescription
-       """.as(ProductdescriptionRow.rowParser.*)
+       """.as(ProductdescriptionRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[ProductdescriptionFieldOrIdValue[_]])(implicit c: Connection): List[ProductdescriptionRow] = {
     fieldValues match {
@@ -88,7 +88,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(ProductdescriptionRow.rowParser.*)
+          .as(ProductdescriptionRow.rowParser(1).*)
     }
   
   }
@@ -96,7 +96,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     SQL"""select productdescriptionid, description, rowguid, modifieddate
           from production.productdescription
           where productdescriptionid = $productdescriptionid
-       """.as(ProductdescriptionRow.rowParser.singleOpt)
+       """.as(ProductdescriptionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): List[ProductdescriptionRow] = {
     implicit val toStatement: ToStatement[Array[ProductdescriptionId]] =
@@ -106,7 +106,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     SQL"""select productdescriptionid, description, rowguid, modifieddate
           from production.productdescription
           where productdescriptionid = ANY($productdescriptionids)
-       """.as(ProductdescriptionRow.rowParser.*)
+       """.as(ProductdescriptionRow.rowParser(1).*)
   
   }
   override def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
@@ -156,7 +156,7 @@ object ProductdescriptionRepoImpl extends ProductdescriptionRepo {
             modifieddate = EXCLUDED.modifieddate
           returning productdescriptionid, description, rowguid, modifieddate
        """
-      .executeInsert(ProductdescriptionRow.rowParser.single)
+      .executeInsert(ProductdescriptionRow.rowParser(1).single)
   
   }
 }

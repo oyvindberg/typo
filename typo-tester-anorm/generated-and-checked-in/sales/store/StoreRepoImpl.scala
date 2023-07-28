@@ -27,7 +27,7 @@ object StoreRepoImpl extends StoreRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
        """
-      .executeInsert(StoreRow.rowParser.single)
+      .executeInsert(StoreRow.rowParser(1).single)
   
   }
   override def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow = {
@@ -50,7 +50,7 @@ object StoreRepoImpl extends StoreRepo {
       SQL"""insert into sales.store default values
             returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
          """
-        .executeInsert(StoreRow.rowParser.single)
+        .executeInsert(StoreRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.store(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -60,14 +60,14 @@ object StoreRepoImpl extends StoreRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(StoreRow.rowParser.single)
+        .executeInsert(StoreRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
-       """.as(StoreRow.rowParser.*)
+       """.as(StoreRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[StoreFieldOrIdValue[_]])(implicit c: Connection): List[StoreRow] = {
     fieldValues match {
@@ -90,7 +90,7 @@ object StoreRepoImpl extends StoreRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(StoreRow.rowParser.*)
+          .as(StoreRow.rowParser(1).*)
     }
   
   }
@@ -98,7 +98,7 @@ object StoreRepoImpl extends StoreRepo {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
           where businessentityid = $businessentityid
-       """.as(StoreRow.rowParser.singleOpt)
+       """.as(StoreRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -108,7 +108,7 @@ object StoreRepoImpl extends StoreRepo {
     SQL"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
           from sales.store
           where businessentityid = ANY($businessentityids)
-       """.as(StoreRow.rowParser.*)
+       """.as(StoreRow.rowParser(1).*)
   
   }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
@@ -166,7 +166,7 @@ object StoreRepoImpl extends StoreRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate
        """
-      .executeInsert(StoreRow.rowParser.single)
+      .executeInsert(StoreRow.rowParser(1).single)
   
   }
 }

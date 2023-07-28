@@ -16,7 +16,7 @@ object EdhViewRepoImpl extends EdhViewRepo {
   override def selectAll(implicit c: Connection): List[EdhViewRow] = {
     SQL"""select "id", businessentityid, departmentid, shiftid, startdate, enddate, modifieddate
           from hr.edh
-       """.as(EdhViewRow.rowParser.*)
+       """.as(EdhViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[EdhViewFieldOrIdValue[_]])(implicit c: Connection): List[EdhViewRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object EdhViewRepoImpl extends EdhViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(EdhViewRow.rowParser.*)
+          .as(EdhViewRow.rowParser(1).*)
     }
   
   }

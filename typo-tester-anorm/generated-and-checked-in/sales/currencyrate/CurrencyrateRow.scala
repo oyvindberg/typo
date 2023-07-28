@@ -37,17 +37,17 @@ case class CurrencyrateRow(
 )
 
 object CurrencyrateRow {
-  val rowParser: RowParser[CurrencyrateRow] =
+  def rowParser(idx: Int): RowParser[CurrencyrateRow] =
     RowParser[CurrencyrateRow] { row =>
       Success(
         CurrencyrateRow(
-          currencyrateid = row[CurrencyrateId]("currencyrateid"),
-          currencyratedate = row[LocalDateTime]("currencyratedate"),
-          fromcurrencycode = row[CurrencyId]("fromcurrencycode"),
-          tocurrencycode = row[CurrencyId]("tocurrencycode"),
-          averagerate = row[BigDecimal]("averagerate"),
-          endofdayrate = row[BigDecimal]("endofdayrate"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          currencyrateid = row[CurrencyrateId](idx + 0),
+          currencyratedate = row[LocalDateTime](idx + 1),
+          fromcurrencycode = row[CurrencyId](idx + 2),
+          tocurrencycode = row[CurrencyId](idx + 3),
+          averagerate = row[BigDecimal](idx + 4),
+          endofdayrate = row[BigDecimal](idx + 5),
+          modifieddate = row[LocalDateTime](idx + 6)
         )
       )
     }

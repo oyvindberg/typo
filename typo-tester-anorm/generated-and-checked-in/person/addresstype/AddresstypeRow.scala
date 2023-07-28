@@ -29,14 +29,14 @@ case class AddresstypeRow(
 )
 
 object AddresstypeRow {
-  val rowParser: RowParser[AddresstypeRow] =
+  def rowParser(idx: Int): RowParser[AddresstypeRow] =
     RowParser[AddresstypeRow] { row =>
       Success(
         AddresstypeRow(
-          addresstypeid = row[AddresstypeId]("addresstypeid"),
-          name = row[Name]("name"),
-          rowguid = row[UUID]("rowguid"),
-          modifieddate = row[LocalDateTime]("modifieddate")
+          addresstypeid = row[AddresstypeId](idx + 0),
+          name = row[Name](idx + 1),
+          rowguid = row[UUID](idx + 2),
+          modifieddate = row[LocalDateTime](idx + 3)
         )
       )
     }

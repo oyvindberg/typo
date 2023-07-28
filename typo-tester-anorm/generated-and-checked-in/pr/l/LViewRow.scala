@@ -34,16 +34,16 @@ case class LViewRow(
 )
 
 object LViewRow {
-  val rowParser: RowParser[LViewRow] =
+  def rowParser(idx: Int): RowParser[LViewRow] =
     RowParser[LViewRow] { row =>
       Success(
         LViewRow(
-          id = row[Option[Int]]("id"),
-          locationid = row[Option[LocationId]]("locationid"),
-          name = row[Option[Name]]("name"),
-          costrate = row[Option[BigDecimal]]("costrate"),
-          availability = row[Option[BigDecimal]]("availability"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          locationid = row[Option[LocationId]](idx + 1),
+          name = row[Option[Name]](idx + 2),
+          costrate = row[Option[BigDecimal]](idx + 3),
+          availability = row[Option[BigDecimal]](idx + 4),
+          modifieddate = row[Option[LocalDateTime]](idx + 5)
         )
       )
     }

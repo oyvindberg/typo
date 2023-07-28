@@ -16,7 +16,7 @@ object PntViewRepoImpl extends PntViewRepo {
   override def selectAll(implicit c: Connection): List[PntViewRow] = {
     SQL"""select "id", phonenumbertypeid, "name", modifieddate
           from pe.pnt
-       """.as(PntViewRow.rowParser.*)
+       """.as(PntViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PntViewFieldOrIdValue[_]])(implicit c: Connection): List[PntViewRow] = {
     fieldValues match {
@@ -37,7 +37,7 @@ object PntViewRepoImpl extends PntViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PntViewRow.rowParser.*)
+          .as(PntViewRow.rowParser(1).*)
     }
   
   }

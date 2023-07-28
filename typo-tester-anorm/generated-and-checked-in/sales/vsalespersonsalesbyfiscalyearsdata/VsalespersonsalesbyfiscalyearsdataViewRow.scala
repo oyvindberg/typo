@@ -30,16 +30,16 @@ case class VsalespersonsalesbyfiscalyearsdataViewRow(
 )
 
 object VsalespersonsalesbyfiscalyearsdataViewRow {
-  val rowParser: RowParser[VsalespersonsalesbyfiscalyearsdataViewRow] =
+  def rowParser(idx: Int): RowParser[VsalespersonsalesbyfiscalyearsdataViewRow] =
     RowParser[VsalespersonsalesbyfiscalyearsdataViewRow] { row =>
       Success(
         VsalespersonsalesbyfiscalyearsdataViewRow(
-          salespersonid = row[Option[BusinessentityId]]("salespersonid"),
-          fullname = row[Option[String]]("fullname"),
-          jobtitle = row[Option[/* max 50 chars */ String]]("jobtitle"),
-          salesterritory = row[Option[Name]]("salesterritory"),
-          salestotal = row[Option[BigDecimal]]("salestotal"),
-          fiscalyear = row[Option[BigDecimal]]("fiscalyear")
+          salespersonid = row[Option[BusinessentityId]](idx + 0),
+          fullname = row[Option[String]](idx + 1),
+          jobtitle = row[Option[/* max 50 chars */ String]](idx + 2),
+          salesterritory = row[Option[Name]](idx + 3),
+          salestotal = row[Option[BigDecimal]](idx + 4),
+          fiscalyear = row[Option[BigDecimal]](idx + 5)
         )
       )
     }

@@ -53,24 +53,24 @@ case class PViewRow(
 )
 
 object PViewRow {
-  val rowParser: RowParser[PViewRow] =
+  def rowParser(idx: Int): RowParser[PViewRow] =
     RowParser[PViewRow] { row =>
       Success(
         PViewRow(
-          id = row[Option[Int]]("id"),
-          businessentityid = row[Option[BusinessentityId]]("businessentityid"),
-          persontype = row[Option[/* bpchar */ String]]("persontype"),
-          namestyle = row[NameStyle]("namestyle"),
-          title = row[Option[/* max 8 chars */ String]]("title"),
-          firstname = row[Option[Name]]("firstname"),
-          middlename = row[Option[Name]]("middlename"),
-          lastname = row[Option[Name]]("lastname"),
-          suffix = row[Option[/* max 10 chars */ String]]("suffix"),
-          emailpromotion = row[Option[Int]]("emailpromotion"),
-          additionalcontactinfo = row[Option[TypoXml]]("additionalcontactinfo"),
-          demographics = row[Option[TypoXml]]("demographics"),
-          rowguid = row[Option[UUID]]("rowguid"),
-          modifieddate = row[Option[LocalDateTime]]("modifieddate")
+          id = row[Option[Int]](idx + 0),
+          businessentityid = row[Option[BusinessentityId]](idx + 1),
+          persontype = row[Option[/* bpchar */ String]](idx + 2),
+          namestyle = row[NameStyle](idx + 3),
+          title = row[Option[/* max 8 chars */ String]](idx + 4),
+          firstname = row[Option[Name]](idx + 5),
+          middlename = row[Option[Name]](idx + 6),
+          lastname = row[Option[Name]](idx + 7),
+          suffix = row[Option[/* max 10 chars */ String]](idx + 8),
+          emailpromotion = row[Option[Int]](idx + 9),
+          additionalcontactinfo = row[Option[TypoXml]](idx + 10),
+          demographics = row[Option[TypoXml]](idx + 11),
+          rowguid = row[Option[UUID]](idx + 12),
+          modifieddate = row[Option[LocalDateTime]](idx + 13)
         )
       )
     }

@@ -24,13 +24,13 @@ object FootballClubRepoImpl extends FootballClubRepo {
           values (${unsaved.id}::int8, ${unsaved.name})
           returning "id", "name"
        """
-      .executeInsert(FootballClubRow.rowParser.single)
+      .executeInsert(FootballClubRow.rowParser(1).single)
   
   }
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     SQL"""select "id", "name"
           from myschema.football_club
-       """.as(FootballClubRow.rowParser.*)
+       """.as(FootballClubRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
@@ -49,7 +49,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(FootballClubRow.rowParser.*)
+          .as(FootballClubRow.rowParser(1).*)
     }
   
   }
@@ -57,7 +57,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     SQL"""select "id", "name"
           from myschema.football_club
           where "id" = $id
-       """.as(FootballClubRow.rowParser.singleOpt)
+       """.as(FootballClubRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     implicit val toStatement: ToStatement[Array[FootballClubId]] =
@@ -67,7 +67,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
     SQL"""select "id", "name"
           from myschema.football_club
           where "id" = ANY($ids)
-       """.as(FootballClubRow.rowParser.*)
+       """.as(FootballClubRow.rowParser(1).*)
   
   }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
@@ -109,7 +109,7 @@ object FootballClubRepoImpl extends FootballClubRepo {
             "name" = EXCLUDED."name"
           returning "id", "name"
        """
-      .executeInsert(FootballClubRow.rowParser.single)
+      .executeInsert(FootballClubRow.rowParser(1).single)
   
   }
 }

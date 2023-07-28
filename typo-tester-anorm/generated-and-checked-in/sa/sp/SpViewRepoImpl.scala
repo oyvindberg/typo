@@ -16,7 +16,7 @@ object SpViewRepoImpl extends SpViewRepo {
   override def selectAll(implicit c: Connection): List[SpViewRow] = {
     SQL"""select "id", businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sa.sp
-       """.as(SpViewRow.rowParser.*)
+       """.as(SpViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SpViewFieldOrIdValue[_]])(implicit c: Connection): List[SpViewRow] = {
     fieldValues match {
@@ -43,7 +43,7 @@ object SpViewRepoImpl extends SpViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SpViewRow.rowParser.*)
+          .as(SpViewRow.rowParser(1).*)
     }
   
   }

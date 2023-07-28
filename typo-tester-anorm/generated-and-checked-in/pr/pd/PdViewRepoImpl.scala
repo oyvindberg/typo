@@ -16,7 +16,7 @@ object PdViewRepoImpl extends PdViewRepo {
   override def selectAll(implicit c: Connection): List[PdViewRow] = {
     SQL"""select "id", productdescriptionid, description, rowguid, modifieddate
           from pr.pd
-       """.as(PdViewRow.rowParser.*)
+       """.as(PdViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[PdViewFieldOrIdValue[_]])(implicit c: Connection): List[PdViewRow] = {
     fieldValues match {
@@ -38,7 +38,7 @@ object PdViewRepoImpl extends PdViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(PdViewRow.rowParser.*)
+          .as(PdViewRow.rowParser(1).*)
     }
   
   }

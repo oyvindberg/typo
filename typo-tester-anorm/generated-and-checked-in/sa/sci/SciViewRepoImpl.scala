@@ -16,7 +16,7 @@ object SciViewRepoImpl extends SciViewRepo {
   override def selectAll(implicit c: Connection): List[SciViewRow] = {
     SQL"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sa.sci
-       """.as(SciViewRow.rowParser.*)
+       """.as(SciViewRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SciViewFieldOrIdValue[_]])(implicit c: Connection): List[SciViewRow] = {
     fieldValues match {
@@ -40,7 +40,7 @@ object SciViewRepoImpl extends SciViewRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SciViewRow.rowParser.*)
+          .as(SciViewRow.rowParser(1).*)
     }
   
   }

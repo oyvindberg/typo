@@ -27,7 +27,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.salesquota}::numeric, ${unsaved.bonus}::numeric, ${unsaved.commissionpct}::numeric, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
        """
-      .executeInsert(SalespersonRow.rowParser.single)
+      .executeInsert(SalespersonRow.rowParser(1).single)
   
   }
   override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
@@ -65,7 +65,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
       SQL"""insert into sales.salesperson default values
             returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
          """
-        .executeInsert(SalespersonRow.rowParser.single)
+        .executeInsert(SalespersonRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.salesperson(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
@@ -75,14 +75,14 @@ object SalespersonRepoImpl extends SalespersonRepo {
       import anorm._
       SQL(q)
         .on(namedParameters.map(_._1) :_*)
-        .executeInsert(SalespersonRow.rowParser.single)
+        .executeInsert(SalespersonRow.rowParser(1).single)
     }
   
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sales.salesperson
-       """.as(SalespersonRow.rowParser.*)
+       """.as(SalespersonRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]])(implicit c: Connection): List[SalespersonRow] = {
     fieldValues match {
@@ -108,7 +108,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
         import anorm._
         SQL(q)
           .on(namedParams: _*)
-          .as(SalespersonRow.rowParser.*)
+          .as(SalespersonRow.rowParser(1).*)
     }
   
   }
@@ -116,7 +116,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sales.salesperson
           where businessentityid = $businessentityid
-       """.as(SalespersonRow.rowParser.singleOpt)
+       """.as(SalespersonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[SalespersonRow] = {
     implicit val toStatement: ToStatement[Array[BusinessentityId]] =
@@ -126,7 +126,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
     SQL"""select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
           from sales.salesperson
           where businessentityid = ANY($businessentityids)
-       """.as(SalespersonRow.rowParser.*)
+       """.as(SalespersonRow.rowParser(1).*)
   
   }
   override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {
@@ -196,7 +196,7 @@ object SalespersonRepoImpl extends SalespersonRepo {
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate
        """
-      .executeInsert(SalespersonRow.rowParser.single)
+      .executeInsert(SalespersonRow.rowParser(1).single)
   
   }
 }
