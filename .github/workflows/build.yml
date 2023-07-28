@@ -22,7 +22,7 @@ jobs:
         run: bleep fmt --check
 
   build-scala212:
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     steps:
@@ -43,7 +43,7 @@ jobs:
           bleep test jvm212
 
   build-scala213:
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     steps:
@@ -64,7 +64,7 @@ jobs:
           bleep test jvm213
 
   build-scala3:
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     steps:
