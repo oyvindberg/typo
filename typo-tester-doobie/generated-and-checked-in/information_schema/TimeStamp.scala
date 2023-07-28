@@ -22,5 +22,5 @@ object TimeStamp {
   implicit val decoder: Decoder[TimeStamp] =
     Decoder[OffsetDateTime].map(TimeStamp(_))
   implicit val meta: Meta[TimeStamp] = Meta[OffsetDateTime].imap(TimeStamp.apply)(_.value)
-  implicit val metaArray: Meta[Array[TimeStamp]] = Meta[Array[OffsetDateTime]].imap(_.map(TimeStamp.apply))(_.map(_.value))
+//  implicit val metaArray: Meta[Array[TimeStamp]] = Meta[Array[OffsetDateTime]].imap(_.map(TimeStamp.apply))(_.map(_.value))
 }
