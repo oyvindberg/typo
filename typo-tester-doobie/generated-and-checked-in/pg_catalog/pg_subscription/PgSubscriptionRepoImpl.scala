@@ -19,16 +19,16 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
     sql"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)
           values (${unsaved.oid}::oid, ${unsaved.subdbid}::oid, ${unsaved.subname}::name, ${unsaved.subowner}::oid, ${unsaved.subenabled}, ${unsaved.subbinary}, ${unsaved.substream}, ${unsaved.subconninfo}, ${unsaved.subslotname}::name, ${unsaved.subsynccommit}, ${unsaved.subpublications}::_text)
           returning oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
-       """.query[PgSubscriptionRow].unique
+       """.query(PgSubscriptionRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgSubscriptionRow] = {
-    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription".query[PgSubscriptionRow].stream
+    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription".query(PgSubscriptionRow.read).stream
   }
   override def selectById(oid: PgSubscriptionId): ConnectionIO[Option[PgSubscriptionRow]] = {
-    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ${oid}".query[PgSubscriptionRow].option
+    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ${oid}".query(PgSubscriptionRow.read).option
   }
   override def selectByIds(oids: Array[PgSubscriptionId]): Stream[ConnectionIO, PgSubscriptionRow] = {
-    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ANY(${oids})".query[PgSubscriptionRow].stream
+    sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription where oid = ANY(${oids})".query(PgSubscriptionRow.read).stream
   }
   override def update(row: PgSubscriptionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -77,6 +77,6 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
             subsynccommit = EXCLUDED.subsynccommit,
             subpublications = EXCLUDED.subpublications
           returning oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
-       """.query[PgSubscriptionRow].unique
+       """.query(PgSubscriptionRow.read).unique
   }
 }

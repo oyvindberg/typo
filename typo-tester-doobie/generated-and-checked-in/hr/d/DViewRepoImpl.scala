@@ -13,6 +13,6 @@ import fs2.Stream
 
 object DViewRepoImpl extends DViewRepo {
   override def selectAll: Stream[ConnectionIO, DViewRow] = {
-    sql"""select "id", departmentid, "name", groupname, modifieddate::text from hr.d""".query[DViewRow].stream
+    sql"""select "id", departmentid, "name", groupname, modifieddate::text from hr.d""".query(DViewRow.read).stream
   }
 }

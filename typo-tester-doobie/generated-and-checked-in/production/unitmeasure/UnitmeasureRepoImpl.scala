@@ -22,7 +22,7 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""insert into production.unitmeasure(unitmeasurecode, "name", modifieddate)
           values (${unsaved.unitmeasurecode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning unitmeasurecode, "name", modifieddate::text
-       """.query[UnitmeasureRow].unique
+       """.query(UnitmeasureRow.read).unique
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
@@ -45,17 +45,17 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
             returning unitmeasurecode, "name", modifieddate::text
          """
     }
-    q.query[UnitmeasureRow].unique
+    q.query(UnitmeasureRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
-    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure""".query[UnitmeasureRow].stream
+    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure""".query(UnitmeasureRow.read).stream
   }
   override def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]] = {
-    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ${unitmeasurecode}""".query[UnitmeasureRow].option
+    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ${unitmeasurecode}""".query(UnitmeasureRow.read).option
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
-    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ANY(${unitmeasurecodes})""".query[UnitmeasureRow].stream
+    sql"""select unitmeasurecode, "name", modifieddate::text from production.unitmeasure where unitmeasurecode = ANY(${unitmeasurecodes})""".query(UnitmeasureRow.read).stream
   }
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     val unitmeasurecode = row.unitmeasurecode
@@ -80,6 +80,6 @@ object UnitmeasureRepoImpl extends UnitmeasureRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning unitmeasurecode, "name", modifieddate::text
-       """.query[UnitmeasureRow].unique
+       """.query(UnitmeasureRow.read).unique
   }
 }

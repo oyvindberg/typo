@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PvViewRepoImpl extends PvViewRepo {
   override def selectAll: Stream[ConnectionIO, PvViewRow] = {
-    sql"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from pu.pv""".query[PvViewRow].stream
+    sql"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from pu.pv""".query(PvViewRow.read).stream
   }
 }

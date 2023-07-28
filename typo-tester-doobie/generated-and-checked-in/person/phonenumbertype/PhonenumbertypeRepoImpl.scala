@@ -22,7 +22,7 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
           values (${unsaved.phonenumbertypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning phonenumbertypeid, "name", modifieddate::text
-       """.query[PhonenumbertypeRow].unique
+       """.query(PhonenumbertypeRow.read).unique
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     val fs = List(
@@ -48,17 +48,17 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             returning phonenumbertypeid, "name", modifieddate::text
          """
     }
-    q.query[PhonenumbertypeRow].unique
+    q.query(PhonenumbertypeRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
-    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype""".query[PhonenumbertypeRow].stream
+    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype""".query(PhonenumbertypeRow.read).stream
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Option[PhonenumbertypeRow]] = {
-    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype where phonenumbertypeid = ${phonenumbertypeid}""".query[PhonenumbertypeRow].option
+    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype where phonenumbertypeid = ${phonenumbertypeid}""".query(PhonenumbertypeRow.read).option
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
-    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype where phonenumbertypeid = ANY(${phonenumbertypeids})""".query[PhonenumbertypeRow].stream
+    sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype where phonenumbertypeid = ANY(${phonenumbertypeids})""".query(PhonenumbertypeRow.read).stream
   }
   override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid
@@ -83,6 +83,6 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning phonenumbertypeid, "name", modifieddate::text
-       """.query[PhonenumbertypeRow].unique
+       """.query(PhonenumbertypeRow.read).unique
   }
 }

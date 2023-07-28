@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PppViewRepoImpl extends PppViewRepo {
   override def selectAll: Stream[ConnectionIO, PppViewRow] = {
-    sql"""select productid, productphotoid, "primary", modifieddate::text from pr.ppp""".query[PppViewRow].stream
+    sql"""select productid, productphotoid, "primary", modifieddate::text from pr.ppp""".query(PppViewRow.read).stream
   }
 }

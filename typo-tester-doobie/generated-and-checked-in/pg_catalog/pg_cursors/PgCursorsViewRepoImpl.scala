@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgCursorsViewRepoImpl extends PgCursorsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgCursorsViewRow] = {
-    sql"""select "name", "statement", is_holdable, is_binary, is_scrollable, creation_time::text from pg_catalog.pg_cursors""".query[PgCursorsViewRow].stream
+    sql"""select "name", "statement", is_holdable, is_binary, is_scrollable, creation_time::text from pg_catalog.pg_cursors""".query(PgCursorsViewRow.read).stream
   }
 }

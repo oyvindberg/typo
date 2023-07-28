@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgConfigViewRepoImpl extends PgConfigViewRepo {
   override def selectAll: Stream[ConnectionIO, PgConfigViewRow] = {
-    sql"""select "name", setting from pg_catalog.pg_config""".query[PgConfigViewRow].stream
+    sql"""select "name", setting from pg_catalog.pg_config""".query(PgConfigViewRow.read).stream
   }
 }

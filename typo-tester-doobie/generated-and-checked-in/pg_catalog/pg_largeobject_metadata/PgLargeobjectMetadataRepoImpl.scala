@@ -19,16 +19,16 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
     sql"""insert into pg_catalog.pg_largeobject_metadata(oid, lomowner, lomacl)
           values (${unsaved.oid}::oid, ${unsaved.lomowner}::oid, ${unsaved.lomacl}::_aclitem)
           returning oid, lomowner, lomacl
-       """.query[PgLargeobjectMetadataRow].unique
+       """.query(PgLargeobjectMetadataRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata".query[PgLargeobjectMetadataRow].stream
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata".query(PgLargeobjectMetadataRow.read).stream
   }
   override def selectById(oid: PgLargeobjectMetadataId): ConnectionIO[Option[PgLargeobjectMetadataRow]] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ${oid}".query[PgLargeobjectMetadataRow].option
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ${oid}".query(PgLargeobjectMetadataRow.read).option
   }
   override def selectByIds(oids: Array[PgLargeobjectMetadataId]): Stream[ConnectionIO, PgLargeobjectMetadataRow] = {
-    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${oids})".query[PgLargeobjectMetadataRow].stream
+    sql"select oid, lomowner, lomacl from pg_catalog.pg_largeobject_metadata where oid = ANY(${oids})".query(PgLargeobjectMetadataRow.read).stream
   }
   override def update(row: PgLargeobjectMetadataRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -53,6 +53,6 @@ object PgLargeobjectMetadataRepoImpl extends PgLargeobjectMetadataRepo {
             lomowner = EXCLUDED.lomowner,
             lomacl = EXCLUDED.lomacl
           returning oid, lomowner, lomacl
-       """.query[PgLargeobjectMetadataRow].unique
+       """.query(PgLargeobjectMetadataRow.read).unique
   }
 }

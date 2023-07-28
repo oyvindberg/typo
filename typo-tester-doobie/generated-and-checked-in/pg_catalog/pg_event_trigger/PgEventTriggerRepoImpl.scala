@@ -19,16 +19,16 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
     sql"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)
           values (${unsaved.oid}::oid, ${unsaved.evtname}::name, ${unsaved.evtevent}::name, ${unsaved.evtowner}::oid, ${unsaved.evtfoid}::oid, ${unsaved.evtenabled}::char, ${unsaved.evttags}::_text)
           returning oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
-       """.query[PgEventTriggerRow].unique
+       """.query(PgEventTriggerRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgEventTriggerRow] = {
-    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger".query[PgEventTriggerRow].stream
+    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger".query(PgEventTriggerRow.read).stream
   }
   override def selectById(oid: PgEventTriggerId): ConnectionIO[Option[PgEventTriggerRow]] = {
-    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ${oid}".query[PgEventTriggerRow].option
+    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ${oid}".query(PgEventTriggerRow.read).option
   }
   override def selectByIds(oids: Array[PgEventTriggerId]): Stream[ConnectionIO, PgEventTriggerRow] = {
-    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ANY(${oids})".query[PgEventTriggerRow].stream
+    sql"select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags from pg_catalog.pg_event_trigger where oid = ANY(${oids})".query(PgEventTriggerRow.read).stream
   }
   override def update(row: PgEventTriggerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -65,6 +65,6 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
             evtenabled = EXCLUDED.evtenabled,
             evttags = EXCLUDED.evttags
           returning oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
-       """.query[PgEventTriggerRow].unique
+       """.query(PgEventTriggerRow.read).unique
   }
 }

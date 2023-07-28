@@ -13,6 +13,6 @@ import fs2.Stream
 
 object TrViewRepoImpl extends TrViewRepo {
   override def selectAll: Stream[ConnectionIO, TrViewRow] = {
-    sql"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sa.tr""".query[TrViewRow].stream
+    sql"""select "id", salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sa.tr""".query(TrViewRow.read).stream
   }
 }

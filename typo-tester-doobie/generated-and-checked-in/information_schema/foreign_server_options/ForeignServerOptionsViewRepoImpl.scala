@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ForeignServerOptionsViewRepoImpl extends ForeignServerOptionsViewRepo {
   override def selectAll: Stream[ConnectionIO, ForeignServerOptionsViewRow] = {
-    sql"select foreign_server_catalog, foreign_server_name, option_name, option_value from information_schema.foreign_server_options".query[ForeignServerOptionsViewRow].stream
+    sql"select foreign_server_catalog, foreign_server_name, option_name, option_value from information_schema.foreign_server_options".query(ForeignServerOptionsViewRow.read).stream
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object CollationsViewRepoImpl extends CollationsViewRepo {
   override def selectAll: Stream[ConnectionIO, CollationsViewRow] = {
-    sql"""select "collation_catalog", "collation_schema", "collation_name", pad_attribute from information_schema.collations""".query[CollationsViewRow].stream
+    sql"""select "collation_catalog", "collation_schema", "collation_name", pad_attribute from information_schema.collations""".query(CollationsViewRow.read).stream
   }
 }

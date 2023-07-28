@@ -23,7 +23,7 @@ object AddressRepoImpl extends AddressRepo {
     sql"""insert into person.address(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)
           values (${unsaved.addressid}::int4, ${unsaved.addressline1}, ${unsaved.addressline2}, ${unsaved.city}, ${unsaved.stateprovinceid}::int4, ${unsaved.postalcode}, ${unsaved.spatiallocation}::bytea, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
-       """.query[AddressRow].unique
+       """.query(AddressRow.read).unique
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
@@ -58,17 +58,17 @@ object AddressRepoImpl extends AddressRepo {
             returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
          """
     }
-    q.query[AddressRow].unique
+    q.query(AddressRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address".query[AddressRow].stream
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address".query(AddressRow.read).stream
   }
   override def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ${addressid}".query[AddressRow].option
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ${addressid}".query(AddressRow.read).option
   }
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
-    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ANY(${addressids})".query[AddressRow].stream
+    sql"select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text from person.address where addressid = ANY(${addressids})".query(AddressRow.read).stream
   }
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     val addressid = row.addressid
@@ -111,6 +111,6 @@ object AddressRepoImpl extends AddressRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate::text
-       """.query[AddressRow].unique
+       """.query(AddressRow.read).unique
   }
 }

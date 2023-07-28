@@ -22,7 +22,7 @@ object ShiftRepoImpl extends ShiftRepo {
     sql"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
           values (${unsaved.shiftid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.starttime}::time, ${unsaved.endtime}::time, ${unsaved.modifieddate}::timestamp)
           returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
-       """.query[ShiftRow].unique
+       """.query(ShiftRow.read).unique
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
@@ -50,17 +50,17 @@ object ShiftRepoImpl extends ShiftRepo {
             returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
          """
     }
-    q.query[ShiftRow].unique
+    q.query(ShiftRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
-    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift""".query[ShiftRow].stream
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift""".query(ShiftRow.read).stream
   }
   override def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = {
-    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ${shiftid}""".query[ShiftRow].option
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ${shiftid}""".query(ShiftRow.read).option
   }
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ANY(${shiftids})""".query[ShiftRow].stream
+    sql"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text from humanresources.shift where shiftid = ANY(${shiftids})""".query(ShiftRow.read).stream
   }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
@@ -91,6 +91,6 @@ object ShiftRepoImpl extends ShiftRepo {
             endtime = EXCLUDED.endtime,
             modifieddate = EXCLUDED.modifieddate
           returning shiftid, "name", starttime::text, endtime::text, modifieddate::text
-       """.query[ShiftRow].unique
+       """.query(ShiftRow.read).unique
   }
 }

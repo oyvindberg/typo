@@ -22,7 +22,7 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
     sql"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)
           values (${unsaved.productphotoid}::int4, ${unsaved.thumbnailphoto}::bytea, ${unsaved.thumbnailphotofilename}, ${unsaved.largephoto}::bytea, ${unsaved.largephotofilename}, ${unsaved.modifieddate}::timestamp)
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
-       """.query[ProductphotoRow].unique
+       """.query(ProductphotoRow.read).unique
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow] = {
     val fs = List(
@@ -51,17 +51,17 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
          """
     }
-    q.query[ProductphotoRow].unique
+    q.query(ProductphotoRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductphotoRow] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto".query[ProductphotoRow].stream
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto".query(ProductphotoRow.read).stream
   }
   override def selectById(productphotoid: ProductphotoId): ConnectionIO[Option[ProductphotoRow]] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ${productphotoid}".query[ProductphotoRow].option
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ${productphotoid}".query(ProductphotoRow.read).option
   }
   override def selectByIds(productphotoids: Array[ProductphotoId]): Stream[ConnectionIO, ProductphotoRow] = {
-    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ANY(${productphotoids})".query[ProductphotoRow].stream
+    sql"select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text from production.productphoto where productphotoid = ANY(${productphotoids})".query(ProductphotoRow.read).stream
   }
   override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
     val productphotoid = row.productphotoid
@@ -95,6 +95,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
             largephotofilename = EXCLUDED.largephotofilename,
             modifieddate = EXCLUDED.modifieddate
           returning productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate::text
-       """.query[ProductphotoRow].unique
+       """.query(ProductphotoRow.read).unique
   }
 }

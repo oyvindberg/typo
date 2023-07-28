@@ -16,9 +16,9 @@ object SqlPartsRepoImpl extends SqlPartsRepo {
     sql"""insert into information_schema.sql_parts(feature_id, feature_name, is_supported, is_verified_by, "comments")
           values (${unsaved.featureId}::information_schema.character_data, ${unsaved.featureName}::information_schema.character_data, ${unsaved.isSupported}::information_schema.yes_or_no, ${unsaved.isVerifiedBy}::information_schema.character_data, ${unsaved.comments}::information_schema.character_data)
           returning feature_id, feature_name, is_supported, is_verified_by, "comments"
-       """.query[SqlPartsRow].unique
+       """.query(SqlPartsRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, SqlPartsRow] = {
-    sql"""select feature_id, feature_name, is_supported, is_verified_by, "comments" from information_schema.sql_parts""".query[SqlPartsRow].stream
+    sql"""select feature_id, feature_name, is_supported, is_verified_by, "comments" from information_schema.sql_parts""".query(SqlPartsRow.read).stream
   }
 }

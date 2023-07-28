@@ -13,6 +13,6 @@ import fs2.Stream
 
 object TablePrivilegesViewRepoImpl extends TablePrivilegesViewRepo {
   override def selectAll: Stream[ConnectionIO, TablePrivilegesViewRow] = {
-    sql"""select grantor, grantee, table_catalog, table_schema, "table_name", privilege_type, is_grantable, with_hierarchy from information_schema.table_privileges""".query[TablePrivilegesViewRow].stream
+    sql"""select grantor, grantee, table_catalog, table_schema, "table_name", privilege_type, is_grantable, with_hierarchy from information_schema.table_privileges""".query(TablePrivilegesViewRow.read).stream
   }
 }

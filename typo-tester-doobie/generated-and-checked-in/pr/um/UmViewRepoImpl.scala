@@ -13,6 +13,6 @@ import fs2.Stream
 
 object UmViewRepoImpl extends UmViewRepo {
   override def selectAll: Stream[ConnectionIO, UmViewRow] = {
-    sql"""select "id", unitmeasurecode, "name", modifieddate::text from pr.um""".query[UmViewRow].stream
+    sql"""select "id", unitmeasurecode, "name", modifieddate::text from pr.um""".query(UmViewRow.read).stream
   }
 }

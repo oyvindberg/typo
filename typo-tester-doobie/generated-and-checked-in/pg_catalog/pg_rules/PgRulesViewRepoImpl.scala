@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgRulesViewRepoImpl extends PgRulesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgRulesViewRow] = {
-    sql"select schemaname, tablename, rulename, definition from pg_catalog.pg_rules".query[PgRulesViewRow].stream
+    sql"select schemaname, tablename, rulename, definition from pg_catalog.pg_rules".query(PgRulesViewRow.read).stream
   }
 }

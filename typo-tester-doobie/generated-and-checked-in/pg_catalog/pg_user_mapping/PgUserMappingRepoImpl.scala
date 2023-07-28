@@ -19,16 +19,16 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
     sql"""insert into pg_catalog.pg_user_mapping(oid, umuser, umserver, umoptions)
           values (${unsaved.oid}::oid, ${unsaved.umuser}::oid, ${unsaved.umserver}::oid, ${unsaved.umoptions}::_text)
           returning oid, umuser, umserver, umoptions
-       """.query[PgUserMappingRow].unique
+       """.query(PgUserMappingRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgUserMappingRow] = {
-    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping".query[PgUserMappingRow].stream
+    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping".query(PgUserMappingRow.read).stream
   }
   override def selectById(oid: PgUserMappingId): ConnectionIO[Option[PgUserMappingRow]] = {
-    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = ${oid}".query[PgUserMappingRow].option
+    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = ${oid}".query(PgUserMappingRow.read).option
   }
   override def selectByIds(oids: Array[PgUserMappingId]): Stream[ConnectionIO, PgUserMappingRow] = {
-    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = ANY(${oids})".query[PgUserMappingRow].stream
+    sql"select oid, umuser, umserver, umoptions from pg_catalog.pg_user_mapping where oid = ANY(${oids})".query(PgUserMappingRow.read).stream
   }
   override def update(row: PgUserMappingRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -56,6 +56,6 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
             umserver = EXCLUDED.umserver,
             umoptions = EXCLUDED.umoptions
           returning oid, umuser, umserver, umoptions
-       """.query[PgUserMappingRow].unique
+       """.query(PgUserMappingRow.read).unique
   }
 }

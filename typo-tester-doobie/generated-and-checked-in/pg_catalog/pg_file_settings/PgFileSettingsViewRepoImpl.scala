@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgFileSettingsViewRepoImpl extends PgFileSettingsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgFileSettingsViewRow] = {
-    sql"""select sourcefile, sourceline, seqno, "name", setting, applied, "error" from pg_catalog.pg_file_settings""".query[PgFileSettingsViewRow].stream
+    sql"""select sourcefile, sourceline, seqno, "name", setting, applied, "error" from pg_catalog.pg_file_settings""".query(PgFileSettingsViewRow.read).stream
   }
 }

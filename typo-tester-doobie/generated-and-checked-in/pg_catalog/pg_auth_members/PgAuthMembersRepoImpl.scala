@@ -19,13 +19,13 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
     sql"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
           values (${unsaved.roleid}::oid, ${unsaved.member}::oid, ${unsaved.grantor}::oid, ${unsaved.adminOption})
           returning roleid, "member", grantor, admin_option
-       """.query[PgAuthMembersRow].unique
+       """.query(PgAuthMembersRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgAuthMembersRow] = {
-    sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members""".query[PgAuthMembersRow].stream
+    sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members""".query(PgAuthMembersRow.read).stream
   }
   override def selectById(compositeId: PgAuthMembersId): ConnectionIO[Option[PgAuthMembersRow]] = {
-    sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}""".query[PgAuthMembersRow].option
+    sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}""".query(PgAuthMembersRow.read).option
   }
   override def update(row: PgAuthMembersRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -51,6 +51,6 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
             grantor = EXCLUDED.grantor,
             admin_option = EXCLUDED.admin_option
           returning roleid, "member", grantor, admin_option
-       """.query[PgAuthMembersRow].unique
+       """.query(PgAuthMembersRow.read).unique
   }
 }

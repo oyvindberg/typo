@@ -19,16 +19,16 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
     sql"""insert into pg_catalog.pg_attrdef(oid, adrelid, adnum, adbin)
           values (${unsaved.oid}::oid, ${unsaved.adrelid}::oid, ${unsaved.adnum}::int2, ${unsaved.adbin}::pg_node_tree)
           returning oid, adrelid, adnum, adbin
-       """.query[PgAttrdefRow].unique
+       """.query(PgAttrdefRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgAttrdefRow] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef".query[PgAttrdefRow].stream
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef".query(PgAttrdefRow.read).stream
   }
   override def selectById(oid: PgAttrdefId): ConnectionIO[Option[PgAttrdefRow]] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ${oid}".query[PgAttrdefRow].option
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ${oid}".query(PgAttrdefRow.read).option
   }
   override def selectByIds(oids: Array[PgAttrdefId]): Stream[ConnectionIO, PgAttrdefRow] = {
-    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${oids})".query[PgAttrdefRow].stream
+    sql"select oid, adrelid, adnum, adbin from pg_catalog.pg_attrdef where oid = ANY(${oids})".query(PgAttrdefRow.read).stream
   }
   override def update(row: PgAttrdefRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -56,6 +56,6 @@ object PgAttrdefRepoImpl extends PgAttrdefRepo {
             adnum = EXCLUDED.adnum,
             adbin = EXCLUDED.adbin
           returning oid, adrelid, adnum, adbin
-       """.query[PgAttrdefRow].unique
+       """.query(PgAttrdefRow.read).unique
   }
 }

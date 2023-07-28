@@ -23,7 +23,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
           values (${unsaved.shipmethodid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.shipbase}::numeric, ${unsaved.shiprate}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
-       """.query[ShipmethodRow].unique
+       """.query(ShipmethodRow.read).unique
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
     val fs = List(
@@ -61,17 +61,17 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
          """
     }
-    q.query[ShipmethodRow].unique
+    q.query(ShipmethodRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod""".query[ShipmethodRow].stream
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod""".query(ShipmethodRow.read).stream
   }
   override def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ${shipmethodid}""".query[ShipmethodRow].option
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ${shipmethodid}""".query(ShipmethodRow.read).option
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
-    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ANY(${shipmethodids})""".query[ShipmethodRow].stream
+    sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod where shipmethodid = ANY(${shipmethodids})""".query(ShipmethodRow.read).stream
   }
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     val shipmethodid = row.shipmethodid
@@ -105,6 +105,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
-       """.query[ShipmethodRow].unique
+       """.query(ShipmethodRow.read).unique
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
   override def selectAll: Stream[ConnectionIO, VstorewithaddressesViewRow] = {
-    sql"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses""".query[VstorewithaddressesViewRow].stream
+    sql"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from sales.vstorewithaddresses""".query(VstorewithaddressesViewRow.read).stream
   }
 }

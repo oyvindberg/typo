@@ -13,6 +13,6 @@ import fs2.Stream
 
 object TriggeredUpdateColumnsViewRepoImpl extends TriggeredUpdateColumnsViewRepo {
   override def selectAll: Stream[ConnectionIO, TriggeredUpdateColumnsViewRow] = {
-    sql"""select "trigger_catalog", "trigger_schema", "trigger_name", event_object_catalog, event_object_schema, event_object_table, event_object_column from information_schema.triggered_update_columns""".query[TriggeredUpdateColumnsViewRow].stream
+    sql"""select "trigger_catalog", "trigger_schema", "trigger_name", event_object_catalog, event_object_schema, event_object_table, event_object_column from information_schema.triggered_update_columns""".query(TriggeredUpdateColumnsViewRow.read).stream
   }
 }

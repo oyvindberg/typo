@@ -29,7 +29,7 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.address a ON a.addressid = bea.addressid
             where s.businessentityid = $businessentityid
          """
-    sql.query[PersonDetailSqlRow].stream
+    sql.query(PersonDetailSqlRow.read).stream
   
   }
 }

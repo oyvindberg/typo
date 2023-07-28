@@ -23,7 +23,7 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     sql"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.emailaddressid}::int4, ${unsaved.emailaddress}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
-       """.query[EmailaddressRow].unique
+       """.query(EmailaddressRow.read).unique
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
     val fs = List(
@@ -54,14 +54,14 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
          """
     }
-    q.query[EmailaddressRow].unique
+    q.query(EmailaddressRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
-    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress".query[EmailaddressRow].stream
+    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress".query(EmailaddressRow.read).stream
   }
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
-    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".query[EmailaddressRow].option
+    sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".query(EmailaddressRow.read).option
   }
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -90,6 +90,6 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text
-       """.query[EmailaddressRow].unique
+       """.query(EmailaddressRow.read).unique
   }
 }

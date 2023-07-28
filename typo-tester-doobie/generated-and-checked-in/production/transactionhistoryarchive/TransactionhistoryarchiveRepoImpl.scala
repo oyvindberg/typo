@@ -22,7 +22,7 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     sql"""insert into production.transactionhistoryarchive(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
           values (${unsaved.transactionid}::int4, ${unsaved.productid}::int4, ${unsaved.referenceorderid}::int4, ${unsaved.referenceorderlineid}::int4, ${unsaved.transactiondate}::timestamp, ${unsaved.transactiontype}::bpchar, ${unsaved.quantity}::int4, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
-       """.query[TransactionhistoryarchiveRow].unique
+       """.query(TransactionhistoryarchiveRow.read).unique
   }
   override def insert(unsaved: TransactionhistoryarchiveRowUnsaved): ConnectionIO[TransactionhistoryarchiveRow] = {
     val fs = List(
@@ -57,17 +57,17 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
          """
     }
-    q.query[TransactionhistoryarchiveRow].unique
+    q.query(TransactionhistoryarchiveRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive".query[TransactionhistoryarchiveRow].stream
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive".query(TransactionhistoryarchiveRow.read).stream
   }
   override def selectById(transactionid: TransactionhistoryarchiveId): ConnectionIO[Option[TransactionhistoryarchiveRow]] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive where transactionid = ${transactionid}".query[TransactionhistoryarchiveRow].option
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive where transactionid = ${transactionid}".query(TransactionhistoryarchiveRow.read).option
   }
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId]): Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive where transactionid = ANY(${transactionids})".query[TransactionhistoryarchiveRow].stream
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistoryarchive where transactionid = ANY(${transactionids})".query(TransactionhistoryarchiveRow.read).stream
   }
   override def update(row: TransactionhistoryarchiveRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
@@ -110,6 +110,6 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             actualcost = EXCLUDED.actualcost,
             modifieddate = EXCLUDED.modifieddate
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
-       """.query[TransactionhistoryarchiveRow].unique
+       """.query(TransactionhistoryarchiveRow.read).unique
   }
 }

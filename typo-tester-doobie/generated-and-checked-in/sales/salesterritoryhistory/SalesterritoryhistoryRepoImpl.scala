@@ -23,7 +23,7 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     sql"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.territoryid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
-       """.query[SalesterritoryhistoryRow].unique
+       """.query(SalesterritoryhistoryRow.read).unique
   }
   override def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow] = {
     val fs = List(
@@ -52,14 +52,14 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
          """
     }
-    q.query[SalesterritoryhistoryRow].unique
+    q.query(SalesterritoryhistoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = {
-    sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory".query[SalesterritoryhistoryRow].stream
+    sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory".query(SalesterritoryhistoryRow.read).stream
   }
   override def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
-    sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".query[SalesterritoryhistoryRow].option
+    sql"select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".query(SalesterritoryhistoryRow.read).option
   }
   override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -89,6 +89,6 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
-       """.query[SalesterritoryhistoryRow].unique
+       """.query(SalesterritoryhistoryRow.read).unique
   }
 }

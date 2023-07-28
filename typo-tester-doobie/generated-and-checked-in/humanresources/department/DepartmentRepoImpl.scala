@@ -22,7 +22,7 @@ object DepartmentRepoImpl extends DepartmentRepo {
     sql"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
           values (${unsaved.departmentid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.groupname}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning departmentid, "name", groupname, modifieddate::text
-       """.query[DepartmentRow].unique
+       """.query(DepartmentRow.read).unique
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
@@ -49,17 +49,17 @@ object DepartmentRepoImpl extends DepartmentRepo {
             returning departmentid, "name", groupname, modifieddate::text
          """
     }
-    q.query[DepartmentRow].unique
+    q.query(DepartmentRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
-    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department""".query[DepartmentRow].stream
+    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department""".query(DepartmentRow.read).stream
   }
   override def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]] = {
-    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ${departmentid}""".query[DepartmentRow].option
+    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ${departmentid}""".query(DepartmentRow.read).option
   }
   override def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow] = {
-    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ANY(${departmentids})""".query[DepartmentRow].stream
+    sql"""select departmentid, "name", groupname, modifieddate::text from humanresources.department where departmentid = ANY(${departmentids})""".query(DepartmentRow.read).stream
   }
   override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
     val departmentid = row.departmentid
@@ -87,6 +87,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
             groupname = EXCLUDED.groupname,
             modifieddate = EXCLUDED.modifieddate
           returning departmentid, "name", groupname, modifieddate::text
-       """.query[DepartmentRow].unique
+       """.query(DepartmentRow.read).unique
   }
 }

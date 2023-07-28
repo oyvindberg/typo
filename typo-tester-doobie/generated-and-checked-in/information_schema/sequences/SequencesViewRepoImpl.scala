@@ -13,6 +13,6 @@ import fs2.Stream
 
 object SequencesViewRepoImpl extends SequencesViewRepo {
   override def selectAll: Stream[ConnectionIO, SequencesViewRow] = {
-    sql"""select sequence_catalog, sequence_schema, sequence_name, data_type, numeric_precision, numeric_precision_radix, numeric_scale, start_value, minimum_value, maximum_value, "increment", cycle_option from information_schema."sequences"""".query[SequencesViewRow].stream
+    sql"""select sequence_catalog, sequence_schema, sequence_name, data_type, numeric_precision, numeric_precision_radix, numeric_scale, start_value, minimum_value, maximum_value, "increment", cycle_option from information_schema."sequences"""".query(SequencesViewRow.read).stream
   }
 }

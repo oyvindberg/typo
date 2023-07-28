@@ -22,7 +22,7 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     sql"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.ratechangedate}::timestamp, ${unsaved.rate}::numeric, ${unsaved.payfrequency}::int2, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
-       """.query[EmployeepayhistoryRow].unique
+       """.query(EmployeepayhistoryRow.read).unique
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ConnectionIO[EmployeepayhistoryRow] = {
     val fs = List(
@@ -47,14 +47,14 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
          """
     }
-    q.query[EmployeepayhistoryRow].unique
+    q.query(EmployeepayhistoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
-    sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory".query[EmployeepayhistoryRow].stream
+    sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory".query(EmployeepayhistoryRow.read).stream
   }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
-    sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".query[EmployeepayhistoryRow].option
+    sql"select businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".query(EmployeepayhistoryRow.read).option
   }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -83,6 +83,6 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             payfrequency = EXCLUDED.payfrequency,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, ratechangedate::text, rate, payfrequency, modifieddate::text
-       """.query[EmployeepayhistoryRow].unique
+       """.query(EmployeepayhistoryRow.read).unique
   }
 }

@@ -23,7 +23,7 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
           values (${unsaved.specialofferid}::int4, ${unsaved.productid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning specialofferid, productid, rowguid, modifieddate::text
-       """.query[SpecialofferproductRow].unique
+       """.query(SpecialofferproductRow.read).unique
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow] = {
     val fs = List(
@@ -50,14 +50,14 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             returning specialofferid, productid, rowguid, modifieddate::text
          """
     }
-    q.query[SpecialofferproductRow].unique
+    q.query(SpecialofferproductRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
-    sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct".query[SpecialofferproductRow].stream
+    sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct".query(SpecialofferproductRow.read).stream
   }
   override def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]] = {
-    sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".query[SpecialofferproductRow].option
+    sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".query(SpecialofferproductRow.read).option
   }
   override def update(row: SpecialofferproductRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -83,6 +83,6 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning specialofferid, productid, rowguid, modifieddate::text
-       """.query[SpecialofferproductRow].unique
+       """.query(SpecialofferproductRow.read).unique
   }
 }

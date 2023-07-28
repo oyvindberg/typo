@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgMatviewsViewRepoImpl extends PgMatviewsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgMatviewsViewRow] = {
-    sql"""select schemaname, matviewname, matviewowner, "tablespace", hasindexes, ispopulated, definition from pg_catalog.pg_matviews""".query[PgMatviewsViewRow].stream
+    sql"""select schemaname, matviewname, matviewowner, "tablespace", hasindexes, ispopulated, definition from pg_catalog.pg_matviews""".query(PgMatviewsViewRow.read).stream
   }
 }

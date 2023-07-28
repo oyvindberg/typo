@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgReplicationOriginStatusViewRepoImpl extends PgReplicationOriginStatusViewRepo {
   override def selectAll: Stream[ConnectionIO, PgReplicationOriginStatusViewRow] = {
-    sql"select local_id, external_id, remote_lsn, local_lsn from pg_catalog.pg_replication_origin_status".query[PgReplicationOriginStatusViewRow].stream
+    sql"select local_id, external_id, remote_lsn, local_lsn from pg_catalog.pg_replication_origin_status".query(PgReplicationOriginStatusViewRow.read).stream
   }
 }

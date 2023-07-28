@@ -22,7 +22,7 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""insert into person.personphone(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.phonenumber}::"public".Phone, ${unsaved.phonenumbertypeid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
-       """.query[PersonphoneRow].unique
+       """.query(PersonphoneRow.read).unique
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
@@ -46,14 +46,14 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
             returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
          """
     }
-    q.query[PersonphoneRow].unique
+    q.query(PersonphoneRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
-    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone".query[PersonphoneRow].stream
+    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone".query(PersonphoneRow.read).stream
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
-    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".query[PersonphoneRow].option
+    sql"select businessentityid, phonenumber, phonenumbertypeid, modifieddate::text from person.personphone where businessentityid = ${compositeId.businessentityid} AND phonenumber = ${compositeId.phonenumber} AND phonenumbertypeid = ${compositeId.phonenumbertypeid}".query(PersonphoneRow.read).option
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -77,6 +77,6 @@ object PersonphoneRepoImpl extends PersonphoneRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, phonenumber, phonenumbertypeid, modifieddate::text
-       """.query[PersonphoneRow].unique
+       """.query(PersonphoneRow.read).unique
   }
 }

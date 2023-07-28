@@ -91,18 +91,18 @@ object DbLibDoobie extends DbLib {
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName""")
-        code"""$sql.query[$rowType].stream"""
+        code"""$sql.query($rowType.$readName).stream"""
 
       case RepoMethod.SelectById(relName, cols, id, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
-        code"""$sql.query[$rowType].option"""
+        code"""$sql.query($rowType.$readName).option"""
 
       case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
 
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchAnyId(unaryId, idsParam)}""")
-        code"""$sql.query[$rowType].stream"""
+        code"""$sql.query($rowType.$readName).stream"""
       case RepoMethod.SelectByUnique(params, fieldValue, _) =>
         val args = params.map { param => code"$fieldValue.${param.name}(${param.name})" }.mkCode(", ")
         code"""selectByFieldValues(${sc.Type.List}($args)).compile.last"""
@@ -120,7 +120,7 @@ object DbLibDoobie extends DbLib {
               |    ${cases.mkCode("\n")}
               |  }
               |)
-              |$sql.query[$rowType].stream
+              |$sql.query($rowType.$readName).stream
               |""".stripMargin
 
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
@@ -194,7 +194,7 @@ object DbLibDoobie extends DbLib {
                |  import cats.syntax.foldable.toFoldableOps
                |  $sql
                |}
-               |q.query[$rowType].unique
+               |q.query($rowType.$readName).unique
                |"""
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -217,7 +217,7 @@ object DbLibDoobie extends DbLib {
                  |""".stripMargin
         }
 
-        code"$sql.query[$rowType].unique"
+        code"$sql.query($rowType.$readName).unique"
 
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -230,7 +230,7 @@ object DbLibDoobie extends DbLib {
                  |""".stripMargin
         }
 
-        code"$sql.query[$rowType].unique"
+        code"$sql.query($rowType.$readName).unique"
 
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
@@ -243,7 +243,7 @@ object DbLibDoobie extends DbLib {
         }
         code"""|val sql =
                |  ${SQL(renderedScript)}
-               |sql.query[${sqlScript.RowName}].stream
+               |sql.query(${sqlScript.RowName}.$readName).stream
                |""".stripMargin
     }
 

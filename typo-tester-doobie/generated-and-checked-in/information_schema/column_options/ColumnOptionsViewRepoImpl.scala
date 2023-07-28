@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ColumnOptionsViewRepoImpl extends ColumnOptionsViewRepo {
   override def selectAll: Stream[ConnectionIO, ColumnOptionsViewRow] = {
-    sql"""select table_catalog, table_schema, "table_name", "column_name", option_name, option_value from information_schema.column_options""".query[ColumnOptionsViewRow].stream
+    sql"""select table_catalog, table_schema, "table_name", "column_name", option_name, option_value from information_schema.column_options""".query(ColumnOptionsViewRow.read).stream
   }
 }

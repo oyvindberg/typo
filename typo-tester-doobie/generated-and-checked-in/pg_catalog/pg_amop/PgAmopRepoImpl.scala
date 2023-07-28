@@ -19,16 +19,16 @@ object PgAmopRepoImpl extends PgAmopRepo {
     sql"""insert into pg_catalog.pg_amop(oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily)
           values (${unsaved.oid}::oid, ${unsaved.amopfamily}::oid, ${unsaved.amoplefttype}::oid, ${unsaved.amoprighttype}::oid, ${unsaved.amopstrategy}::int2, ${unsaved.amoppurpose}::char, ${unsaved.amopopr}::oid, ${unsaved.amopmethod}::oid, ${unsaved.amopsortfamily}::oid)
           returning oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
-       """.query[PgAmopRow].unique
+       """.query(PgAmopRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgAmopRow] = {
-    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop".query[PgAmopRow].stream
+    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop".query(PgAmopRow.read).stream
   }
   override def selectById(oid: PgAmopId): ConnectionIO[Option[PgAmopRow]] = {
-    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ${oid}".query[PgAmopRow].option
+    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ${oid}".query(PgAmopRow.read).option
   }
   override def selectByIds(oids: Array[PgAmopId]): Stream[ConnectionIO, PgAmopRow] = {
-    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ANY(${oids})".query[PgAmopRow].stream
+    sql"select oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily from pg_catalog.pg_amop where oid = ANY(${oids})".query(PgAmopRow.read).stream
   }
   override def update(row: PgAmopRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgAmopRepoImpl extends PgAmopRepo {
             amopmethod = EXCLUDED.amopmethod,
             amopsortfamily = EXCLUDED.amopsortfamily
           returning oid, amopfamily, amoplefttype, amoprighttype, amopstrategy, amoppurpose, amopopr, amopmethod, amopsortfamily
-       """.query[PgAmopRow].unique
+       """.query(PgAmopRow.read).unique
   }
 }

@@ -19,16 +19,16 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
     sql"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
           values (${unsaved.oid}::oid, ${unsaved.tmplname}::name, ${unsaved.tmplnamespace}::oid, ${unsaved.tmplinit}::regproc, ${unsaved.tmpllexize}::regproc)
           returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
-       """.query[PgTsTemplateRow].unique
+       """.query(PgTsTemplateRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTsTemplateRow] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template".query[PgTsTemplateRow].stream
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template".query(PgTsTemplateRow.read).stream
   }
   override def selectById(oid: PgTsTemplateId): ConnectionIO[Option[PgTsTemplateRow]] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ${oid}".query[PgTsTemplateRow].option
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ${oid}".query(PgTsTemplateRow.read).option
   }
   override def selectByIds(oids: Array[PgTsTemplateId]): Stream[ConnectionIO, PgTsTemplateRow] = {
-    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${oids})".query[PgTsTemplateRow].stream
+    sql"select oid, tmplname, tmplnamespace, tmplinit, tmpllexize from pg_catalog.pg_ts_template where oid = ANY(${oids})".query(PgTsTemplateRow.read).stream
   }
   override def update(row: PgTsTemplateRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -59,6 +59,6 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
             tmplinit = EXCLUDED.tmplinit,
             tmpllexize = EXCLUDED.tmpllexize
           returning oid, tmplname, tmplnamespace, tmplinit, tmpllexize
-       """.query[PgTsTemplateRow].unique
+       """.query(PgTsTemplateRow.read).unique
   }
 }

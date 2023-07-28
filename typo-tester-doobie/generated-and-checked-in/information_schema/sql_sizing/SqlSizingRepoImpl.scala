@@ -16,9 +16,9 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
     sql"""insert into information_schema.sql_sizing(sizing_id, sizing_name, supported_value, "comments")
           values (${unsaved.sizingId}::information_schema.cardinal_number, ${unsaved.sizingName}::information_schema.character_data, ${unsaved.supportedValue}::information_schema.cardinal_number, ${unsaved.comments}::information_schema.character_data)
           returning sizing_id, sizing_name, supported_value, "comments"
-       """.query[SqlSizingRow].unique
+       """.query(SqlSizingRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, SqlSizingRow] = {
-    sql"""select sizing_id, sizing_name, supported_value, "comments" from information_schema.sql_sizing""".query[SqlSizingRow].stream
+    sql"""select sizing_id, sizing_name, supported_value, "comments" from information_schema.sql_sizing""".query(SqlSizingRow.read).stream
   }
 }

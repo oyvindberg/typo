@@ -13,6 +13,6 @@ import fs2.Stream
 
 object BomViewRepoImpl extends BomViewRepo {
   override def selectAll: Stream[ConnectionIO, BomViewRow] = {
-    sql"""select "id", billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from pr."bom"""".query[BomViewRow].stream
+    sql"""select "id", billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from pr."bom"""".query(BomViewRow.read).stream
   }
 }

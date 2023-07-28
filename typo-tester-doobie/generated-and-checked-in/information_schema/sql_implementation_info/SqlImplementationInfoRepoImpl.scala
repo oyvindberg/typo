@@ -16,9 +16,9 @@ object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
     sql"""insert into information_schema.sql_implementation_info(implementation_info_id, implementation_info_name, integer_value, character_value, "comments")
           values (${unsaved.implementationInfoId}::information_schema.character_data, ${unsaved.implementationInfoName}::information_schema.character_data, ${unsaved.integerValue}::information_schema.cardinal_number, ${unsaved.characterValue}::information_schema.character_data, ${unsaved.comments}::information_schema.character_data)
           returning implementation_info_id, implementation_info_name, integer_value, character_value, "comments"
-       """.query[SqlImplementationInfoRow].unique
+       """.query(SqlImplementationInfoRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, SqlImplementationInfoRow] = {
-    sql"""select implementation_info_id, implementation_info_name, integer_value, character_value, "comments" from information_schema.sql_implementation_info""".query[SqlImplementationInfoRow].stream
+    sql"""select implementation_info_id, implementation_info_name, integer_value, character_value, "comments" from information_schema.sql_implementation_info""".query(SqlImplementationInfoRow.read).stream
   }
 }

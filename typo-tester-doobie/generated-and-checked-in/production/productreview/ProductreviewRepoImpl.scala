@@ -22,7 +22,7 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
           values (${unsaved.productreviewid}::int4, ${unsaved.productid}::int4, ${unsaved.reviewername}::"public"."Name", ${unsaved.reviewdate}::timestamp, ${unsaved.emailaddress}, ${unsaved.rating}::int4, ${unsaved.comments}, ${unsaved.modifieddate}::timestamp)
           returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
-       """.query[ProductreviewRow].unique
+       """.query(ProductreviewRow.read).unique
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
     val fs = List(
@@ -56,17 +56,17 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
          """
     }
-    q.query[ProductreviewRow].unique
+    q.query(ProductreviewRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview""".query[ProductreviewRow].stream
+    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview""".query(ProductreviewRow.read).stream
   }
   override def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ${productreviewid}""".query[ProductreviewRow].option
+    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ${productreviewid}""".query(ProductreviewRow.read).option
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ANY(${productreviewids})""".query[ProductreviewRow].stream
+    sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview where productreviewid = ANY(${productreviewids})""".query(ProductreviewRow.read).stream
   }
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     val productreviewid = row.productreviewid
@@ -106,6 +106,6 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
             "comments" = EXCLUDED."comments",
             modifieddate = EXCLUDED.modifieddate
           returning productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
-       """.query[ProductreviewRow].unique
+       """.query(ProductreviewRow.read).unique
   }
 }

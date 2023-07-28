@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def selectAll: Stream[ConnectionIO, VadditionalcontactinfoViewRow] = {
-    sql"select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate::text from person.vadditionalcontactinfo".query[VadditionalcontactinfoViewRow].stream
+    sql"select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate::text from person.vadditionalcontactinfo".query(VadditionalcontactinfoViewRow.read).stream
   }
 }

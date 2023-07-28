@@ -13,6 +13,6 @@ import fs2.Stream
 
 object CtViewRepoImpl extends CtViewRepo {
   override def selectAll: Stream[ConnectionIO, CtViewRow] = {
-    sql"""select "id", contacttypeid, "name", modifieddate::text from pe.ct""".query[CtViewRow].stream
+    sql"""select "id", contacttypeid, "name", modifieddate::text from pe.ct""".query(CtViewRow.read).stream
   }
 }

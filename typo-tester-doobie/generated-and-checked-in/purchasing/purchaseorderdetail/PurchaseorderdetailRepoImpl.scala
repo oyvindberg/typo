@@ -22,7 +22,7 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
           values (${unsaved.purchaseorderid}::int4, ${unsaved.purchaseorderdetailid}::int4, ${unsaved.duedate}::timestamp, ${unsaved.orderqty}::int2, ${unsaved.productid}::int4, ${unsaved.unitprice}::numeric, ${unsaved.receivedqty}::numeric, ${unsaved.rejectedqty}::numeric, ${unsaved.modifieddate}::timestamp)
           returning purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
-       """.query[PurchaseorderdetailRow].unique
+       """.query(PurchaseorderdetailRow.read).unique
   }
   override def insert(unsaved: PurchaseorderdetailRowUnsaved): ConnectionIO[PurchaseorderdetailRow] = {
     val fs = List(
@@ -54,14 +54,14 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             returning purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
          """
     }
-    q.query[PurchaseorderdetailRow].unique
+    q.query(PurchaseorderdetailRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
-    sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail".query[PurchaseorderdetailRow].stream
+    sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail".query(PurchaseorderdetailRow.read).stream
   }
   override def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]] = {
-    sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".query[PurchaseorderdetailRow].option
+    sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail where purchaseorderid = ${compositeId.purchaseorderid} AND purchaseorderdetailid = ${compositeId.purchaseorderdetailid}".query(PurchaseorderdetailRow.read).option
   }
   override def update(row: PurchaseorderdetailRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -102,6 +102,6 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
             rejectedqty = EXCLUDED.rejectedqty,
             modifieddate = EXCLUDED.modifieddate
           returning purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text
-       """.query[PurchaseorderdetailRow].unique
+       """.query(PurchaseorderdetailRow.read).unique
   }
 }

@@ -23,7 +23,7 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""insert into person.addresstype(addresstypeid, "name", rowguid, modifieddate)
           values (${unsaved.addresstypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning addresstypeid, "name", rowguid, modifieddate::text
-       """.query[AddresstypeRow].unique
+       """.query(AddresstypeRow.read).unique
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     val fs = List(
@@ -53,17 +53,17 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
             returning addresstypeid, "name", rowguid, modifieddate::text
          """
     }
-    q.query[AddresstypeRow].unique
+    q.query(AddresstypeRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype""".query[AddresstypeRow].stream
+    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype""".query(AddresstypeRow.read).stream
   }
   override def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ${addresstypeid}""".query[AddresstypeRow].option
+    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ${addresstypeid}""".query(AddresstypeRow.read).option
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ANY(${addresstypeids})""".query[AddresstypeRow].stream
+    sql"""select addresstypeid, "name", rowguid, modifieddate::text from person.addresstype where addresstypeid = ANY(${addresstypeids})""".query(AddresstypeRow.read).stream
   }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
@@ -91,6 +91,6 @@ object AddresstypeRepoImpl extends AddresstypeRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning addresstypeid, "name", rowguid, modifieddate::text
-       """.query[AddresstypeRow].unique
+       """.query(AddresstypeRow.read).unique
   }
 }

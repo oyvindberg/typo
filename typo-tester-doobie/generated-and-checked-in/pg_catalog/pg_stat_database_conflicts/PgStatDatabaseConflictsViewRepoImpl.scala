@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatDatabaseConflictsViewRepoImpl extends PgStatDatabaseConflictsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatDatabaseConflictsViewRow] = {
-    sql"select datid, datname, confl_tablespace, confl_lock, confl_snapshot, confl_bufferpin, confl_deadlock from pg_catalog.pg_stat_database_conflicts".query[PgStatDatabaseConflictsViewRow].stream
+    sql"select datid, datname, confl_tablespace, confl_lock, confl_snapshot, confl_bufferpin, confl_deadlock from pg_catalog.pg_stat_database_conflicts".query(PgStatDatabaseConflictsViewRow.read).stream
   }
 }

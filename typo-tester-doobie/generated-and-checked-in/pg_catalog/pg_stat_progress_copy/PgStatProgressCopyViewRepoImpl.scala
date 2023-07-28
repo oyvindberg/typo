@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatProgressCopyViewRepoImpl extends PgStatProgressCopyViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatProgressCopyViewRow] = {
-    sql"""select pid, datid, datname, relid, command, "type", bytes_processed, bytes_total, tuples_processed, tuples_excluded from pg_catalog.pg_stat_progress_copy""".query[PgStatProgressCopyViewRow].stream
+    sql"""select pid, datid, datname, relid, command, "type", bytes_processed, bytes_total, tuples_processed, tuples_excluded from pg_catalog.pg_stat_progress_copy""".query(PgStatProgressCopyViewRow.read).stream
   }
 }

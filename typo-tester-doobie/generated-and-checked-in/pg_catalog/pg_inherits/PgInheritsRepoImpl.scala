@@ -19,13 +19,13 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
     sql"""insert into pg_catalog.pg_inherits(inhrelid, inhparent, inhseqno, inhdetachpending)
           values (${unsaved.inhrelid}::oid, ${unsaved.inhparent}::oid, ${unsaved.inhseqno}::int4, ${unsaved.inhdetachpending})
           returning inhrelid, inhparent, inhseqno, inhdetachpending
-       """.query[PgInheritsRow].unique
+       """.query(PgInheritsRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgInheritsRow] = {
-    sql"select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits".query[PgInheritsRow].stream
+    sql"select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits".query(PgInheritsRow.read).stream
   }
   override def selectById(compositeId: PgInheritsId): ConnectionIO[Option[PgInheritsRow]] = {
-    sql"select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits where inhrelid = ${compositeId.inhrelid} AND inhseqno = ${compositeId.inhseqno}".query[PgInheritsRow].option
+    sql"select inhrelid, inhparent, inhseqno, inhdetachpending from pg_catalog.pg_inherits where inhrelid = ${compositeId.inhrelid} AND inhseqno = ${compositeId.inhseqno}".query(PgInheritsRow.read).option
   }
   override def update(row: PgInheritsRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -51,6 +51,6 @@ object PgInheritsRepoImpl extends PgInheritsRepo {
             inhparent = EXCLUDED.inhparent,
             inhdetachpending = EXCLUDED.inhdetachpending
           returning inhrelid, inhparent, inhseqno, inhdetachpending
-       """.query[PgInheritsRow].unique
+       """.query(PgInheritsRow.read).unique
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object CollationCharacterSetApplicabilityViewRepoImpl extends CollationCharacterSetApplicabilityViewRepo {
   override def selectAll: Stream[ConnectionIO, CollationCharacterSetApplicabilityViewRow] = {
-    sql"""select "collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name" from information_schema.collation_character_set_applicability""".query[CollationCharacterSetApplicabilityViewRow].stream
+    sql"""select "collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name" from information_schema.collation_character_set_applicability""".query(CollationCharacterSetApplicabilityViewRow.read).stream
   }
 }

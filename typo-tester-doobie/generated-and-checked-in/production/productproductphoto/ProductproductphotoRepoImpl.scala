@@ -23,7 +23,7 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     sql"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.productphotoid}::int4, ${unsaved.primary}::"public"."Flag", ${unsaved.modifieddate}::timestamp)
           returning productid, productphotoid, "primary", modifieddate::text
-       """.query[ProductproductphotoRow].unique
+       """.query(ProductproductphotoRow.read).unique
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved): ConnectionIO[ProductproductphotoRow] = {
     val fs = List(
@@ -50,14 +50,14 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             returning productid, productphotoid, "primary", modifieddate::text
          """
     }
-    q.query[ProductproductphotoRow].unique
+    q.query(ProductproductphotoRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductproductphotoRow] = {
-    sql"""select productid, productphotoid, "primary", modifieddate::text from production.productproductphoto""".query[ProductproductphotoRow].stream
+    sql"""select productid, productphotoid, "primary", modifieddate::text from production.productproductphoto""".query(ProductproductphotoRow.read).stream
   }
   override def selectById(compositeId: ProductproductphotoId): ConnectionIO[Option[ProductproductphotoRow]] = {
-    sql"""select productid, productphotoid, "primary", modifieddate::text from production.productproductphoto where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}""".query[ProductproductphotoRow].option
+    sql"""select productid, productphotoid, "primary", modifieddate::text from production.productproductphoto where productid = ${compositeId.productid} AND productphotoid = ${compositeId.productphotoid}""".query(ProductproductphotoRow.read).option
   }
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -83,6 +83,6 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             "primary" = EXCLUDED."primary",
             modifieddate = EXCLUDED.modifieddate
           returning productid, productphotoid, "primary", modifieddate::text
-       """.query[ProductproductphotoRow].unique
+       """.query(ProductproductphotoRow.read).unique
   }
 }

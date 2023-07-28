@@ -19,16 +19,16 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
     sql"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
           values (${unsaved.oid}::oid, ${unsaved.srvname}::name, ${unsaved.srvowner}::oid, ${unsaved.srvfdw}::oid, ${unsaved.srvtype}, ${unsaved.srvversion}, ${unsaved.srvacl}::_aclitem, ${unsaved.srvoptions}::_text)
           returning oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
-       """.query[PgForeignServerRow].unique
+       """.query(PgForeignServerRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgForeignServerRow] = {
-    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server".query[PgForeignServerRow].stream
+    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server".query(PgForeignServerRow.read).stream
   }
   override def selectById(oid: PgForeignServerId): ConnectionIO[Option[PgForeignServerRow]] = {
-    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ${oid}".query[PgForeignServerRow].option
+    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ${oid}".query(PgForeignServerRow.read).option
   }
   override def selectByIds(oids: Array[PgForeignServerId]): Stream[ConnectionIO, PgForeignServerRow] = {
-    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ANY(${oids})".query[PgForeignServerRow].stream
+    sql"select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions from pg_catalog.pg_foreign_server where oid = ANY(${oids})".query(PgForeignServerRow.read).stream
   }
   override def update(row: PgForeignServerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
             srvacl = EXCLUDED.srvacl,
             srvoptions = EXCLUDED.srvoptions
           returning oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
-       """.query[PgForeignServerRow].unique
+       """.query(PgForeignServerRow.read).unique
   }
 }

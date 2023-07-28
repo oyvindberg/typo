@@ -13,6 +13,6 @@ import fs2.Stream
 
 object CheckConstraintsViewRepoImpl extends CheckConstraintsViewRepo {
   override def selectAll: Stream[ConnectionIO, CheckConstraintsViewRow] = {
-    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", check_clause from information_schema.check_constraints""".query[CheckConstraintsViewRow].stream
+    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", check_clause from information_schema.check_constraints""".query(CheckConstraintsViewRow.read).stream
   }
 }

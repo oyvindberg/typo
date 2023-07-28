@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgAvailableExtensionVersionsViewRepoImpl extends PgAvailableExtensionVersionsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgAvailableExtensionVersionsViewRow] = {
-    sql"""select "name", "version", installed, superuser, "trusted", relocatable, "schema", requires, "comment" from pg_catalog.pg_available_extension_versions""".query[PgAvailableExtensionVersionsViewRow].stream
+    sql"""select "name", "version", installed, superuser, "trusted", relocatable, "schema", requires, "comment" from pg_catalog.pg_available_extension_versions""".query(PgAvailableExtensionVersionsViewRow.read).stream
   }
 }

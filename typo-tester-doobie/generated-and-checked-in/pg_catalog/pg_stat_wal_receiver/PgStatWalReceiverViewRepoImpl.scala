@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatWalReceiverViewRepoImpl extends PgStatWalReceiverViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatWalReceiverViewRow] = {
-    sql"select pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time::text, last_msg_receipt_time::text, latest_end_lsn, latest_end_time::text, slot_name, sender_host, sender_port, conninfo from pg_catalog.pg_stat_wal_receiver".query[PgStatWalReceiverViewRow].stream
+    sql"select pid, status, receive_start_lsn, receive_start_tli, written_lsn, flushed_lsn, received_tli, last_msg_send_time::text, last_msg_receipt_time::text, latest_end_lsn, latest_end_time::text, slot_name, sender_host, sender_port, conninfo from pg_catalog.pg_stat_wal_receiver".query(PgStatWalReceiverViewRow.read).stream
   }
 }

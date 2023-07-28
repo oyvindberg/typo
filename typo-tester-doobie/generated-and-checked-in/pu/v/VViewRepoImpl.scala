@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VViewRepoImpl extends VViewRepo {
   override def selectAll: Stream[ConnectionIO, VViewRow] = {
-    sql"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from pu.v""".query[VViewRow].stream
+    sql"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text from pu.v""".query(VViewRow.read).stream
   }
 }

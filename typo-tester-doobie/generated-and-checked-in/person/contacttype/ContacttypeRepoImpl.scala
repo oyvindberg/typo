@@ -22,7 +22,7 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)
           values (${unsaved.contacttypeid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning contacttypeid, "name", modifieddate::text
-       """.query[ContacttypeRow].unique
+       """.query(ContacttypeRow.read).unique
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
     val fs = List(
@@ -48,17 +48,17 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
             returning contacttypeid, "name", modifieddate::text
          """
     }
-    q.query[ContacttypeRow].unique
+    q.query(ContacttypeRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype""".query[ContacttypeRow].stream
+    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype""".query(ContacttypeRow.read).stream
   }
   override def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]] = {
-    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ${contacttypeid}""".query[ContacttypeRow].option
+    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ${contacttypeid}""".query(ContacttypeRow.read).option
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ANY(${contacttypeids})""".query[ContacttypeRow].stream
+    sql"""select contacttypeid, "name", modifieddate::text from person.contacttype where contacttypeid = ANY(${contacttypeids})""".query(ContacttypeRow.read).stream
   }
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     val contacttypeid = row.contacttypeid
@@ -83,6 +83,6 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning contacttypeid, "name", modifieddate::text
-       """.query[ContacttypeRow].unique
+       """.query(ContacttypeRow.read).unique
   }
 }

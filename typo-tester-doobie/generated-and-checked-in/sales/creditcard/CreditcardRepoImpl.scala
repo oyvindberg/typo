@@ -22,7 +22,7 @@ object CreditcardRepoImpl extends CreditcardRepo {
     sql"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)
           values (${unsaved.creditcardid}::int4, ${unsaved.cardtype}, ${unsaved.cardnumber}, ${unsaved.expmonth}::int2, ${unsaved.expyear}::int2, ${unsaved.modifieddate}::timestamp)
           returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
-       """.query[CreditcardRow].unique
+       """.query(CreditcardRow.read).unique
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     val fs = List(
@@ -51,17 +51,17 @@ object CreditcardRepoImpl extends CreditcardRepo {
             returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
          """
     }
-    q.query[CreditcardRow].unique
+    q.query(CreditcardRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard".query[CreditcardRow].stream
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard".query(CreditcardRow.read).stream
   }
   override def selectById(creditcardid: CreditcardId): ConnectionIO[Option[CreditcardRow]] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ${creditcardid}".query[CreditcardRow].option
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ${creditcardid}".query(CreditcardRow.read).option
   }
   override def selectByIds(creditcardids: Array[CreditcardId]): Stream[ConnectionIO, CreditcardRow] = {
-    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ANY(${creditcardids})".query[CreditcardRow].stream
+    sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text from sales.creditcard where creditcardid = ANY(${creditcardids})".query(CreditcardRow.read).stream
   }
   override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
     val creditcardid = row.creditcardid
@@ -95,6 +95,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
             expyear = EXCLUDED.expyear,
             modifieddate = EXCLUDED.modifieddate
           returning creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate::text
-       """.query[CreditcardRow].unique
+       """.query(CreditcardRow.read).unique
   }
 }

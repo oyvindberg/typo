@@ -19,16 +19,16 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
     sql"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
           values (${unsaved.oid}::oid, ${unsaved.amprocfamily}::oid, ${unsaved.amproclefttype}::oid, ${unsaved.amprocrighttype}::oid, ${unsaved.amprocnum}::int2, ${unsaved.amproc}::regproc)
           returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
-       """.query[PgAmprocRow].unique
+       """.query(PgAmprocRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgAmprocRow] = {
-    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc".query[PgAmprocRow].stream
+    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc".query(PgAmprocRow.read).stream
   }
   override def selectById(oid: PgAmprocId): ConnectionIO[Option[PgAmprocRow]] = {
-    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ${oid}".query[PgAmprocRow].option
+    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ${oid}".query(PgAmprocRow.read).option
   }
   override def selectByIds(oids: Array[PgAmprocId]): Stream[ConnectionIO, PgAmprocRow] = {
-    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ANY(${oids})".query[PgAmprocRow].stream
+    sql"select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc from pg_catalog.pg_amproc where oid = ANY(${oids})".query(PgAmprocRow.read).stream
   }
   override def update(row: PgAmprocRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -62,6 +62,6 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
             amprocnum = EXCLUDED.amprocnum,
             amproc = EXCLUDED.amproc
           returning oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
-       """.query[PgAmprocRow].unique
+       """.query(PgAmprocRow.read).unique
   }
 }

@@ -19,16 +19,16 @@ object PgTypeRepoImpl extends PgTypeRepo {
     sql"""insert into pg_catalog.pg_type(oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl)
           values (${unsaved.oid}::oid, ${unsaved.typname}::name, ${unsaved.typnamespace}::oid, ${unsaved.typowner}::oid, ${unsaved.typlen}::int2, ${unsaved.typbyval}, ${unsaved.typtype}::char, ${unsaved.typcategory}::char, ${unsaved.typispreferred}, ${unsaved.typisdefined}, ${unsaved.typdelim}::char, ${unsaved.typrelid}::oid, ${unsaved.typsubscript}::regproc, ${unsaved.typelem}::oid, ${unsaved.typarray}::oid, ${unsaved.typinput}::regproc, ${unsaved.typoutput}::regproc, ${unsaved.typreceive}::regproc, ${unsaved.typsend}::regproc, ${unsaved.typmodin}::regproc, ${unsaved.typmodout}::regproc, ${unsaved.typanalyze}::regproc, ${unsaved.typalign}::char, ${unsaved.typstorage}::char, ${unsaved.typnotnull}, ${unsaved.typbasetype}::oid, ${unsaved.typtypmod}::int4, ${unsaved.typndims}::int4, ${unsaved.typcollation}::oid, ${unsaved.typdefaultbin}::pg_node_tree, ${unsaved.typdefault}, ${unsaved.typacl}::_aclitem)
           returning oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
-       """.query[PgTypeRow].unique
+       """.query(PgTypeRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTypeRow] = {
-    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type".query[PgTypeRow].stream
+    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type".query(PgTypeRow.read).stream
   }
   override def selectById(oid: PgTypeId): ConnectionIO[Option[PgTypeRow]] = {
-    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ${oid}".query[PgTypeRow].option
+    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ${oid}".query(PgTypeRow.read).option
   }
   override def selectByIds(oids: Array[PgTypeId]): Stream[ConnectionIO, PgTypeRow] = {
-    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ANY(${oids})".query[PgTypeRow].stream
+    sql"select oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl from pg_catalog.pg_type where oid = ANY(${oids})".query(PgTypeRow.read).stream
   }
   override def update(row: PgTypeRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -140,6 +140,6 @@ object PgTypeRepoImpl extends PgTypeRepo {
             typdefault = EXCLUDED.typdefault,
             typacl = EXCLUDED.typacl
           returning oid, typname, typnamespace, typowner, typlen, typbyval, typtype, typcategory, typispreferred, typisdefined, typdelim, typrelid, typsubscript, typelem, typarray, typinput, typoutput, typreceive, typsend, typmodin, typmodout, typanalyze, typalign, typstorage, typnotnull, typbasetype, typtypmod, typndims, typcollation, typdefaultbin, typdefault, typacl
-       """.query[PgTypeRow].unique
+       """.query(PgTypeRow.read).unique
   }
 }

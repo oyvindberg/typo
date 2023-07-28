@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatSslViewRepoImpl extends PgStatSslViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatSslViewRow] = {
-    sql"""select pid, ssl, "version", cipher, bits, client_dn, client_serial, issuer_dn from pg_catalog.pg_stat_ssl""".query[PgStatSslViewRow].stream
+    sql"""select pid, ssl, "version", cipher, bits, client_dn, client_serial, issuer_dn from pg_catalog.pg_stat_ssl""".query(PgStatSslViewRow.read).stream
   }
 }

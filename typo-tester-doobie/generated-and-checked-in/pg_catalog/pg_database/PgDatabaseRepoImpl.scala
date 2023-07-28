@@ -19,16 +19,16 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
     sql"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)
           values (${unsaved.oid}::oid, ${unsaved.datname}::name, ${unsaved.datdba}::oid, ${unsaved.encoding}::int4, ${unsaved.datcollate}::name, ${unsaved.datctype}::name, ${unsaved.datistemplate}, ${unsaved.datallowconn}, ${unsaved.datconnlimit}::int4, ${unsaved.datlastsysoid}::oid, ${unsaved.datfrozenxid}::xid, ${unsaved.datminmxid}::xid, ${unsaved.dattablespace}::oid, ${unsaved.datacl}::_aclitem)
           returning oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
-       """.query[PgDatabaseRow].unique
+       """.query(PgDatabaseRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgDatabaseRow] = {
-    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database""".query[PgDatabaseRow].stream
+    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database""".query(PgDatabaseRow.read).stream
   }
   override def selectById(oid: PgDatabaseId): ConnectionIO[Option[PgDatabaseRow]] = {
-    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ${oid}""".query[PgDatabaseRow].option
+    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ${oid}""".query(PgDatabaseRow.read).option
   }
   override def selectByIds(oids: Array[PgDatabaseId]): Stream[ConnectionIO, PgDatabaseRow] = {
-    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ANY(${oids})""".query[PgDatabaseRow].stream
+    sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database where oid = ANY(${oids})""".query(PgDatabaseRow.read).stream
   }
   override def update(row: PgDatabaseRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -86,6 +86,6 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
             dattablespace = EXCLUDED.dattablespace,
             datacl = EXCLUDED.datacl
           returning oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
-       """.query[PgDatabaseRow].unique
+       """.query(PgDatabaseRow.read).unique
   }
 }

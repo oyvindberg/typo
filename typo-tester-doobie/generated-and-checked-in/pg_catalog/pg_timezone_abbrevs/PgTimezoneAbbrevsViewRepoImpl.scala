@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgTimezoneAbbrevsViewRepoImpl extends PgTimezoneAbbrevsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgTimezoneAbbrevsViewRow] = {
-    sql"select abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_abbrevs".query[PgTimezoneAbbrevsViewRow].stream
+    sql"select abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_abbrevs".query(PgTimezoneAbbrevsViewRow.read).stream
   }
 }

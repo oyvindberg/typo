@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgForeignTableColumnsViewRepoImpl extends PgForeignTableColumnsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgForeignTableColumnsViewRow] = {
-    sql"select nspname, relname, attname, attfdwoptions from information_schema._pg_foreign_table_columns".query[PgForeignTableColumnsViewRow].stream
+    sql"select nspname, relname, attname, attfdwoptions from information_schema._pg_foreign_table_columns".query(PgForeignTableColumnsViewRow.read).stream
   }
 }

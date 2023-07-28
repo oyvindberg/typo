@@ -22,7 +22,7 @@ object CurrencyRepoImpl extends CurrencyRepo {
     sql"""insert into sales.currency(currencycode, "name", modifieddate)
           values (${unsaved.currencycode}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning currencycode, "name", modifieddate::text
-       """.query[CurrencyRow].unique
+       """.query(CurrencyRow.read).unique
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
@@ -45,17 +45,17 @@ object CurrencyRepoImpl extends CurrencyRepo {
             returning currencycode, "name", modifieddate::text
          """
     }
-    q.query[CurrencyRow].unique
+    q.query(CurrencyRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select currencycode, "name", modifieddate::text from sales.currency""".query[CurrencyRow].stream
+    sql"""select currencycode, "name", modifieddate::text from sales.currency""".query(CurrencyRow.read).stream
   }
   override def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]] = {
-    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ${currencycode}""".query[CurrencyRow].option
+    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ${currencycode}""".query(CurrencyRow.read).option
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ANY(${currencycodes})""".query[CurrencyRow].stream
+    sql"""select currencycode, "name", modifieddate::text from sales.currency where currencycode = ANY(${currencycodes})""".query(CurrencyRow.read).stream
   }
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode
@@ -80,6 +80,6 @@ object CurrencyRepoImpl extends CurrencyRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning currencycode, "name", modifieddate::text
-       """.query[CurrencyRow].unique
+       """.query(CurrencyRow.read).unique
   }
 }

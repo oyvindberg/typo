@@ -22,7 +22,7 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     sql"""insert into production.productcosthistory(productid, startdate, enddate, standardcost, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.standardcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
-       """.query[ProductcosthistoryRow].unique
+       """.query(ProductcosthistoryRow.read).unique
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow] = {
     val fs = List(
@@ -47,14 +47,14 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
          """
     }
-    q.query[ProductcosthistoryRow].unique
+    q.query(ProductcosthistoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
-    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory".query[ProductcosthistoryRow].stream
+    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory".query(ProductcosthistoryRow.read).stream
   }
   override def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]] = {
-    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query[ProductcosthistoryRow].option
+    sql"select productid, startdate::text, enddate::text, standardcost, modifieddate::text from production.productcosthistory where productid = ${compositeId.productid} AND startdate = ${compositeId.startdate}".query(ProductcosthistoryRow.read).option
   }
   override def update(row: ProductcosthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -83,6 +83,6 @@ object ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             standardcost = EXCLUDED.standardcost,
             modifieddate = EXCLUDED.modifieddate
           returning productid, startdate::text, enddate::text, standardcost, modifieddate::text
-       """.query[ProductcosthistoryRow].unique
+       """.query(ProductcosthistoryRow.read).unique
   }
 }

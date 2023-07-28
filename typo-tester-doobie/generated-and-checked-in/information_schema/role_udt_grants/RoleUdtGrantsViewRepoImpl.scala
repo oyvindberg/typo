@@ -13,6 +13,6 @@ import fs2.Stream
 
 object RoleUdtGrantsViewRepoImpl extends RoleUdtGrantsViewRepo {
   override def selectAll: Stream[ConnectionIO, RoleUdtGrantsViewRow] = {
-    sql"select grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable from information_schema.role_udt_grants".query[RoleUdtGrantsViewRow].stream
+    sql"select grantor, grantee, udt_catalog, udt_schema, udt_name, privilege_type, is_grantable from information_schema.role_udt_grants".query(RoleUdtGrantsViewRow.read).stream
   }
 }

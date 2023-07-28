@@ -19,16 +19,16 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
     sql"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
           values (${unsaved.oid}::oid, ${unsaved.tgrelid}::oid, ${unsaved.tgparentid}::oid, ${unsaved.tgname}::name, ${unsaved.tgfoid}::oid, ${unsaved.tgtype}::int2, ${unsaved.tgenabled}::char, ${unsaved.tgisinternal}, ${unsaved.tgconstrrelid}::oid, ${unsaved.tgconstrindid}::oid, ${unsaved.tgconstraint}::oid, ${unsaved.tgdeferrable}, ${unsaved.tginitdeferred}, ${unsaved.tgnargs}::int2, ${unsaved.tgattr}::int2vector, ${unsaved.tgargs}::bytea, ${unsaved.tgqual}::pg_node_tree, ${unsaved.tgoldtable}::name, ${unsaved.tgnewtable}::name)
           returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
-       """.query[PgTriggerRow].unique
+       """.query(PgTriggerRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTriggerRow] = {
-    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger".query[PgTriggerRow].stream
+    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger".query(PgTriggerRow.read).stream
   }
   override def selectById(oid: PgTriggerId): ConnectionIO[Option[PgTriggerRow]] = {
-    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ${oid}".query[PgTriggerRow].option
+    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ${oid}".query(PgTriggerRow.read).option
   }
   override def selectByIds(oids: Array[PgTriggerId]): Stream[ConnectionIO, PgTriggerRow] = {
-    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ANY(${oids})".query[PgTriggerRow].stream
+    sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger where oid = ANY(${oids})".query(PgTriggerRow.read).stream
   }
   override def update(row: PgTriggerRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -101,6 +101,6 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
             tgoldtable = EXCLUDED.tgoldtable,
             tgnewtable = EXCLUDED.tgnewtable
           returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
-       """.query[PgTriggerRow].unique
+       """.query(PgTriggerRow.read).unique
   }
 }

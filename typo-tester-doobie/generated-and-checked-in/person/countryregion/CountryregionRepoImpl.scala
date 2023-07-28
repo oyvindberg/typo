@@ -22,7 +22,7 @@ object CountryregionRepoImpl extends CountryregionRepo {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)
           values (${unsaved.countryregioncode}, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning countryregioncode, "name", modifieddate::text
-       """.query[CountryregionRow].unique
+       """.query(CountryregionRow.read).unique
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
@@ -45,17 +45,17 @@ object CountryregionRepoImpl extends CountryregionRepo {
             returning countryregioncode, "name", modifieddate::text
          """
     }
-    q.query[CountryregionRow].unique
+    q.query(CountryregionRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion""".query[CountryregionRow].stream
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion""".query(CountryregionRow.read).stream
   }
   override def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]] = {
-    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ${countryregioncode}""".query[CountryregionRow].option
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ${countryregioncode}""".query(CountryregionRow.read).option
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ANY(${countryregioncodes})""".query[CountryregionRow].stream
+    sql"""select countryregioncode, "name", modifieddate::text from person.countryregion where countryregioncode = ANY(${countryregioncodes})""".query(CountryregionRow.read).stream
   }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
@@ -80,6 +80,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning countryregioncode, "name", modifieddate::text
-       """.query[CountryregionRow].unique
+       """.query(CountryregionRow.read).unique
   }
 }

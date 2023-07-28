@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgTablesViewRepoImpl extends PgTablesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgTablesViewRow] = {
-    sql"""select schemaname, tablename, tableowner, "tablespace", hasindexes, hasrules, hastriggers, rowsecurity from pg_catalog.pg_tables""".query[PgTablesViewRow].stream
+    sql"""select schemaname, tablename, tableowner, "tablespace", hasindexes, hasrules, hastriggers, rowsecurity from pg_catalog.pg_tables""".query(PgTablesViewRow.read).stream
   }
 }

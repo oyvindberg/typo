@@ -13,6 +13,6 @@ import fs2.Stream
 
 object TransformsViewRepoImpl extends TransformsViewRepo {
   override def selectAll: Stream[ConnectionIO, TransformsViewRow] = {
-    sql"""select udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, "specific_name", group_name, transform_type from information_schema."transforms"""".query[TransformsViewRow].stream
+    sql"""select udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, "specific_name", group_name, transform_type from information_schema."transforms"""".query(TransformsViewRow.read).stream
   }
 }

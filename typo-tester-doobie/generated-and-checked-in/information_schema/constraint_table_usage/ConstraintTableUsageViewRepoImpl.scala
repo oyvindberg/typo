@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ConstraintTableUsageViewRepoImpl extends ConstraintTableUsageViewRepo {
   override def selectAll: Stream[ConnectionIO, ConstraintTableUsageViewRow] = {
-    sql"""select table_catalog, table_schema, "table_name", "constraint_catalog", "constraint_schema", "constraint_name" from information_schema.constraint_table_usage""".query[ConstraintTableUsageViewRow].stream
+    sql"""select table_catalog, table_schema, "table_name", "constraint_catalog", "constraint_schema", "constraint_name" from information_schema.constraint_table_usage""".query(ConstraintTableUsageViewRow.read).stream
   }
 }

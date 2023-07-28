@@ -19,16 +19,16 @@ object PgIndexRepoImpl extends PgIndexRepo {
     sql"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)
           values (${unsaved.indexrelid}::oid, ${unsaved.indrelid}::oid, ${unsaved.indnatts}::int2, ${unsaved.indnkeyatts}::int2, ${unsaved.indisunique}, ${unsaved.indisprimary}, ${unsaved.indisexclusion}, ${unsaved.indimmediate}, ${unsaved.indisclustered}, ${unsaved.indisvalid}, ${unsaved.indcheckxmin}, ${unsaved.indisready}, ${unsaved.indislive}, ${unsaved.indisreplident}, ${unsaved.indkey}::int2vector, ${unsaved.indcollation}::oidvector, ${unsaved.indclass}::oidvector, ${unsaved.indoption}::int2vector, ${unsaved.indexprs}::pg_node_tree, ${unsaved.indpred}::pg_node_tree)
           returning indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
-       """.query[PgIndexRow].unique
+       """.query(PgIndexRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgIndexRow] = {
-    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index".query[PgIndexRow].stream
+    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index".query(PgIndexRow.read).stream
   }
   override def selectById(indexrelid: PgIndexId): ConnectionIO[Option[PgIndexRow]] = {
-    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ${indexrelid}".query[PgIndexRow].option
+    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ${indexrelid}".query(PgIndexRow.read).option
   }
   override def selectByIds(indexrelids: Array[PgIndexId]): Stream[ConnectionIO, PgIndexRow] = {
-    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ANY(${indexrelids})".query[PgIndexRow].stream
+    sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index where indexrelid = ANY(${indexrelids})".query(PgIndexRow.read).stream
   }
   override def update(row: PgIndexRow): ConnectionIO[Boolean] = {
     val indexrelid = row.indexrelid
@@ -104,6 +104,6 @@ object PgIndexRepoImpl extends PgIndexRepo {
             indexprs = EXCLUDED.indexprs,
             indpred = EXCLUDED.indpred
           returning indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
-       """.query[PgIndexRow].unique
+       """.query(PgIndexRow.read).unique
   }
 }

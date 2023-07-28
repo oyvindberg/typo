@@ -22,7 +22,7 @@ object CultureRepoImpl extends CultureRepo {
     sql"""insert into production.culture(cultureid, "name", modifieddate)
           values (${unsaved.cultureid}::bpchar, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning cultureid, "name", modifieddate::text
-       """.query[CultureRow].unique
+       """.query(CultureRow.read).unique
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
@@ -45,17 +45,17 @@ object CultureRepoImpl extends CultureRepo {
             returning cultureid, "name", modifieddate::text
          """
     }
-    q.query[CultureRow].unique
+    q.query(CultureRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
-    sql"""select cultureid, "name", modifieddate::text from production.culture""".query[CultureRow].stream
+    sql"""select cultureid, "name", modifieddate::text from production.culture""".query(CultureRow.read).stream
   }
   override def selectById(cultureid: CultureId): ConnectionIO[Option[CultureRow]] = {
-    sql"""select cultureid, "name", modifieddate::text from production.culture where cultureid = ${cultureid}""".query[CultureRow].option
+    sql"""select cultureid, "name", modifieddate::text from production.culture where cultureid = ${cultureid}""".query(CultureRow.read).option
   }
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
-    sql"""select cultureid, "name", modifieddate::text from production.culture where cultureid = ANY(${cultureids})""".query[CultureRow].stream
+    sql"""select cultureid, "name", modifieddate::text from production.culture where cultureid = ANY(${cultureids})""".query(CultureRow.read).stream
   }
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     val cultureid = row.cultureid
@@ -80,6 +80,6 @@ object CultureRepoImpl extends CultureRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning cultureid, "name", modifieddate::text
-       """.query[CultureRow].unique
+       """.query(CultureRow.read).unique
   }
 }

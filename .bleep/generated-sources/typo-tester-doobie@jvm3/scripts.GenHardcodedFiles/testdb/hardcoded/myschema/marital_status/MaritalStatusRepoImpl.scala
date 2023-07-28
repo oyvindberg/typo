@@ -20,16 +20,16 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""insert into myschema.marital_status("id")
           values (${unsaved.id}::int8)
           returning "id"
-       """.query[MaritalStatusRow].unique
+       """.query(MaritalStatusRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status""".query[MaritalStatusRow].stream
+    sql"""select "id" from myschema.marital_status""".query(MaritalStatusRow.read).stream
   }
   override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
-    sql"""select "id" from myschema.marital_status where "id" = ${id}""".query[MaritalStatusRow].option
+    sql"""select "id" from myschema.marital_status where "id" = ${id}""".query(MaritalStatusRow.read).option
   }
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query[MaritalStatusRow].stream
+    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query(MaritalStatusRow.read).stream
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
@@ -40,6 +40,6 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           do update set
             
           returning "id"
-       """.query[MaritalStatusRow].unique
+       """.query(MaritalStatusRow.read).unique
   }
 }

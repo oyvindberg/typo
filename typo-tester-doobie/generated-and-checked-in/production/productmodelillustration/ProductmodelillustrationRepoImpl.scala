@@ -22,7 +22,7 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     sql"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.illustrationid}::int4, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, illustrationid, modifieddate::text
-       """.query[ProductmodelillustrationRow].unique
+       """.query(ProductmodelillustrationRow.read).unique
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
     val fs = List(
@@ -45,14 +45,14 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
             returning productmodelid, illustrationid, modifieddate::text
          """
     }
-    q.query[ProductmodelillustrationRow].unique
+    q.query(ProductmodelillustrationRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
-    sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration".query[ProductmodelillustrationRow].stream
+    sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration".query(ProductmodelillustrationRow.read).stream
   }
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
-    sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".query[ProductmodelillustrationRow].option
+    sql"select productmodelid, illustrationid, modifieddate::text from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".query(ProductmodelillustrationRow.read).option
   }
   override def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -75,6 +75,6 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, illustrationid, modifieddate::text
-       """.query[ProductmodelillustrationRow].unique
+       """.query(ProductmodelillustrationRow.read).unique
   }
 }

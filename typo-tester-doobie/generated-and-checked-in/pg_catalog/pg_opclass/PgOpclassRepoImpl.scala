@@ -19,16 +19,16 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
     sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
           values (${unsaved.oid}::oid, ${unsaved.opcmethod}::oid, ${unsaved.opcname}::name, ${unsaved.opcnamespace}::oid, ${unsaved.opcowner}::oid, ${unsaved.opcfamily}::oid, ${unsaved.opcintype}::oid, ${unsaved.opcdefault}, ${unsaved.opckeytype}::oid)
           returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
-       """.query[PgOpclassRow].unique
+       """.query(PgOpclassRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgOpclassRow] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass".query[PgOpclassRow].stream
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass".query(PgOpclassRow.read).stream
   }
   override def selectById(oid: PgOpclassId): ConnectionIO[Option[PgOpclassRow]] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ${oid}".query[PgOpclassRow].option
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ${oid}".query(PgOpclassRow.read).option
   }
   override def selectByIds(oids: Array[PgOpclassId]): Stream[ConnectionIO, PgOpclassRow] = {
-    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${oids})".query[PgOpclassRow].stream
+    sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass where oid = ANY(${oids})".query(PgOpclassRow.read).stream
   }
   override def update(row: PgOpclassRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
             opcdefault = EXCLUDED.opcdefault,
             opckeytype = EXCLUDED.opckeytype
           returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
-       """.query[PgOpclassRow].unique
+       """.query(PgOpclassRow.read).unique
   }
 }

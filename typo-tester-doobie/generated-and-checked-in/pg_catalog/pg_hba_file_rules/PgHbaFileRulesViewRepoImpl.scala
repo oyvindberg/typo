@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgHbaFileRulesViewRepoImpl extends PgHbaFileRulesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgHbaFileRulesViewRow] = {
-    sql"""select line_number, "type", "database", user_name, address, netmask, auth_method, "options", "error" from pg_catalog.pg_hba_file_rules""".query[PgHbaFileRulesViewRow].stream
+    sql"""select line_number, "type", "database", user_name, address, netmask, auth_method, "options", "error" from pg_catalog.pg_hba_file_rules""".query(PgHbaFileRulesViewRow.read).stream
   }
 }

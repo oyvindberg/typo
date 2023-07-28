@@ -19,13 +19,13 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
     sql"""insert into pg_catalog.pg_db_role_setting(setdatabase, setrole, setconfig)
           values (${unsaved.setdatabase}::oid, ${unsaved.setrole}::oid, ${unsaved.setconfig}::_text)
           returning setdatabase, setrole, setconfig
-       """.query[PgDbRoleSettingRow].unique
+       """.query(PgDbRoleSettingRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgDbRoleSettingRow] = {
-    sql"select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting".query[PgDbRoleSettingRow].stream
+    sql"select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting".query(PgDbRoleSettingRow.read).stream
   }
   override def selectById(compositeId: PgDbRoleSettingId): ConnectionIO[Option[PgDbRoleSettingRow]] = {
-    sql"select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting where setdatabase = ${compositeId.setdatabase} AND setrole = ${compositeId.setrole}".query[PgDbRoleSettingRow].option
+    sql"select setdatabase, setrole, setconfig from pg_catalog.pg_db_role_setting where setdatabase = ${compositeId.setdatabase} AND setrole = ${compositeId.setrole}".query(PgDbRoleSettingRow.read).option
   }
   override def update(row: PgDbRoleSettingRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -48,6 +48,6 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
           do update set
             setconfig = EXCLUDED.setconfig
           returning setdatabase, setrole, setconfig
-       """.query[PgDbRoleSettingRow].unique
+       """.query(PgDbRoleSettingRow.read).unique
   }
 }

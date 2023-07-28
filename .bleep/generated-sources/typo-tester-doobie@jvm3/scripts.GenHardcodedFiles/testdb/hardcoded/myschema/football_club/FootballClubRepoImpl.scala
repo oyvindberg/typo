@@ -20,16 +20,16 @@ object FootballClubRepoImpl extends FootballClubRepo {
     sql"""insert into myschema.football_club("id", "name")
           values (${unsaved.id}::int8, ${unsaved.name})
           returning "id", "name"
-       """.query[FootballClubRow].unique
+       """.query(FootballClubRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club""".query[FootballClubRow].stream
+    sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.read).stream
   }
   override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${id}""".query[FootballClubRow].option
+    sql"""select "id", "name" from myschema.football_club where "id" = ${id}""".query(FootballClubRow.read).option
   }
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query[FootballClubRow].stream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(FootballClubRow.read).stream
   }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
@@ -51,6 +51,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
           do update set
             "name" = EXCLUDED."name"
           returning "id", "name"
-       """.query[FootballClubRow].unique
+       """.query(FootballClubRow.read).unique
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object RoutineSequenceUsageViewRepoImpl extends RoutineSequenceUsageViewRepo {
   override def selectAll: Stream[ConnectionIO, RoutineSequenceUsageViewRow] = {
-    sql"""select specific_catalog, specific_schema, "specific_name", "routine_catalog", "routine_schema", "routine_name", sequence_catalog, sequence_schema, sequence_name from information_schema.routine_sequence_usage""".query[RoutineSequenceUsageViewRow].stream
+    sql"""select specific_catalog, specific_schema, "specific_name", "routine_catalog", "routine_schema", "routine_name", sequence_catalog, sequence_schema, sequence_name from information_schema.routine_sequence_usage""".query(RoutineSequenceUsageViewRow.read).stream
   }
 }

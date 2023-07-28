@@ -19,16 +19,16 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
     sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
           values (${unsaved.oid}::oid, ${unsaved.dictname}::name, ${unsaved.dictnamespace}::oid, ${unsaved.dictowner}::oid, ${unsaved.dicttemplate}::oid, ${unsaved.dictinitoption})
           returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
-       """.query[PgTsDictRow].unique
+       """.query(PgTsDictRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTsDictRow] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict".query[PgTsDictRow].stream
+    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict".query(PgTsDictRow.read).stream
   }
   override def selectById(oid: PgTsDictId): ConnectionIO[Option[PgTsDictRow]] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ${oid}".query[PgTsDictRow].option
+    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ${oid}".query(PgTsDictRow.read).option
   }
   override def selectByIds(oids: Array[PgTsDictId]): Stream[ConnectionIO, PgTsDictRow] = {
-    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY(${oids})".query[PgTsDictRow].stream
+    sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict where oid = ANY(${oids})".query(PgTsDictRow.read).stream
   }
   override def update(row: PgTsDictRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -62,6 +62,6 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
             dicttemplate = EXCLUDED.dicttemplate,
             dictinitoption = EXCLUDED.dictinitoption
           returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
-       """.query[PgTsDictRow].unique
+       """.query(PgTsDictRow.read).unique
   }
 }
