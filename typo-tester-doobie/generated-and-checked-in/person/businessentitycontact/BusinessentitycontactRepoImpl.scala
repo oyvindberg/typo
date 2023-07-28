@@ -23,7 +23,7 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     sql"""insert into person.businessentitycontact(businessentityid, personid, contacttypeid, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.personid}::int4, ${unsaved.contacttypeid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
-       """.query[BusinessentitycontactRow].unique
+       """.query(BusinessentitycontactRow.read).unique
   }
   override def insert(unsaved: BusinessentitycontactRowUnsaved): ConnectionIO[BusinessentitycontactRow] = {
     val fs = List(
@@ -51,14 +51,14 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
             returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
          """
     }
-    q.query[BusinessentitycontactRow].unique
+    q.query(BusinessentitycontactRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, BusinessentitycontactRow] = {
-    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate::text from person.businessentitycontact".query[BusinessentitycontactRow].stream
+    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate::text from person.businessentitycontact".query(BusinessentitycontactRow.read).stream
   }
   override def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]] = {
-    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate::text from person.businessentitycontact where businessentityid = ${compositeId.businessentityid} AND personid = ${compositeId.personid} AND contacttypeid = ${compositeId.contacttypeid}".query[BusinessentitycontactRow].option
+    sql"select businessentityid, personid, contacttypeid, rowguid, modifieddate::text from person.businessentitycontact where businessentityid = ${compositeId.businessentityid} AND personid = ${compositeId.personid} AND contacttypeid = ${compositeId.contacttypeid}".query(BusinessentitycontactRow.read).option
   }
   override def update(row: BusinessentitycontactRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -85,6 +85,6 @@ object BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, personid, contacttypeid, rowguid, modifieddate::text
-       """.query[BusinessentitycontactRow].unique
+       """.query(BusinessentitycontactRow.read).unique
   }
 }

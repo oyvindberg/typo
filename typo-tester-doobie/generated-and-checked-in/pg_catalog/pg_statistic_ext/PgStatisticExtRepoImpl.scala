@@ -19,16 +19,16 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
     sql"""insert into pg_catalog.pg_statistic_ext(oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs)
           values (${unsaved.oid}::oid, ${unsaved.stxrelid}::oid, ${unsaved.stxname}::name, ${unsaved.stxnamespace}::oid, ${unsaved.stxowner}::oid, ${unsaved.stxstattarget}::int4, ${unsaved.stxkeys}::int2vector, ${unsaved.stxkind}::_char, ${unsaved.stxexprs}::pg_node_tree)
           returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
-       """.query[PgStatisticExtRow].unique
+       """.query(PgStatisticExtRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgStatisticExtRow] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext".query[PgStatisticExtRow].stream
+    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext".query(PgStatisticExtRow.read).stream
   }
   override def selectById(oid: PgStatisticExtId): ConnectionIO[Option[PgStatisticExtRow]] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ${oid}".query[PgStatisticExtRow].option
+    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ${oid}".query(PgStatisticExtRow.read).option
   }
   override def selectByIds(oids: Array[PgStatisticExtId]): Stream[ConnectionIO, PgStatisticExtRow] = {
-    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY(${oids})".query[PgStatisticExtRow].stream
+    sql"select oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs from pg_catalog.pg_statistic_ext where oid = ANY(${oids})".query(PgStatisticExtRow.read).stream
   }
   override def update(row: PgStatisticExtRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgStatisticExtRepoImpl extends PgStatisticExtRepo {
             stxkind = EXCLUDED.stxkind,
             stxexprs = EXCLUDED.stxexprs
           returning oid, stxrelid, stxname, stxnamespace, stxowner, stxstattarget, stxkeys, stxkind, stxexprs
-       """.query[PgStatisticExtRow].unique
+       """.query(PgStatisticExtRow.read).unique
   }
 }

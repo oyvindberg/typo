@@ -24,7 +24,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
           values (${unsaved.id}::int8, ${unsaved.favouriteFootballClubId}, ${unsaved.name}, ${unsaved.nickName}, ${unsaved.blogUrl}, ${unsaved.email}, ${unsaved.phone}, ${unsaved.likesPizza}, ${unsaved.maritalStatusId}, ${unsaved.workEmail}, ${unsaved.sector}::myschema.sector)
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
-       """.query[PersonRow].unique
+       """.query(PersonRow.read).unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -61,17 +61,17 @@ object PersonRepoImpl extends PersonRepo {
             returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
          """
     }
-    q.query[PersonRow].unique
+    q.query(PersonRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".query[PersonRow].stream
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".query(PersonRow.read).stream
   }
   override def selectById(id: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ${id}""".query[PersonRow].option
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ${id}""".query(PersonRow.read).option
   }
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ANY(${ids})""".query[PersonRow].stream
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ANY(${ids})""".query(PersonRow.read).stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val id = row.id
@@ -120,6 +120,6 @@ object PersonRepoImpl extends PersonRepo {
             work_email = EXCLUDED.work_email,
             sector = EXCLUDED.sector
           returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
-       """.query[PersonRow].unique
+       """.query(PersonRow.read).unique
   }
 }

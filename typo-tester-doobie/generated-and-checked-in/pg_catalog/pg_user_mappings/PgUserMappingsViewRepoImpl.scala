@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgUserMappingsViewRepoImpl extends PgUserMappingsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgUserMappingsViewRow] = {
-    sql"select umid, srvid, srvname, umuser, usename, umoptions from pg_catalog.pg_user_mappings".query[PgUserMappingsViewRow].stream
+    sql"select umid, srvid, srvname, umuser, usename, umoptions from pg_catalog.pg_user_mappings".query(PgUserMappingsViewRow.read).stream
   }
 }

@@ -19,16 +19,16 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
     sql"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
           values (${unsaved.oid}::oid, ${unsaved.defaclrole}::oid, ${unsaved.defaclnamespace}::oid, ${unsaved.defaclobjtype}::char, ${unsaved.defaclacl}::_aclitem)
           returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
-       """.query[PgDefaultAclRow].unique
+       """.query(PgDefaultAclRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgDefaultAclRow] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl".query[PgDefaultAclRow].stream
+    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl".query(PgDefaultAclRow.read).stream
   }
   override def selectById(oid: PgDefaultAclId): ConnectionIO[Option[PgDefaultAclRow]] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ${oid}".query[PgDefaultAclRow].option
+    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ${oid}".query(PgDefaultAclRow.read).option
   }
   override def selectByIds(oids: Array[PgDefaultAclId]): Stream[ConnectionIO, PgDefaultAclRow] = {
-    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ANY(${oids})".query[PgDefaultAclRow].stream
+    sql"select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl from pg_catalog.pg_default_acl where oid = ANY(${oids})".query(PgDefaultAclRow.read).stream
   }
   override def update(row: PgDefaultAclRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -59,6 +59,6 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
             defaclobjtype = EXCLUDED.defaclobjtype,
             defaclacl = EXCLUDED.defaclacl
           returning oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
-       """.query[PgDefaultAclRow].unique
+       """.query(PgDefaultAclRow.read).unique
   }
 }

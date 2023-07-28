@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgForeignDataWrappersViewRepoImpl extends PgForeignDataWrappersViewRepo {
   override def selectAll: Stream[ConnectionIO, PgForeignDataWrappersViewRow] = {
-    sql"select oid, fdwowner, fdwoptions, foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, foreign_data_wrapper_language from information_schema._pg_foreign_data_wrappers".query[PgForeignDataWrappersViewRow].stream
+    sql"select oid, fdwowner, fdwoptions, foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, foreign_data_wrapper_language from information_schema._pg_foreign_data_wrappers".query(PgForeignDataWrappersViewRow.read).stream
   }
 }

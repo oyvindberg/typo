@@ -19,16 +19,16 @@ object PgTransformRepoImpl extends PgTransformRepo {
     sql"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
           values (${unsaved.oid}::oid, ${unsaved.trftype}::oid, ${unsaved.trflang}::oid, ${unsaved.trffromsql}::regproc, ${unsaved.trftosql}::regproc)
           returning oid, trftype, trflang, trffromsql, trftosql
-       """.query[PgTransformRow].unique
+       """.query(PgTransformRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTransformRow] = {
-    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform".query[PgTransformRow].stream
+    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform".query(PgTransformRow.read).stream
   }
   override def selectById(oid: PgTransformId): ConnectionIO[Option[PgTransformRow]] = {
-    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ${oid}".query[PgTransformRow].option
+    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ${oid}".query(PgTransformRow.read).option
   }
   override def selectByIds(oids: Array[PgTransformId]): Stream[ConnectionIO, PgTransformRow] = {
-    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ANY(${oids})".query[PgTransformRow].stream
+    sql"select oid, trftype, trflang, trffromsql, trftosql from pg_catalog.pg_transform where oid = ANY(${oids})".query(PgTransformRow.read).stream
   }
   override def update(row: PgTransformRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -59,6 +59,6 @@ object PgTransformRepoImpl extends PgTransformRepo {
             trffromsql = EXCLUDED.trffromsql,
             trftosql = EXCLUDED.trftosql
           returning oid, trftype, trflang, trffromsql, trftosql
-       """.query[PgTransformRow].unique
+       """.query(PgTransformRow.read).unique
   }
 }

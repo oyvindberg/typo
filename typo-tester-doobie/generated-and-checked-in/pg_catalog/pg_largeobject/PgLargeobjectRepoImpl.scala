@@ -19,13 +19,13 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
     sql"""insert into pg_catalog.pg_largeobject(loid, pageno, "data")
           values (${unsaved.loid}::oid, ${unsaved.pageno}::int4, ${unsaved.data}::bytea)
           returning loid, pageno, "data"
-       """.query[PgLargeobjectRow].unique
+       """.query(PgLargeobjectRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgLargeobjectRow] = {
-    sql"""select loid, pageno, "data" from pg_catalog.pg_largeobject""".query[PgLargeobjectRow].stream
+    sql"""select loid, pageno, "data" from pg_catalog.pg_largeobject""".query(PgLargeobjectRow.read).stream
   }
   override def selectById(compositeId: PgLargeobjectId): ConnectionIO[Option[PgLargeobjectRow]] = {
-    sql"""select loid, pageno, "data" from pg_catalog.pg_largeobject where loid = ${compositeId.loid} AND pageno = ${compositeId.pageno}""".query[PgLargeobjectRow].option
+    sql"""select loid, pageno, "data" from pg_catalog.pg_largeobject where loid = ${compositeId.loid} AND pageno = ${compositeId.pageno}""".query(PgLargeobjectRow.read).option
   }
   override def update(row: PgLargeobjectRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -48,6 +48,6 @@ object PgLargeobjectRepoImpl extends PgLargeobjectRepo {
           do update set
             "data" = EXCLUDED."data"
           returning loid, pageno, "data"
-       """.query[PgLargeobjectRow].unique
+       """.query(PgLargeobjectRow.read).unique
   }
 }

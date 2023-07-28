@@ -22,7 +22,7 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""insert into production.scrapreason(scrapreasonid, "name", modifieddate)
           values (${unsaved.scrapreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning scrapreasonid, "name", modifieddate::text
-       """.query[ScrapreasonRow].unique
+       """.query(ScrapreasonRow.read).unique
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
     val fs = List(
@@ -48,17 +48,17 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
             returning scrapreasonid, "name", modifieddate::text
          """
     }
-    q.query[ScrapreasonRow].unique
+    q.query(ScrapreasonRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason""".query[ScrapreasonRow].stream
+    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason""".query(ScrapreasonRow.read).stream
   }
   override def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]] = {
-    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ${scrapreasonid}""".query[ScrapreasonRow].option
+    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ${scrapreasonid}""".query(ScrapreasonRow.read).option
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ANY(${scrapreasonids})""".query[ScrapreasonRow].stream
+    sql"""select scrapreasonid, "name", modifieddate::text from production.scrapreason where scrapreasonid = ANY(${scrapreasonids})""".query(ScrapreasonRow.read).stream
   }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     val scrapreasonid = row.scrapreasonid
@@ -83,6 +83,6 @@ object ScrapreasonRepoImpl extends ScrapreasonRepo {
             "name" = EXCLUDED."name",
             modifieddate = EXCLUDED.modifieddate
           returning scrapreasonid, "name", modifieddate::text
-       """.query[ScrapreasonRow].unique
+       """.query(ScrapreasonRow.read).unique
   }
 }

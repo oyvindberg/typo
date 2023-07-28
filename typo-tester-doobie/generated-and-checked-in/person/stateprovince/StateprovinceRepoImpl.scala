@@ -24,7 +24,7 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
           values (${unsaved.stateprovinceid}::int4, ${unsaved.stateprovincecode}::bpchar, ${unsaved.countryregioncode}, ${unsaved.isonlystateprovinceflag}::"public"."Flag", ${unsaved.name}::"public"."Name", ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
-       """.query[StateprovinceRow].unique
+       """.query(StateprovinceRow.read).unique
   }
   override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
     val fs = List(
@@ -61,17 +61,17 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
          """
     }
-    q.query[StateprovinceRow].unique
+    q.query(StateprovinceRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
-    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince""".query[StateprovinceRow].stream
+    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince""".query(StateprovinceRow.read).stream
   }
   override def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]] = {
-    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince where stateprovinceid = ${stateprovinceid}""".query[StateprovinceRow].option
+    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince where stateprovinceid = ${stateprovinceid}""".query(StateprovinceRow.read).option
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow] = {
-    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince where stateprovinceid = ANY(${stateprovinceids})""".query[StateprovinceRow].stream
+    sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince where stateprovinceid = ANY(${stateprovinceids})""".query(StateprovinceRow.read).stream
   }
   override def update(row: StateprovinceRow): ConnectionIO[Boolean] = {
     val stateprovinceid = row.stateprovinceid
@@ -111,6 +111,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text
-       """.query[StateprovinceRow].unique
+       """.query(StateprovinceRow.read).unique
   }
 }

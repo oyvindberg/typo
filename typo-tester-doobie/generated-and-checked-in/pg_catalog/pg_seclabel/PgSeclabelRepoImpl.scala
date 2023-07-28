@@ -19,13 +19,13 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
     sql"""insert into pg_catalog.pg_seclabel(objoid, classoid, objsubid, provider, "label")
           values (${unsaved.objoid}::oid, ${unsaved.classoid}::oid, ${unsaved.objsubid}::int4, ${unsaved.provider}, ${unsaved.label})
           returning objoid, classoid, objsubid, provider, "label"
-       """.query[PgSeclabelRow].unique
+       """.query(PgSeclabelRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgSeclabelRow] = {
-    sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel""".query[PgSeclabelRow].stream
+    sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel""".query(PgSeclabelRow.read).stream
   }
   override def selectById(compositeId: PgSeclabelId): ConnectionIO[Option[PgSeclabelRow]] = {
-    sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}""".query[PgSeclabelRow].option
+    sql"""select objoid, classoid, objsubid, provider, "label" from pg_catalog.pg_seclabel where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid} AND provider = ${compositeId.provider}""".query(PgSeclabelRow.read).option
   }
   override def update(row: PgSeclabelRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -50,6 +50,6 @@ object PgSeclabelRepoImpl extends PgSeclabelRepo {
           do update set
             "label" = EXCLUDED."label"
           returning objoid, classoid, objsubid, provider, "label"
-       """.query[PgSeclabelRow].unique
+       """.query(PgSeclabelRow.read).unique
   }
 }

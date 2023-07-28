@@ -22,7 +22,7 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.creditcardid}::int4, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, creditcardid, modifieddate::text
-       """.query[PersoncreditcardRow].unique
+       """.query(PersoncreditcardRow.read).unique
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
     val fs = List(
@@ -45,14 +45,14 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
             returning businessentityid, creditcardid, modifieddate::text
          """
     }
-    q.query[PersoncreditcardRow].unique
+    q.query(PersoncreditcardRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
-    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard".query[PersoncreditcardRow].stream
+    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard".query(PersoncreditcardRow.read).stream
   }
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
-    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".query[PersoncreditcardRow].option
+    sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}".query(PersoncreditcardRow.read).option
   }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -75,6 +75,6 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, creditcardid, modifieddate::text
-       """.query[PersoncreditcardRow].unique
+       """.query(PersoncreditcardRow.read).unique
   }
 }

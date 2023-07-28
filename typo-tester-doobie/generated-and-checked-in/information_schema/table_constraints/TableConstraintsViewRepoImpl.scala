@@ -13,6 +13,6 @@ import fs2.Stream
 
 object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
   override def selectAll: Stream[ConnectionIO, TableConstraintsViewRow] = {
-    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced" from information_schema.table_constraints""".query[TableConstraintsViewRow].stream
+    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced" from information_schema.table_constraints""".query(TableConstraintsViewRow.read).stream
   }
 }

@@ -19,16 +19,16 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
     sql"""insert into pg_catalog.pg_publication(oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot)
           values (${unsaved.oid}::oid, ${unsaved.pubname}::name, ${unsaved.pubowner}::oid, ${unsaved.puballtables}, ${unsaved.pubinsert}, ${unsaved.pubupdate}, ${unsaved.pubdelete}, ${unsaved.pubtruncate}, ${unsaved.pubviaroot})
           returning oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
-       """.query[PgPublicationRow].unique
+       """.query(PgPublicationRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgPublicationRow] = {
-    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication".query[PgPublicationRow].stream
+    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication".query(PgPublicationRow.read).stream
   }
   override def selectById(oid: PgPublicationId): ConnectionIO[Option[PgPublicationRow]] = {
-    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ${oid}".query[PgPublicationRow].option
+    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ${oid}".query(PgPublicationRow.read).option
   }
   override def selectByIds(oids: Array[PgPublicationId]): Stream[ConnectionIO, PgPublicationRow] = {
-    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ANY(${oids})".query[PgPublicationRow].stream
+    sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication where oid = ANY(${oids})".query(PgPublicationRow.read).stream
   }
   override def update(row: PgPublicationRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
             pubtruncate = EXCLUDED.pubtruncate,
             pubviaroot = EXCLUDED.pubviaroot
           returning oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
-       """.query[PgPublicationRow].unique
+       """.query(PgPublicationRow.read).unique
   }
 }

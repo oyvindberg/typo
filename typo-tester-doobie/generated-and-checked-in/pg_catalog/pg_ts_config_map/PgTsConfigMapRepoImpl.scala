@@ -19,13 +19,13 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
     sql"""insert into pg_catalog.pg_ts_config_map(mapcfg, maptokentype, mapseqno, mapdict)
           values (${unsaved.mapcfg}::oid, ${unsaved.maptokentype}::int4, ${unsaved.mapseqno}::int4, ${unsaved.mapdict}::oid)
           returning mapcfg, maptokentype, mapseqno, mapdict
-       """.query[PgTsConfigMapRow].unique
+       """.query(PgTsConfigMapRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTsConfigMapRow] = {
-    sql"select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map".query[PgTsConfigMapRow].stream
+    sql"select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map".query(PgTsConfigMapRow.read).stream
   }
   override def selectById(compositeId: PgTsConfigMapId): ConnectionIO[Option[PgTsConfigMapRow]] = {
-    sql"select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg} AND maptokentype = ${compositeId.maptokentype} AND mapseqno = ${compositeId.mapseqno}".query[PgTsConfigMapRow].option
+    sql"select mapcfg, maptokentype, mapseqno, mapdict from pg_catalog.pg_ts_config_map where mapcfg = ${compositeId.mapcfg} AND maptokentype = ${compositeId.maptokentype} AND mapseqno = ${compositeId.mapseqno}".query(PgTsConfigMapRow.read).option
   }
   override def update(row: PgTsConfigMapRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -49,6 +49,6 @@ object PgTsConfigMapRepoImpl extends PgTsConfigMapRepo {
           do update set
             mapdict = EXCLUDED.mapdict
           returning mapcfg, maptokentype, mapseqno, mapdict
-       """.query[PgTsConfigMapRow].unique
+       """.query(PgTsConfigMapRow.read).unique
   }
 }

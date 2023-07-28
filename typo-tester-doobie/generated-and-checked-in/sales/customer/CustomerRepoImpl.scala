@@ -23,7 +23,7 @@ object CustomerRepoImpl extends CustomerRepo {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
           values (${unsaved.customerid}::int4, ${unsaved.personid}::int4, ${unsaved.storeid}::int4, ${unsaved.territoryid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
-       """.query[CustomerRow].unique
+       """.query(CustomerRow.read).unique
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
@@ -55,17 +55,17 @@ object CustomerRepoImpl extends CustomerRepo {
             returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
          """
     }
-    q.query[CustomerRow].unique
+    q.query(CustomerRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer".query[CustomerRow].stream
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer".query(CustomerRow.read).stream
   }
   override def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ${customerid}".query[CustomerRow].option
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ${customerid}".query(CustomerRow.read).option
   }
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
-    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${customerids})".query[CustomerRow].stream
+    sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer where customerid = ANY(${customerids})".query(CustomerRow.read).stream
   }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid
@@ -99,6 +99,6 @@ object CustomerRepoImpl extends CustomerRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning customerid, personid, storeid, territoryid, rowguid, modifieddate::text
-       """.query[CustomerRow].unique
+       """.query(CustomerRow.read).unique
   }
 }

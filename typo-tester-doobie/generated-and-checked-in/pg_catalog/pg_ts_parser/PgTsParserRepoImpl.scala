@@ -19,16 +19,16 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
     sql"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
           values (${unsaved.oid}::oid, ${unsaved.prsname}::name, ${unsaved.prsnamespace}::oid, ${unsaved.prsstart}::regproc, ${unsaved.prstoken}::regproc, ${unsaved.prsend}::regproc, ${unsaved.prsheadline}::regproc, ${unsaved.prslextype}::regproc)
           returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
-       """.query[PgTsParserRow].unique
+       """.query(PgTsParserRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTsParserRow] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser".query[PgTsParserRow].stream
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser".query(PgTsParserRow.read).stream
   }
   override def selectById(oid: PgTsParserId): ConnectionIO[Option[PgTsParserRow]] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ${oid}".query[PgTsParserRow].option
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ${oid}".query(PgTsParserRow.read).option
   }
   override def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow] = {
-    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${oids})".query[PgTsParserRow].stream
+    sql"select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype from pg_catalog.pg_ts_parser where oid = ANY(${oids})".query(PgTsParserRow.read).stream
   }
   override def update(row: PgTsParserRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
             prsheadline = EXCLUDED.prsheadline,
             prslextype = EXCLUDED.prslextype
           returning oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
-       """.query[PgTsParserRow].unique
+       """.query(PgTsParserRow.read).unique
   }
 }

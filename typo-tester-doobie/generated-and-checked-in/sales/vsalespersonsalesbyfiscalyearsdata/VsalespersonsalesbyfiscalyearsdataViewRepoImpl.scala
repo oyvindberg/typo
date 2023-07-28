@@ -13,6 +13,6 @@ import fs2.Stream
 
 object VsalespersonsalesbyfiscalyearsdataViewRepoImpl extends VsalespersonsalesbyfiscalyearsdataViewRepo {
   override def selectAll: Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsdataViewRow] = {
-    sql"select salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear from sales.vsalespersonsalesbyfiscalyearsdata".query[VsalespersonsalesbyfiscalyearsdataViewRow].stream
+    sql"select salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear from sales.vsalespersonsalesbyfiscalyearsdata".query(VsalespersonsalesbyfiscalyearsdataViewRow.read).stream
   }
 }

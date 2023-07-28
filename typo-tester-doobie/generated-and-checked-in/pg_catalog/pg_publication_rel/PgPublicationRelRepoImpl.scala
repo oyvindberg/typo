@@ -19,16 +19,16 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
     sql"""insert into pg_catalog.pg_publication_rel(oid, prpubid, prrelid)
           values (${unsaved.oid}::oid, ${unsaved.prpubid}::oid, ${unsaved.prrelid}::oid)
           returning oid, prpubid, prrelid
-       """.query[PgPublicationRelRow].unique
+       """.query(PgPublicationRelRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgPublicationRelRow] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel".query[PgPublicationRelRow].stream
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel".query(PgPublicationRelRow.read).stream
   }
   override def selectById(oid: PgPublicationRelId): ConnectionIO[Option[PgPublicationRelRow]] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ${oid}".query[PgPublicationRelRow].option
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ${oid}".query(PgPublicationRelRow.read).option
   }
   override def selectByIds(oids: Array[PgPublicationRelId]): Stream[ConnectionIO, PgPublicationRelRow] = {
-    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY(${oids})".query[PgPublicationRelRow].stream
+    sql"select oid, prpubid, prrelid from pg_catalog.pg_publication_rel where oid = ANY(${oids})".query(PgPublicationRelRow.read).stream
   }
   override def update(row: PgPublicationRelRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -53,6 +53,6 @@ object PgPublicationRelRepoImpl extends PgPublicationRelRepo {
             prpubid = EXCLUDED.prpubid,
             prrelid = EXCLUDED.prrelid
           returning oid, prpubid, prrelid
-       """.query[PgPublicationRelRow].unique
+       """.query(PgPublicationRelRow.read).unique
   }
 }

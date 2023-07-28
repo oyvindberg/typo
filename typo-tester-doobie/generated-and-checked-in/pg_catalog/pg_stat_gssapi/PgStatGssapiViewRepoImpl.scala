@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatGssapiViewRepoImpl extends PgStatGssapiViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatGssapiViewRow] = {
-    sql"""select pid, gss_authenticated, principal, "encrypted" from pg_catalog.pg_stat_gssapi""".query[PgStatGssapiViewRow].stream
+    sql"""select pid, gss_authenticated, principal, "encrypted" from pg_catalog.pg_stat_gssapi""".query(PgStatGssapiViewRow.read).stream
   }
 }

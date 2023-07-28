@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgGroupViewRepoImpl extends PgGroupViewRepo {
   override def selectAll: Stream[ConnectionIO, PgGroupViewRow] = {
-    sql"select groname, grosysid, grolist from pg_catalog.pg_group".query[PgGroupViewRow].stream
+    sql"select groname, grosysid, grolist from pg_catalog.pg_group".query(PgGroupViewRow.read).stream
   }
 }

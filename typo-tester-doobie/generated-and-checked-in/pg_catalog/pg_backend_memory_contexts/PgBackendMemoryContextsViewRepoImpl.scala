@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgBackendMemoryContextsViewRepoImpl extends PgBackendMemoryContextsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgBackendMemoryContextsViewRow] = {
-    sql"""select "name", ident, parent, "level", total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes from pg_catalog.pg_backend_memory_contexts""".query[PgBackendMemoryContextsViewRow].stream
+    sql"""select "name", ident, parent, "level", total_bytes, total_nblocks, free_bytes, free_chunks, used_bytes from pg_catalog.pg_backend_memory_contexts""".query(PgBackendMemoryContextsViewRow.read).stream
   }
 }

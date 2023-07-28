@@ -13,6 +13,6 @@ import fs2.Stream
 
 object EViewRepoImpl extends EViewRepo {
   override def selectAll: Stream[ConnectionIO, EViewRow] = {
-    sql"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from hr.e""".query[EViewRow].stream
+    sql"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from hr.e""".query(EViewRow.read).stream
   }
 }

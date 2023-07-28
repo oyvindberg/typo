@@ -22,7 +22,7 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     sql"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)
           values (${unsaved.countryregioncode}, ${unsaved.currencycode}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning countryregioncode, currencycode, modifieddate::text
-       """.query[CountryregioncurrencyRow].unique
+       """.query(CountryregioncurrencyRow.read).unique
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
     val fs = List(
@@ -45,14 +45,14 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
             returning countryregioncode, currencycode, modifieddate::text
          """
     }
-    q.query[CountryregioncurrencyRow].unique
+    q.query(CountryregioncurrencyRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow] = {
-    sql"select countryregioncode, currencycode, modifieddate::text from sales.countryregioncurrency".query[CountryregioncurrencyRow].stream
+    sql"select countryregioncode, currencycode, modifieddate::text from sales.countryregioncurrency".query(CountryregioncurrencyRow.read).stream
   }
   override def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]] = {
-    sql"select countryregioncode, currencycode, modifieddate::text from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".query[CountryregioncurrencyRow].option
+    sql"select countryregioncode, currencycode, modifieddate::text from sales.countryregioncurrency where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}".query(CountryregioncurrencyRow.read).option
   }
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -75,6 +75,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning countryregioncode, currencycode, modifieddate::text
-       """.query[CountryregioncurrencyRow].unique
+       """.query(CountryregioncurrencyRow.read).unique
   }
 }

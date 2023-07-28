@@ -19,16 +19,16 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
     sql"""insert into pg_catalog.pg_sequence(seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle)
           values (${unsaved.seqrelid}::oid, ${unsaved.seqtypid}::oid, ${unsaved.seqstart}::int8, ${unsaved.seqincrement}::int8, ${unsaved.seqmax}::int8, ${unsaved.seqmin}::int8, ${unsaved.seqcache}::int8, ${unsaved.seqcycle})
           returning seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
-       """.query[PgSequenceRow].unique
+       """.query(PgSequenceRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgSequenceRow] = {
-    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence".query[PgSequenceRow].stream
+    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence".query(PgSequenceRow.read).stream
   }
   override def selectById(seqrelid: PgSequenceId): ConnectionIO[Option[PgSequenceRow]] = {
-    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ${seqrelid}".query[PgSequenceRow].option
+    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ${seqrelid}".query(PgSequenceRow.read).option
   }
   override def selectByIds(seqrelids: Array[PgSequenceId]): Stream[ConnectionIO, PgSequenceRow] = {
-    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ANY(${seqrelids})".query[PgSequenceRow].stream
+    sql"select seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle from pg_catalog.pg_sequence where seqrelid = ANY(${seqrelids})".query(PgSequenceRow.read).stream
   }
   override def update(row: PgSequenceRow): ConnectionIO[Boolean] = {
     val seqrelid = row.seqrelid
@@ -68,6 +68,6 @@ object PgSequenceRepoImpl extends PgSequenceRepo {
             seqcache = EXCLUDED.seqcache,
             seqcycle = EXCLUDED.seqcycle
           returning seqrelid, seqtypid, seqstart, seqincrement, seqmax, seqmin, seqcache, seqcycle
-       """.query[PgSequenceRow].unique
+       """.query(PgSequenceRow.read).unique
   }
 }

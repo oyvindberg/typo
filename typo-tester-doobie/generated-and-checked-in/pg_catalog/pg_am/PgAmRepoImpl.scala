@@ -19,16 +19,16 @@ object PgAmRepoImpl extends PgAmRepo {
     sql"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)
           values (${unsaved.oid}::oid, ${unsaved.amname}::name, ${unsaved.amhandler}::regproc, ${unsaved.amtype}::char)
           returning oid, amname, amhandler, amtype
-       """.query[PgAmRow].unique
+       """.query(PgAmRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgAmRow] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am".query[PgAmRow].stream
+    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am".query(PgAmRow.read).stream
   }
   override def selectById(oid: PgAmId): ConnectionIO[Option[PgAmRow]] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ${oid}".query[PgAmRow].option
+    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ${oid}".query(PgAmRow.read).option
   }
   override def selectByIds(oids: Array[PgAmId]): Stream[ConnectionIO, PgAmRow] = {
-    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY(${oids})".query[PgAmRow].stream
+    sql"select oid, amname, amhandler, amtype from pg_catalog.pg_am where oid = ANY(${oids})".query(PgAmRow.read).stream
   }
   override def update(row: PgAmRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -56,6 +56,6 @@ object PgAmRepoImpl extends PgAmRepo {
             amhandler = EXCLUDED.amhandler,
             amtype = EXCLUDED.amtype
           returning oid, amname, amhandler, amtype
-       """.query[PgAmRow].unique
+       """.query(PgAmRow.read).unique
   }
 }

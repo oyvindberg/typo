@@ -16,9 +16,9 @@ object PgShdependRepoImpl extends PgShdependRepo {
     sql"""insert into pg_catalog.pg_shdepend(dbid, classid, objid, objsubid, refclassid, refobjid, deptype)
           values (${unsaved.dbid}::oid, ${unsaved.classid}::oid, ${unsaved.objid}::oid, ${unsaved.objsubid}::int4, ${unsaved.refclassid}::oid, ${unsaved.refobjid}::oid, ${unsaved.deptype}::char)
           returning dbid, classid, objid, objsubid, refclassid, refobjid, deptype
-       """.query[PgShdependRow].unique
+       """.query(PgShdependRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgShdependRow] = {
-    sql"select dbid, classid, objid, objsubid, refclassid, refobjid, deptype from pg_catalog.pg_shdepend".query[PgShdependRow].stream
+    sql"select dbid, classid, objid, objsubid, refclassid, refobjid, deptype from pg_catalog.pg_shdepend".query(PgShdependRow.read).stream
   }
 }

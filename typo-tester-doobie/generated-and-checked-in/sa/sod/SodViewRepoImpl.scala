@@ -13,6 +13,6 @@ import fs2.Stream
 
 object SodViewRepoImpl extends SodViewRepo {
   override def selectAll: Stream[ConnectionIO, SodViewRow] = {
-    sql"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text from sa.sod""".query[SodViewRow].stream
+    sql"""select "id", salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text from sa.sod""".query(SodViewRow.read).stream
   }
 }

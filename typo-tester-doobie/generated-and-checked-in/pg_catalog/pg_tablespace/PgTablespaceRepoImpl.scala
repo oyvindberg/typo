@@ -19,16 +19,16 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
     sql"""insert into pg_catalog.pg_tablespace(oid, spcname, spcowner, spcacl, spcoptions)
           values (${unsaved.oid}::oid, ${unsaved.spcname}::name, ${unsaved.spcowner}::oid, ${unsaved.spcacl}::_aclitem, ${unsaved.spcoptions}::_text)
           returning oid, spcname, spcowner, spcacl, spcoptions
-       """.query[PgTablespaceRow].unique
+       """.query(PgTablespaceRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTablespaceRow] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace".query[PgTablespaceRow].stream
+    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace".query(PgTablespaceRow.read).stream
   }
   override def selectById(oid: PgTablespaceId): ConnectionIO[Option[PgTablespaceRow]] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ${oid}".query[PgTablespaceRow].option
+    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ${oid}".query(PgTablespaceRow.read).option
   }
   override def selectByIds(oids: Array[PgTablespaceId]): Stream[ConnectionIO, PgTablespaceRow] = {
-    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ANY(${oids})".query[PgTablespaceRow].stream
+    sql"select oid, spcname, spcowner, spcacl, spcoptions from pg_catalog.pg_tablespace where oid = ANY(${oids})".query(PgTablespaceRow.read).stream
   }
   override def update(row: PgTablespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -59,6 +59,6 @@ object PgTablespaceRepoImpl extends PgTablespaceRepo {
             spcacl = EXCLUDED.spcacl,
             spcoptions = EXCLUDED.spcoptions
           returning oid, spcname, spcowner, spcacl, spcoptions
-       """.query[PgTablespaceRow].unique
+       """.query(PgTablespaceRow.read).unique
   }
 }

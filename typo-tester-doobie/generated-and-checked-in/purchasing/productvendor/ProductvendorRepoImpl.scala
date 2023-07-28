@@ -22,7 +22,7 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
     sql"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.averageleadtime}::int4, ${unsaved.standardprice}::numeric, ${unsaved.lastreceiptcost}::numeric, ${unsaved.lastreceiptdate}::timestamp, ${unsaved.minorderqty}::int4, ${unsaved.maxorderqty}::int4, ${unsaved.onorderqty}::int4, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
-       """.query[ProductvendorRow].unique
+       """.query(ProductvendorRow.read).unique
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     val fs = List(
@@ -53,14 +53,14 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
             returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
          """
     }
-    q.query[ProductvendorRow].unique
+    q.query(ProductvendorRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
-    sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from purchasing.productvendor".query[ProductvendorRow].stream
+    sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from purchasing.productvendor".query(ProductvendorRow.read).stream
   }
   override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
-    sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".query[ProductvendorRow].option
+    sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".query(ProductvendorRow.read).option
   }
   override def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -107,6 +107,6 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
             unitmeasurecode = EXCLUDED.unitmeasurecode,
             modifieddate = EXCLUDED.modifieddate
           returning productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate::text, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate::text
-       """.query[ProductvendorRow].unique
+       """.query(ProductvendorRow.read).unique
   }
 }

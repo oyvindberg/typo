@@ -19,16 +19,16 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
     sql"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)
           values (${unsaved.ftrelid}::oid, ${unsaved.ftserver}::oid, ${unsaved.ftoptions}::_text)
           returning ftrelid, ftserver, ftoptions
-       """.query[PgForeignTableRow].unique
+       """.query(PgForeignTableRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgForeignTableRow] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table".query[PgForeignTableRow].stream
+    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table".query(PgForeignTableRow.read).stream
   }
   override def selectById(ftrelid: PgForeignTableId): ConnectionIO[Option[PgForeignTableRow]] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ${ftrelid}".query[PgForeignTableRow].option
+    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ${ftrelid}".query(PgForeignTableRow.read).option
   }
   override def selectByIds(ftrelids: Array[PgForeignTableId]): Stream[ConnectionIO, PgForeignTableRow] = {
-    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ANY(${ftrelids})".query[PgForeignTableRow].stream
+    sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table where ftrelid = ANY(${ftrelids})".query(PgForeignTableRow.read).stream
   }
   override def update(row: PgForeignTableRow): ConnectionIO[Boolean] = {
     val ftrelid = row.ftrelid
@@ -53,6 +53,6 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
             ftserver = EXCLUDED.ftserver,
             ftoptions = EXCLUDED.ftoptions
           returning ftrelid, ftserver, ftoptions
-       """.query[PgForeignTableRow].unique
+       """.query(PgForeignTableRow.read).unique
   }
 }

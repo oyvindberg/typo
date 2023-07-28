@@ -19,16 +19,16 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
     sql"""insert into pg_catalog.pg_partitioned_table(partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs)
           values (${unsaved.partrelid}::oid, ${unsaved.partstrat}::char, ${unsaved.partnatts}::int2, ${unsaved.partdefid}::oid, ${unsaved.partattrs}::int2vector, ${unsaved.partclass}::oidvector, ${unsaved.partcollation}::oidvector, ${unsaved.partexprs}::pg_node_tree)
           returning partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
-       """.query[PgPartitionedTableRow].unique
+       """.query(PgPartitionedTableRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgPartitionedTableRow] = {
-    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table".query[PgPartitionedTableRow].stream
+    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table".query(PgPartitionedTableRow.read).stream
   }
   override def selectById(partrelid: PgPartitionedTableId): ConnectionIO[Option[PgPartitionedTableRow]] = {
-    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ${partrelid}".query[PgPartitionedTableRow].option
+    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ${partrelid}".query(PgPartitionedTableRow.read).option
   }
   override def selectByIds(partrelids: Array[PgPartitionedTableId]): Stream[ConnectionIO, PgPartitionedTableRow] = {
-    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ANY(${partrelids})".query[PgPartitionedTableRow].stream
+    sql"select partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs from pg_catalog.pg_partitioned_table where partrelid = ANY(${partrelids})".query(PgPartitionedTableRow.read).stream
   }
   override def update(row: PgPartitionedTableRow): ConnectionIO[Boolean] = {
     val partrelid = row.partrelid
@@ -68,6 +68,6 @@ object PgPartitionedTableRepoImpl extends PgPartitionedTableRepo {
             partcollation = EXCLUDED.partcollation,
             partexprs = EXCLUDED.partexprs
           returning partrelid, partstrat, partnatts, partdefid, partattrs, partclass, partcollation, partexprs
-       """.query[PgPartitionedTableRow].unique
+       """.query(PgPartitionedTableRow.read).unique
   }
 }

@@ -23,7 +23,7 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
           values (${unsaved.salestaxrateid}::int4, ${unsaved.stateprovinceid}::int4, ${unsaved.taxtype}::int2, ${unsaved.taxrate}::numeric, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
-       """.query[SalestaxrateRow].unique
+       """.query(SalestaxrateRow.read).unique
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow] = {
     val fs = List(
@@ -59,17 +59,17 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
          """
     }
-    q.query[SalestaxrateRow].unique
+    q.query(SalestaxrateRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate""".query[SalestaxrateRow].stream
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate""".query(SalestaxrateRow.read).stream
   }
   override def selectById(salestaxrateid: SalestaxrateId): ConnectionIO[Option[SalestaxrateRow]] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ${salestaxrateid}""".query[SalestaxrateRow].option
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ${salestaxrateid}""".query(SalestaxrateRow.read).option
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ANY(${salestaxrateids})""".query[SalestaxrateRow].stream
+    sql"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text from sales.salestaxrate where salestaxrateid = ANY(${salestaxrateids})""".query(SalestaxrateRow.read).stream
   }
   override def update(row: SalestaxrateRow): ConnectionIO[Boolean] = {
     val salestaxrateid = row.salestaxrateid
@@ -106,6 +106,6 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
-       """.query[SalestaxrateRow].unique
+       """.query(SalestaxrateRow.read).unique
   }
 }

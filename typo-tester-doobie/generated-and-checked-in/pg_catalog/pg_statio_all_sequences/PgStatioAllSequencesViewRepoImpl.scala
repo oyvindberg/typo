@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatioAllSequencesViewRepoImpl extends PgStatioAllSequencesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatioAllSequencesViewRow] = {
-    sql"select relid, schemaname, relname, blks_read, blks_hit from pg_catalog.pg_statio_all_sequences".query[PgStatioAllSequencesViewRow].stream
+    sql"select relid, schemaname, relname, blks_read, blks_hit from pg_catalog.pg_statio_all_sequences".query(PgStatioAllSequencesViewRow.read).stream
   }
 }

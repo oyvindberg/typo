@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ViewColumnUsageViewRepoImpl extends ViewColumnUsageViewRepo {
   override def selectAll: Stream[ConnectionIO, ViewColumnUsageViewRow] = {
-    sql"""select view_catalog, view_schema, view_name, table_catalog, table_schema, "table_name", "column_name" from information_schema.view_column_usage""".query[ViewColumnUsageViewRow].stream
+    sql"""select view_catalog, view_schema, view_name, table_catalog, table_schema, "table_name", "column_name" from information_schema.view_column_usage""".query(ViewColumnUsageViewRow.read).stream
   }
 }

@@ -22,7 +22,7 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
           values (${unsaved.billofmaterialsid}::int4, ${unsaved.productassemblyid}::int4, ${unsaved.componentid}::int4, ${unsaved.startdate}::timestamp, ${unsaved.enddate}::timestamp, ${unsaved.unitmeasurecode}::bpchar, ${unsaved.bomlevel}::int2, ${unsaved.perassemblyqty}::numeric, ${unsaved.modifieddate}::timestamp)
           returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
-       """.query[BillofmaterialsRow].unique
+       """.query(BillofmaterialsRow.read).unique
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
     val fs = List(
@@ -60,17 +60,17 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
          """
     }
-    q.query[BillofmaterialsRow].unique
+    q.query(BillofmaterialsRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
-    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials".query[BillofmaterialsRow].stream
+    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials".query(BillofmaterialsRow.read).stream
   }
   override def selectById(billofmaterialsid: BillofmaterialsId): ConnectionIO[Option[BillofmaterialsRow]] = {
-    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials where billofmaterialsid = ${billofmaterialsid}".query[BillofmaterialsRow].option
+    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials where billofmaterialsid = ${billofmaterialsid}".query(BillofmaterialsRow.read).option
   }
   override def selectByIds(billofmaterialsids: Array[BillofmaterialsId]): Stream[ConnectionIO, BillofmaterialsRow] = {
-    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials where billofmaterialsid = ANY(${billofmaterialsids})".query[BillofmaterialsRow].stream
+    sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials where billofmaterialsid = ANY(${billofmaterialsids})".query(BillofmaterialsRow.read).stream
   }
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
     val billofmaterialsid = row.billofmaterialsid
@@ -113,6 +113,6 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             perassemblyqty = EXCLUDED.perassemblyqty,
             modifieddate = EXCLUDED.modifieddate
           returning billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
-       """.query[BillofmaterialsRow].unique
+       """.query(BillofmaterialsRow.read).unique
   }
 }

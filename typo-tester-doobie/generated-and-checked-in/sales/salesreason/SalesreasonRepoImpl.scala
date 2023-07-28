@@ -22,7 +22,7 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
           values (${unsaved.salesreasonid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.reasontype}::"public"."Name", ${unsaved.modifieddate}::timestamp)
           returning salesreasonid, "name", reasontype, modifieddate::text
-       """.query[SalesreasonRow].unique
+       """.query(SalesreasonRow.read).unique
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
@@ -49,17 +49,17 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             returning salesreasonid, "name", reasontype, modifieddate::text
          """
     }
-    q.query[SalesreasonRow].unique
+    q.query(SalesreasonRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason""".query[SalesreasonRow].stream
+    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason""".query(SalesreasonRow.read).stream
   }
   override def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ${salesreasonid}""".query[SalesreasonRow].option
+    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ${salesreasonid}""".query(SalesreasonRow.read).option
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ANY(${salesreasonids})""".query[SalesreasonRow].stream
+    sql"""select salesreasonid, "name", reasontype, modifieddate::text from sales.salesreason where salesreasonid = ANY(${salesreasonids})""".query(SalesreasonRow.read).stream
   }
   override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
     val salesreasonid = row.salesreasonid
@@ -87,6 +87,6 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
             reasontype = EXCLUDED.reasontype,
             modifieddate = EXCLUDED.modifieddate
           returning salesreasonid, "name", reasontype, modifieddate::text
-       """.query[SalesreasonRow].unique
+       """.query(SalesreasonRow.read).unique
   }
 }

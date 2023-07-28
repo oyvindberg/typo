@@ -19,16 +19,16 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
     sql"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)
           values (${unsaved.oid}::oid, ${unsaved.opfmethod}::oid, ${unsaved.opfname}::name, ${unsaved.opfnamespace}::oid, ${unsaved.opfowner}::oid)
           returning oid, opfmethod, opfname, opfnamespace, opfowner
-       """.query[PgOpfamilyRow].unique
+       """.query(PgOpfamilyRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgOpfamilyRow] = {
-    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily".query[PgOpfamilyRow].stream
+    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily".query(PgOpfamilyRow.read).stream
   }
   override def selectById(oid: PgOpfamilyId): ConnectionIO[Option[PgOpfamilyRow]] = {
-    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ${oid}".query[PgOpfamilyRow].option
+    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ${oid}".query(PgOpfamilyRow.read).option
   }
   override def selectByIds(oids: Array[PgOpfamilyId]): Stream[ConnectionIO, PgOpfamilyRow] = {
-    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ANY(${oids})".query[PgOpfamilyRow].stream
+    sql"select oid, opfmethod, opfname, opfnamespace, opfowner from pg_catalog.pg_opfamily where oid = ANY(${oids})".query(PgOpfamilyRow.read).stream
   }
   override def update(row: PgOpfamilyRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -59,6 +59,6 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
             opfnamespace = EXCLUDED.opfnamespace,
             opfowner = EXCLUDED.opfowner
           returning oid, opfmethod, opfname, opfnamespace, opfowner
-       """.query[PgOpfamilyRow].unique
+       """.query(PgOpfamilyRow.read).unique
   }
 }

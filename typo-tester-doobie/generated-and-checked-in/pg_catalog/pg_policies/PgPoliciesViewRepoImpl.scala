@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgPoliciesViewRepoImpl extends PgPoliciesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgPoliciesViewRow] = {
-    sql"select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check from pg_catalog.pg_policies".query[PgPoliciesViewRow].stream
+    sql"select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check from pg_catalog.pg_policies".query(PgPoliciesViewRow.read).stream
   }
 }

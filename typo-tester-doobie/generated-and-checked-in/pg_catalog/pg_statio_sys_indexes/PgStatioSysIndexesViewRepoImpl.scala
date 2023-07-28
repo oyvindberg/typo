@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatioSysIndexesViewRepoImpl extends PgStatioSysIndexesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatioSysIndexesViewRow] = {
-    sql"select relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit from pg_catalog.pg_statio_sys_indexes".query[PgStatioSysIndexesViewRow].stream
+    sql"select relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit from pg_catalog.pg_statio_sys_indexes".query(PgStatioSysIndexesViewRow.read).stream
   }
 }

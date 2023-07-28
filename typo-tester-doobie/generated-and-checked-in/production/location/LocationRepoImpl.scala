@@ -22,7 +22,7 @@ object LocationRepoImpl extends LocationRepo {
     sql"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)
           values (${unsaved.locationid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.costrate}::numeric, ${unsaved.availability}::numeric, ${unsaved.modifieddate}::timestamp)
           returning locationid, "name", costrate, availability, modifieddate::text
-       """.query[LocationRow].unique
+       """.query(LocationRow.read).unique
   }
   override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     val fs = List(
@@ -56,17 +56,17 @@ object LocationRepoImpl extends LocationRepo {
             returning locationid, "name", costrate, availability, modifieddate::text
          """
     }
-    q.query[LocationRow].unique
+    q.query(LocationRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
-    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location"""".query[LocationRow].stream
+    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location"""".query(LocationRow.read).stream
   }
   override def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]] = {
-    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location" where locationid = ${locationid}""".query[LocationRow].option
+    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location" where locationid = ${locationid}""".query(LocationRow.read).option
   }
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
-    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location" where locationid = ANY(${locationids})""".query[LocationRow].stream
+    sql"""select locationid, "name", costrate, availability, modifieddate::text from production."location" where locationid = ANY(${locationids})""".query(LocationRow.read).stream
   }
   override def update(row: LocationRow): ConnectionIO[Boolean] = {
     val locationid = row.locationid
@@ -97,6 +97,6 @@ object LocationRepoImpl extends LocationRepo {
             availability = EXCLUDED.availability,
             modifieddate = EXCLUDED.modifieddate
           returning locationid, "name", costrate, availability, modifieddate::text
-       """.query[LocationRow].unique
+       """.query(LocationRow.read).unique
   }
 }

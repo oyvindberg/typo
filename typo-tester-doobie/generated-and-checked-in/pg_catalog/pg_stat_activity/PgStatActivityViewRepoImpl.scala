@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatActivityViewRepoImpl extends PgStatActivityViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatActivityViewRow] = {
-    sql"""select datid, datname, pid, leader_pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start::text, xact_start::text, query_start::text, state_change::text, wait_event_type, wait_event, "state", backend_xid, backend_xmin, query_id, query, backend_type from pg_catalog.pg_stat_activity""".query[PgStatActivityViewRow].stream
+    sql"""select datid, datname, pid, leader_pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start::text, xact_start::text, query_start::text, state_change::text, wait_event_type, wait_event, "state", backend_xid, backend_xmin, query_id, query, backend_type from pg_catalog.pg_stat_activity""".query(PgStatActivityViewRow.read).stream
   }
 }

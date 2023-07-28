@@ -22,7 +22,7 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     sql"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.productdescriptionid}::int4, ${unsaved.cultureid}::bpchar, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, productdescriptionid, cultureid, modifieddate::text
-       """.query[ProductmodelproductdescriptioncultureRow].unique
+       """.query(ProductmodelproductdescriptioncultureRow.read).unique
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     val fs = List(
@@ -46,14 +46,14 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
             returning productmodelid, productdescriptionid, cultureid, modifieddate::text
          """
     }
-    q.query[ProductmodelproductdescriptioncultureRow].unique
+    q.query(ProductmodelproductdescriptioncultureRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
-    sql"select productmodelid, productdescriptionid, cultureid, modifieddate::text from production.productmodelproductdescriptionculture".query[ProductmodelproductdescriptioncultureRow].stream
+    sql"select productmodelid, productdescriptionid, cultureid, modifieddate::text from production.productmodelproductdescriptionculture".query(ProductmodelproductdescriptioncultureRow.read).stream
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Option[ProductmodelproductdescriptioncultureRow]] = {
-    sql"select productmodelid, productdescriptionid, cultureid, modifieddate::text from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".query[ProductmodelproductdescriptioncultureRow].option
+    sql"select productmodelid, productdescriptionid, cultureid, modifieddate::text from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".query(ProductmodelproductdescriptioncultureRow.read).option
   }
   override def update(row: ProductmodelproductdescriptioncultureRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -77,6 +77,6 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, productdescriptionid, cultureid, modifieddate::text
-       """.query[ProductmodelproductdescriptioncultureRow].unique
+       """.query(ProductmodelproductdescriptioncultureRow.read).unique
   }
 }

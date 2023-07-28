@@ -22,7 +22,7 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
           values (${unsaved.jobcandidateid}::int4, ${unsaved.businessentityid}::int4, ${unsaved.resume}::xml, ${unsaved.modifieddate}::timestamp)
           returning jobcandidateid, businessentityid, resume, modifieddate::text
-       """.query[JobcandidateRow].unique
+       """.query(JobcandidateRow.read).unique
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
@@ -49,17 +49,17 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
             returning jobcandidateid, businessentityid, resume, modifieddate::text
          """
     }
-    q.query[JobcandidateRow].unique
+    q.query(JobcandidateRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate".query[JobcandidateRow].stream
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate".query(JobcandidateRow.read).stream
   }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ${jobcandidateid}".query[JobcandidateRow].option
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ${jobcandidateid}".query(JobcandidateRow.read).option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
-    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ANY(${jobcandidateids})".query[JobcandidateRow].stream
+    sql"select jobcandidateid, businessentityid, resume, modifieddate::text from humanresources.jobcandidate where jobcandidateid = ANY(${jobcandidateids})".query(JobcandidateRow.read).stream
   }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid
@@ -87,6 +87,6 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
             resume = EXCLUDED.resume,
             modifieddate = EXCLUDED.modifieddate
           returning jobcandidateid, businessentityid, resume, modifieddate::text
-       """.query[JobcandidateRow].unique
+       """.query(JobcandidateRow.read).unique
   }
 }

@@ -19,16 +19,16 @@ object PgProcRepoImpl extends PgProcRepo {
     sql"""insert into pg_catalog.pg_proc(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)
           values (${unsaved.oid}::oid, ${unsaved.proname}::name, ${unsaved.pronamespace}::oid, ${unsaved.proowner}::oid, ${unsaved.prolang}::oid, ${unsaved.procost}::float4, ${unsaved.prorows}::float4, ${unsaved.provariadic}::oid, ${unsaved.prosupport}::regproc, ${unsaved.prokind}::char, ${unsaved.prosecdef}, ${unsaved.proleakproof}, ${unsaved.proisstrict}, ${unsaved.proretset}, ${unsaved.provolatile}::char, ${unsaved.proparallel}::char, ${unsaved.pronargs}::int2, ${unsaved.pronargdefaults}::int2, ${unsaved.prorettype}::oid, ${unsaved.proargtypes}::oidvector, ${unsaved.proallargtypes}::_oid, ${unsaved.proargmodes}::_char, ${unsaved.proargnames}::_text, ${unsaved.proargdefaults}::pg_node_tree, ${unsaved.protrftypes}::_oid, ${unsaved.prosrc}, ${unsaved.probin}, ${unsaved.prosqlbody}::pg_node_tree, ${unsaved.proconfig}::_text, ${unsaved.proacl}::_aclitem)
           returning oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
-       """.query[PgProcRow].unique
+       """.query(PgProcRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgProcRow] = {
-    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc".query[PgProcRow].stream
+    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc".query(PgProcRow.read).stream
   }
   override def selectById(oid: PgProcId): ConnectionIO[Option[PgProcRow]] = {
-    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ${oid}".query[PgProcRow].option
+    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ${oid}".query(PgProcRow.read).option
   }
   override def selectByIds(oids: Array[PgProcId]): Stream[ConnectionIO, PgProcRow] = {
-    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ANY(${oids})".query[PgProcRow].stream
+    sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc where oid = ANY(${oids})".query(PgProcRow.read).stream
   }
   override def update(row: PgProcRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -134,6 +134,6 @@ object PgProcRepoImpl extends PgProcRepo {
             proconfig = EXCLUDED.proconfig,
             proacl = EXCLUDED.proacl
           returning oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
-       """.query[PgProcRow].unique
+       """.query(PgProcRow.read).unique
   }
 }

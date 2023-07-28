@@ -19,13 +19,13 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
     sql"""insert into pg_catalog.pg_subscription_rel(srsubid, srrelid, srsubstate, srsublsn)
           values (${unsaved.srsubid}::oid, ${unsaved.srrelid}::oid, ${unsaved.srsubstate}::char, ${unsaved.srsublsn}::pg_lsn)
           returning srsubid, srrelid, srsubstate, srsublsn
-       """.query[PgSubscriptionRelRow].unique
+       """.query(PgSubscriptionRelRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgSubscriptionRelRow] = {
-    sql"select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel".query[PgSubscriptionRelRow].stream
+    sql"select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel".query(PgSubscriptionRelRow.read).stream
   }
   override def selectById(compositeId: PgSubscriptionRelId): ConnectionIO[Option[PgSubscriptionRelRow]] = {
-    sql"select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel where srrelid = ${compositeId.srrelid} AND srsubid = ${compositeId.srsubid}".query[PgSubscriptionRelRow].option
+    sql"select srsubid, srrelid, srsubstate, srsublsn from pg_catalog.pg_subscription_rel where srrelid = ${compositeId.srrelid} AND srsubid = ${compositeId.srsubid}".query(PgSubscriptionRelRow.read).option
   }
   override def update(row: PgSubscriptionRelRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -51,6 +51,6 @@ object PgSubscriptionRelRepoImpl extends PgSubscriptionRelRepo {
             srsubstate = EXCLUDED.srsubstate,
             srsublsn = EXCLUDED.srsublsn
           returning srsubid, srrelid, srsubstate, srsublsn
-       """.query[PgSubscriptionRelRow].unique
+       """.query(PgSubscriptionRelRow.read).unique
   }
 }

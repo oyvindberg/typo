@@ -23,7 +23,7 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)
           values (${unsaved.productid}::int4, ${unsaved.modifieddate}::timestamp, ${unsaved.documentnode})
           returning productid, modifieddate::text, documentnode
-       """.query[ProductdocumentRow].unique
+       """.query(ProductdocumentRow.read).unique
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
     val fs = List(
@@ -49,14 +49,14 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
             returning productid, modifieddate::text, documentnode
          """
     }
-    q.query[ProductdocumentRow].unique
+    q.query(ProductdocumentRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
-    sql"select productid, modifieddate::text, documentnode from production.productdocument".query[ProductdocumentRow].stream
+    sql"select productid, modifieddate::text, documentnode from production.productdocument".query(ProductdocumentRow.read).stream
   }
   override def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]] = {
-    sql"select productid, modifieddate::text, documentnode from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".query[ProductdocumentRow].option
+    sql"select productid, modifieddate::text, documentnode from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".query(ProductdocumentRow.read).option
   }
   override def update(row: ProductdocumentRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -79,6 +79,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning productid, modifieddate::text, documentnode
-       """.query[ProductdocumentRow].unique
+       """.query(ProductdocumentRow.read).unique
   }
 }

@@ -19,16 +19,16 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
     sql"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
           values (${unsaved.oid}::oid, ${unsaved.rulename}::name, ${unsaved.evClass}::oid, ${unsaved.evType}::char, ${unsaved.evEnabled}::char, ${unsaved.isInstead}, ${unsaved.evQual}::pg_node_tree, ${unsaved.evAction}::pg_node_tree)
           returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
-       """.query[PgRewriteRow].unique
+       """.query(PgRewriteRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgRewriteRow] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite".query[PgRewriteRow].stream
+    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite".query(PgRewriteRow.read).stream
   }
   override def selectById(oid: PgRewriteId): ConnectionIO[Option[PgRewriteRow]] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ${oid}".query[PgRewriteRow].option
+    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ${oid}".query(PgRewriteRow.read).option
   }
   override def selectByIds(oids: Array[PgRewriteId]): Stream[ConnectionIO, PgRewriteRow] = {
-    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY(${oids})".query[PgRewriteRow].stream
+    sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite where oid = ANY(${oids})".query(PgRewriteRow.read).stream
   }
   override def update(row: PgRewriteRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
             ev_qual = EXCLUDED.ev_qual,
             ev_action = EXCLUDED.ev_action
           returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
-       """.query[PgRewriteRow].unique
+       """.query(PgRewriteRow.read).unique
   }
 }

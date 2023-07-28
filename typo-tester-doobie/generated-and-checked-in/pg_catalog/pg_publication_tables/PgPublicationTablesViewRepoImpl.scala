@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgPublicationTablesViewRepoImpl extends PgPublicationTablesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgPublicationTablesViewRow] = {
-    sql"select pubname, schemaname, tablename from pg_catalog.pg_publication_tables".query[PgPublicationTablesViewRow].stream
+    sql"select pubname, schemaname, tablename from pg_catalog.pg_publication_tables".query(PgPublicationTablesViewRow.read).stream
   }
 }

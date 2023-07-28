@@ -13,6 +13,6 @@ import fs2.Stream
 
 object IViewRepoImpl extends IViewRepo {
   override def selectAll: Stream[ConnectionIO, IViewRow] = {
-    sql"""select "id", illustrationid, diagram, modifieddate::text from pr.i""".query[IViewRow].stream
+    sql"""select "id", illustrationid, diagram, modifieddate::text from pr.i""".query(IViewRow.read).stream
   }
 }

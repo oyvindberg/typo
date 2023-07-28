@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatProgressCreateIndexViewRepoImpl extends PgStatProgressCreateIndexViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatProgressCreateIndexViewRow] = {
-    sql"select pid, datid, datname, relid, index_relid, command, phase, lockers_total, lockers_done, current_locker_pid, blocks_total, blocks_done, tuples_total, tuples_done, partitions_total, partitions_done from pg_catalog.pg_stat_progress_create_index".query[PgStatProgressCreateIndexViewRow].stream
+    sql"select pid, datid, datname, relid, index_relid, command, phase, lockers_total, lockers_done, current_locker_pid, blocks_total, blocks_done, tuples_total, tuples_done, partitions_total, partitions_done from pg_catalog.pg_stat_progress_create_index".query(PgStatProgressCreateIndexViewRow.read).stream
   }
 }

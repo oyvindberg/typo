@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ForeignDataWrappersViewRepoImpl extends ForeignDataWrappersViewRepo {
   override def selectAll: Stream[ConnectionIO, ForeignDataWrappersViewRow] = {
-    sql"select foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, library_name, foreign_data_wrapper_language from information_schema.foreign_data_wrappers".query[ForeignDataWrappersViewRow].stream
+    sql"select foreign_data_wrapper_catalog, foreign_data_wrapper_name, authorization_identifier, library_name, foreign_data_wrapper_language from information_schema.foreign_data_wrappers".query(ForeignDataWrappersViewRow.read).stream
   }
 }

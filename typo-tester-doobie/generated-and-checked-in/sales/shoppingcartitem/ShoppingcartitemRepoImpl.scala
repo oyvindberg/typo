@@ -22,7 +22,7 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
           values (${unsaved.shoppingcartitemid}::int4, ${unsaved.shoppingcartid}, ${unsaved.quantity}::int4, ${unsaved.productid}::int4, ${unsaved.datecreated}::timestamp, ${unsaved.modifieddate}::timestamp)
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
-       """.query[ShoppingcartitemRow].unique
+       """.query(ShoppingcartitemRow.read).unique
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
     val fs = List(
@@ -57,17 +57,17 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
          """
     }
-    q.query[ShoppingcartitemRow].unique
+    q.query(ShoppingcartitemRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem".query[ShoppingcartitemRow].stream
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem".query(ShoppingcartitemRow.read).stream
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ${shoppingcartitemid}".query[ShoppingcartitemRow].option
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ${shoppingcartitemid}".query(ShoppingcartitemRow.read).option
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ANY(${shoppingcartitemids})".query[ShoppingcartitemRow].stream
+    sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem where shoppingcartitemid = ANY(${shoppingcartitemids})".query(ShoppingcartitemRow.read).stream
   }
   override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
@@ -101,6 +101,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             datecreated = EXCLUDED.datecreated,
             modifieddate = EXCLUDED.modifieddate
           returning shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text
-       """.query[ShoppingcartitemRow].unique
+       """.query(ShoppingcartitemRow.read).unique
   }
 }

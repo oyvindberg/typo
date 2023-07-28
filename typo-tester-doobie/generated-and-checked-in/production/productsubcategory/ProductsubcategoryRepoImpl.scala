@@ -23,7 +23,7 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     sql"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
           values (${unsaved.productsubcategoryid}::int4, ${unsaved.productcategoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
-       """.query[ProductsubcategoryRow].unique
+       """.query(ProductsubcategoryRow.read).unique
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved): ConnectionIO[ProductsubcategoryRow] = {
     val fs = List(
@@ -54,17 +54,17 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
          """
     }
-    q.query[ProductsubcategoryRow].unique
+    q.query(ProductsubcategoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
-    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory""".query[ProductsubcategoryRow].stream
+    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory""".query(ProductsubcategoryRow.read).stream
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Option[ProductsubcategoryRow]] = {
-    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ${productsubcategoryid}""".query[ProductsubcategoryRow].option
+    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ${productsubcategoryid}""".query(ProductsubcategoryRow.read).option
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow] = {
-    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ANY(${productsubcategoryids})""".query[ProductsubcategoryRow].stream
+    sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory where productsubcategoryid = ANY(${productsubcategoryids})""".query(ProductsubcategoryRow.read).stream
   }
   override def update(row: ProductsubcategoryRow): ConnectionIO[Boolean] = {
     val productsubcategoryid = row.productsubcategoryid
@@ -95,6 +95,6 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
-       """.query[ProductsubcategoryRow].unique
+       """.query(ProductsubcategoryRow.read).unique
   }
 }

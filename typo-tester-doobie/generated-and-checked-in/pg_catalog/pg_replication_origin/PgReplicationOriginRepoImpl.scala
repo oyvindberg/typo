@@ -19,16 +19,16 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
     sql"""insert into pg_catalog.pg_replication_origin(roident, roname)
           values (${unsaved.roident}::oid, ${unsaved.roname})
           returning roident, roname
-       """.query[PgReplicationOriginRow].unique
+       """.query(PgReplicationOriginRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgReplicationOriginRow] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin".query[PgReplicationOriginRow].stream
+    sql"select roident, roname from pg_catalog.pg_replication_origin".query(PgReplicationOriginRow.read).stream
   }
   override def selectById(roident: PgReplicationOriginId): ConnectionIO[Option[PgReplicationOriginRow]] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ${roident}".query[PgReplicationOriginRow].option
+    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ${roident}".query(PgReplicationOriginRow.read).option
   }
   override def selectByIds(roidents: Array[PgReplicationOriginId]): Stream[ConnectionIO, PgReplicationOriginRow] = {
-    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY(${roidents})".query[PgReplicationOriginRow].stream
+    sql"select roident, roname from pg_catalog.pg_replication_origin where roident = ANY(${roidents})".query(PgReplicationOriginRow.read).stream
   }
   override def update(row: PgReplicationOriginRow): ConnectionIO[Boolean] = {
     val roident = row.roident
@@ -50,6 +50,6 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
           do update set
             roname = EXCLUDED.roname
           returning roident, roname
-       """.query[PgReplicationOriginRow].unique
+       """.query(PgReplicationOriginRow.read).unique
   }
 }

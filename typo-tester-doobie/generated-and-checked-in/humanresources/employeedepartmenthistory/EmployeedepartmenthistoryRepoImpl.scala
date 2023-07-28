@@ -22,7 +22,7 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.departmentid}::int2, ${unsaved.shiftid}::int2, ${unsaved.startdate}::date, ${unsaved.enddate}::date, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text
-       """.query[EmployeedepartmenthistoryRow].unique
+       """.query(EmployeedepartmenthistoryRow.read).unique
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved): ConnectionIO[EmployeedepartmenthistoryRow] = {
     val fs = List(
@@ -48,14 +48,14 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             returning businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text
          """
     }
-    q.query[EmployeedepartmenthistoryRow].unique
+    q.query(EmployeedepartmenthistoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
-    sql"select businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text from humanresources.employeedepartmenthistory".query[EmployeedepartmenthistoryRow].stream
+    sql"select businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text from humanresources.employeedepartmenthistory".query(EmployeedepartmenthistoryRow.read).stream
   }
   override def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]] = {
-    sql"select businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}".query[EmployeedepartmenthistoryRow].option
+    sql"select businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}".query(EmployeedepartmenthistoryRow.read).option
   }
   override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -83,6 +83,6 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             enddate = EXCLUDED.enddate,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text
-       """.query[EmployeedepartmenthistoryRow].unique
+       """.query(EmployeedepartmenthistoryRow.read).unique
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object InformationSchemaCatalogNameViewRepoImpl extends InformationSchemaCatalogNameViewRepo {
   override def selectAll: Stream[ConnectionIO, InformationSchemaCatalogNameViewRow] = {
-    sql"""select "catalog_name" from information_schema.information_schema_catalog_name""".query[InformationSchemaCatalogNameViewRow].stream
+    sql"""select "catalog_name" from information_schema.information_schema_catalog_name""".query(InformationSchemaCatalogNameViewRow.read).stream
   }
 }

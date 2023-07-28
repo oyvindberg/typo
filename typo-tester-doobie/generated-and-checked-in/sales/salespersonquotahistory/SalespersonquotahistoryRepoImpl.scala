@@ -23,7 +23,7 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     sql"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.quotadate}::timestamp, ${unsaved.salesquota}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
-       """.query[SalespersonquotahistoryRow].unique
+       """.query(SalespersonquotahistoryRow.read).unique
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow] = {
     val fs = List(
@@ -51,14 +51,14 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
          """
     }
-    q.query[SalespersonquotahistoryRow].unique
+    q.query(SalespersonquotahistoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
-    sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory".query[SalespersonquotahistoryRow].stream
+    sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory".query(SalespersonquotahistoryRow.read).stream
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]] = {
-    sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".query[SalespersonquotahistoryRow].option
+    sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory where businessentityid = ${compositeId.businessentityid} AND quotadate = ${compositeId.quotadate}".query(SalespersonquotahistoryRow.read).option
   }
   override def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -87,6 +87,6 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text
-       """.query[SalespersonquotahistoryRow].unique
+       """.query(SalespersonquotahistoryRow.read).unique
   }
 }

@@ -19,16 +19,16 @@ object PgRangeRepoImpl extends PgRangeRepo {
     sql"""insert into pg_catalog.pg_range(rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff)
           values (${unsaved.rngtypid}::oid, ${unsaved.rngsubtype}::oid, ${unsaved.rngmultitypid}::oid, ${unsaved.rngcollation}::oid, ${unsaved.rngsubopc}::oid, ${unsaved.rngcanonical}::regproc, ${unsaved.rngsubdiff}::regproc)
           returning rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
-       """.query[PgRangeRow].unique
+       """.query(PgRangeRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgRangeRow] = {
-    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range".query[PgRangeRow].stream
+    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range".query(PgRangeRow.read).stream
   }
   override def selectById(rngtypid: PgRangeId): ConnectionIO[Option[PgRangeRow]] = {
-    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ${rngtypid}".query[PgRangeRow].option
+    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ${rngtypid}".query(PgRangeRow.read).option
   }
   override def selectByIds(rngtypids: Array[PgRangeId]): Stream[ConnectionIO, PgRangeRow] = {
-    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ANY(${rngtypids})".query[PgRangeRow].stream
+    sql"select rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff from pg_catalog.pg_range where rngtypid = ANY(${rngtypids})".query(PgRangeRow.read).stream
   }
   override def update(row: PgRangeRow): ConnectionIO[Boolean] = {
     val rngtypid = row.rngtypid
@@ -65,6 +65,6 @@ object PgRangeRepoImpl extends PgRangeRepo {
             rngcanonical = EXCLUDED.rngcanonical,
             rngsubdiff = EXCLUDED.rngsubdiff
           returning rngtypid, rngsubtype, rngmultitypid, rngcollation, rngsubopc, rngcanonical, rngsubdiff
-       """.query[PgRangeRow].unique
+       """.query(PgRangeRow.read).unique
   }
 }

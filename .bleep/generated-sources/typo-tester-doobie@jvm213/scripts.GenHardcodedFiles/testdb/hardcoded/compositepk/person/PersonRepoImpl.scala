@@ -22,7 +22,7 @@ object PersonRepoImpl extends PersonRepo {
     sql"""insert into compositepk.person("one", two, "name")
           values (${unsaved.one}::int8, ${unsaved.two}, ${unsaved.name})
           returning "one", two, "name"
-       """.query[PersonRow].unique
+       """.query(PersonRow.read).unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -48,14 +48,14 @@ object PersonRepoImpl extends PersonRepo {
             returning "one", two, "name"
          """
     }
-    q.query[PersonRow].unique
+    q.query(PersonRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "one", two, "name" from compositepk.person""".query[PersonRow].stream
+    sql"""select "one", two, "name" from compositepk.person""".query(PersonRow.read).stream
   }
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "one", two, "name" from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".query[PersonRow].option
+    sql"""select "one", two, "name" from compositepk.person where "one" = ${compositeId.one} AND two = ${compositeId.two}""".query(PersonRow.read).option
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -78,6 +78,6 @@ object PersonRepoImpl extends PersonRepo {
           do update set
             "name" = EXCLUDED."name"
           returning "one", two, "name"
-       """.query[PersonRow].unique
+       """.query(PersonRow.read).unique
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatSubscriptionViewRepoImpl extends PgStatSubscriptionViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatSubscriptionViewRow] = {
-    sql"select subid, subname, pid, relid, received_lsn, last_msg_send_time::text, last_msg_receipt_time::text, latest_end_lsn, latest_end_time::text from pg_catalog.pg_stat_subscription".query[PgStatSubscriptionViewRow].stream
+    sql"select subid, subname, pid, relid, received_lsn, last_msg_send_time::text, last_msg_receipt_time::text, latest_end_lsn, latest_end_time::text from pg_catalog.pg_stat_subscription".query(PgStatSubscriptionViewRow.read).stream
   }
 }

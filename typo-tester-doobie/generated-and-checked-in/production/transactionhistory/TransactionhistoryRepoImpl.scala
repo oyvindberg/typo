@@ -22,7 +22,7 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)
           values (${unsaved.transactionid}::int4, ${unsaved.productid}::int4, ${unsaved.referenceorderid}::int4, ${unsaved.referenceorderlineid}::int4, ${unsaved.transactiondate}::timestamp, ${unsaved.transactiontype}::bpchar, ${unsaved.quantity}::int4, ${unsaved.actualcost}::numeric, ${unsaved.modifieddate}::timestamp)
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
-       """.query[TransactionhistoryRow].unique
+       """.query(TransactionhistoryRow.read).unique
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
     val fs = List(
@@ -60,17 +60,17 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
          """
     }
-    q.query[TransactionhistoryRow].unique
+    q.query(TransactionhistoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory".query[TransactionhistoryRow].stream
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory".query(TransactionhistoryRow.read).stream
   }
   override def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory where transactionid = ${transactionid}".query[TransactionhistoryRow].option
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory where transactionid = ${transactionid}".query(TransactionhistoryRow.read).option
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory where transactionid = ANY(${transactionids})".query[TransactionhistoryRow].stream
+    sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text from production.transactionhistory where transactionid = ANY(${transactionids})".query(TransactionhistoryRow.read).stream
   }
   override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
@@ -113,6 +113,6 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             actualcost = EXCLUDED.actualcost,
             modifieddate = EXCLUDED.modifieddate
           returning transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
-       """.query[TransactionhistoryRow].unique
+       """.query(TransactionhistoryRow.read).unique
   }
 }

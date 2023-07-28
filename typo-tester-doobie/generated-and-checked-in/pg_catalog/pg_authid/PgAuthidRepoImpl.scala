@@ -19,16 +19,16 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
     sql"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
           values (${unsaved.oid}::oid, ${unsaved.rolname}::name, ${unsaved.rolsuper}, ${unsaved.rolinherit}, ${unsaved.rolcreaterole}, ${unsaved.rolcreatedb}, ${unsaved.rolcanlogin}, ${unsaved.rolreplication}, ${unsaved.rolbypassrls}, ${unsaved.rolconnlimit}::int4, ${unsaved.rolpassword}, ${unsaved.rolvaliduntil}::timestamptz)
           returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
-       """.query[PgAuthidRow].unique
+       """.query(PgAuthidRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgAuthidRow] = {
-    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid".query[PgAuthidRow].stream
+    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid".query(PgAuthidRow.read).stream
   }
   override def selectById(oid: PgAuthidId): ConnectionIO[Option[PgAuthidRow]] = {
-    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ${oid}".query[PgAuthidRow].option
+    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ${oid}".query(PgAuthidRow.read).option
   }
   override def selectByIds(oids: Array[PgAuthidId]): Stream[ConnectionIO, PgAuthidRow] = {
-    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ANY(${oids})".query[PgAuthidRow].stream
+    sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid where oid = ANY(${oids})".query(PgAuthidRow.read).stream
   }
   override def update(row: PgAuthidRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -80,6 +80,6 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
             rolpassword = EXCLUDED.rolpassword,
             rolvaliduntil = EXCLUDED.rolvaliduntil
           returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
-       """.query[PgAuthidRow].unique
+       """.query(PgAuthidRow.read).unique
   }
 }

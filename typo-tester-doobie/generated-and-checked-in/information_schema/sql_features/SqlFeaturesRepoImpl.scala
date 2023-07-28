@@ -16,9 +16,9 @@ object SqlFeaturesRepoImpl extends SqlFeaturesRepo {
     sql"""insert into information_schema.sql_features(feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, "comments")
           values (${unsaved.featureId}::information_schema.character_data, ${unsaved.featureName}::information_schema.character_data, ${unsaved.subFeatureId}::information_schema.character_data, ${unsaved.subFeatureName}::information_schema.character_data, ${unsaved.isSupported}::information_schema.yes_or_no, ${unsaved.isVerifiedBy}::information_schema.character_data, ${unsaved.comments}::information_schema.character_data)
           returning feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, "comments"
-       """.query[SqlFeaturesRow].unique
+       """.query(SqlFeaturesRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, SqlFeaturesRow] = {
-    sql"""select feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, "comments" from information_schema.sql_features""".query[SqlFeaturesRow].stream
+    sql"""select feature_id, feature_name, sub_feature_id, sub_feature_name, is_supported, is_verified_by, "comments" from information_schema.sql_features""".query(SqlFeaturesRow.read).stream
   }
 }

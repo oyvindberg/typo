@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgSequencesViewRepoImpl extends PgSequencesViewRepo {
   override def selectAll: Stream[ConnectionIO, PgSequencesViewRow] = {
-    sql"""select schemaname, sequencename, sequenceowner, data_type, start_value, min_value, max_value, increment_by, "cycle", cache_size, "last_value" from pg_catalog.pg_sequences""".query[PgSequencesViewRow].stream
+    sql"""select schemaname, sequencename, sequenceowner, data_type, start_value, min_value, max_value, increment_by, "cycle", cache_size, "last_value" from pg_catalog.pg_sequences""".query(PgSequencesViewRow.read).stream
   }
 }

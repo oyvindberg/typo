@@ -13,6 +13,6 @@ import fs2.Stream
 
 object EnabledRolesViewRepoImpl extends EnabledRolesViewRepo {
   override def selectAll: Stream[ConnectionIO, EnabledRolesViewRow] = {
-    sql"select role_name from information_schema.enabled_roles".query[EnabledRolesViewRow].stream
+    sql"select role_name from information_schema.enabled_roles".query(EnabledRolesViewRow.read).stream
   }
 }

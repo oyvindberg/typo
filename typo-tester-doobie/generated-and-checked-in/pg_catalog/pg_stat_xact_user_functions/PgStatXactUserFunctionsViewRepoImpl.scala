@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatXactUserFunctionsViewRepoImpl extends PgStatXactUserFunctionsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatXactUserFunctionsViewRow] = {
-    sql"select funcid, schemaname, funcname, calls, total_time, self_time from pg_catalog.pg_stat_xact_user_functions".query[PgStatXactUserFunctionsViewRow].stream
+    sql"select funcid, schemaname, funcname, calls, total_time, self_time from pg_catalog.pg_stat_xact_user_functions".query(PgStatXactUserFunctionsViewRow.read).stream
   }
 }

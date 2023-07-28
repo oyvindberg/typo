@@ -23,7 +23,7 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
           values (${unsaved.territoryid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.countryregioncode}, ${unsaved.group}, ${unsaved.salesytd}::numeric, ${unsaved.saleslastyear}::numeric, ${unsaved.costytd}::numeric, ${unsaved.costlastyear}::numeric, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
-       """.query[SalesterritoryRow].unique
+       """.query(SalesterritoryRow.read).unique
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     val fs = List(
@@ -71,17 +71,17 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
             returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
          """
     }
-    q.query[SalesterritoryRow].unique
+    q.query(SalesterritoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryRow] = {
-    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory""".query[SalesterritoryRow].stream
+    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory""".query(SalesterritoryRow.read).stream
   }
   override def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]] = {
-    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ${territoryid}""".query[SalesterritoryRow].option
+    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ${territoryid}""".query(SalesterritoryRow.read).option
   }
   override def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow] = {
-    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ANY(${territoryids})""".query[SalesterritoryRow].stream
+    sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory where territoryid = ANY(${territoryids})""".query(SalesterritoryRow.read).stream
   }
   override def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
     val territoryid = row.territoryid
@@ -127,6 +127,6 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text
-       """.query[SalesterritoryRow].unique
+       """.query(SalesterritoryRow.read).unique
   }
 }

@@ -19,13 +19,13 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
     sql"""insert into pg_catalog.pg_init_privs(objoid, classoid, objsubid, privtype, initprivs)
           values (${unsaved.objoid}::oid, ${unsaved.classoid}::oid, ${unsaved.objsubid}::int4, ${unsaved.privtype}::char, ${unsaved.initprivs}::_aclitem)
           returning objoid, classoid, objsubid, privtype, initprivs
-       """.query[PgInitPrivsRow].unique
+       """.query(PgInitPrivsRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgInitPrivsRow] = {
-    sql"select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs".query[PgInitPrivsRow].stream
+    sql"select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs".query(PgInitPrivsRow.read).stream
   }
   override def selectById(compositeId: PgInitPrivsId): ConnectionIO[Option[PgInitPrivsRow]] = {
-    sql"select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".query[PgInitPrivsRow].option
+    sql"select objoid, classoid, objsubid, privtype, initprivs from pg_catalog.pg_init_privs where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".query(PgInitPrivsRow.read).option
   }
   override def update(row: PgInitPrivsRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -52,6 +52,6 @@ object PgInitPrivsRepoImpl extends PgInitPrivsRepo {
             privtype = EXCLUDED.privtype,
             initprivs = EXCLUDED.initprivs
           returning objoid, classoid, objsubid, privtype, initprivs
-       """.query[PgInitPrivsRow].unique
+       """.query(PgInitPrivsRow.read).unique
   }
 }

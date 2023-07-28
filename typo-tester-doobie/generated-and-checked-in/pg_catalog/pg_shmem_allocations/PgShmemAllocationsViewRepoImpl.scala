@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgShmemAllocationsViewRepoImpl extends PgShmemAllocationsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgShmemAllocationsViewRow] = {
-    sql"""select "name", "off", "size", allocated_size from pg_catalog.pg_shmem_allocations""".query[PgShmemAllocationsViewRow].stream
+    sql"""select "name", "off", "size", allocated_size from pg_catalog.pg_shmem_allocations""".query(PgShmemAllocationsViewRow.read).stream
   }
 }

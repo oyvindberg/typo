@@ -19,16 +19,16 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
     sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
           values (${unsaved.oid}::oid, ${unsaved.nspname}::name, ${unsaved.nspowner}::oid, ${unsaved.nspacl}::_aclitem)
           returning oid, nspname, nspowner, nspacl
-       """.query[PgNamespaceRow].unique
+       """.query(PgNamespaceRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgNamespaceRow] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace".query[PgNamespaceRow].stream
+    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace".query(PgNamespaceRow.read).stream
   }
   override def selectById(oid: PgNamespaceId): ConnectionIO[Option[PgNamespaceRow]] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ${oid}".query[PgNamespaceRow].option
+    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ${oid}".query(PgNamespaceRow.read).option
   }
   override def selectByIds(oids: Array[PgNamespaceId]): Stream[ConnectionIO, PgNamespaceRow] = {
-    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY(${oids})".query[PgNamespaceRow].stream
+    sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace where oid = ANY(${oids})".query(PgNamespaceRow.read).stream
   }
   override def update(row: PgNamespaceRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -56,6 +56,6 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
             nspowner = EXCLUDED.nspowner,
             nspacl = EXCLUDED.nspacl
           returning oid, nspname, nspowner, nspacl
-       """.query[PgNamespaceRow].unique
+       """.query(PgNamespaceRow.read).unique
   }
 }

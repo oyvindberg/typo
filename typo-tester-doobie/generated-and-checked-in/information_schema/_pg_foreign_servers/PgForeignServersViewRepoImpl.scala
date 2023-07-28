@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgForeignServersViewRepoImpl extends PgForeignServersViewRepo {
   override def selectAll: Stream[ConnectionIO, PgForeignServersViewRow] = {
-    sql"select oid, srvoptions, foreign_server_catalog, foreign_server_name, foreign_data_wrapper_catalog, foreign_data_wrapper_name, foreign_server_type, foreign_server_version, authorization_identifier from information_schema._pg_foreign_servers".query[PgForeignServersViewRow].stream
+    sql"select oid, srvoptions, foreign_server_catalog, foreign_server_name, foreign_data_wrapper_catalog, foreign_data_wrapper_name, foreign_server_type, foreign_server_version, authorization_identifier from information_schema._pg_foreign_servers".query(PgForeignServersViewRow.read).stream
   }
 }

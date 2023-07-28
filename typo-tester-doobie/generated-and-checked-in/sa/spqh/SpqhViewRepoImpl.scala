@@ -13,6 +13,6 @@ import fs2.Stream
 
 object SpqhViewRepoImpl extends SpqhViewRepo {
   override def selectAll: Stream[ConnectionIO, SpqhViewRow] = {
-    sql"""select "id", businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sa.spqh""".query[SpqhViewRow].stream
+    sql"""select "id", businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sa.spqh""".query(SpqhViewRow.read).stream
   }
 }

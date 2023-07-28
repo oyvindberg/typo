@@ -19,13 +19,13 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
     sql"""insert into pg_catalog.pg_statistic(starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5)
           values (${unsaved.starelid}::oid, ${unsaved.staattnum}::int2, ${unsaved.stainherit}, ${unsaved.stanullfrac}::float4, ${unsaved.stawidth}::int4, ${unsaved.stadistinct}::float4, ${unsaved.stakind1}::int2, ${unsaved.stakind2}::int2, ${unsaved.stakind3}::int2, ${unsaved.stakind4}::int2, ${unsaved.stakind5}::int2, ${unsaved.staop1}::oid, ${unsaved.staop2}::oid, ${unsaved.staop3}::oid, ${unsaved.staop4}::oid, ${unsaved.staop5}::oid, ${unsaved.stacoll1}::oid, ${unsaved.stacoll2}::oid, ${unsaved.stacoll3}::oid, ${unsaved.stacoll4}::oid, ${unsaved.stacoll5}::oid, ${unsaved.stanumbers1}::_float4, ${unsaved.stanumbers2}::_float4, ${unsaved.stanumbers3}::_float4, ${unsaved.stanumbers4}::_float4, ${unsaved.stanumbers5}::_float4, ${unsaved.stavalues1}::anyarray, ${unsaved.stavalues2}::anyarray, ${unsaved.stavalues3}::anyarray, ${unsaved.stavalues4}::anyarray, ${unsaved.stavalues5}::anyarray)
           returning starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
-       """.query[PgStatisticRow].unique
+       """.query(PgStatisticRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgStatisticRow] = {
-    sql"select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic".query[PgStatisticRow].stream
+    sql"select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic".query(PgStatisticRow.read).stream
   }
   override def selectById(compositeId: PgStatisticId): ConnectionIO[Option[PgStatisticRow]] = {
-    sql"select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic where starelid = ${compositeId.starelid} AND staattnum = ${compositeId.staattnum} AND stainherit = ${compositeId.stainherit}".query[PgStatisticRow].option
+    sql"select starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5 from pg_catalog.pg_statistic where starelid = ${compositeId.starelid} AND staattnum = ${compositeId.staattnum} AND stainherit = ${compositeId.stainherit}".query(PgStatisticRow.read).option
   }
   override def update(row: PgStatisticRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -130,6 +130,6 @@ object PgStatisticRepoImpl extends PgStatisticRepo {
             stavalues4 = EXCLUDED.stavalues4,
             stavalues5 = EXCLUDED.stavalues5
           returning starelid, staattnum, stainherit, stanullfrac, stawidth, stadistinct, stakind1, stakind2, stakind3, stakind4, stakind5, staop1, staop2, staop3, staop4, staop5, stacoll1, stacoll2, stacoll3, stacoll4, stacoll5, stanumbers1, stanumbers2, stanumbers3, stanumbers4, stanumbers5, stavalues1, stavalues2, stavalues3, stavalues4, stavalues5
-       """.query[PgStatisticRow].unique
+       """.query(PgStatisticRow.read).unique
   }
 }

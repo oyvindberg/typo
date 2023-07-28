@@ -23,7 +23,7 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     sql"""insert into person.businessentity(businessentityid, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, rowguid, modifieddate::text
-       """.query[BusinessentityRow].unique
+       """.query(BusinessentityRow.read).unique
   }
   override def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow] = {
     val fs = List(
@@ -52,17 +52,17 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
             returning businessentityid, rowguid, modifieddate::text
          """
     }
-    q.query[BusinessentityRow].unique
+    q.query(BusinessentityRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
-    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity".query[BusinessentityRow].stream
+    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity".query(BusinessentityRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[BusinessentityRow]] = {
-    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ${businessentityid}".query[BusinessentityRow].option
+    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ${businessentityid}".query(BusinessentityRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
-    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ANY(${businessentityids})".query[BusinessentityRow].stream
+    sql"select businessentityid, rowguid, modifieddate::text from person.businessentity where businessentityid = ANY(${businessentityids})".query(BusinessentityRow.read).stream
   }
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -87,6 +87,6 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, rowguid, modifieddate::text
-       """.query[BusinessentityRow].unique
+       """.query(BusinessentityRow.read).unique
   }
 }

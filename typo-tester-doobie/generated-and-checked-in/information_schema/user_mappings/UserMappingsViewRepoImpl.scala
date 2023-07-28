@@ -13,6 +13,6 @@ import fs2.Stream
 
 object UserMappingsViewRepoImpl extends UserMappingsViewRepo {
   override def selectAll: Stream[ConnectionIO, UserMappingsViewRow] = {
-    sql"select authorization_identifier, foreign_server_catalog, foreign_server_name from information_schema.user_mappings".query[UserMappingsViewRow].stream
+    sql"select authorization_identifier, foreign_server_catalog, foreign_server_name from information_schema.user_mappings".query(UserMappingsViewRow.read).stream
   }
 }

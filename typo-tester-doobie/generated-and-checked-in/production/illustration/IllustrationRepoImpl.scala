@@ -22,7 +22,7 @@ object IllustrationRepoImpl extends IllustrationRepo {
     sql"""insert into production.illustration(illustrationid, diagram, modifieddate)
           values (${unsaved.illustrationid}::int4, ${unsaved.diagram}::xml, ${unsaved.modifieddate}::timestamp)
           returning illustrationid, diagram, modifieddate::text
-       """.query[IllustrationRow].unique
+       """.query(IllustrationRow.read).unique
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
@@ -48,17 +48,17 @@ object IllustrationRepoImpl extends IllustrationRepo {
             returning illustrationid, diagram, modifieddate::text
          """
     }
-    q.query[IllustrationRow].unique
+    q.query(IllustrationRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
-    sql"select illustrationid, diagram, modifieddate::text from production.illustration".query[IllustrationRow].stream
+    sql"select illustrationid, diagram, modifieddate::text from production.illustration".query(IllustrationRow.read).stream
   }
   override def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]] = {
-    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ${illustrationid}".query[IllustrationRow].option
+    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ${illustrationid}".query(IllustrationRow.read).option
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow] = {
-    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ANY(${illustrationids})".query[IllustrationRow].stream
+    sql"select illustrationid, diagram, modifieddate::text from production.illustration where illustrationid = ANY(${illustrationids})".query(IllustrationRow.read).stream
   }
   override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
     val illustrationid = row.illustrationid
@@ -83,6 +83,6 @@ object IllustrationRepoImpl extends IllustrationRepo {
             diagram = EXCLUDED.diagram,
             modifieddate = EXCLUDED.modifieddate
           returning illustrationid, diagram, modifieddate::text
-       """.query[IllustrationRow].unique
+       """.query(IllustrationRow.read).unique
   }
 }

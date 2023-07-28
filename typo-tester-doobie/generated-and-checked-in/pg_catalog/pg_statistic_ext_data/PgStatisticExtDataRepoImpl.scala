@@ -19,16 +19,16 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
     sql"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)
           values (${unsaved.stxoid}::oid, ${unsaved.stxdndistinct}, ${unsaved.stxddependencies}, ${unsaved.stxdmcv}, ${unsaved.stxdexpr})
           returning stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
-       """.query[PgStatisticExtDataRow].unique
+       """.query(PgStatisticExtDataRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgStatisticExtDataRow] = {
-    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data".query[PgStatisticExtDataRow].stream
+    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data".query(PgStatisticExtDataRow.read).stream
   }
   override def selectById(stxoid: PgStatisticExtDataId): ConnectionIO[Option[PgStatisticExtDataRow]] = {
-    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = ${stxoid}".query[PgStatisticExtDataRow].option
+    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = ${stxoid}".query(PgStatisticExtDataRow.read).option
   }
   override def selectByIds(stxoids: Array[PgStatisticExtDataId]): Stream[ConnectionIO, PgStatisticExtDataRow] = {
-    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = ANY(${stxoids})".query[PgStatisticExtDataRow].stream
+    sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data where stxoid = ANY(${stxoids})".query(PgStatisticExtDataRow.read).stream
   }
   override def update(row: PgStatisticExtDataRow): ConnectionIO[Boolean] = {
     val stxoid = row.stxoid
@@ -59,6 +59,6 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
             stxdmcv = EXCLUDED.stxdmcv,
             stxdexpr = EXCLUDED.stxdexpr
           returning stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
-       """.query[PgStatisticExtDataRow].unique
+       """.query(PgStatisticExtDataRow.read).unique
   }
 }

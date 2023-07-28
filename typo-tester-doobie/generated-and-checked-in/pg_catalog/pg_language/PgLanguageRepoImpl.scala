@@ -19,16 +19,16 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
     sql"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
           values (${unsaved.oid}::oid, ${unsaved.lanname}::name, ${unsaved.lanowner}::oid, ${unsaved.lanispl}, ${unsaved.lanpltrusted}, ${unsaved.lanplcallfoid}::oid, ${unsaved.laninline}::oid, ${unsaved.lanvalidator}::oid, ${unsaved.lanacl}::_aclitem)
           returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
-       """.query[PgLanguageRow].unique
+       """.query(PgLanguageRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgLanguageRow] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language".query[PgLanguageRow].stream
+    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language".query(PgLanguageRow.read).stream
   }
   override def selectById(oid: PgLanguageId): ConnectionIO[Option[PgLanguageRow]] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ${oid}".query[PgLanguageRow].option
+    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ${oid}".query(PgLanguageRow.read).option
   }
   override def selectByIds(oids: Array[PgLanguageId]): Stream[ConnectionIO, PgLanguageRow] = {
-    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY(${oids})".query[PgLanguageRow].stream
+    sql"select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl from pg_catalog.pg_language where oid = ANY(${oids})".query(PgLanguageRow.read).stream
   }
   override def update(row: PgLanguageRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -71,6 +71,6 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
             lanvalidator = EXCLUDED.lanvalidator,
             lanacl = EXCLUDED.lanacl
           returning oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
-       """.query[PgLanguageRow].unique
+       """.query(PgLanguageRow.read).unique
   }
 }

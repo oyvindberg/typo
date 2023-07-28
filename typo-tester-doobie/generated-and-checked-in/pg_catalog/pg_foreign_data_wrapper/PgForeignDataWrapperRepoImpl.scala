@@ -19,16 +19,16 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
     sql"""insert into pg_catalog.pg_foreign_data_wrapper(oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions)
           values (${unsaved.oid}::oid, ${unsaved.fdwname}::name, ${unsaved.fdwowner}::oid, ${unsaved.fdwhandler}::oid, ${unsaved.fdwvalidator}::oid, ${unsaved.fdwacl}::_aclitem, ${unsaved.fdwoptions}::_text)
           returning oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions
-       """.query[PgForeignDataWrapperRow].unique
+       """.query(PgForeignDataWrapperRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgForeignDataWrapperRow] = {
-    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper".query[PgForeignDataWrapperRow].stream
+    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper".query(PgForeignDataWrapperRow.read).stream
   }
   override def selectById(oid: PgForeignDataWrapperId): ConnectionIO[Option[PgForeignDataWrapperRow]] = {
-    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ${oid}".query[PgForeignDataWrapperRow].option
+    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ${oid}".query(PgForeignDataWrapperRow.read).option
   }
   override def selectByIds(oids: Array[PgForeignDataWrapperId]): Stream[ConnectionIO, PgForeignDataWrapperRow] = {
-    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ANY(${oids})".query[PgForeignDataWrapperRow].stream
+    sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper where oid = ANY(${oids})".query(PgForeignDataWrapperRow.read).stream
   }
   override def update(row: PgForeignDataWrapperRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -65,6 +65,6 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
             fdwacl = EXCLUDED.fdwacl,
             fdwoptions = EXCLUDED.fdwoptions
           returning oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions
-       """.query[PgForeignDataWrapperRow].unique
+       """.query(PgForeignDataWrapperRow.read).unique
   }
 }

@@ -19,16 +19,16 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
     sql"""insert into pg_catalog.pg_operator(oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin)
           values (${unsaved.oid}::oid, ${unsaved.oprname}::name, ${unsaved.oprnamespace}::oid, ${unsaved.oprowner}::oid, ${unsaved.oprkind}::char, ${unsaved.oprcanmerge}, ${unsaved.oprcanhash}, ${unsaved.oprleft}::oid, ${unsaved.oprright}::oid, ${unsaved.oprresult}::oid, ${unsaved.oprcom}::oid, ${unsaved.oprnegate}::oid, ${unsaved.oprcode}::regproc, ${unsaved.oprrest}::regproc, ${unsaved.oprjoin}::regproc)
           returning oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
-       """.query[PgOperatorRow].unique
+       """.query(PgOperatorRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgOperatorRow] = {
-    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator".query[PgOperatorRow].stream
+    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator".query(PgOperatorRow.read).stream
   }
   override def selectById(oid: PgOperatorId): ConnectionIO[Option[PgOperatorRow]] = {
-    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ${oid}".query[PgOperatorRow].option
+    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ${oid}".query(PgOperatorRow.read).option
   }
   override def selectByIds(oids: Array[PgOperatorId]): Stream[ConnectionIO, PgOperatorRow] = {
-    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ANY(${oids})".query[PgOperatorRow].stream
+    sql"select oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin from pg_catalog.pg_operator where oid = ANY(${oids})".query(PgOperatorRow.read).stream
   }
   override def update(row: PgOperatorRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -89,6 +89,6 @@ object PgOperatorRepoImpl extends PgOperatorRepo {
             oprrest = EXCLUDED.oprrest,
             oprjoin = EXCLUDED.oprjoin
           returning oid, oprname, oprnamespace, oprowner, oprkind, oprcanmerge, oprcanhash, oprleft, oprright, oprresult, oprcom, oprnegate, oprcode, oprrest, oprjoin
-       """.query[PgOperatorRow].unique
+       """.query(PgOperatorRow.read).unique
   }
 }

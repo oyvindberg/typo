@@ -19,16 +19,16 @@ object PgCollationRepoImpl extends PgCollationRepo {
     sql"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
           values (${unsaved.oid}::oid, ${unsaved.collname}::name, ${unsaved.collnamespace}::oid, ${unsaved.collowner}::oid, ${unsaved.collprovider}::char, ${unsaved.collisdeterministic}, ${unsaved.collencoding}::int4, ${unsaved.collcollate}::name, ${unsaved.collctype}::name, ${unsaved.collversion})
           returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
-       """.query[PgCollationRow].unique
+       """.query(PgCollationRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgCollationRow] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation".query[PgCollationRow].stream
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation".query(PgCollationRow.read).stream
   }
   override def selectById(oid: PgCollationId): ConnectionIO[Option[PgCollationRow]] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ${oid}".query[PgCollationRow].option
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ${oid}".query(PgCollationRow.read).option
   }
   override def selectByIds(oids: Array[PgCollationId]): Stream[ConnectionIO, PgCollationRow] = {
-    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY(${oids})".query[PgCollationRow].stream
+    sql"select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion from pg_catalog.pg_collation where oid = ANY(${oids})".query(PgCollationRow.read).stream
   }
   override def update(row: PgCollationRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -74,6 +74,6 @@ object PgCollationRepoImpl extends PgCollationRepo {
             collctype = EXCLUDED.collctype,
             collversion = EXCLUDED.collversion
           returning oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
-       """.query[PgCollationRow].unique
+       """.query(PgCollationRow.read).unique
   }
 }

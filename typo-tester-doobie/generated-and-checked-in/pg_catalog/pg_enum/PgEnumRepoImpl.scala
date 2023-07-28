@@ -19,16 +19,16 @@ object PgEnumRepoImpl extends PgEnumRepo {
     sql"""insert into pg_catalog.pg_enum(oid, enumtypid, enumsortorder, enumlabel)
           values (${unsaved.oid}::oid, ${unsaved.enumtypid}::oid, ${unsaved.enumsortorder}::float4, ${unsaved.enumlabel}::name)
           returning oid, enumtypid, enumsortorder, enumlabel
-       """.query[PgEnumRow].unique
+       """.query(PgEnumRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgEnumRow] = {
-    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum".query[PgEnumRow].stream
+    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum".query(PgEnumRow.read).stream
   }
   override def selectById(oid: PgEnumId): ConnectionIO[Option[PgEnumRow]] = {
-    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ${oid}".query[PgEnumRow].option
+    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ${oid}".query(PgEnumRow.read).option
   }
   override def selectByIds(oids: Array[PgEnumId]): Stream[ConnectionIO, PgEnumRow] = {
-    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ANY(${oids})".query[PgEnumRow].stream
+    sql"select oid, enumtypid, enumsortorder, enumlabel from pg_catalog.pg_enum where oid = ANY(${oids})".query(PgEnumRow.read).stream
   }
   override def update(row: PgEnumRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -56,6 +56,6 @@ object PgEnumRepoImpl extends PgEnumRepo {
             enumsortorder = EXCLUDED.enumsortorder,
             enumlabel = EXCLUDED.enumlabel
           returning oid, enumtypid, enumsortorder, enumlabel
-       """.query[PgEnumRow].unique
+       """.query(PgEnumRow.read).unique
   }
 }

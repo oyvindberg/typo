@@ -19,16 +19,16 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
     sql"""insert into pg_catalog.pg_extension(oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition)
           values (${unsaved.oid}::oid, ${unsaved.extname}::name, ${unsaved.extowner}::oid, ${unsaved.extnamespace}::oid, ${unsaved.extrelocatable}, ${unsaved.extversion}, ${unsaved.extconfig}::_oid, ${unsaved.extcondition}::_text)
           returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
-       """.query[PgExtensionRow].unique
+       """.query(PgExtensionRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgExtensionRow] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension".query[PgExtensionRow].stream
+    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension".query(PgExtensionRow.read).stream
   }
   override def selectById(oid: PgExtensionId): ConnectionIO[Option[PgExtensionRow]] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ${oid}".query[PgExtensionRow].option
+    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ${oid}".query(PgExtensionRow.read).option
   }
   override def selectByIds(oids: Array[PgExtensionId]): Stream[ConnectionIO, PgExtensionRow] = {
-    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ANY(${oids})".query[PgExtensionRow].stream
+    sql"select oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition from pg_catalog.pg_extension where oid = ANY(${oids})".query(PgExtensionRow.read).stream
   }
   override def update(row: PgExtensionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgExtensionRepoImpl extends PgExtensionRepo {
             extconfig = EXCLUDED.extconfig,
             extcondition = EXCLUDED.extcondition
           returning oid, extname, extowner, extnamespace, extrelocatable, extversion, extconfig, extcondition
-       """.query[PgExtensionRow].unique
+       """.query(PgExtensionRow.read).unique
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatProgressBasebackupViewRepoImpl extends PgStatProgressBasebackupViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatProgressBasebackupViewRow] = {
-    sql"select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed from pg_catalog.pg_stat_progress_basebackup".query[PgStatProgressBasebackupViewRow].stream
+    sql"select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed from pg_catalog.pg_stat_progress_basebackup".query(PgStatProgressBasebackupViewRow.read).stream
   }
 }

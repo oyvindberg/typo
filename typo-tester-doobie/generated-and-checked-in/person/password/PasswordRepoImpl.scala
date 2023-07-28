@@ -24,7 +24,7 @@ object PasswordRepoImpl extends PasswordRepo {
     sql"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.passwordhash}, ${unsaved.passwordsalt}, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
-       """.query[PasswordRow].unique
+       """.query(PasswordRow.read).unique
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     val fs = List(
@@ -52,17 +52,17 @@ object PasswordRepoImpl extends PasswordRepo {
             returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
          """
     }
-    q.query[PasswordRow].unique
+    q.query(PasswordRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
-    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password"""".query[PasswordRow].stream
+    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password"""".query(PasswordRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]] = {
-    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ${businessentityid}""".query[PasswordRow].option
+    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ${businessentityid}""".query(PasswordRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
-    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ANY(${businessentityids})""".query[PasswordRow].stream
+    sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password" where businessentityid = ANY(${businessentityids})""".query(PasswordRow.read).stream
   }
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -93,6 +93,6 @@ object PasswordRepoImpl extends PasswordRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
-       """.query[PasswordRow].unique
+       """.query(PasswordRow.read).unique
   }
 }

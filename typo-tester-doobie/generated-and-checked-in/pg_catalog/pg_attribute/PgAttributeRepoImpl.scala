@@ -19,13 +19,13 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
     sql"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
           values (${unsaved.attrelid}::oid, ${unsaved.attname}::name, ${unsaved.atttypid}::oid, ${unsaved.attstattarget}::int4, ${unsaved.attlen}::int2, ${unsaved.attnum}::int2, ${unsaved.attndims}::int4, ${unsaved.attcacheoff}::int4, ${unsaved.atttypmod}::int4, ${unsaved.attbyval}, ${unsaved.attalign}::char, ${unsaved.attstorage}::char, ${unsaved.attcompression}::char, ${unsaved.attnotnull}, ${unsaved.atthasdef}, ${unsaved.atthasmissing}, ${unsaved.attidentity}::char, ${unsaved.attgenerated}::char, ${unsaved.attisdropped}, ${unsaved.attislocal}, ${unsaved.attinhcount}::int4, ${unsaved.attcollation}::oid, ${unsaved.attacl}::_aclitem, ${unsaved.attoptions}::_text, ${unsaved.attfdwoptions}::_text, ${unsaved.attmissingval}::anyarray)
           returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
-       """.query[PgAttributeRow].unique
+       """.query(PgAttributeRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgAttributeRow] = {
-    sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute".query[PgAttributeRow].stream
+    sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute".query(PgAttributeRow.read).stream
   }
   override def selectById(compositeId: PgAttributeId): ConnectionIO[Option[PgAttributeRow]] = {
-    sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}".query[PgAttributeRow].option
+    sql"select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}".query(PgAttributeRow.read).option
   }
   override def update(row: PgAttributeRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -117,6 +117,6 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
             attfdwoptions = EXCLUDED.attfdwoptions,
             attmissingval = EXCLUDED.attmissingval
           returning attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
-       """.query[PgAttributeRow].unique
+       """.query(PgAttributeRow.read).unique
   }
 }

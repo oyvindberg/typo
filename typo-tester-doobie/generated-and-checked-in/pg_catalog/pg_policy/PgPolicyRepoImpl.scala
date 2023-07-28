@@ -19,16 +19,16 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
     sql"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
           values (${unsaved.oid}::oid, ${unsaved.polname}::name, ${unsaved.polrelid}::oid, ${unsaved.polcmd}::char, ${unsaved.polpermissive}, ${unsaved.polroles}::_oid, ${unsaved.polqual}::pg_node_tree, ${unsaved.polwithcheck}::pg_node_tree)
           returning oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
-       """.query[PgPolicyRow].unique
+       """.query(PgPolicyRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgPolicyRow] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy".query[PgPolicyRow].stream
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy".query(PgPolicyRow.read).stream
   }
   override def selectById(oid: PgPolicyId): ConnectionIO[Option[PgPolicyRow]] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ${oid}".query[PgPolicyRow].option
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ${oid}".query(PgPolicyRow.read).option
   }
   override def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow] = {
-    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${oids})".query[PgPolicyRow].stream
+    sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy where oid = ANY(${oids})".query(PgPolicyRow.read).stream
   }
   override def update(row: PgPolicyRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
             polqual = EXCLUDED.polqual,
             polwithcheck = EXCLUDED.polwithcheck
           returning oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
-       """.query[PgPolicyRow].unique
+       """.query(PgPolicyRow.read).unique
   }
 }

@@ -19,16 +19,16 @@ object PgCastRepoImpl extends PgCastRepo {
     sql"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
           values (${unsaved.oid}::oid, ${unsaved.castsource}::oid, ${unsaved.casttarget}::oid, ${unsaved.castfunc}::oid, ${unsaved.castcontext}::char, ${unsaved.castmethod}::char)
           returning oid, castsource, casttarget, castfunc, castcontext, castmethod
-       """.query[PgCastRow].unique
+       """.query(PgCastRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgCastRow] = {
-    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast".query[PgCastRow].stream
+    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast".query(PgCastRow.read).stream
   }
   override def selectById(oid: PgCastId): ConnectionIO[Option[PgCastRow]] = {
-    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ${oid}".query[PgCastRow].option
+    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ${oid}".query(PgCastRow.read).option
   }
   override def selectByIds(oids: Array[PgCastId]): Stream[ConnectionIO, PgCastRow] = {
-    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ANY(${oids})".query[PgCastRow].stream
+    sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast where oid = ANY(${oids})".query(PgCastRow.read).stream
   }
   override def update(row: PgCastRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -62,6 +62,6 @@ object PgCastRepoImpl extends PgCastRepo {
             castcontext = EXCLUDED.castcontext,
             castmethod = EXCLUDED.castmethod
           returning oid, castsource, casttarget, castfunc, castcontext, castmethod
-       """.query[PgCastRow].unique
+       """.query(PgCastRow.read).unique
   }
 }

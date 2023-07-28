@@ -19,16 +19,16 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
     sql"""insert into pg_catalog.pg_ts_config(oid, cfgname, cfgnamespace, cfgowner, cfgparser)
           values (${unsaved.oid}::oid, ${unsaved.cfgname}::name, ${unsaved.cfgnamespace}::oid, ${unsaved.cfgowner}::oid, ${unsaved.cfgparser}::oid)
           returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
-       """.query[PgTsConfigRow].unique
+       """.query(PgTsConfigRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgTsConfigRow] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config".query[PgTsConfigRow].stream
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config".query(PgTsConfigRow.read).stream
   }
   override def selectById(oid: PgTsConfigId): ConnectionIO[Option[PgTsConfigRow]] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ${oid}".query[PgTsConfigRow].option
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ${oid}".query(PgTsConfigRow.read).option
   }
   override def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow] = {
-    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${oids})".query[PgTsConfigRow].stream
+    sql"select oid, cfgname, cfgnamespace, cfgowner, cfgparser from pg_catalog.pg_ts_config where oid = ANY(${oids})".query(PgTsConfigRow.read).stream
   }
   override def update(row: PgTsConfigRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -59,6 +59,6 @@ object PgTsConfigRepoImpl extends PgTsConfigRepo {
             cfgowner = EXCLUDED.cfgowner,
             cfgparser = EXCLUDED.cfgparser
           returning oid, cfgname, cfgnamespace, cfgowner, cfgparser
-       """.query[PgTsConfigRow].unique
+       """.query(PgTsConfigRow.read).unique
   }
 }

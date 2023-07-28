@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PcViewRepoImpl extends PcViewRepo {
   override def selectAll: Stream[ConnectionIO, PcViewRow] = {
-    sql"""select "id", productcategoryid, "name", rowguid, modifieddate::text from pr.pc""".query[PcViewRow].stream
+    sql"""select "id", productcategoryid, "name", rowguid, modifieddate::text from pr.pc""".query(PcViewRow.read).stream
   }
 }

@@ -19,13 +19,13 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
     sql"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
           values (${unsaved.objoid}::oid, ${unsaved.classoid}::oid, ${unsaved.objsubid}::int4, ${unsaved.description})
           returning objoid, classoid, objsubid, description
-       """.query[PgDescriptionRow].unique
+       """.query(PgDescriptionRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgDescriptionRow] = {
-    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description".query[PgDescriptionRow].stream
+    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description".query(PgDescriptionRow.read).stream
   }
   override def selectById(compositeId: PgDescriptionId): ConnectionIO[Option[PgDescriptionRow]] = {
-    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".query[PgDescriptionRow].option
+    sql"select objoid, classoid, objsubid, description from pg_catalog.pg_description where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".query(PgDescriptionRow.read).option
   }
   override def update(row: PgDescriptionRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -49,6 +49,6 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
           do update set
             description = EXCLUDED.description
           returning objoid, classoid, objsubid, description
-       """.query[PgDescriptionRow].unique
+       """.query(PgDescriptionRow.read).unique
   }
 }

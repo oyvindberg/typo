@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ForeignTablesViewRepoImpl extends ForeignTablesViewRepo {
   override def selectAll: Stream[ConnectionIO, ForeignTablesViewRow] = {
-    sql"select foreign_table_catalog, foreign_table_schema, foreign_table_name, foreign_server_catalog, foreign_server_name from information_schema.foreign_tables".query[ForeignTablesViewRow].stream
+    sql"select foreign_table_catalog, foreign_table_schema, foreign_table_name, foreign_server_catalog, foreign_server_name from information_schema.foreign_tables".query(ForeignTablesViewRow.read).stream
   }
 }

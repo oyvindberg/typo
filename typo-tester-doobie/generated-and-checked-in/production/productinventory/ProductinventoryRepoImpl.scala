@@ -23,7 +23,7 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     sql"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
           values (${unsaved.productid}::int4, ${unsaved.locationid}::int2, ${unsaved.shelf}, ${unsaved.bin}::int2, ${unsaved.quantity}::int2, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
-       """.query[ProductinventoryRow].unique
+       """.query(ProductinventoryRow.read).unique
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow] = {
     val fs = List(
@@ -56,14 +56,14 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
          """
     }
-    q.query[ProductinventoryRow].unique
+    q.query(ProductinventoryRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
-    sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text from production.productinventory".query[ProductinventoryRow].stream
+    sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text from production.productinventory".query(ProductinventoryRow.read).stream
   }
   override def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]] = {
-    sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".query[ProductinventoryRow].option
+    sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".query(ProductinventoryRow.read).option
   }
   override def update(row: ProductinventoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -98,6 +98,6 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
-       """.query[ProductinventoryRow].unique
+       """.query(ProductinventoryRow.read).unique
   }
 }

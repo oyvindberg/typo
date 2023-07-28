@@ -13,6 +13,6 @@ import fs2.Stream
 
 object BeaViewRepoImpl extends BeaViewRepo {
   override def selectAll: Stream[ConnectionIO, BeaViewRow] = {
-    sql"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate::text from pe.bea""".query[BeaViewRow].stream
+    sql"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate::text from pe.bea""".query(BeaViewRow.read).stream
   }
 }

@@ -13,6 +13,6 @@ import fs2.Stream
 
 object ReferentialConstraintsViewRepoImpl extends ReferentialConstraintsViewRepo {
   override def selectAll: Stream[ConnectionIO, ReferentialConstraintsViewRow] = {
-    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule from information_schema.referential_constraints""".query[ReferentialConstraintsViewRow].stream
+    sql"""select "constraint_catalog", "constraint_schema", "constraint_name", unique_constraint_catalog, unique_constraint_schema, unique_constraint_name, match_option, update_rule, delete_rule from information_schema.referential_constraints""".query(ReferentialConstraintsViewRow.read).stream
   }
 }

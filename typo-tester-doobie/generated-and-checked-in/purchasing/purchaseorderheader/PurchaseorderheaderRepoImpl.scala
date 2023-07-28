@@ -22,7 +22,7 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
           values (${unsaved.purchaseorderid}::int4, ${unsaved.revisionnumber}::int2, ${unsaved.status}::int2, ${unsaved.employeeid}::int4, ${unsaved.vendorid}::int4, ${unsaved.shipmethodid}::int4, ${unsaved.orderdate}::timestamp, ${unsaved.shipdate}::timestamp, ${unsaved.subtotal}::numeric, ${unsaved.taxamt}::numeric, ${unsaved.freight}::numeric, ${unsaved.modifieddate}::timestamp)
           returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
-       """.query[PurchaseorderheaderRow].unique
+       """.query(PurchaseorderheaderRow.read).unique
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved): ConnectionIO[PurchaseorderheaderRow] = {
     val fs = List(
@@ -75,17 +75,17 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
             returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
          """
     }
-    q.query[PurchaseorderheaderRow].unique
+    q.query(PurchaseorderheaderRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader".query[PurchaseorderheaderRow].stream
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader".query(PurchaseorderheaderRow.read).stream
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Option[PurchaseorderheaderRow]] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ${purchaseorderid}".query[PurchaseorderheaderRow].option
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ${purchaseorderid}".query(PurchaseorderheaderRow.read).option
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ANY(${purchaseorderids})".query[PurchaseorderheaderRow].stream
+    sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader where purchaseorderid = ANY(${purchaseorderids})".query(PurchaseorderheaderRow.read).stream
   }
   override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
     val purchaseorderid = row.purchaseorderid
@@ -137,6 +137,6 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
             freight = EXCLUDED.freight,
             modifieddate = EXCLUDED.modifieddate
           returning purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
-       """.query[PurchaseorderheaderRow].unique
+       """.query(PurchaseorderheaderRow.read).unique
   }
 }

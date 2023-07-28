@@ -24,7 +24,7 @@ object StoreRepoImpl extends StoreRepo {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)
           values (${unsaved.businessentityid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.salespersonid}::int4, ${unsaved.demographics}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
-       """.query[StoreRow].unique
+       """.query(StoreRow.read).unique
   }
   override def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow] = {
     val fs = List(
@@ -53,17 +53,17 @@ object StoreRepoImpl extends StoreRepo {
             returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
          """
     }
-    q.query[StoreRow].unique
+    q.query(StoreRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store""".query[StoreRow].stream
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store""".query(StoreRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[StoreRow]] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ${businessentityid}""".query[StoreRow].option
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ${businessentityid}""".query(StoreRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow] = {
-    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ANY(${businessentityids})""".query[StoreRow].stream
+    sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text from sales.store where businessentityid = ANY(${businessentityids})""".query(StoreRow.read).stream
   }
   override def update(row: StoreRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -97,6 +97,6 @@ object StoreRepoImpl extends StoreRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning businessentityid, "name", salespersonid, demographics, rowguid, modifieddate::text
-       """.query[StoreRow].unique
+       """.query(StoreRow.read).unique
   }
 }

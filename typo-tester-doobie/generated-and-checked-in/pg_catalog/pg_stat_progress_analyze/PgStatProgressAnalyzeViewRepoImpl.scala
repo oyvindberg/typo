@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgStatProgressAnalyzeViewRepoImpl extends PgStatProgressAnalyzeViewRepo {
   override def selectAll: Stream[ConnectionIO, PgStatProgressAnalyzeViewRow] = {
-    sql"select pid, datid, datname, relid, phase, sample_blks_total, sample_blks_scanned, ext_stats_total, ext_stats_computed, child_tables_total, child_tables_done, current_child_table_relid from pg_catalog.pg_stat_progress_analyze".query[PgStatProgressAnalyzeViewRow].stream
+    sql"select pid, datid, datname, relid, phase, sample_blks_total, sample_blks_scanned, ext_stats_total, ext_stats_computed, child_tables_total, child_tables_done, current_child_table_relid from pg_catalog.pg_stat_progress_analyze".query(PgStatProgressAnalyzeViewRow.read).stream
   }
 }

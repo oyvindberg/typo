@@ -13,6 +13,6 @@ import fs2.Stream
 
 object PgSeclabelsViewRepoImpl extends PgSeclabelsViewRepo {
   override def selectAll: Stream[ConnectionIO, PgSeclabelsViewRow] = {
-    sql"""select objoid, classoid, objsubid, objtype, objnamespace, objname, provider, "label" from pg_catalog.pg_seclabels""".query[PgSeclabelsViewRow].stream
+    sql"""select objoid, classoid, objsubid, objtype, objnamespace, objname, provider, "label" from pg_catalog.pg_seclabels""".query(PgSeclabelsViewRow.read).stream
   }
 }

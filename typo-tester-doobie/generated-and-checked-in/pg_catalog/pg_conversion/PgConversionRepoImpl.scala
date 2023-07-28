@@ -19,16 +19,16 @@ object PgConversionRepoImpl extends PgConversionRepo {
     sql"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
           values (${unsaved.oid}::oid, ${unsaved.conname}::name, ${unsaved.connamespace}::oid, ${unsaved.conowner}::oid, ${unsaved.conforencoding}::int4, ${unsaved.contoencoding}::int4, ${unsaved.conproc}::regproc, ${unsaved.condefault})
           returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
-       """.query[PgConversionRow].unique
+       """.query(PgConversionRow.read).unique
   }
   override def selectAll: Stream[ConnectionIO, PgConversionRow] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion".query[PgConversionRow].stream
+    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion".query(PgConversionRow.read).stream
   }
   override def selectById(oid: PgConversionId): ConnectionIO[Option[PgConversionRow]] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ${oid}".query[PgConversionRow].option
+    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ${oid}".query(PgConversionRow.read).option
   }
   override def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow] = {
-    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY(${oids})".query[PgConversionRow].stream
+    sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion where oid = ANY(${oids})".query(PgConversionRow.read).stream
   }
   override def update(row: PgConversionRow): ConnectionIO[Boolean] = {
     val oid = row.oid
@@ -68,6 +68,6 @@ object PgConversionRepoImpl extends PgConversionRepo {
             conproc = EXCLUDED.conproc,
             condefault = EXCLUDED.condefault
           returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
-       """.query[PgConversionRow].unique
+       """.query(PgConversionRow.read).unique
   }
 }

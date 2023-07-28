@@ -23,7 +23,7 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
           values (${unsaved.productmodelid}::int4, ${unsaved.name}::"public"."Name", ${unsaved.catalogdescription}::xml, ${unsaved.instructions}::xml, ${unsaved.rowguid}::uuid, ${unsaved.modifieddate}::timestamp)
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
-       """.query[ProductmodelRow].unique
+       """.query(ProductmodelRow.read).unique
   }
   override def insert(unsaved: ProductmodelRowUnsaved): ConnectionIO[ProductmodelRow] = {
     val fs = List(
@@ -55,17 +55,17 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
             returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
          """
     }
-    q.query[ProductmodelRow].unique
+    q.query(ProductmodelRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel""".query[ProductmodelRow].stream
+    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel""".query(ProductmodelRow.read).stream
   }
   override def selectById(productmodelid: ProductmodelId): ConnectionIO[Option[ProductmodelRow]] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ${productmodelid}""".query[ProductmodelRow].option
+    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ${productmodelid}""".query(ProductmodelRow.read).option
   }
   override def selectByIds(productmodelids: Array[ProductmodelId]): Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ANY(${productmodelids})""".query[ProductmodelRow].stream
+    sql"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text from production.productmodel where productmodelid = ANY(${productmodelids})""".query(ProductmodelRow.read).stream
   }
   override def update(row: ProductmodelRow): ConnectionIO[Boolean] = {
     val productmodelid = row.productmodelid
@@ -99,6 +99,6 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
             rowguid = EXCLUDED.rowguid,
             modifieddate = EXCLUDED.modifieddate
           returning productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
-       """.query[ProductmodelRow].unique
+       """.query(ProductmodelRow.read).unique
   }
 }

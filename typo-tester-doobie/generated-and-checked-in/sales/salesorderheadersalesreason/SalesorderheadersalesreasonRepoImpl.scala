@@ -22,7 +22,7 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
           values (${unsaved.salesorderid}::int4, ${unsaved.salesreasonid}::int4, ${unsaved.modifieddate}::timestamp)
           returning salesorderid, salesreasonid, modifieddate::text
-       """.query[SalesorderheadersalesreasonRow].unique
+       """.query(SalesorderheadersalesreasonRow.read).unique
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
     val fs = List(
@@ -45,14 +45,14 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
             returning salesorderid, salesreasonid, modifieddate::text
          """
     }
-    q.query[SalesorderheadersalesreasonRow].unique
+    q.query(SalesorderheadersalesreasonRow.read).unique
   
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
-    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason".query[SalesorderheadersalesreasonRow].stream
+    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason".query(SalesorderheadersalesreasonRow.read).stream
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
-    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".query[SalesorderheadersalesreasonRow].option
+    sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".query(SalesorderheadersalesreasonRow.read).option
   }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -75,6 +75,6 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           do update set
             modifieddate = EXCLUDED.modifieddate
           returning salesorderid, salesreasonid, modifieddate::text
-       """.query[SalesorderheadersalesreasonRow].unique
+       """.query(SalesorderheadersalesreasonRow.read).unique
   }
 }
