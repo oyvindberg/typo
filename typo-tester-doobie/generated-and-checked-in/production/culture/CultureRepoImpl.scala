@@ -9,10 +9,8 @@ package culture
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -53,17 +51,6 @@ object CultureRepoImpl extends CultureRepo {
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
     sql"""select cultureid, "name", modifieddate from production.culture""".query[CultureRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[CultureFieldOrIdValue[_]]): Stream[ConnectionIO, CultureRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CultureFieldValue.cultureid(value) => fr"cultureid = $value"
-        case CultureFieldValue.name(value) => fr""""name" = $value"""
-        case CultureFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.culture $where".query[CultureRow].stream
-  
-  }
   override def selectById(cultureid: CultureId): ConnectionIO[Option[CultureRow]] = {
     sql"""select cultureid, "name", modifieddate from production.culture where cultureid = $cultureid""".query[CultureRow].option
   }
@@ -80,22 +67,6 @@ object CultureRepoImpl extends CultureRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(cultureid: CultureId, fieldValues: List[CultureFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case CultureFieldValue.name(value) => fr""""name" = $value"""
-            case CultureFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.culture
-              $updates
-              where cultureid = $cultureid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture(cultureid, "name", modifieddate)

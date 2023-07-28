@@ -9,9 +9,7 @@ package myschema
 package football_club
 
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object FootballClubRepoImpl extends FootballClubRepo {
@@ -26,16 +24,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
   }
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club""".query[FootballClubRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]]): Stream[ConnectionIO, FootballClubRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case FootballClubFieldValue.id(value) => fr""""id" = $value"""
-        case FootballClubFieldValue.name(value) => fr""""name" = $value"""
-      } :_*
-    )
-    sql"select * from myschema.football_club $where".query[FootballClubRow].stream
-  
   }
   override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
     sql"""select "id", "name" from myschema.football_club where "id" = $id""".query[FootballClubRow].option
@@ -52,21 +40,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case FootballClubFieldValue.name(value) => fr""""name" = $value"""
-          } :_*
-        )
-        sql"""update myschema.football_club
-              $updates
-              where "id" = $id
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")

@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package sth
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,31 +15,5 @@ object SthViewRepoImpl extends SthViewRepo {
     SQL"""select "id", businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
           from sa.sth
        """.as(SthViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SthViewFieldOrIdValue[_]])(implicit c: Connection): List[SthViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SthViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SthViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case SthViewFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case SthViewFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case SthViewFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case SthViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SthViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, territoryid, startdate, enddate, rowguid, modifieddate
-                    from sa.sth
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SthViewRow.rowParser(1).*)
-    }
-  
   }
 }

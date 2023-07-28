@@ -9,10 +9,8 @@ package contacttype
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -56,17 +54,6 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
     sql"""select contacttypeid, "name", modifieddate from person.contacttype""".query[ContacttypeRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]]): Stream[ConnectionIO, ContacttypeRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ContacttypeFieldValue.contacttypeid(value) => fr"contacttypeid = $value"
-        case ContacttypeFieldValue.name(value) => fr""""name" = $value"""
-        case ContacttypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.contacttype $where".query[ContacttypeRow].stream
-  
-  }
   override def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]] = {
     sql"""select contacttypeid, "name", modifieddate from person.contacttype where contacttypeid = $contacttypeid""".query[ContacttypeRow].option
   }
@@ -83,22 +70,6 @@ object ContacttypeRepoImpl extends ContacttypeRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(contacttypeid: ContacttypeId, fieldValues: List[ContacttypeFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ContacttypeFieldValue.name(value) => fr""""name" = $value"""
-            case ContacttypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.contacttype
-              $updates
-              where contacttypeid = $contacttypeid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype(contacttypeid, "name", modifieddate)

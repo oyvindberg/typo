@@ -31,23 +31,6 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   override def selectAll: Stream[ConnectionIO, SpecialofferRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]]): Stream[ConnectionIO, SpecialofferRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, SpecialofferFieldValue.specialofferid(value)) => acc.filter(_.specialofferid == value)
-        case (acc, SpecialofferFieldValue.description(value)) => acc.filter(_.description == value)
-        case (acc, SpecialofferFieldValue.discountpct(value)) => acc.filter(_.discountpct == value)
-        case (acc, SpecialofferFieldValue.`type`(value)) => acc.filter(_.`type` == value)
-        case (acc, SpecialofferFieldValue.category(value)) => acc.filter(_.category == value)
-        case (acc, SpecialofferFieldValue.startdate(value)) => acc.filter(_.startdate == value)
-        case (acc, SpecialofferFieldValue.enddate(value)) => acc.filter(_.enddate == value)
-        case (acc, SpecialofferFieldValue.minqty(value)) => acc.filter(_.minqty == value)
-        case (acc, SpecialofferFieldValue.maxqty(value)) => acc.filter(_.maxqty == value)
-        case (acc, SpecialofferFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, SpecialofferFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(specialofferid: SpecialofferId): ConnectionIO[Option[SpecialofferRow]] = {
     delay(map.get(specialofferid))
   }
@@ -61,32 +44,6 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
         case Some(_) =>
           map.put(row.specialofferid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(specialofferid: SpecialofferId, fieldValues: List[SpecialofferFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(specialofferid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, SpecialofferFieldValue.description(value)) => acc.copy(description = value)
-            case (acc, SpecialofferFieldValue.discountpct(value)) => acc.copy(discountpct = value)
-            case (acc, SpecialofferFieldValue.`type`(value)) => acc.copy(`type` = value)
-            case (acc, SpecialofferFieldValue.category(value)) => acc.copy(category = value)
-            case (acc, SpecialofferFieldValue.startdate(value)) => acc.copy(startdate = value)
-            case (acc, SpecialofferFieldValue.enddate(value)) => acc.copy(enddate = value)
-            case (acc, SpecialofferFieldValue.minqty(value)) => acc.copy(minqty = value)
-            case (acc, SpecialofferFieldValue.maxqty(value)) => acc.copy(maxqty = value)
-            case (acc, SpecialofferFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, SpecialofferFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(specialofferid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

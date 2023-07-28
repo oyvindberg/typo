@@ -10,10 +10,8 @@ package salesorderheader
 import adventureworks.Defaulted
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -104,39 +102,6 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def selectAll: Stream[ConnectionIO, SalesorderheaderRow] = {
     sql"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate from sales.salesorderheader""".query[SalesorderheaderRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalesorderheaderFieldOrIdValue[_]]): Stream[ConnectionIO, SalesorderheaderRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalesorderheaderFieldValue.salesorderid(value) => fr"salesorderid = $value"
-        case SalesorderheaderFieldValue.revisionnumber(value) => fr"revisionnumber = $value"
-        case SalesorderheaderFieldValue.orderdate(value) => fr"orderdate = $value"
-        case SalesorderheaderFieldValue.duedate(value) => fr"duedate = $value"
-        case SalesorderheaderFieldValue.shipdate(value) => fr"shipdate = $value"
-        case SalesorderheaderFieldValue.status(value) => fr"status = $value"
-        case SalesorderheaderFieldValue.onlineorderflag(value) => fr"onlineorderflag = $value"
-        case SalesorderheaderFieldValue.purchaseordernumber(value) => fr"purchaseordernumber = $value"
-        case SalesorderheaderFieldValue.accountnumber(value) => fr"accountnumber = $value"
-        case SalesorderheaderFieldValue.customerid(value) => fr"customerid = $value"
-        case SalesorderheaderFieldValue.salespersonid(value) => fr"salespersonid = $value"
-        case SalesorderheaderFieldValue.territoryid(value) => fr"territoryid = $value"
-        case SalesorderheaderFieldValue.billtoaddressid(value) => fr"billtoaddressid = $value"
-        case SalesorderheaderFieldValue.shiptoaddressid(value) => fr"shiptoaddressid = $value"
-        case SalesorderheaderFieldValue.shipmethodid(value) => fr"shipmethodid = $value"
-        case SalesorderheaderFieldValue.creditcardid(value) => fr"creditcardid = $value"
-        case SalesorderheaderFieldValue.creditcardapprovalcode(value) => fr"creditcardapprovalcode = $value"
-        case SalesorderheaderFieldValue.currencyrateid(value) => fr"currencyrateid = $value"
-        case SalesorderheaderFieldValue.subtotal(value) => fr"subtotal = $value"
-        case SalesorderheaderFieldValue.taxamt(value) => fr"taxamt = $value"
-        case SalesorderheaderFieldValue.freight(value) => fr"freight = $value"
-        case SalesorderheaderFieldValue.totaldue(value) => fr"totaldue = $value"
-        case SalesorderheaderFieldValue.comment(value) => fr""""comment" = $value"""
-        case SalesorderheaderFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SalesorderheaderFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salesorderheader $where".query[SalesorderheaderRow].stream
-  
-  }
   override def selectById(salesorderid: SalesorderheaderId): ConnectionIO[Option[SalesorderheaderRow]] = {
     sql"""select salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate from sales.salesorderheader where salesorderid = $salesorderid""".query[SalesorderheaderRow].option
   }
@@ -175,44 +140,6 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(salesorderid: SalesorderheaderId, fieldValues: List[SalesorderheaderFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalesorderheaderFieldValue.revisionnumber(value) => fr"revisionnumber = $value"
-            case SalesorderheaderFieldValue.orderdate(value) => fr"orderdate = $value"
-            case SalesorderheaderFieldValue.duedate(value) => fr"duedate = $value"
-            case SalesorderheaderFieldValue.shipdate(value) => fr"shipdate = $value"
-            case SalesorderheaderFieldValue.status(value) => fr"status = $value"
-            case SalesorderheaderFieldValue.onlineorderflag(value) => fr"onlineorderflag = $value"
-            case SalesorderheaderFieldValue.purchaseordernumber(value) => fr"purchaseordernumber = $value"
-            case SalesorderheaderFieldValue.accountnumber(value) => fr"accountnumber = $value"
-            case SalesorderheaderFieldValue.customerid(value) => fr"customerid = $value"
-            case SalesorderheaderFieldValue.salespersonid(value) => fr"salespersonid = $value"
-            case SalesorderheaderFieldValue.territoryid(value) => fr"territoryid = $value"
-            case SalesorderheaderFieldValue.billtoaddressid(value) => fr"billtoaddressid = $value"
-            case SalesorderheaderFieldValue.shiptoaddressid(value) => fr"shiptoaddressid = $value"
-            case SalesorderheaderFieldValue.shipmethodid(value) => fr"shipmethodid = $value"
-            case SalesorderheaderFieldValue.creditcardid(value) => fr"creditcardid = $value"
-            case SalesorderheaderFieldValue.creditcardapprovalcode(value) => fr"creditcardapprovalcode = $value"
-            case SalesorderheaderFieldValue.currencyrateid(value) => fr"currencyrateid = $value"
-            case SalesorderheaderFieldValue.subtotal(value) => fr"subtotal = $value"
-            case SalesorderheaderFieldValue.taxamt(value) => fr"taxamt = $value"
-            case SalesorderheaderFieldValue.freight(value) => fr"freight = $value"
-            case SalesorderheaderFieldValue.totaldue(value) => fr"totaldue = $value"
-            case SalesorderheaderFieldValue.comment(value) => fr""""comment" = $value"""
-            case SalesorderheaderFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SalesorderheaderFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salesorderheader
-              $updates
-              where salesorderid = $salesorderid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     sql"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)

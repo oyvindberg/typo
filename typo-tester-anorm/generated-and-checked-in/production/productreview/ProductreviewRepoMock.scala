@@ -27,18 +27,6 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]])(implicit c: Connection): List[ProductreviewRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, ProductreviewFieldValue.productreviewid(value)) => acc.filter(_.productreviewid == value)
-      case (acc, ProductreviewFieldValue.productid(value)) => acc.filter(_.productid == value)
-      case (acc, ProductreviewFieldValue.reviewername(value)) => acc.filter(_.reviewername == value)
-      case (acc, ProductreviewFieldValue.reviewdate(value)) => acc.filter(_.reviewdate == value)
-      case (acc, ProductreviewFieldValue.emailaddress(value)) => acc.filter(_.emailaddress == value)
-      case (acc, ProductreviewFieldValue.rating(value)) => acc.filter(_.rating == value)
-      case (acc, ProductreviewFieldValue.comments(value)) => acc.filter(_.comments == value)
-      case (acc, ProductreviewFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(productreviewid: ProductreviewId)(implicit c: Connection): Option[ProductreviewRow] = {
     map.get(productreviewid)
   }
@@ -51,27 +39,6 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
       case Some(_) =>
         map.put(row.productreviewid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(productreviewid: ProductreviewId, fieldValues: List[ProductreviewFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(productreviewid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, ProductreviewFieldValue.productid(value)) => acc.copy(productid = value)
-          case (acc, ProductreviewFieldValue.reviewername(value)) => acc.copy(reviewername = value)
-          case (acc, ProductreviewFieldValue.reviewdate(value)) => acc.copy(reviewdate = value)
-          case (acc, ProductreviewFieldValue.emailaddress(value)) => acc.copy(emailaddress = value)
-          case (acc, ProductreviewFieldValue.rating(value)) => acc.copy(rating = value)
-          case (acc, ProductreviewFieldValue.comments(value)) => acc.copy(comments = value)
-          case (acc, ProductreviewFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(productreviewid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

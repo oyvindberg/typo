@@ -9,24 +9,10 @@ package sop
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SopViewRepoImpl extends SopViewRepo {
   override def selectAll: Stream[ConnectionIO, SopViewRow] = {
     sql"""select "id", specialofferid, productid, rowguid, modifieddate from sa.sop""".query[SopViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SopViewFieldOrIdValue[_]]): Stream[ConnectionIO, SopViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SopViewFieldValue.id(value) => fr""""id" = $value"""
-        case SopViewFieldValue.specialofferid(value) => fr"specialofferid = $value"
-        case SopViewFieldValue.productid(value) => fr"productid = $value"
-        case SopViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SopViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.sop $where".query[SopViewRow].stream
-  
   }
 }

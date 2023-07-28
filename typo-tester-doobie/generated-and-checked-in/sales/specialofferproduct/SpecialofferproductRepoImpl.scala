@@ -9,10 +9,8 @@ package specialofferproduct
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -58,18 +56,6 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
     sql"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct".query[SpecialofferproductRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SpecialofferproductFieldOrIdValue[_]]): Stream[ConnectionIO, SpecialofferproductRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SpecialofferproductFieldValue.specialofferid(value) => fr"specialofferid = $value"
-        case SpecialofferproductFieldValue.productid(value) => fr"productid = $value"
-        case SpecialofferproductFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SpecialofferproductFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.specialofferproduct $where".query[SpecialofferproductRow].stream
-  
-  }
   override def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]] = {
     sql"select specialofferid, productid, rowguid, modifieddate from sales.specialofferproduct where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}".query[SpecialofferproductRow].option
   }
@@ -83,22 +69,6 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: SpecialofferproductId, fieldValues: List[SpecialofferproductFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SpecialofferproductFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SpecialofferproductFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.specialofferproduct
-              $updates
-              where specialofferid = ${compositeId.specialofferid} AND productid = ${compositeId.productid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)

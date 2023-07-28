@@ -9,10 +9,8 @@ package location
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -64,19 +62,6 @@ object LocationRepoImpl extends LocationRepo {
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
     sql"""select locationid, "name", costrate, availability, modifieddate from production."location"""".query[LocationRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[LocationFieldOrIdValue[_]]): Stream[ConnectionIO, LocationRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case LocationFieldValue.locationid(value) => fr"locationid = $value"
-        case LocationFieldValue.name(value) => fr""""name" = $value"""
-        case LocationFieldValue.costrate(value) => fr"costrate = $value"
-        case LocationFieldValue.availability(value) => fr"availability = $value"
-        case LocationFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"""select * from production."location" $where""".query[LocationRow].stream
-  
-  }
   override def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]] = {
     sql"""select locationid, "name", costrate, availability, modifieddate from production."location" where locationid = $locationid""".query[LocationRow].option
   }
@@ -95,24 +80,6 @@ object LocationRepoImpl extends LocationRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(locationid: LocationId, fieldValues: List[LocationFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case LocationFieldValue.name(value) => fr""""name" = $value"""
-            case LocationFieldValue.costrate(value) => fr"costrate = $value"
-            case LocationFieldValue.availability(value) => fr"availability = $value"
-            case LocationFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production."location"
-              $updates
-              where locationid = $locationid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production."location"(locationid, "name", costrate, availability, modifieddate)

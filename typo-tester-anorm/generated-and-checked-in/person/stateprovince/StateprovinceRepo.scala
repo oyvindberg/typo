@@ -14,10 +14,8 @@ trait StateprovinceRepo {
   def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow
   def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow
   def selectAll(implicit c: Connection): List[StateprovinceRow]
-  def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]])(implicit c: Connection): List[StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow]
   def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow]
   def update(row: StateprovinceRow)(implicit c: Connection): Boolean
-  def updateFieldValues(stateprovinceid: StateprovinceId, fieldValues: List[StateprovinceFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow
 }

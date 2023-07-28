@@ -15,10 +15,8 @@ trait SalesterritoryRepo {
   def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
   def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow]
   def selectAll: Stream[ConnectionIO, SalesterritoryRow]
-  def selectByFieldValues(fieldValues: List[SalesterritoryFieldOrIdValue[_]]): Stream[ConnectionIO, SalesterritoryRow]
   def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]]
   def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow]
   def update(row: SalesterritoryRow): ConnectionIO[Boolean]
-  def updateFieldValues(territoryid: SalesterritoryId, fieldValues: List[SalesterritoryFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
 }

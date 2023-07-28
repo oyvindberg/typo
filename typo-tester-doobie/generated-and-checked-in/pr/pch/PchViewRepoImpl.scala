@@ -9,25 +9,10 @@ package pch
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PchViewRepoImpl extends PchViewRepo {
   override def selectAll: Stream[ConnectionIO, PchViewRow] = {
     sql"""select "id", productid, startdate, enddate, standardcost, modifieddate from pr.pch""".query[PchViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PchViewFieldOrIdValue[_]]): Stream[ConnectionIO, PchViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PchViewFieldValue.id(value) => fr""""id" = $value"""
-        case PchViewFieldValue.productid(value) => fr"productid = $value"
-        case PchViewFieldValue.startdate(value) => fr"startdate = $value"
-        case PchViewFieldValue.enddate(value) => fr"enddate = $value"
-        case PchViewFieldValue.standardcost(value) => fr"standardcost = $value"
-        case PchViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.pch $where".query[PchViewRow].stream
-  
   }
 }

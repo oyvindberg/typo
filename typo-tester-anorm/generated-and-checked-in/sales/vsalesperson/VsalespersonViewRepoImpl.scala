@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package vsalesperson
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,46 +15,5 @@ object VsalespersonViewRepoImpl extends VsalespersonViewRepo {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, territoryname, territorygroup, salesquota, salesytd, saleslastyear
           from sales.vsalesperson
        """.as(VsalespersonViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VsalespersonViewFieldOrIdValue[_]])(implicit c: Connection): List[VsalespersonViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VsalespersonViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.firstname(value) => NamedParameter("firstname", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.middlename(value) => NamedParameter("middlename", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.lastname(value) => NamedParameter("lastname", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.suffix(value) => NamedParameter("suffix", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.jobtitle(value) => NamedParameter("jobtitle", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.phonenumber(value) => NamedParameter("phonenumber", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.phonenumbertype(value) => NamedParameter("phonenumbertype", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.emailpromotion(value) => NamedParameter("emailpromotion", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.addressline1(value) => NamedParameter("addressline1", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.addressline2(value) => NamedParameter("addressline2", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.city(value) => NamedParameter("city", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.stateprovincename(value) => NamedParameter("stateprovincename", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.postalcode(value) => NamedParameter("postalcode", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.countryregionname(value) => NamedParameter("countryregionname", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.territoryname(value) => NamedParameter("territoryname", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.territorygroup(value) => NamedParameter("territorygroup", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.salesquota(value) => NamedParameter("salesquota", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.salesytd(value) => NamedParameter("salesytd", ParameterValue.from(value))
-          case VsalespersonViewFieldValue.saleslastyear(value) => NamedParameter("saleslastyear", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, territoryname, territorygroup, salesquota, salesytd, saleslastyear
-                    from sales.vsalesperson
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VsalespersonViewRow.rowParser(1).*)
-    }
-  
   }
 }

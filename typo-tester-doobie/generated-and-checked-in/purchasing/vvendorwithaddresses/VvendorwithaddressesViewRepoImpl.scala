@@ -9,28 +9,10 @@ package vvendorwithaddresses
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VvendorwithaddressesViewRepoImpl extends VvendorwithaddressesViewRepo {
   override def selectAll: Stream[ConnectionIO, VvendorwithaddressesViewRow] = {
     sql"""select businessentityid, "name", addresstype, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname from purchasing.vvendorwithaddresses""".query[VvendorwithaddressesViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VvendorwithaddressesViewFieldOrIdValue[_]]): Stream[ConnectionIO, VvendorwithaddressesViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VvendorwithaddressesViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VvendorwithaddressesViewFieldValue.name(value) => fr""""name" = $value"""
-        case VvendorwithaddressesViewFieldValue.addresstype(value) => fr"addresstype = $value"
-        case VvendorwithaddressesViewFieldValue.addressline1(value) => fr"addressline1 = $value"
-        case VvendorwithaddressesViewFieldValue.addressline2(value) => fr"addressline2 = $value"
-        case VvendorwithaddressesViewFieldValue.city(value) => fr"city = $value"
-        case VvendorwithaddressesViewFieldValue.stateprovincename(value) => fr"stateprovincename = $value"
-        case VvendorwithaddressesViewFieldValue.postalcode(value) => fr"postalcode = $value"
-        case VvendorwithaddressesViewFieldValue.countryregionname(value) => fr"countryregionname = $value"
-      } :_*
-    )
-    sql"select * from purchasing.vvendorwithaddresses $where".query[VvendorwithaddressesViewRow].stream
-  
   }
 }

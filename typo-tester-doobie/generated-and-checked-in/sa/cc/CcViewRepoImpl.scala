@@ -9,26 +9,10 @@ package cc
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object CcViewRepoImpl extends CcViewRepo {
   override def selectAll: Stream[ConnectionIO, CcViewRow] = {
     sql"""select "id", creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sa.cc""".query[CcViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[CcViewFieldOrIdValue[_]]): Stream[ConnectionIO, CcViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CcViewFieldValue.id(value) => fr""""id" = $value"""
-        case CcViewFieldValue.creditcardid(value) => fr"creditcardid = $value"
-        case CcViewFieldValue.cardtype(value) => fr"cardtype = $value"
-        case CcViewFieldValue.cardnumber(value) => fr"cardnumber = $value"
-        case CcViewFieldValue.expmonth(value) => fr"expmonth = $value"
-        case CcViewFieldValue.expyear(value) => fr"expyear = $value"
-        case CcViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.cc $where".query[CcViewRow].stream
-  
   }
 }

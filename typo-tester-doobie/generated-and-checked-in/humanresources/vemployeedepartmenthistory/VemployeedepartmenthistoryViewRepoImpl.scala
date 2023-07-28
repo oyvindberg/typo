@@ -9,30 +9,10 @@ package vemployeedepartmenthistory
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VemployeedepartmenthistoryViewRepoImpl extends VemployeedepartmenthistoryViewRepo {
   override def selectAll: Stream[ConnectionIO, VemployeedepartmenthistoryViewRow] = {
     sql"select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate, enddate from humanresources.vemployeedepartmenthistory".query[VemployeedepartmenthistoryViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VemployeedepartmenthistoryViewFieldOrIdValue[_]]): Stream[ConnectionIO, VemployeedepartmenthistoryViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VemployeedepartmenthistoryViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VemployeedepartmenthistoryViewFieldValue.title(value) => fr"title = $value"
-        case VemployeedepartmenthistoryViewFieldValue.firstname(value) => fr"firstname = $value"
-        case VemployeedepartmenthistoryViewFieldValue.middlename(value) => fr"middlename = $value"
-        case VemployeedepartmenthistoryViewFieldValue.lastname(value) => fr"lastname = $value"
-        case VemployeedepartmenthistoryViewFieldValue.suffix(value) => fr"suffix = $value"
-        case VemployeedepartmenthistoryViewFieldValue.shift(value) => fr"shift = $value"
-        case VemployeedepartmenthistoryViewFieldValue.department(value) => fr"department = $value"
-        case VemployeedepartmenthistoryViewFieldValue.groupname(value) => fr"groupname = $value"
-        case VemployeedepartmenthistoryViewFieldValue.startdate(value) => fr"startdate = $value"
-        case VemployeedepartmenthistoryViewFieldValue.enddate(value) => fr"enddate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.vemployeedepartmenthistory $where".query[VemployeedepartmenthistoryViewRow].stream
-  
   }
 }

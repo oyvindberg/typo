@@ -28,23 +28,6 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, PersonFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-      case (acc, PersonFieldValue.persontype(value)) => acc.filter(_.persontype == value)
-      case (acc, PersonFieldValue.namestyle(value)) => acc.filter(_.namestyle == value)
-      case (acc, PersonFieldValue.title(value)) => acc.filter(_.title == value)
-      case (acc, PersonFieldValue.firstname(value)) => acc.filter(_.firstname == value)
-      case (acc, PersonFieldValue.middlename(value)) => acc.filter(_.middlename == value)
-      case (acc, PersonFieldValue.lastname(value)) => acc.filter(_.lastname == value)
-      case (acc, PersonFieldValue.suffix(value)) => acc.filter(_.suffix == value)
-      case (acc, PersonFieldValue.emailpromotion(value)) => acc.filter(_.emailpromotion == value)
-      case (acc, PersonFieldValue.additionalcontactinfo(value)) => acc.filter(_.additionalcontactinfo == value)
-      case (acc, PersonFieldValue.demographics(value)) => acc.filter(_.demographics == value)
-      case (acc, PersonFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, PersonFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PersonRow] = {
     map.get(businessentityid)
   }
@@ -57,32 +40,6 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       case Some(_) =>
         map.put(row.businessentityid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(businessentityid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, PersonFieldValue.persontype(value)) => acc.copy(persontype = value)
-          case (acc, PersonFieldValue.namestyle(value)) => acc.copy(namestyle = value)
-          case (acc, PersonFieldValue.title(value)) => acc.copy(title = value)
-          case (acc, PersonFieldValue.firstname(value)) => acc.copy(firstname = value)
-          case (acc, PersonFieldValue.middlename(value)) => acc.copy(middlename = value)
-          case (acc, PersonFieldValue.lastname(value)) => acc.copy(lastname = value)
-          case (acc, PersonFieldValue.suffix(value)) => acc.copy(suffix = value)
-          case (acc, PersonFieldValue.emailpromotion(value)) => acc.copy(emailpromotion = value)
-          case (acc, PersonFieldValue.additionalcontactinfo(value)) => acc.copy(additionalcontactinfo = value)
-          case (acc, PersonFieldValue.demographics(value)) => acc.copy(demographics = value)
-          case (acc, PersonFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, PersonFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(businessentityid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

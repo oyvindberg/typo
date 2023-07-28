@@ -7,8 +7,6 @@ package adventureworks
 package hr
 package e
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,40 +15,5 @@ object EViewRepoImpl extends EViewRepo {
     SQL"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
           from hr.e
        """.as(EViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[EViewFieldOrIdValue[_]])(implicit c: Connection): List[EViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case EViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case EViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case EViewFieldValue.nationalidnumber(value) => NamedParameter("nationalidnumber", ParameterValue.from(value))
-          case EViewFieldValue.loginid(value) => NamedParameter("loginid", ParameterValue.from(value))
-          case EViewFieldValue.jobtitle(value) => NamedParameter("jobtitle", ParameterValue.from(value))
-          case EViewFieldValue.birthdate(value) => NamedParameter("birthdate", ParameterValue.from(value))
-          case EViewFieldValue.maritalstatus(value) => NamedParameter("maritalstatus", ParameterValue.from(value))
-          case EViewFieldValue.gender(value) => NamedParameter("gender", ParameterValue.from(value))
-          case EViewFieldValue.hiredate(value) => NamedParameter("hiredate", ParameterValue.from(value))
-          case EViewFieldValue.salariedflag(value) => NamedParameter("salariedflag", ParameterValue.from(value))
-          case EViewFieldValue.vacationhours(value) => NamedParameter("vacationhours", ParameterValue.from(value))
-          case EViewFieldValue.sickleavehours(value) => NamedParameter("sickleavehours", ParameterValue.from(value))
-          case EViewFieldValue.currentflag(value) => NamedParameter("currentflag", ParameterValue.from(value))
-          case EViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case EViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-          case EViewFieldValue.organizationnode(value) => NamedParameter("organizationnode", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
-                    from hr.e
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(EViewRow.rowParser(1).*)
-    }
-  
   }
 }

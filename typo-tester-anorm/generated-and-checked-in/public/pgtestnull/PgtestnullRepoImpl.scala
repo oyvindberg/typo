@@ -7,8 +7,6 @@ package adventureworks
 package public
 package pgtestnull
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -25,52 +23,5 @@ object PgtestnullRepoImpl extends PgtestnullRepo {
     SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
           from "public".pgtestnull
        """.as(PgtestnullRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PgtestnullFieldOrIdValue[_]])(implicit c: Connection): List[PgtestnullRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PgtestnullFieldValue.box(value) => NamedParameter("box", ParameterValue.from(value))
-          case PgtestnullFieldValue.circle(value) => NamedParameter("circle", ParameterValue.from(value))
-          case PgtestnullFieldValue.line(value) => NamedParameter("line", ParameterValue.from(value))
-          case PgtestnullFieldValue.lseg(value) => NamedParameter("lseg", ParameterValue.from(value))
-          case PgtestnullFieldValue.path(value) => NamedParameter("path", ParameterValue.from(value))
-          case PgtestnullFieldValue.point(value) => NamedParameter("point", ParameterValue.from(value))
-          case PgtestnullFieldValue.polygon(value) => NamedParameter("polygon", ParameterValue.from(value))
-          case PgtestnullFieldValue.interval(value) => NamedParameter("interval", ParameterValue.from(value))
-          case PgtestnullFieldValue.money(value) => NamedParameter("money", ParameterValue.from(value))
-          case PgtestnullFieldValue.xml(value) => NamedParameter("xml", ParameterValue.from(value))
-          case PgtestnullFieldValue.json(value) => NamedParameter("json", ParameterValue.from(value))
-          case PgtestnullFieldValue.jsonb(value) => NamedParameter("jsonb", ParameterValue.from(value))
-          case PgtestnullFieldValue.hstore(value) => NamedParameter("hstore", ParameterValue.from(value))
-          case PgtestnullFieldValue.inet(value) => NamedParameter("inet", ParameterValue.from(value))
-          case PgtestnullFieldValue.boxes(value) => NamedParameter("boxes", ParameterValue.from(value))
-          case PgtestnullFieldValue.circlees(value) => NamedParameter("circlees", ParameterValue.from(value))
-          case PgtestnullFieldValue.linees(value) => NamedParameter("linees", ParameterValue.from(value))
-          case PgtestnullFieldValue.lseges(value) => NamedParameter("lseges", ParameterValue.from(value))
-          case PgtestnullFieldValue.pathes(value) => NamedParameter("pathes", ParameterValue.from(value))
-          case PgtestnullFieldValue.pointes(value) => NamedParameter("pointes", ParameterValue.from(value))
-          case PgtestnullFieldValue.polygones(value) => NamedParameter("polygones", ParameterValue.from(value))
-          case PgtestnullFieldValue.intervales(value) => NamedParameter("intervales", ParameterValue.from(value))
-          case PgtestnullFieldValue.moneyes(value) => NamedParameter("moneyes", ParameterValue.from(value))
-          case PgtestnullFieldValue.xmles(value) => NamedParameter("xmles", ParameterValue.from(value))
-          case PgtestnullFieldValue.jsones(value) => NamedParameter("jsones", ParameterValue.from(value))
-          case PgtestnullFieldValue.jsonbes(value) => NamedParameter("jsonbes", ParameterValue.from(value))
-          case PgtestnullFieldValue.hstores(value) => NamedParameter("hstores", ParameterValue.from(value))
-          case PgtestnullFieldValue.inets(value) => NamedParameter("inets", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
-                    from "public".pgtestnull
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PgtestnullRow.rowParser(1).*)
-    }
-  
   }
 }

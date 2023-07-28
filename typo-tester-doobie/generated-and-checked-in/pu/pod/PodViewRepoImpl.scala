@@ -9,29 +9,10 @@ package pod
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PodViewRepoImpl extends PodViewRepo {
   override def selectAll: Stream[ConnectionIO, PodViewRow] = {
     sql"""select "id", purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate from pu.pod""".query[PodViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PodViewFieldOrIdValue[_]]): Stream[ConnectionIO, PodViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PodViewFieldValue.id(value) => fr""""id" = $value"""
-        case PodViewFieldValue.purchaseorderid(value) => fr"purchaseorderid = $value"
-        case PodViewFieldValue.purchaseorderdetailid(value) => fr"purchaseorderdetailid = $value"
-        case PodViewFieldValue.duedate(value) => fr"duedate = $value"
-        case PodViewFieldValue.orderqty(value) => fr"orderqty = $value"
-        case PodViewFieldValue.productid(value) => fr"productid = $value"
-        case PodViewFieldValue.unitprice(value) => fr"unitprice = $value"
-        case PodViewFieldValue.receivedqty(value) => fr"receivedqty = $value"
-        case PodViewFieldValue.rejectedqty(value) => fr"rejectedqty = $value"
-        case PodViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pu.pod $where".query[PodViewRow].stream
-  
   }
 }

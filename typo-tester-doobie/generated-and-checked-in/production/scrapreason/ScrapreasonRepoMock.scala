@@ -31,15 +31,6 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]]): Stream[ConnectionIO, ScrapreasonRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ScrapreasonFieldValue.scrapreasonid(value)) => acc.filter(_.scrapreasonid == value)
-        case (acc, ScrapreasonFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, ScrapreasonFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]] = {
     delay(map.get(scrapreasonid))
   }
@@ -53,24 +44,6 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
         case Some(_) =>
           map.put(row.scrapreasonid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(scrapreasonid: ScrapreasonId, fieldValues: List[ScrapreasonFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(scrapreasonid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ScrapreasonFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, ScrapreasonFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(scrapreasonid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

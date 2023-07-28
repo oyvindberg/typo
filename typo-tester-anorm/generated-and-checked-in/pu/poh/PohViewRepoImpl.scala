@@ -7,8 +7,6 @@ package adventureworks
 package pu
 package poh
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,37 +15,5 @@ object PohViewRepoImpl extends PohViewRepo {
     SQL"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from pu.poh
        """.as(PohViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PohViewFieldOrIdValue[_]])(implicit c: Connection): List[PohViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PohViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PohViewFieldValue.purchaseorderid(value) => NamedParameter("purchaseorderid", ParameterValue.from(value))
-          case PohViewFieldValue.revisionnumber(value) => NamedParameter("revisionnumber", ParameterValue.from(value))
-          case PohViewFieldValue.status(value) => NamedParameter("status", ParameterValue.from(value))
-          case PohViewFieldValue.employeeid(value) => NamedParameter("employeeid", ParameterValue.from(value))
-          case PohViewFieldValue.vendorid(value) => NamedParameter("vendorid", ParameterValue.from(value))
-          case PohViewFieldValue.shipmethodid(value) => NamedParameter("shipmethodid", ParameterValue.from(value))
-          case PohViewFieldValue.orderdate(value) => NamedParameter("orderdate", ParameterValue.from(value))
-          case PohViewFieldValue.shipdate(value) => NamedParameter("shipdate", ParameterValue.from(value))
-          case PohViewFieldValue.subtotal(value) => NamedParameter("subtotal", ParameterValue.from(value))
-          case PohViewFieldValue.taxamt(value) => NamedParameter("taxamt", ParameterValue.from(value))
-          case PohViewFieldValue.freight(value) => NamedParameter("freight", ParameterValue.from(value))
-          case PohViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
-                    from pu.poh
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PohViewRow.rowParser(1).*)
-    }
-  
   }
 }

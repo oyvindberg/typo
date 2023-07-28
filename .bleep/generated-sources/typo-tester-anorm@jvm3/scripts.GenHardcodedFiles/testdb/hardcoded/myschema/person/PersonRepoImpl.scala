@@ -77,36 +77,6 @@ object PersonRepoImpl extends PersonRepo {
           from myschema.person
        """.as(PersonRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
-          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case PersonFieldValue.nickName(value) => NamedParameter("nick_name", ParameterValue.from(value))
-          case PersonFieldValue.blogUrl(value) => NamedParameter("blog_url", ParameterValue.from(value))
-          case PersonFieldValue.email(value) => NamedParameter("email", ParameterValue.from(value))
-          case PersonFieldValue.phone(value) => NamedParameter("phone", ParameterValue.from(value))
-          case PersonFieldValue.likesPizza(value) => NamedParameter("likes_pizza", ParameterValue.from(value))
-          case PersonFieldValue.maritalStatusId(value) => NamedParameter("marital_status_id", ParameterValue.from(value))
-          case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
-          case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
-                    from myschema.person
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PersonRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
@@ -139,36 +109,6 @@ object PersonRepoImpl extends PersonRepo {
               sector = ${row.sector}::myschema.sector
           where "id" = $id
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
-          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case PersonFieldValue.nickName(value) => NamedParameter("nick_name", ParameterValue.from(value))
-          case PersonFieldValue.blogUrl(value) => NamedParameter("blog_url", ParameterValue.from(value))
-          case PersonFieldValue.email(value) => NamedParameter("email", ParameterValue.from(value))
-          case PersonFieldValue.phone(value) => NamedParameter("phone", ParameterValue.from(value))
-          case PersonFieldValue.likesPizza(value) => NamedParameter("likes_pizza", ParameterValue.from(value))
-          case PersonFieldValue.maritalStatusId(value) => NamedParameter("marital_status_id", ParameterValue.from(value))
-          case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
-          case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update myschema.person
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where "id" = {id}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("id", ParameterValue.from(id)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)

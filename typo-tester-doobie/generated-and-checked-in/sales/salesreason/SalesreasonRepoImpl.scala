@@ -9,10 +9,8 @@ package salesreason
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -57,18 +55,6 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
     sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason""".query[SalesreasonRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]]): Stream[ConnectionIO, SalesreasonRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalesreasonFieldValue.salesreasonid(value) => fr"salesreasonid = $value"
-        case SalesreasonFieldValue.name(value) => fr""""name" = $value"""
-        case SalesreasonFieldValue.reasontype(value) => fr"reasontype = $value"
-        case SalesreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salesreason $where".query[SalesreasonRow].stream
-  
-  }
   override def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]] = {
     sql"""select salesreasonid, "name", reasontype, modifieddate from sales.salesreason where salesreasonid = $salesreasonid""".query[SalesreasonRow].option
   }
@@ -86,23 +72,6 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(salesreasonid: SalesreasonId, fieldValues: List[SalesreasonFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalesreasonFieldValue.name(value) => fr""""name" = $value"""
-            case SalesreasonFieldValue.reasontype(value) => fr"reasontype = $value"
-            case SalesreasonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salesreason
-              $updates
-              where salesreasonid = $salesreasonid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)

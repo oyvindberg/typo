@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package pp
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,29 +15,5 @@ object PpViewRepoImpl extends PpViewRepo {
     SQL"""select "id", businessentityid, phonenumber, phonenumbertypeid, modifieddate
           from pe.pp
        """.as(PpViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PpViewFieldOrIdValue[_]])(implicit c: Connection): List[PpViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PpViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PpViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PpViewFieldValue.phonenumber(value) => NamedParameter("phonenumber", ParameterValue.from(value))
-          case PpViewFieldValue.phonenumbertypeid(value) => NamedParameter("phonenumbertypeid", ParameterValue.from(value))
-          case PpViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, phonenumber, phonenumbertypeid, modifieddate
-                    from pe.pp
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PpViewRow.rowParser(1).*)
-    }
-  
   }
 }

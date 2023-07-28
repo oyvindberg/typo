@@ -9,10 +9,8 @@ package salesorderdetail
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -70,24 +68,6 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def selectAll: Stream[ConnectionIO, SalesorderdetailRow] = {
     sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail".query[SalesorderdetailRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalesorderdetailFieldOrIdValue[_]]): Stream[ConnectionIO, SalesorderdetailRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalesorderdetailFieldValue.salesorderid(value) => fr"salesorderid = $value"
-        case SalesorderdetailFieldValue.salesorderdetailid(value) => fr"salesorderdetailid = $value"
-        case SalesorderdetailFieldValue.carriertrackingnumber(value) => fr"carriertrackingnumber = $value"
-        case SalesorderdetailFieldValue.orderqty(value) => fr"orderqty = $value"
-        case SalesorderdetailFieldValue.productid(value) => fr"productid = $value"
-        case SalesorderdetailFieldValue.specialofferid(value) => fr"specialofferid = $value"
-        case SalesorderdetailFieldValue.unitprice(value) => fr"unitprice = $value"
-        case SalesorderdetailFieldValue.unitpricediscount(value) => fr"unitpricediscount = $value"
-        case SalesorderdetailFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SalesorderdetailFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salesorderdetail $where".query[SalesorderdetailRow].stream
-  
-  }
   override def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]] = {
     sql"select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".query[SalesorderdetailRow].option
   }
@@ -107,28 +87,6 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: SalesorderdetailId, fieldValues: List[SalesorderdetailFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalesorderdetailFieldValue.carriertrackingnumber(value) => fr"carriertrackingnumber = $value"
-            case SalesorderdetailFieldValue.orderqty(value) => fr"orderqty = $value"
-            case SalesorderdetailFieldValue.productid(value) => fr"productid = $value"
-            case SalesorderdetailFieldValue.specialofferid(value) => fr"specialofferid = $value"
-            case SalesorderdetailFieldValue.unitprice(value) => fr"unitprice = $value"
-            case SalesorderdetailFieldValue.unitpricediscount(value) => fr"unitpricediscount = $value"
-            case SalesorderdetailFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SalesorderdetailFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salesorderdetail
-              $updates
-              where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)

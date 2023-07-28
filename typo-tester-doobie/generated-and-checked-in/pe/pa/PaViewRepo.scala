@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait PaViewRepo {
   def selectAll: Stream[ConnectionIO, PaViewRow]
-  def selectByFieldValues(fieldValues: List[PaViewFieldOrIdValue[_]]): Stream[ConnectionIO, PaViewRow]
 }

@@ -9,29 +9,10 @@ package w
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object WViewRepoImpl extends WViewRepo {
   override def selectAll: Stream[ConnectionIO, WViewRow] = {
     sql"""select "id", workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from pr.w""".query[WViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[WViewFieldOrIdValue[_]]): Stream[ConnectionIO, WViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case WViewFieldValue.id(value) => fr""""id" = $value"""
-        case WViewFieldValue.workorderid(value) => fr"workorderid = $value"
-        case WViewFieldValue.productid(value) => fr"productid = $value"
-        case WViewFieldValue.orderqty(value) => fr"orderqty = $value"
-        case WViewFieldValue.scrappedqty(value) => fr"scrappedqty = $value"
-        case WViewFieldValue.startdate(value) => fr"startdate = $value"
-        case WViewFieldValue.enddate(value) => fr"enddate = $value"
-        case WViewFieldValue.duedate(value) => fr"duedate = $value"
-        case WViewFieldValue.scrapreasonid(value) => fr"scrapreasonid = $value"
-        case WViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.w $where".query[WViewRow].stream
-  
   }
 }

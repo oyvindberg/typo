@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package bec
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,30 +15,5 @@ object BecViewRepoImpl extends BecViewRepo {
     SQL"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate
           from pe.bec
        """.as(BecViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[BecViewFieldOrIdValue[_]])(implicit c: Connection): List[BecViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case BecViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case BecViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case BecViewFieldValue.personid(value) => NamedParameter("personid", ParameterValue.from(value))
-          case BecViewFieldValue.contacttypeid(value) => NamedParameter("contacttypeid", ParameterValue.from(value))
-          case BecViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case BecViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate
-                    from pe.bec
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(BecViewRow.rowParser(1).*)
-    }
-  
   }
 }

@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package sohsr
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,27 +15,5 @@ object SohsrViewRepoImpl extends SohsrViewRepo {
     SQL"""select salesorderid, salesreasonid, modifieddate
           from sa.sohsr
        """.as(SohsrViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SohsrViewFieldOrIdValue[_]])(implicit c: Connection): List[SohsrViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SohsrViewFieldValue.salesorderid(value) => NamedParameter("salesorderid", ParameterValue.from(value))
-          case SohsrViewFieldValue.salesreasonid(value) => NamedParameter("salesreasonid", ParameterValue.from(value))
-          case SohsrViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select salesorderid, salesreasonid, modifieddate
-                    from sa.sohsr
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SohsrViewRow.rowParser(1).*)
-    }
-  
   }
 }

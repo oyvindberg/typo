@@ -9,32 +9,10 @@ package vpersondemographics
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
   override def selectAll: Stream[ConnectionIO, VpersondemographicsViewRow] = {
     sql"select businessentityid, totalpurchaseytd, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned from sales.vpersondemographics".query[VpersondemographicsViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VpersondemographicsViewFieldOrIdValue[_]]): Stream[ConnectionIO, VpersondemographicsViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VpersondemographicsViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VpersondemographicsViewFieldValue.totalpurchaseytd(value) => fr"totalpurchaseytd = $value"
-        case VpersondemographicsViewFieldValue.datefirstpurchase(value) => fr"datefirstpurchase = $value"
-        case VpersondemographicsViewFieldValue.birthdate(value) => fr"birthdate = $value"
-        case VpersondemographicsViewFieldValue.maritalstatus(value) => fr"maritalstatus = $value"
-        case VpersondemographicsViewFieldValue.yearlyincome(value) => fr"yearlyincome = $value"
-        case VpersondemographicsViewFieldValue.gender(value) => fr"gender = $value"
-        case VpersondemographicsViewFieldValue.totalchildren(value) => fr"totalchildren = $value"
-        case VpersondemographicsViewFieldValue.numberchildrenathome(value) => fr"numberchildrenathome = $value"
-        case VpersondemographicsViewFieldValue.education(value) => fr"education = $value"
-        case VpersondemographicsViewFieldValue.occupation(value) => fr"occupation = $value"
-        case VpersondemographicsViewFieldValue.homeownerflag(value) => fr"homeownerflag = $value"
-        case VpersondemographicsViewFieldValue.numbercarsowned(value) => fr"numbercarsowned = $value"
-      } :_*
-    )
-    sql"select * from sales.vpersondemographics $where".query[VpersondemographicsViewRow].stream
-  
   }
 }

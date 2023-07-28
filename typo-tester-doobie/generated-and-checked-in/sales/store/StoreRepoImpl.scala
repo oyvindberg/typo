@@ -10,10 +10,8 @@ package store
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -61,20 +59,6 @@ object StoreRepoImpl extends StoreRepo {
   override def selectAll: Stream[ConnectionIO, StoreRow] = {
     sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store""".query[StoreRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[StoreFieldOrIdValue[_]]): Stream[ConnectionIO, StoreRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case StoreFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case StoreFieldValue.name(value) => fr""""name" = $value"""
-        case StoreFieldValue.salespersonid(value) => fr"salespersonid = $value"
-        case StoreFieldValue.demographics(value) => fr"demographics = $value"
-        case StoreFieldValue.rowguid(value) => fr"rowguid = $value"
-        case StoreFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.store $where".query[StoreRow].stream
-  
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[StoreRow]] = {
     sql"""select businessentityid, "name", salespersonid, demographics, rowguid, modifieddate from sales.store where businessentityid = $businessentityid""".query[StoreRow].option
   }
@@ -94,25 +78,6 @@ object StoreRepoImpl extends StoreRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[StoreFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case StoreFieldValue.name(value) => fr""""name" = $value"""
-            case StoreFieldValue.salespersonid(value) => fr"salespersonid = $value"
-            case StoreFieldValue.demographics(value) => fr"demographics = $value"
-            case StoreFieldValue.rowguid(value) => fr"rowguid = $value"
-            case StoreFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.store
-              $updates
-              where businessentityid = $businessentityid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store(businessentityid, "name", salespersonid, demographics, rowguid, modifieddate)

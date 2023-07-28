@@ -9,26 +9,10 @@ package vsalespersonsalesbyfiscalyears
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VsalespersonsalesbyfiscalyearsViewRepoImpl extends VsalespersonsalesbyfiscalyearsViewRepo {
   override def selectAll: Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsViewRow] = {
     sql"select SalesPersonID, FullName, JobTitle, SalesTerritory, 2012, 2013, 2014 from sales.vsalespersonsalesbyfiscalyears".query[VsalespersonsalesbyfiscalyearsViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VsalespersonsalesbyfiscalyearsViewFieldOrIdValue[_]]): Stream[ConnectionIO, VsalespersonsalesbyfiscalyearsViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VsalespersonsalesbyfiscalyearsViewFieldValue.SalesPersonID(value) => fr"SalesPersonID = $value"
-        case VsalespersonsalesbyfiscalyearsViewFieldValue.FullName(value) => fr"FullName = $value"
-        case VsalespersonsalesbyfiscalyearsViewFieldValue.JobTitle(value) => fr"JobTitle = $value"
-        case VsalespersonsalesbyfiscalyearsViewFieldValue.SalesTerritory(value) => fr"SalesTerritory = $value"
-        case VsalespersonsalesbyfiscalyearsViewFieldValue.`2012`(value) => fr"2012 = $value"
-        case VsalespersonsalesbyfiscalyearsViewFieldValue.`2013`(value) => fr"2013 = $value"
-        case VsalespersonsalesbyfiscalyearsViewFieldValue.`2014`(value) => fr"2014 = $value"
-      } :_*
-    )
-    sql"select * from sales.vsalespersonsalesbyfiscalyears $where".query[VsalespersonsalesbyfiscalyearsViewRow].stream
-  
   }
 }

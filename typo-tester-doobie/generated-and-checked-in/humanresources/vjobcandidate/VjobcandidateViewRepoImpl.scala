@@ -9,35 +9,10 @@ package vjobcandidate
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VjobcandidateViewRepoImpl extends VjobcandidateViewRepo {
   override def selectAll: Stream[ConnectionIO, VjobcandidateViewRow] = {
     sql"""select jobcandidateid, businessentityid, "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", Skills, "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", EMail, WebSite, modifieddate from humanresources.vjobcandidate""".query[VjobcandidateViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VjobcandidateViewFieldOrIdValue[_]]): Stream[ConnectionIO, VjobcandidateViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VjobcandidateViewFieldValue.jobcandidateid(value) => fr"jobcandidateid = $value"
-        case VjobcandidateViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VjobcandidateViewFieldValue.`Name.Prefix`(value) => fr""""Name.Prefix" = $value"""
-        case VjobcandidateViewFieldValue.`Name.First`(value) => fr""""Name.First" = $value"""
-        case VjobcandidateViewFieldValue.`Name.Middle`(value) => fr""""Name.Middle" = $value"""
-        case VjobcandidateViewFieldValue.`Name.Last`(value) => fr""""Name.Last" = $value"""
-        case VjobcandidateViewFieldValue.`Name.Suffix`(value) => fr""""Name.Suffix" = $value"""
-        case VjobcandidateViewFieldValue.Skills(value) => fr"Skills = $value"
-        case VjobcandidateViewFieldValue.`Addr.Type`(value) => fr""""Addr.Type" = $value"""
-        case VjobcandidateViewFieldValue.`Addr.Loc.CountryRegion`(value) => fr""""Addr.Loc.CountryRegion" = $value"""
-        case VjobcandidateViewFieldValue.`Addr.Loc.State`(value) => fr""""Addr.Loc.State" = $value"""
-        case VjobcandidateViewFieldValue.`Addr.Loc.City`(value) => fr""""Addr.Loc.City" = $value"""
-        case VjobcandidateViewFieldValue.`Addr.PostalCode`(value) => fr""""Addr.PostalCode" = $value"""
-        case VjobcandidateViewFieldValue.EMail(value) => fr"EMail = $value"
-        case VjobcandidateViewFieldValue.WebSite(value) => fr"WebSite = $value"
-        case VjobcandidateViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.vjobcandidate $where".query[VjobcandidateViewRow].stream
-  
   }
 }

@@ -14,10 +14,8 @@ trait WorkorderRepo {
   def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow
   def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow
   def selectAll(implicit c: Connection): List[WorkorderRow]
-  def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow]
   def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow]
   def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow]
   def update(row: WorkorderRow)(implicit c: Connection): Boolean
-  def updateFieldValues(workorderid: WorkorderId, fieldValues: List[WorkorderFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow
 }

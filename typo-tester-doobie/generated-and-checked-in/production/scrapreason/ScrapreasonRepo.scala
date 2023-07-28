@@ -15,10 +15,8 @@ trait ScrapreasonRepo {
   def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow]
   def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow]
   def selectAll: Stream[ConnectionIO, ScrapreasonRow]
-  def selectByFieldValues(fieldValues: List[ScrapreasonFieldOrIdValue[_]]): Stream[ConnectionIO, ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]]
   def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow]
   def update(row: ScrapreasonRow): ConnectionIO[Boolean]
-  def updateFieldValues(scrapreasonid: ScrapreasonId, fieldValues: List[ScrapreasonFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow]
 }

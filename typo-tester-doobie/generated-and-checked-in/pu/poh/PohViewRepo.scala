@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait PohViewRepo {
   def selectAll: Stream[ConnectionIO, PohViewRow]
-  def selectByFieldValues(fieldValues: List[PohViewFieldOrIdValue[_]]): Stream[ConnectionIO, PohViewRow]
 }

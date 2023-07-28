@@ -9,25 +9,10 @@ package pa
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PaViewRepoImpl extends PaViewRepo {
   override def selectAll: Stream[ConnectionIO, PaViewRow] = {
     sql"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from pe.pa""".query[PaViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PaViewFieldOrIdValue[_]]): Stream[ConnectionIO, PaViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PaViewFieldValue.id(value) => fr""""id" = $value"""
-        case PaViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case PaViewFieldValue.passwordhash(value) => fr"passwordhash = $value"
-        case PaViewFieldValue.passwordsalt(value) => fr"passwordsalt = $value"
-        case PaViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PaViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pe.pa $where".query[PaViewRow].stream
-  
   }
 }

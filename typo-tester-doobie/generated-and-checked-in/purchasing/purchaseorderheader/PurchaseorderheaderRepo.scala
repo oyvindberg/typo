@@ -15,10 +15,8 @@ trait PurchaseorderheaderRepo {
   def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow]
   def insert(unsaved: PurchaseorderheaderRowUnsaved): ConnectionIO[PurchaseorderheaderRow]
   def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow]
-  def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]]): Stream[ConnectionIO, PurchaseorderheaderRow]
   def selectById(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Option[PurchaseorderheaderRow]]
   def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow]
   def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean]
-  def updateFieldValues(purchaseorderid: PurchaseorderheaderId, fieldValues: List[PurchaseorderheaderFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow]
 }

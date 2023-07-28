@@ -15,10 +15,8 @@ trait JobcandidateRepo {
   def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
   def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow]
   def selectAll: Stream[ConnectionIO, JobcandidateRow]
-  def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]]): Stream[ConnectionIO, JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]]
   def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow]
   def update(row: JobcandidateRow): ConnectionIO[Boolean]
-  def updateFieldValues(jobcandidateid: JobcandidateId, fieldValues: List[JobcandidateFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
 }

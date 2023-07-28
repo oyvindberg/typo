@@ -31,23 +31,6 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ProductvendorFieldOrIdValue[_]]): Stream[ConnectionIO, ProductvendorRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ProductvendorFieldValue.productid(value)) => acc.filter(_.productid == value)
-        case (acc, ProductvendorFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, ProductvendorFieldValue.averageleadtime(value)) => acc.filter(_.averageleadtime == value)
-        case (acc, ProductvendorFieldValue.standardprice(value)) => acc.filter(_.standardprice == value)
-        case (acc, ProductvendorFieldValue.lastreceiptcost(value)) => acc.filter(_.lastreceiptcost == value)
-        case (acc, ProductvendorFieldValue.lastreceiptdate(value)) => acc.filter(_.lastreceiptdate == value)
-        case (acc, ProductvendorFieldValue.minorderqty(value)) => acc.filter(_.minorderqty == value)
-        case (acc, ProductvendorFieldValue.maxorderqty(value)) => acc.filter(_.maxorderqty == value)
-        case (acc, ProductvendorFieldValue.onorderqty(value)) => acc.filter(_.onorderqty == value)
-        case (acc, ProductvendorFieldValue.unitmeasurecode(value)) => acc.filter(_.unitmeasurecode == value)
-        case (acc, ProductvendorFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
     delay(map.get(compositeId))
   }
@@ -58,31 +41,6 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: ProductvendorId, fieldValues: List[ProductvendorFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ProductvendorFieldValue.averageleadtime(value)) => acc.copy(averageleadtime = value)
-            case (acc, ProductvendorFieldValue.standardprice(value)) => acc.copy(standardprice = value)
-            case (acc, ProductvendorFieldValue.lastreceiptcost(value)) => acc.copy(lastreceiptcost = value)
-            case (acc, ProductvendorFieldValue.lastreceiptdate(value)) => acc.copy(lastreceiptdate = value)
-            case (acc, ProductvendorFieldValue.minorderqty(value)) => acc.copy(minorderqty = value)
-            case (acc, ProductvendorFieldValue.maxorderqty(value)) => acc.copy(maxorderqty = value)
-            case (acc, ProductvendorFieldValue.onorderqty(value)) => acc.copy(onorderqty = value)
-            case (acc, ProductvendorFieldValue.unitmeasurecode(value)) => acc.copy(unitmeasurecode = value)
-            case (acc, ProductvendorFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

@@ -15,10 +15,8 @@ trait TransactionhistoryarchiveRepo {
   def insert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow]
   def insert(unsaved: TransactionhistoryarchiveRowUnsaved): ConnectionIO[TransactionhistoryarchiveRow]
   def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow]
-  def selectByFieldValues(fieldValues: List[TransactionhistoryarchiveFieldOrIdValue[_]]): Stream[ConnectionIO, TransactionhistoryarchiveRow]
   def selectById(transactionid: TransactionhistoryarchiveId): ConnectionIO[Option[TransactionhistoryarchiveRow]]
   def selectByIds(transactionids: Array[TransactionhistoryarchiveId]): Stream[ConnectionIO, TransactionhistoryarchiveRow]
   def update(row: TransactionhistoryarchiveRow): ConnectionIO[Boolean]
-  def updateFieldValues(transactionid: TransactionhistoryarchiveId, fieldValues: List[TransactionhistoryarchiveFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow]
 }

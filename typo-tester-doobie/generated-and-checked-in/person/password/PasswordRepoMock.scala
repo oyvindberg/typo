@@ -32,17 +32,6 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]]): Stream[ConnectionIO, PasswordRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, PasswordFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, PasswordFieldValue.passwordhash(value)) => acc.filter(_.passwordhash == value)
-        case (acc, PasswordFieldValue.passwordsalt(value)) => acc.filter(_.passwordsalt == value)
-        case (acc, PasswordFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-        case (acc, PasswordFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]] = {
     delay(map.get(businessentityid))
   }
@@ -56,26 +45,6 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
         case Some(_) =>
           map.put(row.businessentityid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PasswordFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(businessentityid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, PasswordFieldValue.passwordhash(value)) => acc.copy(passwordhash = value)
-            case (acc, PasswordFieldValue.passwordsalt(value)) => acc.copy(passwordsalt = value)
-            case (acc, PasswordFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-            case (acc, PasswordFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(businessentityid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

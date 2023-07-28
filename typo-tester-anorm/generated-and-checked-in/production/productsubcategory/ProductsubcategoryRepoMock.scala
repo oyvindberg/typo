@@ -27,15 +27,6 @@ class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, 
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[ProductsubcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductsubcategoryRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, ProductsubcategoryFieldValue.productsubcategoryid(value)) => acc.filter(_.productsubcategoryid == value)
-      case (acc, ProductsubcategoryFieldValue.productcategoryid(value)) => acc.filter(_.productcategoryid == value)
-      case (acc, ProductsubcategoryFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, ProductsubcategoryFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, ProductsubcategoryFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Option[ProductsubcategoryRow] = {
     map.get(productsubcategoryid)
   }
@@ -48,24 +39,6 @@ class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, 
       case Some(_) =>
         map.put(row.productsubcategoryid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(productsubcategoryid: ProductsubcategoryId, fieldValues: List[ProductsubcategoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(productsubcategoryid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, ProductsubcategoryFieldValue.productcategoryid(value)) => acc.copy(productcategoryid = value)
-          case (acc, ProductsubcategoryFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, ProductsubcategoryFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, ProductsubcategoryFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(productsubcategoryid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

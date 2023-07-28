@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait VemployeedepartmenthistoryViewRepo {
   def selectAll: Stream[ConnectionIO, VemployeedepartmenthistoryViewRow]
-  def selectByFieldValues(fieldValues: List[VemployeedepartmenthistoryViewFieldOrIdValue[_]]): Stream[ConnectionIO, VemployeedepartmenthistoryViewRow]
 }

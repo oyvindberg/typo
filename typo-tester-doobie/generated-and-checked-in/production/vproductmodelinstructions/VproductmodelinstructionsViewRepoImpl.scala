@@ -9,30 +9,10 @@ package vproductmodelinstructions
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
     sql"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate from production.vproductmodelinstructions""".query[VproductmodelinstructionsViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VproductmodelinstructionsViewFieldOrIdValue[_]]): Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VproductmodelinstructionsViewFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case VproductmodelinstructionsViewFieldValue.name(value) => fr""""name" = $value"""
-        case VproductmodelinstructionsViewFieldValue.instructions(value) => fr"instructions = $value"
-        case VproductmodelinstructionsViewFieldValue.LocationID(value) => fr"LocationID = $value"
-        case VproductmodelinstructionsViewFieldValue.SetupHours(value) => fr"SetupHours = $value"
-        case VproductmodelinstructionsViewFieldValue.MachineHours(value) => fr"MachineHours = $value"
-        case VproductmodelinstructionsViewFieldValue.LaborHours(value) => fr"LaborHours = $value"
-        case VproductmodelinstructionsViewFieldValue.LotSize(value) => fr"LotSize = $value"
-        case VproductmodelinstructionsViewFieldValue.Step(value) => fr"Step = $value"
-        case VproductmodelinstructionsViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case VproductmodelinstructionsViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.vproductmodelinstructions $where".query[VproductmodelinstructionsViewRow].stream
-  
   }
 }

@@ -31,16 +31,6 @@ class SalesreasonRepoMock(toRow: Function1[SalesreasonRowUnsaved, SalesreasonRow
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]]): Stream[ConnectionIO, SalesreasonRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, SalesreasonFieldValue.salesreasonid(value)) => acc.filter(_.salesreasonid == value)
-        case (acc, SalesreasonFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, SalesreasonFieldValue.reasontype(value)) => acc.filter(_.reasontype == value)
-        case (acc, SalesreasonFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]] = {
     delay(map.get(salesreasonid))
   }
@@ -54,25 +44,6 @@ class SalesreasonRepoMock(toRow: Function1[SalesreasonRowUnsaved, SalesreasonRow
         case Some(_) =>
           map.put(row.salesreasonid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(salesreasonid: SalesreasonId, fieldValues: List[SalesreasonFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(salesreasonid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, SalesreasonFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, SalesreasonFieldValue.reasontype(value)) => acc.copy(reasontype = value)
-            case (acc, SalesreasonFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(salesreasonid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

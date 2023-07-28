@@ -68,37 +68,6 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           from production.workorderrouting
        """.as(WorkorderroutingRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderroutingRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case WorkorderroutingFieldValue.workorderid(value) => NamedParameter("workorderid", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.operationsequence(value) => NamedParameter("operationsequence", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.locationid(value) => NamedParameter("locationid", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.scheduledstartdate(value) => NamedParameter("scheduledstartdate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.scheduledenddate(value) => NamedParameter("scheduledenddate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualstartdate(value) => NamedParameter("actualstartdate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualenddate(value) => NamedParameter("actualenddate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualresourcehrs(value) => NamedParameter("actualresourcehrs", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.plannedcost(value) => NamedParameter("plannedcost", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
-                    from production.workorderrouting
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(WorkorderroutingRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
     SQL"""select workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from production.workorderrouting
@@ -119,35 +88,6 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where workorderid = ${compositeId.workorderid} AND productid = ${compositeId.productid} AND operationsequence = ${compositeId.operationsequence}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: WorkorderroutingId, fieldValues: List[WorkorderroutingFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case WorkorderroutingFieldValue.locationid(value) => NamedParameter("locationid", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.scheduledstartdate(value) => NamedParameter("scheduledstartdate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.scheduledenddate(value) => NamedParameter("scheduledenddate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualstartdate(value) => NamedParameter("actualstartdate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualenddate(value) => NamedParameter("actualenddate", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualresourcehrs(value) => NamedParameter("actualresourcehrs", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.plannedcost(value) => NamedParameter("plannedcost", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
-          case WorkorderroutingFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.workorderrouting
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where workorderid = {workorderid} AND productid = {productid} AND operationsequence = {operationsequence}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("workorderid", ParameterValue.from(compositeId.workorderid)), NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("operationsequence", ParameterValue.from(compositeId.operationsequence)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     SQL"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)

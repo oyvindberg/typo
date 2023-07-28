@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait CtViewRepo {
   def selectAll: Stream[ConnectionIO, CtViewRow]
-  def selectByFieldValues(fieldValues: List[CtViewFieldOrIdValue[_]]): Stream[ConnectionIO, CtViewRow]
 }

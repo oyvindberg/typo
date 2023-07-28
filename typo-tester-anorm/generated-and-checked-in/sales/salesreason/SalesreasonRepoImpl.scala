@@ -65,29 +65,6 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
           from sales.salesreason
        """.as(SalesreasonRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[SalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesreasonRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalesreasonFieldValue.salesreasonid(value) => NamedParameter("salesreasonid", ParameterValue.from(value))
-          case SalesreasonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SalesreasonFieldValue.reasontype(value) => NamedParameter("reasontype", ParameterValue.from(value))
-          case SalesreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select salesreasonid, "name", reasontype, modifieddate
-                    from sales.salesreason
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SalesreasonRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
     SQL"""select salesreasonid, "name", reasontype, modifieddate
           from sales.salesreason
@@ -113,29 +90,6 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where salesreasonid = $salesreasonid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(salesreasonid: SalesreasonId, fieldValues: List[SalesreasonFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SalesreasonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SalesreasonFieldValue.reasontype(value) => NamedParameter("reasontype", ParameterValue.from(value))
-          case SalesreasonFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.salesreason
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where salesreasonid = {salesreasonid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("salesreasonid", ParameterValue.from(salesreasonid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)

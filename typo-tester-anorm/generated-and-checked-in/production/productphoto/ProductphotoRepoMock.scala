@@ -27,16 +27,6 @@ class ProductphotoRepoMock(toRow: Function1[ProductphotoRowUnsaved, Productphoto
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[ProductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductphotoRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, ProductphotoFieldValue.productphotoid(value)) => acc.filter(_.productphotoid == value)
-      case (acc, ProductphotoFieldValue.thumbnailphoto(value)) => acc.filter(_.thumbnailphoto == value)
-      case (acc, ProductphotoFieldValue.thumbnailphotofilename(value)) => acc.filter(_.thumbnailphotofilename == value)
-      case (acc, ProductphotoFieldValue.largephoto(value)) => acc.filter(_.largephoto == value)
-      case (acc, ProductphotoFieldValue.largephotofilename(value)) => acc.filter(_.largephotofilename == value)
-      case (acc, ProductphotoFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(productphotoid: ProductphotoId)(implicit c: Connection): Option[ProductphotoRow] = {
     map.get(productphotoid)
   }
@@ -49,25 +39,6 @@ class ProductphotoRepoMock(toRow: Function1[ProductphotoRowUnsaved, Productphoto
       case Some(_) =>
         map.put(row.productphotoid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(productphotoid: ProductphotoId, fieldValues: List[ProductphotoFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(productphotoid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, ProductphotoFieldValue.thumbnailphoto(value)) => acc.copy(thumbnailphoto = value)
-          case (acc, ProductphotoFieldValue.thumbnailphotofilename(value)) => acc.copy(thumbnailphotofilename = value)
-          case (acc, ProductphotoFieldValue.largephoto(value)) => acc.copy(largephoto = value)
-          case (acc, ProductphotoFieldValue.largephotofilename(value)) => acc.copy(largephotofilename = value)
-          case (acc, ProductphotoFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(productphotoid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

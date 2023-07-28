@@ -10,10 +10,8 @@ package password
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -60,19 +58,6 @@ object PasswordRepoImpl extends PasswordRepo {
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
     sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person."password"""".query[PasswordRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PasswordFieldOrIdValue[_]]): Stream[ConnectionIO, PasswordRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PasswordFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case PasswordFieldValue.passwordhash(value) => fr"passwordhash = $value"
-        case PasswordFieldValue.passwordsalt(value) => fr"passwordsalt = $value"
-        case PasswordFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PasswordFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"""select * from person."password" $where""".query[PasswordRow].stream
-  
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]] = {
     sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate from person."password" where businessentityid = $businessentityid""".query[PasswordRow].option
   }
@@ -91,24 +76,6 @@ object PasswordRepoImpl extends PasswordRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PasswordFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PasswordFieldValue.passwordhash(value) => fr"passwordhash = $value"
-            case PasswordFieldValue.passwordsalt(value) => fr"passwordsalt = $value"
-            case PasswordFieldValue.rowguid(value) => fr"rowguid = $value"
-            case PasswordFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person."password"
-              $updates
-              where businessentityid = $businessentityid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

@@ -31,15 +31,6 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ContacttypeFieldOrIdValue[_]]): Stream[ConnectionIO, ContacttypeRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ContacttypeFieldValue.contacttypeid(value)) => acc.filter(_.contacttypeid == value)
-        case (acc, ContacttypeFieldValue.name(value)) => acc.filter(_.name == value)
-        case (acc, ContacttypeFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]] = {
     delay(map.get(contacttypeid))
   }
@@ -53,24 +44,6 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
         case Some(_) =>
           map.put(row.contacttypeid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(contacttypeid: ContacttypeId, fieldValues: List[ContacttypeFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(contacttypeid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ContacttypeFieldValue.name(value)) => acc.copy(name = value)
-            case (acc, ContacttypeFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(contacttypeid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

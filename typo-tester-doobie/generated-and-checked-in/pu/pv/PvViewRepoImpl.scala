@@ -9,31 +9,10 @@ package pv
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PvViewRepoImpl extends PvViewRepo {
   override def selectAll: Stream[ConnectionIO, PvViewRow] = {
     sql"""select "id", productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from pu.pv""".query[PvViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PvViewFieldOrIdValue[_]]): Stream[ConnectionIO, PvViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PvViewFieldValue.id(value) => fr""""id" = $value"""
-        case PvViewFieldValue.productid(value) => fr"productid = $value"
-        case PvViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case PvViewFieldValue.averageleadtime(value) => fr"averageleadtime = $value"
-        case PvViewFieldValue.standardprice(value) => fr"standardprice = $value"
-        case PvViewFieldValue.lastreceiptcost(value) => fr"lastreceiptcost = $value"
-        case PvViewFieldValue.lastreceiptdate(value) => fr"lastreceiptdate = $value"
-        case PvViewFieldValue.minorderqty(value) => fr"minorderqty = $value"
-        case PvViewFieldValue.maxorderqty(value) => fr"maxorderqty = $value"
-        case PvViewFieldValue.onorderqty(value) => fr"onorderqty = $value"
-        case PvViewFieldValue.unitmeasurecode(value) => fr"unitmeasurecode = $value"
-        case PvViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pu.pv $where".query[PvViewRow].stream
-  
   }
 }

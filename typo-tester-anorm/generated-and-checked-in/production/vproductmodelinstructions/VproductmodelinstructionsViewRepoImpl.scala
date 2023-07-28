@@ -7,8 +7,6 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,35 +15,5 @@ object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVi
     SQL"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
           from production.vproductmodelinstructions
        """.as(VproductmodelinstructionsViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VproductmodelinstructionsViewFieldOrIdValue[_]])(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VproductmodelinstructionsViewFieldValue.productmodelid(value) => NamedParameter("productmodelid", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.instructions(value) => NamedParameter("instructions", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.LocationID(value) => NamedParameter("LocationID", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.SetupHours(value) => NamedParameter("SetupHours", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.MachineHours(value) => NamedParameter("MachineHours", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.LaborHours(value) => NamedParameter("LaborHours", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.LotSize(value) => NamedParameter("LotSize", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.Step(value) => NamedParameter("Step", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case VproductmodelinstructionsViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate
-                    from production.vproductmodelinstructions
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VproductmodelinstructionsViewRow.rowParser(1).*)
-    }
-  
   }
 }

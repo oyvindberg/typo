@@ -9,30 +9,10 @@ package vjobcandidateemployment
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRepo {
   override def selectAll: Stream[ConnectionIO, VjobcandidateemploymentViewRow] = {
     sql"""select jobcandidateid, "Emp.StartDate", "Emp.EndDate", "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".query[VjobcandidateemploymentViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VjobcandidateemploymentViewFieldOrIdValue[_]]): Stream[ConnectionIO, VjobcandidateemploymentViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VjobcandidateemploymentViewFieldValue.jobcandidateid(value) => fr"jobcandidateid = $value"
-        case VjobcandidateemploymentViewFieldValue.`Emp.StartDate`(value) => fr""""Emp.StartDate" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.EndDate`(value) => fr""""Emp.EndDate" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.OrgName`(value) => fr""""Emp.OrgName" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.JobTitle`(value) => fr""""Emp.JobTitle" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.Responsibility`(value) => fr""""Emp.Responsibility" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.FunctionCategory`(value) => fr""""Emp.FunctionCategory" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.IndustryCategory`(value) => fr""""Emp.IndustryCategory" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.Loc.CountryRegion`(value) => fr""""Emp.Loc.CountryRegion" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.Loc.State`(value) => fr""""Emp.Loc.State" = $value"""
-        case VjobcandidateemploymentViewFieldValue.`Emp.Loc.City`(value) => fr""""Emp.Loc.City" = $value"""
-      } :_*
-    )
-    sql"select * from humanresources.vjobcandidateemployment $where".query[VjobcandidateemploymentViewRow].stream
-  
   }
 }

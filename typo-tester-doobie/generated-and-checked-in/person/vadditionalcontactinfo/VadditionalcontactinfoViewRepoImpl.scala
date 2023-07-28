@@ -9,36 +9,10 @@ package vadditionalcontactinfo
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def selectAll: Stream[ConnectionIO, VadditionalcontactinfoViewRow] = {
     sql"select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate from person.vadditionalcontactinfo".query[VadditionalcontactinfoViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VadditionalcontactinfoViewFieldOrIdValue[_]]): Stream[ConnectionIO, VadditionalcontactinfoViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VadditionalcontactinfoViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VadditionalcontactinfoViewFieldValue.firstname(value) => fr"firstname = $value"
-        case VadditionalcontactinfoViewFieldValue.middlename(value) => fr"middlename = $value"
-        case VadditionalcontactinfoViewFieldValue.lastname(value) => fr"lastname = $value"
-        case VadditionalcontactinfoViewFieldValue.telephonenumber(value) => fr"telephonenumber = $value"
-        case VadditionalcontactinfoViewFieldValue.telephonespecialinstructions(value) => fr"telephonespecialinstructions = $value"
-        case VadditionalcontactinfoViewFieldValue.street(value) => fr"street = $value"
-        case VadditionalcontactinfoViewFieldValue.city(value) => fr"city = $value"
-        case VadditionalcontactinfoViewFieldValue.stateprovince(value) => fr"stateprovince = $value"
-        case VadditionalcontactinfoViewFieldValue.postalcode(value) => fr"postalcode = $value"
-        case VadditionalcontactinfoViewFieldValue.countryregion(value) => fr"countryregion = $value"
-        case VadditionalcontactinfoViewFieldValue.homeaddressspecialinstructions(value) => fr"homeaddressspecialinstructions = $value"
-        case VadditionalcontactinfoViewFieldValue.emailaddress(value) => fr"emailaddress = $value"
-        case VadditionalcontactinfoViewFieldValue.emailspecialinstructions(value) => fr"emailspecialinstructions = $value"
-        case VadditionalcontactinfoViewFieldValue.emailtelephonenumber(value) => fr"emailtelephonenumber = $value"
-        case VadditionalcontactinfoViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case VadditionalcontactinfoViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.vadditionalcontactinfo $where".query[VadditionalcontactinfoViewRow].stream
-  
   }
 }

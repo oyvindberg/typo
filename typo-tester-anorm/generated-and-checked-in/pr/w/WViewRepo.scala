@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait WViewRepo {
   def selectAll(implicit c: Connection): List[WViewRow]
-  def selectByFieldValues(fieldValues: List[WViewFieldOrIdValue[_]])(implicit c: Connection): List[WViewRow]
 }

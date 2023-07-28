@@ -9,25 +9,10 @@ package eph
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object EphViewRepoImpl extends EphViewRepo {
   override def selectAll: Stream[ConnectionIO, EphViewRow] = {
     sql"""select "id", businessentityid, ratechangedate, rate, payfrequency, modifieddate from hr.eph""".query[EphViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[EphViewFieldOrIdValue[_]]): Stream[ConnectionIO, EphViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EphViewFieldValue.id(value) => fr""""id" = $value"""
-        case EphViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EphViewFieldValue.ratechangedate(value) => fr"ratechangedate = $value"
-        case EphViewFieldValue.rate(value) => fr"rate = $value"
-        case EphViewFieldValue.payfrequency(value) => fr"payfrequency = $value"
-        case EphViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from hr.eph $where".query[EphViewRow].stream
-  
   }
 }

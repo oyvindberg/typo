@@ -9,23 +9,10 @@ package ct
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object CtViewRepoImpl extends CtViewRepo {
   override def selectAll: Stream[ConnectionIO, CtViewRow] = {
     sql"""select "id", contacttypeid, "name", modifieddate from pe.ct""".query[CtViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[CtViewFieldOrIdValue[_]]): Stream[ConnectionIO, CtViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CtViewFieldValue.id(value) => fr""""id" = $value"""
-        case CtViewFieldValue.contacttypeid(value) => fr"contacttypeid = $value"
-        case CtViewFieldValue.name(value) => fr""""name" = $value"""
-        case CtViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pe.ct $where".query[CtViewRow].stream
-  
   }
 }

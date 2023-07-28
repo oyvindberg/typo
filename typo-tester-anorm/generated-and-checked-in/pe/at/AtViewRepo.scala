@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait AtViewRepo {
   def selectAll(implicit c: Connection): List[AtViewRow]
-  def selectByFieldValues(fieldValues: List[AtViewFieldOrIdValue[_]])(implicit c: Connection): List[AtViewRow]
 }

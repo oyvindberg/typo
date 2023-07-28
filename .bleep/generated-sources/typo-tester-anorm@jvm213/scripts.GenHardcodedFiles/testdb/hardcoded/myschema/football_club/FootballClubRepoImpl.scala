@@ -8,8 +8,6 @@ package hardcoded
 package myschema
 package football_club
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
@@ -31,27 +29,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
     SQL"""select "id", "name"
           from myschema.football_club
        """.as(FootballClubRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case FootballClubFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", "name"
-                    from myschema.football_club
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(FootballClubRow.rowParser(1).*)
-    }
-  
   }
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
     SQL"""select "id", "name"
@@ -76,27 +53,6 @@ object FootballClubRepoImpl extends FootballClubRepo {
           set "name" = ${row.name}
           where "id" = $id
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case FootballClubFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update myschema.football_club
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where "id" = {id}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("id", ParameterValue.from(id)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")

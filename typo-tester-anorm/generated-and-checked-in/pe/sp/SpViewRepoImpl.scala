@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package sp
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,33 +15,5 @@ object SpViewRepoImpl extends SpViewRepo {
     SQL"""select "id", stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
           from pe.sp
        """.as(SpViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SpViewFieldOrIdValue[_]])(implicit c: Connection): List[SpViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SpViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SpViewFieldValue.stateprovinceid(value) => NamedParameter("stateprovinceid", ParameterValue.from(value))
-          case SpViewFieldValue.stateprovincecode(value) => NamedParameter("stateprovincecode", ParameterValue.from(value))
-          case SpViewFieldValue.countryregioncode(value) => NamedParameter("countryregioncode", ParameterValue.from(value))
-          case SpViewFieldValue.isonlystateprovinceflag(value) => NamedParameter("isonlystateprovinceflag", ParameterValue.from(value))
-          case SpViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case SpViewFieldValue.territoryid(value) => NamedParameter("territoryid", ParameterValue.from(value))
-          case SpViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case SpViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate
-                    from pe.sp
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SpViewRow.rowParser(1).*)
-    }
-  
   }
 }

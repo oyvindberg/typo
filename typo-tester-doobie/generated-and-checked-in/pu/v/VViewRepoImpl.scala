@@ -9,28 +9,10 @@ package v
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VViewRepoImpl extends VViewRepo {
   override def selectAll: Stream[ConnectionIO, VViewRow] = {
     sql"""select "id", businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate from pu.v""".query[VViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VViewFieldOrIdValue[_]]): Stream[ConnectionIO, VViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VViewFieldValue.id(value) => fr""""id" = $value"""
-        case VViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VViewFieldValue.accountnumber(value) => fr"accountnumber = $value"
-        case VViewFieldValue.name(value) => fr""""name" = $value"""
-        case VViewFieldValue.creditrating(value) => fr"creditrating = $value"
-        case VViewFieldValue.preferredvendorstatus(value) => fr"preferredvendorstatus = $value"
-        case VViewFieldValue.activeflag(value) => fr"activeflag = $value"
-        case VViewFieldValue.purchasingwebserviceurl(value) => fr"purchasingwebserviceurl = $value"
-        case VViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pu.v $where".query[VViewRow].stream
-  
   }
 }

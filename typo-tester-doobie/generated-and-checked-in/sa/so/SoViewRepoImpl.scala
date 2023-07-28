@@ -9,31 +9,10 @@ package so
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SoViewRepoImpl extends SoViewRepo {
   override def selectAll: Stream[ConnectionIO, SoViewRow] = {
     sql"""select "id", specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sa.so""".query[SoViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SoViewFieldOrIdValue[_]]): Stream[ConnectionIO, SoViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SoViewFieldValue.id(value) => fr""""id" = $value"""
-        case SoViewFieldValue.specialofferid(value) => fr"specialofferid = $value"
-        case SoViewFieldValue.description(value) => fr"description = $value"
-        case SoViewFieldValue.discountpct(value) => fr"discountpct = $value"
-        case SoViewFieldValue.`type`(value) => fr""""type" = $value"""
-        case SoViewFieldValue.category(value) => fr"category = $value"
-        case SoViewFieldValue.startdate(value) => fr"startdate = $value"
-        case SoViewFieldValue.enddate(value) => fr"enddate = $value"
-        case SoViewFieldValue.minqty(value) => fr"minqty = $value"
-        case SoViewFieldValue.maxqty(value) => fr"maxqty = $value"
-        case SoViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SoViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.so $where".query[SoViewRow].stream
-  
   }
 }

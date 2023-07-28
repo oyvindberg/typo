@@ -15,9 +15,7 @@ trait BusinessentitycontactRepo {
   def insert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow]
   def insert(unsaved: BusinessentitycontactRowUnsaved): ConnectionIO[BusinessentitycontactRow]
   def selectAll: Stream[ConnectionIO, BusinessentitycontactRow]
-  def selectByFieldValues(fieldValues: List[BusinessentitycontactFieldOrIdValue[_]]): Stream[ConnectionIO, BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]]
   def update(row: BusinessentitycontactRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: BusinessentitycontactId, fieldValues: List[BusinessentitycontactFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow]
 }

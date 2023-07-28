@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package um
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,28 +15,5 @@ object UmViewRepoImpl extends UmViewRepo {
     SQL"""select "id", unitmeasurecode, "name", modifieddate
           from pr.um
        """.as(UmViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[UmViewFieldOrIdValue[_]])(implicit c: Connection): List[UmViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case UmViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case UmViewFieldValue.unitmeasurecode(value) => NamedParameter("unitmeasurecode", ParameterValue.from(value))
-          case UmViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case UmViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", unitmeasurecode, "name", modifieddate
-                    from pr.um
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(UmViewRow.rowParser(1).*)
-    }
-  
   }
 }

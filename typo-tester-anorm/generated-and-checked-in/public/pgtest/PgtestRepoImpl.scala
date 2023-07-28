@@ -7,8 +7,6 @@ package adventureworks
 package public
 package pgtest
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -25,52 +23,5 @@ object PgtestRepoImpl extends PgtestRepo {
     SQL"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
           from "public".pgtest
        """.as(PgtestRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PgtestFieldOrIdValue[_]])(implicit c: Connection): List[PgtestRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PgtestFieldValue.box(value) => NamedParameter("box", ParameterValue.from(value))
-          case PgtestFieldValue.circle(value) => NamedParameter("circle", ParameterValue.from(value))
-          case PgtestFieldValue.line(value) => NamedParameter("line", ParameterValue.from(value))
-          case PgtestFieldValue.lseg(value) => NamedParameter("lseg", ParameterValue.from(value))
-          case PgtestFieldValue.path(value) => NamedParameter("path", ParameterValue.from(value))
-          case PgtestFieldValue.point(value) => NamedParameter("point", ParameterValue.from(value))
-          case PgtestFieldValue.polygon(value) => NamedParameter("polygon", ParameterValue.from(value))
-          case PgtestFieldValue.interval(value) => NamedParameter("interval", ParameterValue.from(value))
-          case PgtestFieldValue.money(value) => NamedParameter("money", ParameterValue.from(value))
-          case PgtestFieldValue.xml(value) => NamedParameter("xml", ParameterValue.from(value))
-          case PgtestFieldValue.json(value) => NamedParameter("json", ParameterValue.from(value))
-          case PgtestFieldValue.jsonb(value) => NamedParameter("jsonb", ParameterValue.from(value))
-          case PgtestFieldValue.hstore(value) => NamedParameter("hstore", ParameterValue.from(value))
-          case PgtestFieldValue.inet(value) => NamedParameter("inet", ParameterValue.from(value))
-          case PgtestFieldValue.boxes(value) => NamedParameter("boxes", ParameterValue.from(value))
-          case PgtestFieldValue.circlees(value) => NamedParameter("circlees", ParameterValue.from(value))
-          case PgtestFieldValue.linees(value) => NamedParameter("linees", ParameterValue.from(value))
-          case PgtestFieldValue.lseges(value) => NamedParameter("lseges", ParameterValue.from(value))
-          case PgtestFieldValue.pathes(value) => NamedParameter("pathes", ParameterValue.from(value))
-          case PgtestFieldValue.pointes(value) => NamedParameter("pointes", ParameterValue.from(value))
-          case PgtestFieldValue.polygones(value) => NamedParameter("polygones", ParameterValue.from(value))
-          case PgtestFieldValue.intervales(value) => NamedParameter("intervales", ParameterValue.from(value))
-          case PgtestFieldValue.moneyes(value) => NamedParameter("moneyes", ParameterValue.from(value))
-          case PgtestFieldValue.xmles(value) => NamedParameter("xmles", ParameterValue.from(value))
-          case PgtestFieldValue.jsones(value) => NamedParameter("jsones", ParameterValue.from(value))
-          case PgtestFieldValue.jsonbes(value) => NamedParameter("jsonbes", ParameterValue.from(value))
-          case PgtestFieldValue.hstores(value) => NamedParameter("hstores", ParameterValue.from(value))
-          case PgtestFieldValue.inets(value) => NamedParameter("inets", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select box, circle, line, lseg, "path", point, polygon, "interval", money::numeric, "xml", json, jsonb, hstore, inet, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes::numeric[], xmles, jsones, jsonbes, hstores, inets
-                    from "public".pgtest
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PgtestRow.rowParser(1).*)
-    }
-  
   }
 }

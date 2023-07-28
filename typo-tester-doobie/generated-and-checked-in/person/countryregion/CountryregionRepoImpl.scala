@@ -9,10 +9,8 @@ package countryregion
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -53,17 +51,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
     sql"""select countryregioncode, "name", modifieddate from person.countryregion""".query[CountryregionRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]]): Stream[ConnectionIO, CountryregionRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CountryregionFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-        case CountryregionFieldValue.name(value) => fr""""name" = $value"""
-        case CountryregionFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.countryregion $where".query[CountryregionRow].stream
-  
-  }
   override def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]] = {
     sql"""select countryregioncode, "name", modifieddate from person.countryregion where countryregioncode = $countryregioncode""".query[CountryregionRow].option
   }
@@ -80,22 +67,6 @@ object CountryregionRepoImpl extends CountryregionRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(countryregioncode: CountryregionId, fieldValues: List[CountryregionFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case CountryregionFieldValue.name(value) => fr""""name" = $value"""
-            case CountryregionFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.countryregion
-              $updates
-              where countryregioncode = $countryregioncode
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion(countryregioncode, "name", modifieddate)

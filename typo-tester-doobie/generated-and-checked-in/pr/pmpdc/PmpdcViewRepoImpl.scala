@@ -9,23 +9,10 @@ package pmpdc
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PmpdcViewRepoImpl extends PmpdcViewRepo {
   override def selectAll: Stream[ConnectionIO, PmpdcViewRow] = {
     sql"select productmodelid, productdescriptionid, cultureid, modifieddate from pr.pmpdc".query[PmpdcViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PmpdcViewFieldOrIdValue[_]]): Stream[ConnectionIO, PmpdcViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PmpdcViewFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case PmpdcViewFieldValue.productdescriptionid(value) => fr"productdescriptionid = $value"
-        case PmpdcViewFieldValue.cultureid(value) => fr"cultureid = $value"
-        case PmpdcViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.pmpdc $where".query[PmpdcViewRow].stream
-  
   }
 }

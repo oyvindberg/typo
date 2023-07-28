@@ -9,10 +9,8 @@ package creditcard
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -59,20 +57,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
   override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
     sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard".query[CreditcardRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[CreditcardFieldOrIdValue[_]]): Stream[ConnectionIO, CreditcardRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case CreditcardFieldValue.creditcardid(value) => fr"creditcardid = $value"
-        case CreditcardFieldValue.cardtype(value) => fr"cardtype = $value"
-        case CreditcardFieldValue.cardnumber(value) => fr"cardnumber = $value"
-        case CreditcardFieldValue.expmonth(value) => fr"expmonth = $value"
-        case CreditcardFieldValue.expyear(value) => fr"expyear = $value"
-        case CreditcardFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.creditcard $where".query[CreditcardRow].stream
-  
-  }
   override def selectById(creditcardid: CreditcardId): ConnectionIO[Option[CreditcardRow]] = {
     sql"select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate from sales.creditcard where creditcardid = $creditcardid".query[CreditcardRow].option
   }
@@ -92,25 +76,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(creditcardid: CreditcardId, fieldValues: List[CreditcardFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case CreditcardFieldValue.cardtype(value) => fr"cardtype = $value"
-            case CreditcardFieldValue.cardnumber(value) => fr"cardnumber = $value"
-            case CreditcardFieldValue.expmonth(value) => fr"expmonth = $value"
-            case CreditcardFieldValue.expyear(value) => fr"expyear = $value"
-            case CreditcardFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.creditcard
-              $updates
-              where creditcardid = $creditcardid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)

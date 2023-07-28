@@ -10,10 +10,8 @@ package document
 import adventureworks.Defaulted
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -77,35 +75,11 @@ object DocumentRepoImpl extends DocumentRepo {
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
     sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document"""".query[DocumentRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[DocumentFieldOrIdValue[_]]): Stream[ConnectionIO, DocumentRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case DocumentFieldValue.title(value) => fr"title = $value"
-        case DocumentFieldValue.owner(value) => fr""""owner" = $value"""
-        case DocumentFieldValue.folderflag(value) => fr"folderflag = $value"
-        case DocumentFieldValue.filename(value) => fr"filename = $value"
-        case DocumentFieldValue.fileextension(value) => fr"fileextension = $value"
-        case DocumentFieldValue.revision(value) => fr"revision = $value"
-        case DocumentFieldValue.changenumber(value) => fr"changenumber = $value"
-        case DocumentFieldValue.status(value) => fr"status = $value"
-        case DocumentFieldValue.documentsummary(value) => fr"documentsummary = $value"
-        case DocumentFieldValue.document(value) => fr""""document" = $value"""
-        case DocumentFieldValue.rowguid(value) => fr"rowguid = $value"
-        case DocumentFieldValue.modifieddate(value) => fr"modifieddate = $value"
-        case DocumentFieldValue.documentnode(value) => fr"documentnode = $value"
-      } :_*
-    )
-    sql"""select * from production."document" $where""".query[DocumentRow].stream
-  
-  }
   override def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]] = {
     sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document" where documentnode = $documentnode""".query[DocumentRow].option
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
     sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from production."document" where documentnode = ANY($documentnodes)""".query[DocumentRow].stream
-  }
-  override def selectByUnique(rowguid: UUID): ConnectionIO[Option[DocumentRow]] = {
-    selectByFieldValues(List(DocumentFieldValue.rowguid(rowguid))).compile.last
   }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     val documentnode = row.documentnode
@@ -127,32 +101,6 @@ object DocumentRepoImpl extends DocumentRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(documentnode: DocumentId, fieldValues: List[DocumentFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case DocumentFieldValue.title(value) => fr"title = $value"
-            case DocumentFieldValue.owner(value) => fr""""owner" = $value"""
-            case DocumentFieldValue.folderflag(value) => fr"folderflag = $value"
-            case DocumentFieldValue.filename(value) => fr"filename = $value"
-            case DocumentFieldValue.fileextension(value) => fr"fileextension = $value"
-            case DocumentFieldValue.revision(value) => fr"revision = $value"
-            case DocumentFieldValue.changenumber(value) => fr"changenumber = $value"
-            case DocumentFieldValue.status(value) => fr"status = $value"
-            case DocumentFieldValue.documentsummary(value) => fr"documentsummary = $value"
-            case DocumentFieldValue.document(value) => fr""""document" = $value"""
-            case DocumentFieldValue.rowguid(value) => fr"rowguid = $value"
-            case DocumentFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production."document"
-              $updates
-              where documentnode = $documentnode
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)

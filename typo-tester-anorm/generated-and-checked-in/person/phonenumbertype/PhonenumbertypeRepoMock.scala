@@ -27,13 +27,6 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[PhonenumbertypeFieldOrIdValue[_]])(implicit c: Connection): List[PhonenumbertypeRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, PhonenumbertypeFieldValue.phonenumbertypeid(value)) => acc.filter(_.phonenumbertypeid == value)
-      case (acc, PhonenumbertypeFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, PhonenumbertypeFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
     map.get(phonenumbertypeid)
   }
@@ -46,22 +39,6 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
       case Some(_) =>
         map.put(row.phonenumbertypeid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(phonenumbertypeid: PhonenumbertypeId, fieldValues: List[PhonenumbertypeFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(phonenumbertypeid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, PhonenumbertypeFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, PhonenumbertypeFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(phonenumbertypeid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

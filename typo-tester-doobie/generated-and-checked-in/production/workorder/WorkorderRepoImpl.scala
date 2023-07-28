@@ -9,10 +9,8 @@ package workorder
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -62,23 +60,6 @@ object WorkorderRepoImpl extends WorkorderRepo {
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
     sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder".query[WorkorderRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]]): Stream[ConnectionIO, WorkorderRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case WorkorderFieldValue.workorderid(value) => fr"workorderid = $value"
-        case WorkorderFieldValue.productid(value) => fr"productid = $value"
-        case WorkorderFieldValue.orderqty(value) => fr"orderqty = $value"
-        case WorkorderFieldValue.scrappedqty(value) => fr"scrappedqty = $value"
-        case WorkorderFieldValue.startdate(value) => fr"startdate = $value"
-        case WorkorderFieldValue.enddate(value) => fr"enddate = $value"
-        case WorkorderFieldValue.duedate(value) => fr"duedate = $value"
-        case WorkorderFieldValue.scrapreasonid(value) => fr"scrapreasonid = $value"
-        case WorkorderFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.workorder $where".query[WorkorderRow].stream
-  
-  }
   override def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]] = {
     sql"select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate from production.workorder where workorderid = $workorderid".query[WorkorderRow].option
   }
@@ -101,28 +82,6 @@ object WorkorderRepoImpl extends WorkorderRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(workorderid: WorkorderId, fieldValues: List[WorkorderFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case WorkorderFieldValue.productid(value) => fr"productid = $value"
-            case WorkorderFieldValue.orderqty(value) => fr"orderqty = $value"
-            case WorkorderFieldValue.scrappedqty(value) => fr"scrappedqty = $value"
-            case WorkorderFieldValue.startdate(value) => fr"startdate = $value"
-            case WorkorderFieldValue.enddate(value) => fr"enddate = $value"
-            case WorkorderFieldValue.duedate(value) => fr"duedate = $value"
-            case WorkorderFieldValue.scrapreasonid(value) => fr"scrapreasonid = $value"
-            case WorkorderFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.workorder
-              $updates
-              where workorderid = $workorderid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)

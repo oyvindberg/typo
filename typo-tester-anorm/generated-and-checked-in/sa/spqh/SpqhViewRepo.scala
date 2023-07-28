@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait SpqhViewRepo {
   def selectAll(implicit c: Connection): List[SpqhViewRow]
-  def selectByFieldValues(fieldValues: List[SpqhViewFieldOrIdValue[_]])(implicit c: Connection): List[SpqhViewRow]
 }

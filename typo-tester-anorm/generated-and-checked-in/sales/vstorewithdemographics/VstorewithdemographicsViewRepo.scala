@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait VstorewithdemographicsViewRepo {
   def selectAll(implicit c: Connection): List[VstorewithdemographicsViewRow]
-  def selectByFieldValues(fieldValues: List[VstorewithdemographicsViewFieldOrIdValue[_]])(implicit c: Connection): List[VstorewithdemographicsViewRow]
 }

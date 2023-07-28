@@ -24,12 +24,6 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[_]])(implicit c: Connection): List[FootballClubRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, FootballClubFieldValue.id(value)) => acc.filter(_.id == value)
-      case (acc, FootballClubFieldValue.name(value)) => acc.filter(_.name == value)
-    }.toList
-  }
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
     map.get(id)
   }
@@ -42,21 +36,6 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
       case Some(_) =>
         map.put(row.id, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(id) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, FootballClubFieldValue.name(value)) => acc.copy(name = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(id, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

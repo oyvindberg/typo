@@ -7,8 +7,6 @@ package adventureworks
 package sa
 package sci
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,31 +15,5 @@ object SciViewRepoImpl extends SciViewRepo {
     SQL"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sa.sci
        """.as(SciViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[SciViewFieldOrIdValue[_]])(implicit c: Connection): List[SciViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case SciViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case SciViewFieldValue.shoppingcartitemid(value) => NamedParameter("shoppingcartitemid", ParameterValue.from(value))
-          case SciViewFieldValue.shoppingcartid(value) => NamedParameter("shoppingcartid", ParameterValue.from(value))
-          case SciViewFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case SciViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case SciViewFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
-          case SciViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
-                    from sa.sci
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(SciViewRow.rowParser(1).*)
-    }
-  
   }
 }

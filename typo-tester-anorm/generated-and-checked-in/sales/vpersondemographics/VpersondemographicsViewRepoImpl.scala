@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package vpersondemographics
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,37 +15,5 @@ object VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
     SQL"""select businessentityid, totalpurchaseytd::numeric, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
           from sales.vpersondemographics
        """.as(VpersondemographicsViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VpersondemographicsViewFieldOrIdValue[_]])(implicit c: Connection): List[VpersondemographicsViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VpersondemographicsViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.totalpurchaseytd(value) => NamedParameter("totalpurchaseytd", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.datefirstpurchase(value) => NamedParameter("datefirstpurchase", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.birthdate(value) => NamedParameter("birthdate", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.maritalstatus(value) => NamedParameter("maritalstatus", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.yearlyincome(value) => NamedParameter("yearlyincome", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.gender(value) => NamedParameter("gender", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.totalchildren(value) => NamedParameter("totalchildren", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.numberchildrenathome(value) => NamedParameter("numberchildrenathome", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.education(value) => NamedParameter("education", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.occupation(value) => NamedParameter("occupation", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.homeownerflag(value) => NamedParameter("homeownerflag", ParameterValue.from(value))
-          case VpersondemographicsViewFieldValue.numbercarsowned(value) => NamedParameter("numbercarsowned", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, totalpurchaseytd::numeric, datefirstpurchase, birthdate, maritalstatus, yearlyincome, gender, totalchildren, numberchildrenathome, education, occupation, homeownerflag, numbercarsowned
-                    from sales.vpersondemographics
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VpersondemographicsViewRow.rowParser(1).*)
-    }
-  
   }
 }

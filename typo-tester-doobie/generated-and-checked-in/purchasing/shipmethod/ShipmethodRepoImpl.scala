@@ -9,10 +9,8 @@ package shipmethod
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -69,20 +67,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
     sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod""".query[ShipmethodRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]]): Stream[ConnectionIO, ShipmethodRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ShipmethodFieldValue.shipmethodid(value) => fr"shipmethodid = $value"
-        case ShipmethodFieldValue.name(value) => fr""""name" = $value"""
-        case ShipmethodFieldValue.shipbase(value) => fr"shipbase = $value"
-        case ShipmethodFieldValue.shiprate(value) => fr"shiprate = $value"
-        case ShipmethodFieldValue.rowguid(value) => fr"rowguid = $value"
-        case ShipmethodFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from purchasing.shipmethod $where".query[ShipmethodRow].stream
-  
-  }
   override def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]] = {
     sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate from purchasing.shipmethod where shipmethodid = $shipmethodid""".query[ShipmethodRow].option
   }
@@ -102,25 +86,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(shipmethodid: ShipmethodId, fieldValues: List[ShipmethodFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ShipmethodFieldValue.name(value) => fr""""name" = $value"""
-            case ShipmethodFieldValue.shipbase(value) => fr"shipbase = $value"
-            case ShipmethodFieldValue.shiprate(value) => fr"shiprate = $value"
-            case ShipmethodFieldValue.rowguid(value) => fr"rowguid = $value"
-            case ShipmethodFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update purchasing.shipmethod
-              $updates
-              where shipmethodid = $shipmethodid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)

@@ -9,25 +9,10 @@ package bec
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object BecViewRepoImpl extends BecViewRepo {
   override def selectAll: Stream[ConnectionIO, BecViewRow] = {
     sql"""select "id", businessentityid, personid, contacttypeid, rowguid, modifieddate from pe.bec""".query[BecViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[BecViewFieldOrIdValue[_]]): Stream[ConnectionIO, BecViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case BecViewFieldValue.id(value) => fr""""id" = $value"""
-        case BecViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case BecViewFieldValue.personid(value) => fr"personid = $value"
-        case BecViewFieldValue.contacttypeid(value) => fr"contacttypeid = $value"
-        case BecViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case BecViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pe.bec $where".query[BecViewRow].stream
-  
   }
 }

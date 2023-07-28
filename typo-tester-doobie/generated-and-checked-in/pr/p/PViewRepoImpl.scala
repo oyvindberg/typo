@@ -9,45 +9,10 @@ package p
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PViewRepoImpl extends PViewRepo {
   override def selectAll: Stream[ConnectionIO, PViewRow] = {
     sql"""select "id", productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate from pr."p"""".query[PViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]]): Stream[ConnectionIO, PViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PViewFieldValue.id(value) => fr""""id" = $value"""
-        case PViewFieldValue.productid(value) => fr"productid = $value"
-        case PViewFieldValue.name(value) => fr""""name" = $value"""
-        case PViewFieldValue.productnumber(value) => fr"productnumber = $value"
-        case PViewFieldValue.makeflag(value) => fr"makeflag = $value"
-        case PViewFieldValue.finishedgoodsflag(value) => fr"finishedgoodsflag = $value"
-        case PViewFieldValue.color(value) => fr"color = $value"
-        case PViewFieldValue.safetystocklevel(value) => fr"safetystocklevel = $value"
-        case PViewFieldValue.reorderpoint(value) => fr"reorderpoint = $value"
-        case PViewFieldValue.standardcost(value) => fr"standardcost = $value"
-        case PViewFieldValue.listprice(value) => fr"listprice = $value"
-        case PViewFieldValue.size(value) => fr""""size" = $value"""
-        case PViewFieldValue.sizeunitmeasurecode(value) => fr"sizeunitmeasurecode = $value"
-        case PViewFieldValue.weightunitmeasurecode(value) => fr"weightunitmeasurecode = $value"
-        case PViewFieldValue.weight(value) => fr"weight = $value"
-        case PViewFieldValue.daystomanufacture(value) => fr"daystomanufacture = $value"
-        case PViewFieldValue.productline(value) => fr"productline = $value"
-        case PViewFieldValue.`class`(value) => fr""""class" = $value"""
-        case PViewFieldValue.style(value) => fr""""style" = $value"""
-        case PViewFieldValue.productsubcategoryid(value) => fr"productsubcategoryid = $value"
-        case PViewFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case PViewFieldValue.sellstartdate(value) => fr"sellstartdate = $value"
-        case PViewFieldValue.sellenddate(value) => fr"sellenddate = $value"
-        case PViewFieldValue.discontinueddate(value) => fr"discontinueddate = $value"
-        case PViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"""select * from pr."p" $where""".query[PViewRow].stream
-  
   }
 }

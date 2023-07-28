@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait SohViewRepo {
   def selectAll: Stream[ConnectionIO, SohViewRow]
-  def selectByFieldValues(fieldValues: List[SohViewFieldOrIdValue[_]]): Stream[ConnectionIO, SohViewRow]
 }

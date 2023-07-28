@@ -10,10 +10,8 @@ package stateprovince
 import adventureworks.Defaulted
 import adventureworks.public.Flag
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -69,22 +67,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
     sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate from person.stateprovince""".query[StateprovinceRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]]): Stream[ConnectionIO, StateprovinceRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case StateprovinceFieldValue.stateprovinceid(value) => fr"stateprovinceid = $value"
-        case StateprovinceFieldValue.stateprovincecode(value) => fr"stateprovincecode = $value"
-        case StateprovinceFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-        case StateprovinceFieldValue.isonlystateprovinceflag(value) => fr"isonlystateprovinceflag = $value"
-        case StateprovinceFieldValue.name(value) => fr""""name" = $value"""
-        case StateprovinceFieldValue.territoryid(value) => fr"territoryid = $value"
-        case StateprovinceFieldValue.rowguid(value) => fr"rowguid = $value"
-        case StateprovinceFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.stateprovince $where".query[StateprovinceRow].stream
-  
-  }
   override def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]] = {
     sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate from person.stateprovince where stateprovinceid = $stateprovinceid""".query[StateprovinceRow].option
   }
@@ -106,27 +88,6 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(stateprovinceid: StateprovinceId, fieldValues: List[StateprovinceFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case StateprovinceFieldValue.stateprovincecode(value) => fr"stateprovincecode = $value"
-            case StateprovinceFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-            case StateprovinceFieldValue.isonlystateprovinceflag(value) => fr"isonlystateprovinceflag = $value"
-            case StateprovinceFieldValue.name(value) => fr""""name" = $value"""
-            case StateprovinceFieldValue.territoryid(value) => fr"territoryid = $value"
-            case StateprovinceFieldValue.rowguid(value) => fr"rowguid = $value"
-            case StateprovinceFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.stateprovince
-              $updates
-              where stateprovinceid = $stateprovinceid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)

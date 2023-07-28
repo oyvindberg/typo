@@ -27,15 +27,6 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
   override def selectAll(implicit c: Connection): List[BusinessentityaddressRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[BusinessentityaddressFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityaddressRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, BusinessentityaddressFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-      case (acc, BusinessentityaddressFieldValue.addressid(value)) => acc.filter(_.addressid == value)
-      case (acc, BusinessentityaddressFieldValue.addresstypeid(value)) => acc.filter(_.addresstypeid == value)
-      case (acc, BusinessentityaddressFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, BusinessentityaddressFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(compositeId: BusinessentityaddressId)(implicit c: Connection): Option[BusinessentityaddressRow] = {
     map.get(compositeId)
   }
@@ -45,22 +36,6 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
       case Some(_) =>
         map.put(row.compositeId, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(compositeId: BusinessentityaddressId, fieldValues: List[BusinessentityaddressFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(compositeId) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, BusinessentityaddressFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, BusinessentityaddressFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

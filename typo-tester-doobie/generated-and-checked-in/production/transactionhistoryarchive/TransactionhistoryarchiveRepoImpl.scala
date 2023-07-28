@@ -9,10 +9,8 @@ package transactionhistoryarchive
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -65,23 +63,6 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive".query[TransactionhistoryarchiveRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[TransactionhistoryarchiveFieldOrIdValue[_]]): Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case TransactionhistoryarchiveFieldValue.transactionid(value) => fr"transactionid = $value"
-        case TransactionhistoryarchiveFieldValue.productid(value) => fr"productid = $value"
-        case TransactionhistoryarchiveFieldValue.referenceorderid(value) => fr"referenceorderid = $value"
-        case TransactionhistoryarchiveFieldValue.referenceorderlineid(value) => fr"referenceorderlineid = $value"
-        case TransactionhistoryarchiveFieldValue.transactiondate(value) => fr"transactiondate = $value"
-        case TransactionhistoryarchiveFieldValue.transactiontype(value) => fr"transactiontype = $value"
-        case TransactionhistoryarchiveFieldValue.quantity(value) => fr"quantity = $value"
-        case TransactionhistoryarchiveFieldValue.actualcost(value) => fr"actualcost = $value"
-        case TransactionhistoryarchiveFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.transactionhistoryarchive $where".query[TransactionhistoryarchiveRow].stream
-  
-  }
   override def selectById(transactionid: TransactionhistoryarchiveId): ConnectionIO[Option[TransactionhistoryarchiveRow]] = {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistoryarchive where transactionid = $transactionid".query[TransactionhistoryarchiveRow].option
   }
@@ -104,28 +85,6 @@ object TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(transactionid: TransactionhistoryarchiveId, fieldValues: List[TransactionhistoryarchiveFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case TransactionhistoryarchiveFieldValue.productid(value) => fr"productid = $value"
-            case TransactionhistoryarchiveFieldValue.referenceorderid(value) => fr"referenceorderid = $value"
-            case TransactionhistoryarchiveFieldValue.referenceorderlineid(value) => fr"referenceorderlineid = $value"
-            case TransactionhistoryarchiveFieldValue.transactiondate(value) => fr"transactiondate = $value"
-            case TransactionhistoryarchiveFieldValue.transactiontype(value) => fr"transactiontype = $value"
-            case TransactionhistoryarchiveFieldValue.quantity(value) => fr"quantity = $value"
-            case TransactionhistoryarchiveFieldValue.actualcost(value) => fr"actualcost = $value"
-            case TransactionhistoryarchiveFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.transactionhistoryarchive
-              $updates
-              where transactionid = $transactionid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow] = {
     sql"""insert into production.transactionhistoryarchive(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)

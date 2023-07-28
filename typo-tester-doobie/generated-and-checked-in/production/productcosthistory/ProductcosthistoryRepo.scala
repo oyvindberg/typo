@@ -15,9 +15,7 @@ trait ProductcosthistoryRepo {
   def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow]
   def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow]
   def selectAll: Stream[ConnectionIO, ProductcosthistoryRow]
-  def selectByFieldValues(fieldValues: List[ProductcosthistoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]]
   def update(row: ProductcosthistoryRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: ProductcosthistoryId, fieldValues: List[ProductcosthistoryFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow]
 }

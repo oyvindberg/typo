@@ -12,5 +12,4 @@ import java.sql.Connection
 trait PgtestRepo {
   def insert(unsaved: PgtestRow)(implicit c: Connection): PgtestRow
   def selectAll(implicit c: Connection): List[PgtestRow]
-  def selectByFieldValues(fieldValues: List[PgtestFieldOrIdValue[_]])(implicit c: Connection): List[PgtestRow]
 }

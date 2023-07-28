@@ -94,40 +94,6 @@ object EmployeeRepoImpl extends EmployeeRepo {
           from humanresources.employee
        """.as(EmployeeRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[EmployeeFieldOrIdValue[_]])(implicit c: Connection): List[EmployeeRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case EmployeeFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case EmployeeFieldValue.nationalidnumber(value) => NamedParameter("nationalidnumber", ParameterValue.from(value))
-          case EmployeeFieldValue.loginid(value) => NamedParameter("loginid", ParameterValue.from(value))
-          case EmployeeFieldValue.jobtitle(value) => NamedParameter("jobtitle", ParameterValue.from(value))
-          case EmployeeFieldValue.birthdate(value) => NamedParameter("birthdate", ParameterValue.from(value))
-          case EmployeeFieldValue.maritalstatus(value) => NamedParameter("maritalstatus", ParameterValue.from(value))
-          case EmployeeFieldValue.gender(value) => NamedParameter("gender", ParameterValue.from(value))
-          case EmployeeFieldValue.hiredate(value) => NamedParameter("hiredate", ParameterValue.from(value))
-          case EmployeeFieldValue.salariedflag(value) => NamedParameter("salariedflag", ParameterValue.from(value))
-          case EmployeeFieldValue.vacationhours(value) => NamedParameter("vacationhours", ParameterValue.from(value))
-          case EmployeeFieldValue.sickleavehours(value) => NamedParameter("sickleavehours", ParameterValue.from(value))
-          case EmployeeFieldValue.currentflag(value) => NamedParameter("currentflag", ParameterValue.from(value))
-          case EmployeeFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case EmployeeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-          case EmployeeFieldValue.organizationnode(value) => NamedParameter("organizationnode", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
-                    from humanresources.employee
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(EmployeeRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow] = {
     SQL"""select businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode
           from humanresources.employee
@@ -164,40 +130,6 @@ object EmployeeRepoImpl extends EmployeeRepo {
               organizationnode = ${row.organizationnode}
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[EmployeeFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case EmployeeFieldValue.nationalidnumber(value) => NamedParameter("nationalidnumber", ParameterValue.from(value))
-          case EmployeeFieldValue.loginid(value) => NamedParameter("loginid", ParameterValue.from(value))
-          case EmployeeFieldValue.jobtitle(value) => NamedParameter("jobtitle", ParameterValue.from(value))
-          case EmployeeFieldValue.birthdate(value) => NamedParameter("birthdate", ParameterValue.from(value))
-          case EmployeeFieldValue.maritalstatus(value) => NamedParameter("maritalstatus", ParameterValue.from(value))
-          case EmployeeFieldValue.gender(value) => NamedParameter("gender", ParameterValue.from(value))
-          case EmployeeFieldValue.hiredate(value) => NamedParameter("hiredate", ParameterValue.from(value))
-          case EmployeeFieldValue.salariedflag(value) => NamedParameter("salariedflag", ParameterValue.from(value))
-          case EmployeeFieldValue.vacationhours(value) => NamedParameter("vacationhours", ParameterValue.from(value))
-          case EmployeeFieldValue.sickleavehours(value) => NamedParameter("sickleavehours", ParameterValue.from(value))
-          case EmployeeFieldValue.currentflag(value) => NamedParameter("currentflag", ParameterValue.from(value))
-          case EmployeeFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case EmployeeFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-          case EmployeeFieldValue.organizationnode(value) => NamedParameter("organizationnode", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update humanresources.employee
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(businessentityid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     SQL"""insert into humanresources.employee(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)

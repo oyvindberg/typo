@@ -9,30 +9,10 @@ package st
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object StViewRepoImpl extends StViewRepo {
   override def selectAll: Stream[ConnectionIO, StViewRow] = {
     sql"""select "id", territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sa.st""".query[StViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[StViewFieldOrIdValue[_]]): Stream[ConnectionIO, StViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case StViewFieldValue.id(value) => fr""""id" = $value"""
-        case StViewFieldValue.territoryid(value) => fr"territoryid = $value"
-        case StViewFieldValue.name(value) => fr""""name" = $value"""
-        case StViewFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-        case StViewFieldValue.group(value) => fr""""group" = $value"""
-        case StViewFieldValue.salesytd(value) => fr"salesytd = $value"
-        case StViewFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
-        case StViewFieldValue.costytd(value) => fr"costytd = $value"
-        case StViewFieldValue.costlastyear(value) => fr"costlastyear = $value"
-        case StViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case StViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.st $where".query[StViewRow].stream
-  
   }
 }

@@ -9,23 +9,10 @@ package pnt
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PntViewRepoImpl extends PntViewRepo {
   override def selectAll: Stream[ConnectionIO, PntViewRow] = {
     sql"""select "id", phonenumbertypeid, "name", modifieddate from pe.pnt""".query[PntViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PntViewFieldOrIdValue[_]]): Stream[ConnectionIO, PntViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PntViewFieldValue.id(value) => fr""""id" = $value"""
-        case PntViewFieldValue.phonenumbertypeid(value) => fr"phonenumbertypeid = $value"
-        case PntViewFieldValue.name(value) => fr""""name" = $value"""
-        case PntViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pe.pnt $where".query[PntViewRow].stream
-  
   }
 }

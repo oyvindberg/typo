@@ -74,34 +74,6 @@ object AddressRepoImpl extends AddressRepo {
           from person.address
        """.as(AddressRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case AddressFieldValue.addressid(value) => NamedParameter("addressid", ParameterValue.from(value))
-          case AddressFieldValue.addressline1(value) => NamedParameter("addressline1", ParameterValue.from(value))
-          case AddressFieldValue.addressline2(value) => NamedParameter("addressline2", ParameterValue.from(value))
-          case AddressFieldValue.city(value) => NamedParameter("city", ParameterValue.from(value))
-          case AddressFieldValue.stateprovinceid(value) => NamedParameter("stateprovinceid", ParameterValue.from(value))
-          case AddressFieldValue.postalcode(value) => NamedParameter("postalcode", ParameterValue.from(value))
-          case AddressFieldValue.spatiallocation(value) => NamedParameter("spatiallocation", ParameterValue.from(value))
-          case AddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case AddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
-                    from person.address
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(AddressRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
     SQL"""select addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate
           from person.address
@@ -132,34 +104,6 @@ object AddressRepoImpl extends AddressRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where addressid = $addressid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(addressid: AddressId, fieldValues: List[AddressFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case AddressFieldValue.addressline1(value) => NamedParameter("addressline1", ParameterValue.from(value))
-          case AddressFieldValue.addressline2(value) => NamedParameter("addressline2", ParameterValue.from(value))
-          case AddressFieldValue.city(value) => NamedParameter("city", ParameterValue.from(value))
-          case AddressFieldValue.stateprovinceid(value) => NamedParameter("stateprovinceid", ParameterValue.from(value))
-          case AddressFieldValue.postalcode(value) => NamedParameter("postalcode", ParameterValue.from(value))
-          case AddressFieldValue.spatiallocation(value) => NamedParameter("spatiallocation", ParameterValue.from(value))
-          case AddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case AddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.address
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where addressid = {addressid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("addressid", ParameterValue.from(addressid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into person.address(addressid, addressline1, addressline2, city, stateprovinceid, postalcode, spatiallocation, rowguid, modifieddate)

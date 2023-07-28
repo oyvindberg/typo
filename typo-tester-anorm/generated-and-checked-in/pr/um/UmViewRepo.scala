@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait UmViewRepo {
   def selectAll(implicit c: Connection): List[UmViewRow]
-  def selectByFieldValues(fieldValues: List[UmViewFieldOrIdValue[_]])(implicit c: Connection): List[UmViewRow]
 }

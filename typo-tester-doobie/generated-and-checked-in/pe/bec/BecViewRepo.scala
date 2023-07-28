@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait BecViewRepo {
   def selectAll: Stream[ConnectionIO, BecViewRow]
-  def selectByFieldValues(fieldValues: List[BecViewFieldOrIdValue[_]]): Stream[ConnectionIO, BecViewRow]
 }

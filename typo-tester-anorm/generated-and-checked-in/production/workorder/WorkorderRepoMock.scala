@@ -27,19 +27,6 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, WorkorderFieldValue.workorderid(value)) => acc.filter(_.workorderid == value)
-      case (acc, WorkorderFieldValue.productid(value)) => acc.filter(_.productid == value)
-      case (acc, WorkorderFieldValue.orderqty(value)) => acc.filter(_.orderqty == value)
-      case (acc, WorkorderFieldValue.scrappedqty(value)) => acc.filter(_.scrappedqty == value)
-      case (acc, WorkorderFieldValue.startdate(value)) => acc.filter(_.startdate == value)
-      case (acc, WorkorderFieldValue.enddate(value)) => acc.filter(_.enddate == value)
-      case (acc, WorkorderFieldValue.duedate(value)) => acc.filter(_.duedate == value)
-      case (acc, WorkorderFieldValue.scrapreasonid(value)) => acc.filter(_.scrapreasonid == value)
-      case (acc, WorkorderFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
     map.get(workorderid)
   }
@@ -52,28 +39,6 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
       case Some(_) =>
         map.put(row.workorderid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(workorderid: WorkorderId, fieldValues: List[WorkorderFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(workorderid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, WorkorderFieldValue.productid(value)) => acc.copy(productid = value)
-          case (acc, WorkorderFieldValue.orderqty(value)) => acc.copy(orderqty = value)
-          case (acc, WorkorderFieldValue.scrappedqty(value)) => acc.copy(scrappedqty = value)
-          case (acc, WorkorderFieldValue.startdate(value)) => acc.copy(startdate = value)
-          case (acc, WorkorderFieldValue.enddate(value)) => acc.copy(enddate = value)
-          case (acc, WorkorderFieldValue.duedate(value)) => acc.copy(duedate = value)
-          case (acc, WorkorderFieldValue.scrapreasonid(value)) => acc.copy(scrapreasonid = value)
-          case (acc, WorkorderFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(workorderid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

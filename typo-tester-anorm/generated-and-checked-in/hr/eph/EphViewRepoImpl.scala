@@ -7,8 +7,6 @@ package adventureworks
 package hr
 package eph
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,30 +15,5 @@ object EphViewRepoImpl extends EphViewRepo {
     SQL"""select "id", businessentityid, ratechangedate, rate, payfrequency, modifieddate
           from hr.eph
        """.as(EphViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[EphViewFieldOrIdValue[_]])(implicit c: Connection): List[EphViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case EphViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case EphViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case EphViewFieldValue.ratechangedate(value) => NamedParameter("ratechangedate", ParameterValue.from(value))
-          case EphViewFieldValue.rate(value) => NamedParameter("rate", ParameterValue.from(value))
-          case EphViewFieldValue.payfrequency(value) => NamedParameter("payfrequency", ParameterValue.from(value))
-          case EphViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, ratechangedate, rate, payfrequency, modifieddate
-                    from hr.eph
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(EphViewRow.rowParser(1).*)
-    }
-  
   }
 }

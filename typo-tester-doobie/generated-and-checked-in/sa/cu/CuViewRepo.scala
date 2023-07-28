@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait CuViewRepo {
   def selectAll: Stream[ConnectionIO, CuViewRow]
-  def selectByFieldValues(fieldValues: List[CuViewFieldOrIdValue[_]]): Stream[ConnectionIO, CuViewRow]
 }

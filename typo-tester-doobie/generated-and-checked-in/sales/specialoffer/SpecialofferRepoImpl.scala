@@ -9,10 +9,8 @@ package specialoffer
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -74,25 +72,6 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
   override def selectAll: Stream[ConnectionIO, SpecialofferRow] = {
     sql"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer""".query[SpecialofferRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SpecialofferFieldOrIdValue[_]]): Stream[ConnectionIO, SpecialofferRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SpecialofferFieldValue.specialofferid(value) => fr"specialofferid = $value"
-        case SpecialofferFieldValue.description(value) => fr"description = $value"
-        case SpecialofferFieldValue.discountpct(value) => fr"discountpct = $value"
-        case SpecialofferFieldValue.`type`(value) => fr""""type" = $value"""
-        case SpecialofferFieldValue.category(value) => fr"category = $value"
-        case SpecialofferFieldValue.startdate(value) => fr"startdate = $value"
-        case SpecialofferFieldValue.enddate(value) => fr"enddate = $value"
-        case SpecialofferFieldValue.minqty(value) => fr"minqty = $value"
-        case SpecialofferFieldValue.maxqty(value) => fr"maxqty = $value"
-        case SpecialofferFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SpecialofferFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.specialoffer $where".query[SpecialofferRow].stream
-  
-  }
   override def selectById(specialofferid: SpecialofferId): ConnectionIO[Option[SpecialofferRow]] = {
     sql"""select specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate from sales.specialoffer where specialofferid = $specialofferid""".query[SpecialofferRow].option
   }
@@ -117,30 +96,6 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(specialofferid: SpecialofferId, fieldValues: List[SpecialofferFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SpecialofferFieldValue.description(value) => fr"description = $value"
-            case SpecialofferFieldValue.discountpct(value) => fr"discountpct = $value"
-            case SpecialofferFieldValue.`type`(value) => fr""""type" = $value"""
-            case SpecialofferFieldValue.category(value) => fr"category = $value"
-            case SpecialofferFieldValue.startdate(value) => fr"startdate = $value"
-            case SpecialofferFieldValue.enddate(value) => fr"enddate = $value"
-            case SpecialofferFieldValue.minqty(value) => fr"minqty = $value"
-            case SpecialofferFieldValue.maxqty(value) => fr"maxqty = $value"
-            case SpecialofferFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SpecialofferFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.specialoffer
-              $updates
-              where specialofferid = $specialofferid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)

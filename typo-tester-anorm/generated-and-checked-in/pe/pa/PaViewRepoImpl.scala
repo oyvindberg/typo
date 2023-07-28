@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package pa
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,30 +15,5 @@ object PaViewRepoImpl extends PaViewRepo {
     SQL"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
           from pe.pa
        """.as(PaViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PaViewFieldOrIdValue[_]])(implicit c: Connection): List[PaViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PaViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PaViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PaViewFieldValue.passwordhash(value) => NamedParameter("passwordhash", ParameterValue.from(value))
-          case PaViewFieldValue.passwordsalt(value) => NamedParameter("passwordsalt", ParameterValue.from(value))
-          case PaViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PaViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate
-                    from pe.pa
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PaViewRow.rowParser(1).*)
-    }
-  
   }
 }

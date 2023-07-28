@@ -31,15 +31,6 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]]): Stream[ConnectionIO, ProductmodelillustrationRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ProductmodelillustrationFieldValue.productmodelid(value)) => acc.filter(_.productmodelid == value)
-        case (acc, ProductmodelillustrationFieldValue.illustrationid(value)) => acc.filter(_.illustrationid == value)
-        case (acc, ProductmodelillustrationFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
     delay(map.get(compositeId))
   }
@@ -50,23 +41,6 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: ProductmodelillustrationId, fieldValues: List[ProductmodelillustrationFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ProductmodelillustrationFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

@@ -9,32 +9,10 @@ package vjobcandidateeducation
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo {
   override def selectAll: Stream[ConnectionIO, VjobcandidateeducationViewRow] = {
     sql"""select jobcandidateid, "Edu.Level", "Edu.StartDate", "Edu.EndDate", "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City" from humanresources.vjobcandidateeducation""".query[VjobcandidateeducationViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VjobcandidateeducationViewFieldOrIdValue[_]]): Stream[ConnectionIO, VjobcandidateeducationViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VjobcandidateeducationViewFieldValue.jobcandidateid(value) => fr"jobcandidateid = $value"
-        case VjobcandidateeducationViewFieldValue.`Edu.Level`(value) => fr""""Edu.Level" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.StartDate`(value) => fr""""Edu.StartDate" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.EndDate`(value) => fr""""Edu.EndDate" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.Degree`(value) => fr""""Edu.Degree" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.Major`(value) => fr""""Edu.Major" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.Minor`(value) => fr""""Edu.Minor" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.GPA`(value) => fr""""Edu.GPA" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.GPAScale`(value) => fr""""Edu.GPAScale" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.School`(value) => fr""""Edu.School" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.Loc.CountryRegion`(value) => fr""""Edu.Loc.CountryRegion" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.Loc.State`(value) => fr""""Edu.Loc.State" = $value"""
-        case VjobcandidateeducationViewFieldValue.`Edu.Loc.City`(value) => fr""""Edu.Loc.City" = $value"""
-      } :_*
-    )
-    sql"select * from humanresources.vjobcandidateeducation $where".query[VjobcandidateeducationViewRow].stream
-  
   }
 }

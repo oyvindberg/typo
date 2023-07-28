@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait BeaViewRepo {
   def selectAll(implicit c: Connection): List[BeaViewRow]
-  def selectByFieldValues(fieldValues: List[BeaViewFieldOrIdValue[_]])(implicit c: Connection): List[BeaViewRow]
 }

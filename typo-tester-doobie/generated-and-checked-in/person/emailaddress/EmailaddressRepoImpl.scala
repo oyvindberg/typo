@@ -9,10 +9,8 @@ package emailaddress
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -62,19 +60,6 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
     sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress".query[EmailaddressRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]]): Stream[ConnectionIO, EmailaddressRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EmailaddressFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EmailaddressFieldValue.emailaddressid(value) => fr"emailaddressid = $value"
-        case EmailaddressFieldValue.emailaddress(value) => fr"emailaddress = $value"
-        case EmailaddressFieldValue.rowguid(value) => fr"rowguid = $value"
-        case EmailaddressFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.emailaddress $where".query[EmailaddressRow].stream
-  
-  }
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
     sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate from person.emailaddress where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}".query[EmailaddressRow].option
   }
@@ -89,23 +74,6 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: EmailaddressId, fieldValues: List[EmailaddressFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case EmailaddressFieldValue.emailaddress(value) => fr"emailaddress = $value"
-            case EmailaddressFieldValue.rowguid(value) => fr"rowguid = $value"
-            case EmailaddressFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.emailaddress
-              $updates
-              where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)

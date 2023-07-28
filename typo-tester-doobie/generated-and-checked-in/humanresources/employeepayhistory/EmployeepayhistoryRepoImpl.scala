@@ -9,10 +9,8 @@ package employeepayhistory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -55,19 +53,6 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
     sql"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory".query[EmployeepayhistoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[EmployeepayhistoryFieldOrIdValue[_]]): Stream[ConnectionIO, EmployeepayhistoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case EmployeepayhistoryFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case EmployeepayhistoryFieldValue.ratechangedate(value) => fr"ratechangedate = $value"
-        case EmployeepayhistoryFieldValue.rate(value) => fr"rate = $value"
-        case EmployeepayhistoryFieldValue.payfrequency(value) => fr"payfrequency = $value"
-        case EmployeepayhistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from humanresources.employeepayhistory $where".query[EmployeepayhistoryRow].stream
-  
-  }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
     sql"select businessentityid, ratechangedate, rate, payfrequency, modifieddate from humanresources.employeepayhistory where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}".query[EmployeepayhistoryRow].option
   }
@@ -82,23 +67,6 @@ object EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: EmployeepayhistoryId, fieldValues: List[EmployeepayhistoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case EmployeepayhistoryFieldValue.rate(value) => fr"rate = $value"
-            case EmployeepayhistoryFieldValue.payfrequency(value) => fr"payfrequency = $value"
-            case EmployeepayhistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update humanresources.employeepayhistory
-              $updates
-              where businessentityid = ${compositeId.businessentityid} AND ratechangedate = ${compositeId.ratechangedate}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory(businessentityid, ratechangedate, rate, payfrequency, modifieddate)

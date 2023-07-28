@@ -10,10 +10,8 @@ package productdocument
 import adventureworks.Defaulted
 import adventureworks.production.document.DocumentId
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -57,17 +55,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
     sql"select productid, modifieddate, documentnode from production.productdocument".query[ProductdocumentRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]]): Stream[ConnectionIO, ProductdocumentRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductdocumentFieldValue.productid(value) => fr"productid = $value"
-        case ProductdocumentFieldValue.modifieddate(value) => fr"modifieddate = $value"
-        case ProductdocumentFieldValue.documentnode(value) => fr"documentnode = $value"
-      } :_*
-    )
-    sql"select * from production.productdocument $where".query[ProductdocumentRow].stream
-  
-  }
   override def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]] = {
     sql"select productid, modifieddate, documentnode from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".query[ProductdocumentRow].option
   }
@@ -80,21 +67,6 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: ProductdocumentId, fieldValues: List[ProductdocumentFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductdocumentFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productdocument
-              $updates
-              where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument(productid, modifieddate, documentnode)

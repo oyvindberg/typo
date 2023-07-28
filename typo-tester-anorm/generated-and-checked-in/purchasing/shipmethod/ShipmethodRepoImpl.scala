@@ -77,31 +77,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
           from purchasing.shipmethod
        """.as(ShipmethodRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ShipmethodFieldOrIdValue[_]])(implicit c: Connection): List[ShipmethodRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ShipmethodFieldValue.shipmethodid(value) => NamedParameter("shipmethodid", ParameterValue.from(value))
-          case ShipmethodFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ShipmethodFieldValue.shipbase(value) => NamedParameter("shipbase", ParameterValue.from(value))
-          case ShipmethodFieldValue.shiprate(value) => NamedParameter("shiprate", ParameterValue.from(value))
-          case ShipmethodFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case ShipmethodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
-                    from purchasing.shipmethod
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ShipmethodRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow] = {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate
           from purchasing.shipmethod
@@ -129,31 +104,6 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where shipmethodid = $shipmethodid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(shipmethodid: ShipmethodId, fieldValues: List[ShipmethodFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ShipmethodFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ShipmethodFieldValue.shipbase(value) => NamedParameter("shipbase", ParameterValue.from(value))
-          case ShipmethodFieldValue.shiprate(value) => NamedParameter("shiprate", ParameterValue.from(value))
-          case ShipmethodFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case ShipmethodFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update purchasing.shipmethod
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where shipmethodid = {shipmethodid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("shipmethodid", ParameterValue.from(shipmethodid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)

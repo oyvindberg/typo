@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package pdoc
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,28 +15,5 @@ object PdocViewRepoImpl extends PdocViewRepo {
     SQL"""select "id", productid, modifieddate, documentnode
           from pr.pdoc
        """.as(PdocViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PdocViewFieldOrIdValue[_]])(implicit c: Connection): List[PdocViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PdocViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PdocViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case PdocViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-          case PdocViewFieldValue.documentnode(value) => NamedParameter("documentnode", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productid, modifieddate, documentnode
-                    from pr.pdoc
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PdocViewRow.rowParser(1).*)
-    }
-  
   }
 }

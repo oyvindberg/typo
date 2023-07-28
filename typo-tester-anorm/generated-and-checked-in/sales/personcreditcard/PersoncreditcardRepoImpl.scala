@@ -59,28 +59,6 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           from sales.personcreditcard
        """.as(PersoncreditcardRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[PersoncreditcardFieldOrIdValue[_]])(implicit c: Connection): List[PersoncreditcardRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersoncreditcardFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PersoncreditcardFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
-          case PersoncreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, creditcardid, modifieddate
-                    from sales.personcreditcard
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PersoncreditcardRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
     SQL"""select businessentityid, creditcardid, modifieddate
           from sales.personcreditcard
@@ -93,27 +71,6 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND creditcardid = ${compositeId.creditcardid}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: PersoncreditcardId, fieldValues: List[PersoncreditcardFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersoncreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.personcreditcard
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid} AND creditcardid = {creditcardid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("creditcardid", ParameterValue.from(compositeId.creditcardid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     SQL"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)

@@ -9,28 +9,10 @@ package pr
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PrViewRepoImpl extends PrViewRepo {
   override def selectAll: Stream[ConnectionIO, PrViewRow] = {
     sql"""select "id", productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate from pr.pr""".query[PrViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PrViewFieldOrIdValue[_]]): Stream[ConnectionIO, PrViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PrViewFieldValue.id(value) => fr""""id" = $value"""
-        case PrViewFieldValue.productreviewid(value) => fr"productreviewid = $value"
-        case PrViewFieldValue.productid(value) => fr"productid = $value"
-        case PrViewFieldValue.reviewername(value) => fr"reviewername = $value"
-        case PrViewFieldValue.reviewdate(value) => fr"reviewdate = $value"
-        case PrViewFieldValue.emailaddress(value) => fr"emailaddress = $value"
-        case PrViewFieldValue.rating(value) => fr"rating = $value"
-        case PrViewFieldValue.comments(value) => fr""""comments" = $value"""
-        case PrViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.pr $where".query[PrViewRow].stream
-  
   }
 }

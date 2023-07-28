@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package wr
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,37 +15,5 @@ object WrViewRepoImpl extends WrViewRepo {
     SQL"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
           from pr.wr
        """.as(WrViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[WrViewFieldOrIdValue[_]])(implicit c: Connection): List[WrViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case WrViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case WrViewFieldValue.workorderid(value) => NamedParameter("workorderid", ParameterValue.from(value))
-          case WrViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case WrViewFieldValue.operationsequence(value) => NamedParameter("operationsequence", ParameterValue.from(value))
-          case WrViewFieldValue.locationid(value) => NamedParameter("locationid", ParameterValue.from(value))
-          case WrViewFieldValue.scheduledstartdate(value) => NamedParameter("scheduledstartdate", ParameterValue.from(value))
-          case WrViewFieldValue.scheduledenddate(value) => NamedParameter("scheduledenddate", ParameterValue.from(value))
-          case WrViewFieldValue.actualstartdate(value) => NamedParameter("actualstartdate", ParameterValue.from(value))
-          case WrViewFieldValue.actualenddate(value) => NamedParameter("actualenddate", ParameterValue.from(value))
-          case WrViewFieldValue.actualresourcehrs(value) => NamedParameter("actualresourcehrs", ParameterValue.from(value))
-          case WrViewFieldValue.plannedcost(value) => NamedParameter("plannedcost", ParameterValue.from(value))
-          case WrViewFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
-          case WrViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate
-                    from pr.wr
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(WrViewRow.rowParser(1).*)
-    }
-  
   }
 }

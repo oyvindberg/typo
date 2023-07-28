@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait PntViewRepo {
   def selectAll: Stream[ConnectionIO, PntViewRow]
-  def selectByFieldValues(fieldValues: List[PntViewFieldOrIdValue[_]]): Stream[ConnectionIO, PntViewRow]
 }

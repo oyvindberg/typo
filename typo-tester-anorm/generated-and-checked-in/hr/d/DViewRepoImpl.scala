@@ -7,8 +7,6 @@ package adventureworks
 package hr
 package d
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,29 +15,5 @@ object DViewRepoImpl extends DViewRepo {
     SQL"""select "id", departmentid, "name", groupname, modifieddate
           from hr.d
        """.as(DViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[DViewFieldOrIdValue[_]])(implicit c: Connection): List[DViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case DViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case DViewFieldValue.departmentid(value) => NamedParameter("departmentid", ParameterValue.from(value))
-          case DViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case DViewFieldValue.groupname(value) => NamedParameter("groupname", ParameterValue.from(value))
-          case DViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", departmentid, "name", groupname, modifieddate
-                    from hr.d
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(DViewRow.rowParser(1).*)
-    }
-  
   }
 }

@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package p
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,38 +15,5 @@ object PViewRepoImpl extends PViewRepo {
     SQL"""select "id", businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
           from pe."p"
        """.as(PViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PViewFieldOrIdValue[_]])(implicit c: Connection): List[PViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case PViewFieldValue.persontype(value) => NamedParameter("persontype", ParameterValue.from(value))
-          case PViewFieldValue.namestyle(value) => NamedParameter("namestyle", ParameterValue.from(value))
-          case PViewFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case PViewFieldValue.firstname(value) => NamedParameter("firstname", ParameterValue.from(value))
-          case PViewFieldValue.middlename(value) => NamedParameter("middlename", ParameterValue.from(value))
-          case PViewFieldValue.lastname(value) => NamedParameter("lastname", ParameterValue.from(value))
-          case PViewFieldValue.suffix(value) => NamedParameter("suffix", ParameterValue.from(value))
-          case PViewFieldValue.emailpromotion(value) => NamedParameter("emailpromotion", ParameterValue.from(value))
-          case PViewFieldValue.additionalcontactinfo(value) => NamedParameter("additionalcontactinfo", ParameterValue.from(value))
-          case PViewFieldValue.demographics(value) => NamedParameter("demographics", ParameterValue.from(value))
-          case PViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate
-                    from pe."p"
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PViewRow.rowParser(1).*)
-    }
-  
   }
 }

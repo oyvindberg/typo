@@ -27,13 +27,6 @@ class SalesorderheadersalesreasonRepoMock(toRow: Function1[Salesorderheadersales
   override def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[SalesorderheadersalesreasonFieldOrIdValue[_]])(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, SalesorderheadersalesreasonFieldValue.salesorderid(value)) => acc.filter(_.salesorderid == value)
-      case (acc, SalesorderheadersalesreasonFieldValue.salesreasonid(value)) => acc.filter(_.salesreasonid == value)
-      case (acc, SalesorderheadersalesreasonFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow] = {
     map.get(compositeId)
   }
@@ -43,21 +36,6 @@ class SalesorderheadersalesreasonRepoMock(toRow: Function1[Salesorderheadersales
       case Some(_) =>
         map.put(row.compositeId, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(compositeId: SalesorderheadersalesreasonId, fieldValues: List[SalesorderheadersalesreasonFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(compositeId) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, SalesorderheadersalesreasonFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

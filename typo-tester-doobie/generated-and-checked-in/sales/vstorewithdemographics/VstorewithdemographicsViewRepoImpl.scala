@@ -9,31 +9,10 @@ package vstorewithdemographics
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo {
   override def selectAll: Stream[ConnectionIO, VstorewithdemographicsViewRow] = {
     sql"""select businessentityid, "name", AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees from sales.vstorewithdemographics""".query[VstorewithdemographicsViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VstorewithdemographicsViewFieldOrIdValue[_]]): Stream[ConnectionIO, VstorewithdemographicsViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VstorewithdemographicsViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VstorewithdemographicsViewFieldValue.name(value) => fr""""name" = $value"""
-        case VstorewithdemographicsViewFieldValue.AnnualSales(value) => fr"AnnualSales = $value"
-        case VstorewithdemographicsViewFieldValue.AnnualRevenue(value) => fr"AnnualRevenue = $value"
-        case VstorewithdemographicsViewFieldValue.BankName(value) => fr"BankName = $value"
-        case VstorewithdemographicsViewFieldValue.BusinessType(value) => fr"BusinessType = $value"
-        case VstorewithdemographicsViewFieldValue.YearOpened(value) => fr"YearOpened = $value"
-        case VstorewithdemographicsViewFieldValue.Specialty(value) => fr"Specialty = $value"
-        case VstorewithdemographicsViewFieldValue.SquareFeet(value) => fr"SquareFeet = $value"
-        case VstorewithdemographicsViewFieldValue.Brands(value) => fr"Brands = $value"
-        case VstorewithdemographicsViewFieldValue.Internet(value) => fr"Internet = $value"
-        case VstorewithdemographicsViewFieldValue.NumberEmployees(value) => fr"NumberEmployees = $value"
-      } :_*
-    )
-    sql"select * from sales.vstorewithdemographics $where".query[VstorewithdemographicsViewRow].stream
-  
   }
 }

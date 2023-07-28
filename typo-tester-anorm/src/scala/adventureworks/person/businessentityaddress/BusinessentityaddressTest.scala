@@ -77,7 +77,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
 
       // check field values
       val newModifiedDate = saved1.modifieddate.minusDays(1)
-      repo.updateFieldValues(saved1.compositeId, List(BusinessentityaddressFieldValue.modifieddate(newModifiedDate)))
+      repo.update(saved1.copy(modifieddate = newModifiedDate))
       val List(saved3) = repo.selectAll: @unchecked
       assert(saved3.modifieddate == newModifiedDate)
 

@@ -15,10 +15,8 @@ trait CustomerRepo {
   def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow]
   def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow]
   def selectAll: Stream[ConnectionIO, CustomerRow]
-  def selectByFieldValues(fieldValues: List[CustomerFieldOrIdValue[_]]): Stream[ConnectionIO, CustomerRow]
   def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]]
   def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow]
   def update(row: CustomerRow): ConnectionIO[Boolean]
-  def updateFieldValues(customerid: CustomerId, fieldValues: List[CustomerFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow]
 }

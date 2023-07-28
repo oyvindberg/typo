@@ -62,28 +62,6 @@ object PersonRepoImpl extends PersonRepo {
           from compositepk.person
        """.as(PersonRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]])(implicit c: Connection): List[PersonRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonFieldValue.one(value) => NamedParameter("one", ParameterValue.from(value))
-          case PersonFieldValue.two(value) => NamedParameter("two", ParameterValue.from(value))
-          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "one", two, "name"
-                    from compositepk.person
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PersonRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
     SQL"""select "one", two, "name"
           from compositepk.person
@@ -96,27 +74,6 @@ object PersonRepoImpl extends PersonRepo {
           set "name" = ${row.name}
           where "one" = ${compositeId.one} AND two = ${compositeId.two}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update compositepk.person
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where "one" = {one} AND two = {two}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("one", ParameterValue.from(compositeId.one)), NamedParameter("two", ParameterValue.from(compositeId.two)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into compositepk.person("one", two, "name")

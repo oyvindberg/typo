@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package pc
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,29 +15,5 @@ object PcViewRepoImpl extends PcViewRepo {
     SQL"""select "id", productcategoryid, "name", rowguid, modifieddate
           from pr.pc
        """.as(PcViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PcViewFieldOrIdValue[_]])(implicit c: Connection): List[PcViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PcViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PcViewFieldValue.productcategoryid(value) => NamedParameter("productcategoryid", ParameterValue.from(value))
-          case PcViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case PcViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case PcViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productcategoryid, "name", rowguid, modifieddate
-                    from pr.pc
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PcViewRow.rowParser(1).*)
-    }
-  
   }
 }

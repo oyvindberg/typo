@@ -9,10 +9,8 @@ package productvendor
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -61,25 +59,6 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
     sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor".query[ProductvendorRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductvendorFieldOrIdValue[_]]): Stream[ConnectionIO, ProductvendorRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductvendorFieldValue.productid(value) => fr"productid = $value"
-        case ProductvendorFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case ProductvendorFieldValue.averageleadtime(value) => fr"averageleadtime = $value"
-        case ProductvendorFieldValue.standardprice(value) => fr"standardprice = $value"
-        case ProductvendorFieldValue.lastreceiptcost(value) => fr"lastreceiptcost = $value"
-        case ProductvendorFieldValue.lastreceiptdate(value) => fr"lastreceiptdate = $value"
-        case ProductvendorFieldValue.minorderqty(value) => fr"minorderqty = $value"
-        case ProductvendorFieldValue.maxorderqty(value) => fr"maxorderqty = $value"
-        case ProductvendorFieldValue.onorderqty(value) => fr"onorderqty = $value"
-        case ProductvendorFieldValue.unitmeasurecode(value) => fr"unitmeasurecode = $value"
-        case ProductvendorFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from purchasing.productvendor $where".query[ProductvendorRow].stream
-  
-  }
   override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
     sql"select productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate from purchasing.productvendor where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}".query[ProductvendorRow].option
   }
@@ -100,29 +79,6 @@ object ProductvendorRepoImpl extends ProductvendorRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: ProductvendorId, fieldValues: List[ProductvendorFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductvendorFieldValue.averageleadtime(value) => fr"averageleadtime = $value"
-            case ProductvendorFieldValue.standardprice(value) => fr"standardprice = $value"
-            case ProductvendorFieldValue.lastreceiptcost(value) => fr"lastreceiptcost = $value"
-            case ProductvendorFieldValue.lastreceiptdate(value) => fr"lastreceiptdate = $value"
-            case ProductvendorFieldValue.minorderqty(value) => fr"minorderqty = $value"
-            case ProductvendorFieldValue.maxorderqty(value) => fr"maxorderqty = $value"
-            case ProductvendorFieldValue.onorderqty(value) => fr"onorderqty = $value"
-            case ProductvendorFieldValue.unitmeasurecode(value) => fr"unitmeasurecode = $value"
-            case ProductvendorFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update purchasing.productvendor
-              $updates
-              where productid = ${compositeId.productid} AND businessentityid = ${compositeId.businessentityid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)

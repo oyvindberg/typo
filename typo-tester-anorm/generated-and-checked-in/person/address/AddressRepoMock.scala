@@ -27,19 +27,6 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def selectAll(implicit c: Connection): List[AddressRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[AddressFieldOrIdValue[_]])(implicit c: Connection): List[AddressRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, AddressFieldValue.addressid(value)) => acc.filter(_.addressid == value)
-      case (acc, AddressFieldValue.addressline1(value)) => acc.filter(_.addressline1 == value)
-      case (acc, AddressFieldValue.addressline2(value)) => acc.filter(_.addressline2 == value)
-      case (acc, AddressFieldValue.city(value)) => acc.filter(_.city == value)
-      case (acc, AddressFieldValue.stateprovinceid(value)) => acc.filter(_.stateprovinceid == value)
-      case (acc, AddressFieldValue.postalcode(value)) => acc.filter(_.postalcode == value)
-      case (acc, AddressFieldValue.spatiallocation(value)) => acc.filter(_.spatiallocation == value)
-      case (acc, AddressFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, AddressFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
     map.get(addressid)
   }
@@ -52,28 +39,6 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
       case Some(_) =>
         map.put(row.addressid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(addressid: AddressId, fieldValues: List[AddressFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(addressid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, AddressFieldValue.addressline1(value)) => acc.copy(addressline1 = value)
-          case (acc, AddressFieldValue.addressline2(value)) => acc.copy(addressline2 = value)
-          case (acc, AddressFieldValue.city(value)) => acc.copy(city = value)
-          case (acc, AddressFieldValue.stateprovinceid(value)) => acc.copy(stateprovinceid = value)
-          case (acc, AddressFieldValue.postalcode(value)) => acc.copy(postalcode = value)
-          case (acc, AddressFieldValue.spatiallocation(value)) => acc.copy(spatiallocation = value)
-          case (acc, AddressFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, AddressFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(addressid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

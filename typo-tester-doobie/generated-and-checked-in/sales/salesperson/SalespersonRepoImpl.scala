@@ -10,10 +10,8 @@ package salesperson
 import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -76,23 +74,6 @@ object SalespersonRepoImpl extends SalespersonRepo {
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
     sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson".query[SalespersonRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalespersonFieldOrIdValue[_]]): Stream[ConnectionIO, SalespersonRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalespersonFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case SalespersonFieldValue.territoryid(value) => fr"territoryid = $value"
-        case SalespersonFieldValue.salesquota(value) => fr"salesquota = $value"
-        case SalespersonFieldValue.bonus(value) => fr"bonus = $value"
-        case SalespersonFieldValue.commissionpct(value) => fr"commissionpct = $value"
-        case SalespersonFieldValue.salesytd(value) => fr"salesytd = $value"
-        case SalespersonFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
-        case SalespersonFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SalespersonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salesperson $where".query[SalespersonRow].stream
-  
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[SalespersonRow]] = {
     sql"select businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate from sales.salesperson where businessentityid = $businessentityid".query[SalespersonRow].option
   }
@@ -115,28 +96,6 @@ object SalespersonRepoImpl extends SalespersonRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[SalespersonFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalespersonFieldValue.territoryid(value) => fr"territoryid = $value"
-            case SalespersonFieldValue.salesquota(value) => fr"salesquota = $value"
-            case SalespersonFieldValue.bonus(value) => fr"bonus = $value"
-            case SalespersonFieldValue.commissionpct(value) => fr"commissionpct = $value"
-            case SalespersonFieldValue.salesytd(value) => fr"salesytd = $value"
-            case SalespersonFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
-            case SalespersonFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SalespersonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salesperson
-              $updates
-              where businessentityid = $businessentityid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow] = {
     sql"""insert into sales.salesperson(businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate)

@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait VemployeedepartmentViewRepo {
   def selectAll(implicit c: Connection): List[VemployeedepartmentViewRow]
-  def selectByFieldValues(fieldValues: List[VemployeedepartmentViewFieldOrIdValue[_]])(implicit c: Connection): List[VemployeedepartmentViewRow]
 }

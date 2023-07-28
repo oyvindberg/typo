@@ -7,8 +7,6 @@ package adventureworks
 package purchasing
 package vvendorwithcontacts
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,36 +15,5 @@ object VvendorwithcontactsViewRepoImpl extends VvendorwithcontactsViewRepo {
     SQL"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
           from purchasing.vvendorwithcontacts
        """.as(VvendorwithcontactsViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VvendorwithcontactsViewFieldOrIdValue[_]])(implicit c: Connection): List[VvendorwithcontactsViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VvendorwithcontactsViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.contacttype(value) => NamedParameter("contacttype", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.firstname(value) => NamedParameter("firstname", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.middlename(value) => NamedParameter("middlename", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.lastname(value) => NamedParameter("lastname", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.suffix(value) => NamedParameter("suffix", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.phonenumber(value) => NamedParameter("phonenumber", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.phonenumbertype(value) => NamedParameter("phonenumbertype", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case VvendorwithcontactsViewFieldValue.emailpromotion(value) => NamedParameter("emailpromotion", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, "name", contacttype, title, firstname, middlename, lastname, suffix, phonenumber, phonenumbertype, emailaddress, emailpromotion
-                    from purchasing.vvendorwithcontacts
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VvendorwithcontactsViewRow.rowParser(1).*)
-    }
-  
   }
 }

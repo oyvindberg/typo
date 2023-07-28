@@ -73,31 +73,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           from sales.shoppingcartitem
        """.as(ShoppingcartitemRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ShoppingcartitemFieldOrIdValue[_]])(implicit c: Connection): List[ShoppingcartitemRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ShoppingcartitemFieldValue.shoppingcartitemid(value) => NamedParameter("shoppingcartitemid", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.shoppingcartid(value) => NamedParameter("shoppingcartid", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
-                    from sales.shoppingcartitem
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ShoppingcartitemRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow] = {
     SQL"""select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate
           from sales.shoppingcartitem
@@ -125,31 +100,6 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where shoppingcartitemid = $shoppingcartitemid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(shoppingcartitemid: ShoppingcartitemId, fieldValues: List[ShoppingcartitemFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ShoppingcartitemFieldValue.shoppingcartid(value) => NamedParameter("shoppingcartid", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.datecreated(value) => NamedParameter("datecreated", ParameterValue.from(value))
-          case ShoppingcartitemFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.shoppingcartitem
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where shoppingcartitemid = {shoppingcartitemid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("shoppingcartitemid", ParameterValue.from(shoppingcartitemid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     SQL"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)

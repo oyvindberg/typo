@@ -9,25 +9,10 @@ package spqh
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object SpqhViewRepoImpl extends SpqhViewRepo {
   override def selectAll: Stream[ConnectionIO, SpqhViewRow] = {
     sql"""select "id", businessentityid, quotadate, salesquota, rowguid, modifieddate from sa.spqh""".query[SpqhViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[SpqhViewFieldOrIdValue[_]]): Stream[ConnectionIO, SpqhViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SpqhViewFieldValue.id(value) => fr""""id" = $value"""
-        case SpqhViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case SpqhViewFieldValue.quotadate(value) => fr"quotadate = $value"
-        case SpqhViewFieldValue.salesquota(value) => fr"salesquota = $value"
-        case SpqhViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SpqhViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sa.spqh $where".query[SpqhViewRow].stream
-  
   }
 }

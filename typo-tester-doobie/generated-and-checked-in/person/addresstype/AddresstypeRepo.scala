@@ -15,10 +15,8 @@ trait AddresstypeRepo {
   def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow]
   def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow]
   def selectAll: Stream[ConnectionIO, AddresstypeRow]
-  def selectByFieldValues(fieldValues: List[AddresstypeFieldOrIdValue[_]]): Stream[ConnectionIO, AddresstypeRow]
   def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]]
   def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow]
   def update(row: AddresstypeRow): ConnectionIO[Boolean]
-  def updateFieldValues(addresstypeid: AddresstypeId, fieldValues: List[AddresstypeFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow]
 }

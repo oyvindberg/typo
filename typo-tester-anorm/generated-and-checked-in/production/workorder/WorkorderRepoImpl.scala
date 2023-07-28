@@ -70,34 +70,6 @@ object WorkorderRepoImpl extends WorkorderRepo {
           from production.workorder
        """.as(WorkorderRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[WorkorderFieldOrIdValue[_]])(implicit c: Connection): List[WorkorderRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case WorkorderFieldValue.workorderid(value) => NamedParameter("workorderid", ParameterValue.from(value))
-          case WorkorderFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case WorkorderFieldValue.orderqty(value) => NamedParameter("orderqty", ParameterValue.from(value))
-          case WorkorderFieldValue.scrappedqty(value) => NamedParameter("scrappedqty", ParameterValue.from(value))
-          case WorkorderFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case WorkorderFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case WorkorderFieldValue.duedate(value) => NamedParameter("duedate", ParameterValue.from(value))
-          case WorkorderFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
-          case WorkorderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
-                    from production.workorder
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(WorkorderRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from production.workorder
@@ -128,34 +100,6 @@ object WorkorderRepoImpl extends WorkorderRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where workorderid = $workorderid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(workorderid: WorkorderId, fieldValues: List[WorkorderFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case WorkorderFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case WorkorderFieldValue.orderqty(value) => NamedParameter("orderqty", ParameterValue.from(value))
-          case WorkorderFieldValue.scrappedqty(value) => NamedParameter("scrappedqty", ParameterValue.from(value))
-          case WorkorderFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case WorkorderFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case WorkorderFieldValue.duedate(value) => NamedParameter("duedate", ParameterValue.from(value))
-          case WorkorderFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
-          case WorkorderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.workorder
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where workorderid = {workorderid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("workorderid", ParameterValue.from(workorderid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)

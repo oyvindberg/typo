@@ -27,14 +27,6 @@ class ProductcategoryRepoMock(toRow: Function1[ProductcategoryRowUnsaved, Produc
   override def selectAll(implicit c: Connection): List[ProductcategoryRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[ProductcategoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductcategoryRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, ProductcategoryFieldValue.productcategoryid(value)) => acc.filter(_.productcategoryid == value)
-      case (acc, ProductcategoryFieldValue.name(value)) => acc.filter(_.name == value)
-      case (acc, ProductcategoryFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, ProductcategoryFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(productcategoryid: ProductcategoryId)(implicit c: Connection): Option[ProductcategoryRow] = {
     map.get(productcategoryid)
   }
@@ -47,23 +39,6 @@ class ProductcategoryRepoMock(toRow: Function1[ProductcategoryRowUnsaved, Produc
       case Some(_) =>
         map.put(row.productcategoryid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(productcategoryid: ProductcategoryId, fieldValues: List[ProductcategoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(productcategoryid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, ProductcategoryFieldValue.name(value)) => acc.copy(name = value)
-          case (acc, ProductcategoryFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, ProductcategoryFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(productcategoryid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

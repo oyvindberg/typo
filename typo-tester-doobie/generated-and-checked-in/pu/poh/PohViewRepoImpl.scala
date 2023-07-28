@@ -9,32 +9,10 @@ package poh
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object PohViewRepoImpl extends PohViewRepo {
   override def selectAll: Stream[ConnectionIO, PohViewRow] = {
     sql"""select "id", purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate from pu.poh""".query[PohViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[PohViewFieldOrIdValue[_]]): Stream[ConnectionIO, PohViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PohViewFieldValue.id(value) => fr""""id" = $value"""
-        case PohViewFieldValue.purchaseorderid(value) => fr"purchaseorderid = $value"
-        case PohViewFieldValue.revisionnumber(value) => fr"revisionnumber = $value"
-        case PohViewFieldValue.status(value) => fr"status = $value"
-        case PohViewFieldValue.employeeid(value) => fr"employeeid = $value"
-        case PohViewFieldValue.vendorid(value) => fr"vendorid = $value"
-        case PohViewFieldValue.shipmethodid(value) => fr"shipmethodid = $value"
-        case PohViewFieldValue.orderdate(value) => fr"orderdate = $value"
-        case PohViewFieldValue.shipdate(value) => fr"shipdate = $value"
-        case PohViewFieldValue.subtotal(value) => fr"subtotal = $value"
-        case PohViewFieldValue.taxamt(value) => fr"taxamt = $value"
-        case PohViewFieldValue.freight(value) => fr"freight = $value"
-        case PohViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pu.poh $where".query[PohViewRow].stream
-  
   }
 }

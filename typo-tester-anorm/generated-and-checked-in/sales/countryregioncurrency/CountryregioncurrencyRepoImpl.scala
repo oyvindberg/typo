@@ -59,28 +59,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           from sales.countryregioncurrency
        """.as(CountryregioncurrencyRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[CountryregioncurrencyFieldOrIdValue[_]])(implicit c: Connection): List[CountryregioncurrencyRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CountryregioncurrencyFieldValue.countryregioncode(value) => NamedParameter("countryregioncode", ParameterValue.from(value))
-          case CountryregioncurrencyFieldValue.currencycode(value) => NamedParameter("currencycode", ParameterValue.from(value))
-          case CountryregioncurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select countryregioncode, currencycode, modifieddate
-                    from sales.countryregioncurrency
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(CountryregioncurrencyRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
     SQL"""select countryregioncode, currencycode, modifieddate
           from sales.countryregioncurrency
@@ -93,27 +71,6 @@ object CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where countryregioncode = ${compositeId.countryregioncode} AND currencycode = ${compositeId.currencycode}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: CountryregioncurrencyId, fieldValues: List[CountryregioncurrencyFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CountryregioncurrencyFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.countryregioncurrency
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where countryregioncode = {countryregioncode} AND currencycode = {currencycode}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("countryregioncode", ParameterValue.from(compositeId.countryregioncode)), NamedParameter("currencycode", ParameterValue.from(compositeId.currencycode)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into sales.countryregioncurrency(countryregioncode, currencycode, modifieddate)

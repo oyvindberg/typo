@@ -12,6 +12,6 @@ case class ViewFiles(view: ComputedView, options: InternalOptions) {
     for {
       dbLib <- options.dbLib
     } yield relation.RepoImplFile(dbLib, view.repoMethods),
-    Some(relation.FieldValueFile)
+    relation.FieldValueFile
   ).flatten
 }

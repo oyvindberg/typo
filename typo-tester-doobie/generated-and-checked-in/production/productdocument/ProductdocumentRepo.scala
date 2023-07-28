@@ -15,9 +15,7 @@ trait ProductdocumentRepo {
   def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow]
   def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow]
   def selectAll: Stream[ConnectionIO, ProductdocumentRow]
-  def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]]): Stream[ConnectionIO, ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]]
   def update(row: ProductdocumentRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: ProductdocumentId, fieldValues: List[ProductdocumentFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow]
 }

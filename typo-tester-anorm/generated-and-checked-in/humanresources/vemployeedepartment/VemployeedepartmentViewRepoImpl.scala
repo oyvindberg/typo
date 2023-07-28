@@ -7,8 +7,6 @@ package adventureworks
 package humanresources
 package vemployeedepartment
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,34 +15,5 @@ object VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate
           from humanresources.vemployeedepartment
        """.as(VemployeedepartmentViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[VemployeedepartmentViewFieldOrIdValue[_]])(implicit c: Connection): List[VemployeedepartmentViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case VemployeedepartmentViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.title(value) => NamedParameter("title", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.firstname(value) => NamedParameter("firstname", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.middlename(value) => NamedParameter("middlename", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.lastname(value) => NamedParameter("lastname", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.suffix(value) => NamedParameter("suffix", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.jobtitle(value) => NamedParameter("jobtitle", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.department(value) => NamedParameter("department", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.groupname(value) => NamedParameter("groupname", ParameterValue.from(value))
-          case VemployeedepartmentViewFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, department, groupname, startdate
-                    from humanresources.vemployeedepartment
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(VemployeedepartmentViewRow.rowParser(1).*)
-    }
-  
   }
 }

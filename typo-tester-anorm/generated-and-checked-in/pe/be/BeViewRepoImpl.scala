@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package be
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,28 +15,5 @@ object BeViewRepoImpl extends BeViewRepo {
     SQL"""select "id", businessentityid, rowguid, modifieddate
           from pe.be
        """.as(BeViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[BeViewFieldOrIdValue[_]])(implicit c: Connection): List[BeViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case BeViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case BeViewFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case BeViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case BeViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", businessentityid, rowguid, modifieddate
-                    from pe.be
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(BeViewRow.rowParser(1).*)
-    }
-  
   }
 }

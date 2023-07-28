@@ -15,10 +15,8 @@ trait StateprovinceRepo {
   def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
   def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow]
   def selectAll: Stream[ConnectionIO, StateprovinceRow]
-  def selectByFieldValues(fieldValues: List[StateprovinceFieldOrIdValue[_]]): Stream[ConnectionIO, StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]]
   def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow]
   def update(row: StateprovinceRow): ConnectionIO[Boolean]
-  def updateFieldValues(stateprovinceid: StateprovinceId, fieldValues: List[StateprovinceFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
 }

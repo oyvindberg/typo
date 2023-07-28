@@ -31,16 +31,6 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[PersonphoneFieldOrIdValue[_]]): Stream[ConnectionIO, PersonphoneRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, PersonphoneFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, PersonphoneFieldValue.phonenumber(value)) => acc.filter(_.phonenumber == value)
-        case (acc, PersonphoneFieldValue.phonenumbertypeid(value)) => acc.filter(_.phonenumbertypeid == value)
-        case (acc, PersonphoneFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
     delay(map.get(compositeId))
   }
@@ -51,23 +41,6 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: PersonphoneId, fieldValues: List[PersonphoneFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, PersonphoneFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

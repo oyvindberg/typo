@@ -67,31 +67,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
           from production.productphoto
        """.as(ProductphotoRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ProductphotoFieldOrIdValue[_]])(implicit c: Connection): List[ProductphotoRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductphotoFieldValue.productphotoid(value) => NamedParameter("productphotoid", ParameterValue.from(value))
-          case ProductphotoFieldValue.thumbnailphoto(value) => NamedParameter("thumbnailphoto", ParameterValue.from(value))
-          case ProductphotoFieldValue.thumbnailphotofilename(value) => NamedParameter("thumbnailphotofilename", ParameterValue.from(value))
-          case ProductphotoFieldValue.largephoto(value) => NamedParameter("largephoto", ParameterValue.from(value))
-          case ProductphotoFieldValue.largephotofilename(value) => NamedParameter("largephotofilename", ParameterValue.from(value))
-          case ProductphotoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
-                    from production.productphoto
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ProductphotoRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(productphotoid: ProductphotoId)(implicit c: Connection): Option[ProductphotoRow] = {
     SQL"""select productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from production.productphoto
@@ -119,31 +94,6 @@ object ProductphotoRepoImpl extends ProductphotoRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productphotoid = $productphotoid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(productphotoid: ProductphotoId, fieldValues: List[ProductphotoFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductphotoFieldValue.thumbnailphoto(value) => NamedParameter("thumbnailphoto", ParameterValue.from(value))
-          case ProductphotoFieldValue.thumbnailphotofilename(value) => NamedParameter("thumbnailphotofilename", ParameterValue.from(value))
-          case ProductphotoFieldValue.largephoto(value) => NamedParameter("largephoto", ParameterValue.from(value))
-          case ProductphotoFieldValue.largephotofilename(value) => NamedParameter("largephotofilename", ParameterValue.from(value))
-          case ProductphotoFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.productphoto
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where productphotoid = {productphotoid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("productphotoid", ParameterValue.from(productphotoid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto(productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate)

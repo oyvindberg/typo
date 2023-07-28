@@ -65,29 +65,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
           from humanresources.department
        """.as(DepartmentRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[DepartmentFieldOrIdValue[_]])(implicit c: Connection): List[DepartmentRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case DepartmentFieldValue.departmentid(value) => NamedParameter("departmentid", ParameterValue.from(value))
-          case DepartmentFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case DepartmentFieldValue.groupname(value) => NamedParameter("groupname", ParameterValue.from(value))
-          case DepartmentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select departmentid, "name", groupname, modifieddate
-                    from humanresources.department
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(DepartmentRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow] = {
     SQL"""select departmentid, "name", groupname, modifieddate
           from humanresources.department
@@ -113,29 +90,6 @@ object DepartmentRepoImpl extends DepartmentRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where departmentid = $departmentid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(departmentid: DepartmentId, fieldValues: List[DepartmentFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case DepartmentFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case DepartmentFieldValue.groupname(value) => NamedParameter("groupname", ParameterValue.from(value))
-          case DepartmentFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update humanresources.department
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where departmentid = {departmentid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("departmentid", ParameterValue.from(departmentid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)

@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait PppViewRepo {
   def selectAll(implicit c: Connection): List[PppViewRow]
-  def selectByFieldValues(fieldValues: List[PppViewFieldOrIdValue[_]])(implicit c: Connection): List[PppViewRow]
 }

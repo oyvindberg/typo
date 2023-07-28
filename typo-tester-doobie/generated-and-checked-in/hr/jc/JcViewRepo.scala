@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait JcViewRepo {
   def selectAll: Stream[ConnectionIO, JcViewRow]
-  def selectByFieldValues(fieldValues: List[JcViewFieldOrIdValue[_]]): Stream[ConnectionIO, JcViewRow]
 }

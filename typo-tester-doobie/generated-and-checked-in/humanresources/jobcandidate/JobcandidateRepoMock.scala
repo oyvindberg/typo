@@ -31,16 +31,6 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]]): Stream[ConnectionIO, JobcandidateRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, JobcandidateFieldValue.jobcandidateid(value)) => acc.filter(_.jobcandidateid == value)
-        case (acc, JobcandidateFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-        case (acc, JobcandidateFieldValue.resume(value)) => acc.filter(_.resume == value)
-        case (acc, JobcandidateFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-      }.toList
-    }
-  }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
     delay(map.get(jobcandidateid))
   }
@@ -54,25 +44,6 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
         case Some(_) =>
           map.put(row.jobcandidateid, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(jobcandidateid: JobcandidateId, fieldValues: List[JobcandidateFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(jobcandidateid) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, JobcandidateFieldValue.businessentityid(value)) => acc.copy(businessentityid = value)
-            case (acc, JobcandidateFieldValue.resume(value)) => acc.copy(resume = value)
-            case (acc, JobcandidateFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(jobcandidateid, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

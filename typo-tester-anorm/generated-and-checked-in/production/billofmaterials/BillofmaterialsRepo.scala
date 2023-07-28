@@ -14,10 +14,8 @@ trait BillofmaterialsRepo {
   def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
   def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow
   def selectAll(implicit c: Connection): List[BillofmaterialsRow]
-  def selectByFieldValues(fieldValues: List[BillofmaterialsFieldOrIdValue[_]])(implicit c: Connection): List[BillofmaterialsRow]
   def selectById(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Option[BillofmaterialsRow]
   def selectByIds(billofmaterialsids: Array[BillofmaterialsId])(implicit c: Connection): List[BillofmaterialsRow]
   def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean
-  def updateFieldValues(billofmaterialsid: BillofmaterialsId, fieldValues: List[BillofmaterialsFieldValue[_]])(implicit c: Connection): Boolean
   def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
 }

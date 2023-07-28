@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait CuViewRepo {
   def selectAll(implicit c: Connection): List[CuViewRow]
-  def selectByFieldValues(fieldValues: List[CuViewFieldOrIdValue[_]])(implicit c: Connection): List[CuViewRow]
 }

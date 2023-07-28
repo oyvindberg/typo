@@ -9,10 +9,8 @@ package transactionhistory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -68,23 +66,6 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory".query[TransactionhistoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]]): Stream[ConnectionIO, TransactionhistoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case TransactionhistoryFieldValue.transactionid(value) => fr"transactionid = $value"
-        case TransactionhistoryFieldValue.productid(value) => fr"productid = $value"
-        case TransactionhistoryFieldValue.referenceorderid(value) => fr"referenceorderid = $value"
-        case TransactionhistoryFieldValue.referenceorderlineid(value) => fr"referenceorderlineid = $value"
-        case TransactionhistoryFieldValue.transactiondate(value) => fr"transactiondate = $value"
-        case TransactionhistoryFieldValue.transactiontype(value) => fr"transactiontype = $value"
-        case TransactionhistoryFieldValue.quantity(value) => fr"quantity = $value"
-        case TransactionhistoryFieldValue.actualcost(value) => fr"actualcost = $value"
-        case TransactionhistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.transactionhistory $where".query[TransactionhistoryRow].stream
-  
-  }
   override def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]] = {
     sql"select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate from production.transactionhistory where transactionid = $transactionid".query[TransactionhistoryRow].option
   }
@@ -107,28 +88,6 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(transactionid: TransactionhistoryId, fieldValues: List[TransactionhistoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case TransactionhistoryFieldValue.productid(value) => fr"productid = $value"
-            case TransactionhistoryFieldValue.referenceorderid(value) => fr"referenceorderid = $value"
-            case TransactionhistoryFieldValue.referenceorderlineid(value) => fr"referenceorderlineid = $value"
-            case TransactionhistoryFieldValue.transactiondate(value) => fr"transactiondate = $value"
-            case TransactionhistoryFieldValue.transactiontype(value) => fr"transactiontype = $value"
-            case TransactionhistoryFieldValue.quantity(value) => fr"quantity = $value"
-            case TransactionhistoryFieldValue.actualcost(value) => fr"actualcost = $value"
-            case TransactionhistoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.transactionhistory
-              $updates
-              where transactionid = $transactionid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)

@@ -11,5 +11,4 @@ import java.sql.Connection
 
 trait CrcViewRepo {
   def selectAll(implicit c: Connection): List[CrcViewRow]
-  def selectByFieldValues(fieldValues: List[CrcViewFieldOrIdValue[_]])(implicit c: Connection): List[CrcViewRow]
 }

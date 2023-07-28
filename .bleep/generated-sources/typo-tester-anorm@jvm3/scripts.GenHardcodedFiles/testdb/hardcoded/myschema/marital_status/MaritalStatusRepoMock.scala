@@ -24,11 +24,6 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[_]])(implicit c: Connection): List[MaritalStatusRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, MaritalStatusFieldValue.id(value)) => acc.filter(_.id == value)
-    }.toList
-  }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
     map.get(id)
   }

@@ -15,10 +15,8 @@ trait ProductreviewRepo {
   def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow]
   def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow]
   def selectAll: Stream[ConnectionIO, ProductreviewRow]
-  def selectByFieldValues(fieldValues: List[ProductreviewFieldOrIdValue[_]]): Stream[ConnectionIO, ProductreviewRow]
   def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]]
   def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow]
   def update(row: ProductreviewRow): ConnectionIO[Boolean]
-  def updateFieldValues(productreviewid: ProductreviewId, fieldValues: List[ProductreviewFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow]
 }

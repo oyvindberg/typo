@@ -27,16 +27,6 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
   override def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[EmployeedepartmenthistoryFieldOrIdValue[_]])(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, EmployeedepartmenthistoryFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-      case (acc, EmployeedepartmenthistoryFieldValue.departmentid(value)) => acc.filter(_.departmentid == value)
-      case (acc, EmployeedepartmenthistoryFieldValue.shiftid(value)) => acc.filter(_.shiftid == value)
-      case (acc, EmployeedepartmenthistoryFieldValue.startdate(value)) => acc.filter(_.startdate == value)
-      case (acc, EmployeedepartmenthistoryFieldValue.enddate(value)) => acc.filter(_.enddate == value)
-      case (acc, EmployeedepartmenthistoryFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Option[EmployeedepartmenthistoryRow] = {
     map.get(compositeId)
   }
@@ -46,22 +36,6 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
       case Some(_) =>
         map.put(row.compositeId, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(compositeId: EmployeedepartmenthistoryId, fieldValues: List[EmployeedepartmenthistoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(compositeId) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, EmployeedepartmenthistoryFieldValue.enddate(value)) => acc.copy(enddate = value)
-          case (acc, EmployeedepartmenthistoryFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(compositeId, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

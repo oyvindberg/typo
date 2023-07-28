@@ -67,31 +67,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
           from sales.creditcard
        """.as(CreditcardRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[CreditcardFieldOrIdValue[_]])(implicit c: Connection): List[CreditcardRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CreditcardFieldValue.creditcardid(value) => NamedParameter("creditcardid", ParameterValue.from(value))
-          case CreditcardFieldValue.cardtype(value) => NamedParameter("cardtype", ParameterValue.from(value))
-          case CreditcardFieldValue.cardnumber(value) => NamedParameter("cardnumber", ParameterValue.from(value))
-          case CreditcardFieldValue.expmonth(value) => NamedParameter("expmonth", ParameterValue.from(value))
-          case CreditcardFieldValue.expyear(value) => NamedParameter("expyear", ParameterValue.from(value))
-          case CreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
-                    from sales.creditcard
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(CreditcardRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(creditcardid: CreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
     SQL"""select creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate
           from sales.creditcard
@@ -119,31 +94,6 @@ object CreditcardRepoImpl extends CreditcardRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where creditcardid = $creditcardid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(creditcardid: CreditcardId, fieldValues: List[CreditcardFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case CreditcardFieldValue.cardtype(value) => NamedParameter("cardtype", ParameterValue.from(value))
-          case CreditcardFieldValue.cardnumber(value) => NamedParameter("cardnumber", ParameterValue.from(value))
-          case CreditcardFieldValue.expmonth(value) => NamedParameter("expmonth", ParameterValue.from(value))
-          case CreditcardFieldValue.expyear(value) => NamedParameter("expyear", ParameterValue.from(value))
-          case CreditcardFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update sales.creditcard
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where creditcardid = {creditcardid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("creditcardid", ParameterValue.from(creditcardid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     SQL"""insert into sales.creditcard(creditcardid, cardtype, cardnumber, expmonth, expyear, modifieddate)

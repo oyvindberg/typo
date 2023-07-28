@@ -9,32 +9,10 @@ package d
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object DViewRepoImpl extends DViewRepo {
   override def selectAll: Stream[ConnectionIO, DViewRow] = {
     sql"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode from pr.d""".query[DViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[DViewFieldOrIdValue[_]]): Stream[ConnectionIO, DViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case DViewFieldValue.title(value) => fr"title = $value"
-        case DViewFieldValue.owner(value) => fr""""owner" = $value"""
-        case DViewFieldValue.folderflag(value) => fr"folderflag = $value"
-        case DViewFieldValue.filename(value) => fr"filename = $value"
-        case DViewFieldValue.fileextension(value) => fr"fileextension = $value"
-        case DViewFieldValue.revision(value) => fr"revision = $value"
-        case DViewFieldValue.changenumber(value) => fr"changenumber = $value"
-        case DViewFieldValue.status(value) => fr"status = $value"
-        case DViewFieldValue.documentsummary(value) => fr"documentsummary = $value"
-        case DViewFieldValue.document(value) => fr""""document" = $value"""
-        case DViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case DViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-        case DViewFieldValue.documentnode(value) => fr"documentnode = $value"
-      } :_*
-    )
-    sql"select * from pr.d $where".query[DViewRow].stream
-  
   }
 }

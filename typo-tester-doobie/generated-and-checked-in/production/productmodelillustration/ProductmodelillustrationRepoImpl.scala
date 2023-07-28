@@ -9,10 +9,8 @@ package productmodelillustration
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -53,17 +51,6 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
     sql"select productmodelid, illustrationid, modifieddate from production.productmodelillustration".query[ProductmodelillustrationRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductmodelillustrationFieldOrIdValue[_]]): Stream[ConnectionIO, ProductmodelillustrationRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductmodelillustrationFieldValue.productmodelid(value) => fr"productmodelid = $value"
-        case ProductmodelillustrationFieldValue.illustrationid(value) => fr"illustrationid = $value"
-        case ProductmodelillustrationFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productmodelillustration $where".query[ProductmodelillustrationRow].stream
-  
-  }
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
     sql"select productmodelid, illustrationid, modifieddate from production.productmodelillustration where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}".query[ProductmodelillustrationRow].option
   }
@@ -76,21 +63,6 @@ object ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: ProductmodelillustrationId, fieldValues: List[ProductmodelillustrationFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductmodelillustrationFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productmodelillustration
-              $updates
-              where productmodelid = ${compositeId.productmodelid} AND illustrationid = ${compositeId.illustrationid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration(productmodelid, illustrationid, modifieddate)

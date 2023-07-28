@@ -15,9 +15,7 @@ trait SalesorderheadersalesreasonRepo {
   def insert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow]
   def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow]
   def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow]
-  def selectByFieldValues(fieldValues: List[SalesorderheadersalesreasonFieldOrIdValue[_]]): Stream[ConnectionIO, SalesorderheadersalesreasonRow]
   def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]]
   def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: SalesorderheadersalesreasonId, fieldValues: List[SalesorderheadersalesreasonFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow]
 }

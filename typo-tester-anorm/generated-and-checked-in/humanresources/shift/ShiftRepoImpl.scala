@@ -66,30 +66,6 @@ object ShiftRepoImpl extends ShiftRepo {
           from humanresources.shift
        """.as(ShiftRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ShiftFieldOrIdValue[_]])(implicit c: Connection): List[ShiftRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ShiftFieldValue.shiftid(value) => NamedParameter("shiftid", ParameterValue.from(value))
-          case ShiftFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ShiftFieldValue.starttime(value) => NamedParameter("starttime", ParameterValue.from(value))
-          case ShiftFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
-          case ShiftFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select shiftid, "name", starttime, endtime, modifieddate
-                    from humanresources.shift
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ShiftRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow] = {
     SQL"""select shiftid, "name", starttime, endtime, modifieddate
           from humanresources.shift
@@ -116,30 +92,6 @@ object ShiftRepoImpl extends ShiftRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where shiftid = $shiftid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(shiftid: ShiftId, fieldValues: List[ShiftFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ShiftFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case ShiftFieldValue.starttime(value) => NamedParameter("starttime", ParameterValue.from(value))
-          case ShiftFieldValue.endtime(value) => NamedParameter("endtime", ParameterValue.from(value))
-          case ShiftFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update humanresources.shift
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where shiftid = {shiftid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("shiftid", ParameterValue.from(shiftid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)

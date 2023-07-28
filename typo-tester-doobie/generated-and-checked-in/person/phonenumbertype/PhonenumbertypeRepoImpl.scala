@@ -9,10 +9,8 @@ package phonenumbertype
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 
@@ -56,17 +54,6 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
     sql"""select phonenumbertypeid, "name", modifieddate from person.phonenumbertype""".query[PhonenumbertypeRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PhonenumbertypeFieldOrIdValue[_]]): Stream[ConnectionIO, PhonenumbertypeRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PhonenumbertypeFieldValue.phonenumbertypeid(value) => fr"phonenumbertypeid = $value"
-        case PhonenumbertypeFieldValue.name(value) => fr""""name" = $value"""
-        case PhonenumbertypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.phonenumbertype $where".query[PhonenumbertypeRow].stream
-  
-  }
   override def selectById(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Option[PhonenumbertypeRow]] = {
     sql"""select phonenumbertypeid, "name", modifieddate from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid""".query[PhonenumbertypeRow].option
   }
@@ -83,22 +70,6 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(phonenumbertypeid: PhonenumbertypeId, fieldValues: List[PhonenumbertypeFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PhonenumbertypeFieldValue.name(value) => fr""""name" = $value"""
-            case PhonenumbertypeFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.phonenumbertype
-              $updates
-              where phonenumbertypeid = $phonenumbertypeid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)

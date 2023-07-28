@@ -65,29 +65,6 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
           from humanresources.jobcandidate
        """.as(JobcandidateRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[JobcandidateFieldOrIdValue[_]])(implicit c: Connection): List[JobcandidateRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case JobcandidateFieldValue.jobcandidateid(value) => NamedParameter("jobcandidateid", ParameterValue.from(value))
-          case JobcandidateFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case JobcandidateFieldValue.resume(value) => NamedParameter("resume", ParameterValue.from(value))
-          case JobcandidateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select jobcandidateid, businessentityid, resume, modifieddate
-                    from humanresources.jobcandidate
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(JobcandidateRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate
           from humanresources.jobcandidate
@@ -113,29 +90,6 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where jobcandidateid = $jobcandidateid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(jobcandidateid: JobcandidateId, fieldValues: List[JobcandidateFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case JobcandidateFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case JobcandidateFieldValue.resume(value) => NamedParameter("resume", ParameterValue.from(value))
-          case JobcandidateFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update humanresources.jobcandidate
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where jobcandidateid = {jobcandidateid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("jobcandidateid", ParameterValue.from(jobcandidateid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)

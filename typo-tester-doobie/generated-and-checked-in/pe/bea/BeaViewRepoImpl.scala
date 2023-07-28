@@ -9,25 +9,10 @@ package bea
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object BeaViewRepoImpl extends BeaViewRepo {
   override def selectAll: Stream[ConnectionIO, BeaViewRow] = {
     sql"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate from pe.bea""".query[BeaViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[BeaViewFieldOrIdValue[_]]): Stream[ConnectionIO, BeaViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case BeaViewFieldValue.id(value) => fr""""id" = $value"""
-        case BeaViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case BeaViewFieldValue.addressid(value) => fr"addressid = $value"
-        case BeaViewFieldValue.addresstypeid(value) => fr"addresstypeid = $value"
-        case BeaViewFieldValue.rowguid(value) => fr"rowguid = $value"
-        case BeaViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pe.bea $where".query[BeaViewRow].stream
-  
   }
 }

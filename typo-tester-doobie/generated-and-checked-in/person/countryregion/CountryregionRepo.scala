@@ -15,10 +15,8 @@ trait CountryregionRepo {
   def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
   def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow]
   def selectAll: Stream[ConnectionIO, CountryregionRow]
-  def selectByFieldValues(fieldValues: List[CountryregionFieldOrIdValue[_]]): Stream[ConnectionIO, CountryregionRow]
   def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]]
   def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow]
   def update(row: CountryregionRow): ConnectionIO[Boolean]
-  def updateFieldValues(countryregioncode: CountryregionId, fieldValues: List[CountryregionFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
 }

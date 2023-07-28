@@ -91,37 +91,6 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           from purchasing.purchaseorderheader
        """.as(PurchaseorderheaderRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[PurchaseorderheaderFieldOrIdValue[_]])(implicit c: Connection): List[PurchaseorderheaderRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PurchaseorderheaderFieldValue.purchaseorderid(value) => NamedParameter("purchaseorderid", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.revisionnumber(value) => NamedParameter("revisionnumber", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.status(value) => NamedParameter("status", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.employeeid(value) => NamedParameter("employeeid", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.vendorid(value) => NamedParameter("vendorid", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.shipmethodid(value) => NamedParameter("shipmethodid", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.orderdate(value) => NamedParameter("orderdate", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.shipdate(value) => NamedParameter("shipdate", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.subtotal(value) => NamedParameter("subtotal", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.taxamt(value) => NamedParameter("taxamt", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.freight(value) => NamedParameter("freight", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
-                    from purchasing.purchaseorderheader
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PurchaseorderheaderRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate
           from purchasing.purchaseorderheader
@@ -155,37 +124,6 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where purchaseorderid = $purchaseorderid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(purchaseorderid: PurchaseorderheaderId, fieldValues: List[PurchaseorderheaderFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PurchaseorderheaderFieldValue.revisionnumber(value) => NamedParameter("revisionnumber", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.status(value) => NamedParameter("status", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.employeeid(value) => NamedParameter("employeeid", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.vendorid(value) => NamedParameter("vendorid", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.shipmethodid(value) => NamedParameter("shipmethodid", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.orderdate(value) => NamedParameter("orderdate", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.shipdate(value) => NamedParameter("shipdate", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.subtotal(value) => NamedParameter("subtotal", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.taxamt(value) => NamedParameter("taxamt", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.freight(value) => NamedParameter("freight", ParameterValue.from(value))
-          case PurchaseorderheaderFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update purchasing.purchaseorderheader
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where purchaseorderid = {purchaseorderid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("purchaseorderid", ParameterValue.from(purchaseorderid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)

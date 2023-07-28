@@ -76,34 +76,6 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           from production.transactionhistory
        """.as(TransactionhistoryRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[TransactionhistoryFieldOrIdValue[_]])(implicit c: Connection): List[TransactionhistoryRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case TransactionhistoryFieldValue.transactionid(value) => NamedParameter("transactionid", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.referenceorderid(value) => NamedParameter("referenceorderid", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.referenceorderlineid(value) => NamedParameter("referenceorderlineid", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.transactiondate(value) => NamedParameter("transactiondate", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.transactiontype(value) => NamedParameter("transactiontype", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
-                    from production.transactionhistory
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(TransactionhistoryRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow] = {
     SQL"""select transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate
           from production.transactionhistory
@@ -134,34 +106,6 @@ object TransactionhistoryRepoImpl extends TransactionhistoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where transactionid = $transactionid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(transactionid: TransactionhistoryId, fieldValues: List[TransactionhistoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case TransactionhistoryFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.referenceorderid(value) => NamedParameter("referenceorderid", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.referenceorderlineid(value) => NamedParameter("referenceorderlineid", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.transactiondate(value) => NamedParameter("transactiondate", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.transactiontype(value) => NamedParameter("transactiontype", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.actualcost(value) => NamedParameter("actualcost", ParameterValue.from(value))
-          case TransactionhistoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.transactionhistory
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where transactionid = {transactionid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("transactionid", ParameterValue.from(transactionid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
     SQL"""insert into production.transactionhistory(transactionid, productid, referenceorderid, referenceorderlineid, transactiondate, transactiontype, quantity, actualcost, modifieddate)

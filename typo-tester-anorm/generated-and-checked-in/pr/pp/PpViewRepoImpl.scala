@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package pp
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,31 +15,5 @@ object PpViewRepoImpl extends PpViewRepo {
     SQL"""select "id", productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
           from pr.pp
        """.as(PpViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PpViewFieldOrIdValue[_]])(implicit c: Connection): List[PpViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PpViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case PpViewFieldValue.productphotoid(value) => NamedParameter("productphotoid", ParameterValue.from(value))
-          case PpViewFieldValue.thumbnailphoto(value) => NamedParameter("thumbnailphoto", ParameterValue.from(value))
-          case PpViewFieldValue.thumbnailphotofilename(value) => NamedParameter("thumbnailphotofilename", ParameterValue.from(value))
-          case PpViewFieldValue.largephoto(value) => NamedParameter("largephoto", ParameterValue.from(value))
-          case PpViewFieldValue.largephotofilename(value) => NamedParameter("largephotofilename", ParameterValue.from(value))
-          case PpViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", productphotoid, thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, modifieddate
-                    from pr.pp
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PpViewRow.rowParser(1).*)
-    }
-  
   }
 }

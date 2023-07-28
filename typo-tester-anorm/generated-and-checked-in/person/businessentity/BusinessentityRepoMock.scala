@@ -27,13 +27,6 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
     map.values.toList
   }
-  override def selectByFieldValues(fieldValues: List[BusinessentityFieldOrIdValue[_]])(implicit c: Connection): List[BusinessentityRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, BusinessentityFieldValue.businessentityid(value)) => acc.filter(_.businessentityid == value)
-      case (acc, BusinessentityFieldValue.rowguid(value)) => acc.filter(_.rowguid == value)
-      case (acc, BusinessentityFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-    }.toList
-  }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[BusinessentityRow] = {
     map.get(businessentityid)
   }
@@ -46,22 +39,6 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
       case Some(_) =>
         map.put(row.businessentityid, row)
         true
-      case None => false
-    }
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[BusinessentityFieldValue[_]])(implicit c: Connection): Boolean = {
-    map.get(businessentityid) match {
-      case Some(oldRow) =>
-        val updatedRow = fieldValues.foldLeft(oldRow) {
-          case (acc, BusinessentityFieldValue.rowguid(value)) => acc.copy(rowguid = value)
-          case (acc, BusinessentityFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-        }
-        if (updatedRow != oldRow) {
-          map.put(businessentityid, updatedRow)
-          true
-        } else {
-          false
-        }
       case None => false
     }
   }

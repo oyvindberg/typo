@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package l
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,30 +15,5 @@ object LViewRepoImpl extends LViewRepo {
     SQL"""select "id", locationid, "name", costrate, availability, modifieddate
           from pr.l
        """.as(LViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[LViewFieldOrIdValue[_]])(implicit c: Connection): List[LViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case LViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case LViewFieldValue.locationid(value) => NamedParameter("locationid", ParameterValue.from(value))
-          case LViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case LViewFieldValue.costrate(value) => NamedParameter("costrate", ParameterValue.from(value))
-          case LViewFieldValue.availability(value) => NamedParameter("availability", ParameterValue.from(value))
-          case LViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", locationid, "name", costrate, availability, modifieddate
-                    from pr.l
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(LViewRow.rowParser(1).*)
-    }
-  
   }
 }

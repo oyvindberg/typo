@@ -15,10 +15,8 @@ trait SalestaxrateRepo {
   def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow]
   def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow]
   def selectAll: Stream[ConnectionIO, SalestaxrateRow]
-  def selectByFieldValues(fieldValues: List[SalestaxrateFieldOrIdValue[_]]): Stream[ConnectionIO, SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId): ConnectionIO[Option[SalestaxrateRow]]
   def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow]
   def update(row: SalestaxrateRow): ConnectionIO[Boolean]
-  def updateFieldValues(salestaxrateid: SalestaxrateId, fieldValues: List[SalestaxrateFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow]
 }

@@ -9,41 +9,10 @@ package vsalesperson
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object VsalespersonViewRepoImpl extends VsalespersonViewRepo {
   override def selectAll: Stream[ConnectionIO, VsalespersonViewRow] = {
     sql"select businessentityid, title, firstname, middlename, lastname, suffix, jobtitle, phonenumber, phonenumbertype, emailaddress, emailpromotion, addressline1, addressline2, city, stateprovincename, postalcode, countryregionname, territoryname, territorygroup, salesquota, salesytd, saleslastyear from sales.vsalesperson".query[VsalespersonViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[VsalespersonViewFieldOrIdValue[_]]): Stream[ConnectionIO, VsalespersonViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case VsalespersonViewFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case VsalespersonViewFieldValue.title(value) => fr"title = $value"
-        case VsalespersonViewFieldValue.firstname(value) => fr"firstname = $value"
-        case VsalespersonViewFieldValue.middlename(value) => fr"middlename = $value"
-        case VsalespersonViewFieldValue.lastname(value) => fr"lastname = $value"
-        case VsalespersonViewFieldValue.suffix(value) => fr"suffix = $value"
-        case VsalespersonViewFieldValue.jobtitle(value) => fr"jobtitle = $value"
-        case VsalespersonViewFieldValue.phonenumber(value) => fr"phonenumber = $value"
-        case VsalespersonViewFieldValue.phonenumbertype(value) => fr"phonenumbertype = $value"
-        case VsalespersonViewFieldValue.emailaddress(value) => fr"emailaddress = $value"
-        case VsalespersonViewFieldValue.emailpromotion(value) => fr"emailpromotion = $value"
-        case VsalespersonViewFieldValue.addressline1(value) => fr"addressline1 = $value"
-        case VsalespersonViewFieldValue.addressline2(value) => fr"addressline2 = $value"
-        case VsalespersonViewFieldValue.city(value) => fr"city = $value"
-        case VsalespersonViewFieldValue.stateprovincename(value) => fr"stateprovincename = $value"
-        case VsalespersonViewFieldValue.postalcode(value) => fr"postalcode = $value"
-        case VsalespersonViewFieldValue.countryregionname(value) => fr"countryregionname = $value"
-        case VsalespersonViewFieldValue.territoryname(value) => fr"territoryname = $value"
-        case VsalespersonViewFieldValue.territorygroup(value) => fr"territorygroup = $value"
-        case VsalespersonViewFieldValue.salesquota(value) => fr"salesquota = $value"
-        case VsalespersonViewFieldValue.salesytd(value) => fr"salesytd = $value"
-        case VsalespersonViewFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
-      } :_*
-    )
-    sql"select * from sales.vsalesperson $where".query[VsalespersonViewRow].stream
-  
   }
 }

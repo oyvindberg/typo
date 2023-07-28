@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package w
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,34 +15,5 @@ object WViewRepoImpl extends WViewRepo {
     SQL"""select "id", workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
           from pr.w
        """.as(WViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[WViewFieldOrIdValue[_]])(implicit c: Connection): List[WViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case WViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case WViewFieldValue.workorderid(value) => NamedParameter("workorderid", ParameterValue.from(value))
-          case WViewFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case WViewFieldValue.orderqty(value) => NamedParameter("orderqty", ParameterValue.from(value))
-          case WViewFieldValue.scrappedqty(value) => NamedParameter("scrappedqty", ParameterValue.from(value))
-          case WViewFieldValue.startdate(value) => NamedParameter("startdate", ParameterValue.from(value))
-          case WViewFieldValue.enddate(value) => NamedParameter("enddate", ParameterValue.from(value))
-          case WViewFieldValue.duedate(value) => NamedParameter("duedate", ParameterValue.from(value))
-          case WViewFieldValue.scrapreasonid(value) => NamedParameter("scrapreasonid", ParameterValue.from(value))
-          case WViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate
-                    from pr.w
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(WViewRow.rowParser(1).*)
-    }
-  
   }
 }

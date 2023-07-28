@@ -31,15 +31,6 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectByFieldValues(fieldValues: List[ProductdocumentFieldOrIdValue[_]]): Stream[ConnectionIO, ProductdocumentRow] = {
-    Stream.emits {
-      fieldValues.foldLeft(map.values) {
-        case (acc, ProductdocumentFieldValue.productid(value)) => acc.filter(_.productid == value)
-        case (acc, ProductdocumentFieldValue.modifieddate(value)) => acc.filter(_.modifieddate == value)
-        case (acc, ProductdocumentFieldValue.documentnode(value)) => acc.filter(_.documentnode == value)
-      }.toList
-    }
-  }
   override def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]] = {
     delay(map.get(compositeId))
   }
@@ -50,23 +41,6 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
         case Some(_) =>
           map.put(row.compositeId, row)
           true
-        case None => false
-      }
-    }
-  }
-  override def updateFieldValues(compositeId: ProductdocumentId, fieldValues: List[ProductdocumentFieldValue[_]]): ConnectionIO[Boolean] = {
-    delay {
-      map.get(compositeId) match {
-        case Some(oldRow) =>
-          val updatedRow = fieldValues.foldLeft(oldRow) {
-            case (acc, ProductdocumentFieldValue.modifieddate(value)) => acc.copy(modifieddate = value)
-          }
-          if (updatedRow != oldRow) {
-            map.put(compositeId, updatedRow)
-            true
-          } else {
-            false
-          }
         case None => false
       }
     }

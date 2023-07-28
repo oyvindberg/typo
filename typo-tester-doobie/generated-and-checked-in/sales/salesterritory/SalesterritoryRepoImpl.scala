@@ -9,10 +9,8 @@ package salesterritory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -79,24 +77,6 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def selectAll: Stream[ConnectionIO, SalesterritoryRow] = {
     sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory""".query[SalesterritoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[SalesterritoryFieldOrIdValue[_]]): Stream[ConnectionIO, SalesterritoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case SalesterritoryFieldValue.territoryid(value) => fr"territoryid = $value"
-        case SalesterritoryFieldValue.name(value) => fr""""name" = $value"""
-        case SalesterritoryFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-        case SalesterritoryFieldValue.group(value) => fr""""group" = $value"""
-        case SalesterritoryFieldValue.salesytd(value) => fr"salesytd = $value"
-        case SalesterritoryFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
-        case SalesterritoryFieldValue.costytd(value) => fr"costytd = $value"
-        case SalesterritoryFieldValue.costlastyear(value) => fr"costlastyear = $value"
-        case SalesterritoryFieldValue.rowguid(value) => fr"rowguid = $value"
-        case SalesterritoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from sales.salesterritory $where".query[SalesterritoryRow].stream
-  
-  }
   override def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]] = {
     sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate from sales.salesterritory where territoryid = $territoryid""".query[SalesterritoryRow].option
   }
@@ -120,29 +100,6 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(territoryid: SalesterritoryId, fieldValues: List[SalesterritoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case SalesterritoryFieldValue.name(value) => fr""""name" = $value"""
-            case SalesterritoryFieldValue.countryregioncode(value) => fr"countryregioncode = $value"
-            case SalesterritoryFieldValue.group(value) => fr""""group" = $value"""
-            case SalesterritoryFieldValue.salesytd(value) => fr"salesytd = $value"
-            case SalesterritoryFieldValue.saleslastyear(value) => fr"saleslastyear = $value"
-            case SalesterritoryFieldValue.costytd(value) => fr"costytd = $value"
-            case SalesterritoryFieldValue.costlastyear(value) => fr"costlastyear = $value"
-            case SalesterritoryFieldValue.rowguid(value) => fr"rowguid = $value"
-            case SalesterritoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update sales.salesterritory
-              $updates
-              where territoryid = $territoryid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)

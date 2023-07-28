@@ -15,10 +15,8 @@ trait BusinessentityRepo {
   def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow]
   def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow]
   def selectAll: Stream[ConnectionIO, BusinessentityRow]
-  def selectByFieldValues(fieldValues: List[BusinessentityFieldOrIdValue[_]]): Stream[ConnectionIO, BusinessentityRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[BusinessentityRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow]
   def update(row: BusinessentityRow): ConnectionIO[Boolean]
-  def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[BusinessentityFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow]
 }

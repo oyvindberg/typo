@@ -15,9 +15,7 @@ trait WorkorderroutingRepo {
   def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow]
   def selectAll: Stream[ConnectionIO, WorkorderroutingRow]
-  def selectByFieldValues(fieldValues: List[WorkorderroutingFieldOrIdValue[_]]): Stream[ConnectionIO, WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]]
   def update(row: WorkorderroutingRow): ConnectionIO[Boolean]
-  def updateFieldValues(compositeId: WorkorderroutingId, fieldValues: List[WorkorderroutingFieldValue[_]]): ConnectionIO[Boolean]
   def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
 }

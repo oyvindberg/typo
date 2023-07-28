@@ -70,32 +70,6 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
           from production.productinventory
        """.as(ProductinventoryRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[ProductinventoryFieldOrIdValue[_]])(implicit c: Connection): List[ProductinventoryRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductinventoryFieldValue.productid(value) => NamedParameter("productid", ParameterValue.from(value))
-          case ProductinventoryFieldValue.locationid(value) => NamedParameter("locationid", ParameterValue.from(value))
-          case ProductinventoryFieldValue.shelf(value) => NamedParameter("shelf", ParameterValue.from(value))
-          case ProductinventoryFieldValue.bin(value) => NamedParameter("bin", ParameterValue.from(value))
-          case ProductinventoryFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case ProductinventoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case ProductinventoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate
-                    from production.productinventory
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(ProductinventoryRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: ProductinventoryId)(implicit c: Connection): Option[ProductinventoryRow] = {
     SQL"""select productid, locationid, shelf, bin, quantity, rowguid, modifieddate
           from production.productinventory
@@ -112,31 +86,6 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: ProductinventoryId, fieldValues: List[ProductinventoryFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case ProductinventoryFieldValue.shelf(value) => NamedParameter("shelf", ParameterValue.from(value))
-          case ProductinventoryFieldValue.bin(value) => NamedParameter("bin", ParameterValue.from(value))
-          case ProductinventoryFieldValue.quantity(value) => NamedParameter("quantity", ParameterValue.from(value))
-          case ProductinventoryFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case ProductinventoryFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update production.productinventory
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where productid = {productid} AND locationid = {locationid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("productid", ParameterValue.from(compositeId.productid)), NamedParameter("locationid", ParameterValue.from(compositeId.locationid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)

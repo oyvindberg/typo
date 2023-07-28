@@ -12,5 +12,4 @@ import fs2.Stream
 
 trait VadditionalcontactinfoViewRepo {
   def selectAll: Stream[ConnectionIO, VadditionalcontactinfoViewRow]
-  def selectByFieldValues(fieldValues: List[VadditionalcontactinfoViewFieldOrIdValue[_]]): Stream[ConnectionIO, VadditionalcontactinfoViewRow]
 }

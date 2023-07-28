@@ -9,29 +9,10 @@ package bom
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object BomViewRepoImpl extends BomViewRepo {
   override def selectAll: Stream[ConnectionIO, BomViewRow] = {
     sql"""select "id", billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate from pr."bom"""".query[BomViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[BomViewFieldOrIdValue[_]]): Stream[ConnectionIO, BomViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case BomViewFieldValue.id(value) => fr""""id" = $value"""
-        case BomViewFieldValue.billofmaterialsid(value) => fr"billofmaterialsid = $value"
-        case BomViewFieldValue.productassemblyid(value) => fr"productassemblyid = $value"
-        case BomViewFieldValue.componentid(value) => fr"componentid = $value"
-        case BomViewFieldValue.startdate(value) => fr"startdate = $value"
-        case BomViewFieldValue.enddate(value) => fr"enddate = $value"
-        case BomViewFieldValue.unitmeasurecode(value) => fr"unitmeasurecode = $value"
-        case BomViewFieldValue.bomlevel(value) => fr"bomlevel = $value"
-        case BomViewFieldValue.perassemblyqty(value) => fr"perassemblyqty = $value"
-        case BomViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"""select * from pr."bom" $where""".query[BomViewRow].stream
-  
   }
 }

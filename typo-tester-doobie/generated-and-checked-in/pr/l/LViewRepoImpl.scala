@@ -9,25 +9,10 @@ package l
 
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
-import doobie.util.fragments
 import fs2.Stream
 
 object LViewRepoImpl extends LViewRepo {
   override def selectAll: Stream[ConnectionIO, LViewRow] = {
     sql"""select "id", locationid, "name", costrate, availability, modifieddate from pr.l""".query[LViewRow].stream
-  }
-  override def selectByFieldValues(fieldValues: List[LViewFieldOrIdValue[_]]): Stream[ConnectionIO, LViewRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case LViewFieldValue.id(value) => fr""""id" = $value"""
-        case LViewFieldValue.locationid(value) => fr"locationid = $value"
-        case LViewFieldValue.name(value) => fr""""name" = $value"""
-        case LViewFieldValue.costrate(value) => fr"costrate = $value"
-        case LViewFieldValue.availability(value) => fr"availability = $value"
-        case LViewFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from pr.l $where".query[LViewRow].stream
-  
   }
 }

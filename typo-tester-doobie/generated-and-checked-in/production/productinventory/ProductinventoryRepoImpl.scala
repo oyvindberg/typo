@@ -9,10 +9,8 @@ package productinventory
 
 import adventureworks.Defaulted
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -64,21 +62,6 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
     sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory".query[ProductinventoryRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[ProductinventoryFieldOrIdValue[_]]): Stream[ConnectionIO, ProductinventoryRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case ProductinventoryFieldValue.productid(value) => fr"productid = $value"
-        case ProductinventoryFieldValue.locationid(value) => fr"locationid = $value"
-        case ProductinventoryFieldValue.shelf(value) => fr"shelf = $value"
-        case ProductinventoryFieldValue.bin(value) => fr"bin = $value"
-        case ProductinventoryFieldValue.quantity(value) => fr"quantity = $value"
-        case ProductinventoryFieldValue.rowguid(value) => fr"rowguid = $value"
-        case ProductinventoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from production.productinventory $where".query[ProductinventoryRow].stream
-  
-  }
   override def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]] = {
     sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate from production.productinventory where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}".query[ProductinventoryRow].option
   }
@@ -95,25 +78,6 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(compositeId: ProductinventoryId, fieldValues: List[ProductinventoryFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case ProductinventoryFieldValue.shelf(value) => fr"shelf = $value"
-            case ProductinventoryFieldValue.bin(value) => fr"bin = $value"
-            case ProductinventoryFieldValue.quantity(value) => fr"quantity = $value"
-            case ProductinventoryFieldValue.rowguid(value) => fr"rowguid = $value"
-            case ProductinventoryFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update production.productinventory
-              $updates
-              where productid = ${compositeId.productid} AND locationid = ${compositeId.locationid}
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)

@@ -107,7 +107,7 @@ case class ComputedTable(
     tpe
   }
 
-  val names = ComputedNames(naming, source, cols, maybeId)
+  val names = ComputedNames(naming, source, cols, maybeId, options.enableFieldValue)
 
   val colsNotId: Option[NonEmptyList[ComputedColumn]] =
     maybeId.flatMap { id =>
@@ -159,10 +159,13 @@ case class ComputedTable(
     } else None
 
   val repoMethods: Option[NonEmptyList[RepoMethod]] = {
-    val fieldValueOrIdsParam = sc.Param(
-      sc.Ident("fieldValues"),
-      sc.Type.List.of(names.FieldOrIdValueName.of(sc.Type.Wildcard)),
-      None
+
+    val maybeFieldValueOrIdsParam = names.FieldOrIdValueName.map(name =>
+      sc.Param(
+        sc.Ident("fieldValues"),
+        sc.Type.List.of(name.of(sc.Type.Wildcard)),
+        None
+      )
     )
 
     val insertMethod: RepoMethod = {
@@ -194,20 +197,24 @@ case class ComputedTable(
                 // todo: support composite ids
                 None
             },
-            Some(RepoMethod.SelectByFieldValues(dbTable.name, cols, names.FieldValueName, fieldValueOrIdsParam, names.RowName)),
-            colsNotId.map(colsNotId =>
-              RepoMethod.UpdateFieldValues(
-                dbTable.name,
-                id,
-                sc.Param(
-                  sc.Ident("fieldValues"),
-                  sc.Type.List.of(names.FieldValueName.of(sc.Type.Wildcard)),
-                  None
-                ),
-                names.FieldValueName,
-                colsNotId,
-                names.RowName
-              )
+            for {
+              fieldValueOrIdsParam <- maybeFieldValueOrIdsParam
+              fieldValueName <- names.FieldValueName
+            } yield RepoMethod.SelectByFieldValues(dbTable.name, cols, fieldValueName, fieldValueOrIdsParam, names.RowName),
+            for {
+              colsNotId <- colsNotId
+              fieldValueName <- names.FieldValueName
+            } yield RepoMethod.UpdateFieldValues(
+              dbTable.name,
+              id,
+              sc.Param(
+                sc.Ident("fieldValues"),
+                sc.Type.List.of(fieldValueName.of(sc.Type.Wildcard)),
+                None
+              ),
+              fieldValueName,
+              colsNotId,
+              names.RowName
             ),
             colsNotId.map(colsNotId => RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName, None), colsNotId)),
             Some(insertMethod),
@@ -219,13 +226,18 @@ case class ComputedTable(
             Some(insertMethod),
             maybeInsertUnsavedMethod,
             Some(RepoMethod.SelectAll(dbTable.name, cols, names.RowName)),
-            Some(RepoMethod.SelectByFieldValues(dbTable.name, cols, names.FieldValueName, fieldValueOrIdsParam, names.RowName))
+            for {
+              fieldValueName <- names.FieldValueName
+              fieldValueOrIdsParam <- maybeFieldValueOrIdsParam
+            } yield RepoMethod.SelectByFieldValues(dbTable.name, cols, fieldValueName, fieldValueOrIdsParam, names.RowName)
           ).flatten
       },
       dbTable.uniqueKeys
-        .map { uk =>
-          val params = uk.cols.map(colName => cols.find(_.dbName == colName).get)
-          RepoMethod.SelectByUnique(params, names.FieldValueName, names.RowName)
+        .flatMap { uk =>
+          names.FieldValueName.map { fieldValueName =>
+            val params = uk.cols.map(colName => cols.find(_.dbName == colName).get)
+            RepoMethod.SelectByUnique(params, fieldValueName, names.RowName)
+          }
         }
         .distinctByCompat(x => x.params.map(_.tpe)) // avoid erasure clashes
     )

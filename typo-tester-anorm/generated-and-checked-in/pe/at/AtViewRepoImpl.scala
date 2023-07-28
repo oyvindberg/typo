@@ -7,8 +7,6 @@ package adventureworks
 package pe
 package at
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -17,29 +15,5 @@ object AtViewRepoImpl extends AtViewRepo {
     SQL"""select "id", addresstypeid, "name", rowguid, modifieddate
           from pe."at"
        """.as(AtViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[AtViewFieldOrIdValue[_]])(implicit c: Connection): List[AtViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case AtViewFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
-          case AtViewFieldValue.addresstypeid(value) => NamedParameter("addresstypeid", ParameterValue.from(value))
-          case AtViewFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
-          case AtViewFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case AtViewFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "id", addresstypeid, "name", rowguid, modifieddate
-                    from pe."at"
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(AtViewRow.rowParser(1).*)
-    }
-  
   }
 }

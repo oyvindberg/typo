@@ -11,10 +11,8 @@ import adventureworks.Defaulted
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.NameStyle
 import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.fragments
 import fs2.Stream
 import java.time.LocalDateTime
 import java.util.UUID
@@ -75,27 +73,6 @@ object PersonRepoImpl extends PersonRepo {
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person".query[PersonRow].stream
   }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[_]]): Stream[ConnectionIO, PersonRow] = {
-    val where = fragments.whereAnd(
-      fieldValues.map {
-        case PersonFieldValue.businessentityid(value) => fr"businessentityid = $value"
-        case PersonFieldValue.persontype(value) => fr"persontype = $value"
-        case PersonFieldValue.namestyle(value) => fr"namestyle = $value"
-        case PersonFieldValue.title(value) => fr"title = $value"
-        case PersonFieldValue.firstname(value) => fr"firstname = $value"
-        case PersonFieldValue.middlename(value) => fr"middlename = $value"
-        case PersonFieldValue.lastname(value) => fr"lastname = $value"
-        case PersonFieldValue.suffix(value) => fr"suffix = $value"
-        case PersonFieldValue.emailpromotion(value) => fr"emailpromotion = $value"
-        case PersonFieldValue.additionalcontactinfo(value) => fr"additionalcontactinfo = $value"
-        case PersonFieldValue.demographics(value) => fr"demographics = $value"
-        case PersonFieldValue.rowguid(value) => fr"rowguid = $value"
-        case PersonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-      } :_*
-    )
-    sql"select * from person.person $where".query[PersonRow].stream
-  
-  }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PersonRow]] = {
     sql"select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate from person.person where businessentityid = $businessentityid".query[PersonRow].option
   }
@@ -122,32 +99,6 @@ object PersonRepoImpl extends PersonRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def updateFieldValues(businessentityid: BusinessentityId, fieldValues: List[PersonFieldValue[_]]): ConnectionIO[Boolean] = {
-    fieldValues match {
-      case Nil => pure(false)
-      case nonEmpty =>
-        val updates = fragments.set(
-          nonEmpty.map {
-            case PersonFieldValue.persontype(value) => fr"persontype = $value"
-            case PersonFieldValue.namestyle(value) => fr"namestyle = $value"
-            case PersonFieldValue.title(value) => fr"title = $value"
-            case PersonFieldValue.firstname(value) => fr"firstname = $value"
-            case PersonFieldValue.middlename(value) => fr"middlename = $value"
-            case PersonFieldValue.lastname(value) => fr"lastname = $value"
-            case PersonFieldValue.suffix(value) => fr"suffix = $value"
-            case PersonFieldValue.emailpromotion(value) => fr"emailpromotion = $value"
-            case PersonFieldValue.additionalcontactinfo(value) => fr"additionalcontactinfo = $value"
-            case PersonFieldValue.demographics(value) => fr"demographics = $value"
-            case PersonFieldValue.rowguid(value) => fr"rowguid = $value"
-            case PersonFieldValue.modifieddate(value) => fr"modifieddate = $value"
-          } :_*
-        )
-        sql"""update person.person
-              $updates
-              where businessentityid = $businessentityid
-           """.update.run.map(_ > 0)
-    }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)

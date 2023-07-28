@@ -68,30 +68,6 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
           from person.emailaddress
        """.as(EmailaddressRow.rowParser(1).*)
   }
-  override def selectByFieldValues(fieldValues: List[EmailaddressFieldOrIdValue[_]])(implicit c: Connection): List[EmailaddressRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case EmailaddressFieldValue.businessentityid(value) => NamedParameter("businessentityid", ParameterValue.from(value))
-          case EmailaddressFieldValue.emailaddressid(value) => NamedParameter("emailaddressid", ParameterValue.from(value))
-          case EmailaddressFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case EmailaddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case EmailaddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
-                    from person.emailaddress
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(EmailaddressRow.rowParser(1).*)
-    }
-  
-  }
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
     SQL"""select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate
           from person.emailaddress
@@ -106,29 +82,6 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND emailaddressid = ${compositeId.emailaddressid}
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(compositeId: EmailaddressId, fieldValues: List[EmailaddressFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case EmailaddressFieldValue.emailaddress(value) => NamedParameter("emailaddress", ParameterValue.from(value))
-          case EmailaddressFieldValue.rowguid(value) => NamedParameter("rowguid", ParameterValue.from(value))
-          case EmailaddressFieldValue.modifieddate(value) => NamedParameter("modifieddate", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update person.emailaddress
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where businessentityid = {businessentityid} AND emailaddressid = {emailaddressid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("businessentityid", ParameterValue.from(compositeId.businessentityid)), NamedParameter("emailaddressid", ParameterValue.from(compositeId.emailaddressid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
     SQL"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
