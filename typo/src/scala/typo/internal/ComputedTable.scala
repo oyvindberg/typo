@@ -15,12 +15,18 @@ case class ComputedTable(
   val source = Source.Table(dbTable.name)
   val pointsTo: Map[db.ColName, (Source.Relation, db.ColName)] =
     dbTable.foreignKeys.flatMap { fk =>
-      val otherTable: HasSource =
-        if (fk.otherTable == dbTable.name) this
-        else eval(fk.otherTable).forceGet(s"${dbTable.name.value} => ${fk.otherTable.value}")
+      val maybeOtherTable: Option[HasSource] =
+        if (fk.otherTable == dbTable.name) Some(this)
+        else eval(fk.otherTable).get
 
-      val value = fk.otherCols.map(cn => (otherTable.source, cn))
-      fk.cols.zip(value).toList
+      maybeOtherTable match {
+        case None =>
+          System.err.println(s"Circular: ${dbTable.name.value} => ${fk.otherTable.value}")
+          Nil
+        case Some(otherTable) =>
+          val value = fk.otherCols.map(cn => (otherTable.source, cn))
+          fk.cols.zip(value).toList
+      }
     }.toMap
 
   val dbColsByName: Map[db.ColName, db.Col] =
