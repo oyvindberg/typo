@@ -55,6 +55,7 @@ object TypoLocalDateTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
+  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[TypoLocalDateTime] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoLocalDateTime] = new ParameterMetaData[TypoLocalDateTime] {
     override def sqlType: String = "text"
     override def jdbcType: Int = Types.OTHER

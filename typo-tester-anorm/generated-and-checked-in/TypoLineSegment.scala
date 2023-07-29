@@ -47,6 +47,7 @@ object TypoLineSegment {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGlseg, got ${other.getClass.getName}"))
     }
   )
+  implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoLineSegment] = Ordering.by(x => (x.p1, x.p2))
   implicit val parameterMetadata: ParameterMetaData[TypoLineSegment] = new ParameterMetaData[TypoLineSegment] {
     override def sqlType: String = "lseg"
     override def jdbcType: Int = Types.OTHER

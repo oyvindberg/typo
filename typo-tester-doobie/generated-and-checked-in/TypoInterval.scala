@@ -24,5 +24,6 @@ object TypoInterval {
   implicit val encoder: Encoder[TypoInterval] = Encoder.forProduct6[TypoInterval, Int, Int, Int, Int, Int, Double]("years", "months", "days", "hours", "minutes", "seconds")(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))(Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeDouble)
   implicit val get: Get[TypoInterval] = Get.Advanced.other[PGInterval](NonEmptyList.one("interval"))
     .map(v => TypoInterval(v.getYears, v.getMonths, v.getDays, v.getHours, v.getMinutes, v.getSeconds))
+  implicit val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
   implicit val put: Put[TypoInterval] = Put.Advanced.other[PGInterval](NonEmptyList.one("interval")).contramap(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds))
 }

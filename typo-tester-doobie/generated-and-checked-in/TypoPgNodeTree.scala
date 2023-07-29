@@ -29,6 +29,7 @@ object TypoPgNodeTree {
   implicit val encoder: Encoder[TypoPgNodeTree] = Encoder.forProduct1[TypoPgNodeTree, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoPgNodeTree] = Get.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree"))
     .map(v => TypoPgNodeTree(v.getValue))
+  implicit val ordering: Ordering[TypoPgNodeTree] = Ordering.by(_.value)
   implicit val put: Put[TypoPgNodeTree] = Put.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree")).contramap(v => {
                                                                                   val obj = new PGobject
                                                                                   obj.setType("pg_node_tree")

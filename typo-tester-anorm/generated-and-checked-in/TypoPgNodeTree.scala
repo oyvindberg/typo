@@ -52,6 +52,7 @@ object TypoPgNodeTree {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoPgNodeTree] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoPgNodeTree] = new ParameterMetaData[TypoPgNodeTree] {
     override def sqlType: String = "pg_node_tree"
     override def jdbcType: Int = Types.OTHER

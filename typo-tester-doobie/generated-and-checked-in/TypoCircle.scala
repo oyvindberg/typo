@@ -24,5 +24,6 @@ object TypoCircle {
   implicit val encoder: Encoder[TypoCircle] = Encoder.forProduct2[TypoCircle, TypoPoint, Double]("center", "radius")(x => (x.center, x.radius))(TypoPoint.encoder, Encoder.encodeDouble)
   implicit val get: Get[TypoCircle] = Get.Advanced.other[PGcircle](NonEmptyList.one("circle"))
     .map(v => TypoCircle(TypoPoint(v.center.x, v.center.y), v.radius))
+  implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoCircle] = Ordering.by(x => (x.center, x.radius))
   implicit val put: Put[TypoCircle] = Put.Advanced.other[PGcircle](NonEmptyList.one("circle")).contramap(v => new PGcircle(v.center.x, v.center.y, v.radius))
 }

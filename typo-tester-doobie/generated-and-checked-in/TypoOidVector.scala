@@ -29,6 +29,7 @@ object TypoOidVector {
   implicit val encoder: Encoder[TypoOidVector] = Encoder.forProduct1[TypoOidVector, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoOidVector] = Get.Advanced.other[PGobject](NonEmptyList.one("oidvector"))
     .map(v => TypoOidVector(v.getValue))
+  implicit val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)
   implicit val put: Put[TypoOidVector] = Put.Advanced.other[PGobject](NonEmptyList.one("oidvector")).contramap(v => {
                                                                                val obj = new PGobject
                                                                                obj.setType("oidvector")

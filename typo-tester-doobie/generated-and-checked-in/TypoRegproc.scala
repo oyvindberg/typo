@@ -29,6 +29,7 @@ object TypoRegproc {
   implicit val encoder: Encoder[TypoRegproc] = Encoder.forProduct1[TypoRegproc, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoRegproc] = Get.Advanced.other[PGobject](NonEmptyList.one("regproc"))
     .map(v => TypoRegproc(v.getValue))
+  implicit val ordering: Ordering[TypoRegproc] = Ordering.by(_.value)
   implicit val put: Put[TypoRegproc] = Put.Advanced.other[PGobject](NonEmptyList.one("regproc")).contramap(v => {
                                                                              val obj = new PGobject
                                                                              obj.setType("regproc")

@@ -36,6 +36,7 @@ object TypoHStore {
                 v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                 TypoHStore(b.result())
               })
+  implicit def ordering(implicit O0: Ordering[Map[String, String]]): Ordering[TypoHStore] = Ordering.by(_.value)
   implicit val put: Put[TypoHStore] = Put.Advanced.other[java.util.Map[String, String]](NonEmptyList.one("hstore")).contramap(v => {
                                                                                                  val b = new HashMap[String, String]
                                                                                                  v.value.foreach { case (k, v) => b.put(k, v)}

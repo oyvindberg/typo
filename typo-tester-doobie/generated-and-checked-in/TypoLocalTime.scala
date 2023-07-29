@@ -27,5 +27,6 @@ object TypoLocalTime {
   implicit val encoder: Encoder[TypoLocalTime] = Encoder.forProduct1[TypoLocalTime, LocalTime]("value")(x => (x.value))(Encoder.encodeLocalTime)
   implicit val get: Get[TypoLocalTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
     .map(v => TypoLocalTime(LocalTime.parse(v)))
+  implicit def ordering(implicit O0: Ordering[LocalTime]): Ordering[TypoLocalTime] = Ordering.by(_.value)
   implicit val put: Put[TypoLocalTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
 }

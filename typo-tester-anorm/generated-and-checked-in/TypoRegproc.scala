@@ -52,6 +52,7 @@ object TypoRegproc {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoRegproc] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoRegproc] = new ParameterMetaData[TypoRegproc] {
     override def sqlType: String = "regproc"
     override def jdbcType: Int = Types.OTHER

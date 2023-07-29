@@ -32,5 +32,6 @@ object TypoOffsetDateTime {
   implicit val encoder: Encoder[TypoOffsetDateTime] = Encoder.forProduct1[TypoOffsetDateTime, OffsetDateTime]("value")(x => (x.value))(Encoder.encodeOffsetDateTime)
   implicit val get: Get[TypoOffsetDateTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
     .map(v => TypoOffsetDateTime(OffsetDateTime.parse(v, parser)))
+  implicit def ordering(implicit O0: Ordering[OffsetDateTime]): Ordering[TypoOffsetDateTime] = Ordering.by(_.value)
   implicit val put: Put[TypoOffsetDateTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
 }

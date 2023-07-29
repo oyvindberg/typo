@@ -52,6 +52,7 @@ object TypoAnyArray {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoAnyArray] = new ParameterMetaData[TypoAnyArray] {
     override def sqlType: String = "anyarray"
     override def jdbcType: Int = Types.OTHER

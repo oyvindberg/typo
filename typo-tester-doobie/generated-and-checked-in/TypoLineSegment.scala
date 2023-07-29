@@ -25,5 +25,6 @@ object TypoLineSegment {
   implicit val encoder: Encoder[TypoLineSegment] = Encoder.forProduct2[TypoLineSegment, TypoPoint, TypoPoint]("p1", "p2")(x => (x.p1, x.p2))(TypoPoint.encoder, TypoPoint.encoder)
   implicit val get: Get[TypoLineSegment] = Get.Advanced.other[PGlseg](NonEmptyList.one("lseg"))
     .map(v => TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
+  implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoLineSegment] = Ordering.by(x => (x.p1, x.p2))
   implicit val put: Put[TypoLineSegment] = Put.Advanced.other[PGlseg](NonEmptyList.one("lseg")).contramap(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y)))
 }

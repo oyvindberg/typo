@@ -23,5 +23,6 @@ object TypoMoney {
   implicit val encoder: Encoder[TypoMoney] = Encoder.forProduct1[TypoMoney, BigDecimal]("value")(x => (x.value))(Encoder.encodeBigDecimal)
   implicit val get: Get[TypoMoney] = Get.Advanced.other[java.math.BigDecimal](NonEmptyList.one("money"))
     .map(v => TypoMoney(BigDecimal(v)))
+  implicit val ordering: Ordering[TypoMoney] = Ordering.by(_.value)
   implicit val put: Put[TypoMoney] = Put.Advanced.other[java.math.BigDecimal](NonEmptyList.one("money")).contramap(v => v.value.bigDecimal)
 }

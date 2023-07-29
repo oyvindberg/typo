@@ -3,12 +3,13 @@ package internal
 package codegen
 
 object CustomTypeFile {
-  def apply(options: InternalOptions)(et: CustomType): sc.File = {
+  def apply(options: InternalOptions, genOrdering: GenOrdering)(et: CustomType): sc.File = {
 
     val comments = scaladoc(et.comment)(Nil)
 
     val instances =
-      options.jsonLibs.flatMap(_.customTypeInstances(et)) ++
+      List(genOrdering.ordering(et.typoType, et.params)) ++
+        options.jsonLibs.flatMap(_.customTypeInstances(et)) ++
         options.dbLib.toList.flatMap(_.customTypeInstances(et))
 
     val str =

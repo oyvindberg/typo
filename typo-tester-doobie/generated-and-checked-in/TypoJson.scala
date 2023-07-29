@@ -29,6 +29,7 @@ object TypoJson {
   implicit val encoder: Encoder[TypoJson] = Encoder.forProduct1[TypoJson, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoJson] = Get.Advanced.other[PGobject](NonEmptyList.one("json"))
     .map(v => TypoJson(v.getValue))
+  implicit val ordering: Ordering[TypoJson] = Ordering.by(_.value)
   implicit val put: Put[TypoJson] = Put.Advanced.other[PGobject](NonEmptyList.one("json")).contramap(v => {
                                                                           val obj = new PGobject
                                                                           obj.setType("json")

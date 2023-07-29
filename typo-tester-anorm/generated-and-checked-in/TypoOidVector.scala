@@ -52,6 +52,7 @@ object TypoOidVector {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoOidVector] = new ParameterMetaData[TypoOidVector] {
     override def sqlType: String = "oidvector"
     override def jdbcType: Int = Types.OTHER

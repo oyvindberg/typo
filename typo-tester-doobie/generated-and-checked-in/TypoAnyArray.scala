@@ -29,6 +29,7 @@ object TypoAnyArray {
   implicit val encoder: Encoder[TypoAnyArray] = Encoder.forProduct1[TypoAnyArray, String]("value")(x => (x.value))(Encoder.encodeString)
   implicit val get: Get[TypoAnyArray] = Get.Advanced.other[PGobject](NonEmptyList.one("anyarray"))
     .map(v => TypoAnyArray(v.getValue))
+  implicit val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
   implicit val put: Put[TypoAnyArray] = Put.Advanced.other[PGobject](NonEmptyList.one("anyarray")).contramap(v => {
                                                                               val obj = new PGobject
                                                                               obj.setType("anyarray")

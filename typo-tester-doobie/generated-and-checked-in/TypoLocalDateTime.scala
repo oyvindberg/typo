@@ -32,5 +32,6 @@ object TypoLocalDateTime {
   implicit val encoder: Encoder[TypoLocalDateTime] = Encoder.forProduct1[TypoLocalDateTime, LocalDateTime]("value")(x => (x.value))(Encoder.encodeLocalDateTime)
   implicit val get: Get[TypoLocalDateTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
     .map(v => TypoLocalDateTime(LocalDateTime.parse(v, parser)))
+  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[TypoLocalDateTime] = Ordering.by(_.value)
   implicit val put: Put[TypoLocalDateTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
 }

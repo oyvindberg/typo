@@ -52,6 +52,7 @@ object TypoJsonb {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoJsonb] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoJsonb] = new ParameterMetaData[TypoJsonb] {
     override def sqlType: String = "jsonb"
     override def jdbcType: Int = Types.OTHER

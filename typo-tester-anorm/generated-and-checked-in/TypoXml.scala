@@ -53,6 +53,7 @@ object TypoXml {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgSQLXML, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoXml] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoXml] = new ParameterMetaData[TypoXml] {
     override def sqlType: String = "xml"
     override def jdbcType: Int = Types.OTHER

@@ -52,6 +52,7 @@ object TypoXid {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoXid] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoXid] = new ParameterMetaData[TypoXid] {
     override def sqlType: String = "xid"
     override def jdbcType: Int = Types.OTHER
