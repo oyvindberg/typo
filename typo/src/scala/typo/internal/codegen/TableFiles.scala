@@ -88,19 +88,20 @@ case class TableFiles(table: ComputedTable, options: InternalOptions, genOrderin
   val IdFile: Option[sc.File] = {
     table.maybeId.flatMap {
       case id: IdComputed.UnaryNormal =>
+        val value = sc.Ident("value")
         val comments = scaladoc(s"Type for the primary key of table `${table.dbTable.name.value}`")(Nil)
         val instances = List(
           List(
-            genOrdering.ordering(id.tpe, NonEmptyList(sc.Param(sc.Ident("value"), id.underlying, None)))
+            genOrdering.ordering(id.tpe, NonEmptyList(sc.Param(value, id.underlying, None)))
           ),
-          options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying)),
+          options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, fieldName = value, underlying = id.underlying)),
           options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = id.tpe, underlying = id.underlying))
         ).flatten
         Some(
           sc.File(
             id.tpe,
             code"""|$comments
-                   |case class ${id.tpe.name}(value: ${id.underlying}) extends AnyVal
+                   |case class ${id.tpe.name}($value: ${id.underlying}) extends AnyVal
                    |${genObject(id.tpe.value, instances)}
                    |""".stripMargin,
             secondaryTypes = Nil

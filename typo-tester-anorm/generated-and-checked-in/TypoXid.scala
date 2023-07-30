@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** xid (via PGObject) */
 case class TypoXid(value: String)
@@ -57,23 +51,12 @@ object TypoXid {
     override def sqlType: String = "xid"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoXid] = Reads[TypoXid](json => JsResult.fromTry(
-      Try(
-        TypoXid(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoXid] = Reads.StringReads.map(TypoXid.apply)
   implicit val toStatement: ToStatement[TypoXid] = ToStatement[TypoXid]((s, index, v) => s.setObject(index, {
                                                              val obj = new PGobject
                                                              obj.setType("xid")
                                                              obj.setValue(v.value)
                                                              obj
                                                            }))
-  implicit val writes: OWrites[TypoXid] = OWrites[TypoXid](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoXid] = Writes.StringWrites.contramap(_.value)
 }

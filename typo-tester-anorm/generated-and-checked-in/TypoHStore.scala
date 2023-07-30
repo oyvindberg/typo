@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import java.util.HashMap
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** The text representation of an hstore, used for input and output, includes zero or more key => value pairs separated by commas */
 case class TypoHStore(value: Map[String, String])
@@ -64,22 +58,11 @@ object TypoHStore {
     override def sqlType: String = "hstore"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoHStore] = Reads[TypoHStore](json => JsResult.fromTry(
-      Try(
-        TypoHStore(
-          value = json.\("value").as(implicitly[Reads[Map[String, String]]])
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoHStore] = implicitly[Reads[Map[String, String]]].map(TypoHStore.apply)
   implicit val toStatement: ToStatement[TypoHStore] = ToStatement[TypoHStore]((s, index, v) => s.setObject(index, {
                                                                 val b = new HashMap[String, String]
                                                                 v.value.foreach { case (k, v) => b.put(k, v)}
                                                                 b
                                                               }))
-  implicit val writes: OWrites[TypoHStore] = OWrites[TypoHStore](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> implicitly[Writes[Map[String, String]]].writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoHStore] = implicitly[Writes[Map[String, String]]].contramap(_.value)
 }

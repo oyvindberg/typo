@@ -28,8 +28,8 @@ object TypoHStore {
                             v.value.foreach { case (k, v) => b.put(k, v)}
                             b
                           }))
-  implicit val decoder: Decoder[TypoHStore] = Decoder.forProduct1[TypoHStore, Map[String, String]]("value")(TypoHStore.apply)(Decoder[Map[String, String]])
-  implicit val encoder: Encoder[TypoHStore] = Encoder.forProduct1[TypoHStore, Map[String, String]]("value")(x => (x.value))(Encoder[Map[String, String]])
+  implicit val decoder: Decoder[TypoHStore] = Decoder[Map[String, String]].map(TypoHStore.apply)
+  implicit val encoder: Encoder[TypoHStore] = Encoder[Map[String, String]].contramap(_.value)
   implicit val get: Get[TypoHStore] = Get.Advanced.other[java.util.Map[?, ?]](NonEmptyList.one("hstore"))
     .map(v => {
                 val b = Map.newBuilder[String, String]

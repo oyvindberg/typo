@@ -13,14 +13,8 @@ import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.jdbc.PgSQLXML
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** XML */
 case class TypoXml(value: String)
@@ -58,18 +52,7 @@ object TypoXml {
     override def sqlType: String = "xml"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoXml] = Reads[TypoXml](json => JsResult.fromTry(
-      Try(
-        TypoXml(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoXml] = Reads.StringReads.map(TypoXml.apply)
   implicit val toStatement: ToStatement[TypoXml] = ToStatement[TypoXml]((s, index, v) => s.setObject(index, v.value))
-  implicit val writes: OWrites[TypoXml] = OWrites[TypoXml](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoXml] = Writes.StringWrites.contramap(_.value)
 }

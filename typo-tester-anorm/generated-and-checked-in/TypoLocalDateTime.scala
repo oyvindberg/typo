@@ -16,14 +16,8 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** This is `java.time.LocalDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalDateTime(value: LocalDateTime)
@@ -60,18 +54,7 @@ object TypoLocalDateTime {
     override def sqlType: String = "text"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoLocalDateTime] = Reads[TypoLocalDateTime](json => JsResult.fromTry(
-      Try(
-        TypoLocalDateTime(
-          value = json.\("value").as(Reads.DefaultLocalDateTimeReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoLocalDateTime] = Reads.DefaultLocalDateTimeReads.map(TypoLocalDateTime.apply)
   implicit val toStatement: ToStatement[TypoLocalDateTime] = ToStatement[TypoLocalDateTime]((s, index, v) => s.setObject(index, v.value.toString))
-  implicit val writes: OWrites[TypoLocalDateTime] = OWrites[TypoLocalDateTime](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.DefaultLocalDateTimeWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoLocalDateTime] = Writes.DefaultLocalDateTimeWrites.contramap(_.value)
 }

@@ -26,8 +26,8 @@ object TypoXml {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoXml] = Decoder.forProduct1[TypoXml, String]("value")(TypoXml.apply)(Decoder.decodeString)
-  implicit val encoder: Encoder[TypoXml] = Encoder.forProduct1[TypoXml, String]("value")(x => (x.value))(Encoder.encodeString)
+  implicit val decoder: Decoder[TypoXml] = Decoder.decodeString.map(TypoXml.apply)
+  implicit val encoder: Encoder[TypoXml] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoXml] = Get.Advanced.other[PgSQLXML](NonEmptyList.one("xml"))
     .map(v => TypoXml(v.getString))
   implicit val ordering: Ordering[TypoXml] = Ordering.by(_.value)

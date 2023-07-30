@@ -25,8 +25,8 @@ object TypoAclItem {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoAclItem] = Decoder.forProduct1[TypoAclItem, String]("value")(TypoAclItem.apply)(Decoder.decodeString)
-  implicit val encoder: Encoder[TypoAclItem] = Encoder.forProduct1[TypoAclItem, String]("value")(x => (x.value))(Encoder.encodeString)
+  implicit val decoder: Decoder[TypoAclItem] = Decoder.decodeString.map(TypoAclItem.apply)
+  implicit val encoder: Encoder[TypoAclItem] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoAclItem] = Get.Advanced.other[PGobject](NonEmptyList.one("aclitem"))
     .map(v => TypoAclItem(v.getValue))
   implicit val ordering: Ordering[TypoAclItem] = Ordering.by(_.value)

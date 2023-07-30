@@ -25,8 +25,8 @@ object TypoRegtype {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoRegtype] = Decoder.forProduct1[TypoRegtype, String]("value")(TypoRegtype.apply)(Decoder.decodeString)
-  implicit val encoder: Encoder[TypoRegtype] = Encoder.forProduct1[TypoRegtype, String]("value")(x => (x.value))(Encoder.encodeString)
+  implicit val decoder: Decoder[TypoRegtype] = Decoder.decodeString.map(TypoRegtype.apply)
+  implicit val encoder: Encoder[TypoRegtype] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoRegtype] = Get.Advanced.other[PGobject](NonEmptyList.one("regtype"))
     .map(v => TypoRegtype(v.getValue))
   implicit val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)

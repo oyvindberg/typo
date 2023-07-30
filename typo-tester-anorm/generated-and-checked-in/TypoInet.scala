@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** inet (via PGObject) */
 case class TypoInet(value: String)
@@ -57,23 +51,12 @@ object TypoInet {
     override def sqlType: String = "inet"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoInet] = Reads[TypoInet](json => JsResult.fromTry(
-      Try(
-        TypoInet(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoInet] = Reads.StringReads.map(TypoInet.apply)
   implicit val toStatement: ToStatement[TypoInet] = ToStatement[TypoInet]((s, index, v) => s.setObject(index, {
                                                               val obj = new PGobject
                                                               obj.setType("inet")
                                                               obj.setValue(v.value)
                                                               obj
                                                             }))
-  implicit val writes: OWrites[TypoInet] = OWrites[TypoInet](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoInet] = Writes.StringWrites.contramap(_.value)
 }

@@ -25,8 +25,8 @@ object TypoOidVector {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoOidVector] = Decoder.forProduct1[TypoOidVector, String]("value")(TypoOidVector.apply)(Decoder.decodeString)
-  implicit val encoder: Encoder[TypoOidVector] = Encoder.forProduct1[TypoOidVector, String]("value")(x => (x.value))(Encoder.encodeString)
+  implicit val decoder: Decoder[TypoOidVector] = Decoder.decodeString.map(TypoOidVector.apply)
+  implicit val encoder: Encoder[TypoOidVector] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoOidVector] = Get.Advanced.other[PGobject](NonEmptyList.one("oidvector"))
     .map(v => TypoOidVector(v.getValue))
   implicit val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)

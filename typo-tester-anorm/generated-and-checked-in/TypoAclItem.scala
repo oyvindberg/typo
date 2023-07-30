@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** aclitem (via PGObject) */
 case class TypoAclItem(value: String)
@@ -57,23 +51,12 @@ object TypoAclItem {
     override def sqlType: String = "aclitem"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoAclItem] = Reads[TypoAclItem](json => JsResult.fromTry(
-      Try(
-        TypoAclItem(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoAclItem] = Reads.StringReads.map(TypoAclItem.apply)
   implicit val toStatement: ToStatement[TypoAclItem] = ToStatement[TypoAclItem]((s, index, v) => s.setObject(index, {
                                                                  val obj = new PGobject
                                                                  obj.setType("aclitem")
                                                                  obj.setValue(v.value)
                                                                  obj
                                                                }))
-  implicit val writes: OWrites[TypoAclItem] = OWrites[TypoAclItem](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoAclItem] = Writes.StringWrites.contramap(_.value)
 }
