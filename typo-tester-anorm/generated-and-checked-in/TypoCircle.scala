@@ -47,6 +47,7 @@ object TypoCircle {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGcircle, got ${other.getClass.getName}"))
     }
   )
+  implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoCircle] = Ordering.by(x => (x.center, x.radius))
   implicit val parameterMetadata: ParameterMetaData[TypoCircle] = new ParameterMetaData[TypoCircle] {
     override def sqlType: String = "circle"
     override def jdbcType: Int = Types.OTHER

@@ -11,14 +11,8 @@ import anorm.ToStatement
 import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** Money and cash types in PostgreSQL */
 case class TypoMoney(value: BigDecimal)
@@ -46,22 +40,12 @@ object TypoMoney {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.math.BigDecimal, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoMoney] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoMoney] = new ParameterMetaData[TypoMoney] {
     override def sqlType: String = "money"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoMoney] = Reads[TypoMoney](json => JsResult.fromTry(
-      Try(
-        TypoMoney(
-          value = json.\("value").as(Reads.bigDecReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoMoney] = Reads.bigDecReads.map(TypoMoney.apply)
   implicit val toStatement: ToStatement[TypoMoney] = ToStatement[TypoMoney]((s, index, v) => s.setObject(index, v.value.bigDecimal))
-  implicit val writes: OWrites[TypoMoney] = OWrites[TypoMoney](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.BigDecimalWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoMoney] = Writes.BigDecimalWrites.contramap(_.value)
 }

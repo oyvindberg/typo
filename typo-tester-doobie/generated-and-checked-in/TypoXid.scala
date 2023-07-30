@@ -25,10 +25,11 @@ object TypoXid {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoXid] = Decoder.forProduct1[TypoXid, String]("value")(TypoXid.apply)(Decoder.decodeString)
-  implicit val encoder: Encoder[TypoXid] = Encoder.forProduct1[TypoXid, String]("value")(x => (x.value))(Encoder.encodeString)
+  implicit val decoder: Decoder[TypoXid] = Decoder.decodeString.map(TypoXid.apply)
+  implicit val encoder: Encoder[TypoXid] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoXid] = Get.Advanced.other[PGobject](NonEmptyList.one("xid"))
     .map(v => TypoXid(v.getValue))
+  implicit val ordering: Ordering[TypoXid] = Ordering.by(_.value)
   implicit val put: Put[TypoXid] = Put.Advanced.other[PGobject](NonEmptyList.one("xid")).contramap(v => {
                                                                          val obj = new PGobject
                                                                          obj.setType("xid")

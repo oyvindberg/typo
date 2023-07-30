@@ -194,7 +194,7 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
       )
     )
 
-  def anyValInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
+  def anyValInstances(wrapperType: sc.Type.Qualified, fieldName: sc.Ident, underlying: sc.Type): List[sc.Given] =
     List(
       sc.Given(
         tparams = Nil,
@@ -208,7 +208,7 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
         name = writesName,
         implicitParams = Nil,
         tpe = Writes.of(wrapperType),
-        body = code"${lookupWritesFor(underlying)}.contramap(_.value)"
+        body = code"${lookupWritesFor(underlying)}.contramap(_.$fieldName)"
       )
     )
 

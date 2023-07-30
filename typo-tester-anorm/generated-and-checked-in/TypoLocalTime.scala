@@ -13,14 +13,8 @@ import java.sql.Types
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** This is `java.time.LocalTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalTime(value: LocalTime)
@@ -50,22 +44,12 @@ object TypoLocalTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
+  implicit def ordering(implicit O0: Ordering[LocalTime]): Ordering[TypoLocalTime] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoLocalTime] = new ParameterMetaData[TypoLocalTime] {
     override def sqlType: String = "text"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoLocalTime] = Reads[TypoLocalTime](json => JsResult.fromTry(
-      Try(
-        TypoLocalTime(
-          value = json.\("value").as(Reads.DefaultLocalTimeReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoLocalTime] = Reads.DefaultLocalTimeReads.map(TypoLocalTime.apply)
   implicit val toStatement: ToStatement[TypoLocalTime] = ToStatement[TypoLocalTime]((s, index, v) => s.setObject(index, v.value.toString))
-  implicit val writes: OWrites[TypoLocalTime] = OWrites[TypoLocalTime](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.DefaultLocalTimeWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoLocalTime] = Writes.DefaultLocalTimeWrites.contramap(_.value)
 }

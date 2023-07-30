@@ -72,7 +72,7 @@ package object typo {
         List(DefaultFile(default, options.jsonLibs).file),
         metaDb.enums.map(StringEnumFile(naming, options)),
         metaDb.domains.map(DomainFile(naming, options, scalaTypeMapper, genOrdering)),
-        customTypes.All.map(CustomTypeFile.apply(options)),
+        customTypes.All.map(CustomTypeFile(options, genOrdering)),
         relationFilesByName.map { case (_, f) => f },
         sqlFileFiles
       ).flatten

@@ -21,9 +21,10 @@ object TypoPolygon {
     .map(_.map(v => TypoPolygon(v.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList)))
   implicit val arrayPut: Put[Array[TypoPolygon]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_polygon"), "polygon")
     .contramap(_.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
-  implicit val decoder: Decoder[TypoPolygon] = Decoder.forProduct1[TypoPolygon, List[TypoPoint]]("points")(TypoPolygon.apply)(Decoder[List[TypoPoint]])
-  implicit val encoder: Encoder[TypoPolygon] = Encoder.forProduct1[TypoPolygon, List[TypoPoint]]("points")(x => (x.points))(Encoder[List[TypoPoint]])
+  implicit val decoder: Decoder[TypoPolygon] = Decoder[List[TypoPoint]].map(TypoPolygon.apply)
+  implicit val encoder: Encoder[TypoPolygon] = Encoder[List[TypoPoint]].contramap(_.points)
   implicit val get: Get[TypoPolygon] = Get.Advanced.other[PGpolygon](NonEmptyList.one("polygon"))
     .map(v => TypoPolygon(v.points.map(p => TypoPoint(p.x, p.y)).toList))
+  implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPolygon] = Ordering.by(_.points)
   implicit val put: Put[TypoPolygon] = Put.Advanced.other[PGpolygon](NonEmptyList.one("polygon")).contramap(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray))
 }

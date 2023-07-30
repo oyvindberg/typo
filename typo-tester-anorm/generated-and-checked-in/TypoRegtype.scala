@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** regtype (via PGObject) */
 case class TypoRegtype(value: String)
@@ -52,27 +46,17 @@ object TypoRegtype {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoRegtype] = new ParameterMetaData[TypoRegtype] {
     override def sqlType: String = "regtype"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoRegtype] = Reads[TypoRegtype](json => JsResult.fromTry(
-      Try(
-        TypoRegtype(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoRegtype] = Reads.StringReads.map(TypoRegtype.apply)
   implicit val toStatement: ToStatement[TypoRegtype] = ToStatement[TypoRegtype]((s, index, v) => s.setObject(index, {
                                                                  val obj = new PGobject
                                                                  obj.setType("regtype")
                                                                  obj.setValue(v.value)
                                                                  obj
                                                                }))
-  implicit val writes: OWrites[TypoRegtype] = OWrites[TypoRegtype](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoRegtype] = Writes.StringWrites.contramap(_.value)
 }

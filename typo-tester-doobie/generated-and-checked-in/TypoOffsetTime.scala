@@ -28,9 +28,10 @@ object TypoOffsetTime {
     .map(_.map(v => TypoOffsetTime(OffsetTime.parse(v.asInstanceOf[String], parser))))
   implicit val arrayPut: Put[Array[TypoOffsetTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_text"), "text")
     .contramap(_.map(v => v.value.toString))
-  implicit val decoder: Decoder[TypoOffsetTime] = Decoder.forProduct1[TypoOffsetTime, OffsetTime]("value")(TypoOffsetTime.apply)(Decoder.decodeOffsetTime)
-  implicit val encoder: Encoder[TypoOffsetTime] = Encoder.forProduct1[TypoOffsetTime, OffsetTime]("value")(x => (x.value))(Encoder.encodeOffsetTime)
+  implicit val decoder: Decoder[TypoOffsetTime] = Decoder.decodeOffsetTime.map(TypoOffsetTime.apply)
+  implicit val encoder: Encoder[TypoOffsetTime] = Encoder.encodeOffsetTime.contramap(_.value)
   implicit val get: Get[TypoOffsetTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
     .map(v => TypoOffsetTime(OffsetTime.parse(v, parser)))
+  implicit def ordering(implicit O0: Ordering[OffsetTime]): Ordering[TypoOffsetTime] = Ordering.by(_.value)
   implicit val put: Put[TypoOffsetTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
 }

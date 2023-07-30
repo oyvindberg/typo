@@ -13,14 +13,8 @@ import java.sql.Types
 import org.postgresql.geometric.PGpoint
 import org.postgresql.geometric.PGpolygon
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** Polygon datatype in PostgreSQL */
 case class TypoPolygon(points: List[TypoPoint])
@@ -48,22 +42,12 @@ object TypoPolygon {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGpolygon, got ${other.getClass.getName}"))
     }
   )
+  implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPolygon] = Ordering.by(_.points)
   implicit val parameterMetadata: ParameterMetaData[TypoPolygon] = new ParameterMetaData[TypoPolygon] {
     override def sqlType: String = "polygon"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoPolygon] = Reads[TypoPolygon](json => JsResult.fromTry(
-      Try(
-        TypoPolygon(
-          points = json.\("points").as(implicitly[Reads[List[TypoPoint]]])
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoPolygon] = implicitly[Reads[List[TypoPoint]]].map(TypoPolygon.apply)
   implicit val toStatement: ToStatement[TypoPolygon] = ToStatement[TypoPolygon]((s, index, v) => s.setObject(index, new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
-  implicit val writes: OWrites[TypoPolygon] = OWrites[TypoPolygon](o =>
-    new JsObject(ListMap[String, JsValue](
-      "points" -> implicitly[Writes[List[TypoPoint]]].writes(o.points)
-    ))
-  )
+  implicit val writes: Writes[TypoPolygon] = implicitly[Writes[List[TypoPoint]]].contramap(_.points)
 }

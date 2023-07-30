@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** anyarray (via PGObject) */
 case class TypoAnyArray(value: String)
@@ -52,27 +46,17 @@ object TypoAnyArray {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoAnyArray] = new ParameterMetaData[TypoAnyArray] {
     override def sqlType: String = "anyarray"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoAnyArray] = Reads[TypoAnyArray](json => JsResult.fromTry(
-      Try(
-        TypoAnyArray(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoAnyArray] = Reads.StringReads.map(TypoAnyArray.apply)
   implicit val toStatement: ToStatement[TypoAnyArray] = ToStatement[TypoAnyArray]((s, index, v) => s.setObject(index, {
                                                                   val obj = new PGobject
                                                                   obj.setType("anyarray")
                                                                   obj.setValue(v.value)
                                                                   obj
                                                                 }))
-  implicit val writes: OWrites[TypoAnyArray] = OWrites[TypoAnyArray](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoAnyArray] = Writes.StringWrites.contramap(_.value)
 }

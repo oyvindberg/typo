@@ -25,10 +25,11 @@ object TypoInet {
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val decoder: Decoder[TypoInet] = Decoder.forProduct1[TypoInet, String]("value")(TypoInet.apply)(Decoder.decodeString)
-  implicit val encoder: Encoder[TypoInet] = Encoder.forProduct1[TypoInet, String]("value")(x => (x.value))(Encoder.encodeString)
+  implicit val decoder: Decoder[TypoInet] = Decoder.decodeString.map(TypoInet.apply)
+  implicit val encoder: Encoder[TypoInet] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoInet] = Get.Advanced.other[PGobject](NonEmptyList.one("inet"))
     .map(v => TypoInet(v.getValue))
+  implicit val ordering: Ordering[TypoInet] = Ordering.by(_.value)
   implicit val put: Put[TypoInet] = Put.Advanced.other[PGobject](NonEmptyList.one("inet")).contramap(v => {
                                                                           val obj = new PGobject
                                                                           obj.setType("inet")

@@ -47,6 +47,7 @@ object TypoInterval {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGInterval, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
   implicit val parameterMetadata: ParameterMetaData[TypoInterval] = new ParameterMetaData[TypoInterval] {
     override def sqlType: String = "interval"
     override def jdbcType: Int = Types.OTHER

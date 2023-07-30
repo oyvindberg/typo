@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import java.time.LocalDate
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** This is `java.time.LocalDate`, but transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalDate(value: LocalDate)
@@ -48,22 +42,12 @@ object TypoLocalDate {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
+  implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[TypoLocalDate] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoLocalDate] = new ParameterMetaData[TypoLocalDate] {
     override def sqlType: String = "text"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoLocalDate] = Reads[TypoLocalDate](json => JsResult.fromTry(
-      Try(
-        TypoLocalDate(
-          value = json.\("value").as(Reads.DefaultLocalDateReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoLocalDate] = Reads.DefaultLocalDateReads.map(TypoLocalDate.apply)
   implicit val toStatement: ToStatement[TypoLocalDate] = ToStatement[TypoLocalDate]((s, index, v) => s.setObject(index, v.value.toString))
-  implicit val writes: OWrites[TypoLocalDate] = OWrites[TypoLocalDate](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.DefaultLocalDateWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoLocalDate] = Writes.DefaultLocalDateWrites.contramap(_.value)
 }

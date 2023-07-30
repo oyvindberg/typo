@@ -16,13 +16,8 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import play.api.libs.json.Writes
 
 /** This is `java.time.OffsetTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoOffsetTime(value: OffsetTime)
@@ -54,22 +49,12 @@ object TypoOffsetTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
+  implicit def ordering(implicit O0: Ordering[OffsetTime]): Ordering[TypoOffsetTime] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoOffsetTime] = new ParameterMetaData[TypoOffsetTime] {
     override def sqlType: String = "text"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoOffsetTime] = Reads[TypoOffsetTime](json => JsResult.fromTry(
-      Try(
-        TypoOffsetTime(
-          value = json.\("value").as(adventureworks.OffsetTimeReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoOffsetTime] = adventureworks.OffsetTimeReads.map(TypoOffsetTime.apply)
   implicit val toStatement: ToStatement[TypoOffsetTime] = ToStatement[TypoOffsetTime]((s, index, v) => s.setObject(index, v.value.toString))
-  implicit val writes: OWrites[TypoOffsetTime] = OWrites[TypoOffsetTime](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> adventureworks.OffsetTimeWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoOffsetTime] = adventureworks.OffsetTimeWrites.contramap(_.value)
 }

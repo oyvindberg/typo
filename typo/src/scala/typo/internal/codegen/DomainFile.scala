@@ -13,19 +13,20 @@ object DomainFile {
         case None             => List("No constraint")
       }
     )
+    val value = sc.Ident("value")
 
     val underlying: sc.Type = typeMapperScala.domain(dom.tpe)
     val instances = List(
       List(
-        genOrdering.ordering(tpe, NonEmptyList(sc.Param(sc.Ident("value"), underlying, None)))
+        genOrdering.ordering(tpe, NonEmptyList(sc.Param(value, underlying, None)))
       ),
-      options.jsonLibs.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying)),
+      options.jsonLibs.flatMap(_.anyValInstances(wrapperType = tpe, fieldName = value, underlying = underlying)),
       options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying))
     ).flatten
 
     val str =
       code"""$comments
-            |case class ${qident.name}(value: $underlying) extends AnyVal
+            |case class ${qident.name}($value: $underlying) extends AnyVal
             |${genObject(qident, instances)}
             |""".stripMargin
 

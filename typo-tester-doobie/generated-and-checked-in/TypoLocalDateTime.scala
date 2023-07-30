@@ -28,9 +28,10 @@ object TypoLocalDateTime {
     .map(_.map(v => TypoLocalDateTime(LocalDateTime.parse(v.asInstanceOf[String], parser))))
   implicit val arrayPut: Put[Array[TypoLocalDateTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_text"), "text")
     .contramap(_.map(v => v.value.toString))
-  implicit val decoder: Decoder[TypoLocalDateTime] = Decoder.forProduct1[TypoLocalDateTime, LocalDateTime]("value")(TypoLocalDateTime.apply)(Decoder.decodeLocalDateTime)
-  implicit val encoder: Encoder[TypoLocalDateTime] = Encoder.forProduct1[TypoLocalDateTime, LocalDateTime]("value")(x => (x.value))(Encoder.encodeLocalDateTime)
+  implicit val decoder: Decoder[TypoLocalDateTime] = Decoder.decodeLocalDateTime.map(TypoLocalDateTime.apply)
+  implicit val encoder: Encoder[TypoLocalDateTime] = Encoder.encodeLocalDateTime.contramap(_.value)
   implicit val get: Get[TypoLocalDateTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
     .map(v => TypoLocalDateTime(LocalDateTime.parse(v, parser)))
+  implicit def ordering(implicit O0: Ordering[LocalDateTime]): Ordering[TypoLocalDateTime] = Ordering.by(_.value)
   implicit val put: Put[TypoLocalDateTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
 }

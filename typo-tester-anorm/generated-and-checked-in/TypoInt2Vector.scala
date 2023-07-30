@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** int2vector (via PGObject) */
 case class TypoInt2Vector(value: String)
@@ -52,27 +46,17 @@ object TypoInt2Vector {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoInt2Vector] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoInt2Vector] = new ParameterMetaData[TypoInt2Vector] {
     override def sqlType: String = "int2vector"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoInt2Vector] = Reads[TypoInt2Vector](json => JsResult.fromTry(
-      Try(
-        TypoInt2Vector(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoInt2Vector] = Reads.StringReads.map(TypoInt2Vector.apply)
   implicit val toStatement: ToStatement[TypoInt2Vector] = ToStatement[TypoInt2Vector]((s, index, v) => s.setObject(index, {
                                                                     val obj = new PGobject
                                                                     obj.setType("int2vector")
                                                                     obj.setValue(v.value)
                                                                     obj
                                                                   }))
-  implicit val writes: OWrites[TypoInt2Vector] = OWrites[TypoInt2Vector](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoInt2Vector] = Writes.StringWrites.contramap(_.value)
 }

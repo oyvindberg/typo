@@ -12,14 +12,8 @@ import anorm.TypeDoesNotMatch
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
 
 /** jsonb (via PGObject) */
 case class TypoJsonb(value: String)
@@ -52,27 +46,17 @@ object TypoJsonb {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoJsonb] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoJsonb] = new ParameterMetaData[TypoJsonb] {
     override def sqlType: String = "jsonb"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoJsonb] = Reads[TypoJsonb](json => JsResult.fromTry(
-      Try(
-        TypoJsonb(
-          value = json.\("value").as(Reads.StringReads)
-        )
-      )
-    ),
-  )
+  implicit val reads: Reads[TypoJsonb] = Reads.StringReads.map(TypoJsonb.apply)
   implicit val toStatement: ToStatement[TypoJsonb] = ToStatement[TypoJsonb]((s, index, v) => s.setObject(index, {
                                                                val obj = new PGobject
                                                                obj.setType("jsonb")
                                                                obj.setValue(v.value)
                                                                obj
                                                              }))
-  implicit val writes: OWrites[TypoJsonb] = OWrites[TypoJsonb](o =>
-    new JsObject(ListMap[String, JsValue](
-      "value" -> Writes.StringWrites.writes(o.value)
-    ))
-  )
+  implicit val writes: Writes[TypoJsonb] = Writes.StringWrites.contramap(_.value)
 }

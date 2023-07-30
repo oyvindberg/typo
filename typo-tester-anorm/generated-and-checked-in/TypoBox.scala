@@ -47,6 +47,7 @@ object TypoBox {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGbox, got ${other.getClass.getName}"))
     }
   )
+  implicit val ordering: Ordering[TypoBox] = Ordering.by(x => (x.x1, x.y1, x.x2, x.y2))
   implicit val parameterMetadata: ParameterMetaData[TypoBox] = new ParameterMetaData[TypoBox] {
     override def sqlType: String = "box"
     override def jdbcType: Int = Types.OTHER
