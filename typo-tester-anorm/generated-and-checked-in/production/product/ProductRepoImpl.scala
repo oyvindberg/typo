@@ -15,10 +15,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductRepoImpl extends ProductRepo {
   override def delete(productid: ProductId)(implicit c: Connection): Boolean = {
     SQL"delete from production.product where productid = $productid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
+    DeleteBuilder("production.product", ProductFields)
   }
   override def insert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
@@ -90,6 +97,9 @@ object ProductRepoImpl extends ProductRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductFields, ProductRow] = {
+    SelectBuilderSql("production.product", ProductFields, ProductRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductRow] = {
     SQL"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
           from production.product
@@ -137,6 +147,9 @@ object ProductRepoImpl extends ProductRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productid = $productid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductFields, ProductRow] = {
+    UpdateBuilder("production.product", ProductFields, ProductRow.rowParser)
   }
   override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)

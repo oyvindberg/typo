@@ -15,10 +15,17 @@ import java.sql.Connection
 import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.person where "id" = $id""".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("myschema.person", PersonFields)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
@@ -70,6 +77,9 @@ object PersonRepoImpl extends PersonRepo {
     }
     
   }
+  override def select: SelectBuilder[PersonFields, PersonRow] = {
+    SelectBuilderSql("myschema.person", PersonFields, PersonRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
           from myschema.person
@@ -103,6 +113,9 @@ object PersonRepoImpl extends PersonRepo {
               sector = ${row.sector}::myschema.sector
           where "id" = $id
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("myschema.person", PersonFields, PersonRow.rowParser)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)

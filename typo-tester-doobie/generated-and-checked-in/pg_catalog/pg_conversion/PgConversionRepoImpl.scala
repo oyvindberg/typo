@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgConversionRepoImpl extends PgConversionRepo {
   override def delete(oid: PgConversionId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_conversion where oid = ${fromWrite(oid)(Write.fromPut(PgConversionId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
+    DeleteBuilder("pg_catalog.pg_conversion", PgConversionFields)
   }
   override def insert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
     sql"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgConversionId.put))}::oid, ${fromWrite(unsaved.conname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.connamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.conowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.conforencoding)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.contoencoding)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.conproc)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.condefault)(Write.fromPut(Meta.BooleanMeta.put))})
           returning oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault
        """.query(PgConversionRow.read).unique
+  }
+  override def select: SelectBuilder[PgConversionFields, PgConversionRow] = {
+    SelectBuilderSql("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgConversionRow] = {
     sql"select oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault from pg_catalog.pg_conversion".query(PgConversionRow.read).stream
@@ -48,6 +58,9 @@ object PgConversionRepoImpl extends PgConversionRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgConversionFields, PgConversionRow] = {
+    UpdateBuilder("pg_catalog.pg_conversion", PgConversionFields, PgConversionRow.read)
   }
   override def upsert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
     sql"""insert into pg_catalog.pg_conversion(oid, conname, connamespace, conowner, conforencoding, contoencoding, conproc, condefault)

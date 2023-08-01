@@ -8,7 +8,9 @@ package information_schema
 package schemata
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait SchemataViewRepo {
+  def select: SelectBuilder[SchemataViewFields, SchemataViewRow]
   def selectAll(implicit c: Connection): List[SchemataViewRow]
 }

@@ -9,10 +9,17 @@ package pg_attribute
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAttributeRepoImpl extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_attribute where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgAttributeFields, PgAttributeRow] = {
+    DeleteBuilder("pg_catalog.pg_attribute", PgAttributeFields)
   }
   override def insert(unsaved: PgAttributeRow)(implicit c: Connection): PgAttributeRow = {
     SQL"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)
@@ -21,6 +28,9 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
        """
       .executeInsert(PgAttributeRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgAttributeFields, PgAttributeRow] = {
+    SelectBuilderSql("pg_catalog.pg_attribute", PgAttributeFields, PgAttributeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
     SQL"""select attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval
@@ -62,6 +72,9 @@ object PgAttributeRepoImpl extends PgAttributeRepo {
               attmissingval = ${row.attmissingval}::anyarray
           where attrelid = ${compositeId.attrelid} AND attnum = ${compositeId.attnum}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgAttributeFields, PgAttributeRow] = {
+    UpdateBuilder("pg_catalog.pg_attribute", PgAttributeFields, PgAttributeRow.rowParser)
   }
   override def upsert(unsaved: PgAttributeRow)(implicit c: Connection): PgAttributeRow = {
     SQL"""insert into pg_catalog.pg_attribute(attrelid, attname, atttypid, attstattarget, attlen, attnum, attndims, attcacheoff, atttypmod, attbyval, attalign, attstorage, attcompression, attnotnull, atthasdef, atthasmissing, attidentity, attgenerated, attisdropped, attislocal, attinhcount, attcollation, attacl, attoptions, attfdwoptions, attmissingval)

@@ -8,11 +8,23 @@ package sales
 package salesorderheader
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, SalesorderheaderRow],
                                map: scala.collection.mutable.Map[SalesorderheaderId, SalesorderheaderRow] = scala.collection.mutable.Map.empty) extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId)(implicit c: Connection): Boolean = {
     map.remove(salesorderid).isDefined
+  }
+  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields, map)
   }
   override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
     if (map.contains(unsaved.salesorderid))
@@ -23,6 +35,9 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    SelectBuilderMock(SalesorderheaderFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields, map)
   }
   override def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
     map.put(unsaved.salesorderid, unsaved)

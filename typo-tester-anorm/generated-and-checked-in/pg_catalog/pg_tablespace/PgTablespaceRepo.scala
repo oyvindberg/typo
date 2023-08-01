@@ -8,13 +8,19 @@ package pg_catalog
 package pg_tablespace
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgTablespaceRepo {
   def delete(oid: PgTablespaceId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgTablespaceFields, PgTablespaceRow]
   def insert(unsaved: PgTablespaceRow)(implicit c: Connection): PgTablespaceRow
+  def select: SelectBuilder[PgTablespaceFields, PgTablespaceRow]
   def selectAll(implicit c: Connection): List[PgTablespaceRow]
   def selectById(oid: PgTablespaceId)(implicit c: Connection): Option[PgTablespaceRow]
   def selectByIds(oids: Array[PgTablespaceId])(implicit c: Connection): List[PgTablespaceRow]
   def update(row: PgTablespaceRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow]
   def upsert(unsaved: PgTablespaceRow)(implicit c: Connection): PgTablespaceRow
 }

@@ -17,10 +17,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
     sql"delete from sales.salesorderheadersalesreason where salesorderid = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND salesreasonid = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
@@ -52,6 +59,9 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     q.query(SalesorderheadersalesreasonRow.read).unique
     
   }
+  override def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    SelectBuilderSql("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
     sql"select salesorderid, salesreasonid, modifieddate::text from sales.salesorderheadersalesreason".query(SalesorderheadersalesreasonRow.read).stream
   }
@@ -66,6 +76,9 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    UpdateBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow.read)
   }
   override def upsert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)

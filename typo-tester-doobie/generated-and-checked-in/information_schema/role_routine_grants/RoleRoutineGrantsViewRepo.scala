@@ -9,7 +9,9 @@ package role_routine_grants
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait RoleRoutineGrantsViewRepo {
+  def select: SelectBuilder[RoleRoutineGrantsViewFields, RoleRoutineGrantsViewRow]
   def selectAll: Stream[ConnectionIO, RoleRoutineGrantsViewRow]
 }

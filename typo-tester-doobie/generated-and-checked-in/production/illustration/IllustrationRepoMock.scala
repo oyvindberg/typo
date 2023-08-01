@@ -10,11 +10,23 @@ package illustration
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, IllustrationRow],
                            map: scala.collection.mutable.Map[IllustrationId, IllustrationRow] = scala.collection.mutable.Map.empty) extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
     delay(map.remove(illustrationid).isDefined)
+  }
+  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, IllustrationFields, map)
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     delay {
@@ -27,6 +39,9 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
+    SelectBuilderMock(IllustrationFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, IllustrationFields, map)
   }
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     delay {

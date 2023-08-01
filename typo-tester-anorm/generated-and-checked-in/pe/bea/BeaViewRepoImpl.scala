@@ -9,8 +9,13 @@ package bea
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object BeaViewRepoImpl extends BeaViewRepo {
+  override def select: SelectBuilder[BeaViewFields, BeaViewRow] = {
+    SelectBuilderSql("pe.bea", BeaViewFields, BeaViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[BeaViewRow] = {
     SQL"""select "id", businessentityid, addressid, addresstypeid, rowguid, modifieddate::text
           from pe.bea

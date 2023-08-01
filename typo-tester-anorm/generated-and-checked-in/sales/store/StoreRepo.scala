@@ -9,14 +9,20 @@ package store
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait StoreRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[StoreFields, StoreRow]
   def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow
   def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow
+  def select: SelectBuilder[StoreFields, StoreRow]
   def selectAll(implicit c: Connection): List[StoreRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow]
   def update(row: StoreRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[StoreFields, StoreRow]
   def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow
 }

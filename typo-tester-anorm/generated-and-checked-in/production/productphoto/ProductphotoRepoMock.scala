@@ -8,11 +8,23 @@ package production
 package productphoto
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductphotoRepoMock(toRow: Function1[ProductphotoRowUnsaved, ProductphotoRow],
                            map: scala.collection.mutable.Map[ProductphotoId, ProductphotoRow] = scala.collection.mutable.Map.empty) extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
     map.remove(productphotoid).isDefined
+  }
+  override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductphotoFields, map)
   }
   override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     if (map.contains(unsaved.productphotoid))
@@ -23,6 +35,9 @@ class ProductphotoRepoMock(toRow: Function1[ProductphotoRowUnsaved, Productphoto
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
+    SelectBuilderMock(ProductphotoFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class ProductphotoRepoMock(toRow: Function1[ProductphotoRowUnsaved, Productphoto
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductphotoFields, map)
   }
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     map.put(unsaved.productphotoid, unsaved)

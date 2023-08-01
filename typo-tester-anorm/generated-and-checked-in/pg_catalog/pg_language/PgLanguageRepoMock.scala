@@ -8,10 +8,22 @@ package pg_catalog
 package pg_language
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgLanguageRepoMock(map: scala.collection.mutable.Map[PgLanguageId, PgLanguageRow] = scala.collection.mutable.Map.empty) extends PgLanguageRepo {
   override def delete(oid: PgLanguageId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgLanguageFields, map)
   }
   override def insert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgLanguageRepoMock(map: scala.collection.mutable.Map[PgLanguageId, PgLangu
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgLanguageFields, PgLanguageRow] = {
+    SelectBuilderMock(PgLanguageFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgLanguageRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgLanguageRepoMock(map: scala.collection.mutable.Map[PgLanguageId, PgLangu
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgLanguageFields, PgLanguageRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgLanguageFields, map)
   }
   override def upsert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow = {
     map.put(unsaved.oid, unsaved)

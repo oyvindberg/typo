@@ -10,11 +10,23 @@ package salespersonquotahistory
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRowUnsaved, SalespersonquotahistoryRow],
                                       map: scala.collection.mutable.Map[SalespersonquotahistoryId, SalespersonquotahistoryRow] = scala.collection.mutable.Map.empty) extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields, map)
   }
   override def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     delay {
@@ -27,6 +39,9 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    SelectBuilderMock(SalespersonquotahistoryFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalespersonquotahistoryFields, map)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     delay {

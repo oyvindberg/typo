@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
     SQL"delete from person.countryregion where countryregioncode = $countryregioncode".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
+    DeleteBuilder("person.countryregion", CountryregionFields)
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)
@@ -54,6 +61,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
     }
     
   }
+  override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
+    SelectBuilderSql("person.countryregion", CountryregionFields, CountryregionRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select countryregioncode, "name", modifieddate::text
           from person.countryregion
@@ -79,6 +89,9 @@ object CountryregionRepoImpl extends CountryregionRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where countryregioncode = $countryregioncode
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
+    UpdateBuilder("person.countryregion", CountryregionFields, CountryregionRow.rowParser)
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion(countryregioncode, "name", modifieddate)

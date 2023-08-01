@@ -10,11 +10,23 @@ package productvendor
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, ProductvendorRow],
                             map: scala.collection.mutable.Map[ProductvendorId, ProductvendorRow] = scala.collection.mutable.Map.empty) extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductvendorFields, map)
   }
   override def insert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     delay {
@@ -27,6 +39,9 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
+    SelectBuilderMock(ProductvendorFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductvendorFields, map)
   }
   override def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     delay {

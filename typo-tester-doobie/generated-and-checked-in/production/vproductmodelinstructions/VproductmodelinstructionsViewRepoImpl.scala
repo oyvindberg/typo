@@ -10,8 +10,13 @@ package vproductmodelinstructions
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
+  override def select: SelectBuilder[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow] = {
+    SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow] = {
     sql"""select productmodelid, "name", instructions, LocationID, SetupHours, MachineHours, LaborHours, LotSize, Step, rowguid, modifieddate::text from production.vproductmodelinstructions""".query(VproductmodelinstructionsViewRow.read).stream
   }

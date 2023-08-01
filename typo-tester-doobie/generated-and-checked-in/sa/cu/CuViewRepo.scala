@@ -9,7 +9,9 @@ package cu
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait CuViewRepo {
+  def select: SelectBuilder[CuViewFields, CuViewRow]
   def selectAll: Stream[ConnectionIO, CuViewRow]
 }

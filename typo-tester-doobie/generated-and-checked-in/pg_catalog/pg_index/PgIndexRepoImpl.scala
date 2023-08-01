@@ -16,16 +16,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgIndexRepoImpl extends PgIndexRepo {
   override def delete(indexrelid: PgIndexId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_index where indexrelid = ${fromWrite(indexrelid)(Write.fromPut(PgIndexId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgIndexFields, PgIndexRow] = {
+    DeleteBuilder("pg_catalog.pg_index", PgIndexFields)
   }
   override def insert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow] = {
     sql"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)
           values (${fromWrite(unsaved.indexrelid)(Write.fromPut(PgIndexId.put))}::oid, ${fromWrite(unsaved.indrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.indnatts)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.indnkeyatts)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.indisunique)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indisprimary)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indisexclusion)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indimmediate)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indisclustered)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indisvalid)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indcheckxmin)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indisready)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indislive)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indisreplident)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.indkey)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.indcollation)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.indclass)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.indoption)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.indexprs)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.indpred)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree)
           returning indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred
        """.query(PgIndexRow.read).unique
+  }
+  override def select: SelectBuilder[PgIndexFields, PgIndexRow] = {
+    SelectBuilderSql("pg_catalog.pg_index", PgIndexFields, PgIndexRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgIndexRow] = {
     sql"select indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred from pg_catalog.pg_index".query(PgIndexRow.read).stream
@@ -62,6 +72,9 @@ object PgIndexRepoImpl extends PgIndexRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgIndexFields, PgIndexRow] = {
+    UpdateBuilder("pg_catalog.pg_index", PgIndexFields, PgIndexRow.read)
   }
   override def upsert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow] = {
     sql"""insert into pg_catalog.pg_index(indexrelid, indrelid, indnatts, indnkeyatts, indisunique, indisprimary, indisexclusion, indimmediate, indisclustered, indisvalid, indcheckxmin, indisready, indislive, indisreplident, indkey, indcollation, indclass, indoption, indexprs, indpred)

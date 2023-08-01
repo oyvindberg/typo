@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
     SQL"delete from production.illustration where illustrationid = $illustrationid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
+    DeleteBuilder("production.illustration", IllustrationFields)
   }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)
@@ -57,6 +64,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
     }
     
   }
+  override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
+    SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select illustrationid, diagram, modifieddate::text
           from production.illustration
@@ -82,6 +92,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where illustrationid = $illustrationid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
+    UpdateBuilder("production.illustration", IllustrationFields, IllustrationRow.rowParser)
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration(illustrationid, diagram, modifieddate)

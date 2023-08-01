@@ -8,7 +8,9 @@ package information_schema
 package view_column_usage
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ViewColumnUsageViewRepo {
+  def select: SelectBuilder[ViewColumnUsageViewFields, ViewColumnUsageViewRow]
   def selectAll(implicit c: Connection): List[ViewColumnUsageViewRow]
 }

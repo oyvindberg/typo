@@ -8,14 +8,20 @@ package humanresources
 package jobcandidate
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait JobcandidateRepo {
   def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow]
   def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow
   def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow
+  def select: SelectBuilder[JobcandidateFields, JobcandidateRow]
   def selectAll(implicit c: Connection): List[JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow]
   def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow]
   def update(row: JobcandidateRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
   def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow
 }

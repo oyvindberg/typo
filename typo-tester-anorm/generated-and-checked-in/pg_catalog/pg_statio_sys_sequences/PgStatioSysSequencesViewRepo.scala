@@ -8,7 +8,9 @@ package pg_catalog
 package pg_statio_sys_sequences
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatioSysSequencesViewRepo {
+  def select: SelectBuilder[PgStatioSysSequencesViewFields, PgStatioSysSequencesViewRow]
   def selectAll(implicit c: Connection): List[PgStatioSysSequencesViewRow]
 }

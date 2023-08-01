@@ -9,10 +9,17 @@ package pg_auth_members
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def delete(compositeId: PgAuthMembersId)(implicit c: Connection): Boolean = {
     SQL"""delete from pg_catalog.pg_auth_members where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}""".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    DeleteBuilder("pg_catalog.pg_auth_members", PgAuthMembersFields)
   }
   override def insert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
     SQL"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
@@ -21,6 +28,9 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
        """
       .executeInsert(PgAuthMembersRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    SelectBuilderSql("pg_catalog.pg_auth_members", PgAuthMembersFields, PgAuthMembersRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAuthMembersRow] = {
     SQL"""select roleid, "member", grantor, admin_option
@@ -40,6 +50,9 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
               admin_option = ${row.adminOption}
           where roleid = ${compositeId.roleid} AND "member" = ${compositeId.member}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    UpdateBuilder("pg_catalog.pg_auth_members", PgAuthMembersFields, PgAuthMembersRow.rowParser)
   }
   override def upsert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow = {
     SQL"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)

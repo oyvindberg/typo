@@ -9,8 +9,13 @@ package pmpdc
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PmpdcViewRepoImpl extends PmpdcViewRepo {
+  override def select: SelectBuilder[PmpdcViewFields, PmpdcViewRow] = {
+    SelectBuilderSql("pr.pmpdc", PmpdcViewFields, PmpdcViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PmpdcViewRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate::text
           from pr.pmpdc

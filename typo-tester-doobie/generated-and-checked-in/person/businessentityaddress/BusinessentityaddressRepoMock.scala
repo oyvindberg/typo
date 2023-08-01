@@ -10,11 +10,23 @@ package businessentityaddress
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUnsaved, BusinessentityaddressRow],
                                     map: scala.collection.mutable.Map[BusinessentityaddressId, BusinessentityaddressRow] = scala.collection.mutable.Map.empty) extends BusinessentityaddressRepo {
   override def delete(compositeId: BusinessentityaddressId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields, map)
   }
   override def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     delay {
@@ -27,6 +39,9 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    SelectBuilderMock(BusinessentityaddressFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityaddressRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields, map)
   }
   override def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     delay {

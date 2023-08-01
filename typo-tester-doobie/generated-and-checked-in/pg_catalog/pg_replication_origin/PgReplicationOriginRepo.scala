@@ -9,13 +9,19 @@ package pg_replication_origin
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgReplicationOriginRepo {
   def delete(roident: PgReplicationOriginId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgReplicationOriginFields, PgReplicationOriginRow]
   def insert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow]
+  def select: SelectBuilder[PgReplicationOriginFields, PgReplicationOriginRow]
   def selectAll: Stream[ConnectionIO, PgReplicationOriginRow]
   def selectById(roident: PgReplicationOriginId): ConnectionIO[Option[PgReplicationOriginRow]]
   def selectByIds(roidents: Array[PgReplicationOriginId]): Stream[ConnectionIO, PgReplicationOriginRow]
   def update(row: PgReplicationOriginRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow]
   def upsert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow]
 }

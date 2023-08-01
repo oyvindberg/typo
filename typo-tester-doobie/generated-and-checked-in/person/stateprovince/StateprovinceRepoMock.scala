@@ -10,11 +10,23 @@ package stateprovince
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, StateprovinceRow],
                             map: scala.collection.mutable.Map[StateprovinceId, StateprovinceRow] = scala.collection.mutable.Map.empty) extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId): ConnectionIO[Boolean] = {
     delay(map.remove(stateprovinceid).isDefined)
+  }
+  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields, map)
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {
@@ -27,6 +39,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   }
   override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
+    SelectBuilderMock(StateprovinceFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields, map)
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {

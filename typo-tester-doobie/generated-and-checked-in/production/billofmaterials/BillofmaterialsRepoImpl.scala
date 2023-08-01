@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId): ConnectionIO[Boolean] = {
     sql"delete from production.billofmaterials where billofmaterialsid = ${fromWrite(billofmaterialsid)(Write.fromPut(BillofmaterialsId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    DeleteBuilder("production.billofmaterials", BillofmaterialsFields)
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
@@ -68,6 +75,9 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     q.query(BillofmaterialsRow.read).unique
     
   }
+  override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     sql"select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text from production.billofmaterials".query(BillofmaterialsRow.read).stream
   }
@@ -92,6 +102,9 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    UpdateBuilder("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.read)
   }
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)

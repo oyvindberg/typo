@@ -8,13 +8,19 @@ package pg_catalog
 package pg_cast
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgCastRepo {
   def delete(oid: PgCastId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgCastFields, PgCastRow]
   def insert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow
+  def select: SelectBuilder[PgCastFields, PgCastRow]
   def selectAll(implicit c: Connection): List[PgCastRow]
   def selectById(oid: PgCastId)(implicit c: Connection): Option[PgCastRow]
   def selectByIds(oids: Array[PgCastId])(implicit c: Connection): List[PgCastRow]
   def update(row: PgCastRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgCastFields, PgCastRow]
   def upsert(unsaved: PgCastRow)(implicit c: Connection): PgCastRow
 }

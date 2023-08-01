@@ -8,7 +8,9 @@ package pr
 package pch
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PchViewRepo {
+  def select: SelectBuilder[PchViewFields, PchViewRow]
   def selectAll(implicit c: Connection): List[PchViewRow]
 }

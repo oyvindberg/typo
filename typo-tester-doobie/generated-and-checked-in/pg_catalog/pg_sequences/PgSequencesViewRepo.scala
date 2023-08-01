@@ -9,7 +9,9 @@ package pg_sequences
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgSequencesViewRepo {
+  def select: SelectBuilder[PgSequencesViewFields, PgSequencesViewRow]
   def selectAll: Stream[ConnectionIO, PgSequencesViewRow]
 }

@@ -8,11 +8,23 @@ package humanresources
 package shift
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
                     map: scala.collection.mutable.Map[ShiftId, ShiftRow] = scala.collection.mutable.Map.empty) extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
     map.remove(shiftid).isDefined
+  }
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields, map)
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     if (map.contains(unsaved.shiftid))
@@ -23,6 +35,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ShiftFields, ShiftRow] = {
+    SelectBuilderMock(ShiftFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields, map)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     map.put(unsaved.shiftid, unsaved)

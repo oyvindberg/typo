@@ -10,11 +10,23 @@ package workorderrouting
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, WorkorderroutingRow],
                                map: scala.collection.mutable.Map[WorkorderroutingId, WorkorderroutingRow] = scala.collection.mutable.Map.empty) extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields, map)
   }
   override def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     delay {
@@ -27,6 +39,9 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    SelectBuilderMock(WorkorderroutingFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields, map)
   }
   override def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     delay {

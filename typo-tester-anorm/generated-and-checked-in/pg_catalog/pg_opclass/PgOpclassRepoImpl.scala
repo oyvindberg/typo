@@ -9,10 +9,17 @@ package pg_opclass
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_opclass where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgOpclassFields, PgOpclassRow] = {
+    DeleteBuilder("pg_catalog.pg_opclass", PgOpclassFields)
   }
   override def insert(unsaved: PgOpclassRow)(implicit c: Connection): PgOpclassRow = {
     SQL"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
@@ -21,6 +28,9 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
        """
       .executeInsert(PgOpclassRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgOpclassFields, PgOpclassRow] = {
+    SelectBuilderSql("pg_catalog.pg_opclass", PgOpclassFields, PgOpclassRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgOpclassRow] = {
     SQL"""select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
@@ -53,6 +63,9 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
               opckeytype = ${row.opckeytype}::oid
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgOpclassFields, PgOpclassRow] = {
+    UpdateBuilder("pg_catalog.pg_opclass", PgOpclassFields, PgOpclassRow.rowParser)
   }
   override def upsert(unsaved: PgOpclassRow)(implicit c: Connection): PgOpclassRow = {
     SQL"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)

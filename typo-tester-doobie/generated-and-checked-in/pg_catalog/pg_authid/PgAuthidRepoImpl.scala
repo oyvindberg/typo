@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAuthidRepoImpl extends PgAuthidRepo {
   override def delete(oid: PgAuthidId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_authid where oid = ${fromWrite(oid)(Write.fromPut(PgAuthidId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgAuthidFields, PgAuthidRow] = {
+    DeleteBuilder("pg_catalog.pg_authid", PgAuthidFields)
   }
   override def insert(unsaved: PgAuthidRow): ConnectionIO[PgAuthidRow] = {
     sql"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgAuthidId.put))}::oid, ${fromWrite(unsaved.rolname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.rolsuper)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolinherit)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcreaterole)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcreatedb)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolcanlogin)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolreplication)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolbypassrls)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.rolconnlimit)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.rolpassword)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rolvaliduntil)(Write.fromPutOption(TypoOffsetDateTime.put))}::timestamptz)
           returning oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
        """.query(PgAuthidRow.read).unique
+  }
+  override def select: SelectBuilder[PgAuthidFields, PgAuthidRow] = {
+    SelectBuilderSql("pg_catalog.pg_authid", PgAuthidFields, PgAuthidRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAuthidRow] = {
     sql"select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text from pg_catalog.pg_authid".query(PgAuthidRow.read).stream
@@ -52,6 +62,9 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgAuthidFields, PgAuthidRow] = {
+    UpdateBuilder("pg_catalog.pg_authid", PgAuthidFields, PgAuthidRow.read)
   }
   override def upsert(unsaved: PgAuthidRow): ConnectionIO[PgAuthidRow] = {
     sql"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)

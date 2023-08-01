@@ -8,10 +8,22 @@ package pg_catalog
 package pg_attribute
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgAttributeRepoMock(map: scala.collection.mutable.Map[PgAttributeId, PgAttributeRow] = scala.collection.mutable.Map.empty) extends PgAttributeRepo {
   override def delete(compositeId: PgAttributeId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PgAttributeFields, PgAttributeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgAttributeFields, map)
   }
   override def insert(unsaved: PgAttributeRow)(implicit c: Connection): PgAttributeRow = {
     if (map.contains(unsaved.compositeId))
@@ -19,6 +31,9 @@ class PgAttributeRepoMock(map: scala.collection.mutable.Map[PgAttributeId, PgAtt
     else
       map.put(unsaved.compositeId, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgAttributeFields, PgAttributeRow] = {
+    SelectBuilderMock(PgAttributeFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgAttributeRow] = {
     map.values.toList
@@ -34,6 +49,9 @@ class PgAttributeRepoMock(map: scala.collection.mutable.Map[PgAttributeId, PgAtt
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgAttributeFields, PgAttributeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgAttributeFields, map)
   }
   override def upsert(unsaved: PgAttributeRow)(implicit c: Connection): PgAttributeRow = {
     map.put(unsaved.compositeId, unsaved)

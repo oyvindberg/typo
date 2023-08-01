@@ -11,6 +11,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `information_schema.character_data`
   * No constraint
@@ -18,6 +19,7 @@ import play.api.libs.json.Writes
 case class CharacterData(value: String) extends AnyVal
 object CharacterData {
   implicit val arrayToStatement: ToStatement[Array[CharacterData]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[CharacterData, String] = Bijection[CharacterData, String](_.value)(CharacterData.apply)
   implicit val column: Column[CharacterData] = implicitly[Column[String]].map(CharacterData.apply)
   implicit val ordering: Ordering[CharacterData] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[CharacterData] = new ParameterMetaData[CharacterData] {

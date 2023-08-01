@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Boolean] = {
     sql"delete from production.productsubcategory where productsubcategoryid = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields)
   }
   override def insert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
@@ -61,6 +68,9 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     q.query(ProductsubcategoryRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
     sql"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from production.productsubcategory""".query(ProductsubcategoryRow.read).stream
   }
@@ -81,6 +91,9 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.read)
   }
   override def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)

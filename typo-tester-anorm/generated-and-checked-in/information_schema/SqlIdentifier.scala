@@ -11,6 +11,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `information_schema.sql_identifier`
   * No constraint
@@ -18,6 +19,7 @@ import play.api.libs.json.Writes
 case class SqlIdentifier(value: String) extends AnyVal
 object SqlIdentifier {
   implicit val arrayToStatement: ToStatement[Array[SqlIdentifier]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[SqlIdentifier, String] = Bijection[SqlIdentifier, String](_.value)(SqlIdentifier.apply)
   implicit val column: Column[SqlIdentifier] = implicitly[Column[String]].map(SqlIdentifier.apply)
   implicit val ordering: Ordering[SqlIdentifier] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[SqlIdentifier] = new ParameterMetaData[SqlIdentifier] {

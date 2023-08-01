@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** anyarray (via PGObject) */
 case class TypoAnyArray(value: String)
@@ -25,6 +26,7 @@ object TypoAnyArray {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoAnyArray, String] = Bijection[TypoAnyArray, String](_.value)(TypoAnyArray.apply)
   implicit val decoder: Decoder[TypoAnyArray] = Decoder.decodeString.map(TypoAnyArray.apply)
   implicit val encoder: Encoder[TypoAnyArray] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoAnyArray] = Get.Advanced.other[PGobject](NonEmptyList.one("anyarray"))

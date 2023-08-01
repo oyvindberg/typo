@@ -9,7 +9,9 @@ package foreign_table_options
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ForeignTableOptionsViewRepo {
+  def select: SelectBuilder[ForeignTableOptionsViewFields, ForeignTableOptionsViewRow]
   def selectAll: Stream[ConnectionIO, ForeignTableOptionsViewRow]
 }

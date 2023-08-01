@@ -12,12 +12,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `production.transactionhistoryarchive` */
 case class TransactionhistoryarchiveId(value: Int) extends AnyVal
 object TransactionhistoryarchiveId {
   implicit val arrayGet: Get[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.get.map(_.map(TransactionhistoryarchiveId.apply))
   implicit val arrayPut: Put[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[TransactionhistoryarchiveId, Int] = Bijection[TransactionhistoryarchiveId, Int](_.value)(TransactionhistoryarchiveId.apply)
   implicit val decoder: Decoder[TransactionhistoryarchiveId] = Decoder.decodeInt.map(TransactionhistoryarchiveId.apply)
   implicit val encoder: Encoder[TransactionhistoryarchiveId] = Encoder.encodeInt.contramap(_.value)
   implicit val get: Get[TransactionhistoryarchiveId] = Meta.IntMeta.get.map(TransactionhistoryarchiveId.apply)

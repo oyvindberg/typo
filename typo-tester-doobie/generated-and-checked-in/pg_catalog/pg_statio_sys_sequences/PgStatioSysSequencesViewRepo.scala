@@ -9,7 +9,9 @@ package pg_statio_sys_sequences
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatioSysSequencesViewRepo {
+  def select: SelectBuilder[PgStatioSysSequencesViewFields, PgStatioSysSequencesViewRow]
   def selectAll: Stream[ConnectionIO, PgStatioSysSequencesViewRow]
 }

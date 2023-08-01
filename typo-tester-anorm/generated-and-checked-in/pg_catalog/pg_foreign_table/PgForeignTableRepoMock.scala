@@ -8,10 +8,22 @@ package pg_catalog
 package pg_foreign_table
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgForeignTableRepoMock(map: scala.collection.mutable.Map[PgForeignTableId, PgForeignTableRow] = scala.collection.mutable.Map.empty) extends PgForeignTableRepo {
   override def delete(ftrelid: PgForeignTableId)(implicit c: Connection): Boolean = {
     map.remove(ftrelid).isDefined
+  }
+  override def delete: DeleteBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgForeignTableFields, map)
   }
   override def insert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow = {
     if (map.contains(unsaved.ftrelid))
@@ -19,6 +31,9 @@ class PgForeignTableRepoMock(map: scala.collection.mutable.Map[PgForeignTableId,
     else
       map.put(unsaved.ftrelid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    SelectBuilderMock(PgForeignTableFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgForeignTableRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgForeignTableRepoMock(map: scala.collection.mutable.Map[PgForeignTableId,
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgForeignTableFields, map)
   }
   override def upsert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow = {
     map.put(unsaved.ftrelid, unsaved)

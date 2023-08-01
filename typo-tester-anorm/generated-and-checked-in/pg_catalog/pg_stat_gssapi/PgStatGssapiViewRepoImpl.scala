@@ -9,8 +9,13 @@ package pg_stat_gssapi
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatGssapiViewRepoImpl extends PgStatGssapiViewRepo {
+  override def select: SelectBuilder[PgStatGssapiViewFields, PgStatGssapiViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_gssapi", PgStatGssapiViewFields, PgStatGssapiViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatGssapiViewRow] = {
     SQL"""select pid, gss_authenticated, principal, "encrypted"
           from pg_catalog.pg_stat_gssapi

@@ -10,8 +10,13 @@ package pa
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PaViewRepoImpl extends PaViewRepo {
+  override def select: SelectBuilder[PaViewFields, PaViewRow] = {
+    SelectBuilderSql("pe.pa", PaViewFields, PaViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PaViewRow] = {
     sql"""select "id", businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from pe.pa""".query(PaViewRow.read).stream
   }

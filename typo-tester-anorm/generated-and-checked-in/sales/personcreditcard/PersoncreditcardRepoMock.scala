@@ -8,11 +8,23 @@ package sales
 package personcreditcard
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, PersoncreditcardRow],
                                map: scala.collection.mutable.Map[PersoncreditcardId, PersoncreditcardRow] = scala.collection.mutable.Map.empty) extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields, map)
   }
   override def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    SelectBuilderMock(PersoncreditcardFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PersoncreditcardRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields, map)
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     map.put(unsaved.compositeId, unsaved)

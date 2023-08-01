@@ -8,11 +8,23 @@ package purchasing
 package productvendor
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, ProductvendorRow],
                             map: scala.collection.mutable.Map[ProductvendorId, ProductvendorRow] = scala.collection.mutable.Map.empty) extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductvendorFields, map)
   }
   override def insert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
   }
   override def insert(unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
+    SelectBuilderMock(ProductvendorFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductvendorRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductvendorFields, map)
   }
   override def upsert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     map.put(unsaved.compositeId, unsaved)

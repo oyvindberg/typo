@@ -10,8 +10,13 @@ package pg_shadow
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgShadowViewRepoImpl extends PgShadowViewRepo {
+  override def select: SelectBuilder[PgShadowViewFields, PgShadowViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_shadow", PgShadowViewFields, PgShadowViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgShadowViewRow] = {
     sql"select usename, usesysid, usecreatedb, usesuper, userepl, usebypassrls, passwd, valuntil::text, useconfig from pg_catalog.pg_shadow".query(PgShadowViewRow.read).stream
   }

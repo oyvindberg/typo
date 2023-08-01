@@ -9,8 +9,13 @@ package pmi
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PmiViewRepoImpl extends PmiViewRepo {
+  override def select: SelectBuilder[PmiViewFields, PmiViewRow] = {
+    SelectBuilderSql("pr.pmi", PmiViewFields, PmiViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PmiViewRow] = {
     SQL"""select productmodelid, illustrationid, modifieddate::text
           from pr.pmi

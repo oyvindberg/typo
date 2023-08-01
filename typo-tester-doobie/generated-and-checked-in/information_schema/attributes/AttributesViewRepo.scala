@@ -9,7 +9,9 @@ package attributes
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait AttributesViewRepo {
+  def select: SelectBuilder[AttributesViewFields, AttributesViewRow]
   def selectAll: Stream[ConnectionIO, AttributesViewRow]
 }

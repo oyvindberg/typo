@@ -8,13 +8,19 @@ package pg_catalog
 package pg_amproc
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgAmprocRepo {
   def delete(oid: PgAmprocId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgAmprocFields, PgAmprocRow]
   def insert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow
+  def select: SelectBuilder[PgAmprocFields, PgAmprocRow]
   def selectAll(implicit c: Connection): List[PgAmprocRow]
   def selectById(oid: PgAmprocId)(implicit c: Connection): Option[PgAmprocRow]
   def selectByIds(oids: Array[PgAmprocId])(implicit c: Connection): List[PgAmprocRow]
   def update(row: PgAmprocRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgAmprocFields, PgAmprocRow]
   def upsert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow
 }

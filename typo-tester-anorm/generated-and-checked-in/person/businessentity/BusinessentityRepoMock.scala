@@ -8,11 +8,23 @@ package person
 package businessentity
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, BusinessentityRow],
                              map: scala.collection.mutable.Map[BusinessentityId, BusinessentityRow] = scala.collection.mutable.Map.empty) extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     map.remove(businessentityid).isDefined
+  }
+  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityFields, map)
   }
   override def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     if (map.contains(unsaved.businessentityid))
@@ -23,6 +35,9 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   }
   override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
+    SelectBuilderMock(BusinessentityFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityFields, map)
   }
   override def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     map.put(unsaved.businessentityid, unsaved)

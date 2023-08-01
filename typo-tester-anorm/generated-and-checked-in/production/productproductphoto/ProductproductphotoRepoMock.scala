@@ -8,11 +8,23 @@ package production
 package productproductphoto
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductproductphotoRepoMock(toRow: Function1[ProductproductphotoRowUnsaved, ProductproductphotoRow],
                                   map: scala.collection.mutable.Map[ProductproductphotoId, ProductproductphotoRow] = scala.collection.mutable.Map.empty) extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductproductphotoFields, map)
   }
   override def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class ProductproductphotoRepoMock(toRow: Function1[ProductproductphotoRowUnsaved
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved)(implicit c: Connection): ProductproductphotoRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    SelectBuilderMock(ProductproductphotoFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class ProductproductphotoRepoMock(toRow: Function1[ProductproductphotoRowUnsaved
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductproductphotoFields, map)
   }
   override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     map.put(unsaved.compositeId, unsaved)

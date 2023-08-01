@@ -9,7 +9,9 @@ package check_constraints
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait CheckConstraintsViewRepo {
+  def select: SelectBuilder[CheckConstraintsViewFields, CheckConstraintsViewRow]
   def selectAll: Stream[ConnectionIO, CheckConstraintsViewRow]
 }

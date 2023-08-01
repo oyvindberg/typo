@@ -9,14 +9,20 @@ package shoppingcartitem
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ShoppingcartitemRepo {
   def delete(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow]
   def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow]
+  def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def selectAll: Stream[ConnectionIO, ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]]
   def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow]
   def update(row: ShoppingcartitemRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow]
 }

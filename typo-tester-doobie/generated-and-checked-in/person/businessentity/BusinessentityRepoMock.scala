@@ -10,11 +10,23 @@ package businessentity
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, BusinessentityRow],
                              map: scala.collection.mutable.Map[BusinessentityId, BusinessentityRow] = scala.collection.mutable.Map.empty) extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     delay(map.remove(businessentityid).isDefined)
+  }
+  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityFields, map)
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     delay {
@@ -27,6 +39,9 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   }
   override def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
+    SelectBuilderMock(BusinessentityFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityFields, map)
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     delay {

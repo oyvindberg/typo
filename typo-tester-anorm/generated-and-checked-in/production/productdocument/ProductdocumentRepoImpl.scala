@@ -14,10 +14,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productdocument where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    DeleteBuilder("production.productdocument", ProductdocumentFields)
   }
   override def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
     SQL"""insert into production.productdocument(productid, modifieddate, documentnode)
@@ -58,6 +65,9 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    SelectBuilderSql("production.productdocument", ProductdocumentFields, ProductdocumentRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
     SQL"""select productid, modifieddate::text, documentnode
           from production.productdocument
@@ -75,6 +85,9 @@ object ProductdocumentRepoImpl extends ProductdocumentRepo {
           set modifieddate = ${row.modifieddate}::timestamp
           where productid = ${compositeId.productid} AND documentnode = ${compositeId.documentnode}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    UpdateBuilder("production.productdocument", ProductdocumentFields, ProductdocumentRow.rowParser)
   }
   override def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
     SQL"""insert into production.productdocument(productid, modifieddate, documentnode)

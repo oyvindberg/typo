@@ -9,7 +9,9 @@ package pg_stat_ssl
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatSslViewRepo {
+  def select: SelectBuilder[PgStatSslViewFields, PgStatSslViewRow]
   def selectAll: Stream[ConnectionIO, PgStatSslViewRow]
 }

@@ -9,8 +9,13 @@ package pg_matviews
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgMatviewsViewRepoImpl extends PgMatviewsViewRepo {
+  override def select: SelectBuilder[PgMatviewsViewFields, PgMatviewsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_matviews", PgMatviewsViewFields, PgMatviewsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgMatviewsViewRow] = {
     SQL"""select schemaname, matviewname, matviewowner, "tablespace", hasindexes, ispopulated, definition
           from pg_catalog.pg_matviews

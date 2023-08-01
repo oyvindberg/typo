@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgRewriteRepoImpl extends PgRewriteRepo {
   override def delete(oid: PgRewriteId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_rewrite where oid = ${fromWrite(oid)(Write.fromPut(PgRewriteId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow] = {
+    DeleteBuilder("pg_catalog.pg_rewrite", PgRewriteFields)
   }
   override def insert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow] = {
     sql"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgRewriteId.put))}::oid, ${fromWrite(unsaved.rulename)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.evClass)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.evType)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.evEnabled)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.isInstead)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.evQual)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.evAction)(Write.fromPut(TypoPgNodeTree.put))}::pg_node_tree)
           returning oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action
        """.query(PgRewriteRow.read).unique
+  }
+  override def select: SelectBuilder[PgRewriteFields, PgRewriteRow] = {
+    SelectBuilderSql("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgRewriteRow] = {
     sql"select oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action from pg_catalog.pg_rewrite".query(PgRewriteRow.read).stream
@@ -48,6 +58,9 @@ object PgRewriteRepoImpl extends PgRewriteRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgRewriteFields, PgRewriteRow] = {
+    UpdateBuilder("pg_catalog.pg_rewrite", PgRewriteFields, PgRewriteRow.read)
   }
   override def upsert(unsaved: PgRewriteRow): ConnectionIO[PgRewriteRow] = {
     sql"""insert into pg_catalog.pg_rewrite(oid, rulename, ev_class, ev_type, ev_enabled, is_instead, ev_qual, ev_action)

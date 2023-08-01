@@ -8,10 +8,22 @@ package pg_catalog
 package pg_policy
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgPolicyRepoMock(map: scala.collection.mutable.Map[PgPolicyId, PgPolicyRow] = scala.collection.mutable.Map.empty) extends PgPolicyRepo {
   override def delete(oid: PgPolicyId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgPolicyFields, PgPolicyRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgPolicyFields, map)
   }
   override def insert(unsaved: PgPolicyRow)(implicit c: Connection): PgPolicyRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgPolicyRepoMock(map: scala.collection.mutable.Map[PgPolicyId, PgPolicyRow
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgPolicyFields, PgPolicyRow] = {
+    SelectBuilderMock(PgPolicyFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgPolicyRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgPolicyRepoMock(map: scala.collection.mutable.Map[PgPolicyId, PgPolicyRow
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgPolicyFields, PgPolicyRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgPolicyFields, map)
   }
   override def upsert(unsaved: PgPolicyRow)(implicit c: Connection): PgPolicyRow = {
     map.put(unsaved.oid, unsaved)

@@ -9,10 +9,17 @@ package pg_default_acl
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_default_acl where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    DeleteBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields)
   }
   override def insert(unsaved: PgDefaultAclRow)(implicit c: Connection): PgDefaultAclRow = {
     SQL"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)
@@ -21,6 +28,9 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
        """
       .executeInsert(PgDefaultAclRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    SelectBuilderSql("pg_catalog.pg_default_acl", PgDefaultAclFields, PgDefaultAclRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgDefaultAclRow] = {
     SQL"""select oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl
@@ -49,6 +59,9 @@ object PgDefaultAclRepoImpl extends PgDefaultAclRepo {
               defaclacl = ${row.defaclacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    UpdateBuilder("pg_catalog.pg_default_acl", PgDefaultAclFields, PgDefaultAclRow.rowParser)
   }
   override def upsert(unsaved: PgDefaultAclRow)(implicit c: Connection): PgDefaultAclRow = {
     SQL"""insert into pg_catalog.pg_default_acl(oid, defaclrole, defaclnamespace, defaclobjtype, defaclacl)

@@ -9,8 +9,13 @@ package pg_indexes
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgIndexesViewRepoImpl extends PgIndexesViewRepo {
+  override def select: SelectBuilder[PgIndexesViewFields, PgIndexesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_indexes", PgIndexesViewFields, PgIndexesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgIndexesViewRow] = {
     SQL"""select schemaname, tablename, indexname, "tablespace", indexdef
           from pg_catalog.pg_indexes

@@ -10,11 +10,23 @@ package currencyrate
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, CurrencyrateRow],
                            map: scala.collection.mutable.Map[CurrencyrateId, CurrencyrateRow] = scala.collection.mutable.Map.empty) extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId): ConnectionIO[Boolean] = {
     delay(map.remove(currencyrateid).isDefined)
+  }
+  override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields, map)
   }
   override def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     delay {
@@ -27,6 +39,9 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
   }
   override def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    SelectBuilderMock(CurrencyrateFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields, map)
   }
   override def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     delay {

@@ -10,8 +10,13 @@ package sp
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SpViewRepoImpl extends SpViewRepo {
+  override def select: SelectBuilder[SpViewFields, SpViewRow] = {
+    SelectBuilderSql("sa.sp", SpViewFields, SpViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SpViewRow] = {
     sql"""select "id", businessentityid, territoryid, salesquota, bonus, commissionpct, salesytd, saleslastyear, rowguid, modifieddate::text from sa.sp""".query(SpViewRow.read).stream
   }

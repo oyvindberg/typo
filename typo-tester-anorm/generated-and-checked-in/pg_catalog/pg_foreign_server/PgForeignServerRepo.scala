@@ -8,13 +8,19 @@ package pg_catalog
 package pg_foreign_server
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgForeignServerRepo {
   def delete(oid: PgForeignServerId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgForeignServerFields, PgForeignServerRow]
   def insert(unsaved: PgForeignServerRow)(implicit c: Connection): PgForeignServerRow
+  def select: SelectBuilder[PgForeignServerFields, PgForeignServerRow]
   def selectAll(implicit c: Connection): List[PgForeignServerRow]
   def selectById(oid: PgForeignServerId)(implicit c: Connection): Option[PgForeignServerRow]
   def selectByIds(oids: Array[PgForeignServerId])(implicit c: Connection): List[PgForeignServerRow]
   def update(row: PgForeignServerRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgForeignServerFields, PgForeignServerRow]
   def upsert(unsaved: PgForeignServerRow)(implicit c: Connection): PgForeignServerRow
 }

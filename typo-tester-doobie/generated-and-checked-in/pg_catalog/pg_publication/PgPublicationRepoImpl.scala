@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgPublicationRepoImpl extends PgPublicationRepo {
   override def delete(oid: PgPublicationId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_publication where oid = ${fromWrite(oid)(Write.fromPut(PgPublicationId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgPublicationFields, PgPublicationRow] = {
+    DeleteBuilder("pg_catalog.pg_publication", PgPublicationFields)
   }
   override def insert(unsaved: PgPublicationRow): ConnectionIO[PgPublicationRow] = {
     sql"""insert into pg_catalog.pg_publication(oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgPublicationId.put))}::oid, ${fromWrite(unsaved.pubname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.pubowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.puballtables)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.pubinsert)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.pubupdate)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.pubdelete)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.pubtruncate)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.pubviaroot)(Write.fromPut(Meta.BooleanMeta.put))})
           returning oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot
        """.query(PgPublicationRow.read).unique
+  }
+  override def select: SelectBuilder[PgPublicationFields, PgPublicationRow] = {
+    SelectBuilderSql("pg_catalog.pg_publication", PgPublicationFields, PgPublicationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgPublicationRow] = {
     sql"select oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot from pg_catalog.pg_publication".query(PgPublicationRow.read).stream
@@ -48,6 +58,9 @@ object PgPublicationRepoImpl extends PgPublicationRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgPublicationFields, PgPublicationRow] = {
+    UpdateBuilder("pg_catalog.pg_publication", PgPublicationFields, PgPublicationRow.read)
   }
   override def upsert(unsaved: PgPublicationRow): ConnectionIO[PgPublicationRow] = {
     sql"""insert into pg_catalog.pg_publication(oid, pubname, pubowner, puballtables, pubinsert, pubupdate, pubdelete, pubtruncate, pubviaroot)

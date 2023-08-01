@@ -8,11 +8,23 @@ package production
 package workorder
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
                         map: scala.collection.mutable.Map[WorkorderId, WorkorderRow] = scala.collection.mutable.Map.empty) extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     map.remove(workorderid).isDefined
+  }
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, WorkorderFields, map)
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     if (map.contains(unsaved.workorderid))
@@ -23,6 +35,9 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
+    SelectBuilderMock(WorkorderFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, WorkorderFields, map)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     map.put(unsaved.workorderid, unsaved)

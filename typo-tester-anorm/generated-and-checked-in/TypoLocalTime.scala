@@ -15,6 +15,7 @@ import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** This is `java.time.LocalTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoLocalTime(value: LocalTime)
@@ -34,10 +35,11 @@ object TypoLocalTime {
     }
   )
   implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalTime]] = new ParameterMetaData[Array[TypoLocalTime]] {
-    override def sqlType: String = "_text"
+    override def sqlType: String = "_time"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoLocalTime]] = ToStatement[Array[TypoLocalTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("text", v.map(v => v.value.toString))))
+  implicit val arrayToStatement: ToStatement[Array[TypoLocalTime]] = ToStatement[Array[TypoLocalTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("time", v.map(v => v.value.toString))))
+  implicit val bijection: Bijection[TypoLocalTime, LocalTime] = Bijection[TypoLocalTime, LocalTime](_.value)(TypoLocalTime.apply)
   implicit val column: Column[TypoLocalTime] = Column.nonNull[TypoLocalTime]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoLocalTime(LocalTime.parse(v)))
@@ -46,7 +48,7 @@ object TypoLocalTime {
   )
   implicit def ordering(implicit O0: Ordering[LocalTime]): Ordering[TypoLocalTime] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[TypoLocalTime] = new ParameterMetaData[TypoLocalTime] {
-    override def sqlType: String = "text"
+    override def sqlType: String = "time"
     override def jdbcType: Int = Types.OTHER
   }
   implicit val reads: Reads[TypoLocalTime] = Reads.DefaultLocalTimeReads.map(TypoLocalTime.apply)

@@ -19,10 +19,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
     sql"delete from production.productinventory where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND locationid = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    DeleteBuilder("production.productinventory", ProductinventoryFields)
   }
   override def insert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
@@ -64,6 +71,9 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
     q.query(ProductinventoryRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    SelectBuilderSql("production.productinventory", ProductinventoryFields, ProductinventoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
     sql"select productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text from production.productinventory".query(ProductinventoryRow.read).stream
   }
@@ -82,6 +92,9 @@ object ProductinventoryRepoImpl extends ProductinventoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    UpdateBuilder("production.productinventory", ProductinventoryFields, ProductinventoryRow.read)
   }
   override def upsert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into production.productinventory(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)

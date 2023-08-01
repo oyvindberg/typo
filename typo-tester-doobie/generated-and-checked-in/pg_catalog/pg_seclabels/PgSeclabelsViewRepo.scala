@@ -9,7 +9,9 @@ package pg_seclabels
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgSeclabelsViewRepo {
+  def select: SelectBuilder[PgSeclabelsViewFields, PgSeclabelsViewRow]
   def selectAll: Stream[ConnectionIO, PgSeclabelsViewRow]
 }

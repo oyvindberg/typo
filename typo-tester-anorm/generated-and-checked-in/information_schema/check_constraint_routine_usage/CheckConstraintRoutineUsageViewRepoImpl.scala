@@ -9,8 +9,13 @@ package check_constraint_routine_usage
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CheckConstraintRoutineUsageViewRepoImpl extends CheckConstraintRoutineUsageViewRepo {
+  override def select: SelectBuilder[CheckConstraintRoutineUsageViewFields, CheckConstraintRoutineUsageViewRow] = {
+    SelectBuilderSql("information_schema.check_constraint_routine_usage", CheckConstraintRoutineUsageViewFields, CheckConstraintRoutineUsageViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CheckConstraintRoutineUsageViewRow] = {
     SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", specific_catalog, specific_schema, "specific_name"
           from information_schema.check_constraint_routine_usage

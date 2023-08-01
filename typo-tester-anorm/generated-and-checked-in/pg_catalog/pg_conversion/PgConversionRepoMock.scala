@@ -8,10 +8,22 @@ package pg_catalog
 package pg_conversion
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgConversionRow] = scala.collection.mutable.Map.empty) extends PgConversionRepo {
   override def delete(oid: PgConversionId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgConversionFields, map)
   }
   override def insert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgConversionFields, PgConversionRow] = {
+    SelectBuilderMock(PgConversionFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgConversionRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgConversionFields, PgConversionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgConversionFields, map)
   }
   override def upsert(unsaved: PgConversionRow)(implicit c: Connection): PgConversionRow = {
     map.put(unsaved.oid, unsaved)

@@ -9,8 +9,13 @@ package pg_stat_progress_cluster
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatProgressClusterViewRepoImpl extends PgStatProgressClusterViewRepo {
+  override def select: SelectBuilder[PgStatProgressClusterViewFields, PgStatProgressClusterViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_progress_cluster", PgStatProgressClusterViewFields, PgStatProgressClusterViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatProgressClusterViewRow] = {
     SQL"""select pid, datid, datname, relid, command, phase, cluster_index_relid, heap_tuples_scanned, heap_tuples_written, heap_blks_total, heap_blks_scanned, index_rebuild_count
           from pg_catalog.pg_stat_progress_cluster

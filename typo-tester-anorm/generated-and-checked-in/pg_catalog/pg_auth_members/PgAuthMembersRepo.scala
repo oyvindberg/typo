@@ -8,12 +8,18 @@ package pg_catalog
 package pg_auth_members
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgAuthMembersRepo {
   def delete(compositeId: PgAuthMembersId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgAuthMembersFields, PgAuthMembersRow]
   def insert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow
+  def select: SelectBuilder[PgAuthMembersFields, PgAuthMembersRow]
   def selectAll(implicit c: Connection): List[PgAuthMembersRow]
   def selectById(compositeId: PgAuthMembersId)(implicit c: Connection): Option[PgAuthMembersRow]
   def update(row: PgAuthMembersRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow]
   def upsert(unsaved: PgAuthMembersRow)(implicit c: Connection): PgAuthMembersRow
 }

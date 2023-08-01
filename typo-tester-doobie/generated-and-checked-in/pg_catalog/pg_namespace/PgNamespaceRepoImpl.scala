@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_namespace where oid = ${fromWrite(oid)(Write.fromPut(PgNamespaceId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    DeleteBuilder("pg_catalog.pg_namespace", PgNamespaceFields)
   }
   override def insert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
     sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgNamespaceId.put))}::oid, ${fromWrite(unsaved.nspname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.nspowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.nspacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, nspname, nspowner, nspacl
        """.query(PgNamespaceRow.read).unique
+  }
+  override def select: SelectBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    SelectBuilderSql("pg_catalog.pg_namespace", PgNamespaceFields, PgNamespaceRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgNamespaceRow] = {
     sql"select oid, nspname, nspowner, nspacl from pg_catalog.pg_namespace".query(PgNamespaceRow.read).stream
@@ -44,6 +54,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    UpdateBuilder("pg_catalog.pg_namespace", PgNamespaceFields, PgNamespaceRow.read)
   }
   override def upsert(unsaved: PgNamespaceRow): ConnectionIO[PgNamespaceRow] = {
     sql"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)

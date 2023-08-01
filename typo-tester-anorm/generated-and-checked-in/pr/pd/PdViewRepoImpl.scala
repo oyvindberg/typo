@@ -9,8 +9,13 @@ package pd
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PdViewRepoImpl extends PdViewRepo {
+  override def select: SelectBuilder[PdViewFields, PdViewRow] = {
+    SelectBuilderSql("pr.pd", PdViewFields, PdViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PdViewRow] = {
     SQL"""select "id", productdescriptionid, description, rowguid, modifieddate::text
           from pr.pd

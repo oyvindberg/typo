@@ -8,7 +8,9 @@ package information_schema
 package referential_constraints
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ReferentialConstraintsViewRepo {
+  def select: SelectBuilder[ReferentialConstraintsViewFields, ReferentialConstraintsViewRow]
   def selectAll(implicit c: Connection): List[ReferentialConstraintsViewRow]
 }

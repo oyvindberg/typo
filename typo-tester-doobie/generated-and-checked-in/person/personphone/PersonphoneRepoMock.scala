@@ -10,11 +10,23 @@ package personphone
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow],
                           map: scala.collection.mutable.Map[PersonphoneId, PersonphoneRow] = scala.collection.mutable.Map.empty) extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PersonphoneFields, map)
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     delay {
@@ -27,6 +39,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
+    SelectBuilderMock(PersonphoneFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PersonphoneFields, map)
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     delay {

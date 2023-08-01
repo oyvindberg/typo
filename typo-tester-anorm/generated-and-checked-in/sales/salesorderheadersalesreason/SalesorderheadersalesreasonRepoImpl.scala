@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
   override def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderheadersalesreason where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)
@@ -54,6 +61,9 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
     }
     
   }
+  override def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    SelectBuilderSql("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
     SQL"""select salesorderid, salesreasonid, modifieddate::text
           from sales.salesorderheadersalesreason
@@ -71,6 +81,9 @@ object SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRe
           set modifieddate = ${row.modifieddate}::timestamp
           where salesorderid = ${compositeId.salesorderid} AND salesreasonid = ${compositeId.salesreasonid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    UpdateBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow.rowParser)
   }
   override def upsert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     SQL"""insert into sales.salesorderheadersalesreason(salesorderid, salesreasonid, modifieddate)

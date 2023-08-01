@@ -16,10 +16,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from person.person where businessentityid = $businessentityid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("person.person", PersonFields)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)
@@ -76,6 +83,9 @@ object PersonRepoImpl extends PersonRepo {
     }
     
   }
+  override def select: SelectBuilder[PersonFields, PersonRow] = {
+    SelectBuilderSql("person.person", PersonFields, PersonRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     SQL"""select businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
           from person.person
@@ -111,6 +121,9 @@ object PersonRepoImpl extends PersonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("person.person", PersonFields, PersonRow.rowParser)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person(businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate)

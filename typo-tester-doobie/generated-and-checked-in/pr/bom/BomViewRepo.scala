@@ -9,7 +9,9 @@ package bom
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait BomViewRepo {
+  def select: SelectBuilder[BomViewFields, BomViewRow]
   def selectAll: Stream[ConnectionIO, BomViewRow]
 }

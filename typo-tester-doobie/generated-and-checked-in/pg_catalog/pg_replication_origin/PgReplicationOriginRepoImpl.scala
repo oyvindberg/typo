@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
   override def delete(roident: PgReplicationOriginId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_replication_origin where roident = ${fromWrite(roident)(Write.fromPut(PgReplicationOriginId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    DeleteBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields)
   }
   override def insert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     sql"""insert into pg_catalog.pg_replication_origin(roident, roname)
           values (${fromWrite(unsaved.roident)(Write.fromPut(PgReplicationOriginId.put))}::oid, ${fromWrite(unsaved.roname)(Write.fromPut(Meta.StringMeta.put))})
           returning roident, roname
        """.query(PgReplicationOriginRow.read).unique
+  }
+  override def select: SelectBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    SelectBuilderSql("pg_catalog.pg_replication_origin", PgReplicationOriginFields, PgReplicationOriginRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgReplicationOriginRow] = {
     sql"select roident, roname from pg_catalog.pg_replication_origin".query(PgReplicationOriginRow.read).stream
@@ -41,6 +51,9 @@ object PgReplicationOriginRepoImpl extends PgReplicationOriginRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgReplicationOriginFields, PgReplicationOriginRow] = {
+    UpdateBuilder("pg_catalog.pg_replication_origin", PgReplicationOriginFields, PgReplicationOriginRow.read)
   }
   override def upsert(unsaved: PgReplicationOriginRow): ConnectionIO[PgReplicationOriginRow] = {
     sql"""insert into pg_catalog.pg_replication_origin(roident, roname)

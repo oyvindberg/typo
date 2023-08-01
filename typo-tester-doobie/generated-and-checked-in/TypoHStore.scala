@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import java.util.HashMap
+import typo.dsl.Bijection
 
 /** The text representation of an hstore, used for input and output, includes zero or more key => value pairs separated by commas */
 case class TypoHStore(value: Map[String, String])
@@ -28,6 +29,7 @@ object TypoHStore {
                             v.value.foreach { case (k, v) => b.put(k, v)}
                             b
                           }))
+  implicit val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
   implicit val decoder: Decoder[TypoHStore] = Decoder[Map[String, String]].map(TypoHStore.apply)
   implicit val encoder: Encoder[TypoHStore] = Encoder[Map[String, String]].contramap(_.value)
   implicit val get: Get[TypoHStore] = Get.Advanced.other[java.util.Map[?, ?]](NonEmptyList.one("hstore"))

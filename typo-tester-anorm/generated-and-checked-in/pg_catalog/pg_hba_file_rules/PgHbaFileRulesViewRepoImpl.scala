@@ -9,8 +9,13 @@ package pg_hba_file_rules
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgHbaFileRulesViewRepoImpl extends PgHbaFileRulesViewRepo {
+  override def select: SelectBuilder[PgHbaFileRulesViewFields, PgHbaFileRulesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_hba_file_rules", PgHbaFileRulesViewFields, PgHbaFileRulesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgHbaFileRulesViewRow] = {
     SQL"""select line_number, "type", "database", user_name, address, netmask, auth_method, "options", "error"
           from pg_catalog.pg_hba_file_rules

@@ -11,6 +11,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `information_schema.cardinal_number`
   * Constraint: CHECK ((VALUE >= 0))
@@ -18,6 +19,7 @@ import play.api.libs.json.Writes
 case class CardinalNumber(value: Int) extends AnyVal
 object CardinalNumber {
   implicit val arrayToStatement: ToStatement[Array[CardinalNumber]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[CardinalNumber, Int] = Bijection[CardinalNumber, Int](_.value)(CardinalNumber.apply)
   implicit val column: Column[CardinalNumber] = implicitly[Column[Int]].map(CardinalNumber.apply)
   implicit val ordering: Ordering[CardinalNumber] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[CardinalNumber] = new ParameterMetaData[CardinalNumber] {

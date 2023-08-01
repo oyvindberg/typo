@@ -9,7 +9,9 @@ package pdoc
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PdocViewRepo {
+  def select: SelectBuilder[PdocViewFields, PdocViewRow]
   def selectAll: Stream[ConnectionIO, PdocViewRow]
 }

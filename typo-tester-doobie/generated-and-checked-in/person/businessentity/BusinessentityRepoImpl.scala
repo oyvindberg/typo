@@ -16,10 +16,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"delete from person.businessentity where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
+    DeleteBuilder("person.businessentity", BusinessentityFields)
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity(businessentityid, rowguid, modifieddate)
@@ -57,6 +64,9 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     q.query(BusinessentityRow.read).unique
     
   }
+  override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
+    SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
     sql"select businessentityid, rowguid, modifieddate::text from person.businessentity".query(BusinessentityRow.read).stream
   }
@@ -75,6 +85,9 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
+    UpdateBuilder("person.businessentity", BusinessentityFields, BusinessentityRow.read)
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity(businessentityid, rowguid, modifieddate)

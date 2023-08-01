@@ -8,7 +8,9 @@ package information_schema
 package check_constraint_routine_usage
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait CheckConstraintRoutineUsageViewRepo {
+  def select: SelectBuilder[CheckConstraintRoutineUsageViewFields, CheckConstraintRoutineUsageViewRow]
   def selectAll(implicit c: Connection): List[CheckConstraintRoutineUsageViewRow]
 }

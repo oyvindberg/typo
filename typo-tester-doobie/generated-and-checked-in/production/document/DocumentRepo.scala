@@ -9,14 +9,20 @@ package document
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait DocumentRepo {
   def delete(documentnode: DocumentId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[DocumentFields, DocumentRow]
   def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow]
   def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow]
+  def select: SelectBuilder[DocumentFields, DocumentRow]
   def selectAll: Stream[ConnectionIO, DocumentRow]
   def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]]
   def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow]
   def update(row: DocumentRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[DocumentFields, DocumentRow]
   def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow]
 }

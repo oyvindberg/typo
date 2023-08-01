@@ -8,7 +8,9 @@ package information_schema
 package foreign_data_wrapper_options
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ForeignDataWrapperOptionsViewRepo {
+  def select: SelectBuilder[ForeignDataWrapperOptionsViewFields, ForeignDataWrapperOptionsViewRow]
   def selectAll(implicit c: Connection): List[ForeignDataWrapperOptionsViewRow]
 }

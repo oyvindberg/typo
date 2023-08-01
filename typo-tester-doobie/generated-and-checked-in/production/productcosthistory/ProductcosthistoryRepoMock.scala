@@ -10,11 +10,23 @@ package productcosthistory
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, ProductcosthistoryRow],
                                  map: scala.collection.mutable.Map[ProductcosthistoryId, ProductcosthistoryRow] = scala.collection.mutable.Map.empty) extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductcosthistoryFields, map)
   }
   override def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     delay {
@@ -27,6 +39,9 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    SelectBuilderMock(ProductcosthistoryFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductcosthistoryFields, map)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     delay {

@@ -8,7 +8,9 @@ package information_schema
 package constraint_column_usage
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ConstraintColumnUsageViewRepo {
+  def select: SelectBuilder[ConstraintColumnUsageViewFields, ConstraintColumnUsageViewRow]
   def selectAll(implicit c: Connection): List[ConstraintColumnUsageViewRow]
 }

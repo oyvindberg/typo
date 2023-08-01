@@ -8,10 +8,22 @@ package pg_catalog
 package pg_foreign_data_wrapper
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDataWrapperId, PgForeignDataWrapperRow] = scala.collection.mutable.Map.empty) extends PgForeignDataWrapperRepo {
   override def delete(oid: PgForeignDataWrapperId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgForeignDataWrapperFields, map)
   }
   override def insert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDa
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    SelectBuilderMock(PgForeignDataWrapperFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgForeignDataWrapperRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgForeignDataWrapperRepoMock(map: scala.collection.mutable.Map[PgForeignDa
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgForeignDataWrapperFields, map)
   }
   override def upsert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow = {
     map.put(unsaved.oid, unsaved)

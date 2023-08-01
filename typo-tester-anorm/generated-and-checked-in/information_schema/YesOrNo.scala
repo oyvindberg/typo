@@ -11,6 +11,7 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Domain `information_schema.yes_or_no`
   * Constraint: CHECK (((VALUE)::text = ANY ((ARRAY['YES'::character varying, 'NO'::character varying])::text[])))
@@ -18,6 +19,7 @@ import play.api.libs.json.Writes
 case class YesOrNo(value: String) extends AnyVal
 object YesOrNo {
   implicit val arrayToStatement: ToStatement[Array[YesOrNo]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[YesOrNo, String] = Bijection[YesOrNo, String](_.value)(YesOrNo.apply)
   implicit val column: Column[YesOrNo] = implicitly[Column[String]].map(YesOrNo.apply)
   implicit val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {

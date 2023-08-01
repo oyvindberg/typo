@@ -9,10 +9,17 @@ package pg_collation
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgCollationRepoImpl extends PgCollationRepo {
   override def delete(oid: PgCollationId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_collation where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgCollationFields, PgCollationRow] = {
+    DeleteBuilder("pg_catalog.pg_collation", PgCollationFields)
   }
   override def insert(unsaved: PgCollationRow)(implicit c: Connection): PgCollationRow = {
     SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)
@@ -21,6 +28,9 @@ object PgCollationRepoImpl extends PgCollationRepo {
        """
       .executeInsert(PgCollationRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgCollationFields, PgCollationRow] = {
+    SelectBuilderSql("pg_catalog.pg_collation", PgCollationFields, PgCollationRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgCollationRow] = {
     SQL"""select oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion
@@ -54,6 +64,9 @@ object PgCollationRepoImpl extends PgCollationRepo {
               collversion = ${row.collversion}
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgCollationFields, PgCollationRow] = {
+    UpdateBuilder("pg_catalog.pg_collation", PgCollationFields, PgCollationRow.rowParser)
   }
   override def upsert(unsaved: PgCollationRow)(implicit c: Connection): PgCollationRow = {
     SQL"""insert into pg_catalog.pg_collation(oid, collname, collnamespace, collowner, collprovider, collisdeterministic, collencoding, collcollate, collctype, collversion)

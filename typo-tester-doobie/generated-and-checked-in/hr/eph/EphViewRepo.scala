@@ -9,7 +9,9 @@ package eph
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait EphViewRepo {
+  def select: SelectBuilder[EphViewFields, EphViewRow]
   def selectAll: Stream[ConnectionIO, EphViewRow]
 }

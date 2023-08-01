@@ -15,16 +15,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def delete(oid: PgDatabaseId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_database where oid = ${fromWrite(oid)(Write.fromPut(PgDatabaseId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgDatabaseFields, PgDatabaseRow] = {
+    DeleteBuilder("pg_catalog.pg_database", PgDatabaseFields)
   }
   override def insert(unsaved: PgDatabaseRow): ConnectionIO[PgDatabaseRow] = {
     sql"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgDatabaseId.put))}::oid, ${fromWrite(unsaved.datname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.datdba)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.encoding)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.datcollate)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.datctype)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.datistemplate)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.datallowconn)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.datconnlimit)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.datlastsysoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.datfrozenxid)(Write.fromPut(TypoXid.put))}::xid, ${fromWrite(unsaved.datminmxid)(Write.fromPut(TypoXid.put))}::xid, ${fromWrite(unsaved.dattablespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.datacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
        """.query(PgDatabaseRow.read).unique
+  }
+  override def select: SelectBuilder[PgDatabaseFields, PgDatabaseRow] = {
+    SelectBuilderSql("pg_catalog.pg_database", PgDatabaseFields, PgDatabaseRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgDatabaseRow] = {
     sql"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl from pg_catalog.pg_database""".query(PgDatabaseRow.read).stream
@@ -55,6 +65,9 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgDatabaseFields, PgDatabaseRow] = {
+    UpdateBuilder("pg_catalog.pg_database", PgDatabaseFields, PgDatabaseRow.read)
   }
   override def upsert(unsaved: PgDatabaseRow): ConnectionIO[PgDatabaseRow] = {
     sql"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)

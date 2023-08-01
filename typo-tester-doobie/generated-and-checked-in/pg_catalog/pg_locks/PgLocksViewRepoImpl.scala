@@ -10,8 +10,13 @@ package pg_locks
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgLocksViewRepoImpl extends PgLocksViewRepo {
+  override def select: SelectBuilder[PgLocksViewFields, PgLocksViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_locks", PgLocksViewFields, PgLocksViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgLocksViewRow] = {
     sql"""select locktype, "database", relation, page, tuple, virtualxid, transactionid, classid, objid, objsubid, virtualtransaction, pid, "mode", "granted", fastpath, waitstart::text from pg_catalog.pg_locks""".query(PgLocksViewRow.read).stream
   }

@@ -9,10 +9,17 @@ package pg_namespace
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_namespace where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    DeleteBuilder("pg_catalog.pg_namespace", PgNamespaceFields)
   }
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
@@ -21,6 +28,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
        """
       .executeInsert(PgNamespaceRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    SelectBuilderSql("pg_catalog.pg_namespace", PgNamespaceFields, PgNamespaceRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl
@@ -48,6 +58,9 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
               nspacl = ${row.nspacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    UpdateBuilder("pg_catalog.pg_namespace", PgNamespaceFields, PgNamespaceRow.rowParser)
   }
   override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)

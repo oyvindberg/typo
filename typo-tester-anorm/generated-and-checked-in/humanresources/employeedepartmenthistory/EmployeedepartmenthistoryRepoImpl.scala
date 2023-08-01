@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def delete(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.employeedepartmenthistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     SQL"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
@@ -57,6 +64,9 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     }
     
   }
+  override def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     SQL"""select businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text
           from humanresources.employeedepartmenthistory
@@ -75,6 +85,9 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND departmentid = ${compositeId.departmentid} AND shiftid = ${compositeId.shiftid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.rowParser)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     SQL"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)

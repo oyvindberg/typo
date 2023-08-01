@@ -9,7 +9,9 @@ package pg_stat_slru
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatSlruViewRepo {
+  def select: SelectBuilder[PgStatSlruViewFields, PgStatSlruViewRow]
   def selectAll: Stream[ConnectionIO, PgStatSlruViewRow]
 }

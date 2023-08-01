@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_slru
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatSlruViewRepo {
+  def select: SelectBuilder[PgStatSlruViewFields, PgStatSlruViewRow]
   def selectAll(implicit c: Connection): List[PgStatSlruViewRow]
 }

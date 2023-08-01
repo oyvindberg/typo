@@ -17,10 +17,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId): ConnectionIO[Boolean] = {
     sql"delete from sales.specialoffer where specialofferid = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
+    DeleteBuilder("sales.specialoffer", SpecialofferFields)
   }
   override def insert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)
@@ -72,6 +79,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
     q.query(SpecialofferRow.read).unique
     
   }
+  override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
+    SelectBuilderSql("sales.specialoffer", SpecialofferFields, SpecialofferRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SpecialofferRow] = {
     sql"""select specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text from sales.specialoffer""".query(SpecialofferRow.read).stream
   }
@@ -98,6 +108,9 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
+    UpdateBuilder("sales.specialoffer", SpecialofferFields, SpecialofferRow.read)
   }
   override def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into sales.specialoffer(specialofferid, description, discountpct, "type", category, startdate, enddate, minqty, maxqty, rowguid, modifieddate)

@@ -8,11 +8,23 @@ package sales
 package salespersonquotahistory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRowUnsaved, SalespersonquotahistoryRow],
                                       map: scala.collection.mutable.Map[SalespersonquotahistoryId, SalespersonquotahistoryRow] = scala.collection.mutable.Map.empty) extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields, map)
   }
   override def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    SelectBuilderMock(SalespersonquotahistoryFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalespersonquotahistoryFields, map)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     map.put(unsaved.compositeId, unsaved)

@@ -14,15 +14,28 @@ import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SqlImplementationInfoRepoImpl extends SqlImplementationInfoRepo {
+  override def delete: DeleteBuilder[SqlImplementationInfoFields, SqlImplementationInfoRow] = {
+    DeleteBuilder("information_schema.sql_implementation_info", SqlImplementationInfoFields)
+  }
   override def insert(unsaved: SqlImplementationInfoRow): ConnectionIO[SqlImplementationInfoRow] = {
     sql"""insert into information_schema.sql_implementation_info(implementation_info_id, implementation_info_name, integer_value, character_value, "comments")
           values (${fromWrite(unsaved.implementationInfoId)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.implementationInfoName)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.integerValue)(Write.fromPutOption(CardinalNumber.put))}::information_schema.cardinal_number, ${fromWrite(unsaved.characterValue)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data, ${fromWrite(unsaved.comments)(Write.fromPutOption(CharacterData.put))}::information_schema.character_data)
           returning implementation_info_id, implementation_info_name, integer_value, character_value, "comments"
        """.query(SqlImplementationInfoRow.read).unique
   }
+  override def select: SelectBuilder[SqlImplementationInfoFields, SqlImplementationInfoRow] = {
+    SelectBuilderSql("information_schema.sql_implementation_info", SqlImplementationInfoFields, SqlImplementationInfoRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SqlImplementationInfoRow] = {
     sql"""select implementation_info_id, implementation_info_name, integer_value, character_value, "comments" from information_schema.sql_implementation_info""".query(SqlImplementationInfoRow.read).stream
+  }
+  override def update: UpdateBuilder[SqlImplementationInfoFields, SqlImplementationInfoRow] = {
+    UpdateBuilder("information_schema.sql_implementation_info", SqlImplementationInfoFields, SqlImplementationInfoRow.read)
   }
 }

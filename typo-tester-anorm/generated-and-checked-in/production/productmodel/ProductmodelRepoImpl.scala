@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productmodel where productmodelid = $productmodelid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
+    DeleteBuilder("production.productmodel", ProductmodelFields)
   }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)
@@ -64,6 +71,9 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
+    SelectBuilderSql("production.productmodel", ProductmodelFields, ProductmodelRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
     SQL"""select productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from production.productmodel
@@ -92,6 +102,9 @@ object ProductmodelRepoImpl extends ProductmodelRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productmodelid = $productmodelid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
+    UpdateBuilder("production.productmodel", ProductmodelFields, ProductmodelRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel(productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate)

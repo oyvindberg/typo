@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId): ConnectionIO[Boolean] = {
     sql"delete from production.productreview where productreviewid = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilder("production.productreview", ProductreviewFields)
   }
   override def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
@@ -64,6 +71,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     q.query(ProductreviewRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
+    SelectBuilderSql("production.productreview", ProductreviewFields, ProductreviewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
     sql"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from production.productreview""".query(ProductreviewRow.read).stream
   }
@@ -87,6 +97,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilder("production.productreview", ProductreviewFields, ProductreviewRow.read)
   }
   override def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)

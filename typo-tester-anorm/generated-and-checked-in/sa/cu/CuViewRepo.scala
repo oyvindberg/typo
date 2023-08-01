@@ -8,7 +8,9 @@ package sa
 package cu
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait CuViewRepo {
+  def select: SelectBuilder[CuViewFields, CuViewRow]
   def selectAll(implicit c: Connection): List[CuViewRow]
 }

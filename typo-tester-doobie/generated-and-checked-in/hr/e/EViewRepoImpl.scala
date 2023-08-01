@@ -10,8 +10,13 @@ package e
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object EViewRepoImpl extends EViewRepo {
+  override def select: SelectBuilder[EViewFields, EViewRow] = {
+    SelectBuilderSql("hr.e", EViewFields, EViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, EViewRow] = {
     sql"""select "id", businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode from hr.e""".query(EViewRow.read).stream
   }

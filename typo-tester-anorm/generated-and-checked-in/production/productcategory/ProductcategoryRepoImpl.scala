@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def delete(productcategoryid: ProductcategoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productcategory where productcategoryid = $productcategoryid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
+    DeleteBuilder("production.productcategory", ProductcategoryFields)
   }
   override def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)
@@ -62,6 +69,9 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow] = {
+    SelectBuilderSql("production.productcategory", ProductcategoryFields, ProductcategoryRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductcategoryRow] = {
     SQL"""select productcategoryid, "name", rowguid, modifieddate::text
           from production.productcategory
@@ -88,6 +98,9 @@ object ProductcategoryRepoImpl extends ProductcategoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productcategoryid = $productcategoryid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
+    UpdateBuilder("production.productcategory", ProductcategoryFields, ProductcategoryRow.rowParser)
   }
   override def upsert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory(productcategoryid, "name", rowguid, modifieddate)

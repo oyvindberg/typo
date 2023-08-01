@@ -10,10 +10,22 @@ package pg_tablespace
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgTablespaceRepoMock(map: scala.collection.mutable.Map[PgTablespaceId, PgTablespaceRow] = scala.collection.mutable.Map.empty) extends PgTablespaceRepo {
   override def delete(oid: PgTablespaceId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgTablespaceFields, map)
   }
   override def insert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgTablespaceRepoMock(map: scala.collection.mutable.Map[PgTablespaceId, PgT
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    SelectBuilderMock(PgTablespaceFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgTablespaceRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgTablespaceRepoMock(map: scala.collection.mutable.Map[PgTablespaceId, PgT
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgTablespaceFields, PgTablespaceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgTablespaceFields, map)
   }
   override def upsert(unsaved: PgTablespaceRow): ConnectionIO[PgTablespaceRow] = {
     delay {

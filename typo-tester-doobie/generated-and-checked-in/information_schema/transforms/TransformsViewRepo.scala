@@ -9,7 +9,9 @@ package transforms
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait TransformsViewRepo {
+  def select: SelectBuilder[TransformsViewFields, TransformsViewRow]
   def selectAll: Stream[ConnectionIO, TransformsViewRow]
 }

@@ -9,13 +9,19 @@ package salesorderdetail
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalesorderdetailRepo {
   def delete(compositeId: SalesorderdetailId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow]
   def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow]
+  def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def selectAll: Stream[ConnectionIO, SalesorderdetailRow]
   def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]]
   def update(row: SalesorderdetailRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow]
 }

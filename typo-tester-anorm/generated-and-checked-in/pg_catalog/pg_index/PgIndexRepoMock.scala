@@ -8,10 +8,22 @@ package pg_catalog
 package pg_index
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] = scala.collection.mutable.Map.empty) extends PgIndexRepo {
   override def delete(indexrelid: PgIndexId)(implicit c: Connection): Boolean = {
     map.remove(indexrelid).isDefined
+  }
+  override def delete: DeleteBuilder[PgIndexFields, PgIndexRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgIndexFields, map)
   }
   override def insert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
     if (map.contains(unsaved.indexrelid))
@@ -19,6 +31,9 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
     else
       map.put(unsaved.indexrelid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgIndexFields, PgIndexRow] = {
+    SelectBuilderMock(PgIndexFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgIndexRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgIndexFields, PgIndexRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgIndexFields, map)
   }
   override def upsert(unsaved: PgIndexRow)(implicit c: Connection): PgIndexRow = {
     map.put(unsaved.indexrelid, unsaved)

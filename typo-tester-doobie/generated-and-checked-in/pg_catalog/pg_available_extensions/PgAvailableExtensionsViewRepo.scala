@@ -9,7 +9,9 @@ package pg_available_extensions
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgAvailableExtensionsViewRepo {
+  def select: SelectBuilder[PgAvailableExtensionsViewFields, PgAvailableExtensionsViewRow]
   def selectAll: Stream[ConnectionIO, PgAvailableExtensionsViewRow]
 }

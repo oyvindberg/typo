@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_progress_vacuum
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatProgressVacuumViewRepo {
+  def select: SelectBuilder[PgStatProgressVacuumViewFields, PgStatProgressVacuumViewRow]
   def selectAll(implicit c: Connection): List[PgStatProgressVacuumViewRow]
 }

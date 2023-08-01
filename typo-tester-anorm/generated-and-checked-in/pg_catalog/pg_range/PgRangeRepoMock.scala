@@ -8,10 +8,22 @@ package pg_catalog
 package pg_range
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] = scala.collection.mutable.Map.empty) extends PgRangeRepo {
   override def delete(rngtypid: PgRangeId)(implicit c: Connection): Boolean = {
     map.remove(rngtypid).isDefined
+  }
+  override def delete: DeleteBuilder[PgRangeFields, PgRangeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgRangeFields, map)
   }
   override def insert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
     if (map.contains(unsaved.rngtypid))
@@ -19,6 +31,9 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
     else
       map.put(unsaved.rngtypid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgRangeFields, PgRangeRow] = {
+    SelectBuilderMock(PgRangeFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgRangeRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgRangeRepoMock(map: scala.collection.mutable.Map[PgRangeId, PgRangeRow] =
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgRangeFields, PgRangeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgRangeFields, map)
   }
   override def upsert(unsaved: PgRangeRow)(implicit c: Connection): PgRangeRow = {
     map.put(unsaved.rngtypid, unsaved)

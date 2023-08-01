@@ -8,10 +8,22 @@ package pg_catalog
 package pg_namespace
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNamespaceRow] = scala.collection.mutable.Map.empty) extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgNamespaceFields, map)
   }
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    SelectBuilderMock(PgNamespaceFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgNamespaceRepoMock(map: scala.collection.mutable.Map[PgNamespaceId, PgNam
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgNamespaceFields, PgNamespaceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgNamespaceFields, map)
   }
   override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     map.put(unsaved.oid, unsaved)

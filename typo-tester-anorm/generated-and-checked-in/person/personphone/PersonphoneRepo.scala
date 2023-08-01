@@ -8,13 +8,19 @@ package person
 package personphone
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PersonphoneRepo {
   def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow]
   def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow
   def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow
+  def select: SelectBuilder[PersonphoneFields, PersonphoneRow]
   def selectAll(implicit c: Connection): List[PersonphoneRow]
   def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow]
   def update(row: PersonphoneRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PersonphoneFields, PersonphoneRow]
   def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow
 }

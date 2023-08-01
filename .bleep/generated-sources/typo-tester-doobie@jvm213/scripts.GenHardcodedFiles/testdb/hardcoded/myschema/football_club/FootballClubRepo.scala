@@ -10,13 +10,19 @@ package football_club
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait FootballClubRepo {
   def delete(id: FootballClubId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
   def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
+  def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll: Stream[ConnectionIO, FootballClubRow]
   def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow]
   def update(row: FootballClubRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[FootballClubFields, FootballClubRow]
   def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
 }

@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Boolean = {
     SQL"delete from production.billofmaterials where billofmaterialsid = $billofmaterialsid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    DeleteBuilder("production.billofmaterials", BillofmaterialsFields)
   }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)
@@ -69,6 +76,9 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     }
     
   }
+  override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    SelectBuilderSql("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
     SQL"""select billofmaterialsid, productassemblyid, componentid, startdate::text, enddate::text, unitmeasurecode, bomlevel, perassemblyqty, modifieddate::text
           from production.billofmaterials
@@ -100,6 +110,9 @@ object BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where billofmaterialsid = $billofmaterialsid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    UpdateBuilder("production.billofmaterials", BillofmaterialsFields, BillofmaterialsRow.rowParser)
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials(billofmaterialsid, productassemblyid, componentid, startdate, enddate, unitmeasurecode, bomlevel, perassemblyqty, modifieddate)

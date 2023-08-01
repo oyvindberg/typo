@@ -8,11 +8,23 @@ package production
 package document
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
                        map: scala.collection.mutable.Map[DocumentId, DocumentRow] = scala.collection.mutable.Map.empty) extends DocumentRepo {
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
     map.remove(documentnode).isDefined
+  }
+  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields, map)
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     if (map.contains(unsaved.documentnode))
@@ -23,6 +35,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   }
   override def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[DocumentFields, DocumentRow] = {
+    SelectBuilderMock(DocumentFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields, map)
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     map.put(unsaved.documentnode, unsaved)

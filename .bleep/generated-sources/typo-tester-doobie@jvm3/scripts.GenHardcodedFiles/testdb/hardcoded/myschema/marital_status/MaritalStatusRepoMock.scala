@@ -11,10 +11,22 @@ package marital_status
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, MaritalStatusRow] = scala.collection.mutable.Map.empty) extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId): ConnectionIO[Boolean] = {
     delay(map.remove(id).isDefined)
+  }
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields, map)
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {
@@ -25,6 +37,9 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
       unsaved
     }
   }
+  override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    SelectBuilderMock(MaritalStatusFields, delay(map.values.toList), SelectParams.empty)
+  }
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     Stream.emits(map.values.toList)
   }
@@ -33,6 +48,9 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   }
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
     Stream.emits(ids.flatMap(map.get).toList)
+  }
+  override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields, map)
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {

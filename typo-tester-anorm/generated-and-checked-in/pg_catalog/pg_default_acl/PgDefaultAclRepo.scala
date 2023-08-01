@@ -8,13 +8,19 @@ package pg_catalog
 package pg_default_acl
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgDefaultAclRepo {
   def delete(oid: PgDefaultAclId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def insert(unsaved: PgDefaultAclRow)(implicit c: Connection): PgDefaultAclRow
+  def select: SelectBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def selectAll(implicit c: Connection): List[PgDefaultAclRow]
   def selectById(oid: PgDefaultAclId)(implicit c: Connection): Option[PgDefaultAclRow]
   def selectByIds(oids: Array[PgDefaultAclId])(implicit c: Connection): List[PgDefaultAclRow]
   def update(row: PgDefaultAclRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def upsert(unsaved: PgDefaultAclRow)(implicit c: Connection): PgDefaultAclRow
 }

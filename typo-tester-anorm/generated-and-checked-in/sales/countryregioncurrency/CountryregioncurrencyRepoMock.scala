@@ -8,11 +8,23 @@ package sales
 package countryregioncurrency
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUnsaved, CountryregioncurrencyRow],
                                     map: scala.collection.mutable.Map[CountryregioncurrencyId, CountryregioncurrencyRow] = scala.collection.mutable.Map.empty) extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields, map)
   }
   override def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    SelectBuilderMock(CountryregioncurrencyFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CountryregioncurrencyRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields, map)
   }
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     map.put(unsaved.compositeId, unsaved)

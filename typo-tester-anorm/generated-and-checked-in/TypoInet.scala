@@ -14,6 +14,7 @@ import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** inet (via PGObject) */
 case class TypoInet(value: String)
@@ -40,6 +41,7 @@ object TypoInet {
                                                                                                                      obj.setValue(v.value)
                                                                                                                      obj
                                                                                                                    }))))
+  implicit val bijection: Bijection[TypoInet, String] = Bijection[TypoInet, String](_.value)(TypoInet.apply)
   implicit val column: Column[TypoInet] = Column.nonNull[TypoInet]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoInet(v.getValue))

@@ -9,13 +9,19 @@ package pg_subscription
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgSubscriptionRepo {
   def delete(oid: PgSubscriptionId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgSubscriptionFields, PgSubscriptionRow]
   def insert(unsaved: PgSubscriptionRow): ConnectionIO[PgSubscriptionRow]
+  def select: SelectBuilder[PgSubscriptionFields, PgSubscriptionRow]
   def selectAll: Stream[ConnectionIO, PgSubscriptionRow]
   def selectById(oid: PgSubscriptionId): ConnectionIO[Option[PgSubscriptionRow]]
   def selectByIds(oids: Array[PgSubscriptionId]): Stream[ConnectionIO, PgSubscriptionRow]
   def update(row: PgSubscriptionRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgSubscriptionFields, PgSubscriptionRow]
   def upsert(unsaved: PgSubscriptionRow): ConnectionIO[PgSubscriptionRow]
 }

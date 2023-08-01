@@ -10,8 +10,13 @@ package pr
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PrViewRepoImpl extends PrViewRepo {
+  override def select: SelectBuilder[PrViewFields, PrViewRow] = {
+    SelectBuilderSql("pr.pr", PrViewFields, PrViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PrViewRow] = {
     sql"""select "id", productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text from pr.pr""".query(PrViewRow.read).stream
   }

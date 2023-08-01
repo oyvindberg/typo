@@ -9,8 +9,13 @@ package th
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ThViewRepoImpl extends ThViewRepo {
+  override def select: SelectBuilder[ThViewFields, ThViewRow] = {
+    SelectBuilderSql("pr.th", ThViewFields, ThViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ThViewRow] = {
     SQL"""select "id", transactionid, productid, referenceorderid, referenceorderlineid, transactiondate::text, transactiontype, quantity, actualcost, modifieddate::text
           from pr.th

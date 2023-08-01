@@ -10,8 +10,13 @@ package pmpdc
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PmpdcViewRepoImpl extends PmpdcViewRepo {
+  override def select: SelectBuilder[PmpdcViewFields, PmpdcViewRow] = {
+    SelectBuilderSql("pr.pmpdc", PmpdcViewFields, PmpdcViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PmpdcViewRow] = {
     sql"select productmodelid, productdescriptionid, cultureid, modifieddate::text from pr.pmpdc".query(PmpdcViewRow.read).stream
   }

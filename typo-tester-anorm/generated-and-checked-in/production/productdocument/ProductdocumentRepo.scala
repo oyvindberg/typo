@@ -8,13 +8,19 @@ package production
 package productdocument
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ProductdocumentRepo {
   def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow]
   def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow
   def insert(unsaved: ProductdocumentRowUnsaved)(implicit c: Connection): ProductdocumentRow
+  def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow]
   def selectAll(implicit c: Connection): List[ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow]
   def update(row: ProductdocumentRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow]
   def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow
 }

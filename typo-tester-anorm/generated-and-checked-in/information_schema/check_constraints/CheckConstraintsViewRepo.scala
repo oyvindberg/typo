@@ -8,7 +8,9 @@ package information_schema
 package check_constraints
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait CheckConstraintsViewRepo {
+  def select: SelectBuilder[CheckConstraintsViewFields, CheckConstraintsViewRow]
   def selectAll(implicit c: Connection): List[CheckConstraintsViewRow]
 }

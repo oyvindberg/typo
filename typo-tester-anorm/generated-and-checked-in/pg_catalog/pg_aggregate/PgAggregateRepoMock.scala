@@ -8,10 +8,22 @@ package pg_catalog
 package pg_aggregate
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAggregateRow] = scala.collection.mutable.Map.empty) extends PgAggregateRepo {
   override def delete(aggfnoid: PgAggregateId)(implicit c: Connection): Boolean = {
     map.remove(aggfnoid).isDefined
+  }
+  override def delete: DeleteBuilder[PgAggregateFields, PgAggregateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgAggregateFields, map)
   }
   override def insert(unsaved: PgAggregateRow)(implicit c: Connection): PgAggregateRow = {
     if (map.contains(unsaved.aggfnoid))
@@ -19,6 +31,9 @@ class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAgg
     else
       map.put(unsaved.aggfnoid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgAggregateFields, PgAggregateRow] = {
+    SelectBuilderMock(PgAggregateFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgAggregateRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgAggregateRepoMock(map: scala.collection.mutable.Map[PgAggregateId, PgAgg
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgAggregateFields, PgAggregateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgAggregateFields, map)
   }
   override def upsert(unsaved: PgAggregateRow)(implicit c: Connection): PgAggregateRow = {
     map.put(unsaved.aggfnoid, unsaved)

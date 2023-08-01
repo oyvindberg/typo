@@ -9,13 +9,19 @@ package pg_index
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgIndexRepo {
   def delete(indexrelid: PgIndexId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgIndexFields, PgIndexRow]
   def insert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow]
+  def select: SelectBuilder[PgIndexFields, PgIndexRow]
   def selectAll: Stream[ConnectionIO, PgIndexRow]
   def selectById(indexrelid: PgIndexId): ConnectionIO[Option[PgIndexRow]]
   def selectByIds(indexrelids: Array[PgIndexId]): Stream[ConnectionIO, PgIndexRow]
   def update(row: PgIndexRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgIndexFields, PgIndexRow]
   def upsert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow]
 }

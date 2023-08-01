@@ -9,13 +9,19 @@ package pg_policy
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgPolicyRepo {
   def delete(oid: PgPolicyId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgPolicyFields, PgPolicyRow]
   def insert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow]
+  def select: SelectBuilder[PgPolicyFields, PgPolicyRow]
   def selectAll: Stream[ConnectionIO, PgPolicyRow]
   def selectById(oid: PgPolicyId): ConnectionIO[Option[PgPolicyRow]]
   def selectByIds(oids: Array[PgPolicyId]): Stream[ConnectionIO, PgPolicyRow]
   def update(row: PgPolicyRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgPolicyFields, PgPolicyRow]
   def upsert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow]
 }

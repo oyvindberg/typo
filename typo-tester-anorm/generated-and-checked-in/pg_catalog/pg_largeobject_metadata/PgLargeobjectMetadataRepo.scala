@@ -8,13 +8,19 @@ package pg_catalog
 package pg_largeobject_metadata
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgLargeobjectMetadataRepo {
   def delete(oid: PgLargeobjectMetadataId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow]
   def insert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow
+  def select: SelectBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow]
   def selectAll(implicit c: Connection): List[PgLargeobjectMetadataRow]
   def selectById(oid: PgLargeobjectMetadataId)(implicit c: Connection): Option[PgLargeobjectMetadataRow]
   def selectByIds(oids: Array[PgLargeobjectMetadataId])(implicit c: Connection): List[PgLargeobjectMetadataRow]
   def update(row: PgLargeobjectMetadataRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgLargeobjectMetadataFields, PgLargeobjectMetadataRow]
   def upsert(unsaved: PgLargeobjectMetadataRow)(implicit c: Connection): PgLargeobjectMetadataRow
 }

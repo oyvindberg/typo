@@ -3,7 +3,7 @@ package internal
 
 import typo.internal.rewriteDependentData.Eval
 
-case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, HasSource], enableFieldValue: Boolean) extends HasSource {
+case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapperScala, eval: Eval[db.RelationName, HasSource], enableFieldValue: Boolean, enableDsl: Boolean) extends HasSource {
   val source = Source.View(view.name, view.isMaterialized)
   val cols: NonEmptyList[ComputedColumn] =
     view.cols.map { dbCol =>
@@ -35,7 +35,7 @@ case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
     tpe
   }
 
-  val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue)
+  val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue, enableDsl = enableDsl)
 
   val repoMethods: NonEmptyList[RepoMethod] = {
     val maybeSelectByFieldValues = for {
@@ -49,10 +49,14 @@ case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
       )
       RepoMethod.SelectByFieldValues(view.name, cols, fieldValueName, fieldValuesParam, names.RowName)
     }
-
+    val maybeSelectBuilder = for {
+      fieldsName <- names.FieldsName
+    } yield {
+      RepoMethod.SelectBuilder(view.name, fieldsName, names.RowName)
+    }
     NonEmptyList[RepoMethod](
       RepoMethod.SelectAll(view.name, cols, names.RowName),
-      maybeSelectByFieldValues.toList
+      maybeSelectBuilder.toList ++ maybeSelectByFieldValues
     ).sorted
   }
 }

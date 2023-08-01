@@ -15,10 +15,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
     SQL"""delete from production."document" where documentnode = $documentnode""".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
+    DeleteBuilder("production.document", DocumentFields)
   }
   override def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     SQL"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)
@@ -78,6 +85,9 @@ object DocumentRepoImpl extends DocumentRepo {
     }
     
   }
+  override def select: SelectBuilder[DocumentFields, DocumentRow] = {
+    SelectBuilderSql("production.document", DocumentFields, DocumentRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[DocumentRow] = {
     SQL"""select title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
           from production."document"
@@ -113,6 +123,9 @@ object DocumentRepoImpl extends DocumentRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where documentnode = $documentnode
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
+    UpdateBuilder("production.document", DocumentFields, DocumentRow.rowParser)
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     SQL"""insert into production."document"(title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate, documentnode)

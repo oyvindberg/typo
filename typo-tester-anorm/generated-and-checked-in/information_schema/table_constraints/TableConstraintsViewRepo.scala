@@ -8,7 +8,9 @@ package information_schema
 package table_constraints
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait TableConstraintsViewRepo {
+  def select: SelectBuilder[TableConstraintsViewFields, TableConstraintsViewRow]
   def selectAll(implicit c: Connection): List[TableConstraintsViewRow]
 }

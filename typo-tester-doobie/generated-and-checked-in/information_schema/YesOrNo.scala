@@ -11,6 +11,7 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `information_schema.yes_or_no`
   * Constraint: CHECK (((VALUE)::text = ANY ((ARRAY['YES'::character varying, 'NO'::character varying])::text[])))
@@ -19,6 +20,7 @@ case class YesOrNo(value: String) extends AnyVal
 object YesOrNo {
   implicit val arrayGet: Get[Array[YesOrNo]] = adventureworks.StringArrayMeta.get.map(_.map(YesOrNo.apply))
   implicit val arrayPut: Put[Array[YesOrNo]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[YesOrNo, String] = Bijection[YesOrNo, String](_.value)(YesOrNo.apply)
   implicit val decoder: Decoder[YesOrNo] = Decoder.decodeString.map(YesOrNo.apply)
   implicit val encoder: Encoder[YesOrNo] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[YesOrNo] = Meta.StringMeta.get.map(YesOrNo.apply)

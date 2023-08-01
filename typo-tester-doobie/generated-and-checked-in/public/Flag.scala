@@ -11,6 +11,7 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `public.Flag`
   * No constraint
@@ -19,6 +20,7 @@ case class Flag(value: Boolean) extends AnyVal
 object Flag {
   implicit val arrayGet: Get[Array[Flag]] = adventureworks.BooleanArrayMeta.get.map(_.map(Flag.apply))
   implicit val arrayPut: Put[Array[Flag]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[Flag, Boolean] = Bijection[Flag, Boolean](_.value)(Flag.apply)
   implicit val decoder: Decoder[Flag] = Decoder.decodeBoolean.map(Flag.apply)
   implicit val encoder: Encoder[Flag] = Encoder.encodeBoolean.contramap(_.value)
   implicit val get: Get[Flag] = Meta.BooleanMeta.get.map(Flag.apply)

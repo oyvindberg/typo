@@ -8,11 +8,23 @@ package humanresources
 package employeedepartmenthistory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class EmployeedepartmenthistoryRepoMock(toRow: Function1[EmployeedepartmenthistoryRowUnsaved, EmployeedepartmenthistoryRow],
                                         map: scala.collection.mutable.Map[EmployeedepartmenthistoryId, EmployeedepartmenthistoryRow] = scala.collection.mutable.Map.empty) extends EmployeedepartmenthistoryRepo {
   override def delete(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, EmployeedepartmenthistoryFields, map)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    SelectBuilderMock(EmployeedepartmenthistoryFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, EmployeedepartmenthistoryFields, map)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     map.put(unsaved.compositeId, unsaved)

@@ -9,14 +9,20 @@ package product
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ProductRepo {
   def delete(productid: ProductId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[ProductFields, ProductRow]
   def insert(unsaved: ProductRow): ConnectionIO[ProductRow]
   def insert(unsaved: ProductRowUnsaved): ConnectionIO[ProductRow]
+  def select: SelectBuilder[ProductFields, ProductRow]
   def selectAll: Stream[ConnectionIO, ProductRow]
   def selectById(productid: ProductId): ConnectionIO[Option[ProductRow]]
   def selectByIds(productids: Array[ProductId]): Stream[ConnectionIO, ProductRow]
   def update(row: ProductRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[ProductFields, ProductRow]
   def upsert(unsaved: ProductRow): ConnectionIO[ProductRow]
 }

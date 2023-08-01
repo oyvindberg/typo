@@ -8,7 +8,9 @@ package information_schema
 package domain_constraints
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait DomainConstraintsViewRepo {
+  def select: SelectBuilder[DomainConstraintsViewFields, DomainConstraintsViewRow]
   def selectAll(implicit c: Connection): List[DomainConstraintsViewRow]
 }

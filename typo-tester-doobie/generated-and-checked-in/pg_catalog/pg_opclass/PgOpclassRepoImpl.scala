@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgOpclassRepoImpl extends PgOpclassRepo {
   override def delete(oid: PgOpclassId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_opclass where oid = ${fromWrite(oid)(Write.fromPut(PgOpclassId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgOpclassFields, PgOpclassRow] = {
+    DeleteBuilder("pg_catalog.pg_opclass", PgOpclassFields)
   }
   override def insert(unsaved: PgOpclassRow): ConnectionIO[PgOpclassRow] = {
     sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgOpclassId.put))}::oid, ${fromWrite(unsaved.opcmethod)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.opcnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcfamily)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcintype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.opcdefault)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.opckeytype)(Write.fromPut(Meta.LongMeta.put))}::oid)
           returning oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype
        """.query(PgOpclassRow.read).unique
+  }
+  override def select: SelectBuilder[PgOpclassFields, PgOpclassRow] = {
+    SelectBuilderSql("pg_catalog.pg_opclass", PgOpclassFields, PgOpclassRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgOpclassRow] = {
     sql"select oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype from pg_catalog.pg_opclass".query(PgOpclassRow.read).stream
@@ -48,6 +58,9 @@ object PgOpclassRepoImpl extends PgOpclassRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgOpclassFields, PgOpclassRow] = {
+    UpdateBuilder("pg_catalog.pg_opclass", PgOpclassFields, PgOpclassRow.read)
   }
   override def upsert(unsaved: PgOpclassRow): ConnectionIO[PgOpclassRow] = {
     sql"""insert into pg_catalog.pg_opclass(oid, opcmethod, opcname, opcnamespace, opcowner, opcfamily, opcintype, opcdefault, opckeytype)

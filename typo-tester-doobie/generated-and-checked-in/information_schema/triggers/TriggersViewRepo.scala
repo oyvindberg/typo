@@ -9,7 +9,9 @@ package triggers
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait TriggersViewRepo {
+  def select: SelectBuilder[TriggersViewFields, TriggersViewRow]
   def selectAll: Stream[ConnectionIO, TriggersViewRow]
 }

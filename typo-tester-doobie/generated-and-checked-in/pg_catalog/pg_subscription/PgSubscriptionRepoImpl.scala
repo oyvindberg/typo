@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
   override def delete(oid: PgSubscriptionId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_subscription where oid = ${fromWrite(oid)(Write.fromPut(PgSubscriptionId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
+    DeleteBuilder("pg_catalog.pg_subscription", PgSubscriptionFields)
   }
   override def insert(unsaved: PgSubscriptionRow): ConnectionIO[PgSubscriptionRow] = {
     sql"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgSubscriptionId.put))}::oid, ${fromWrite(unsaved.subdbid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.subname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.subowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.subenabled)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.subbinary)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.substream)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.subconninfo)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.subslotname)(Write.fromPutOption(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.subsynccommit)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.subpublications)(Write.fromPut(adventureworks.StringArrayMeta.put))}::_text)
           returning oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications
        """.query(PgSubscriptionRow.read).unique
+  }
+  override def select: SelectBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
+    SelectBuilderSql("pg_catalog.pg_subscription", PgSubscriptionFields, PgSubscriptionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgSubscriptionRow] = {
     sql"select oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications from pg_catalog.pg_subscription".query(PgSubscriptionRow.read).stream
@@ -50,6 +60,9 @@ object PgSubscriptionRepoImpl extends PgSubscriptionRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgSubscriptionFields, PgSubscriptionRow] = {
+    UpdateBuilder("pg_catalog.pg_subscription", PgSubscriptionFields, PgSubscriptionRow.read)
   }
   override def upsert(unsaved: PgSubscriptionRow): ConnectionIO[PgSubscriptionRow] = {
     sql"""insert into pg_catalog.pg_subscription(oid, subdbid, subname, subowner, subenabled, subbinary, substream, subconninfo, subslotname, subsynccommit, subpublications)

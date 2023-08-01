@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salestaxrate where salestaxrateid = $salestaxrateid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    DeleteBuilder("sales.salestaxrate", SalestaxrateFields)
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)
@@ -68,6 +75,9 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
     
   }
+  override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    SelectBuilderSql("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate::text
           from sales.salestaxrate
@@ -97,6 +107,9 @@ object SalestaxrateRepoImpl extends SalestaxrateRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where salestaxrateid = $salestaxrateid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    UpdateBuilder("sales.salestaxrate", SalestaxrateFields, SalestaxrateRow.rowParser)
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate(salestaxrateid, stateprovinceid, taxtype, taxrate, "name", rowguid, modifieddate)

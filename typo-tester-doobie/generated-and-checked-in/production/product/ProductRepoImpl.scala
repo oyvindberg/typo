@@ -22,10 +22,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductRepoImpl extends ProductRepo {
   override def delete(productid: ProductId): ConnectionIO[Boolean] = {
     sql"delete from production.product where productid = ${fromWrite(productid)(Write.fromPut(ProductId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
+    DeleteBuilder("production.product", ProductFields)
   }
   override def insert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)
@@ -91,6 +98,9 @@ object ProductRepoImpl extends ProductRepo {
     q.query(ProductRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductFields, ProductRow] = {
+    SelectBuilderSql("production.product", ProductFields, ProductRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductRow] = {
     sql"""select productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text from production.product""".query(ProductRow.read).stream
   }
@@ -131,6 +141,9 @@ object ProductRepoImpl extends ProductRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductFields, ProductRow] = {
+    UpdateBuilder("production.product", ProductFields, ProductRow.read)
   }
   override def upsert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product(productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, rowguid, modifieddate)

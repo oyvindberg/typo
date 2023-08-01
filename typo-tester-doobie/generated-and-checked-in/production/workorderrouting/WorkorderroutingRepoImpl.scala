@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean] = {
     sql"delete from production.workorderrouting where workorderid = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND productid = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND operationsequence = ${fromWrite(compositeId.operationsequence)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    DeleteBuilder("production.workorderrouting", WorkorderroutingFields)
   }
   override def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
@@ -62,6 +69,9 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     q.query(WorkorderroutingRow.read).unique
     
   }
+  override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    SelectBuilderSql("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
     sql"select workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text from production.workorderrouting".query(WorkorderroutingRow.read).stream
   }
@@ -84,6 +94,9 @@ object WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    UpdateBuilder("production.workorderrouting", WorkorderroutingFields, WorkorderroutingRow.read)
   }
   override def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     sql"""insert into production.workorderrouting(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)

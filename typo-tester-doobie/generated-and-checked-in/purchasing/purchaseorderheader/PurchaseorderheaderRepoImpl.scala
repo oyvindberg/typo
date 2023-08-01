@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Boolean] = {
     sql"delete from purchasing.purchaseorderheader where purchaseorderid = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
@@ -83,6 +90,9 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     q.query(PurchaseorderheaderRow.read).unique
     
   }
+  override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
     sql"select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text from purchasing.purchaseorderheader".query(PurchaseorderheaderRow.read).stream
   }
@@ -110,6 +120,9 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.read)
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)

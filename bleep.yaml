@@ -12,13 +12,33 @@ projects:
   # main project
   typo:
     dependencies:
-      - com.typesafe.play::play-json:2.10.0-RC9
-      - org.playframework.anorm::anorm:2.7.0
-      - org.postgresql:postgresql:42.6.0
+    - com.typesafe.play::play-json:2.10.0-RC9
+    - org.playframework.anorm::anorm:2.7.0
+    - org.postgresql:postgresql:42.6.0
     extends: template-cross
     platform:
       mainClass: com.foo.App
     sources: ./generated-and-checked-in
+  typo-dsl-anorm:
+    cross:
+      jvm213:
+        extends: template-kind-projector
+      jvm212:
+        extends: template-kind-projector
+    dependencies:
+    - org.playframework.anorm::anorm:2.7.0
+    extends: template-cross
+    sources: ../typo-dsl-shared
+  typo-dsl-doobie:
+    cross:
+      jvm213:
+        extends: template-kind-projector
+      jvm212:
+        extends: template-kind-projector
+    dependencies:
+    - org.tpolecat::doobie-postgres:1.0.0-RC4
+    extends: template-cross
+    sources: ../typo-dsl-shared
   # scripts for publishing, codegen and so on
   typo-scripts:
     dependencies: build.bleep::bleep-plugin-ci-release:${BLEEP_VERSION}
@@ -26,11 +46,12 @@ projects:
     extends: template-nocross
   # scripts generate code into this project, and there are hand-written tests as well
   typo-tester-anorm:
+    dependsOn: typo-dsl-anorm
     dependencies:
-      - com.typesafe.play::play-json:2.10.0-RC9
-      - org.playframework.anorm::anorm:2.7.0
-      - org.postgresql:postgresql:42.6.0
-      - org.scalatest::scalatest:3.3.0-SNAP4
+    - com.typesafe.play::play-json:2.10.0-RC9
+    - org.playframework.anorm::anorm:2.7.0
+    - org.postgresql:postgresql:42.6.0
+    - org.scalatest::scalatest:3.3.0-SNAP4
     extends: template-cross
     isTestProject: true
     sourcegen:
@@ -38,11 +59,11 @@ projects:
       project: typo-scripts
     sources: ./generated-and-checked-in
   typo-tester-doobie:
+    dependsOn: typo-dsl-doobie
     dependencies:
-      - io.circe::circe-core:0.15.0-M1
-      - org.postgresql:postgresql:42.6.0
-      - org.scalatest::scalatest:3.3.0-SNAP4
-      - org.tpolecat::doobie-postgres:1.0.0-RC4
+    - io.circe::circe-core:0.15.0-M1
+    - org.postgresql:postgresql:42.6.0
+    - org.scalatest::scalatest:3.3.0-SNAP4
     extends: template-cross
     isTestProject: true
     sourcegen:
@@ -87,3 +108,7 @@ templates:
     extends: template-common
     scala:
       version: 3.3.0
+  template-kind-projector:
+    scala:
+      compilerPlugins: org.typelevel:::kind-projector:0.13.2
+

@@ -9,7 +9,9 @@ package check_constraint_routine_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait CheckConstraintRoutineUsageViewRepo {
+  def select: SelectBuilder[CheckConstraintRoutineUsageViewFields, CheckConstraintRoutineUsageViewRow]
   def selectAll: Stream[ConnectionIO, CheckConstraintRoutineUsageViewRow]
 }

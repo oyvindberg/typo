@@ -8,13 +8,19 @@ package pg_catalog
 package pg_foreign_table
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgForeignTableRepo {
   def delete(ftrelid: PgForeignTableId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgForeignTableFields, PgForeignTableRow]
   def insert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow
+  def select: SelectBuilder[PgForeignTableFields, PgForeignTableRow]
   def selectAll(implicit c: Connection): List[PgForeignTableRow]
   def selectById(ftrelid: PgForeignTableId)(implicit c: Connection): Option[PgForeignTableRow]
   def selectByIds(ftrelids: Array[PgForeignTableId])(implicit c: Connection): List[PgForeignTableRow]
   def update(row: PgForeignTableRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgForeignTableFields, PgForeignTableRow]
   def upsert(unsaved: PgForeignTableRow)(implicit c: Connection): PgForeignTableRow
 }

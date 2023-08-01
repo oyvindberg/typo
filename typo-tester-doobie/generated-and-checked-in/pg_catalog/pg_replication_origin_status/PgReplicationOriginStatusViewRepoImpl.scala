@@ -10,8 +10,13 @@ package pg_replication_origin_status
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgReplicationOriginStatusViewRepoImpl extends PgReplicationOriginStatusViewRepo {
+  override def select: SelectBuilder[PgReplicationOriginStatusViewFields, PgReplicationOriginStatusViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_replication_origin_status", PgReplicationOriginStatusViewFields, PgReplicationOriginStatusViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgReplicationOriginStatusViewRow] = {
     sql"select local_id, external_id, remote_lsn, local_lsn from pg_catalog.pg_replication_origin_status".query(PgReplicationOriginStatusViewRow.read).stream
   }

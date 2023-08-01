@@ -8,14 +8,20 @@ package sales
 package shoppingcartitem
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ShoppingcartitemRepo {
   def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow
   def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow
+  def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def selectAll(implicit c: Connection): List[ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow]
   def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow]
   def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow
 }

@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.currency where currencycode = $currencycode".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
+    DeleteBuilder("sales.currency", CurrencyFields)
   }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency(currencycode, "name", modifieddate)
@@ -54,6 +61,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
     }
     
   }
+  override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
+    SelectBuilderSql("sales.currency", CurrencyFields, CurrencyRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CurrencyRow] = {
     SQL"""select currencycode, "name", modifieddate::text
           from sales.currency
@@ -79,6 +89,9 @@ object CurrencyRepoImpl extends CurrencyRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where currencycode = $currencycode
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
+    UpdateBuilder("sales.currency", CurrencyFields, CurrencyRow.rowParser)
   }
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency(currencycode, "name", modifieddate)

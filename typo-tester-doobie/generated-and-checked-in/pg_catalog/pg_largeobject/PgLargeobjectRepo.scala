@@ -9,12 +9,18 @@ package pg_largeobject
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgLargeobjectRepo {
   def delete(compositeId: PgLargeobjectId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgLargeobjectFields, PgLargeobjectRow]
   def insert(unsaved: PgLargeobjectRow): ConnectionIO[PgLargeobjectRow]
+  def select: SelectBuilder[PgLargeobjectFields, PgLargeobjectRow]
   def selectAll: Stream[ConnectionIO, PgLargeobjectRow]
   def selectById(compositeId: PgLargeobjectId): ConnectionIO[Option[PgLargeobjectRow]]
   def update(row: PgLargeobjectRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgLargeobjectFields, PgLargeobjectRow]
   def upsert(unsaved: PgLargeobjectRow): ConnectionIO[PgLargeobjectRow]
 }

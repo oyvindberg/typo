@@ -9,8 +9,13 @@ package pg_statio_all_indexes
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatioAllIndexesViewRepoImpl extends PgStatioAllIndexesViewRepo {
+  override def select: SelectBuilder[PgStatioAllIndexesViewFields, PgStatioAllIndexesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_statio_all_indexes", PgStatioAllIndexesViewFields, PgStatioAllIndexesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatioAllIndexesViewRow] = {
     SQL"""select relid, indexrelid, schemaname, relname, indexrelname, idx_blks_read, idx_blks_hit
           from pg_catalog.pg_statio_all_indexes

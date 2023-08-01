@@ -8,7 +8,9 @@ package purchasing
 package vvendorwithcontacts
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait VvendorwithcontactsViewRepo {
+  def select: SelectBuilder[VvendorwithcontactsViewFields, VvendorwithcontactsViewRow]
   def selectAll(implicit c: Connection): List[VvendorwithcontactsViewRow]
 }

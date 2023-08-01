@@ -17,10 +17,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId): ConnectionIO[Boolean] = {
     sql"delete from sales.currencyrate where currencyrateid = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    DeleteBuilder("sales.currencyrate", CurrencyrateFields)
   }
   override def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)
@@ -59,6 +66,9 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
     q.query(CurrencyrateRow.read).unique
     
   }
+  override def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    SelectBuilderSql("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CurrencyrateRow] = {
     sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sales.currencyrate".query(CurrencyrateRow.read).stream
   }
@@ -81,6 +91,9 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    UpdateBuilder("sales.currencyrate", CurrencyrateFields, CurrencyrateRow.read)
   }
   override def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into sales.currencyrate(currencyrateid, currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate)

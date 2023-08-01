@@ -78,6 +78,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       }
 
   override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
+    case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
+      code"def select: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}"
     case RepoMethod.SelectAll(_, _, rowType) =>
       code"def selectAll(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
     case RepoMethod.SelectById(_, _, id, rowType) =>
@@ -94,6 +96,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
+    case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
+      code"def update: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
     case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
       code"def updateFieldValues(${id.param}, $varargs)(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.Update(_, _, _, param, _) =>
@@ -104,6 +108,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"def upsert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
     case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
       code"def insert($unsavedParam)(implicit c: ${sc.Type.Connection}): $rowType"
+    case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
+      code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.SqlFile(sqlScript) =>
@@ -116,6 +122,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
+      case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
+        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.rowParser)"""
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(cols, isRead = true)}
@@ -143,6 +151,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         code"""|$sql.as(${rowParserFor(rowType)}.*)
                |""".stripMargin
+
+      case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
+        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.rowParser)"
 
       case RepoMethod.SelectByUnique(params, fieldValue, _) =>
         val args = params.map { param =>
@@ -311,6 +322,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |}
                |"""
 
+      case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
+        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType)"
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL {
           code"""delete from $relName where ${matchId(id)}"""
@@ -329,6 +342,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code = {
     repoMethod match {
+      case RepoMethod.SelectBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.SelectBuilderMock}($fieldsType, () => map.values.toList, ${sc.Type.dsl.SelectParams}.empty)"
       case RepoMethod.SelectAll(_, _, _) =>
         code"map.values.toList"
       case RepoMethod.SelectById(_, _, id, _) =>
@@ -366,6 +381,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |    }
                |  case ${sc.Type.None} => false
                |}""".stripMargin
+      case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType, map)"
       case RepoMethod.Update(_, _, _, param, _) =>
         code"""map.get(${param.name}.${id.paramName}) match {
               |  case ${sc.Type.Some}(`${param.name}`) => false
@@ -386,6 +403,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
 
+      case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
+        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType, map)"
       case RepoMethod.Delete(_, id) =>
         code"map.remove(${id.paramName}).isDefined"
       case RepoMethod.SqlFile(_) =>

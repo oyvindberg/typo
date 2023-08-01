@@ -9,10 +9,17 @@ package pg_ts_parser
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsParserRepoImpl extends PgTsParserRepo {
   override def delete(oid: PgTsParserId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_ts_parser where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_parser", PgTsParserFields)
   }
   override def insert(unsaved: PgTsParserRow)(implicit c: Connection): PgTsParserRow = {
     SQL"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)
@@ -21,6 +28,9 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
        """
       .executeInsert(PgTsParserRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTsParserFields, PgTsParserRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_parser", PgTsParserFields, PgTsParserRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsParserRow] = {
     SQL"""select oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype
@@ -52,6 +62,9 @@ object PgTsParserRepoImpl extends PgTsParserRepo {
               prslextype = ${row.prslextype}::regproc
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTsParserFields, PgTsParserRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_parser", PgTsParserFields, PgTsParserRow.rowParser)
   }
   override def upsert(unsaved: PgTsParserRow)(implicit c: Connection): PgTsParserRow = {
     SQL"""insert into pg_catalog.pg_ts_parser(oid, prsname, prsnamespace, prsstart, prstoken, prsend, prsheadline, prslextype)

@@ -8,10 +8,22 @@ package pg_catalog
 package pg_init_privs
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgInitPrivsRepoMock(map: scala.collection.mutable.Map[PgInitPrivsId, PgInitPrivsRow] = scala.collection.mutable.Map.empty) extends PgInitPrivsRepo {
   override def delete(compositeId: PgInitPrivsId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgInitPrivsFields, map)
   }
   override def insert(unsaved: PgInitPrivsRow)(implicit c: Connection): PgInitPrivsRow = {
     if (map.contains(unsaved.compositeId))
@@ -19,6 +31,9 @@ class PgInitPrivsRepoMock(map: scala.collection.mutable.Map[PgInitPrivsId, PgIni
     else
       map.put(unsaved.compositeId, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    SelectBuilderMock(PgInitPrivsFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgInitPrivsRow] = {
     map.values.toList
@@ -34,6 +49,9 @@ class PgInitPrivsRepoMock(map: scala.collection.mutable.Map[PgInitPrivsId, PgIni
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgInitPrivsFields, map)
   }
   override def upsert(unsaved: PgInitPrivsRow)(implicit c: Connection): PgInitPrivsRow = {
     map.put(unsaved.compositeId, unsaved)

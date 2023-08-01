@@ -9,7 +9,9 @@ package pg_stat_bgwriter
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatBgwriterViewRepo {
+  def select: SelectBuilder[PgStatBgwriterViewFields, PgStatBgwriterViewRow]
   def selectAll: Stream[ConnectionIO, PgStatBgwriterViewRow]
 }

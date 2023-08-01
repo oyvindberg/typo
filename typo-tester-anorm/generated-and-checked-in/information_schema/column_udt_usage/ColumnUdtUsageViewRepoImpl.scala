@@ -9,8 +9,13 @@ package column_udt_usage
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnUdtUsageViewRepoImpl extends ColumnUdtUsageViewRepo {
+  override def select: SelectBuilder[ColumnUdtUsageViewFields, ColumnUdtUsageViewRow] = {
+    SelectBuilderSql("information_schema.column_udt_usage", ColumnUdtUsageViewFields, ColumnUdtUsageViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ColumnUdtUsageViewRow] = {
     SQL"""select udt_catalog, udt_schema, udt_name, table_catalog, table_schema, "table_name", "column_name"
           from information_schema.column_udt_usage

@@ -8,11 +8,23 @@ package production
 package productreview
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, ProductreviewRow],
                             map: scala.collection.mutable.Map[ProductreviewId, ProductreviewRow] = scala.collection.mutable.Map.empty) extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
     map.remove(productreviewid).isDefined
+  }
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields, map)
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     if (map.contains(unsaved.productreviewid))
@@ -23,6 +35,9 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
   }
   override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
+    SelectBuilderMock(ProductreviewFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields, map)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     map.put(unsaved.productreviewid, unsaved)

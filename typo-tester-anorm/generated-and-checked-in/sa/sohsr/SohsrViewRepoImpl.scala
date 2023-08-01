@@ -9,8 +9,13 @@ package sohsr
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SohsrViewRepoImpl extends SohsrViewRepo {
+  override def select: SelectBuilder[SohsrViewFields, SohsrViewRow] = {
+    SelectBuilderSql("sa.sohsr", SohsrViewFields, SohsrViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SohsrViewRow] = {
     SQL"""select salesorderid, salesreasonid, modifieddate::text
           from sa.sohsr

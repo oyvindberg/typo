@@ -8,12 +8,18 @@ package pg_catalog
 package pg_description
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgDescriptionRepo {
   def delete(compositeId: PgDescriptionId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgDescriptionFields, PgDescriptionRow]
   def insert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow
+  def select: SelectBuilder[PgDescriptionFields, PgDescriptionRow]
   def selectAll(implicit c: Connection): List[PgDescriptionRow]
   def selectById(compositeId: PgDescriptionId)(implicit c: Connection): Option[PgDescriptionRow]
   def update(row: PgDescriptionRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgDescriptionFields, PgDescriptionRow]
   def upsert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow
 }

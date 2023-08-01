@@ -9,7 +9,9 @@ package `_pg_foreign_table_columns`
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgForeignTableColumnsViewRepo {
+  def select: SelectBuilder[PgForeignTableColumnsViewFields, PgForeignTableColumnsViewRow]
   def selectAll: Stream[ConnectionIO, PgForeignTableColumnsViewRow]
 }

@@ -8,7 +8,9 @@ package information_schema
 package user_mappings
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait UserMappingsViewRepo {
+  def select: SelectBuilder[UserMappingsViewFields, UserMappingsViewRow]
   def selectAll(implicit c: Connection): List[UserMappingsViewRow]
 }

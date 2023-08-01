@@ -9,7 +9,9 @@ package pg_roles
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgRolesViewRepo {
+  def select: SelectBuilder[PgRolesViewFields, PgRolesViewRow]
   def selectAll: Stream[ConnectionIO, PgRolesViewRow]
 }

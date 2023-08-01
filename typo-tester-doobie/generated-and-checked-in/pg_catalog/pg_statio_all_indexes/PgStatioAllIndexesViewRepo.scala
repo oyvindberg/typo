@@ -9,7 +9,9 @@ package pg_statio_all_indexes
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatioAllIndexesViewRepo {
+  def select: SelectBuilder[PgStatioAllIndexesViewFields, PgStatioAllIndexesViewRow]
   def selectAll: Stream[ConnectionIO, PgStatioAllIndexesViewRow]
 }

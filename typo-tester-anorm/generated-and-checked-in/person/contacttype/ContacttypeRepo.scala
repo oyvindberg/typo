@@ -8,14 +8,20 @@ package person
 package contacttype
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ContacttypeRepo {
   def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow]
   def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow
   def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow
+  def select: SelectBuilder[ContacttypeFields, ContacttypeRow]
   def selectAll(implicit c: Connection): List[ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow]
   def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow]
   def update(row: ContacttypeRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
   def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow
 }

@@ -8,7 +8,9 @@ package pg_catalog
 package pg_views
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgViewsViewRepo {
+  def select: SelectBuilder[PgViewsViewFields, PgViewsViewRow]
   def selectAll(implicit c: Connection): List[PgViewsViewRow]
 }

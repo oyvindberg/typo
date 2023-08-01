@@ -9,7 +9,9 @@ package applicable_roles
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ApplicableRolesViewRepo {
+  def select: SelectBuilder[ApplicableRolesViewFields, ApplicableRolesViewRow]
   def selectAll: Stream[ConnectionIO, ApplicableRolesViewRow]
 }

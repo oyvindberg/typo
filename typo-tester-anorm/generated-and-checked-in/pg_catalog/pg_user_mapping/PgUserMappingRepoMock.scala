@@ -8,10 +8,22 @@ package pg_catalog
 package pg_user_mapping
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, PgUserMappingRow] = scala.collection.mutable.Map.empty) extends PgUserMappingRepo {
   override def delete(oid: PgUserMappingId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgUserMappingFields, map)
   }
   override def insert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, P
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    SelectBuilderMock(PgUserMappingFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgUserMappingRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgUserMappingRepoMock(map: scala.collection.mutable.Map[PgUserMappingId, P
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgUserMappingFields, map)
   }
   override def upsert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
     map.put(unsaved.oid, unsaved)

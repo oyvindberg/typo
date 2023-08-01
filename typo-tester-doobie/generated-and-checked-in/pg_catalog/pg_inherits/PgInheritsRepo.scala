@@ -9,12 +9,18 @@ package pg_inherits
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgInheritsRepo {
   def delete(compositeId: PgInheritsId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgInheritsFields, PgInheritsRow]
   def insert(unsaved: PgInheritsRow): ConnectionIO[PgInheritsRow]
+  def select: SelectBuilder[PgInheritsFields, PgInheritsRow]
   def selectAll: Stream[ConnectionIO, PgInheritsRow]
   def selectById(compositeId: PgInheritsId): ConnectionIO[Option[PgInheritsRow]]
   def update(row: PgInheritsRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgInheritsFields, PgInheritsRow]
   def upsert(unsaved: PgInheritsRow): ConnectionIO[PgInheritsRow]
 }

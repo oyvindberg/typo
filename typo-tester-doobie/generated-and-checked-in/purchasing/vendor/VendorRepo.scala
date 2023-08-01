@@ -10,14 +10,20 @@ package vendor
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait VendorRepo {
   def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[VendorFields, VendorRow]
   def insert(unsaved: VendorRow): ConnectionIO[VendorRow]
   def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow]
+  def select: SelectBuilder[VendorFields, VendorRow]
   def selectAll: Stream[ConnectionIO, VendorRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[VendorRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow]
   def update(row: VendorRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[VendorFields, VendorRow]
   def upsert(unsaved: VendorRow): ConnectionIO[VendorRow]
 }

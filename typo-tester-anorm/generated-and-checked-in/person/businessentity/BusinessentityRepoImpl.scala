@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from person.businessentity where businessentityid = $businessentityid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
+    DeleteBuilder("person.businessentity", BusinessentityFields)
   }
   override def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     SQL"""insert into person.businessentity(businessentityid, rowguid, modifieddate)
@@ -61,6 +68,9 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
     }
     
   }
+  override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
+    SelectBuilderSql("person.businessentity", BusinessentityFields, BusinessentityRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
     SQL"""select businessentityid, rowguid, modifieddate::text
           from person.businessentity
@@ -86,6 +96,9 @@ object BusinessentityRepoImpl extends BusinessentityRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
+    UpdateBuilder("person.businessentity", BusinessentityFields, BusinessentityRow.rowParser)
   }
   override def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     SQL"""insert into person.businessentity(businessentityid, rowguid, modifieddate)

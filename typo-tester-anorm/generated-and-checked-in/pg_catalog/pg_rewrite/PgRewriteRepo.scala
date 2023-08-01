@@ -8,13 +8,19 @@ package pg_catalog
 package pg_rewrite
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgRewriteRepo {
   def delete(oid: PgRewriteId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow]
   def insert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow
+  def select: SelectBuilder[PgRewriteFields, PgRewriteRow]
   def selectAll(implicit c: Connection): List[PgRewriteRow]
   def selectById(oid: PgRewriteId)(implicit c: Connection): Option[PgRewriteRow]
   def selectByIds(oids: Array[PgRewriteId])(implicit c: Connection): List[PgRewriteRow]
   def update(row: PgRewriteRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgRewriteFields, PgRewriteRow]
   def upsert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow
 }

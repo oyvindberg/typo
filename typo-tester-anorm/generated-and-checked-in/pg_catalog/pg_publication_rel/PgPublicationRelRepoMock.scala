@@ -8,10 +8,22 @@ package pg_catalog
 package pg_publication_rel
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRelId, PgPublicationRelRow] = scala.collection.mutable.Map.empty) extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgPublicationRelFields, map)
   }
   override def insert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRe
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    SelectBuilderMock(PgPublicationRelFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgPublicationRelRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRe
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgPublicationRelFields, map)
   }
   override def upsert(unsaved: PgPublicationRelRow)(implicit c: Connection): PgPublicationRelRow = {
     map.put(unsaved.oid, unsaved)

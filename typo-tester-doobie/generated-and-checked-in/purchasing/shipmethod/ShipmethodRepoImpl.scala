@@ -18,10 +18,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
     sql"delete from purchasing.shipmethod where shipmethodid = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
+    DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
@@ -68,6 +75,9 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     q.query(ShipmethodRow.read).unique
     
   }
+  override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
+    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ShipmethodRow] = {
     sql"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from purchasing.shipmethod""".query(ShipmethodRow.read).stream
   }
@@ -89,6 +99,9 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
+    UpdateBuilder("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.read)
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)

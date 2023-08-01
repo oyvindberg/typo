@@ -9,10 +9,17 @@ package pg_ts_template
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
   override def delete(oid: PgTsTemplateId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_ts_template where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields)
   }
   override def insert(unsaved: PgTsTemplateRow)(implicit c: Connection): PgTsTemplateRow = {
     SQL"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)
@@ -21,6 +28,9 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
        """
       .executeInsert(PgTsTemplateRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_template", PgTsTemplateFields, PgTsTemplateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTsTemplateRow] = {
     SQL"""select oid, tmplname, tmplnamespace, tmplinit, tmpllexize
@@ -49,6 +59,9 @@ object PgTsTemplateRepoImpl extends PgTsTemplateRepo {
               tmpllexize = ${row.tmpllexize}::regproc
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTsTemplateFields, PgTsTemplateRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_template", PgTsTemplateFields, PgTsTemplateRow.rowParser)
   }
   override def upsert(unsaved: PgTsTemplateRow)(implicit c: Connection): PgTsTemplateRow = {
     SQL"""insert into pg_catalog.pg_ts_template(oid, tmplname, tmplnamespace, tmplinit, tmpllexize)

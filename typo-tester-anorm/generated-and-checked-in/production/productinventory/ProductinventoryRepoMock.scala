@@ -8,11 +8,23 @@ package production
 package productinventory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductinventoryRepoMock(toRow: Function1[ProductinventoryRowUnsaved, ProductinventoryRow],
                                map: scala.collection.mutable.Map[ProductinventoryId, ProductinventoryRow] = scala.collection.mutable.Map.empty) extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductinventoryFields, map)
   }
   override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class ProductinventoryRepoMock(toRow: Function1[ProductinventoryRowUnsaved, Prod
   }
   override def insert(unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    SelectBuilderMock(ProductinventoryFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductinventoryRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class ProductinventoryRepoMock(toRow: Function1[ProductinventoryRowUnsaved, Prod
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductinventoryFields, map)
   }
   override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     map.put(unsaved.compositeId, unsaved)

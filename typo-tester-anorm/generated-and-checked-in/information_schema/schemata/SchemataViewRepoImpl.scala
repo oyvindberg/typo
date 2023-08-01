@@ -9,8 +9,13 @@ package schemata
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SchemataViewRepoImpl extends SchemataViewRepo {
+  override def select: SelectBuilder[SchemataViewFields, SchemataViewRow] = {
+    SelectBuilderSql("information_schema.schemata", SchemataViewFields, SchemataViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SchemataViewRow] = {
     SQL"""select "catalog_name", "schema_name", schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path
           from information_schema.schemata

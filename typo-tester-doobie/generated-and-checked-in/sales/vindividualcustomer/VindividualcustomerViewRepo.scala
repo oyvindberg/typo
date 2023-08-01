@@ -9,7 +9,9 @@ package vindividualcustomer
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait VindividualcustomerViewRepo {
+  def select: SelectBuilder[VindividualcustomerViewFields, VindividualcustomerViewRow]
   def selectAll: Stream[ConnectionIO, VindividualcustomerViewRow]
 }

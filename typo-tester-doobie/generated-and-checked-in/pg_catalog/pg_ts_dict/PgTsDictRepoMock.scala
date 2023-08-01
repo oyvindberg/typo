@@ -10,10 +10,22 @@ package pg_ts_dict
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow] = scala.collection.mutable.Map.empty) extends PgTsDictRepo {
   override def delete(oid: PgTsDictId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgTsDictFields, PgTsDictRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgTsDictFields, map)
   }
   override def insert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgTsDictFields, PgTsDictRow] = {
+    SelectBuilderMock(PgTsDictFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgTsDictRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgTsDictRepoMock(map: scala.collection.mutable.Map[PgTsDictId, PgTsDictRow
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgTsDictFields, PgTsDictRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgTsDictFields, map)
   }
   override def upsert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
     delay {

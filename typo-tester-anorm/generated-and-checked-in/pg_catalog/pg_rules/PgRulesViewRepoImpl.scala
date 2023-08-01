@@ -9,8 +9,13 @@ package pg_rules
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgRulesViewRepoImpl extends PgRulesViewRepo {
+  override def select: SelectBuilder[PgRulesViewFields, PgRulesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_rules", PgRulesViewFields, PgRulesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgRulesViewRow] = {
     SQL"""select schemaname, tablename, rulename, definition
           from pg_catalog.pg_rules

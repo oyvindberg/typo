@@ -10,8 +10,13 @@ package pg_available_extensions
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgAvailableExtensionsViewRepoImpl extends PgAvailableExtensionsViewRepo {
+  override def select: SelectBuilder[PgAvailableExtensionsViewFields, PgAvailableExtensionsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_available_extensions", PgAvailableExtensionsViewFields, PgAvailableExtensionsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgAvailableExtensionsViewRow] = {
     sql"""select "name", default_version, installed_version, "comment" from pg_catalog.pg_available_extensions""".query(PgAvailableExtensionsViewRow.read).stream
   }

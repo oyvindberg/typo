@@ -90,8 +90,13 @@ case class TableFiles(table: ComputedTable, options: InternalOptions, genOrderin
       case id: IdComputed.UnaryNormal =>
         val value = sc.Ident("value")
         val comments = scaladoc(s"Type for the primary key of table `${table.dbTable.name.value}`")(Nil)
+        val bijection = {
+          val thisBijection = sc.Type.dsl.Bijection.of(id.tpe, id.underlying)
+          sc.Given(Nil, sc.Ident("bijection"), Nil, thisBijection, code"$thisBijection(_.$value)(${id.tpe}.apply)")
+        }
         val instances = List(
           List(
+            bijection,
             genOrdering.ordering(id.tpe, NonEmptyList(sc.Param(value, id.underlying, None)))
           ),
           options.jsonLibs.flatMap(_.anyValInstances(wrapperType = id.tpe, fieldName = value, underlying = id.underlying)),
@@ -140,6 +145,8 @@ case class TableFiles(table: ComputedTable, options: InternalOptions, genOrderin
 
   val all: List[sc.File] = List(
     Some(relation.RowFile),
+    relation.FieldsFile,
+    relation.StructureFile,
     UnsavedRowFile,
     for {
       repoMethods <- table.repoMethods

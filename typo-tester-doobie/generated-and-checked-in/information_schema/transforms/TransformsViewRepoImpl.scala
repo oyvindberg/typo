@@ -10,8 +10,13 @@ package transforms
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object TransformsViewRepoImpl extends TransformsViewRepo {
+  override def select: SelectBuilder[TransformsViewFields, TransformsViewRow] = {
+    SelectBuilderSql("information_schema.transforms", TransformsViewFields, TransformsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, TransformsViewRow] = {
     sql"""select udt_catalog, udt_schema, udt_name, specific_catalog, specific_schema, "specific_name", group_name, transform_type from information_schema."transforms"""".query(TransformsViewRow.read).stream
   }

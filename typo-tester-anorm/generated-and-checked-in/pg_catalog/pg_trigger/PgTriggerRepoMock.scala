@@ -8,10 +8,22 @@ package pg_catalog
 package pg_trigger
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgTriggerRepoMock(map: scala.collection.mutable.Map[PgTriggerId, PgTriggerRow] = scala.collection.mutable.Map.empty) extends PgTriggerRepo {
   override def delete(oid: PgTriggerId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgTriggerFields, PgTriggerRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgTriggerFields, map)
   }
   override def insert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgTriggerRepoMock(map: scala.collection.mutable.Map[PgTriggerId, PgTrigger
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgTriggerFields, PgTriggerRow] = {
+    SelectBuilderMock(PgTriggerFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgTriggerRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgTriggerRepoMock(map: scala.collection.mutable.Map[PgTriggerId, PgTrigger
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgTriggerFields, PgTriggerRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgTriggerFields, map)
   }
   override def upsert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
     map.put(unsaved.oid, unsaved)

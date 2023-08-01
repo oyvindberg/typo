@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** int2vector (via PGObject) */
 case class TypoInt2Vector(value: String)
@@ -25,6 +26,7 @@ object TypoInt2Vector {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoInt2Vector, String] = Bijection[TypoInt2Vector, String](_.value)(TypoInt2Vector.apply)
   implicit val decoder: Decoder[TypoInt2Vector] = Decoder.decodeString.map(TypoInt2Vector.apply)
   implicit val encoder: Encoder[TypoInt2Vector] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoInt2Vector] = Get.Advanced.other[PGobject](NonEmptyList.one("int2vector"))

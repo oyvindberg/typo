@@ -10,8 +10,13 @@ package pg_stats_ext
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatsExtViewRepoImpl extends PgStatsExtViewRepo {
+  override def select: SelectBuilder[PgStatsExtViewFields, PgStatsExtViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stats_ext", PgStatsExtViewFields, PgStatsExtViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatsExtViewRow] = {
     sql"select schemaname, tablename, statistics_schemaname, statistics_name, statistics_owner, attnames, exprs, kinds, n_distinct, dependencies, most_common_vals, most_common_val_nulls, most_common_freqs, most_common_base_freqs from pg_catalog.pg_stats_ext".query(PgStatsExtViewRow.read).stream
   }

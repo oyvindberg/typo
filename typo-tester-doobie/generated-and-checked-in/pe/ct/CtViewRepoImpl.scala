@@ -10,8 +10,13 @@ package ct
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CtViewRepoImpl extends CtViewRepo {
+  override def select: SelectBuilder[CtViewFields, CtViewRow] = {
+    SelectBuilderSql("pe.ct", CtViewFields, CtViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CtViewRow] = {
     sql"""select "id", contacttypeid, "name", modifieddate::text from pe.ct""".query(CtViewRow.read).stream
   }

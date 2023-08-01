@@ -10,11 +10,23 @@ package billofmaterials
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow],
                               map: scala.collection.mutable.Map[BillofmaterialsId, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId): ConnectionIO[Boolean] = {
     delay(map.remove(billofmaterialsid).isDefined)
+  }
+  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields, map)
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {
@@ -27,6 +39,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    SelectBuilderMock(BillofmaterialsFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields, map)
   }
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {

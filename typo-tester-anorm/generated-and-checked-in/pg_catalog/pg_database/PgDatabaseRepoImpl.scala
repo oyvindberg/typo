@@ -9,10 +9,17 @@ package pg_database
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgDatabaseRepoImpl extends PgDatabaseRepo {
   override def delete(oid: PgDatabaseId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_database where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgDatabaseFields, PgDatabaseRow] = {
+    DeleteBuilder("pg_catalog.pg_database", PgDatabaseFields)
   }
   override def insert(unsaved: PgDatabaseRow)(implicit c: Connection): PgDatabaseRow = {
     SQL"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)
@@ -21,6 +28,9 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
        """
       .executeInsert(PgDatabaseRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgDatabaseFields, PgDatabaseRow] = {
+    SelectBuilderSql("pg_catalog.pg_database", PgDatabaseFields, PgDatabaseRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgDatabaseRow] = {
     SQL"""select oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl
@@ -58,6 +68,9 @@ object PgDatabaseRepoImpl extends PgDatabaseRepo {
               datacl = ${row.datacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgDatabaseFields, PgDatabaseRow] = {
+    UpdateBuilder("pg_catalog.pg_database", PgDatabaseFields, PgDatabaseRow.rowParser)
   }
   override def upsert(unsaved: PgDatabaseRow)(implicit c: Connection): PgDatabaseRow = {
     SQL"""insert into pg_catalog.pg_database(oid, datname, datdba, "encoding", datcollate, datctype, datistemplate, datallowconn, datconnlimit, datlastsysoid, datfrozenxid, datminmxid, dattablespace, datacl)

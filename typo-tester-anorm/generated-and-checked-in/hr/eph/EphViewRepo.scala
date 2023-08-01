@@ -8,7 +8,9 @@ package hr
 package eph
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait EphViewRepo {
+  def select: SelectBuilder[EphViewFields, EphViewRow]
   def selectAll(implicit c: Connection): List[EphViewRow]
 }

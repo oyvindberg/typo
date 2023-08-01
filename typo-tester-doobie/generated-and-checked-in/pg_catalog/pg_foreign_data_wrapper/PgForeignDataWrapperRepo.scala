@@ -9,13 +9,19 @@ package pg_foreign_data_wrapper
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgForeignDataWrapperRepo {
   def delete(oid: PgForeignDataWrapperId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def insert(unsaved: PgForeignDataWrapperRow): ConnectionIO[PgForeignDataWrapperRow]
+  def select: SelectBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def selectAll: Stream[ConnectionIO, PgForeignDataWrapperRow]
   def selectById(oid: PgForeignDataWrapperId): ConnectionIO[Option[PgForeignDataWrapperRow]]
   def selectByIds(oids: Array[PgForeignDataWrapperId]): Stream[ConnectionIO, PgForeignDataWrapperRow]
   def update(row: PgForeignDataWrapperRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow]
   def upsert(unsaved: PgForeignDataWrapperRow): ConnectionIO[PgForeignDataWrapperRow]
 }

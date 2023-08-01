@@ -8,11 +8,23 @@ package production
 package billofmaterials
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow],
                               map: scala.collection.mutable.Map[BillofmaterialsId, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: BillofmaterialsId)(implicit c: Connection): Boolean = {
     map.remove(billofmaterialsid).isDefined
+  }
+  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields, map)
   }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     if (map.contains(unsaved.billofmaterialsid))
@@ -23,6 +35,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    SelectBuilderMock(BillofmaterialsFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields, map)
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     map.put(unsaved.billofmaterialsid, unsaved)

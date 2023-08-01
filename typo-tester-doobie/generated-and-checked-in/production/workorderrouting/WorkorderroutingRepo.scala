@@ -9,13 +9,19 @@ package workorderrouting
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait WorkorderroutingRepo {
   def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow]
+  def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll: Stream[ConnectionIO, WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]]
   def update(row: WorkorderroutingRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
 }

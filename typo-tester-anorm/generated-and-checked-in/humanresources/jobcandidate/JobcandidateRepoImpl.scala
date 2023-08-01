@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.jobcandidate where jobcandidateid = $jobcandidateid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
+    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields)
   }
   override def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)
@@ -58,6 +65,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
     }
     
   }
+  override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
+    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[JobcandidateRow] = {
     SQL"""select jobcandidateid, businessentityid, resume, modifieddate::text
           from humanresources.jobcandidate
@@ -84,6 +94,9 @@ object JobcandidateRepoImpl extends JobcandidateRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where jobcandidateid = $jobcandidateid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
+    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields, JobcandidateRow.rowParser)
   }
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate(jobcandidateid, businessentityid, resume, modifieddate)

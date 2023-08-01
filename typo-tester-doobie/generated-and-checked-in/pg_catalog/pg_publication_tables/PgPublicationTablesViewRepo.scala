@@ -9,7 +9,9 @@ package pg_publication_tables
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgPublicationTablesViewRepo {
+  def select: SelectBuilder[PgPublicationTablesViewFields, PgPublicationTablesViewRow]
   def selectAll: Stream[ConnectionIO, PgPublicationTablesViewRow]
 }

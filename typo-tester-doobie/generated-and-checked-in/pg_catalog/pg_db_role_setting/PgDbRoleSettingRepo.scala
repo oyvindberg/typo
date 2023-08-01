@@ -9,12 +9,18 @@ package pg_db_role_setting
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgDbRoleSettingRepo {
   def delete(compositeId: PgDbRoleSettingId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow]
   def insert(unsaved: PgDbRoleSettingRow): ConnectionIO[PgDbRoleSettingRow]
+  def select: SelectBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow]
   def selectAll: Stream[ConnectionIO, PgDbRoleSettingRow]
   def selectById(compositeId: PgDbRoleSettingId): ConnectionIO[Option[PgDbRoleSettingRow]]
   def update(row: PgDbRoleSettingRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow]
   def upsert(unsaved: PgDbRoleSettingRow): ConnectionIO[PgDbRoleSettingRow]
 }

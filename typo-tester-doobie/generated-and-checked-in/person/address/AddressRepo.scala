@@ -9,14 +9,20 @@ package address
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait AddressRepo {
   def delete(addressid: AddressId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[AddressFields, AddressRow]
   def insert(unsaved: AddressRow): ConnectionIO[AddressRow]
   def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow]
+  def select: SelectBuilder[AddressFields, AddressRow]
   def selectAll: Stream[ConnectionIO, AddressRow]
   def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]]
   def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow]
   def update(row: AddressRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[AddressFields, AddressRow]
   def upsert(unsaved: AddressRow): ConnectionIO[AddressRow]
 }

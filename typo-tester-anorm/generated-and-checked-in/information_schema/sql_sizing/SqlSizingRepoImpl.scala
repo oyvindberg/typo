@@ -9,8 +9,15 @@ package sql_sizing
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SqlSizingRepoImpl extends SqlSizingRepo {
+  override def delete: DeleteBuilder[SqlSizingFields, SqlSizingRow] = {
+    DeleteBuilder("information_schema.sql_sizing", SqlSizingFields)
+  }
   override def insert(unsaved: SqlSizingRow)(implicit c: Connection): SqlSizingRow = {
     SQL"""insert into information_schema.sql_sizing(sizing_id, sizing_name, supported_value, "comments")
           values (${unsaved.sizingId}::information_schema.cardinal_number, ${unsaved.sizingName}::information_schema.character_data, ${unsaved.supportedValue}::information_schema.cardinal_number, ${unsaved.comments}::information_schema.character_data)
@@ -19,9 +26,15 @@ object SqlSizingRepoImpl extends SqlSizingRepo {
       .executeInsert(SqlSizingRow.rowParser(1).single)
     
   }
+  override def select: SelectBuilder[SqlSizingFields, SqlSizingRow] = {
+    SelectBuilderSql("information_schema.sql_sizing", SqlSizingFields, SqlSizingRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SqlSizingRow] = {
     SQL"""select sizing_id, sizing_name, supported_value, "comments"
           from information_schema.sql_sizing
        """.as(SqlSizingRow.rowParser(1).*)
+  }
+  override def update: UpdateBuilder[SqlSizingFields, SqlSizingRow] = {
+    UpdateBuilder("information_schema.sql_sizing", SqlSizingFields, SqlSizingRow.rowParser)
   }
 }

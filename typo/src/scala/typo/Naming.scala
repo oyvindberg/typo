@@ -39,10 +39,11 @@ class Naming(val pkg: sc.QIdent) {
   def repoImplName(source: Source): sc.QIdent = relation(source, "RepoImpl")
   def repoMockName(source: Source): sc.QIdent = relation(source, "RepoMock")
   def rowName(source: Source): sc.QIdent = relation(source, "Row")
+  def fieldsName(source: Source): sc.QIdent = relation(source, "Fields")
+  def structureName(source: Source): sc.QIdent = relation(source, "Structure")
   def fieldValueName(source: Source): sc.QIdent = relation(source, "FieldValue")
   def fieldOrIdValueName(source: Source): sc.QIdent = relation(source, "FieldOrIdValue")
   def rowUnsaved(source: Source): sc.QIdent = relation(source, "RowUnsaved")
-  def joinedRow(source: Source): sc.QIdent = relation(source, "JoinedRow")
 
   def className(names: List[sc.Ident]): sc.QIdent = pkg / names
 

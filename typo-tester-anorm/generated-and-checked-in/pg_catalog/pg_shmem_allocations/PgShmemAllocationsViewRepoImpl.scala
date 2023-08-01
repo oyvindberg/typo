@@ -9,8 +9,13 @@ package pg_shmem_allocations
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgShmemAllocationsViewRepoImpl extends PgShmemAllocationsViewRepo {
+  override def select: SelectBuilder[PgShmemAllocationsViewFields, PgShmemAllocationsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_shmem_allocations", PgShmemAllocationsViewFields, PgShmemAllocationsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgShmemAllocationsViewRow] = {
     SQL"""select "name", "off", "size", allocated_size
           from pg_catalog.pg_shmem_allocations

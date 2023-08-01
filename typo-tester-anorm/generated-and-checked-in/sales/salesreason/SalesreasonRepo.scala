@@ -8,14 +8,20 @@ package sales
 package salesreason
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalesreasonRepo {
   def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow]
   def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow
   def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow
+  def select: SelectBuilder[SalesreasonFields, SalesreasonRow]
   def selectAll(implicit c: Connection): List[SalesreasonRow]
   def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow]
   def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow]
   def update(row: SalesreasonRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[SalesreasonFields, SalesreasonRow]
   def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow
 }

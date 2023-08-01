@@ -8,11 +8,23 @@ package sales
 package specialoffer
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, SpecialofferRow],
                            map: scala.collection.mutable.Map[SpecialofferId, SpecialofferRow] = scala.collection.mutable.Map.empty) extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean = {
     map.remove(specialofferid).isDefined
+  }
+  override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields, map)
   }
   override def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     if (map.contains(unsaved.specialofferid))
@@ -23,6 +35,9 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   }
   override def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
+    SelectBuilderMock(SpecialofferFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields, map)
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     map.put(unsaved.specialofferid, unsaved)

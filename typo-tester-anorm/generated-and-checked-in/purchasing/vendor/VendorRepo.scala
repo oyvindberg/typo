@@ -9,14 +9,20 @@ package vendor
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait VendorRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[VendorFields, VendorRow]
   def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow
   def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow
+  def select: SelectBuilder[VendorFields, VendorRow]
   def selectAll(implicit c: Connection): List[VendorRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow]
   def update(row: VendorRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[VendorFields, VendorRow]
   def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow
 }

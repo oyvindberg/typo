@@ -9,8 +9,13 @@ package pg_cursors
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgCursorsViewRepoImpl extends PgCursorsViewRepo {
+  override def select: SelectBuilder[PgCursorsViewFields, PgCursorsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_cursors", PgCursorsViewFields, PgCursorsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgCursorsViewRow] = {
     SQL"""select "name", "statement", is_holdable, is_binary, is_scrollable, creation_time::text
           from pg_catalog.pg_cursors

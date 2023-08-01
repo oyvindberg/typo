@@ -10,8 +10,13 @@ package pg_cursors
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgCursorsViewRepoImpl extends PgCursorsViewRepo {
+  override def select: SelectBuilder[PgCursorsViewFields, PgCursorsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_cursors", PgCursorsViewFields, PgCursorsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgCursorsViewRow] = {
     sql"""select "name", "statement", is_holdable, is_binary, is_scrollable, creation_time::text from pg_catalog.pg_cursors""".query(PgCursorsViewRow.read).stream
   }

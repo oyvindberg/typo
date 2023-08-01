@@ -9,13 +9,19 @@ package pg_ts_config
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgTsConfigRepo {
   def delete(oid: PgTsConfigId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgTsConfigFields, PgTsConfigRow]
   def insert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow]
+  def select: SelectBuilder[PgTsConfigFields, PgTsConfigRow]
   def selectAll: Stream[ConnectionIO, PgTsConfigRow]
   def selectById(oid: PgTsConfigId): ConnectionIO[Option[PgTsConfigRow]]
   def selectByIds(oids: Array[PgTsConfigId]): Stream[ConnectionIO, PgTsConfigRow]
   def update(row: PgTsConfigRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgTsConfigFields, PgTsConfigRow]
   def upsert(unsaved: PgTsConfigRow): ConnectionIO[PgTsConfigRow]
 }

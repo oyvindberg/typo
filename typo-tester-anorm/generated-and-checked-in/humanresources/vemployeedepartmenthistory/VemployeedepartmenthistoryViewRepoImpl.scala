@@ -9,8 +9,13 @@ package vemployeedepartmenthistory
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VemployeedepartmenthistoryViewRepoImpl extends VemployeedepartmenthistoryViewRepo {
+  override def select: SelectBuilder[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow] = {
+    SelectBuilderSql("humanresources.vemployeedepartmenthistory", VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[VemployeedepartmenthistoryViewRow] = {
     SQL"""select businessentityid, title, firstname, middlename, lastname, suffix, shift, department, groupname, startdate::text, enddate::text
           from humanresources.vemployeedepartmenthistory

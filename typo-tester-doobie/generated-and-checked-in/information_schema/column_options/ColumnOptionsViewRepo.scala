@@ -9,7 +9,9 @@ package column_options
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ColumnOptionsViewRepo {
+  def select: SelectBuilder[ColumnOptionsViewFields, ColumnOptionsViewRow]
   def selectAll: Stream[ConnectionIO, ColumnOptionsViewRow]
 }

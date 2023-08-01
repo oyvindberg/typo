@@ -8,14 +8,20 @@ package humanresources
 package shift
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ShiftRepo {
   def delete(shiftid: ShiftId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[ShiftFields, ShiftRow]
   def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow
   def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow
+  def select: SelectBuilder[ShiftFields, ShiftRow]
   def selectAll(implicit c: Connection): List[ShiftRow]
   def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow]
   def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow]
   def update(row: ShiftRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[ShiftFields, ShiftRow]
   def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow
 }

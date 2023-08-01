@@ -9,8 +9,13 @@ package vjobcandidateeducation
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VjobcandidateeducationViewRepoImpl extends VjobcandidateeducationViewRepo {
+  override def select: SelectBuilder[VjobcandidateeducationViewFields, VjobcandidateeducationViewRow] = {
+    SelectBuilderSql("humanresources.vjobcandidateeducation", VjobcandidateeducationViewFields, VjobcandidateeducationViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[VjobcandidateeducationViewRow] = {
     SQL"""select jobcandidateid, "Edu.Level", "Edu.StartDate"::text, "Edu.EndDate"::text, "Edu.Degree", "Edu.Major", "Edu.Minor", "Edu.GPA", "Edu.GPAScale", "Edu.School", "Edu.Loc.CountryRegion", "Edu.Loc.State", "Edu.Loc.City"
           from humanresources.vjobcandidateeducation

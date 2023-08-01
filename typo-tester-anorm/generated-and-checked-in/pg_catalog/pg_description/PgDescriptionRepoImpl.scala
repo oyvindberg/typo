@@ -9,10 +9,17 @@ package pg_description
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgDescriptionRepoImpl extends PgDescriptionRepo {
   override def delete(compositeId: PgDescriptionId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_description where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    DeleteBuilder("pg_catalog.pg_description", PgDescriptionFields)
   }
   override def insert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow = {
     SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)
@@ -21,6 +28,9 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
        """
       .executeInsert(PgDescriptionRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    SelectBuilderSql("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgDescriptionRow] = {
     SQL"""select objoid, classoid, objsubid, description
@@ -39,6 +49,9 @@ object PgDescriptionRepoImpl extends PgDescriptionRepo {
           set description = ${row.description}
           where objoid = ${compositeId.objoid} AND classoid = ${compositeId.classoid} AND objsubid = ${compositeId.objsubid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgDescriptionFields, PgDescriptionRow] = {
+    UpdateBuilder("pg_catalog.pg_description", PgDescriptionFields, PgDescriptionRow.rowParser)
   }
   override def upsert(unsaved: PgDescriptionRow)(implicit c: Connection): PgDescriptionRow = {
     SQL"""insert into pg_catalog.pg_description(objoid, classoid, objsubid, description)

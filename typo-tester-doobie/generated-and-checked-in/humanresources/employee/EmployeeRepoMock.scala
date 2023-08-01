@@ -11,11 +11,23 @@ import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
                        map: scala.collection.mutable.Map[BusinessentityId, EmployeeRow] = scala.collection.mutable.Map.empty) extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     delay(map.remove(businessentityid).isDefined)
+  }
+  override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, EmployeeFields, map)
   }
   override def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     delay {
@@ -28,6 +40,9 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
   }
   override def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[EmployeeFields, EmployeeRow] = {
+    SelectBuilderMock(EmployeeFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, EmployeeRow] = {
     Stream.emits(map.values.toList)
@@ -48,6 +63,9 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, EmployeeFields, map)
   }
   override def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     delay {

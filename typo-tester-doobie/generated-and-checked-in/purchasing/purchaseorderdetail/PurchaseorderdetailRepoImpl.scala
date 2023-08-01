@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def delete(compositeId: PurchaseorderdetailId): ConnectionIO[Boolean] = {
     sql"delete from purchasing.purchaseorderdetail where purchaseorderid = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND purchaseorderdetailid = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    DeleteBuilder("purchasing.purchaseorderdetail", PurchaseorderdetailFields)
   }
   override def insert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
@@ -62,6 +69,9 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     q.query(PurchaseorderdetailRow.read).unique
     
   }
+  override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
     sql"select purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from purchasing.purchaseorderdetail".query(PurchaseorderdetailRow.read).stream
   }
@@ -82,6 +92,9 @@ object PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
+    UpdateBuilder("purchasing.purchaseorderdetail", PurchaseorderdetailFields, PurchaseorderdetailRow.read)
   }
   override def upsert(unsaved: PurchaseorderdetailRow): ConnectionIO[PurchaseorderdetailRow] = {
     sql"""insert into purchasing.purchaseorderdetail(purchaseorderid, purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)

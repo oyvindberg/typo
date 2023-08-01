@@ -10,8 +10,13 @@ package plph
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PlphViewRepoImpl extends PlphViewRepo {
+  override def select: SelectBuilder[PlphViewFields, PlphViewRow] = {
+    SelectBuilderSql("pr.plph", PlphViewFields, PlphViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PlphViewRow] = {
     sql"""select "id", productid, startdate::text, enddate::text, listprice, modifieddate::text from pr.plph""".query(PlphViewRow.read).stream
   }

@@ -15,10 +15,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.vendor where businessentityid = $businessentityid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[VendorFields, VendorRow] = {
+    DeleteBuilder("purchasing.vendor", VendorFields)
   }
   override def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)
@@ -67,6 +74,9 @@ object VendorRepoImpl extends VendorRepo {
     }
     
   }
+  override def select: SelectBuilder[VendorFields, VendorRow] = {
+    SelectBuilderSql("purchasing.vendor", VendorFields, VendorRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
     SQL"""select businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
           from purchasing.vendor
@@ -97,6 +107,9 @@ object VendorRepoImpl extends VendorRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[VendorFields, VendorRow] = {
+    UpdateBuilder("purchasing.vendor", VendorFields, VendorRow.rowParser)
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor(businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate)

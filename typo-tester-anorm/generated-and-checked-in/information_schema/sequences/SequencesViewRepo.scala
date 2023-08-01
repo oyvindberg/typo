@@ -8,7 +8,9 @@ package information_schema
 package sequences
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait SequencesViewRepo {
+  def select: SelectBuilder[SequencesViewFields, SequencesViewRow]
   def selectAll(implicit c: Connection): List[SequencesViewRow]
 }

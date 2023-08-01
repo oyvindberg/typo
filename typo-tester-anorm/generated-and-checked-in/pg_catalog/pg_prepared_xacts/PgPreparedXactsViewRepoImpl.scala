@@ -9,8 +9,13 @@ package pg_prepared_xacts
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgPreparedXactsViewRepoImpl extends PgPreparedXactsViewRepo {
+  override def select: SelectBuilder[PgPreparedXactsViewFields, PgPreparedXactsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_prepared_xacts", PgPreparedXactsViewFields, PgPreparedXactsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgPreparedXactsViewRow] = {
     SQL"""select "transaction", gid, "prepared"::text, "owner", "database"
           from pg_catalog.pg_prepared_xacts

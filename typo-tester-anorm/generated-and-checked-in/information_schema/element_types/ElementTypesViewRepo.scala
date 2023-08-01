@@ -8,7 +8,9 @@ package information_schema
 package element_types
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ElementTypesViewRepo {
+  def select: SelectBuilder[ElementTypesViewFields, ElementTypesViewRow]
   def selectAll(implicit c: Connection): List[ElementTypesViewRow]
 }

@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def delete(oid: PgForeignDataWrapperId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_foreign_data_wrapper where oid = ${fromWrite(oid)(Write.fromPut(PgForeignDataWrapperId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    DeleteBuilder("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields)
   }
   override def insert(unsaved: PgForeignDataWrapperRow): ConnectionIO[PgForeignDataWrapperRow] = {
     sql"""insert into pg_catalog.pg_foreign_data_wrapper(oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgForeignDataWrapperId.put))}::oid, ${fromWrite(unsaved.fdwname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.fdwowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.fdwhandler)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.fdwvalidator)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.fdwacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem, ${fromWrite(unsaved.fdwoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
           returning oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions
        """.query(PgForeignDataWrapperRow.read).unique
+  }
+  override def select: SelectBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    SelectBuilderSql("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields, PgForeignDataWrapperRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgForeignDataWrapperRow] = {
     sql"select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions from pg_catalog.pg_foreign_data_wrapper".query(PgForeignDataWrapperRow.read).stream
@@ -47,6 +57,9 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    UpdateBuilder("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields, PgForeignDataWrapperRow.read)
   }
   override def upsert(unsaved: PgForeignDataWrapperRow): ConnectionIO[PgForeignDataWrapperRow] = {
     sql"""insert into pg_catalog.pg_foreign_data_wrapper(oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions)

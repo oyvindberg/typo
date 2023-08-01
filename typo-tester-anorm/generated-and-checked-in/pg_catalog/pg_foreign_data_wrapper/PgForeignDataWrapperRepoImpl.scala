@@ -9,10 +9,17 @@ package pg_foreign_data_wrapper
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
   override def delete(oid: PgForeignDataWrapperId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_foreign_data_wrapper where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    DeleteBuilder("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields)
   }
   override def insert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow = {
     SQL"""insert into pg_catalog.pg_foreign_data_wrapper(oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions)
@@ -21,6 +28,9 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
        """
       .executeInsert(PgForeignDataWrapperRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    SelectBuilderSql("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields, PgForeignDataWrapperRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgForeignDataWrapperRow] = {
     SQL"""select oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions
@@ -51,6 +61,9 @@ object PgForeignDataWrapperRepoImpl extends PgForeignDataWrapperRepo {
               fdwoptions = ${row.fdwoptions}::_text
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgForeignDataWrapperFields, PgForeignDataWrapperRow] = {
+    UpdateBuilder("pg_catalog.pg_foreign_data_wrapper", PgForeignDataWrapperFields, PgForeignDataWrapperRow.rowParser)
   }
   override def upsert(unsaved: PgForeignDataWrapperRow)(implicit c: Connection): PgForeignDataWrapperRow = {
     SQL"""insert into pg_catalog.pg_foreign_data_wrapper(oid, fdwname, fdwowner, fdwhandler, fdwvalidator, fdwacl, fdwoptions)

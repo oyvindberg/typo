@@ -6,6 +6,8 @@ case class SqlFileFiles(script: ComputedSqlFile, naming: Naming, options: Intern
   val relation = RelationFiles(naming, script.names, options)
   val all: List[sc.File] = List(
     Some(relation.RowFile),
+    relation.FieldsFile,
+    relation.StructureFile,
     for {
       dbLib <- options.dbLib
     } yield relation.RepoTraitFile(dbLib, script.repoMethods),

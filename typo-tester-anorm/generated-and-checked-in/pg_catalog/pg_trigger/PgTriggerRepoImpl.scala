@@ -9,10 +9,17 @@ package pg_trigger
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTriggerRepoImpl extends PgTriggerRepo {
   override def delete(oid: PgTriggerId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_trigger where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTriggerFields, PgTriggerRow] = {
+    DeleteBuilder("pg_catalog.pg_trigger", PgTriggerFields)
   }
   override def insert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
     SQL"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
@@ -21,6 +28,9 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
        """
       .executeInsert(PgTriggerRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTriggerFields, PgTriggerRow] = {
+    SelectBuilderSql("pg_catalog.pg_trigger", PgTriggerFields, PgTriggerRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTriggerRow] = {
     SQL"""select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
@@ -63,6 +73,9 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
               tgnewtable = ${row.tgnewtable}::name
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTriggerFields, PgTriggerRow] = {
+    UpdateBuilder("pg_catalog.pg_trigger", PgTriggerFields, PgTriggerRow.rowParser)
   }
   override def upsert(unsaved: PgTriggerRow)(implicit c: Connection): PgTriggerRow = {
     SQL"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)

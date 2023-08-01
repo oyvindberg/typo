@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.purchaseorderheader where purchaseorderid = $purchaseorderid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields)
   }
   override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)
@@ -84,6 +91,9 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     }
     
   }
+  override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
     SQL"""select purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate::text, shipdate::text, subtotal, taxamt, freight, modifieddate::text
           from purchasing.purchaseorderheader
@@ -118,6 +128,9 @@ object PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where purchaseorderid = $purchaseorderid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields, PurchaseorderheaderRow.rowParser)
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into purchasing.purchaseorderheader(purchaseorderid, revisionnumber, status, employeeid, vendorid, shipmethodid, orderdate, shipdate, subtotal, taxamt, freight, modifieddate)

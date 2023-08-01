@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_xact_user_tables
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatXactUserTablesViewRepo {
+  def select: SelectBuilder[PgStatXactUserTablesViewFields, PgStatXactUserTablesViewRow]
   def selectAll(implicit c: Connection): List[PgStatXactUserTablesViewRow]
 }

@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** regtype (via PGObject) */
 case class TypoRegtype(value: String)
@@ -25,6 +26,7 @@ object TypoRegtype {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoRegtype, String] = Bijection[TypoRegtype, String](_.value)(TypoRegtype.apply)
   implicit val decoder: Decoder[TypoRegtype] = Decoder.decodeString.map(TypoRegtype.apply)
   implicit val encoder: Encoder[TypoRegtype] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoRegtype] = Get.Advanced.other[PGobject](NonEmptyList.one("regtype"))

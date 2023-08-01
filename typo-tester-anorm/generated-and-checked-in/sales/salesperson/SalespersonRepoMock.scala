@@ -9,11 +9,23 @@ package salesperson
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow],
                           map: scala.collection.mutable.Map[BusinessentityId, SalespersonRow] = scala.collection.mutable.Map.empty) extends SalespersonRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     map.remove(businessentityid).isDefined
+  }
+  override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalespersonFields, map)
   }
   override def insert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     if (map.contains(unsaved.businessentityid))
@@ -24,6 +36,9 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
   }
   override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
+    SelectBuilderMock(SalespersonFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalespersonRow] = {
     map.values.toList
@@ -42,6 +57,9 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalespersonFields, map)
   }
   override def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     map.put(unsaved.businessentityid, unsaved)

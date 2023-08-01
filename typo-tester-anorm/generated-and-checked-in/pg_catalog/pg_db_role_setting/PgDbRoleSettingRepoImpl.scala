@@ -9,10 +9,17 @@ package pg_db_role_setting
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
   override def delete(compositeId: PgDbRoleSettingId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_db_role_setting where setdatabase = ${compositeId.setdatabase} AND setrole = ${compositeId.setrole}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    DeleteBuilder("pg_catalog.pg_db_role_setting", PgDbRoleSettingFields)
   }
   override def insert(unsaved: PgDbRoleSettingRow)(implicit c: Connection): PgDbRoleSettingRow = {
     SQL"""insert into pg_catalog.pg_db_role_setting(setdatabase, setrole, setconfig)
@@ -21,6 +28,9 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
        """
       .executeInsert(PgDbRoleSettingRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    SelectBuilderSql("pg_catalog.pg_db_role_setting", PgDbRoleSettingFields, PgDbRoleSettingRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgDbRoleSettingRow] = {
     SQL"""select setdatabase, setrole, setconfig
@@ -39,6 +49,9 @@ object PgDbRoleSettingRepoImpl extends PgDbRoleSettingRepo {
           set setconfig = ${row.setconfig}::_text
           where setdatabase = ${compositeId.setdatabase} AND setrole = ${compositeId.setrole}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    UpdateBuilder("pg_catalog.pg_db_role_setting", PgDbRoleSettingFields, PgDbRoleSettingRow.rowParser)
   }
   override def upsert(unsaved: PgDbRoleSettingRow)(implicit c: Connection): PgDbRoleSettingRow = {
     SQL"""insert into pg_catalog.pg_db_role_setting(setdatabase, setrole, setconfig)

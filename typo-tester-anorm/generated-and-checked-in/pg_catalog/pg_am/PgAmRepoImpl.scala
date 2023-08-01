@@ -9,10 +9,17 @@ package pg_am
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAmRepoImpl extends PgAmRepo {
   override def delete(oid: PgAmId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_am where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgAmFields, PgAmRow] = {
+    DeleteBuilder("pg_catalog.pg_am", PgAmFields)
   }
   override def insert(unsaved: PgAmRow)(implicit c: Connection): PgAmRow = {
     SQL"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)
@@ -21,6 +28,9 @@ object PgAmRepoImpl extends PgAmRepo {
        """
       .executeInsert(PgAmRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgAmFields, PgAmRow] = {
+    SelectBuilderSql("pg_catalog.pg_am", PgAmFields, PgAmRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAmRow] = {
     SQL"""select oid, amname, amhandler, amtype
@@ -48,6 +58,9 @@ object PgAmRepoImpl extends PgAmRepo {
               amtype = ${row.amtype}::char
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgAmFields, PgAmRow] = {
+    UpdateBuilder("pg_catalog.pg_am", PgAmFields, PgAmRow.rowParser)
   }
   override def upsert(unsaved: PgAmRow)(implicit c: Connection): PgAmRow = {
     SQL"""insert into pg_catalog.pg_am(oid, amname, amhandler, amtype)

@@ -12,11 +12,13 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `humanresources.shift` */
 case class ShiftId(value: Int) extends AnyVal
 object ShiftId {
   implicit val arrayToStatement: ToStatement[Array[ShiftId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[ShiftId, Int] = Bijection[ShiftId, Int](_.value)(ShiftId.apply)
   implicit val column: Column[ShiftId] = implicitly[Column[Int]].map(ShiftId.apply)
   implicit val ordering: Ordering[ShiftId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[ShiftId] = new ParameterMetaData[ShiftId] {

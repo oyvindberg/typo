@@ -19,10 +19,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId): ConnectionIO[Boolean] = {
     sql"delete from sales.salesterritory where territoryid = ${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    DeleteBuilder("sales.salesterritory", SalesterritoryFields)
   }
   override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
@@ -79,6 +86,9 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
     q.query(SalesterritoryRow.read).unique
     
   }
+  override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    SelectBuilderSql("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalesterritoryRow] = {
     sql"""select territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate::text from sales.salesterritory""".query(SalesterritoryRow.read).stream
   }
@@ -104,6 +114,9 @@ object SalesterritoryRepoImpl extends SalesterritoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    UpdateBuilder("sales.salesterritory", SalesterritoryFields, SalesterritoryRow.read)
   }
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory(territoryid, "name", countryregioncode, "group", salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)

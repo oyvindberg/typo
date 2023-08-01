@@ -10,11 +10,23 @@ package personcreditcard
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, PersoncreditcardRow],
                                map: scala.collection.mutable.Map[PersoncreditcardId, PersoncreditcardRow] = scala.collection.mutable.Map.empty) extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields, map)
   }
   override def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     delay {
@@ -27,6 +39,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    SelectBuilderMock(PersoncreditcardFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields, map)
   }
   override def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     delay {

@@ -17,16 +17,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgProcRepoImpl extends PgProcRepo {
   override def delete(oid: PgProcId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_proc where oid = ${fromWrite(oid)(Write.fromPut(PgProcId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgProcFields, PgProcRow] = {
+    DeleteBuilder("pg_catalog.pg_proc", PgProcFields)
   }
   override def insert(unsaved: PgProcRow): ConnectionIO[PgProcRow] = {
     sql"""insert into pg_catalog.pg_proc(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgProcId.put))}::oid, ${fromWrite(unsaved.proname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.pronamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.proowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prolang)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.procost)(Write.fromPut(Meta.FloatMeta.put))}::float4, ${fromWrite(unsaved.prorows)(Write.fromPut(Meta.FloatMeta.put))}::float4, ${fromWrite(unsaved.provariadic)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.prosupport)(Write.fromPut(TypoRegproc.put))}::regproc, ${fromWrite(unsaved.prokind)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.prosecdef)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.proleakproof)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.proisstrict)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.proretset)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.provolatile)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.proparallel)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.pronargs)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.pronargdefaults)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.prorettype)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.proargtypes)(Write.fromPut(TypoOidVector.put))}::oidvector, ${fromWrite(unsaved.proallargtypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.proargmodes)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_char, ${fromWrite(unsaved.proargnames)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.proargdefaults)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.protrftypes)(Write.fromPutOption(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.prosrc)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.probin)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.prosqlbody)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.proconfig)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text, ${fromWrite(unsaved.proacl)(Write.fromPutOption(TypoAclItem.arrayPut))}::_aclitem)
           returning oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
        """.query(PgProcRow.read).unique
+  }
+  override def select: SelectBuilder[PgProcFields, PgProcRow] = {
+    SelectBuilderSql("pg_catalog.pg_proc", PgProcFields, PgProcRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgProcRow] = {
     sql"select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl from pg_catalog.pg_proc".query(PgProcRow.read).stream
@@ -73,6 +83,9 @@ object PgProcRepoImpl extends PgProcRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgProcFields, PgProcRow] = {
+    UpdateBuilder("pg_catalog.pg_proc", PgProcFields, PgProcRow.read)
   }
   override def upsert(unsaved: PgProcRow): ConnectionIO[PgProcRow] = {
     sql"""insert into pg_catalog.pg_proc(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)

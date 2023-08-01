@@ -9,10 +9,17 @@ package pg_user_mapping
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgUserMappingRepoImpl extends PgUserMappingRepo {
   override def delete(oid: PgUserMappingId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_user_mapping where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    DeleteBuilder("pg_catalog.pg_user_mapping", PgUserMappingFields)
   }
   override def insert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
     SQL"""insert into pg_catalog.pg_user_mapping(oid, umuser, umserver, umoptions)
@@ -21,6 +28,9 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
        """
       .executeInsert(PgUserMappingRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    SelectBuilderSql("pg_catalog.pg_user_mapping", PgUserMappingFields, PgUserMappingRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgUserMappingRow] = {
     SQL"""select oid, umuser, umserver, umoptions
@@ -48,6 +58,9 @@ object PgUserMappingRepoImpl extends PgUserMappingRepo {
               umoptions = ${row.umoptions}::_text
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgUserMappingFields, PgUserMappingRow] = {
+    UpdateBuilder("pg_catalog.pg_user_mapping", PgUserMappingFields, PgUserMappingRow.rowParser)
   }
   override def upsert(unsaved: PgUserMappingRow)(implicit c: Connection): PgUserMappingRow = {
     SQL"""insert into pg_catalog.pg_user_mapping(oid, umuser, umserver, umoptions)

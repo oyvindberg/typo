@@ -8,13 +8,19 @@ package sales
 package countryregioncurrency
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait CountryregioncurrencyRepo {
   def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
   def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow
+  def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def selectAll(implicit c: Connection): List[CountryregioncurrencyRow]
   def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow]
   def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
 }

@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_archiver
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatArchiverViewRepo {
+  def select: SelectBuilder[PgStatArchiverViewFields, PgStatArchiverViewRow]
   def selectAll(implicit c: Connection): List[PgStatArchiverViewRow]
 }

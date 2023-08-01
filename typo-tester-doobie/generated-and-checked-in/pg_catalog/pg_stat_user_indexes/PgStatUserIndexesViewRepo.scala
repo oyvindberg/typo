@@ -9,7 +9,9 @@ package pg_stat_user_indexes
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatUserIndexesViewRepo {
+  def select: SelectBuilder[PgStatUserIndexesViewFields, PgStatUserIndexesViewRow]
   def selectAll: Stream[ConnectionIO, PgStatUserIndexesViewRow]
 }

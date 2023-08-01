@@ -8,7 +8,9 @@ package pg_catalog
 package pg_replication_slots
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgReplicationSlotsViewRepo {
+  def select: SelectBuilder[PgReplicationSlotsViewFields, PgReplicationSlotsViewRow]
   def selectAll(implicit c: Connection): List[PgReplicationSlotsViewRow]
 }

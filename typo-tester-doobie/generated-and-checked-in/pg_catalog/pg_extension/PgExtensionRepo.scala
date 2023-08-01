@@ -9,13 +9,19 @@ package pg_extension
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgExtensionRepo {
   def delete(oid: PgExtensionId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgExtensionFields, PgExtensionRow]
   def insert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow]
+  def select: SelectBuilder[PgExtensionFields, PgExtensionRow]
   def selectAll: Stream[ConnectionIO, PgExtensionRow]
   def selectById(oid: PgExtensionId): ConnectionIO[Option[PgExtensionRow]]
   def selectByIds(oids: Array[PgExtensionId]): Stream[ConnectionIO, PgExtensionRow]
   def update(row: PgExtensionRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgExtensionFields, PgExtensionRow]
   def upsert(unsaved: PgExtensionRow): ConnectionIO[PgExtensionRow]
 }

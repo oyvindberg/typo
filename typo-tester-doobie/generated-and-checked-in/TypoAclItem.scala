@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** aclitem (via PGObject) */
 case class TypoAclItem(value: String)
@@ -25,6 +26,7 @@ object TypoAclItem {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoAclItem, String] = Bijection[TypoAclItem, String](_.value)(TypoAclItem.apply)
   implicit val decoder: Decoder[TypoAclItem] = Decoder.decodeString.map(TypoAclItem.apply)
   implicit val encoder: Encoder[TypoAclItem] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoAclItem] = Get.Advanced.other[PGobject](NonEmptyList.one("aclitem"))

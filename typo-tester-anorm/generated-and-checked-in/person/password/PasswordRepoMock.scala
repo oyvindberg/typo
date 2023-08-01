@@ -9,11 +9,23 @@ package password
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
                        map: scala.collection.mutable.Map[BusinessentityId, PasswordRow] = scala.collection.mutable.Map.empty) extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     map.remove(businessentityid).isDefined
+  }
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PasswordFields, map)
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     if (map.contains(unsaved.businessentityid))
@@ -24,6 +36,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PasswordFields, PasswordRow] = {
+    SelectBuilderMock(PasswordFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     map.values.toList
@@ -42,6 +57,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PasswordFields, map)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     map.put(unsaved.businessentityid, unsaved)

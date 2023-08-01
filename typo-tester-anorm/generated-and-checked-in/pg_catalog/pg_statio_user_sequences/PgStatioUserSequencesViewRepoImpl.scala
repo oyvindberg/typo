@@ -9,8 +9,13 @@ package pg_statio_user_sequences
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatioUserSequencesViewRepoImpl extends PgStatioUserSequencesViewRepo {
+  override def select: SelectBuilder[PgStatioUserSequencesViewFields, PgStatioUserSequencesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_statio_user_sequences", PgStatioUserSequencesViewFields, PgStatioUserSequencesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatioUserSequencesViewRow] = {
     SQL"""select relid, schemaname, relname, blks_read, blks_hit
           from pg_catalog.pg_statio_user_sequences

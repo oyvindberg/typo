@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
     SQL"delete from purchasing.shipmethod where shipmethodid = $shipmethodid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
+    DeleteBuilder("purchasing.shipmethod", ShipmethodFields)
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)
@@ -70,6 +77,9 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
     }
     
   }
+  override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
+    SelectBuilderSql("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
     SQL"""select shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
           from purchasing.shipmethod
@@ -98,6 +108,9 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where shipmethodid = $shipmethodid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
+    UpdateBuilder("purchasing.shipmethod", ShipmethodFields, ShipmethodRow.rowParser)
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod(shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate)

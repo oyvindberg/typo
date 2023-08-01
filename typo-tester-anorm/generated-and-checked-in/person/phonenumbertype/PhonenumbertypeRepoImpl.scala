@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
     SQL"delete from person.phonenumbertype where phonenumbertypeid = $phonenumbertypeid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields)
   }
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
@@ -57,6 +64,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     }
     
   }
+  override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
     SQL"""select phonenumbertypeid, "name", modifieddate::text
           from person.phonenumbertype
@@ -82,6 +92,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where phonenumbertypeid = $phonenumbertypeid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.rowParser)
   }
   override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)

@@ -10,8 +10,13 @@ package pdoc
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PdocViewRepoImpl extends PdocViewRepo {
+  override def select: SelectBuilder[PdocViewFields, PdocViewRow] = {
+    SelectBuilderSql("pr.pdoc", PdocViewFields, PdocViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PdocViewRow] = {
     sql"""select "id", productid, modifieddate::text, documentnode from pr.pdoc""".query(PdocViewRow.read).stream
   }

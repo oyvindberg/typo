@@ -10,10 +10,22 @@ package pg_statistic_ext
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgStatisticExtRepoMock(map: scala.collection.mutable.Map[PgStatisticExtId, PgStatisticExtRow] = scala.collection.mutable.Map.empty) extends PgStatisticExtRepo {
   override def delete(oid: PgStatisticExtId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgStatisticExtFields, map)
   }
   override def insert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgStatisticExtRepoMock(map: scala.collection.mutable.Map[PgStatisticExtId,
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    SelectBuilderMock(PgStatisticExtFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgStatisticExtRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgStatisticExtRepoMock(map: scala.collection.mutable.Map[PgStatisticExtId,
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgStatisticExtFields, PgStatisticExtRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgStatisticExtFields, map)
   }
   override def upsert(unsaved: PgStatisticExtRow): ConnectionIO[PgStatisticExtRow] = {
     delay {

@@ -8,13 +8,19 @@ package pg_catalog
 package pg_enum
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgEnumRepo {
   def delete(oid: PgEnumId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgEnumFields, PgEnumRow]
   def insert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow
+  def select: SelectBuilder[PgEnumFields, PgEnumRow]
   def selectAll(implicit c: Connection): List[PgEnumRow]
   def selectById(oid: PgEnumId)(implicit c: Connection): Option[PgEnumRow]
   def selectByIds(oids: Array[PgEnumId])(implicit c: Connection): List[PgEnumRow]
   def update(row: PgEnumRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgEnumFields, PgEnumRow]
   def upsert(unsaved: PgEnumRow)(implicit c: Connection): PgEnumRow
 }

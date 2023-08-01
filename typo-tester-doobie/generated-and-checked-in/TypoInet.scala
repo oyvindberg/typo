@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** inet (via PGObject) */
 case class TypoInet(value: String)
@@ -25,6 +26,7 @@ object TypoInet {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoInet, String] = Bijection[TypoInet, String](_.value)(TypoInet.apply)
   implicit val decoder: Decoder[TypoInet] = Decoder.decodeString.map(TypoInet.apply)
   implicit val encoder: Encoder[TypoInet] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoInet] = Get.Advanced.other[PGobject](NonEmptyList.one("inet"))

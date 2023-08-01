@@ -8,13 +8,19 @@ package pg_catalog
 package pg_ts_parser
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgTsParserRepo {
   def delete(oid: PgTsParserId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow]
   def insert(unsaved: PgTsParserRow)(implicit c: Connection): PgTsParserRow
+  def select: SelectBuilder[PgTsParserFields, PgTsParserRow]
   def selectAll(implicit c: Connection): List[PgTsParserRow]
   def selectById(oid: PgTsParserId)(implicit c: Connection): Option[PgTsParserRow]
   def selectByIds(oids: Array[PgTsParserId])(implicit c: Connection): List[PgTsParserRow]
   def update(row: PgTsParserRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgTsParserFields, PgTsParserRow]
   def upsert(unsaved: PgTsParserRow)(implicit c: Connection): PgTsParserRow
 }

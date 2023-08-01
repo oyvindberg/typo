@@ -10,8 +10,13 @@ package pod
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PodViewRepoImpl extends PodViewRepo {
+  override def select: SelectBuilder[PodViewFields, PodViewRow] = {
+    SelectBuilderSql("pu.pod", PodViewFields, PodViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PodViewRow] = {
     sql"""select "id", purchaseorderid, purchaseorderdetailid, duedate::text, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate::text from pu.pod""".query(PodViewRow.read).stream
   }

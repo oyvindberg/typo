@@ -9,13 +9,19 @@ package pg_range
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgRangeRepo {
   def delete(rngtypid: PgRangeId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgRangeFields, PgRangeRow]
   def insert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow]
+  def select: SelectBuilder[PgRangeFields, PgRangeRow]
   def selectAll: Stream[ConnectionIO, PgRangeRow]
   def selectById(rngtypid: PgRangeId): ConnectionIO[Option[PgRangeRow]]
   def selectByIds(rngtypids: Array[PgRangeId]): Stream[ConnectionIO, PgRangeRow]
   def update(row: PgRangeRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgRangeFields, PgRangeRow]
   def upsert(unsaved: PgRangeRow): ConnectionIO[PgRangeRow]
 }

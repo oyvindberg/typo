@@ -9,10 +9,17 @@ package pg_proc
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgProcRepoImpl extends PgProcRepo {
   override def delete(oid: PgProcId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_proc where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgProcFields, PgProcRow] = {
+    DeleteBuilder("pg_catalog.pg_proc", PgProcFields)
   }
   override def insert(unsaved: PgProcRow)(implicit c: Connection): PgProcRow = {
     SQL"""insert into pg_catalog.pg_proc(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)
@@ -21,6 +28,9 @@ object PgProcRepoImpl extends PgProcRepo {
        """
       .executeInsert(PgProcRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgProcFields, PgProcRow] = {
+    SelectBuilderSql("pg_catalog.pg_proc", PgProcFields, PgProcRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgProcRow] = {
     SQL"""select oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl
@@ -74,6 +84,9 @@ object PgProcRepoImpl extends PgProcRepo {
               proacl = ${row.proacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgProcFields, PgProcRow] = {
+    UpdateBuilder("pg_catalog.pg_proc", PgProcFields, PgProcRow.rowParser)
   }
   override def upsert(unsaved: PgProcRow)(implicit c: Connection): PgProcRow = {
     SQL"""insert into pg_catalog.pg_proc(oid, proname, pronamespace, proowner, prolang, procost, prorows, provariadic, prosupport, prokind, prosecdef, proleakproof, proisstrict, proretset, provolatile, proparallel, pronargs, pronargdefaults, prorettype, proargtypes, proallargtypes, proargmodes, proargnames, proargdefaults, protrftypes, prosrc, probin, prosqlbody, proconfig, proacl)

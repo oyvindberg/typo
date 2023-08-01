@@ -9,13 +9,19 @@ package pg_ts_parser
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgTsParserRepo {
   def delete(oid: PgTsParserId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgTsParserFields, PgTsParserRow]
   def insert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow]
+  def select: SelectBuilder[PgTsParserFields, PgTsParserRow]
   def selectAll: Stream[ConnectionIO, PgTsParserRow]
   def selectById(oid: PgTsParserId): ConnectionIO[Option[PgTsParserRow]]
   def selectByIds(oids: Array[PgTsParserId]): Stream[ConnectionIO, PgTsParserRow]
   def update(row: PgTsParserRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgTsParserFields, PgTsParserRow]
   def upsert(unsaved: PgTsParserRow): ConnectionIO[PgTsParserRow]
 }

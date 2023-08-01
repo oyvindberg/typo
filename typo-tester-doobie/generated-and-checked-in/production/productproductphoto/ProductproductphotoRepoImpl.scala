@@ -18,10 +18,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId): ConnectionIO[Boolean] = {
     sql"delete from production.productproductphoto where productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND productphotoid = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    DeleteBuilder("production.productproductphoto", ProductproductphotoFields)
   }
   override def insert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)
@@ -57,6 +64,9 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     q.query(ProductproductphotoRow.read).unique
     
   }
+  override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ProductproductphotoRow] = {
     sql"""select productid, productphotoid, "primary", modifieddate::text from production.productproductphoto""".query(ProductproductphotoRow.read).stream
   }
@@ -72,6 +82,9 @@ object ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    UpdateBuilder("production.productproductphoto", ProductproductphotoFields, ProductproductphotoRow.read)
   }
   override def upsert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto(productid, productphotoid, "primary", modifieddate)

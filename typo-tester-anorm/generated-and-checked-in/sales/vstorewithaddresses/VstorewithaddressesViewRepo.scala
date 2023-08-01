@@ -8,7 +8,9 @@ package sales
 package vstorewithaddresses
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait VstorewithaddressesViewRepo {
+  def select: SelectBuilder[VstorewithaddressesViewFields, VstorewithaddressesViewRow]
   def selectAll(implicit c: Connection): List[VstorewithaddressesViewRow]
 }

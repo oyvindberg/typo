@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productsubcategory where productsubcategoryid = $productsubcategoryid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields)
   }
   override def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)
@@ -63,6 +70,9 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
     SQL"""select productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text
           from production.productsubcategory
@@ -90,6 +100,9 @@ object ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productsubcategoryid = $productsubcategoryid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields, ProductsubcategoryRow.rowParser)
   }
   override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory(productsubcategoryid, productcategoryid, "name", rowguid, modifieddate)

@@ -9,7 +9,9 @@ package pg_rules
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgRulesViewRepo {
+  def select: SelectBuilder[PgRulesViewFields, PgRulesViewRow]
   def selectAll: Stream[ConnectionIO, PgRulesViewRow]
 }

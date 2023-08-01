@@ -9,13 +9,19 @@ package compositepk
 package person
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PersonRepo {
   def delete(compositeId: PersonId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PersonFields, PersonRow]
   def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow
   def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow
+  def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll(implicit c: Connection): List[PersonRow]
   def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow]
   def update(row: PersonRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PersonFields, PersonRow]
   def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
 }

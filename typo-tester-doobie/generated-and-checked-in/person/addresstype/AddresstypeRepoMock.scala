@@ -10,11 +10,23 @@ package addresstype
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow],
                           map: scala.collection.mutable.Map[AddresstypeId, AddresstypeRow] = scala.collection.mutable.Map.empty) extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
     delay(map.remove(addresstypeid).isDefined)
+  }
+  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, AddresstypeFields, map)
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     delay {
@@ -27,6 +39,9 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
+    SelectBuilderMock(AddresstypeFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, AddresstypeFields, map)
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     delay {

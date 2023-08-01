@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
   override def delete(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productmodelproductdescriptionculture where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
+    DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     SQL"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)
@@ -55,6 +62,9 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
     }
     
   }
+  override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
+    SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select productmodelid, productdescriptionid, cultureid, modifieddate::text
           from production.productmodelproductdescriptionculture
@@ -72,6 +82,9 @@ object ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproduct
           set modifieddate = ${row.modifieddate}::timestamp
           where productmodelid = ${compositeId.productmodelid} AND productdescriptionid = ${compositeId.productdescriptionid} AND cultureid = ${compositeId.cultureid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
+    UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     SQL"""insert into production.productmodelproductdescriptionculture(productmodelid, productdescriptionid, cultureid, modifieddate)

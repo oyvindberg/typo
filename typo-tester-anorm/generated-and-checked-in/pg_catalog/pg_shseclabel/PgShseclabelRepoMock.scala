@@ -8,10 +8,22 @@ package pg_catalog
 package pg_shseclabel
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgShseclabelRow] = scala.collection.mutable.Map.empty) extends PgShseclabelRepo {
   override def delete(compositeId: PgShseclabelId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgShseclabelFields, map)
   }
   override def insert(unsaved: PgShseclabelRow)(implicit c: Connection): PgShseclabelRow = {
     if (map.contains(unsaved.compositeId))
@@ -19,6 +31,9 @@ class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgS
     else
       map.put(unsaved.compositeId, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    SelectBuilderMock(PgShseclabelFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgShseclabelRow] = {
     map.values.toList
@@ -34,6 +49,9 @@ class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgS
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgShseclabelFields, map)
   }
   override def upsert(unsaved: PgShseclabelRow)(implicit c: Connection): PgShseclabelRow = {
     map.put(unsaved.compositeId, unsaved)

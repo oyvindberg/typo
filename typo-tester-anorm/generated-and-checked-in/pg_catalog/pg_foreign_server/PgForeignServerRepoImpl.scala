@@ -9,10 +9,17 @@ package pg_foreign_server
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgForeignServerRepoImpl extends PgForeignServerRepo {
   override def delete(oid: PgForeignServerId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_foreign_server where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgForeignServerFields, PgForeignServerRow] = {
+    DeleteBuilder("pg_catalog.pg_foreign_server", PgForeignServerFields)
   }
   override def insert(unsaved: PgForeignServerRow)(implicit c: Connection): PgForeignServerRow = {
     SQL"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)
@@ -21,6 +28,9 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
        """
       .executeInsert(PgForeignServerRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgForeignServerFields, PgForeignServerRow] = {
+    SelectBuilderSql("pg_catalog.pg_foreign_server", PgForeignServerFields, PgForeignServerRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgForeignServerRow] = {
     SQL"""select oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions
@@ -52,6 +62,9 @@ object PgForeignServerRepoImpl extends PgForeignServerRepo {
               srvoptions = ${row.srvoptions}::_text
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgForeignServerFields, PgForeignServerRow] = {
+    UpdateBuilder("pg_catalog.pg_foreign_server", PgForeignServerFields, PgForeignServerRow.rowParser)
   }
   override def upsert(unsaved: PgForeignServerRow)(implicit c: Connection): PgForeignServerRow = {
     SQL"""insert into pg_catalog.pg_foreign_server(oid, srvname, srvowner, srvfdw, srvtype, srvversion, srvacl, srvoptions)

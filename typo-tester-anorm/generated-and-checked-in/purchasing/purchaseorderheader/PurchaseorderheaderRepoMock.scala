@@ -8,11 +8,23 @@ package purchasing
 package purchaseorderheader
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved, PurchaseorderheaderRow],
                                   map: scala.collection.mutable.Map[PurchaseorderheaderId, PurchaseorderheaderRow] = scala.collection.mutable.Map.empty) extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
     map.remove(purchaseorderid).isDefined
+  }
+  override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields, map)
   }
   override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     if (map.contains(unsaved.purchaseorderid))
@@ -23,6 +35,9 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    SelectBuilderMock(PurchaseorderheaderFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderheaderRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields, map)
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     map.put(unsaved.purchaseorderid, unsaved)

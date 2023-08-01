@@ -10,11 +10,23 @@ package productmodelproductdescriptionculture
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[ProductmodelproductdescriptioncultureRowUnsaved, ProductmodelproductdescriptioncultureRow],
                                                     map: scala.collection.mutable.Map[ProductmodelproductdescriptioncultureId, ProductmodelproductdescriptioncultureRow] = scala.collection.mutable.Map.empty) extends ProductmodelproductdescriptioncultureRepo {
   override def delete(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductmodelproductdescriptioncultureFields, map)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     delay {
@@ -27,6 +39,9 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
+    SelectBuilderMock(ProductmodelproductdescriptioncultureFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductmodelproductdescriptioncultureFields, map)
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     delay {

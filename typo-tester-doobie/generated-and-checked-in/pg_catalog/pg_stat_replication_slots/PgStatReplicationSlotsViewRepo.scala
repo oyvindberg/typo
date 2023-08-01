@@ -9,7 +9,9 @@ package pg_stat_replication_slots
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatReplicationSlotsViewRepo {
+  def select: SelectBuilder[PgStatReplicationSlotsViewFields, PgStatReplicationSlotsViewRow]
   def selectAll: Stream[ConnectionIO, PgStatReplicationSlotsViewRow]
 }

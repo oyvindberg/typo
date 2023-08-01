@@ -9,7 +9,9 @@ package pg_hba_file_rules
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgHbaFileRulesViewRepo {
+  def select: SelectBuilder[PgHbaFileRulesViewFields, PgHbaFileRulesViewRow]
   def selectAll: Stream[ConnectionIO, PgHbaFileRulesViewRow]
 }

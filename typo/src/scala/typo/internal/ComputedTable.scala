@@ -113,7 +113,7 @@ case class ComputedTable(
     tpe
   }
 
-  val names = ComputedNames(naming, source, cols, maybeId, options.enableFieldValue)
+  val names = ComputedNames(naming, source, cols, maybeId, options.enableFieldValue, options.enableDsl)
 
   val colsNotId: Option[NonEmptyList[ComputedColumn]] =
     maybeId.flatMap { id =>
@@ -127,79 +127,64 @@ case class ComputedTable(
     ComputedRowUnsaved(source, cols, default, naming)
 
   val repoMethods: Option[NonEmptyList[RepoMethod]] = {
-
-    val maybeFieldValueOrIdsParam = names.FieldOrIdValueName.map(name =>
-      sc.Param(
-        sc.Ident("fieldValues"),
-        sc.Type.List.of(name.of(sc.Type.Wildcard)),
-        None
-      )
-    )
-
-    val insertMethod: RepoMethod = {
-      val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
-      RepoMethod.Insert(dbTable.name, cols, unsavedParam, names.RowName)
-    }
-
-    val maybeInsertUnsavedMethod: Option[RepoMethod] =
-      maybeUnsavedRow.map { unsavedRow =>
-        val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe, None)
-        RepoMethod.InsertUnsaved(dbTable.name, cols, unsavedRow, unsavedParam, default, names.RowName)
-      }
-
     val maybeMethods = List(
-      maybeId match {
-        case Some(id) =>
-          List[Iterable[RepoMethod]](
-            Some(RepoMethod.SelectAll(dbTable.name, cols, names.RowName)),
-            Some(RepoMethod.SelectById(dbTable.name, cols, id, names.RowName)), {
-              val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
-              Some(RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName))
-            },
-            id match {
-              case unary: IdComputed.Unary =>
-                Some(
-                  RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(id.paramName.appended("s"), sc.Type.Array.of(id.tpe), None), names.RowName)
-                )
-              case IdComputed.Composite(_, _, _) =>
-                // todo: support composite ids
-                None
-            },
-            for {
-              fieldValueOrIdsParam <- maybeFieldValueOrIdsParam
-              fieldValueName <- names.FieldValueName
-            } yield RepoMethod.SelectByFieldValues(dbTable.name, cols, fieldValueName, fieldValueOrIdsParam, names.RowName),
-            for {
-              colsNotId <- colsNotId
-              fieldValueName <- names.FieldValueName
-            } yield RepoMethod.UpdateFieldValues(
-              dbTable.name,
-              id,
-              sc.Param(
-                sc.Ident("fieldValues"),
-                sc.Type.List.of(fieldValueName.of(sc.Type.Wildcard)),
-                None
-              ),
-              fieldValueName,
-              colsNotId,
-              names.RowName
-            ),
-            colsNotId.map(colsNotId => RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName, None), colsNotId)),
-            Some(insertMethod),
-            maybeInsertUnsavedMethod,
-            Some(RepoMethod.Delete(dbTable.name, id))
-          ).flatten
-        case None =>
-          List(
-            Some(insertMethod),
-            maybeInsertUnsavedMethod,
-            Some(RepoMethod.SelectAll(dbTable.name, cols, names.RowName)),
-            for {
-              fieldValueName <- names.FieldValueName
-              fieldValueOrIdsParam <- maybeFieldValueOrIdsParam
-            } yield RepoMethod.SelectByFieldValues(dbTable.name, cols, fieldValueName, fieldValueOrIdsParam, names.RowName)
-          ).flatten
-      },
+      List[Iterable[RepoMethod]](
+        for {
+          fieldsName <- names.FieldsName.toList
+          builder <- List(
+            RepoMethod.UpdateBuilder(dbTable.name, fieldsName, names.RowName),
+            RepoMethod.SelectBuilder(dbTable.name, fieldsName, names.RowName),
+            RepoMethod.DeleteBuilder(dbTable.name, fieldsName, names.RowName)
+          )
+        } yield builder,
+        Some(RepoMethod.SelectAll(dbTable.name, cols, names.RowName)),
+        maybeId.map(id => RepoMethod.SelectById(dbTable.name, cols, id, names.RowName)),
+        maybeId.map { id =>
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
+          RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName)
+        },
+        maybeId.collect {
+          // todo: support composite ids
+          case unary: IdComputed.Unary =>
+            RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.Array.of(unary.tpe), None), names.RowName)
+        },
+        for {
+          name <- names.FieldOrIdValueName
+          fieldValueName <- names.FieldValueName
+        } yield {
+          val fieldValueOrIdsParam = sc.Param(sc.Ident("fieldValues"), sc.Type.List.of(name.of(sc.Type.Wildcard)), None)
+          RepoMethod.SelectByFieldValues(dbTable.name, cols, fieldValueName, fieldValueOrIdsParam, names.RowName)
+        },
+        for {
+          id <- maybeId
+          colsNotId <- colsNotId
+          fieldValueName <- names.FieldValueName
+        } yield RepoMethod.UpdateFieldValues(
+          dbTable.name,
+          id,
+          sc.Param(
+            sc.Ident("fieldValues"),
+            sc.Type.List.of(fieldValueName.of(sc.Type.Wildcard)),
+            None
+          ),
+          fieldValueName,
+          colsNotId,
+          names.RowName
+        ),
+        for {
+          id <- maybeId
+          colsNotId <- colsNotId
+        } yield RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName, None), colsNotId),
+        Some({
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
+          RepoMethod.Insert(dbTable.name, cols, unsavedParam, names.RowName)
+        }),
+        maybeUnsavedRow.map { unsavedRow =>
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe, None)
+          RepoMethod.InsertUnsaved(dbTable.name, cols, unsavedRow, unsavedParam, default, names.RowName)
+        },
+        maybeId.map(id => RepoMethod.Delete(dbTable.name, id))
+      ).flatten,
       dbTable.uniqueKeys
         .flatMap { uk =>
           names.FieldValueName.map { fieldValueName =>

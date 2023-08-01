@@ -10,8 +10,13 @@ package column_column_usage
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnColumnUsageViewRepoImpl extends ColumnColumnUsageViewRepo {
+  override def select: SelectBuilder[ColumnColumnUsageViewFields, ColumnColumnUsageViewRow] = {
+    SelectBuilderSql("information_schema.column_column_usage", ColumnColumnUsageViewFields, ColumnColumnUsageViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ColumnColumnUsageViewRow] = {
     sql"""select table_catalog, table_schema, "table_name", "column_name", dependent_column from information_schema.column_column_usage""".query(ColumnColumnUsageViewRow.read).stream
   }

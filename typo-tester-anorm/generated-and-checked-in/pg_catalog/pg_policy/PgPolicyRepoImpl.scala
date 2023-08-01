@@ -9,10 +9,17 @@ package pg_policy
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgPolicyRepoImpl extends PgPolicyRepo {
   override def delete(oid: PgPolicyId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_policy where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgPolicyFields, PgPolicyRow] = {
+    DeleteBuilder("pg_catalog.pg_policy", PgPolicyFields)
   }
   override def insert(unsaved: PgPolicyRow)(implicit c: Connection): PgPolicyRow = {
     SQL"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
@@ -21,6 +28,9 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
        """
       .executeInsert(PgPolicyRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgPolicyFields, PgPolicyRow] = {
+    SelectBuilderSql("pg_catalog.pg_policy", PgPolicyFields, PgPolicyRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgPolicyRow] = {
     SQL"""select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
@@ -52,6 +62,9 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
               polwithcheck = ${row.polwithcheck}::pg_node_tree
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgPolicyFields, PgPolicyRow] = {
+    UpdateBuilder("pg_catalog.pg_policy", PgPolicyFields, PgPolicyRow.rowParser)
   }
   override def upsert(unsaved: PgPolicyRow)(implicit c: Connection): PgPolicyRow = {
     SQL"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)

@@ -9,13 +9,19 @@ package productlistpricehistory
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ProductlistpricehistoryRepo {
   def delete(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]
   def insert(unsaved: ProductlistpricehistoryRowUnsaved): ConnectionIO[ProductlistpricehistoryRow]
+  def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow]
   def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]]
   def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]
 }

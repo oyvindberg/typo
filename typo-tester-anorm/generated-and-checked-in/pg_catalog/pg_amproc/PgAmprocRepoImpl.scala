@@ -9,10 +9,17 @@ package pg_amproc
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAmprocRepoImpl extends PgAmprocRepo {
   override def delete(oid: PgAmprocId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_amproc where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgAmprocFields, PgAmprocRow] = {
+    DeleteBuilder("pg_catalog.pg_amproc", PgAmprocFields)
   }
   override def insert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow = {
     SQL"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)
@@ -21,6 +28,9 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
        """
       .executeInsert(PgAmprocRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgAmprocFields, PgAmprocRow] = {
+    SelectBuilderSql("pg_catalog.pg_amproc", PgAmprocFields, PgAmprocRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAmprocRow] = {
     SQL"""select oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc
@@ -50,6 +60,9 @@ object PgAmprocRepoImpl extends PgAmprocRepo {
               amproc = ${row.amproc}::regproc
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgAmprocFields, PgAmprocRow] = {
+    UpdateBuilder("pg_catalog.pg_amproc", PgAmprocFields, PgAmprocRow.rowParser)
   }
   override def upsert(unsaved: PgAmprocRow)(implicit c: Connection): PgAmprocRow = {
     SQL"""insert into pg_catalog.pg_amproc(oid, amprocfamily, amproclefttype, amprocrighttype, amprocnum, amproc)

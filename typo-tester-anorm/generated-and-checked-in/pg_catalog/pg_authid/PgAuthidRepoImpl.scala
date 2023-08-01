@@ -9,10 +9,17 @@ package pg_authid
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAuthidRepoImpl extends PgAuthidRepo {
   override def delete(oid: PgAuthidId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_authid where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgAuthidFields, PgAuthidRow] = {
+    DeleteBuilder("pg_catalog.pg_authid", PgAuthidFields)
   }
   override def insert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
     SQL"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)
@@ -21,6 +28,9 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
        """
       .executeInsert(PgAuthidRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgAuthidFields, PgAuthidRow] = {
+    SelectBuilderSql("pg_catalog.pg_authid", PgAuthidFields, PgAuthidRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgAuthidRow] = {
     SQL"""select oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil::text
@@ -56,6 +66,9 @@ object PgAuthidRepoImpl extends PgAuthidRepo {
               rolvaliduntil = ${row.rolvaliduntil}::timestamptz
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgAuthidFields, PgAuthidRow] = {
+    UpdateBuilder("pg_catalog.pg_authid", PgAuthidFields, PgAuthidRow.rowParser)
   }
   override def upsert(unsaved: PgAuthidRow)(implicit c: Connection): PgAuthidRow = {
     SQL"""insert into pg_catalog.pg_authid(oid, rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolcanlogin, rolreplication, rolbypassrls, rolconnlimit, rolpassword, rolvaliduntil)

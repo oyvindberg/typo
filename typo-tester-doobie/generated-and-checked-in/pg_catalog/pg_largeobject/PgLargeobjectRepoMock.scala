@@ -10,10 +10,22 @@ package pg_largeobject
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, PgLargeobjectRow] = scala.collection.mutable.Map.empty) extends PgLargeobjectRepo {
   override def delete(compositeId: PgLargeobjectId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgLargeobjectFields, map)
   }
   override def insert(unsaved: PgLargeobjectRow): ConnectionIO[PgLargeobjectRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, P
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    SelectBuilderMock(PgLargeobjectFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgLargeobjectRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgLargeobjectRepoMock(map: scala.collection.mutable.Map[PgLargeobjectId, P
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgLargeobjectFields, PgLargeobjectRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgLargeobjectFields, map)
   }
   override def upsert(unsaved: PgLargeobjectRow): ConnectionIO[PgLargeobjectRow] = {
     delay {

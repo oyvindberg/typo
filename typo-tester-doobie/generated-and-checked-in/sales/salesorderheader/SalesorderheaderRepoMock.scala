@@ -10,11 +10,23 @@ package salesorderheader
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, SalesorderheaderRow],
                                map: scala.collection.mutable.Map[SalesorderheaderId, SalesorderheaderRow] = scala.collection.mutable.Map.empty) extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean] = {
     delay(map.remove(salesorderid).isDefined)
+  }
+  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields, map)
   }
   override def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     delay {
@@ -27,6 +39,9 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    SelectBuilderMock(SalesorderheaderFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheaderRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields, map)
   }
   override def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     delay {

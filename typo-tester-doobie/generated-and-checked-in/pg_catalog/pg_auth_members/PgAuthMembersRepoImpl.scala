@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
   override def delete(compositeId: PgAuthMembersId): ConnectionIO[Boolean] = {
     sql"""delete from pg_catalog.pg_auth_members where roleid = ${fromWrite(compositeId.roleid)(Write.fromPut(Meta.LongMeta.put))} AND "member" = ${fromWrite(compositeId.member)(Write.fromPut(Meta.LongMeta.put))}""".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    DeleteBuilder("pg_catalog.pg_auth_members", PgAuthMembersFields)
   }
   override def insert(unsaved: PgAuthMembersRow): ConnectionIO[PgAuthMembersRow] = {
     sql"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)
           values (${fromWrite(unsaved.roleid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.member)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.grantor)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.adminOption)(Write.fromPut(Meta.BooleanMeta.put))})
           returning roleid, "member", grantor, admin_option
        """.query(PgAuthMembersRow.read).unique
+  }
+  override def select: SelectBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    SelectBuilderSql("pg_catalog.pg_auth_members", PgAuthMembersFields, PgAuthMembersRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgAuthMembersRow] = {
     sql"""select roleid, "member", grantor, admin_option from pg_catalog.pg_auth_members""".query(PgAuthMembersRow.read).stream
@@ -39,6 +49,9 @@ object PgAuthMembersRepoImpl extends PgAuthMembersRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgAuthMembersFields, PgAuthMembersRow] = {
+    UpdateBuilder("pg_catalog.pg_auth_members", PgAuthMembersFields, PgAuthMembersRow.read)
   }
   override def upsert(unsaved: PgAuthMembersRow): ConnectionIO[PgAuthMembersRow] = {
     sql"""insert into pg_catalog.pg_auth_members(roleid, "member", grantor, admin_option)

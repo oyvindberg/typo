@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_gssapi
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatGssapiViewRepo {
+  def select: SelectBuilder[PgStatGssapiViewFields, PgStatGssapiViewRow]
   def selectAll(implicit c: Connection): List[PgStatGssapiViewRow]
 }

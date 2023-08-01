@@ -14,6 +14,7 @@ import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** anyarray (via PGObject) */
 case class TypoAnyArray(value: String)
@@ -40,6 +41,7 @@ object TypoAnyArray {
                                                                                                                              obj.setValue(v.value)
                                                                                                                              obj
                                                                                                                            }))))
+  implicit val bijection: Bijection[TypoAnyArray, String] = Bijection[TypoAnyArray, String](_.value)(TypoAnyArray.apply)
   implicit val column: Column[TypoAnyArray] = Column.nonNull[TypoAnyArray]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoAnyArray(v.getValue))

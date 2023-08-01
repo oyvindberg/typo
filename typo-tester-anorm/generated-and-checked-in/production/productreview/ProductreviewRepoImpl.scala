@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
     SQL"delete from production.productreview where productreviewid = $productreviewid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilder("production.productreview", ProductreviewFields)
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)
@@ -65,6 +72,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
     }
     
   }
+  override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
+    SelectBuilderSql("production.productreview", ProductreviewFields, ProductreviewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     SQL"""select productreviewid, productid, reviewername, reviewdate::text, emailaddress, rating, "comments", modifieddate::text
           from production.productreview
@@ -95,6 +105,9 @@ object ProductreviewRepoImpl extends ProductreviewRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where productreviewid = $productreviewid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilder("production.productreview", ProductreviewFields, ProductreviewRow.rowParser)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview(productreviewid, productid, reviewername, reviewdate, emailaddress, rating, "comments", modifieddate)

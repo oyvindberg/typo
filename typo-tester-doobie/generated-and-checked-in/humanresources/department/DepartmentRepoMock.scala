@@ -10,11 +10,23 @@ package department
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
                          map: scala.collection.mutable.Map[DepartmentId, DepartmentRow] = scala.collection.mutable.Map.empty) extends DepartmentRepo {
   override def delete(departmentid: DepartmentId): ConnectionIO[Boolean] = {
     delay(map.remove(departmentid).isDefined)
+  }
+  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
+    DeleteBuilderMock(DeleteParams.empty, DepartmentFields, map)
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     delay {
@@ -27,6 +39,9 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
+    SelectBuilderMock(DepartmentFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
+    UpdateBuilderMock(UpdateParams.empty, DepartmentFields, map)
   }
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     delay {

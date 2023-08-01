@@ -9,8 +9,13 @@ package pdoc
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PdocViewRepoImpl extends PdocViewRepo {
+  override def select: SelectBuilder[PdocViewFields, PdocViewRow] = {
+    SelectBuilderSql("pr.pdoc", PdocViewFields, PdocViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PdocViewRow] = {
     SQL"""select "id", productid, modifieddate::text, documentnode
           from pr.pdoc

@@ -8,7 +8,9 @@ package information_schema
 package role_column_grants
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait RoleColumnGrantsViewRepo {
+  def select: SelectBuilder[RoleColumnGrantsViewFields, RoleColumnGrantsViewRow]
   def selectAll(implicit c: Connection): List[RoleColumnGrantsViewRow]
 }

@@ -9,13 +9,19 @@ package countryregioncurrency
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait CountryregioncurrencyRepo {
   def delete(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow]
   def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow]
+  def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow]
   def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]]
   def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow]
 }

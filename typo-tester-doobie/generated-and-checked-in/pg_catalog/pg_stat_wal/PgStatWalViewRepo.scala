@@ -9,7 +9,9 @@ package pg_stat_wal
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatWalViewRepo {
+  def select: SelectBuilder[PgStatWalViewFields, PgStatWalViewRow]
   def selectAll: Stream[ConnectionIO, PgStatWalViewRow]
 }

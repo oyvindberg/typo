@@ -9,7 +9,9 @@ package parameters
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ParametersViewRepo {
+  def select: SelectBuilder[ParametersViewFields, ParametersViewRow]
   def selectAll: Stream[ConnectionIO, ParametersViewRow]
 }

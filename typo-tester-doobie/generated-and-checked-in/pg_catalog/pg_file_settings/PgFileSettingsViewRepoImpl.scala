@@ -10,8 +10,13 @@ package pg_file_settings
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgFileSettingsViewRepoImpl extends PgFileSettingsViewRepo {
+  override def select: SelectBuilder[PgFileSettingsViewFields, PgFileSettingsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_file_settings", PgFileSettingsViewFields, PgFileSettingsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgFileSettingsViewRow] = {
     sql"""select sourcefile, sourceline, seqno, "name", setting, applied, "error" from pg_catalog.pg_file_settings""".query(PgFileSettingsViewRow.read).stream
   }

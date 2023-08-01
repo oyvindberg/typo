@@ -13,6 +13,7 @@ import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Money and cash types in PostgreSQL */
 case class TypoMoney(value: BigDecimal)
@@ -34,6 +35,7 @@ object TypoMoney {
     override def jdbcType: Int = Types.ARRAY
   }
   implicit val arrayToStatement: ToStatement[Array[TypoMoney]] = ToStatement[Array[TypoMoney]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("money", v.map(v => v.value.bigDecimal))))
+  implicit val bijection: Bijection[TypoMoney, BigDecimal] = Bijection[TypoMoney, BigDecimal](_.value)(TypoMoney.apply)
   implicit val column: Column[TypoMoney] = Column.nonNull[TypoMoney]((v1: Any, _) =>
     v1 match {
       case v: java.math.BigDecimal => Right(TypoMoney(BigDecimal(v)))

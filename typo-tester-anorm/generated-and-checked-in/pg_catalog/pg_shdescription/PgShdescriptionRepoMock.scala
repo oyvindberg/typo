@@ -8,10 +8,22 @@ package pg_catalog
 package pg_shdescription
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgShdescriptionRepoMock(map: scala.collection.mutable.Map[PgShdescriptionId, PgShdescriptionRow] = scala.collection.mutable.Map.empty) extends PgShdescriptionRepo {
   override def delete(compositeId: PgShdescriptionId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgShdescriptionFields, map)
   }
   override def insert(unsaved: PgShdescriptionRow)(implicit c: Connection): PgShdescriptionRow = {
     if (map.contains(unsaved.compositeId))
@@ -19,6 +31,9 @@ class PgShdescriptionRepoMock(map: scala.collection.mutable.Map[PgShdescriptionI
     else
       map.put(unsaved.compositeId, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
+    SelectBuilderMock(PgShdescriptionFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgShdescriptionRow] = {
     map.values.toList
@@ -34,6 +49,9 @@ class PgShdescriptionRepoMock(map: scala.collection.mutable.Map[PgShdescriptionI
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgShdescriptionFields, PgShdescriptionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgShdescriptionFields, map)
   }
   override def upsert(unsaved: PgShdescriptionRow)(implicit c: Connection): PgShdescriptionRow = {
     map.put(unsaved.compositeId, unsaved)

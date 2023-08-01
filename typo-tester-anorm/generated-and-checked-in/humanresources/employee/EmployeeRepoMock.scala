@@ -9,11 +9,23 @@ package employee
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
                        map: scala.collection.mutable.Map[BusinessentityId, EmployeeRow] = scala.collection.mutable.Map.empty) extends EmployeeRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     map.remove(businessentityid).isDefined
+  }
+  override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, EmployeeFields, map)
   }
   override def insert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     if (map.contains(unsaved.businessentityid))
@@ -24,6 +36,9 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
   }
   override def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[EmployeeFields, EmployeeRow] = {
+    SelectBuilderMock(EmployeeFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
     map.values.toList
@@ -42,6 +57,9 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, EmployeeFields, map)
   }
   override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     map.put(unsaved.businessentityid, unsaved)

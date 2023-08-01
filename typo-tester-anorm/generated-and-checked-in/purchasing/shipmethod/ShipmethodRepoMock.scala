@@ -8,11 +8,23 @@ package purchasing
 package shipmethod
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
                          map: scala.collection.mutable.Map[ShipmethodId, ShipmethodRow] = scala.collection.mutable.Map.empty) extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
     map.remove(shipmethodid).isDefined
+  }
+  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields, map)
   }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     if (map.contains(unsaved.shipmethodid))
@@ -23,6 +35,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ShipmethodFields, ShipmethodRow] = {
+    SelectBuilderMock(ShipmethodFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ShipmethodRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields, map)
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     map.put(unsaved.shipmethodid, unsaved)

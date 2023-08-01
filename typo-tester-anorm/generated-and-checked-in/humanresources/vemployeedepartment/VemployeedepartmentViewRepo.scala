@@ -8,7 +8,9 @@ package humanresources
 package vemployeedepartment
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait VemployeedepartmentViewRepo {
+  def select: SelectBuilder[VemployeedepartmentViewFields, VemployeedepartmentViewRow]
   def selectAll(implicit c: Connection): List[VemployeedepartmentViewRow]
 }

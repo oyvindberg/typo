@@ -8,14 +8,20 @@ package sales
 package currency
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait CurrencyRepo {
   def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[CurrencyFields, CurrencyRow]
   def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
   def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow
+  def select: SelectBuilder[CurrencyFields, CurrencyRow]
   def selectAll(implicit c: Connection): List[CurrencyRow]
   def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow]
   def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow]
   def update(row: CurrencyRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[CurrencyFields, CurrencyRow]
   def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
 }

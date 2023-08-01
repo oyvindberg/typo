@@ -9,7 +9,9 @@ package user_mappings
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait UserMappingsViewRepo {
+  def select: SelectBuilder[UserMappingsViewFields, UserMappingsViewRow]
   def selectAll: Stream[ConnectionIO, UserMappingsViewRow]
 }

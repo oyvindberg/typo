@@ -8,7 +8,9 @@ package information_schema
 package `_pg_foreign_tables`
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgForeignTablesViewRepo {
+  def select: SelectBuilder[PgForeignTablesViewFields, PgForeignTablesViewRow]
   def selectAll(implicit c: Connection): List[PgForeignTablesViewRow]
 }

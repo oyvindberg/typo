@@ -9,8 +9,13 @@ package pm
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PmViewRepoImpl extends PmViewRepo {
+  override def select: SelectBuilder[PmViewFields, PmViewRow] = {
+    SelectBuilderSql("pr.pm", PmViewFields, PmViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PmViewRow] = {
     SQL"""select "id", productmodelid, "name", catalogdescription, instructions, rowguid, modifieddate::text
           from pr.pm

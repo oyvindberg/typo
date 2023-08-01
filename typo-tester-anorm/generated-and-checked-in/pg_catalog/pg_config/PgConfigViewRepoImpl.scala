@@ -9,8 +9,13 @@ package pg_config
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgConfigViewRepoImpl extends PgConfigViewRepo {
+  override def select: SelectBuilder[PgConfigViewFields, PgConfigViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_config", PgConfigViewFields, PgConfigViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgConfigViewRow] = {
     SQL"""select "name", setting
           from pg_catalog.pg_config

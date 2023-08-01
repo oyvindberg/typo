@@ -21,10 +21,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object StateprovinceRepoImpl extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId): ConnectionIO[Boolean] = {
     sql"delete from person.stateprovince where stateprovinceid = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
+    DeleteBuilder("person.stateprovince", StateprovinceFields)
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)
@@ -70,6 +77,9 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
     q.query(StateprovinceRow.read).unique
     
   }
+  override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
+    SelectBuilderSql("person.stateprovince", StateprovinceFields, StateprovinceRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
     sql"""select stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate::text from person.stateprovince""".query(StateprovinceRow.read).stream
   }
@@ -93,6 +103,9 @@ object StateprovinceRepoImpl extends StateprovinceRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
+    UpdateBuilder("person.stateprovince", StateprovinceFields, StateprovinceRow.read)
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into person.stateprovince(stateprovinceid, stateprovincecode, countryregioncode, isonlystateprovinceflag, "name", territoryid, rowguid, modifieddate)

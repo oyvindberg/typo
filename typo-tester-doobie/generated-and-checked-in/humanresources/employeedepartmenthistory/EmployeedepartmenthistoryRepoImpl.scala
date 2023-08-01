@@ -19,10 +19,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def delete(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Boolean] = {
     sql"delete from humanresources.employeedepartmenthistory where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND startdate = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND departmentid = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND shiftid = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
@@ -57,6 +64,9 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     q.query(EmployeedepartmenthistoryRow.read).unique
     
   }
+  override def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
     sql"select businessentityid, departmentid, shiftid, startdate::text, enddate::text, modifieddate::text from humanresources.employeedepartmenthistory".query(EmployeedepartmenthistoryRow.read).stream
   }
@@ -72,6 +82,9 @@ object EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow.read)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into humanresources.employeedepartmenthistory(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)

@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId): ConnectionIO[Boolean] = {
     sql"delete from sales.specialofferproduct where specialofferid = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND productid = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields)
   }
   override def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)
@@ -57,6 +64,9 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     q.query(SpecialofferproductRow.read).unique
     
   }
+  override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
     sql"select specialofferid, productid, rowguid, modifieddate::text from sales.specialofferproduct".query(SpecialofferproductRow.read).stream
   }
@@ -72,6 +82,9 @@ object SpecialofferproductRepoImpl extends SpecialofferproductRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields, SpecialofferproductRow.read)
   }
   override def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into sales.specialofferproduct(specialofferid, productid, rowguid, modifieddate)

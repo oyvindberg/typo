@@ -9,7 +9,9 @@ package role_column_grants
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait RoleColumnGrantsViewRepo {
+  def select: SelectBuilder[RoleColumnGrantsViewFields, RoleColumnGrantsViewRow]
   def selectAll: Stream[ConnectionIO, RoleColumnGrantsViewRow]
 }

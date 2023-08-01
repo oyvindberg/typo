@@ -10,8 +10,13 @@ package cr
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CrViewRepoImpl extends CrViewRepo {
+  override def select: SelectBuilder[CrViewFields, CrViewRow] = {
+    SelectBuilderSql("sa.cr", CrViewFields, CrViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CrViewRow] = {
     sql"select currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text from sa.cr".query(CrViewRow.read).stream
   }

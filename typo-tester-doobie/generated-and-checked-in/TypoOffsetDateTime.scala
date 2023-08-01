@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+import typo.dsl.Bijection
 
 /** This is `java.time.OffsetDateTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoOffsetDateTime(value: OffsetDateTime)
@@ -24,14 +25,15 @@ object TypoOffsetDateTime {
     new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
   def apply(value: OffsetDateTime): TypoOffsetDateTime = new TypoOffsetDateTime(value.truncatedTo(ChronoUnit.MICROS))  
   def now = TypoOffsetDateTime(OffsetDateTime.now)
-  implicit val arrayGet: Get[Array[TypoOffsetDateTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_text"))
+  implicit val arrayGet: Get[Array[TypoOffsetDateTime]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_timestamptz"))
     .map(_.map(v => TypoOffsetDateTime(OffsetDateTime.parse(v.asInstanceOf[String], parser))))
-  implicit val arrayPut: Put[Array[TypoOffsetDateTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_text"), "text")
+  implicit val arrayPut: Put[Array[TypoOffsetDateTime]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_timestamptz"), "timestamptz")
     .contramap(_.map(v => v.value.toString))
+  implicit val bijection: Bijection[TypoOffsetDateTime, OffsetDateTime] = Bijection[TypoOffsetDateTime, OffsetDateTime](_.value)(TypoOffsetDateTime.apply)
   implicit val decoder: Decoder[TypoOffsetDateTime] = Decoder.decodeOffsetDateTime.map(TypoOffsetDateTime.apply)
   implicit val encoder: Encoder[TypoOffsetDateTime] = Encoder.encodeOffsetDateTime.contramap(_.value)
-  implicit val get: Get[TypoOffsetDateTime] = Get.Advanced.other[String](NonEmptyList.one("text"))
+  implicit val get: Get[TypoOffsetDateTime] = Get.Advanced.other[String](NonEmptyList.one("timestamptz"))
     .map(v => TypoOffsetDateTime(OffsetDateTime.parse(v, parser)))
   implicit def ordering(implicit O0: Ordering[OffsetDateTime]): Ordering[TypoOffsetDateTime] = Ordering.by(_.value)
-  implicit val put: Put[TypoOffsetDateTime] = Put.Advanced.other[String](NonEmptyList.one("text")).contramap(v => v.value.toString)
+  implicit val put: Put[TypoOffsetDateTime] = Put.Advanced.other[String](NonEmptyList.one("timestamptz")).contramap(v => v.value.toString)
 }

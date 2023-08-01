@@ -9,7 +9,9 @@ package vemployeedepartment
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait VemployeedepartmentViewRepo {
+  def select: SelectBuilder[VemployeedepartmentViewFields, VemployeedepartmentViewRow]
   def selectAll: Stream[ConnectionIO, VemployeedepartmentViewRow]
 }

@@ -17,10 +17,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean] = {
     sql"delete from sales.shoppingcartitem where shoppingcartitemid = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields)
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)
@@ -64,6 +71,9 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     q.query(ShoppingcartitemRow.read).unique
     
   }
+  override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
     sql"select shoppingcartitemid, shoppingcartid, quantity, productid, datecreated::text, modifieddate::text from sales.shoppingcartitem".query(ShoppingcartitemRow.read).stream
   }
@@ -85,6 +95,9 @@ object ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields, ShoppingcartitemRow.read)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem(shoppingcartitemid, shoppingcartid, quantity, productid, datecreated, modifieddate)

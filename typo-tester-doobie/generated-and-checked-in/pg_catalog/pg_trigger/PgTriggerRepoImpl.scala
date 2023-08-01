@@ -15,16 +15,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTriggerRepoImpl extends PgTriggerRepo {
   override def delete(oid: PgTriggerId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_trigger where oid = ${fromWrite(oid)(Write.fromPut(PgTriggerId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgTriggerFields, PgTriggerRow] = {
+    DeleteBuilder("pg_catalog.pg_trigger", PgTriggerFields)
   }
   override def insert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow] = {
     sql"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTriggerId.put))}::oid, ${fromWrite(unsaved.tgrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgparentid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgfoid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgtype)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.tgenabled)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.tgisinternal)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgconstrrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstrindid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgconstraint)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.tgdeferrable)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tginitdeferred)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.tgnargs)(Write.fromPut(Meta.IntMeta.put))}::int2, ${fromWrite(unsaved.tgattr)(Write.fromPut(TypoInt2Vector.put))}::int2vector, ${fromWrite(unsaved.tgargs)(Write.fromPut(Meta.ByteArrayMeta.put))}::bytea, ${fromWrite(unsaved.tgqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.tgoldtable)(Write.fromPutOption(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.tgnewtable)(Write.fromPutOption(Meta.StringMeta.put))}::name)
           returning oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable
        """.query(PgTriggerRow.read).unique
+  }
+  override def select: SelectBuilder[PgTriggerFields, PgTriggerRow] = {
+    SelectBuilderSql("pg_catalog.pg_trigger", PgTriggerFields, PgTriggerRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTriggerRow] = {
     sql"select oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable from pg_catalog.pg_trigger".query(PgTriggerRow.read).stream
@@ -60,6 +70,9 @@ object PgTriggerRepoImpl extends PgTriggerRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgTriggerFields, PgTriggerRow] = {
+    UpdateBuilder("pg_catalog.pg_trigger", PgTriggerFields, PgTriggerRow.read)
   }
   override def upsert(unsaved: PgTriggerRow): ConnectionIO[PgTriggerRow] = {
     sql"""insert into pg_catalog.pg_trigger(oid, tgrelid, tgparentid, tgname, tgfoid, tgtype, tgenabled, tgisinternal, tgconstrrelid, tgconstrindid, tgconstraint, tgdeferrable, tginitdeferred, tgnargs, tgattr, tgargs, tgqual, tgoldtable, tgnewtable)

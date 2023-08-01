@@ -10,8 +10,13 @@ package sm
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SmViewRepoImpl extends SmViewRepo {
+  override def select: SelectBuilder[SmViewFields, SmViewRow] = {
+    SelectBuilderSql("pu.sm", SmViewFields, SmViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SmViewRow] = {
     sql"""select "id", shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text from pu.sm""".query(SmViewRow.read).stream
   }

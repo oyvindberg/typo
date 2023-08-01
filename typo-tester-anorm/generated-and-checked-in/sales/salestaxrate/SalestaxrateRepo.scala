@@ -8,14 +8,20 @@ package sales
 package salestaxrate
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalestaxrateRepo {
   def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
   def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow
   def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow
+  def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow]
   def selectAll(implicit c: Connection): List[SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow]
   def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow]
   def update(row: SalestaxrateRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow]
   def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow
 }

@@ -8,14 +8,20 @@ package person
 package stateprovince
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait StateprovinceRepo {
   def delete(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
   def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow
   def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow
+  def select: SelectBuilder[StateprovinceFields, StateprovinceRow]
   def selectAll(implicit c: Connection): List[StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId)(implicit c: Connection): Option[StateprovinceRow]
   def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow]
   def update(row: StateprovinceRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[StateprovinceFields, StateprovinceRow]
   def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow
 }

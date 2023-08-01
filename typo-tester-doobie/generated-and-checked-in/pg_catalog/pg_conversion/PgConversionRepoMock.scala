@@ -10,10 +10,22 @@ package pg_conversion
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgConversionRow] = scala.collection.mutable.Map.empty) extends PgConversionRepo {
   override def delete(oid: PgConversionId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgConversionFields, PgConversionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgConversionFields, map)
   }
   override def insert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgConversionFields, PgConversionRow] = {
+    SelectBuilderMock(PgConversionFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgConversionRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgConversionRepoMock(map: scala.collection.mutable.Map[PgConversionId, PgC
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgConversionFields, PgConversionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgConversionFields, map)
   }
   override def upsert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow] = {
     delay {

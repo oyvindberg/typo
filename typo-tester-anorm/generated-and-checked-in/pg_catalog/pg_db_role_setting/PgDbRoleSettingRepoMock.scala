@@ -8,10 +8,22 @@ package pg_catalog
 package pg_db_role_setting
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgDbRoleSettingRepoMock(map: scala.collection.mutable.Map[PgDbRoleSettingId, PgDbRoleSettingRow] = scala.collection.mutable.Map.empty) extends PgDbRoleSettingRepo {
   override def delete(compositeId: PgDbRoleSettingId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgDbRoleSettingFields, map)
   }
   override def insert(unsaved: PgDbRoleSettingRow)(implicit c: Connection): PgDbRoleSettingRow = {
     if (map.contains(unsaved.compositeId))
@@ -19,6 +31,9 @@ class PgDbRoleSettingRepoMock(map: scala.collection.mutable.Map[PgDbRoleSettingI
     else
       map.put(unsaved.compositeId, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    SelectBuilderMock(PgDbRoleSettingFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgDbRoleSettingRow] = {
     map.values.toList
@@ -34,6 +49,9 @@ class PgDbRoleSettingRepoMock(map: scala.collection.mutable.Map[PgDbRoleSettingI
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgDbRoleSettingFields, PgDbRoleSettingRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgDbRoleSettingFields, map)
   }
   override def upsert(unsaved: PgDbRoleSettingRow)(implicit c: Connection): PgDbRoleSettingRow = {
     map.put(unsaved.compositeId, unsaved)

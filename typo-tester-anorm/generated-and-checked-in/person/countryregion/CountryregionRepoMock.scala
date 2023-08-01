@@ -8,11 +8,23 @@ package person
 package countryregion
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, CountryregionRow],
                             map: scala.collection.mutable.Map[CountryregionId, CountryregionRow] = scala.collection.mutable.Map.empty) extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
     map.remove(countryregioncode).isDefined
+  }
+  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CountryregionFields, map)
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     if (map.contains(unsaved.countryregioncode))
@@ -23,6 +35,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
+    SelectBuilderMock(CountryregionFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CountryregionFields, map)
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     map.put(unsaved.countryregioncode, unsaved)

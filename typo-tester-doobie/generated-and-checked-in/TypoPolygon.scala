@@ -12,6 +12,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.geometric.PGpoint
 import org.postgresql.geometric.PGpolygon
+import typo.dsl.Bijection
 
 /** Polygon datatype in PostgreSQL */
 case class TypoPolygon(points: List[TypoPoint])
@@ -21,6 +22,7 @@ object TypoPolygon {
     .map(_.map(v => TypoPolygon(v.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList)))
   implicit val arrayPut: Put[Array[TypoPolygon]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_polygon"), "polygon")
     .contramap(_.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
+  implicit val bijection: Bijection[TypoPolygon, List[TypoPoint]] = Bijection[TypoPolygon, List[TypoPoint]](_.points)(TypoPolygon.apply)
   implicit val decoder: Decoder[TypoPolygon] = Decoder[List[TypoPoint]].map(TypoPolygon.apply)
   implicit val encoder: Encoder[TypoPolygon] = Encoder[List[TypoPoint]].contramap(_.points)
   implicit val get: Get[TypoPolygon] = Get.Advanced.other[PGpolygon](NonEmptyList.one("polygon"))

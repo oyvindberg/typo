@@ -7,8 +7,19 @@ object CustomTypeFile {
 
     val comments = scaladoc(ct.comment)(Nil)
 
+    val maybeBijection = ct.params match {
+      case NonEmptyList(sc.Param(name, underlying, _), Nil) =>
+        val bijection = {
+          val thisBijection = sc.Type.dsl.Bijection.of(ct.typoType, underlying)
+          sc.Given(Nil, sc.Ident("bijection"), Nil, thisBijection, code"$thisBijection(_.$name)(${ct.typoType}.apply)")
+        }
+        Some(bijection)
+      case _ => None
+    }
+
     val instances =
-      List(genOrdering.ordering(ct.typoType, ct.params)) ++
+      maybeBijection.toList ++
+        List(genOrdering.ordering(ct.typoType, ct.params)) ++
         options.jsonLibs.flatMap(_.customTypeInstances(ct)) ++
         options.dbLib.toList.flatMap(_.customTypeInstances(ct))
 

@@ -9,7 +9,9 @@ package pg_stat_activity
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatActivityViewRepo {
+  def select: SelectBuilder[PgStatActivityViewFields, PgStatActivityViewRow]
   def selectAll: Stream[ConnectionIO, PgStatActivityViewRow]
 }

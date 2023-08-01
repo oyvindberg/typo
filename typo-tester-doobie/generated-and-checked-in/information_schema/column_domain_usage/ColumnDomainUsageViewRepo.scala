@@ -9,7 +9,9 @@ package column_domain_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ColumnDomainUsageViewRepo {
+  def select: SelectBuilder[ColumnDomainUsageViewFields, ColumnDomainUsageViewRow]
   def selectAll: Stream[ConnectionIO, ColumnDomainUsageViewRow]
 }

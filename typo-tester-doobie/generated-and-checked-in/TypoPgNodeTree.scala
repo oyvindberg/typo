@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** pg_node_tree (via PGObject) */
 case class TypoPgNodeTree(value: String)
@@ -25,6 +26,7 @@ object TypoPgNodeTree {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoPgNodeTree, String] = Bijection[TypoPgNodeTree, String](_.value)(TypoPgNodeTree.apply)
   implicit val decoder: Decoder[TypoPgNodeTree] = Decoder.decodeString.map(TypoPgNodeTree.apply)
   implicit val encoder: Encoder[TypoPgNodeTree] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoPgNodeTree] = Get.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree"))

@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_progress_create_index
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatProgressCreateIndexViewRepo {
+  def select: SelectBuilder[PgStatProgressCreateIndexViewFields, PgStatProgressCreateIndexViewRow]
   def selectAll(implicit c: Connection): List[PgStatProgressCreateIndexViewRow]
 }

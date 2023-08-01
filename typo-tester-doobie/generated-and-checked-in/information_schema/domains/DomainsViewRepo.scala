@@ -9,7 +9,9 @@ package domains
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait DomainsViewRepo {
+  def select: SelectBuilder[DomainsViewFields, DomainsViewRow]
   def selectAll: Stream[ConnectionIO, DomainsViewRow]
 }

@@ -8,10 +8,22 @@ package pg_catalog
 package pg_extension
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgExtensionRepoMock(map: scala.collection.mutable.Map[PgExtensionId, PgExtensionRow] = scala.collection.mutable.Map.empty) extends PgExtensionRepo {
   override def delete(oid: PgExtensionId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgExtensionFields, PgExtensionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgExtensionFields, map)
   }
   override def insert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgExtensionRepoMock(map: scala.collection.mutable.Map[PgExtensionId, PgExt
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgExtensionFields, PgExtensionRow] = {
+    SelectBuilderMock(PgExtensionFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgExtensionRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgExtensionRepoMock(map: scala.collection.mutable.Map[PgExtensionId, PgExt
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgExtensionFields, PgExtensionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgExtensionFields, map)
   }
   override def upsert(unsaved: PgExtensionRow)(implicit c: Connection): PgExtensionRow = {
     map.put(unsaved.oid, unsaved)

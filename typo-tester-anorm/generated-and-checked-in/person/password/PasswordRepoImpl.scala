@@ -15,10 +15,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person."password" where businessentityid = $businessentityid""".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilder("person.password", PasswordFields)
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
@@ -61,6 +68,9 @@ object PasswordRepoImpl extends PasswordRepo {
     }
     
   }
+  override def select: SelectBuilder[PasswordFields, PasswordRow] = {
+    SelectBuilderSql("person.password", PasswordFields, PasswordRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     SQL"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text
           from person."password"
@@ -88,6 +98,9 @@ object PasswordRepoImpl extends PasswordRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = $businessentityid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilder("person.password", PasswordFields, PasswordRow.rowParser)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

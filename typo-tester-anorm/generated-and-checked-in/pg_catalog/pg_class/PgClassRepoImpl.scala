@@ -9,10 +9,17 @@ package pg_class
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgClassRepoImpl extends PgClassRepo {
   override def delete(oid: PgClassId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_class where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgClassFields, PgClassRow] = {
+    DeleteBuilder("pg_catalog.pg_class", PgClassFields)
   }
   override def insert(unsaved: PgClassRow)(implicit c: Connection): PgClassRow = {
     SQL"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)
@@ -21,6 +28,9 @@ object PgClassRepoImpl extends PgClassRepo {
        """
       .executeInsert(PgClassRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgClassFields, PgClassRow] = {
+    SelectBuilderSql("pg_catalog.pg_class", PgClassFields, PgClassRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgClassRow] = {
     SQL"""select oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound
@@ -77,6 +87,9 @@ object PgClassRepoImpl extends PgClassRepo {
               relpartbound = ${row.relpartbound}::pg_node_tree
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgClassFields, PgClassRow] = {
+    UpdateBuilder("pg_catalog.pg_class", PgClassFields, PgClassRow.rowParser)
   }
   override def upsert(unsaved: PgClassRow)(implicit c: Connection): PgClassRow = {
     SQL"""insert into pg_catalog.pg_class(oid, relname, relnamespace, reltype, reloftype, relowner, relam, relfilenode, reltablespace, relpages, reltuples, relallvisible, reltoastrelid, relhasindex, relisshared, relpersistence, relkind, relnatts, relchecks, relhasrules, relhastriggers, relhassubclass, relrowsecurity, relforcerowsecurity, relispopulated, relreplident, relispartition, relrewrite, relfrozenxid, relminmxid, relacl, reloptions, relpartbound)

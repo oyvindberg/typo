@@ -9,13 +9,19 @@ package pg_default_acl
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgDefaultAclRepo {
   def delete(oid: PgDefaultAclId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def insert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow]
+  def select: SelectBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def selectAll: Stream[ConnectionIO, PgDefaultAclRow]
   def selectById(oid: PgDefaultAclId): ConnectionIO[Option[PgDefaultAclRow]]
   def selectByIds(oids: Array[PgDefaultAclId]): Stream[ConnectionIO, PgDefaultAclRow]
   def update(row: PgDefaultAclRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow]
   def upsert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow]
 }

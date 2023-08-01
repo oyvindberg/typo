@@ -8,10 +8,22 @@ package pg_catalog
 package pg_event_trigger
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId, PgEventTriggerRow] = scala.collection.mutable.Map.empty) extends PgEventTriggerRepo {
   override def delete(oid: PgEventTriggerId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgEventTriggerFields, map)
   }
   override def insert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId,
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    SelectBuilderMock(PgEventTriggerFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgEventTriggerRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgEventTriggerRepoMock(map: scala.collection.mutable.Map[PgEventTriggerId,
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgEventTriggerFields, map)
   }
   override def upsert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow = {
     map.put(unsaved.oid, unsaved)

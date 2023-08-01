@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTsDictRepoImpl extends PgTsDictRepo {
   override def delete(oid: PgTsDictId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_ts_dict where oid = ${fromWrite(oid)(Write.fromPut(PgTsDictId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgTsDictFields, PgTsDictRow] = {
+    DeleteBuilder("pg_catalog.pg_ts_dict", PgTsDictFields)
   }
   override def insert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
     sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgTsDictId.put))}::oid, ${fromWrite(unsaved.dictname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.dictnamespace)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dictowner)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dicttemplate)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.dictinitoption)(Write.fromPutOption(Meta.StringMeta.put))})
           returning oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption
        """.query(PgTsDictRow.read).unique
+  }
+  override def select: SelectBuilder[PgTsDictFields, PgTsDictRow] = {
+    SelectBuilderSql("pg_catalog.pg_ts_dict", PgTsDictFields, PgTsDictRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgTsDictRow] = {
     sql"select oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption from pg_catalog.pg_ts_dict".query(PgTsDictRow.read).stream
@@ -45,6 +55,9 @@ object PgTsDictRepoImpl extends PgTsDictRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgTsDictFields, PgTsDictRow] = {
+    UpdateBuilder("pg_catalog.pg_ts_dict", PgTsDictFields, PgTsDictRow.read)
   }
   override def upsert(unsaved: PgTsDictRow): ConnectionIO[PgTsDictRow] = {
     sql"""insert into pg_catalog.pg_ts_dict(oid, dictname, dictnamespace, dictowner, dicttemplate, dictinitoption)

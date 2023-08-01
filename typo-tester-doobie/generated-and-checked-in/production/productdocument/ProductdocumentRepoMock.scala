@@ -10,11 +10,23 @@ package productdocument
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, ProductdocumentRow],
                               map: scala.collection.mutable.Map[ProductdocumentId, ProductdocumentRow] = scala.collection.mutable.Map.empty) extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductdocumentFields, map)
   }
   override def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     delay {
@@ -27,6 +39,9 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    SelectBuilderMock(ProductdocumentFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, ProductdocumentRow] = {
     Stream.emits(map.values.toList)
@@ -44,6 +59,9 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductdocumentFields, map)
   }
   override def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     delay {

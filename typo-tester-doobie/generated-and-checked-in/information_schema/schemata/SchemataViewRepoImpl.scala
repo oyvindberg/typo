@@ -10,8 +10,13 @@ package schemata
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SchemataViewRepoImpl extends SchemataViewRepo {
+  override def select: SelectBuilder[SchemataViewFields, SchemataViewRow] = {
+    SelectBuilderSql("information_schema.schemata", SchemataViewFields, SchemataViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SchemataViewRow] = {
     sql"""select "catalog_name", "schema_name", schema_owner, default_character_set_catalog, default_character_set_schema, default_character_set_name, sql_path from information_schema.schemata""".query(SchemataViewRow.read).stream
   }

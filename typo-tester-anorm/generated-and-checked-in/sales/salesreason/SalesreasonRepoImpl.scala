@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesreason where salesreasonid = $salesreasonid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
+    DeleteBuilder("sales.salesreason", SalesreasonFields)
   }
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)
@@ -58,6 +65,9 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
     }
     
   }
+  override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
+    SelectBuilderSql("sales.salesreason", SalesreasonFields, SalesreasonRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select salesreasonid, "name", reasontype, modifieddate::text
           from sales.salesreason
@@ -84,6 +94,9 @@ object SalesreasonRepoImpl extends SalesreasonRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where salesreasonid = $salesreasonid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
+    UpdateBuilder("sales.salesreason", SalesreasonFields, SalesreasonRow.rowParser)
   }
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason(salesreasonid, "name", reasontype, modifieddate)

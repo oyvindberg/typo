@@ -9,10 +9,17 @@ package pg_transform
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgTransformRepoImpl extends PgTransformRepo {
   override def delete(oid: PgTransformId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_transform where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgTransformFields, PgTransformRow] = {
+    DeleteBuilder("pg_catalog.pg_transform", PgTransformFields)
   }
   override def insert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow = {
     SQL"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)
@@ -21,6 +28,9 @@ object PgTransformRepoImpl extends PgTransformRepo {
        """
       .executeInsert(PgTransformRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgTransformFields, PgTransformRow] = {
+    SelectBuilderSql("pg_catalog.pg_transform", PgTransformFields, PgTransformRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgTransformRow] = {
     SQL"""select oid, trftype, trflang, trffromsql, trftosql
@@ -49,6 +59,9 @@ object PgTransformRepoImpl extends PgTransformRepo {
               trftosql = ${row.trftosql}::regproc
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgTransformFields, PgTransformRow] = {
+    UpdateBuilder("pg_catalog.pg_transform", PgTransformFields, PgTransformRow.rowParser)
   }
   override def upsert(unsaved: PgTransformRow)(implicit c: Connection): PgTransformRow = {
     SQL"""insert into pg_catalog.pg_transform(oid, trftype, trflang, trffromsql, trftosql)

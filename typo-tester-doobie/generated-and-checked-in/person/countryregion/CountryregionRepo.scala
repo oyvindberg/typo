@@ -9,14 +9,20 @@ package countryregion
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait CountryregionRepo {
   def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[CountryregionFields, CountryregionRow]
   def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
   def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow]
+  def select: SelectBuilder[CountryregionFields, CountryregionRow]
   def selectAll: Stream[ConnectionIO, CountryregionRow]
   def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]]
   def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow]
   def update(row: CountryregionRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[CountryregionFields, CountryregionRow]
   def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
 }

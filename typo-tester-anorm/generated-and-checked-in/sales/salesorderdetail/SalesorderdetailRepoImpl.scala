@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderdetail where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields)
   }
   override def insert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     SQL"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
@@ -71,6 +78,9 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     }
     
   }
+  override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
     SQL"""select salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate::text
           from sales.salesorderdetail
@@ -95,6 +105,9 @@ object SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where salesorderid = ${compositeId.salesorderid} AND salesorderdetailid = ${compositeId.salesorderdetailid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields, SalesorderdetailRow.rowParser)
   }
   override def upsert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     SQL"""insert into sales.salesorderdetail(salesorderid, salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)

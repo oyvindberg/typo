@@ -9,7 +9,9 @@ package administrable_role_authorizations
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait AdministrableRoleAuthorizationsViewRepo {
+  def select: SelectBuilder[AdministrableRoleAuthorizationsViewFields, AdministrableRoleAuthorizationsViewRow]
   def selectAll: Stream[ConnectionIO, AdministrableRoleAuthorizationsViewRow]
 }

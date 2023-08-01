@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
   override def delete(stxoid: PgStatisticExtDataId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_statistic_ext_data where stxoid = ${fromWrite(stxoid)(Write.fromPut(PgStatisticExtDataId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
+    DeleteBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields)
   }
   override def insert(unsaved: PgStatisticExtDataRow): ConnectionIO[PgStatisticExtDataRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)
           values (${fromWrite(unsaved.stxoid)(Write.fromPut(PgStatisticExtDataId.put))}::oid, ${fromWrite(unsaved.stxdndistinct)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.stxddependencies)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.stxdmcv)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.stxdexpr)(Write.fromPutOption(Meta.StringMeta.put))})
           returning stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr
        """.query(PgStatisticExtDataRow.read).unique
+  }
+  override def select: SelectBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
+    SelectBuilderSql("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgStatisticExtDataRow] = {
     sql"select stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr from pg_catalog.pg_statistic_ext_data".query(PgStatisticExtDataRow.read).stream
@@ -44,6 +54,9 @@ object PgStatisticExtDataRepoImpl extends PgStatisticExtDataRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgStatisticExtDataFields, PgStatisticExtDataRow] = {
+    UpdateBuilder("pg_catalog.pg_statistic_ext_data", PgStatisticExtDataFields, PgStatisticExtDataRow.read)
   }
   override def upsert(unsaved: PgStatisticExtDataRow): ConnectionIO[PgStatisticExtDataRow] = {
     sql"""insert into pg_catalog.pg_statistic_ext_data(stxoid, stxdndistinct, stxddependencies, stxdmcv, stxdexpr)

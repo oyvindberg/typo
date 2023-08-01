@@ -161,6 +161,27 @@ object sc {
     val ChronoField = Qualified("java.time.temporal.ChronoField")
     val ChronoUnit = Qualified("java.time.temporal.ChronoUnit")
 
+    object dsl {
+      val Bijection = Qualified("typo.dsl.Bijection")
+      val DeleteBuilder = Qualified("typo.dsl.DeleteBuilder")
+      val DeleteBuilderMock = Qualified("typo.dsl.DeleteBuilder.DeleteBuilderMock")
+      val DeleteParams = Qualified("typo.dsl.DeleteParams")
+      val Field = Qualified("typo.dsl.SqlExpr.Field")
+      val FieldLikeNoHkt = Qualified("typo.dsl.SqlExpr.FieldLikeNoHkt")
+      val FieldValue = Qualified("typo.dsl.FieldValue")
+      val IdField = Qualified("typo.dsl.SqlExpr.IdField")
+      val OptField = Qualified("typo.dsl.SqlExpr.OptField")
+      val SelectBuilder = Qualified("typo.dsl.SelectBuilder")
+      val SelectBuilderMock = Qualified("typo.dsl.SelectBuilderMock")
+      val SelectBuilderSql = Qualified("typo.dsl.SelectBuilderSql")
+      val SelectParams = Qualified("typo.dsl.SelectParams")
+      val StructureRelation = Qualified("typo.dsl.Structure.Relation")
+      val UpdatedValue = Qualified("typo.dsl.UpdatedValue")
+      val UpdateBuilder = Qualified("typo.dsl.UpdateBuilder")
+      val UpdateBuilderMock = Qualified("typo.dsl.UpdateBuilder.UpdateBuilderMock")
+      val UpdateParams = Qualified("typo.dsl.UpdateParams")
+    }
+
     // don't generate imports for these
     val BuiltIn: Map[Ident, Type.Qualified] =
       Set(

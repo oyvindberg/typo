@@ -9,7 +9,9 @@ package user_defined_types
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait UserDefinedTypesViewRepo {
+  def select: SelectBuilder[UserDefinedTypesViewFields, UserDefinedTypesViewRow]
   def selectAll: Stream[ConnectionIO, UserDefinedTypesViewRow]
 }

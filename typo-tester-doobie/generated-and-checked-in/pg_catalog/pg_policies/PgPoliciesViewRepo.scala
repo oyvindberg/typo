@@ -9,7 +9,9 @@ package pg_policies
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgPoliciesViewRepo {
+  def select: SelectBuilder[PgPoliciesViewFields, PgPoliciesViewRow]
   def selectAll: Stream[ConnectionIO, PgPoliciesViewRow]
 }

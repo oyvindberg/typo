@@ -10,8 +10,13 @@ package column_privileges
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnPrivilegesViewRepoImpl extends ColumnPrivilegesViewRepo {
+  override def select: SelectBuilder[ColumnPrivilegesViewFields, ColumnPrivilegesViewRow] = {
+    SelectBuilderSql("information_schema.column_privileges", ColumnPrivilegesViewFields, ColumnPrivilegesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ColumnPrivilegesViewRow] = {
     sql"""select grantor, grantee, table_catalog, table_schema, "table_name", "column_name", privilege_type, is_grantable from information_schema.column_privileges""".query(ColumnPrivilegesViewRow.read).stream
   }

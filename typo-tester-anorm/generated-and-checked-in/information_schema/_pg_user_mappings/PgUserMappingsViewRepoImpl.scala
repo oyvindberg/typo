@@ -9,8 +9,13 @@ package `_pg_user_mappings`
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgUserMappingsViewRepoImpl extends PgUserMappingsViewRepo {
+  override def select: SelectBuilder[PgUserMappingsViewFields, PgUserMappingsViewRow] = {
+    SelectBuilderSql("information_schema._pg_user_mappings", PgUserMappingsViewFields, PgUserMappingsViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgUserMappingsViewRow] = {
     SQL"""select oid, umoptions, umuser, authorization_identifier, foreign_server_catalog, foreign_server_name, srvowner
           from information_schema._pg_user_mappings

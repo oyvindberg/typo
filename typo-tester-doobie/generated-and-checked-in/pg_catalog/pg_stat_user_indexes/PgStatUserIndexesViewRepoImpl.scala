@@ -10,8 +10,13 @@ package pg_stat_user_indexes
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatUserIndexesViewRepoImpl extends PgStatUserIndexesViewRepo {
+  override def select: SelectBuilder[PgStatUserIndexesViewFields, PgStatUserIndexesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_user_indexes", PgStatUserIndexesViewFields, PgStatUserIndexesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatUserIndexesViewRow] = {
     sql"select relid, indexrelid, schemaname, relname, indexrelname, idx_scan, idx_tup_read, idx_tup_fetch from pg_catalog.pg_stat_user_indexes".query(PgStatUserIndexesViewRow.read).stream
   }

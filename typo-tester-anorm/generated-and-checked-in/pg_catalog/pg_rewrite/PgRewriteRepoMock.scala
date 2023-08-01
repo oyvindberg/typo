@@ -8,10 +8,22 @@ package pg_catalog
 package pg_rewrite
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgRewriteRepoMock(map: scala.collection.mutable.Map[PgRewriteId, PgRewriteRow] = scala.collection.mutable.Map.empty) extends PgRewriteRepo {
   override def delete(oid: PgRewriteId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgRewriteFields, PgRewriteRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgRewriteFields, map)
   }
   override def insert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgRewriteRepoMock(map: scala.collection.mutable.Map[PgRewriteId, PgRewrite
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgRewriteFields, PgRewriteRow] = {
+    SelectBuilderMock(PgRewriteFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgRewriteRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgRewriteRepoMock(map: scala.collection.mutable.Map[PgRewriteId, PgRewrite
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgRewriteFields, PgRewriteRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgRewriteFields, map)
   }
   override def upsert(unsaved: PgRewriteRow)(implicit c: Connection): PgRewriteRow = {
     map.put(unsaved.oid, unsaved)

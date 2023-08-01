@@ -12,12 +12,14 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `sales.creditcard` */
 case class CreditcardId(value: Int) extends AnyVal
 object CreditcardId {
   implicit val arrayGet: Get[Array[CreditcardId]] = adventureworks.IntegerArrayMeta.get.map(_.map(CreditcardId.apply))
   implicit val arrayPut: Put[Array[CreditcardId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[CreditcardId, Int] = Bijection[CreditcardId, Int](_.value)(CreditcardId.apply)
   implicit val decoder: Decoder[CreditcardId] = Decoder.decodeInt.map(CreditcardId.apply)
   implicit val encoder: Encoder[CreditcardId] = Encoder.encodeInt.contramap(_.value)
   implicit val get: Get[CreditcardId] = Meta.IntMeta.get.map(CreditcardId.apply)

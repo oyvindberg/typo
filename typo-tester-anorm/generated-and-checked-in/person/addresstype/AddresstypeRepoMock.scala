@@ -8,11 +8,23 @@ package person
 package addresstype
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow],
                           map: scala.collection.mutable.Map[AddresstypeId, AddresstypeRow] = scala.collection.mutable.Map.empty) extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
     map.remove(addresstypeid).isDefined
+  }
+  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, AddresstypeFields, map)
   }
   override def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     if (map.contains(unsaved.addresstypeid))
@@ -23,6 +35,9 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
+    SelectBuilderMock(AddresstypeFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[AddresstypeRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, AddresstypeFields, map)
   }
   override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     map.put(unsaved.addresstypeid, unsaved)

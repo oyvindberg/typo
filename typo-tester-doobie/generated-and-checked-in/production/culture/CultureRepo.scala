@@ -9,14 +9,20 @@ package culture
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait CultureRepo {
   def delete(cultureid: CultureId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[CultureFields, CultureRow]
   def insert(unsaved: CultureRow): ConnectionIO[CultureRow]
   def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow]
+  def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll: Stream[ConnectionIO, CultureRow]
   def selectById(cultureid: CultureId): ConnectionIO[Option[CultureRow]]
   def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow]
   def update(row: CultureRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[CultureFields, CultureRow]
   def upsert(unsaved: CultureRow): ConnectionIO[CultureRow]
 }

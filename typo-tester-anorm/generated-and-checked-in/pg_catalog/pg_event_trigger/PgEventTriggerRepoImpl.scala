@@ -9,10 +9,17 @@ package pg_event_trigger
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
   override def delete(oid: PgEventTriggerId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_event_trigger where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    DeleteBuilder("pg_catalog.pg_event_trigger", PgEventTriggerFields)
   }
   override def insert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow = {
     SQL"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)
@@ -21,6 +28,9 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
        """
       .executeInsert(PgEventTriggerRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    SelectBuilderSql("pg_catalog.pg_event_trigger", PgEventTriggerFields, PgEventTriggerRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgEventTriggerRow] = {
     SQL"""select oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags
@@ -51,6 +61,9 @@ object PgEventTriggerRepoImpl extends PgEventTriggerRepo {
               evttags = ${row.evttags}::_text
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgEventTriggerFields, PgEventTriggerRow] = {
+    UpdateBuilder("pg_catalog.pg_event_trigger", PgEventTriggerFields, PgEventTriggerRow.rowParser)
   }
   override def upsert(unsaved: PgEventTriggerRow)(implicit c: Connection): PgEventTriggerRow = {
     SQL"""insert into pg_catalog.pg_event_trigger(oid, evtname, evtevent, evtowner, evtfoid, evtenabled, evttags)

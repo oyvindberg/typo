@@ -8,7 +8,9 @@ package information_schema
 package `_pg_foreign_data_wrappers`
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgForeignDataWrappersViewRepo {
+  def select: SelectBuilder[PgForeignDataWrappersViewFields, PgForeignDataWrappersViewRow]
   def selectAll(implicit c: Connection): List[PgForeignDataWrappersViewRow]
 }

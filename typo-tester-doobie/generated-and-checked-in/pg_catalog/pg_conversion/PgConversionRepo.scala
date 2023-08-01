@@ -9,13 +9,19 @@ package pg_conversion
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgConversionRepo {
   def delete(oid: PgConversionId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgConversionFields, PgConversionRow]
   def insert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow]
+  def select: SelectBuilder[PgConversionFields, PgConversionRow]
   def selectAll: Stream[ConnectionIO, PgConversionRow]
   def selectById(oid: PgConversionId): ConnectionIO[Option[PgConversionRow]]
   def selectByIds(oids: Array[PgConversionId]): Stream[ConnectionIO, PgConversionRow]
   def update(row: PgConversionRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgConversionFields, PgConversionRow]
   def upsert(unsaved: PgConversionRow): ConnectionIO[PgConversionRow]
 }

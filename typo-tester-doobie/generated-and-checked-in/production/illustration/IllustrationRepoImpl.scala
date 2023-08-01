@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
     sql"delete from production.illustration where illustrationid = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
+    DeleteBuilder("production.illustration", IllustrationFields)
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into production.illustration(illustrationid, diagram, modifieddate)
@@ -54,6 +61,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
     q.query(IllustrationRow.read).unique
     
   }
+  override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
+    SelectBuilderSql("production.illustration", IllustrationFields, IllustrationRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
     sql"select illustrationid, diagram, modifieddate::text from production.illustration".query(IllustrationRow.read).stream
   }
@@ -72,6 +82,9 @@ object IllustrationRepoImpl extends IllustrationRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
+    UpdateBuilder("production.illustration", IllustrationFields, IllustrationRow.read)
   }
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into production.illustration(illustrationid, diagram, modifieddate)

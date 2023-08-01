@@ -9,7 +9,9 @@ package character_sets
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait CharacterSetsViewRepo {
+  def select: SelectBuilder[CharacterSetsViewFields, CharacterSetsViewRow]
   def selectAll: Stream[ConnectionIO, CharacterSetsViewRow]
 }

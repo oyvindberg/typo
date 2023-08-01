@@ -10,8 +10,13 @@ package spqh
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object SpqhViewRepoImpl extends SpqhViewRepo {
+  override def select: SelectBuilder[SpqhViewFields, SpqhViewRow] = {
+    SelectBuilderSql("sa.spqh", SpqhViewFields, SpqhViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SpqhViewRow] = {
     sql"""select "id", businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sa.spqh""".query(SpqhViewRow.read).stream
   }

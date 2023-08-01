@@ -8,11 +8,23 @@ package production
 package productsubcategory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, ProductsubcategoryRow],
                                  map: scala.collection.mutable.Map[ProductsubcategoryId, ProductsubcategoryRow] = scala.collection.mutable.Map.empty) extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Boolean = {
     map.remove(productsubcategoryid).isDefined
+  }
+  override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductsubcategoryFields, map)
   }
   override def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     if (map.contains(unsaved.productsubcategoryid))
@@ -23,6 +35,9 @@ class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, 
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    SelectBuilderMock(ProductsubcategoryFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ProductsubcategoryRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class ProductsubcategoryRepoMock(toRow: Function1[ProductsubcategoryRowUnsaved, 
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductsubcategoryFields, map)
   }
   override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     map.put(unsaved.productsubcategoryid, unsaved)

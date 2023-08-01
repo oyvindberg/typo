@@ -9,13 +9,19 @@ package pg_enum
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgEnumRepo {
   def delete(oid: PgEnumId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgEnumFields, PgEnumRow]
   def insert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow]
+  def select: SelectBuilder[PgEnumFields, PgEnumRow]
   def selectAll: Stream[ConnectionIO, PgEnumRow]
   def selectById(oid: PgEnumId): ConnectionIO[Option[PgEnumRow]]
   def selectByIds(oids: Array[PgEnumId]): Stream[ConnectionIO, PgEnumRow]
   def update(row: PgEnumRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgEnumFields, PgEnumRow]
   def upsert(unsaved: PgEnumRow): ConnectionIO[PgEnumRow]
 }

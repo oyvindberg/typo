@@ -9,7 +9,9 @@ package view_table_usage
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait ViewTableUsageViewRepo {
+  def select: SelectBuilder[ViewTableUsageViewFields, ViewTableUsageViewRow]
   def selectAll: Stream[ConnectionIO, ViewTableUsageViewRow]
 }

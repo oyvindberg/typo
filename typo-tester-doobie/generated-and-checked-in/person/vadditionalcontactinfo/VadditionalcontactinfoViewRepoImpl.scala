@@ -10,8 +10,13 @@ package vadditionalcontactinfo
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
+  override def select: SelectBuilder[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow] = {
+    SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, VadditionalcontactinfoViewRow] = {
     sql"select businessentityid, firstname, middlename, lastname, telephonenumber, telephonespecialinstructions, street, city, stateprovince, postalcode, countryregion, homeaddressspecialinstructions, emailaddress, emailspecialinstructions, emailtelephonenumber, rowguid, modifieddate::text from person.vadditionalcontactinfo".query(VadditionalcontactinfoViewRow.read).stream
   }

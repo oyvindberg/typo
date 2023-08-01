@@ -8,13 +8,19 @@ package production
 package productcosthistory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ProductcosthistoryRepo {
   def delete(compositeId: ProductcosthistoryId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow
   def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow
+  def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def selectAll(implicit c: Connection): List[ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow]
   def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow
 }

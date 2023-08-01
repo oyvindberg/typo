@@ -10,8 +10,13 @@ package pg_policies
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgPoliciesViewRepoImpl extends PgPoliciesViewRepo {
+  override def select: SelectBuilder[PgPoliciesViewFields, PgPoliciesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_policies", PgPoliciesViewFields, PgPoliciesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgPoliciesViewRow] = {
     sql"select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check from pg_catalog.pg_policies".query(PgPoliciesViewRow.read).stream
   }

@@ -9,7 +9,9 @@ package pg_stat_xact_user_functions
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatXactUserFunctionsViewRepo {
+  def select: SelectBuilder[PgStatXactUserFunctionsViewFields, PgStatXactUserFunctionsViewRow]
   def selectAll: Stream[ConnectionIO, PgStatXactUserFunctionsViewRow]
 }

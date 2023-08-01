@@ -9,10 +9,17 @@ package pg_language
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgLanguageRepoImpl extends PgLanguageRepo {
   override def delete(oid: PgLanguageId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_language where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgLanguageFields, PgLanguageRow] = {
+    DeleteBuilder("pg_catalog.pg_language", PgLanguageFields)
   }
   override def insert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow = {
     SQL"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)
@@ -21,6 +28,9 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
        """
       .executeInsert(PgLanguageRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgLanguageFields, PgLanguageRow] = {
+    SelectBuilderSql("pg_catalog.pg_language", PgLanguageFields, PgLanguageRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgLanguageRow] = {
     SQL"""select oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl
@@ -53,6 +63,9 @@ object PgLanguageRepoImpl extends PgLanguageRepo {
               lanacl = ${row.lanacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgLanguageFields, PgLanguageRow] = {
+    UpdateBuilder("pg_catalog.pg_language", PgLanguageFields, PgLanguageRow.rowParser)
   }
   override def upsert(unsaved: PgLanguageRow)(implicit c: Connection): PgLanguageRow = {
     SQL"""insert into pg_catalog.pg_language(oid, lanname, lanowner, lanispl, lanpltrusted, lanplcallfoid, laninline, lanvalidator, lanacl)

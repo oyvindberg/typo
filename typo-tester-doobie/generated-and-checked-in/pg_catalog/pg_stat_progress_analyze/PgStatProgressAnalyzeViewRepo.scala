@@ -9,7 +9,9 @@ package pg_stat_progress_analyze
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatProgressAnalyzeViewRepo {
+  def select: SelectBuilder[PgStatProgressAnalyzeViewFields, PgStatProgressAnalyzeViewRow]
   def selectAll: Stream[ConnectionIO, PgStatProgressAnalyzeViewRow]
 }

@@ -18,10 +18,17 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId): ConnectionIO[Boolean] = {
     sql"delete from sales.customer where customerid = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
+    DeleteBuilder("sales.customer", CustomerFields)
   }
   override def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)
@@ -62,6 +69,9 @@ object CustomerRepoImpl extends CustomerRepo {
     q.query(CustomerRow.read).unique
     
   }
+  override def select: SelectBuilder[CustomerFields, CustomerRow] = {
+    SelectBuilderSql("sales.customer", CustomerFields, CustomerRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
     sql"select customerid, personid, storeid, territoryid, rowguid, modifieddate::text from sales.customer".query(CustomerRow.read).stream
   }
@@ -83,6 +93,9 @@ object CustomerRepoImpl extends CustomerRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
+    UpdateBuilder("sales.customer", CustomerFields, CustomerRow.read)
   }
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer(customerid, personid, storeid, territoryid, rowguid, modifieddate)

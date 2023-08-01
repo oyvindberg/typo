@@ -8,7 +8,9 @@ package information_schema
 package foreign_tables
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait ForeignTablesViewRepo {
+  def select: SelectBuilder[ForeignTablesViewFields, ForeignTablesViewRow]
   def selectAll(implicit c: Connection): List[ForeignTablesViewRow]
 }

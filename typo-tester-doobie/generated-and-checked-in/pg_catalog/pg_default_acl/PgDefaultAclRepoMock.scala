@@ -10,10 +10,22 @@ package pg_default_acl
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgDefaultAclRepoMock(map: scala.collection.mutable.Map[PgDefaultAclId, PgDefaultAclRow] = scala.collection.mutable.Map.empty) extends PgDefaultAclRepo {
   override def delete(oid: PgDefaultAclId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgDefaultAclFields, map)
   }
   override def insert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgDefaultAclRepoMock(map: scala.collection.mutable.Map[PgDefaultAclId, PgD
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    SelectBuilderMock(PgDefaultAclFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgDefaultAclRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgDefaultAclRepoMock(map: scala.collection.mutable.Map[PgDefaultAclId, PgD
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgDefaultAclFields, PgDefaultAclRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgDefaultAclFields, map)
   }
   override def upsert(unsaved: PgDefaultAclRow): ConnectionIO[PgDefaultAclRow] = {
     delay {

@@ -10,8 +10,13 @@ package psc
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PscViewRepoImpl extends PscViewRepo {
+  override def select: SelectBuilder[PscViewFields, PscViewRow] = {
+    SelectBuilderSql("pr.psc", PscViewFields, PscViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PscViewRow] = {
     sql"""select "id", productsubcategoryid, productcategoryid, "name", rowguid, modifieddate::text from pr.psc""".query(PscViewRow.read).stream
   }

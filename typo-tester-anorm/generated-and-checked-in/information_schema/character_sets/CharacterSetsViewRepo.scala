@@ -8,7 +8,9 @@ package information_schema
 package character_sets
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait CharacterSetsViewRepo {
+  def select: SelectBuilder[CharacterSetsViewFields, CharacterSetsViewRow]
   def selectAll(implicit c: Connection): List[CharacterSetsViewRow]
 }

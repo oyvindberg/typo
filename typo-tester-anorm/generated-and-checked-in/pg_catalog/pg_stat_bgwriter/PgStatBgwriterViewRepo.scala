@@ -8,7 +8,9 @@ package pg_catalog
 package pg_stat_bgwriter
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgStatBgwriterViewRepo {
+  def select: SelectBuilder[PgStatBgwriterViewFields, PgStatBgwriterViewRow]
   def selectAll(implicit c: Connection): List[PgStatBgwriterViewRow]
 }

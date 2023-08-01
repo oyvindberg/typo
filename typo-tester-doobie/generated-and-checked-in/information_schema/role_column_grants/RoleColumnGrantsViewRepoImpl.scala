@@ -10,8 +10,13 @@ package role_column_grants
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object RoleColumnGrantsViewRepoImpl extends RoleColumnGrantsViewRepo {
+  override def select: SelectBuilder[RoleColumnGrantsViewFields, RoleColumnGrantsViewRow] = {
+    SelectBuilderSql("information_schema.role_column_grants", RoleColumnGrantsViewFields, RoleColumnGrantsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, RoleColumnGrantsViewRow] = {
     sql"""select grantor, grantee, table_catalog, table_schema, "table_name", "column_name", privilege_type, is_grantable from information_schema.role_column_grants""".query(RoleColumnGrantsViewRow.read).stream
   }

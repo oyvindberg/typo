@@ -9,7 +9,9 @@ package pg_stats_ext_exprs
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatsExtExprsViewRepo {
+  def select: SelectBuilder[PgStatsExtExprsViewFields, PgStatsExtExprsViewRow]
   def selectAll: Stream[ConnectionIO, PgStatsExtExprsViewRow]
 }

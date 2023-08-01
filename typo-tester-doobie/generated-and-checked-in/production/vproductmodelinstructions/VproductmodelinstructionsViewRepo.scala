@@ -9,7 +9,9 @@ package vproductmodelinstructions
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait VproductmodelinstructionsViewRepo {
+  def select: SelectBuilder[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow]
   def selectAll: Stream[ConnectionIO, VproductmodelinstructionsViewRow]
 }

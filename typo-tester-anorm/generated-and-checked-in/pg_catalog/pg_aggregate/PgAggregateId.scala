@@ -13,11 +13,13 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `pg_catalog.pg_aggregate` */
 case class PgAggregateId(value: TypoRegproc) extends AnyVal
 object PgAggregateId {
   implicit val arrayToStatement: ToStatement[Array[PgAggregateId]] = implicitly[ToStatement[Array[TypoRegproc]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[PgAggregateId, TypoRegproc] = Bijection[PgAggregateId, TypoRegproc](_.value)(PgAggregateId.apply)
   implicit val column: Column[PgAggregateId] = implicitly[Column[TypoRegproc]].map(PgAggregateId.apply)
   implicit def ordering(implicit O0: Ordering[TypoRegproc]): Ordering[PgAggregateId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[PgAggregateId] = new ParameterMetaData[PgAggregateId] {

@@ -11,6 +11,7 @@ import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
 import org.postgresql.util.PGobject
+import typo.dsl.Bijection
 
 /** xid (via PGObject) */
 case class TypoXid(value: String)
@@ -25,6 +26,7 @@ object TypoXid {
                             obj.setValue(v.value)
                             obj
                           }))
+  implicit val bijection: Bijection[TypoXid, String] = Bijection[TypoXid, String](_.value)(TypoXid.apply)
   implicit val decoder: Decoder[TypoXid] = Decoder.decodeString.map(TypoXid.apply)
   implicit val encoder: Encoder[TypoXid] = Encoder.encodeString.contramap(_.value)
   implicit val get: Get[TypoXid] = Get.Advanced.other[PGobject](NonEmptyList.one("xid"))

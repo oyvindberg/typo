@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     SQL"delete from production.workorder where workorderid = $workorderid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilder("production.workorder", WorkorderFields)
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)
@@ -63,6 +70,9 @@ object WorkorderRepoImpl extends WorkorderRepo {
     }
     
   }
+  override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
+    SelectBuilderSql("production.workorder", WorkorderFields, WorkorderRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select workorderid, productid, orderqty, scrappedqty, startdate::text, enddate::text, duedate::text, scrapreasonid, modifieddate::text
           from production.workorder
@@ -94,6 +104,9 @@ object WorkorderRepoImpl extends WorkorderRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where workorderid = $workorderid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilder("production.workorder", WorkorderFields, WorkorderRow.rowParser)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder(workorderid, productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, modifieddate)

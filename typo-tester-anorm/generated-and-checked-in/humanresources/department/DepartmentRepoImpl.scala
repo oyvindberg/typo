@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.department where departmentid = $departmentid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
+    DeleteBuilder("humanresources.department", DepartmentFields)
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)
@@ -58,6 +65,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
     }
     
   }
+  override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
+    SelectBuilderSql("humanresources.department", DepartmentFields, DepartmentRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select departmentid, "name", groupname, modifieddate::text
           from humanresources.department
@@ -84,6 +94,9 @@ object DepartmentRepoImpl extends DepartmentRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where departmentid = $departmentid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
+    UpdateBuilder("humanresources.department", DepartmentFields, DepartmentRow.rowParser)
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department(departmentid, "name", groupname, modifieddate)

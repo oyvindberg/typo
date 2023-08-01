@@ -10,10 +10,22 @@ package pg_sequence
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSequenceRow] = scala.collection.mutable.Map.empty) extends PgSequenceRepo {
   override def delete(seqrelid: PgSequenceId): ConnectionIO[Boolean] = {
     delay(map.remove(seqrelid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgSequenceFields, map)
   }
   override def insert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
         map.put(unsaved.seqrelid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgSequenceFields, PgSequenceRow] = {
+    SelectBuilderMock(PgSequenceFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgSequenceRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgSequenceRepoMock(map: scala.collection.mutable.Map[PgSequenceId, PgSeque
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgSequenceFields, PgSequenceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgSequenceFields, map)
   }
   override def upsert(unsaved: PgSequenceRow): ConnectionIO[PgSequenceRow] = {
     delay {

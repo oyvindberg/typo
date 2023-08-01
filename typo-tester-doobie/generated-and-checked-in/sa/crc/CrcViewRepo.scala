@@ -9,7 +9,9 @@ package crc
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait CrcViewRepo {
+  def select: SelectBuilder[CrcViewFields, CrcViewRow]
   def selectAll: Stream[ConnectionIO, CrcViewRow]
 }

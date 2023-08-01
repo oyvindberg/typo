@@ -10,10 +10,22 @@ package pg_ts_config_map
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgTsConfigMapRepoMock(map: scala.collection.mutable.Map[PgTsConfigMapId, PgTsConfigMapRow] = scala.collection.mutable.Map.empty) extends PgTsConfigMapRepo {
   override def delete(compositeId: PgTsConfigMapId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgTsConfigMapFields, map)
   }
   override def insert(unsaved: PgTsConfigMapRow): ConnectionIO[PgTsConfigMapRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgTsConfigMapRepoMock(map: scala.collection.mutable.Map[PgTsConfigMapId, P
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
+    SelectBuilderMock(PgTsConfigMapFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgTsConfigMapRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgTsConfigMapRepoMock(map: scala.collection.mutable.Map[PgTsConfigMapId, P
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgTsConfigMapFields, PgTsConfigMapRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgTsConfigMapFields, map)
   }
   override def upsert(unsaved: PgTsConfigMapRow): ConnectionIO[PgTsConfigMapRow] = {
     delay {

@@ -8,7 +8,9 @@ package humanresources
 package vjobcandidateeducation
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait VjobcandidateeducationViewRepo {
+  def select: SelectBuilder[VjobcandidateeducationViewFields, VjobcandidateeducationViewRow]
   def selectAll(implicit c: Connection): List[VjobcandidateeducationViewRow]
 }

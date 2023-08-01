@@ -17,10 +17,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
     sql"delete from sales.personcreditcard where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND creditcardid = ${fromWrite(compositeId.creditcardid)(Write.fromPut(CreditcardId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields)
   }
   override def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)
@@ -52,6 +59,9 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     q.query(PersoncreditcardRow.read).unique
     
   }
+  override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
     sql"select businessentityid, creditcardid, modifieddate::text from sales.personcreditcard".query(PersoncreditcardRow.read).stream
   }
@@ -66,6 +76,9 @@ object PersoncreditcardRepoImpl extends PersoncreditcardRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields, PersoncreditcardRow.read)
   }
   override def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard(businessentityid, creditcardid, modifieddate)

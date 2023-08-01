@@ -10,8 +10,13 @@ package `_pg_foreign_tables`
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgForeignTablesViewRepoImpl extends PgForeignTablesViewRepo {
+  override def select: SelectBuilder[PgForeignTablesViewFields, PgForeignTablesViewRow] = {
+    SelectBuilderSql("information_schema._pg_foreign_tables", PgForeignTablesViewFields, PgForeignTablesViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgForeignTablesViewRow] = {
     sql"select foreign_table_catalog, foreign_table_schema, foreign_table_name, ftoptions, foreign_server_catalog, foreign_server_name, authorization_identifier from information_schema._pg_foreign_tables".query(PgForeignTablesViewRow.read).stream
   }

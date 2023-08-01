@@ -16,10 +16,17 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Boolean] = {
     sql"delete from person.phonenumbertype where phonenumbertypeid = ${fromWrite(phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields)
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)
@@ -54,6 +61,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     q.query(PhonenumbertypeRow.read).unique
     
   }
+  override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
     sql"""select phonenumbertypeid, "name", modifieddate::text from person.phonenumbertype""".query(PhonenumbertypeRow.read).stream
   }
@@ -72,6 +82,9 @@ object PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields, PhonenumbertypeRow.read)
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype(phonenumbertypeid, "name", modifieddate)

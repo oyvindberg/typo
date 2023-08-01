@@ -10,8 +10,13 @@ package view_table_usage
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ViewTableUsageViewRepoImpl extends ViewTableUsageViewRepo {
+  override def select: SelectBuilder[ViewTableUsageViewFields, ViewTableUsageViewRow] = {
+    SelectBuilderSql("information_schema.view_table_usage", ViewTableUsageViewFields, ViewTableUsageViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ViewTableUsageViewRow] = {
     sql"""select view_catalog, view_schema, view_name, table_catalog, table_schema, "table_name" from information_schema.view_table_usage""".query(ViewTableUsageViewRow.read).stream
   }

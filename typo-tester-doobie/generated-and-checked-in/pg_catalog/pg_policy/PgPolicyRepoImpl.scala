@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgPolicyRepoImpl extends PgPolicyRepo {
   override def delete(oid: PgPolicyId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_policy where oid = ${fromWrite(oid)(Write.fromPut(PgPolicyId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgPolicyFields, PgPolicyRow] = {
+    DeleteBuilder("pg_catalog.pg_policy", PgPolicyFields)
   }
   override def insert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow] = {
     sql"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgPolicyId.put))}::oid, ${fromWrite(unsaved.polname)(Write.fromPut(Meta.StringMeta.put))}::name, ${fromWrite(unsaved.polrelid)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.polcmd)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.polpermissive)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.polroles)(Write.fromPut(adventureworks.LongArrayMeta.put))}::_oid, ${fromWrite(unsaved.polqual)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree, ${fromWrite(unsaved.polwithcheck)(Write.fromPutOption(TypoPgNodeTree.put))}::pg_node_tree)
           returning oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck
        """.query(PgPolicyRow.read).unique
+  }
+  override def select: SelectBuilder[PgPolicyFields, PgPolicyRow] = {
+    SelectBuilderSql("pg_catalog.pg_policy", PgPolicyFields, PgPolicyRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgPolicyRow] = {
     sql"select oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck from pg_catalog.pg_policy".query(PgPolicyRow.read).stream
@@ -48,6 +58,9 @@ object PgPolicyRepoImpl extends PgPolicyRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgPolicyFields, PgPolicyRow] = {
+    UpdateBuilder("pg_catalog.pg_policy", PgPolicyFields, PgPolicyRow.read)
   }
   override def upsert(unsaved: PgPolicyRow): ConnectionIO[PgPolicyRow] = {
     sql"""insert into pg_catalog.pg_policy(oid, polname, polrelid, polcmd, polpermissive, polroles, polqual, polwithcheck)

@@ -9,7 +9,9 @@ package collations
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait CollationsViewRepo {
+  def select: SelectBuilder[CollationsViewFields, CollationsViewRow]
   def selectAll: Stream[ConnectionIO, CollationsViewRow]
 }

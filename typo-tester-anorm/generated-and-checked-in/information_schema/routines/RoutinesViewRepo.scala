@@ -8,7 +8,9 @@ package information_schema
 package routines
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait RoutinesViewRepo {
+  def select: SelectBuilder[RoutinesViewFields, RoutinesViewRow]
   def selectAll(implicit c: Connection): List[RoutinesViewRow]
 }

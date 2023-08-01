@@ -8,13 +8,19 @@ package sales
 package salesterritoryhistory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait SalesterritoryhistoryRepo {
   def delete(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def insert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow
   def insert(unsaved: SalesterritoryhistoryRowUnsaved)(implicit c: Connection): SalesterritoryhistoryRow
+  def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow]
   def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow
 }

@@ -8,11 +8,23 @@ package production
 package scrapreason
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow],
                           map: scala.collection.mutable.Map[ScrapreasonId, ScrapreasonRow] = scala.collection.mutable.Map.empty) extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     map.remove(scrapreasonid).isDefined
+  }
+  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields, map)
   }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     if (map.contains(unsaved.scrapreasonid))
@@ -23,6 +35,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    SelectBuilderMock(ScrapreasonFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[ScrapreasonRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields, map)
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     map.put(unsaved.scrapreasonid, unsaved)

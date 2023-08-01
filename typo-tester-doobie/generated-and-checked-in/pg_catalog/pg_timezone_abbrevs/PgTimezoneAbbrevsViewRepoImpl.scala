@@ -10,8 +10,13 @@ package pg_timezone_abbrevs
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgTimezoneAbbrevsViewRepoImpl extends PgTimezoneAbbrevsViewRepo {
+  override def select: SelectBuilder[PgTimezoneAbbrevsViewFields, PgTimezoneAbbrevsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_timezone_abbrevs", PgTimezoneAbbrevsViewFields, PgTimezoneAbbrevsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgTimezoneAbbrevsViewRow] = {
     sql"select abbrev, utc_offset, is_dst from pg_catalog.pg_timezone_abbrevs".query(PgTimezoneAbbrevsViewRow.read).stream
   }

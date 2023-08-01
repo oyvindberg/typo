@@ -9,7 +9,9 @@ package ppp
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PppViewRepo {
+  def select: SelectBuilder[PppViewFields, PppViewRow]
   def selectAll: Stream[ConnectionIO, PppViewRow]
 }

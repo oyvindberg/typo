@@ -10,10 +10,22 @@ package pg_init_privs
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgInitPrivsRepoMock(map: scala.collection.mutable.Map[PgInitPrivsId, PgInitPrivsRow] = scala.collection.mutable.Map.empty) extends PgInitPrivsRepo {
   override def delete(compositeId: PgInitPrivsId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgInitPrivsFields, map)
   }
   override def insert(unsaved: PgInitPrivsRow): ConnectionIO[PgInitPrivsRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgInitPrivsRepoMock(map: scala.collection.mutable.Map[PgInitPrivsId, PgIni
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    SelectBuilderMock(PgInitPrivsFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgInitPrivsRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgInitPrivsRepoMock(map: scala.collection.mutable.Map[PgInitPrivsId, PgIni
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgInitPrivsFields, PgInitPrivsRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgInitPrivsFields, map)
   }
   override def upsert(unsaved: PgInitPrivsRow): ConnectionIO[PgInitPrivsRow] = {
     delay {

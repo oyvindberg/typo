@@ -10,11 +10,23 @@ package phonenumbertype
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, PhonenumbertypeRow],
                               map: scala.collection.mutable.Map[PhonenumbertypeId, PhonenumbertypeRow] = scala.collection.mutable.Map.empty) extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Boolean] = {
     delay(map.remove(phonenumbertypeid).isDefined)
+  }
+  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields, map)
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     delay {
@@ -27,6 +39,9 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    SelectBuilderMock(PhonenumbertypeFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields, map)
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     delay {

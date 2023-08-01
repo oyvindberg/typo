@@ -9,8 +9,13 @@ package pi
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PiViewRepoImpl extends PiViewRepo {
+  override def select: SelectBuilder[PiViewFields, PiViewRow] = {
+    SelectBuilderSql("pr.pi", PiViewFields, PiViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PiViewRow] = {
     SQL"""select "id", productid, locationid, shelf, bin, quantity, rowguid, modifieddate::text
           from pr.pi

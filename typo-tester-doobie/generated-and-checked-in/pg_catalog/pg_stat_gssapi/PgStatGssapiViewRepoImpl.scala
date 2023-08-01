@@ -10,8 +10,13 @@ package pg_stat_gssapi
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatGssapiViewRepoImpl extends PgStatGssapiViewRepo {
+  override def select: SelectBuilder[PgStatGssapiViewFields, PgStatGssapiViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_gssapi", PgStatGssapiViewFields, PgStatGssapiViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgStatGssapiViewRow] = {
     sql"""select pid, gss_authenticated, principal, "encrypted" from pg_catalog.pg_stat_gssapi""".query(PgStatGssapiViewRow.read).stream
   }

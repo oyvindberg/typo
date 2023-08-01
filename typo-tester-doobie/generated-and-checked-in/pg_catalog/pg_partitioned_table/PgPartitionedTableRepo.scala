@@ -9,13 +9,19 @@ package pg_partitioned_table
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgPartitionedTableRepo {
   def delete(partrelid: PgPartitionedTableId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgPartitionedTableFields, PgPartitionedTableRow]
   def insert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow]
+  def select: SelectBuilder[PgPartitionedTableFields, PgPartitionedTableRow]
   def selectAll: Stream[ConnectionIO, PgPartitionedTableRow]
   def selectById(partrelid: PgPartitionedTableId): ConnectionIO[Option[PgPartitionedTableRow]]
   def selectByIds(partrelids: Array[PgPartitionedTableId]): Stream[ConnectionIO, PgPartitionedTableRow]
   def update(row: PgPartitionedTableRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgPartitionedTableFields, PgPartitionedTableRow]
   def upsert(unsaved: PgPartitionedTableRow): ConnectionIO[PgPartitionedTableRow]
 }

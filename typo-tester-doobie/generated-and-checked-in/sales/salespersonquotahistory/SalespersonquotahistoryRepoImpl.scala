@@ -18,10 +18,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean] = {
     sql"delete from sales.salespersonquotahistory where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND quotadate = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields)
   }
   override def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     sql"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)
@@ -58,6 +65,9 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     q.query(SalespersonquotahistoryRow.read).unique
     
   }
+  override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    SelectBuilderSql("sales.salespersonquotahistory", SalespersonquotahistoryFields, SalespersonquotahistoryRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     sql"select businessentityid, quotadate::text, salesquota, rowguid, modifieddate::text from sales.salespersonquotahistory".query(SalespersonquotahistoryRow.read).stream
   }
@@ -74,6 +84,9 @@ object SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    UpdateBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields, SalespersonquotahistoryRow.read)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     sql"""insert into sales.salespersonquotahistory(businessentityid, quotadate, salesquota, rowguid, modifieddate)

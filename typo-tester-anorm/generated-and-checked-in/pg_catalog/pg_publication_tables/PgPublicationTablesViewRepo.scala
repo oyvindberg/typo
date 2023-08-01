@@ -8,7 +8,9 @@ package pg_catalog
 package pg_publication_tables
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgPublicationTablesViewRepo {
+  def select: SelectBuilder[PgPublicationTablesViewFields, PgPublicationTablesViewRow]
   def selectAll(implicit c: Connection): List[PgPublicationTablesViewRow]
 }

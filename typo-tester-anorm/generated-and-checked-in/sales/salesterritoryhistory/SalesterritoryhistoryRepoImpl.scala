@@ -14,10 +14,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def delete(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesterritoryhistory where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields)
   }
   override def insert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
     SQL"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)
@@ -61,6 +68,9 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     }
     
   }
+  override def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    SelectBuilderSql("sales.salesterritoryhistory", SalesterritoryhistoryFields, SalesterritoryhistoryRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow] = {
     SQL"""select businessentityid, territoryid, startdate::text, enddate::text, rowguid, modifieddate::text
           from sales.salesterritoryhistory
@@ -80,6 +90,9 @@ object SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where businessentityid = ${compositeId.businessentityid} AND startdate = ${compositeId.startdate} AND territoryid = ${compositeId.territoryid}
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields, SalesterritoryhistoryRow.rowParser)
   }
   override def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
     SQL"""insert into sales.salesterritoryhistory(businessentityid, territoryid, startdate, enddate, rowguid, modifieddate)

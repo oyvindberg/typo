@@ -13,10 +13,17 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
     SQL"delete from humanresources.shift where shiftid = $shiftid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilder("humanresources.shift", ShiftFields)
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)
@@ -59,6 +66,9 @@ object ShiftRepoImpl extends ShiftRepo {
     }
     
   }
+  override def select: SelectBuilder[ShiftFields, ShiftRow] = {
+    SelectBuilderSql("humanresources.shift", ShiftFields, ShiftRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ShiftRow] = {
     SQL"""select shiftid, "name", starttime::text, endtime::text, modifieddate::text
           from humanresources.shift
@@ -86,6 +96,9 @@ object ShiftRepoImpl extends ShiftRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where shiftid = $shiftid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilder("humanresources.shift", ShiftFields, ShiftRow.rowParser)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift(shiftid, "name", starttime, endtime, modifieddate)

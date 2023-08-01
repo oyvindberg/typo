@@ -8,7 +8,9 @@ package pr
 package w
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait WViewRepo {
+  def select: SelectBuilder[WViewFields, WViewRow]
   def selectAll(implicit c: Connection): List[WViewRow]
 }

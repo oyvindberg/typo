@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgCastRepoImpl extends PgCastRepo {
   override def delete(oid: PgCastId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_cast where oid = ${fromWrite(oid)(Write.fromPut(PgCastId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgCastFields, PgCastRow] = {
+    DeleteBuilder("pg_catalog.pg_cast", PgCastFields)
   }
   override def insert(unsaved: PgCastRow): ConnectionIO[PgCastRow] = {
     sql"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)
           values (${fromWrite(unsaved.oid)(Write.fromPut(PgCastId.put))}::oid, ${fromWrite(unsaved.castsource)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.casttarget)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.castfunc)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.castcontext)(Write.fromPut(Meta.StringMeta.put))}::char, ${fromWrite(unsaved.castmethod)(Write.fromPut(Meta.StringMeta.put))}::char)
           returning oid, castsource, casttarget, castfunc, castcontext, castmethod
        """.query(PgCastRow.read).unique
+  }
+  override def select: SelectBuilder[PgCastFields, PgCastRow] = {
+    SelectBuilderSql("pg_catalog.pg_cast", PgCastFields, PgCastRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgCastRow] = {
     sql"select oid, castsource, casttarget, castfunc, castcontext, castmethod from pg_catalog.pg_cast".query(PgCastRow.read).stream
@@ -45,6 +55,9 @@ object PgCastRepoImpl extends PgCastRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgCastFields, PgCastRow] = {
+    UpdateBuilder("pg_catalog.pg_cast", PgCastFields, PgCastRow.read)
   }
   override def upsert(unsaved: PgCastRow): ConnectionIO[PgCastRow] = {
     sql"""insert into pg_catalog.pg_cast(oid, castsource, casttarget, castfunc, castcontext, castmethod)

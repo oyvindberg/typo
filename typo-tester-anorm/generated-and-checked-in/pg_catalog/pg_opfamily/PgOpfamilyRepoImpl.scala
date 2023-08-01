@@ -9,10 +9,17 @@ package pg_opfamily
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
   override def delete(oid: PgOpfamilyId)(implicit c: Connection): Boolean = {
     SQL"delete from pg_catalog.pg_opfamily where oid = $oid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
+    DeleteBuilder("pg_catalog.pg_opfamily", PgOpfamilyFields)
   }
   override def insert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
     SQL"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)
@@ -21,6 +28,9 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
        """
       .executeInsert(PgOpfamilyRow.rowParser(1).single)
     
+  }
+  override def select: SelectBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
+    SelectBuilderSql("pg_catalog.pg_opfamily", PgOpfamilyFields, PgOpfamilyRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PgOpfamilyRow] = {
     SQL"""select oid, opfmethod, opfname, opfnamespace, opfowner
@@ -49,6 +59,9 @@ object PgOpfamilyRepoImpl extends PgOpfamilyRepo {
               opfowner = ${row.opfowner}::oid
           where oid = $oid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[PgOpfamilyFields, PgOpfamilyRow] = {
+    UpdateBuilder("pg_catalog.pg_opfamily", PgOpfamilyFields, PgOpfamilyRow.rowParser)
   }
   override def upsert(unsaved: PgOpfamilyRow)(implicit c: Connection): PgOpfamilyRow = {
     SQL"""insert into pg_catalog.pg_opfamily(oid, opfmethod, opfname, opfnamespace, opfowner)

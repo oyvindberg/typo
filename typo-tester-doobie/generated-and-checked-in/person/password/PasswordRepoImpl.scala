@@ -18,10 +18,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from person."password" where businessentityid = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilder("person.password", PasswordFields)
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
@@ -58,6 +65,9 @@ object PasswordRepoImpl extends PasswordRepo {
     q.query(PasswordRow.read).unique
     
   }
+  override def select: SelectBuilder[PasswordFields, PasswordRow] = {
+    SelectBuilderSql("person.password", PasswordFields, PasswordRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
     sql"""select businessentityid, passwordhash, passwordsalt, rowguid, modifieddate::text from person."password"""".query(PasswordRow.read).stream
   }
@@ -78,6 +88,9 @@ object PasswordRepoImpl extends PasswordRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilder("person.password", PasswordFields, PasswordRow.read)
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person."password"(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)

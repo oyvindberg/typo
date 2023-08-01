@@ -9,13 +9,19 @@ package businessentitycontact
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait BusinessentitycontactRepo {
   def delete(compositeId: BusinessentitycontactId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def insert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow]
   def insert(unsaved: BusinessentitycontactRowUnsaved): ConnectionIO[BusinessentitycontactRow]
+  def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def selectAll: Stream[ConnectionIO, BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]]
   def update(row: BusinessentitycontactRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow]
 }

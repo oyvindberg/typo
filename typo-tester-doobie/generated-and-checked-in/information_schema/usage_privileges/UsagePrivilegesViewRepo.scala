@@ -9,7 +9,9 @@ package usage_privileges
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait UsagePrivilegesViewRepo {
+  def select: SelectBuilder[UsagePrivilegesViewFields, UsagePrivilegesViewRow]
   def selectAll: Stream[ConnectionIO, UsagePrivilegesViewRow]
 }

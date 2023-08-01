@@ -9,8 +9,13 @@ package wr
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object WrViewRepoImpl extends WrViewRepo {
+  override def select: SelectBuilder[WrViewFields, WrViewRow] = {
+    SelectBuilderSql("pr.wr", WrViewFields, WrViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[WrViewRow] = {
     SQL"""select "id", workorderid, productid, operationsequence, locationid, scheduledstartdate::text, scheduledenddate::text, actualstartdate::text, actualenddate::text, actualresourcehrs, plannedcost, actualcost, modifieddate::text
           from pr.wr

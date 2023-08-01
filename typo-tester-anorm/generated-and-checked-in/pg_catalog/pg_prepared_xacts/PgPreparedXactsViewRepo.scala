@@ -8,7 +8,9 @@ package pg_catalog
 package pg_prepared_xacts
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgPreparedXactsViewRepo {
+  def select: SelectBuilder[PgPreparedXactsViewFields, PgPreparedXactsViewRow]
   def selectAll(implicit c: Connection): List[PgPreparedXactsViewRow]
 }

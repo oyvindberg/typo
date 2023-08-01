@@ -8,10 +8,22 @@ package pg_catalog
 package pg_partitioned_table
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitionedTableId, PgPartitionedTableRow] = scala.collection.mutable.Map.empty) extends PgPartitionedTableRepo {
   override def delete(partrelid: PgPartitionedTableId)(implicit c: Connection): Boolean = {
     map.remove(partrelid).isDefined
+  }
+  override def delete: DeleteBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgPartitionedTableFields, map)
   }
   override def insert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
     if (map.contains(unsaved.partrelid))
@@ -19,6 +31,9 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
     else
       map.put(unsaved.partrelid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    SelectBuilderMock(PgPartitionedTableFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgPartitionedTableRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgPartitionedTableRepoMock(map: scala.collection.mutable.Map[PgPartitioned
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgPartitionedTableFields, PgPartitionedTableRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgPartitionedTableFields, map)
   }
   override def upsert(unsaved: PgPartitionedTableRow)(implicit c: Connection): PgPartitionedTableRow = {
     map.put(unsaved.partrelid, unsaved)

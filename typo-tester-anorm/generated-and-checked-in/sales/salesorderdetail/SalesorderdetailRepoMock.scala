@@ -8,11 +8,23 @@ package sales
 package salesorderdetail
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, SalesorderdetailRow],
                                map: scala.collection.mutable.Map[SalesorderdetailId, SalesorderdetailRow] = scala.collection.mutable.Map.empty) extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalesorderdetailFields, map)
   }
   override def insert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    SelectBuilderMock(SalesorderdetailFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalesorderdetailFields, map)
   }
   override def upsert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     map.put(unsaved.compositeId, unsaved)

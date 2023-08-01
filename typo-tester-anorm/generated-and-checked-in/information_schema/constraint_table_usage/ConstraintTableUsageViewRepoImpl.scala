@@ -9,8 +9,13 @@ package constraint_table_usage
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ConstraintTableUsageViewRepoImpl extends ConstraintTableUsageViewRepo {
+  override def select: SelectBuilder[ConstraintTableUsageViewFields, ConstraintTableUsageViewRow] = {
+    SelectBuilderSql("information_schema.constraint_table_usage", ConstraintTableUsageViewFields, ConstraintTableUsageViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[ConstraintTableUsageViewRow] = {
     SQL"""select table_catalog, table_schema, "table_name", "constraint_catalog", "constraint_schema", "constraint_name"
           from information_schema.constraint_table_usage

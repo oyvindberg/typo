@@ -9,12 +9,18 @@ package pg_shdescription
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgShdescriptionRepo {
   def delete(compositeId: PgShdescriptionId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[PgShdescriptionFields, PgShdescriptionRow]
   def insert(unsaved: PgShdescriptionRow): ConnectionIO[PgShdescriptionRow]
+  def select: SelectBuilder[PgShdescriptionFields, PgShdescriptionRow]
   def selectAll: Stream[ConnectionIO, PgShdescriptionRow]
   def selectById(compositeId: PgShdescriptionId): ConnectionIO[Option[PgShdescriptionRow]]
   def update(row: PgShdescriptionRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[PgShdescriptionFields, PgShdescriptionRow]
   def upsert(unsaved: PgShdescriptionRow): ConnectionIO[PgShdescriptionRow]
 }

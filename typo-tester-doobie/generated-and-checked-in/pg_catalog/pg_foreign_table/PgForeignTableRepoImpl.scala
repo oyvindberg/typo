@@ -13,16 +13,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PgForeignTableRepoImpl extends PgForeignTableRepo {
   override def delete(ftrelid: PgForeignTableId): ConnectionIO[Boolean] = {
     sql"delete from pg_catalog.pg_foreign_table where ftrelid = ${fromWrite(ftrelid)(Write.fromPut(PgForeignTableId.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    DeleteBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields)
   }
   override def insert(unsaved: PgForeignTableRow): ConnectionIO[PgForeignTableRow] = {
     sql"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)
           values (${fromWrite(unsaved.ftrelid)(Write.fromPut(PgForeignTableId.put))}::oid, ${fromWrite(unsaved.ftserver)(Write.fromPut(Meta.LongMeta.put))}::oid, ${fromWrite(unsaved.ftoptions)(Write.fromPutOption(adventureworks.StringArrayMeta.put))}::_text)
           returning ftrelid, ftserver, ftoptions
        """.query(PgForeignTableRow.read).unique
+  }
+  override def select: SelectBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    SelectBuilderSql("pg_catalog.pg_foreign_table", PgForeignTableFields, PgForeignTableRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PgForeignTableRow] = {
     sql"select ftrelid, ftserver, ftoptions from pg_catalog.pg_foreign_table".query(PgForeignTableRow.read).stream
@@ -42,6 +52,9 @@ object PgForeignTableRepoImpl extends PgForeignTableRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PgForeignTableFields, PgForeignTableRow] = {
+    UpdateBuilder("pg_catalog.pg_foreign_table", PgForeignTableFields, PgForeignTableRow.read)
   }
   override def upsert(unsaved: PgForeignTableRow): ConnectionIO[PgForeignTableRow] = {
     sql"""insert into pg_catalog.pg_foreign_table(ftrelid, ftserver, ftoptions)

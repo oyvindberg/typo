@@ -9,7 +9,9 @@ package enabled_roles
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait EnabledRolesViewRepo {
+  def select: SelectBuilder[EnabledRolesViewFields, EnabledRolesViewRow]
   def selectAll: Stream[ConnectionIO, EnabledRolesViewRow]
 }

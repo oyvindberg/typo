@@ -19,10 +19,17 @@ import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId): ConnectionIO[Boolean] = {
     sql"""delete from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("myschema.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
@@ -68,6 +75,9 @@ object PersonRepoImpl extends PersonRepo {
     q.query(PersonRow.read).unique
     
   }
+  override def select: SelectBuilder[PersonFields, PersonRow] = {
+    SelectBuilderSql("myschema.person", PersonFields, PersonRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".query(PersonRow.read).stream
   }
@@ -94,6 +104,9 @@ object PersonRepoImpl extends PersonRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("myschema.person", PersonFields, PersonRow.read)
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)

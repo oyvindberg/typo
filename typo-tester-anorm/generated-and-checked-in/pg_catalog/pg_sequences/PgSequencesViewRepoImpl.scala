@@ -9,8 +9,13 @@ package pg_sequences
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgSequencesViewRepoImpl extends PgSequencesViewRepo {
+  override def select: SelectBuilder[PgSequencesViewFields, PgSequencesViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_sequences", PgSequencesViewFields, PgSequencesViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgSequencesViewRow] = {
     SQL"""select schemaname, sequencename, sequenceowner, data_type, start_value, min_value, max_value, increment_by, "cycle", cache_size, "last_value"
           from pg_catalog.pg_sequences

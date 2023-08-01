@@ -10,12 +10,18 @@ package marital_status
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait MaritalStatusRepo {
   def delete(id: MaritalStatusId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow]
   def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
+  def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow]
   def selectAll: Stream[ConnectionIO, MaritalStatusRow]
   def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]]
   def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow]
+  def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
 }

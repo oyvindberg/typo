@@ -18,10 +18,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId): ConnectionIO[Boolean] = {
     sql"delete from person.emailaddress where businessentityid = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND emailaddressid = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
+    DeleteBuilder("person.emailaddress", EmailaddressFields)
   }
   override def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)
@@ -61,6 +68,9 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
     q.query(EmailaddressRow.read).unique
     
   }
+  override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
+    SelectBuilderSql("person.emailaddress", EmailaddressFields, EmailaddressRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
     sql"select businessentityid, emailaddressid, emailaddress, rowguid, modifieddate::text from person.emailaddress".query(EmailaddressRow.read).stream
   }
@@ -77,6 +87,9 @@ object EmailaddressRepoImpl extends EmailaddressRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
+    UpdateBuilder("person.emailaddress", EmailaddressFields, EmailaddressRow.read)
   }
   override def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into person.emailaddress(businessentityid, emailaddressid, emailaddress, rowguid, modifieddate)

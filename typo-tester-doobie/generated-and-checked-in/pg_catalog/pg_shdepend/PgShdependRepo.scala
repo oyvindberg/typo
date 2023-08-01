@@ -9,8 +9,14 @@ package pg_shdepend
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgShdependRepo {
+  def delete: DeleteBuilder[PgShdependFields, PgShdependRow]
   def insert(unsaved: PgShdependRow): ConnectionIO[PgShdependRow]
+  def select: SelectBuilder[PgShdependFields, PgShdependRow]
   def selectAll: Stream[ConnectionIO, PgShdependRow]
+  def update: UpdateBuilder[PgShdependFields, PgShdependRow]
 }

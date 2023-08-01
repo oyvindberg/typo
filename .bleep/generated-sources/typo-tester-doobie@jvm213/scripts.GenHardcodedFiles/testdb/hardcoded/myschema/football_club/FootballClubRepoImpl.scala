@@ -14,16 +14,26 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
     sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilder("myschema.football_club", FootballClubFields)
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
           values (${fromWrite(unsaved.id)(Write.fromPut(FootballClubId.put))}::int8, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))})
           returning "id", "name"
        """.query(FootballClubRow.read).unique
+  }
+  override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
+    SelectBuilderSql("myschema.football_club", FootballClubFields, FootballClubRow.read)
   }
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.read).stream
@@ -42,6 +52,9 @@ object FootballClubRepoImpl extends FootballClubRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilder("myschema.football_club", FootballClubFields, FootballClubRow.read)
   }
   override def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")

@@ -10,10 +10,22 @@ package pg_index
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] = scala.collection.mutable.Map.empty) extends PgIndexRepo {
   override def delete(indexrelid: PgIndexId): ConnectionIO[Boolean] = {
     delay(map.remove(indexrelid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgIndexFields, PgIndexRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgIndexFields, map)
   }
   override def insert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
         map.put(unsaved.indexrelid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgIndexFields, PgIndexRow] = {
+    SelectBuilderMock(PgIndexFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgIndexRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgIndexRepoMock(map: scala.collection.mutable.Map[PgIndexId, PgIndexRow] =
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgIndexFields, PgIndexRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgIndexFields, map)
   }
   override def upsert(unsaved: PgIndexRow): ConnectionIO[PgIndexRow] = {
     delay {

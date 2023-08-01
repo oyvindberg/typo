@@ -9,7 +9,9 @@ package pg_stat_all_tables
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgStatAllTablesViewRepo {
+  def select: SelectBuilder[PgStatAllTablesViewFields, PgStatAllTablesViewRow]
   def selectAll: Stream[ConnectionIO, PgStatAllTablesViewRow]
 }

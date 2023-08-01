@@ -9,8 +9,13 @@ package vjobcandidateemployment
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRepo {
+  override def select: SelectBuilder[VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow] = {
+    SelectBuilderSql("humanresources.vjobcandidateemployment", VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[VjobcandidateemploymentViewRow] = {
     SQL"""select jobcandidateid, "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City"
           from humanresources.vjobcandidateemployment

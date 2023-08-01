@@ -9,8 +9,13 @@ package pg_stat_progress_basebackup
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgStatProgressBasebackupViewRepoImpl extends PgStatProgressBasebackupViewRepo {
+  override def select: SelectBuilder[PgStatProgressBasebackupViewFields, PgStatProgressBasebackupViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_stat_progress_basebackup", PgStatProgressBasebackupViewFields, PgStatProgressBasebackupViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[PgStatProgressBasebackupViewRow] = {
     SQL"""select pid, phase, backup_total, backup_streamed, tablespaces_total, tablespaces_streamed
           from pg_catalog.pg_stat_progress_basebackup

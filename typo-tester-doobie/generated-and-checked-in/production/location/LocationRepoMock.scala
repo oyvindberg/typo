@@ -10,11 +10,23 @@ package location
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
                        map: scala.collection.mutable.Map[LocationId, LocationRow] = scala.collection.mutable.Map.empty) extends LocationRepo {
   override def delete(locationid: LocationId): ConnectionIO[Boolean] = {
     delay(map.remove(locationid).isDefined)
+  }
+  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, LocationFields, map)
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     delay {
@@ -27,6 +39,9 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   }
   override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[LocationFields, LocationRow] = {
+    SelectBuilderMock(LocationFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[LocationFields, LocationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, LocationFields, map)
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     delay {

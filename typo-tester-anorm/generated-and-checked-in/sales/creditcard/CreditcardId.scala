@@ -12,11 +12,13 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** Type for the primary key of table `sales.creditcard` */
 case class CreditcardId(value: Int) extends AnyVal
 object CreditcardId {
   implicit val arrayToStatement: ToStatement[Array[CreditcardId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit val bijection: Bijection[CreditcardId, Int] = Bijection[CreditcardId, Int](_.value)(CreditcardId.apply)
   implicit val column: Column[CreditcardId] = implicitly[Column[Int]].map(CreditcardId.apply)
   implicit val ordering: Ordering[CreditcardId] = Ordering.by(_.value)
   implicit val parameterMetadata: ParameterMetaData[CreditcardId] = new ParameterMetaData[CreditcardId] {

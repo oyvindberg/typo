@@ -9,13 +9,19 @@ package emailaddress
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait EmailaddressRepo {
   def delete(compositeId: EmailaddressId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
   def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
   def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow]
+  def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll: Stream[ConnectionIO, EmailaddressRow]
   def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]]
   def update(row: EmailaddressRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
   def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
 }

@@ -8,7 +8,9 @@ package pg_catalog
 package pg_policies
 
 import java.sql.Connection
+import typo.dsl.SelectBuilder
 
 trait PgPoliciesViewRepo {
+  def select: SelectBuilder[PgPoliciesViewFields, PgPoliciesViewRow]
   def selectAll(implicit c: Connection): List[PgPoliciesViewRow]
 }

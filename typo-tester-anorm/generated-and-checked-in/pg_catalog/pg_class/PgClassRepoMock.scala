@@ -8,10 +8,22 @@ package pg_catalog
 package pg_class
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgClassRepoMock(map: scala.collection.mutable.Map[PgClassId, PgClassRow] = scala.collection.mutable.Map.empty) extends PgClassRepo {
   override def delete(oid: PgClassId)(implicit c: Connection): Boolean = {
     map.remove(oid).isDefined
+  }
+  override def delete: DeleteBuilder[PgClassFields, PgClassRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgClassFields, map)
   }
   override def insert(unsaved: PgClassRow)(implicit c: Connection): PgClassRow = {
     if (map.contains(unsaved.oid))
@@ -19,6 +31,9 @@ class PgClassRepoMock(map: scala.collection.mutable.Map[PgClassId, PgClassRow] =
     else
       map.put(unsaved.oid, unsaved)
     unsaved
+  }
+  override def select: SelectBuilder[PgClassFields, PgClassRow] = {
+    SelectBuilderMock(PgClassFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[PgClassRow] = {
     map.values.toList
@@ -37,6 +52,9 @@ class PgClassRepoMock(map: scala.collection.mutable.Map[PgClassId, PgClassRow] =
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[PgClassFields, PgClassRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgClassFields, map)
   }
   override def upsert(unsaved: PgClassRow)(implicit c: Connection): PgClassRow = {
     map.put(unsaved.oid, unsaved)

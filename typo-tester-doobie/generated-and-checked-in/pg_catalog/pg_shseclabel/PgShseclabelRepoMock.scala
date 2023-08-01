@@ -10,10 +10,22 @@ package pg_shseclabel
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgShseclabelRow] = scala.collection.mutable.Map.empty) extends PgShseclabelRepo {
   override def delete(compositeId: PgShseclabelId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def delete: DeleteBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgShseclabelFields, map)
   }
   override def insert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgS
         map.put(unsaved.compositeId, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    SelectBuilderMock(PgShseclabelFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgShseclabelRow] = {
     Stream.emits(map.values.toList)
@@ -40,6 +55,9 @@ class PgShseclabelRepoMock(map: scala.collection.mutable.Map[PgShseclabelId, PgS
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgShseclabelFields, PgShseclabelRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgShseclabelFields, map)
   }
   override def upsert(unsaved: PgShseclabelRow): ConnectionIO[PgShseclabelRow] = {
     delay {

@@ -11,6 +11,7 @@ import doobie.util.Put
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
+import typo.dsl.Bijection
 
 /** Domain `public.NameStyle`
   * No constraint
@@ -19,6 +20,7 @@ case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
   implicit val arrayGet: Get[Array[NameStyle]] = adventureworks.BooleanArrayMeta.get.map(_.map(NameStyle.apply))
   implicit val arrayPut: Put[Array[NameStyle]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
+  implicit val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)
   implicit val decoder: Decoder[NameStyle] = Decoder.decodeBoolean.map(NameStyle.apply)
   implicit val encoder: Encoder[NameStyle] = Encoder.encodeBoolean.contramap(_.value)
   implicit val get: Get[NameStyle] = Meta.BooleanMeta.get.map(NameStyle.apply)

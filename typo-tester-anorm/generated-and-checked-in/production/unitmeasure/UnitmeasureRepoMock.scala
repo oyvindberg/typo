@@ -8,11 +8,23 @@ package production
 package unitmeasure
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow],
                           map: scala.collection.mutable.Map[UnitmeasureId, UnitmeasureRow] = scala.collection.mutable.Map.empty) extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
     map.remove(unitmeasurecode).isDefined
+  }
+  override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields, map)
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     if (map.contains(unsaved.unitmeasurecode))
@@ -23,6 +35,9 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   }
   override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    SelectBuilderMock(UnitmeasureFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
     map.values.toList
@@ -41,6 +56,9 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields, map)
   }
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     map.put(unsaved.unitmeasurecode, unsaved)

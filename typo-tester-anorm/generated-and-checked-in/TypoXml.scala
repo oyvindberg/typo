@@ -15,6 +15,7 @@ import org.postgresql.jdbc.PgSQLXML
 import org.postgresql.util.PGobject
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
+import typo.dsl.Bijection
 
 /** XML */
 case class TypoXml(value: String)
@@ -41,6 +42,7 @@ object TypoXml {
                                                                                                                    obj.setValue(v.value)
                                                                                                                    obj
                                                                                                                  }))))
+  implicit val bijection: Bijection[TypoXml, String] = Bijection[TypoXml, String](_.value)(TypoXml.apply)
   implicit val column: Column[TypoXml] = Column.nonNull[TypoXml]((v1: Any, _) =>
     v1 match {
       case v: PgSQLXML => Right(TypoXml(v.getString))

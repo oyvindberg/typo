@@ -8,11 +8,23 @@ package person
 package emailaddress
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, EmailaddressRow],
                            map: scala.collection.mutable.Map[EmailaddressId, EmailaddressRow] = scala.collection.mutable.Map.empty) extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields, map)
   }
   override def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
     if (map.contains(unsaved.compositeId))
@@ -23,6 +35,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   }
   override def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
+    SelectBuilderMock(EmailaddressFields, () => map.values.toList, SelectParams.empty)
   }
   override def selectAll(implicit c: Connection): List[EmailaddressRow] = {
     map.values.toList
@@ -38,6 +53,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
         true
       case None => false
     }
+  }
+  override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields, map)
   }
   override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
     map.put(unsaved.compositeId, unsaved)

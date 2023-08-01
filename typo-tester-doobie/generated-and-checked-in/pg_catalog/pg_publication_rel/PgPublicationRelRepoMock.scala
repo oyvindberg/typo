@@ -10,10 +10,22 @@ package pg_publication_rel
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRelId, PgPublicationRelRow] = scala.collection.mutable.Map.empty) extends PgPublicationRelRepo {
   override def delete(oid: PgPublicationRelId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgPublicationRelFields, map)
   }
   override def insert(unsaved: PgPublicationRelRow): ConnectionIO[PgPublicationRelRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRe
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    SelectBuilderMock(PgPublicationRelFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgPublicationRelRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgPublicationRelRepoMock(map: scala.collection.mutable.Map[PgPublicationRe
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgPublicationRelFields, PgPublicationRelRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgPublicationRelFields, map)
   }
   override def upsert(unsaved: PgPublicationRelRow): ConnectionIO[PgPublicationRelRow] = {
     delay {

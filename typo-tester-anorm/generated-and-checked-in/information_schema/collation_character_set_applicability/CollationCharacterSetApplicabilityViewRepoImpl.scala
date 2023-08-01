@@ -9,8 +9,13 @@ package collation_character_set_applicability
 
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object CollationCharacterSetApplicabilityViewRepoImpl extends CollationCharacterSetApplicabilityViewRepo {
+  override def select: SelectBuilder[CollationCharacterSetApplicabilityViewFields, CollationCharacterSetApplicabilityViewRow] = {
+    SelectBuilderSql("information_schema.collation_character_set_applicability", CollationCharacterSetApplicabilityViewFields, CollationCharacterSetApplicabilityViewRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[CollationCharacterSetApplicabilityViewRow] = {
     SQL"""select "collation_catalog", "collation_schema", "collation_name", "character_set_catalog", "character_set_schema", "character_set_name"
           from information_schema.collation_character_set_applicability

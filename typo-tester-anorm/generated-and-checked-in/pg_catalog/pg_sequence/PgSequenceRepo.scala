@@ -8,13 +8,19 @@ package pg_catalog
 package pg_sequence
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait PgSequenceRepo {
   def delete(seqrelid: PgSequenceId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[PgSequenceFields, PgSequenceRow]
   def insert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow
+  def select: SelectBuilder[PgSequenceFields, PgSequenceRow]
   def selectAll(implicit c: Connection): List[PgSequenceRow]
   def selectById(seqrelid: PgSequenceId)(implicit c: Connection): Option[PgSequenceRow]
   def selectByIds(seqrelids: Array[PgSequenceId])(implicit c: Connection): List[PgSequenceRow]
   def update(row: PgSequenceRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[PgSequenceFields, PgSequenceRow]
   def upsert(unsaved: PgSequenceRow)(implicit c: Connection): PgSequenceRow
 }

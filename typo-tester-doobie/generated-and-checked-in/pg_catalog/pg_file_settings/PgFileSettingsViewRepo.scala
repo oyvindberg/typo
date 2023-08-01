@@ -9,7 +9,9 @@ package pg_file_settings
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.SelectBuilder
 
 trait PgFileSettingsViewRepo {
+  def select: SelectBuilder[PgFileSettingsViewFields, PgFileSettingsViewRow]
   def selectAll: Stream[ConnectionIO, PgFileSettingsViewRow]
 }

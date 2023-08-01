@@ -10,11 +10,23 @@ package salesterritory
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, SalesterritoryRow],
                              map: scala.collection.mutable.Map[SalesterritoryId, SalesterritoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId): ConnectionIO[Boolean] = {
     delay(map.remove(territoryid).isDefined)
+  }
+  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields, map)
   }
   override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     delay {
@@ -27,6 +39,9 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     insert(toRow(unsaved))
+  }
+  override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    SelectBuilderMock(SalesterritoryFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, SalesterritoryRow] = {
     Stream.emits(map.values.toList)
@@ -47,6 +62,9 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields, map)
   }
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     delay {

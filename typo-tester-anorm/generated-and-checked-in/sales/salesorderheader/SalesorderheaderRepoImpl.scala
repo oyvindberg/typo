@@ -15,10 +15,17 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import java.util.UUID
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId)(implicit c: Connection): Boolean = {
     SQL"delete from sales.salesorderheader where salesorderid = $salesorderid".executeUpdate() > 0
+  }
+  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    DeleteBuilder("sales.salesorderheader", SalesorderheaderFields)
   }
   override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
     SQL"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)
@@ -105,6 +112,9 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     }
     
   }
+  override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    SelectBuilderSql("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.rowParser)
+  }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     SQL"""select salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text
           from sales.salesorderheader
@@ -152,6 +162,9 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
               modifieddate = ${row.modifieddate}::timestamp
           where salesorderid = $salesorderid
        """.executeUpdate() > 0
+  }
+  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    UpdateBuilder("sales.salesorderheader", SalesorderheaderFields, SalesorderheaderRow.rowParser)
   }
   override def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
     SQL"""insert into sales.salesorderheader(salesorderid, revisionnumber, orderdate, duedate, shipdate, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate)

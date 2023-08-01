@@ -10,8 +10,13 @@ package pg_prepared_xacts
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object PgPreparedXactsViewRepoImpl extends PgPreparedXactsViewRepo {
+  override def select: SelectBuilder[PgPreparedXactsViewFields, PgPreparedXactsViewRow] = {
+    SelectBuilderSql("pg_catalog.pg_prepared_xacts", PgPreparedXactsViewFields, PgPreparedXactsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PgPreparedXactsViewRow] = {
     sql"""select "transaction", gid, "prepared"::text, "owner", "database" from pg_catalog.pg_prepared_xacts""".query(PgPreparedXactsViewRow.read).stream
   }

@@ -9,14 +9,20 @@ package employee
 
 import adventureworks.person.businessentity.BusinessentityId
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait EmployeeRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[EmployeeFields, EmployeeRow]
   def insert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow
   def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow
+  def select: SelectBuilder[EmployeeFields, EmployeeRow]
   def selectAll(implicit c: Connection): List[EmployeeRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[EmployeeRow]
   def update(row: EmployeeRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[EmployeeFields, EmployeeRow]
   def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow
 }

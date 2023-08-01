@@ -8,13 +8,19 @@ package humanresources
 package employeepayhistory
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait EmployeepayhistoryRepo {
   def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
   def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow
+  def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def selectAll(implicit c: Connection): List[EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow]
   def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
 }

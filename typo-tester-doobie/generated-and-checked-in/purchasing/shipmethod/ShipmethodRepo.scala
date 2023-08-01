@@ -9,14 +9,20 @@ package shipmethod
 
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait ShipmethodRepo {
   def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean]
+  def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
   def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
   def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow]
+  def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll: Stream[ConnectionIO, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]]
   def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow]
   def update(row: ShipmethodRow): ConnectionIO[Boolean]
+  def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
   def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
 }

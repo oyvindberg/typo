@@ -10,8 +10,13 @@ package constraint_column_usage
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ConstraintColumnUsageViewRepoImpl extends ConstraintColumnUsageViewRepo {
+  override def select: SelectBuilder[ConstraintColumnUsageViewFields, ConstraintColumnUsageViewRow] = {
+    SelectBuilderSql("information_schema.constraint_column_usage", ConstraintColumnUsageViewFields, ConstraintColumnUsageViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ConstraintColumnUsageViewRow] = {
     sql"""select table_catalog, table_schema, "table_name", "column_name", "constraint_catalog", "constraint_schema", "constraint_name" from information_schema.constraint_column_usage""".query(ConstraintColumnUsageViewRow.read).stream
   }

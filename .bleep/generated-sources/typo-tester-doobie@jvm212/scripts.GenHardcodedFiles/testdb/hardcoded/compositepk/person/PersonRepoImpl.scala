@@ -16,10 +16,17 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import testdb.hardcoded.Defaulted
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
+import typo.dsl.UpdateBuilder
 
 object PersonRepoImpl extends PersonRepo {
   override def delete(compositeId: PersonId): ConnectionIO[Boolean] = {
     sql"""delete from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
+  }
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("compositepk.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", two, "name")
@@ -54,6 +61,9 @@ object PersonRepoImpl extends PersonRepo {
     q.query(PersonRow.read).unique
     
   }
+  override def select: SelectBuilder[PersonFields, PersonRow] = {
+    SelectBuilderSql("compositepk.person", PersonFields, PersonRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
     sql"""select "one", two, "name" from compositepk.person""".query(PersonRow.read).stream
   }
@@ -68,6 +78,9 @@ object PersonRepoImpl extends PersonRepo {
       .update
       .run
       .map(_ > 0)
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("compositepk.person", PersonFields, PersonRow.read)
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", two, "name")

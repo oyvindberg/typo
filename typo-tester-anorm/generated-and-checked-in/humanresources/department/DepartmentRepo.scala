@@ -8,14 +8,20 @@ package humanresources
 package department
 
 import java.sql.Connection
+import typo.dsl.DeleteBuilder
+import typo.dsl.SelectBuilder
+import typo.dsl.UpdateBuilder
 
 trait DepartmentRepo {
   def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean
+  def delete: DeleteBuilder[DepartmentFields, DepartmentRow]
   def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow
   def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow
+  def select: SelectBuilder[DepartmentFields, DepartmentRow]
   def selectAll(implicit c: Connection): List[DepartmentRow]
   def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow]
   def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow]
   def update(row: DepartmentRow)(implicit c: Connection): Boolean
+  def update: UpdateBuilder[DepartmentFields, DepartmentRow]
   def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow
 }

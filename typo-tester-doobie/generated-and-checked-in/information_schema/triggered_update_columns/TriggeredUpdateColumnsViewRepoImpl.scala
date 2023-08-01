@@ -10,8 +10,13 @@ package triggered_update_columns
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object TriggeredUpdateColumnsViewRepoImpl extends TriggeredUpdateColumnsViewRepo {
+  override def select: SelectBuilder[TriggeredUpdateColumnsViewFields, TriggeredUpdateColumnsViewRow] = {
+    SelectBuilderSql("information_schema.triggered_update_columns", TriggeredUpdateColumnsViewFields, TriggeredUpdateColumnsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, TriggeredUpdateColumnsViewRow] = {
     sql"""select "trigger_catalog", "trigger_schema", "trigger_name", event_object_catalog, event_object_schema, event_object_table, event_object_column from information_schema.triggered_update_columns""".query(TriggeredUpdateColumnsViewRow.read).stream
   }

@@ -10,10 +10,22 @@ package pg_constraint
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
 import fs2.Stream
+import typo.dsl.DeleteBuilder
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.DeleteParams
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderMock
+import typo.dsl.SelectParams
+import typo.dsl.UpdateBuilder
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
+import typo.dsl.UpdateParams
 
 class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgConstraintRow] = scala.collection.mutable.Map.empty) extends PgConstraintRepo {
   override def delete(oid: PgConstraintId): ConnectionIO[Boolean] = {
     delay(map.remove(oid).isDefined)
+  }
+  override def delete: DeleteBuilder[PgConstraintFields, PgConstraintRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PgConstraintFields, map)
   }
   override def insert(unsaved: PgConstraintRow): ConnectionIO[PgConstraintRow] = {
     delay {
@@ -23,6 +35,9 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
         map.put(unsaved.oid, unsaved)
       unsaved
     }
+  }
+  override def select: SelectBuilder[PgConstraintFields, PgConstraintRow] = {
+    SelectBuilderMock(PgConstraintFields, delay(map.values.toList), SelectParams.empty)
   }
   override def selectAll: Stream[ConnectionIO, PgConstraintRow] = {
     Stream.emits(map.values.toList)
@@ -43,6 +58,9 @@ class PgConstraintRepoMock(map: scala.collection.mutable.Map[PgConstraintId, PgC
         case None => false
       }
     }
+  }
+  override def update: UpdateBuilder[PgConstraintFields, PgConstraintRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PgConstraintFields, map)
   }
   override def upsert(unsaved: PgConstraintRow): ConnectionIO[PgConstraintRow] = {
     delay {

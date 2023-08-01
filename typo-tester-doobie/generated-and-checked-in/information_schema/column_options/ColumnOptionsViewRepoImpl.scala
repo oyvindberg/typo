@@ -10,8 +10,13 @@ package column_options
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
+import typo.dsl.SelectBuilder
+import typo.dsl.SelectBuilderSql
 
 object ColumnOptionsViewRepoImpl extends ColumnOptionsViewRepo {
+  override def select: SelectBuilder[ColumnOptionsViewFields, ColumnOptionsViewRow] = {
+    SelectBuilderSql("information_schema.column_options", ColumnOptionsViewFields, ColumnOptionsViewRow.read)
+  }
   override def selectAll: Stream[ConnectionIO, ColumnOptionsViewRow] = {
     sql"""select table_catalog, table_schema, "table_name", "column_name", option_name, option_value from information_schema.column_options""".query(ColumnOptionsViewRow.read).stream
   }
