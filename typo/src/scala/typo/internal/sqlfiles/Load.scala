@@ -54,10 +54,12 @@ object Load {
     val sql = s"""create temporary view $viewName as (${decomposedSql.sqlWithNulls})"""
     try {
       SQL(sql).execute()
-      ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
+      val ret = ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
         val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
         (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
       }.toMap
+      SQL(s"drop view $viewName").execute()
+      ret
     } catch {
       case e: PSQLException =>
         System.err.println(s"Couldn't read dependencies for $sqlFile through a temporary view: ${e.getMessage}. SQL: $sql")
