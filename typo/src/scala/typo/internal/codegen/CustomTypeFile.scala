@@ -8,7 +8,7 @@ object CustomTypeFile {
     val comments = scaladoc(ct.comment)(Nil)
 
     val maybeBijection = ct.params match {
-      case NonEmptyList(sc.Param(name, underlying, _), Nil) =>
+      case NonEmptyList(sc.Param(name, underlying, _), Nil) if options.enableDsl =>
         val bijection = {
           val thisBijection = sc.Type.dsl.Bijection.of(ct.typoType, underlying)
           sc.Given(Nil, sc.Ident("bijection"), Nil, thisBijection, code"$thisBijection(_.$name)(${ct.typoType}.apply)")

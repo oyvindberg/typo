@@ -16,15 +16,18 @@ object DomainFile {
     val value = sc.Ident("value")
 
     val underlying: sc.Type = typeMapperScala.domain(dom.tpe)
-    val bijection = {
-      val thisBijection = sc.Type.dsl.Bijection.of(tpe, underlying)
-      sc.Given(Nil, sc.Ident("bijection"), Nil, thisBijection, code"$thisBijection(_.$value)($tpe.apply)")
-    }
+    val bijection =
+      if (options.enableDsl)
+        Some {
+          val thisBijection = sc.Type.dsl.Bijection.of(tpe, underlying)
+          sc.Given(Nil, sc.Ident("bijection"), Nil, thisBijection, code"$thisBijection(_.$value)($tpe.apply)")
+        }
+      else None
     val instances = List(
       List(
-        bijection,
         genOrdering.ordering(tpe, NonEmptyList(sc.Param(value, underlying, None)))
       ),
+      bijection.toList,
       options.jsonLibs.flatMap(_.anyValInstances(wrapperType = tpe, fieldName = value, underlying = underlying)),
       options.dbLib.toList.flatMap(_.anyValInstances(wrapperType = tpe, underlying = underlying))
     ).flatten
