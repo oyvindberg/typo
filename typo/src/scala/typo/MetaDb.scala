@@ -1,5 +1,6 @@
 package typo
 
+import typo.internal.TypeMapperDb
 import typo.internal.metadb.load
 import typo.internal.sqlfiles.SqlFile
 
@@ -13,9 +14,9 @@ case class MetaDb(
     sqlFiles: List[SqlFile]
 )
 object MetaDb {
-  def fromDb(implicit c: Connection): MetaDb =
+  def fromDb(implicit c: Connection): (MetaDb, TypeMapperDb) =
     load(maybeScriptPath = None)
 
-  def fromDbAndScripts(scriptPath: Path)(implicit c: Connection): MetaDb =
+  def fromDbAndScripts(scriptPath: Path)(implicit c: Connection): (MetaDb, TypeMapperDb) =
     load(maybeScriptPath = Some(scriptPath))
 }

@@ -54,7 +54,7 @@ object load {
     }
   }
 
-  def apply(maybeScriptPath: Option[Path])(implicit c: Connection): MetaDb = {
+  def apply(maybeScriptPath: Option[Path])(implicit c: Connection): (MetaDb, TypeMapperDb) = {
     val input = load.Input.fromDb
     val groupedViewRows: Map[db.RelationName, ViewFindAllSqlRow] =
       input.viewRows.map { view => (db.RelationName(view.tableSchema, view.tableName.get), view) }.toMap
@@ -165,6 +165,6 @@ object load {
       case None             => Nil
     }
 
-    MetaDb(relations, enums, domains, sqlScripts)
+    (MetaDb(relations, enums, domains, sqlScripts), typeMapperDb)
   }
 }

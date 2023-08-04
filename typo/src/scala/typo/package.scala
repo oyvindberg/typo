@@ -8,10 +8,10 @@ import scala.collection.immutable.SortedMap
 
 package object typo {
   def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated =
-    fromMetaDb(options, load(maybeScriptPath = Some(scriptsPath)), selector)
+    fromMetaDb(options, load(maybeScriptPath = Some(scriptsPath))._1, selector)
 
   def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated =
-    fromMetaDb(options, load(maybeScriptPath = None), selector)
+    fromMetaDb(options, load(maybeScriptPath = None)._1, selector)
 
   // use this constructor if you need to run `typo` multiple times with different options but same database/scripts
   def fromMetaDb(publicOptions: Options, metaDb: MetaDb, selector: Selector): Generated = {
