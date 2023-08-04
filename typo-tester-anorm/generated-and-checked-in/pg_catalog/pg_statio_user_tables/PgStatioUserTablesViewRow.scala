@@ -45,7 +45,7 @@ case class PgStatioUserTablesViewRow(
 )
 
 object PgStatioUserTablesViewRow {
-  implicit val reads: Reads[PgStatioUserTablesViewRow] = Reads[PgStatioUserTablesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatioUserTablesViewRow] = Reads[PgStatioUserTablesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioUserTablesViewRow(
           relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
@@ -80,7 +80,7 @@ object PgStatioUserTablesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatioUserTablesViewRow] = OWrites[PgStatioUserTablesViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatioUserTablesViewRow] = OWrites[PgStatioUserTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),

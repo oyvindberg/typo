@@ -29,7 +29,7 @@ case class PgAuthMembersRow(
  }
 
 object PgAuthMembersRow {
-  implicit val reads: Reads[PgAuthMembersRow] = Reads[PgAuthMembersRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgAuthMembersRow] = Reads[PgAuthMembersRow](json => JsResult.fromTry(
       Try(
         PgAuthMembersRow(
           roleid = json.\("roleid").as(Reads.LongReads),
@@ -50,7 +50,7 @@ object PgAuthMembersRow {
       )
     )
   }
-  implicit val writes: OWrites[PgAuthMembersRow] = OWrites[PgAuthMembersRow](o =>
+  implicit lazy val writes: OWrites[PgAuthMembersRow] = OWrites[PgAuthMembersRow](o =>
     new JsObject(ListMap[String, JsValue](
       "roleid" -> Writes.LongWrites.writes(o.roleid),
       "member" -> Writes.LongWrites.writes(o.member),

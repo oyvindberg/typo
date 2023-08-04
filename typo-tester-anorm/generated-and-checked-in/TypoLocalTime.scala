@@ -23,7 +23,7 @@ case class TypoLocalTime(value: LocalTime)
 object TypoLocalTime {
   def apply(value: LocalTime): TypoLocalTime = new TypoLocalTime(value.truncatedTo(ChronoUnit.MICROS))
   def now = TypoLocalTime(LocalTime.now)
-  implicit val arrayColumn: Column[Array[TypoLocalTime]] = Column.nonNull[Array[TypoLocalTime]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoLocalTime]] = Column.nonNull[Array[TypoLocalTime]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -34,24 +34,24 @@ object TypoLocalTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalTime]] = new ParameterMetaData[Array[TypoLocalTime]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalTime]] = new ParameterMetaData[Array[TypoLocalTime]] {
     override def sqlType: String = "_time"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoLocalTime]] = ToStatement[Array[TypoLocalTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("time", v.map(v => v.value.toString))))
-  implicit val bijection: Bijection[TypoLocalTime, LocalTime] = Bijection[TypoLocalTime, LocalTime](_.value)(TypoLocalTime.apply)
-  implicit val column: Column[TypoLocalTime] = Column.nonNull[TypoLocalTime]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoLocalTime]] = ToStatement[Array[TypoLocalTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("time", v.map(v => v.value.toString))))
+  implicit lazy val bijection: Bijection[TypoLocalTime, LocalTime] = Bijection[TypoLocalTime, LocalTime](_.value)(TypoLocalTime.apply)
+  implicit lazy val column: Column[TypoLocalTime] = Column.nonNull[TypoLocalTime]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoLocalTime(LocalTime.parse(v)))
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
   implicit def ordering(implicit O0: Ordering[LocalTime]): Ordering[TypoLocalTime] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoLocalTime] = new ParameterMetaData[TypoLocalTime] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalTime] = new ParameterMetaData[TypoLocalTime] {
     override def sqlType: String = "time"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoLocalTime] = Reads.DefaultLocalTimeReads.map(TypoLocalTime.apply)
-  implicit val toStatement: ToStatement[TypoLocalTime] = ToStatement[TypoLocalTime]((s, index, v) => s.setObject(index, v.value.toString))
-  implicit val writes: Writes[TypoLocalTime] = Writes.DefaultLocalTimeWrites.contramap(_.value)
+  implicit lazy val reads: Reads[TypoLocalTime] = Reads.DefaultLocalTimeReads.map(TypoLocalTime.apply)
+  implicit lazy val toStatement: ToStatement[TypoLocalTime] = ToStatement[TypoLocalTime]((s, index, v) => s.setObject(index, v.value.toString))
+  implicit lazy val writes: Writes[TypoLocalTime] = Writes.DefaultLocalTimeWrites.contramap(_.value)
 }

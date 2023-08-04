@@ -57,7 +57,7 @@ case class PgStatisticRow(
  }
 
 object PgStatisticRow {
-  implicit val reads: Reads[PgStatisticRow] = Reads[PgStatisticRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatisticRow] = Reads[PgStatisticRow](json => JsResult.fromTry(
       Try(
         PgStatisticRow(
           starelid = json.\("starelid").as(Reads.LongReads),
@@ -132,7 +132,7 @@ object PgStatisticRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatisticRow] = OWrites[PgStatisticRow](o =>
+  implicit lazy val writes: OWrites[PgStatisticRow] = OWrites[PgStatisticRow](o =>
     new JsObject(ListMap[String, JsValue](
       "starelid" -> Writes.LongWrites.writes(o.starelid),
       "staattnum" -> Writes.IntWrites.writes(o.staattnum),

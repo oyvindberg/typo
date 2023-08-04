@@ -25,7 +25,7 @@ import scala.util.Try
 case class TypoLine(a: Double, b: Double, c: Double)
 
 object TypoLine {
-  implicit val arrayColumn: Column[Array[TypoLine]] = Column.nonNull[Array[TypoLine]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoLine]] = Column.nonNull[Array[TypoLine]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -36,23 +36,23 @@ object TypoLine {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLine]] = new ParameterMetaData[Array[TypoLine]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoLine]] = new ParameterMetaData[Array[TypoLine]] {
     override def sqlType: String = "_line"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoLine]] = ToStatement[Array[TypoLine]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("line", v.map(v => new PGline(v.a, v.b, v.c)))))
-  implicit val column: Column[TypoLine] = Column.nonNull[TypoLine]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoLine]] = ToStatement[Array[TypoLine]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("line", v.map(v => new PGline(v.a, v.b, v.c)))))
+  implicit lazy val column: Column[TypoLine] = Column.nonNull[TypoLine]((v1: Any, _) =>
     v1 match {
       case v: PGline => Right(TypoLine(v.a, v.b, v.c))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGline, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoLine] = Ordering.by(x => (x.a, x.b, x.c))
-  implicit val parameterMetadata: ParameterMetaData[TypoLine] = new ParameterMetaData[TypoLine] {
+  implicit lazy val ordering: Ordering[TypoLine] = Ordering.by(x => (x.a, x.b, x.c))
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLine] = new ParameterMetaData[TypoLine] {
     override def sqlType: String = "line"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoLine] = Reads[TypoLine](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TypoLine] = Reads[TypoLine](json => JsResult.fromTry(
       Try(
         TypoLine(
           a = json.\("a").as(Reads.DoubleReads),
@@ -62,8 +62,8 @@ object TypoLine {
       )
     ),
   )
-  implicit val toStatement: ToStatement[TypoLine] = ToStatement[TypoLine]((s, index, v) => s.setObject(index, new PGline(v.a, v.b, v.c)))
-  implicit val writes: OWrites[TypoLine] = OWrites[TypoLine](o =>
+  implicit lazy val toStatement: ToStatement[TypoLine] = ToStatement[TypoLine]((s, index, v) => s.setObject(index, new PGline(v.a, v.b, v.c)))
+  implicit lazy val writes: OWrites[TypoLine] = OWrites[TypoLine](o =>
     new JsObject(ListMap[String, JsValue](
       "a" -> Writes.DoubleWrites.writes(o.a),
       "b" -> Writes.DoubleWrites.writes(o.b),

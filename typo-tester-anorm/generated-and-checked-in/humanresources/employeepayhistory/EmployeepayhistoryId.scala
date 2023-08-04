@@ -21,7 +21,7 @@ import scala.util.Try
 case class EmployeepayhistoryId(businessentityid: BusinessentityId, ratechangedate: TypoLocalDateTime)
 object EmployeepayhistoryId {
   implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[EmployeepayhistoryId] = Ordering.by(x => (x.businessentityid, x.ratechangedate))
-  implicit val reads: Reads[EmployeepayhistoryId] = Reads[EmployeepayhistoryId](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[EmployeepayhistoryId] = Reads[EmployeepayhistoryId](json => JsResult.fromTry(
       Try(
         EmployeepayhistoryId(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -30,7 +30,7 @@ object EmployeepayhistoryId {
       )
     ),
   )
-  implicit val writes: OWrites[EmployeepayhistoryId] = OWrites[EmployeepayhistoryId](o =>
+  implicit lazy val writes: OWrites[EmployeepayhistoryId] = OWrites[EmployeepayhistoryId](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate)

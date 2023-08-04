@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_user_mapping` */
 case class PgUserMappingId(value: /* oid */ Long) extends AnyVal
 object PgUserMappingId {
-  implicit val arrayToStatement: ToStatement[Array[PgUserMappingId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgUserMappingId, /* oid */ Long] = Bijection[PgUserMappingId, /* oid */ Long](_.value)(PgUserMappingId.apply)
-  implicit val column: Column[PgUserMappingId] = implicitly[Column[/* oid */ Long]].map(PgUserMappingId.apply)
-  implicit val ordering: Ordering[PgUserMappingId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgUserMappingId] = new ParameterMetaData[PgUserMappingId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgUserMappingId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgUserMappingId, /* oid */ Long] = Bijection[PgUserMappingId, /* oid */ Long](_.value)(PgUserMappingId.apply)
+  implicit lazy val column: Column[PgUserMappingId] = implicitly[Column[/* oid */ Long]].map(PgUserMappingId.apply)
+  implicit lazy val ordering: Ordering[PgUserMappingId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgUserMappingId] = new ParameterMetaData[PgUserMappingId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgUserMappingId] = Reads.LongReads.map(PgUserMappingId.apply)
-  implicit val toStatement: ToStatement[PgUserMappingId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgUserMappingId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgUserMappingId] = Reads.LongReads.map(PgUserMappingId.apply)
+  implicit lazy val toStatement: ToStatement[PgUserMappingId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgUserMappingId] = Writes.LongWrites.contramap(_.value)
 }

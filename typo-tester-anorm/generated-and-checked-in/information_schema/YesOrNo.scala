@@ -18,15 +18,15 @@ import typo.dsl.Bijection
   */
 case class YesOrNo(value: String) extends AnyVal
 object YesOrNo {
-  implicit val arrayToStatement: ToStatement[Array[YesOrNo]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[YesOrNo, String] = Bijection[YesOrNo, String](_.value)(YesOrNo.apply)
-  implicit val column: Column[YesOrNo] = implicitly[Column[String]].map(YesOrNo.apply)
-  implicit val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {
+  implicit lazy val arrayToStatement: ToStatement[Array[YesOrNo]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[YesOrNo, String] = Bijection[YesOrNo, String](_.value)(YesOrNo.apply)
+  implicit lazy val column: Column[YesOrNo] = implicitly[Column[String]].map(YesOrNo.apply)
+  implicit lazy val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[YesOrNo] = Reads.StringReads.map(YesOrNo.apply)
-  implicit val toStatement: ToStatement[YesOrNo] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[YesOrNo] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val reads: Reads[YesOrNo] = Reads.StringReads.map(YesOrNo.apply)
+  implicit lazy val toStatement: ToStatement[YesOrNo] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val writes: Writes[YesOrNo] = Writes.StringWrites.contramap(_.value)
 }

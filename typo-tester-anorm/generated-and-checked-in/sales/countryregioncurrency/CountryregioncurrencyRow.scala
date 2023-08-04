@@ -33,7 +33,7 @@ case class CountryregioncurrencyRow(
  }
 
 object CountryregioncurrencyRow {
-  implicit val reads: Reads[CountryregioncurrencyRow] = Reads[CountryregioncurrencyRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CountryregioncurrencyRow] = Reads[CountryregioncurrencyRow](json => JsResult.fromTry(
       Try(
         CountryregioncurrencyRow(
           countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
@@ -52,7 +52,7 @@ object CountryregioncurrencyRow {
       )
     )
   }
-  implicit val writes: OWrites[CountryregioncurrencyRow] = OWrites[CountryregioncurrencyRow](o =>
+  implicit lazy val writes: OWrites[CountryregioncurrencyRow] = OWrites[CountryregioncurrencyRow](o =>
     new JsObject(ListMap[String, JsValue](
       "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
       "currencycode" -> CurrencyId.writes.writes(o.currencycode),

@@ -158,7 +158,7 @@ case class SalesorderheaderRowUnsaved(
     )
 }
 object SalesorderheaderRowUnsaved {
-  implicit val reads: Reads[SalesorderheaderRowUnsaved] = Reads[SalesorderheaderRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SalesorderheaderRowUnsaved] = Reads[SalesorderheaderRowUnsaved](json => JsResult.fromTry(
       Try(
         SalesorderheaderRowUnsaved(
           duedate = json.\("duedate").as(TypoLocalDateTime.reads),
@@ -190,7 +190,7 @@ object SalesorderheaderRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[SalesorderheaderRowUnsaved] = OWrites[SalesorderheaderRowUnsaved](o =>
+  implicit lazy val writes: OWrites[SalesorderheaderRowUnsaved] = OWrites[SalesorderheaderRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "duedate" -> TypoLocalDateTime.writes.writes(o.duedate),
       "shipdate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.shipdate),

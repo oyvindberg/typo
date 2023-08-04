@@ -33,7 +33,7 @@ case class PgLanguageRow(
 )
 
 object PgLanguageRow {
-  implicit val reads: Reads[PgLanguageRow] = Reads[PgLanguageRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgLanguageRow] = Reads[PgLanguageRow](json => JsResult.fromTry(
       Try(
         PgLanguageRow(
           oid = json.\("oid").as(PgLanguageId.reads),
@@ -64,7 +64,7 @@ object PgLanguageRow {
       )
     )
   }
-  implicit val writes: OWrites[PgLanguageRow] = OWrites[PgLanguageRow](o =>
+  implicit lazy val writes: OWrites[PgLanguageRow] = OWrites[PgLanguageRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgLanguageId.writes.writes(o.oid),
       "lanname" -> Writes.StringWrites.writes(o.lanname),

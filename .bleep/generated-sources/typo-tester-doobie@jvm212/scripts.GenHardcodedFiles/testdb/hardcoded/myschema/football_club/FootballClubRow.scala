@@ -21,9 +21,9 @@ case class FootballClubRow(
 )
 
 object FootballClubRow {
-  implicit val decoder: Decoder[FootballClubRow] = Decoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(FootballClubRow.apply)(FootballClubId.decoder, Decoder.decodeString)
-  implicit val encoder: Encoder[FootballClubRow] = Encoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(x => (x.id, x.name))(FootballClubId.encoder, Encoder.encodeString)
-  implicit val read: Read[FootballClubRow] = new Read[FootballClubRow](
+  implicit lazy val decoder: Decoder[FootballClubRow] = Decoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(FootballClubRow.apply)(FootballClubId.decoder, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[FootballClubRow] = Encoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(x => (x.id, x.name))(FootballClubId.encoder, Encoder.encodeString)
+  implicit lazy val read: Read[FootballClubRow] = new Read[FootballClubRow](
     gets = List(
       (FootballClubId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls)

@@ -42,7 +42,7 @@ case class ScrapreasonRowUnsaved(
     )
 }
 object ScrapreasonRowUnsaved {
-  implicit val reads: Reads[ScrapreasonRowUnsaved] = Reads[ScrapreasonRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ScrapreasonRowUnsaved] = Reads[ScrapreasonRowUnsaved](json => JsResult.fromTry(
       Try(
         ScrapreasonRowUnsaved(
           name = json.\("name").as(Name.reads),
@@ -52,7 +52,7 @@ object ScrapreasonRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[ScrapreasonRowUnsaved] = OWrites[ScrapreasonRowUnsaved](o =>
+  implicit lazy val writes: OWrites[ScrapreasonRowUnsaved] = OWrites[ScrapreasonRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),
       "scrapreasonid" -> Defaulted.writes(ScrapreasonId.writes).writes(o.scrapreasonid),

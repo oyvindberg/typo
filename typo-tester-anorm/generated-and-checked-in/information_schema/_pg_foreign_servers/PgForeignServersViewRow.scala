@@ -34,7 +34,7 @@ case class PgForeignServersViewRow(
 )
 
 object PgForeignServersViewRow {
-  implicit val reads: Reads[PgForeignServersViewRow] = Reads[PgForeignServersViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgForeignServersViewRow] = Reads[PgForeignServersViewRow](json => JsResult.fromTry(
       Try(
         PgForeignServersViewRow(
           oid = json.\("oid").toOption.map(_.as(Reads.LongReads)),
@@ -65,7 +65,7 @@ object PgForeignServersViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgForeignServersViewRow] = OWrites[PgForeignServersViewRow](o =>
+  implicit lazy val writes: OWrites[PgForeignServersViewRow] = OWrites[PgForeignServersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.oid),
       "srvoptions" -> Writes.OptionWrites(Writes.arrayWrites[String](implicitly, Writes.StringWrites)).writes(o.srvoptions),

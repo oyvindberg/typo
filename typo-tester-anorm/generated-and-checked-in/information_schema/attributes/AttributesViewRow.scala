@@ -58,7 +58,7 @@ case class AttributesViewRow(
 )
 
 object AttributesViewRow {
-  implicit val reads: Reads[AttributesViewRow] = Reads[AttributesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[AttributesViewRow] = Reads[AttributesViewRow](json => JsResult.fromTry(
       Try(
         AttributesViewRow(
           udtCatalog = json.\("udt_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -133,7 +133,7 @@ object AttributesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[AttributesViewRow] = OWrites[AttributesViewRow](o =>
+  implicit lazy val writes: OWrites[AttributesViewRow] = OWrites[AttributesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "udt_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtCatalog),
       "udt_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtSchema),

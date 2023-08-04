@@ -83,7 +83,7 @@ case class PgtestnullRow(
 )
 
 object PgtestnullRow {
-  implicit val reads: Reads[PgtestnullRow] = Reads[PgtestnullRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgtestnullRow] = Reads[PgtestnullRow](json => JsResult.fromTry(
       Try(
         PgtestnullRow(
           box = json.\("box").toOption.map(_.as(TypoBox.reads)),
@@ -176,7 +176,7 @@ object PgtestnullRow {
       )
     )
   }
-  implicit val writes: OWrites[PgtestnullRow] = OWrites[PgtestnullRow](o =>
+  implicit lazy val writes: OWrites[PgtestnullRow] = OWrites[PgtestnullRow](o =>
     new JsObject(ListMap[String, JsValue](
       "box" -> Writes.OptionWrites(TypoBox.writes).writes(o.box),
       "circle" -> Writes.OptionWrites(TypoCircle.writes).writes(o.circle),

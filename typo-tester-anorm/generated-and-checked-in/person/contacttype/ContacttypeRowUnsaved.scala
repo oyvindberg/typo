@@ -42,7 +42,7 @@ case class ContacttypeRowUnsaved(
     )
 }
 object ContacttypeRowUnsaved {
-  implicit val reads: Reads[ContacttypeRowUnsaved] = Reads[ContacttypeRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ContacttypeRowUnsaved] = Reads[ContacttypeRowUnsaved](json => JsResult.fromTry(
       Try(
         ContacttypeRowUnsaved(
           name = json.\("name").as(Name.reads),
@@ -52,7 +52,7 @@ object ContacttypeRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[ContacttypeRowUnsaved] = OWrites[ContacttypeRowUnsaved](o =>
+  implicit lazy val writes: OWrites[ContacttypeRowUnsaved] = OWrites[ContacttypeRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),
       "contacttypeid" -> Defaulted.writes(ContacttypeId.writes).writes(o.contacttypeid),

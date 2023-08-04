@@ -25,7 +25,7 @@ case class InformationSchemaCatalogNameViewRow(
 )
 
 object InformationSchemaCatalogNameViewRow {
-  implicit val reads: Reads[InformationSchemaCatalogNameViewRow] = Reads[InformationSchemaCatalogNameViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[InformationSchemaCatalogNameViewRow] = Reads[InformationSchemaCatalogNameViewRow](json => JsResult.fromTry(
       Try(
         InformationSchemaCatalogNameViewRow(
           catalogName = json.\("catalog_name").toOption.map(_.as(SqlIdentifier.reads))
@@ -40,7 +40,7 @@ object InformationSchemaCatalogNameViewRow {
       )
     )
   }
-  implicit val writes: OWrites[InformationSchemaCatalogNameViewRow] = OWrites[InformationSchemaCatalogNameViewRow](o =>
+  implicit lazy val writes: OWrites[InformationSchemaCatalogNameViewRow] = OWrites[InformationSchemaCatalogNameViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "catalog_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.catalogName)
     ))

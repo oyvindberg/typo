@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.productsubcategory` */
 case class ProductsubcategoryId(value: Int) extends AnyVal
 object ProductsubcategoryId {
-  implicit val arrayToStatement: ToStatement[Array[ProductsubcategoryId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[ProductsubcategoryId, Int] = Bijection[ProductsubcategoryId, Int](_.value)(ProductsubcategoryId.apply)
-  implicit val column: Column[ProductsubcategoryId] = implicitly[Column[Int]].map(ProductsubcategoryId.apply)
-  implicit val ordering: Ordering[ProductsubcategoryId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[ProductsubcategoryId] = new ParameterMetaData[ProductsubcategoryId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[ProductsubcategoryId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[ProductsubcategoryId, Int] = Bijection[ProductsubcategoryId, Int](_.value)(ProductsubcategoryId.apply)
+  implicit lazy val column: Column[ProductsubcategoryId] = implicitly[Column[Int]].map(ProductsubcategoryId.apply)
+  implicit lazy val ordering: Ordering[ProductsubcategoryId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[ProductsubcategoryId] = new ParameterMetaData[ProductsubcategoryId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[ProductsubcategoryId] = Reads.IntReads.map(ProductsubcategoryId.apply)
-  implicit val toStatement: ToStatement[ProductsubcategoryId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[ProductsubcategoryId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[ProductsubcategoryId] = Reads.IntReads.map(ProductsubcategoryId.apply)
+  implicit lazy val toStatement: ToStatement[ProductsubcategoryId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[ProductsubcategoryId] = Writes.IntWrites.contramap(_.value)
 }

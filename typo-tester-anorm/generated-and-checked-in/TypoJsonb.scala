@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoJsonb(value: String)
 
 object TypoJsonb {
-  implicit val arrayColumn: Column[Array[TypoJsonb]] = Column.nonNull[Array[TypoJsonb]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoJsonb]] = Column.nonNull[Array[TypoJsonb]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoJsonb {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoJsonb]] = new ParameterMetaData[Array[TypoJsonb]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoJsonb]] = new ParameterMetaData[Array[TypoJsonb]] {
     override def sqlType: String = "_jsonb"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoJsonb]] = ToStatement[Array[TypoJsonb]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("jsonb", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoJsonb]] = ToStatement[Array[TypoJsonb]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("jsonb", v.map(v => {
                                                                                                                        val obj = new PGobject
                                                                                                                        obj.setType("jsonb")
                                                                                                                        obj.setValue(v.value)
                                                                                                                        obj
                                                                                                                      }))))
-  implicit val bijection: Bijection[TypoJsonb, String] = Bijection[TypoJsonb, String](_.value)(TypoJsonb.apply)
-  implicit val column: Column[TypoJsonb] = Column.nonNull[TypoJsonb]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoJsonb, String] = Bijection[TypoJsonb, String](_.value)(TypoJsonb.apply)
+  implicit lazy val column: Column[TypoJsonb] = Column.nonNull[TypoJsonb]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoJsonb(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoJsonb] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoJsonb] = new ParameterMetaData[TypoJsonb] {
+  implicit lazy val ordering: Ordering[TypoJsonb] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoJsonb] = new ParameterMetaData[TypoJsonb] {
     override def sqlType: String = "jsonb"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoJsonb] = Reads.StringReads.map(TypoJsonb.apply)
-  implicit val toStatement: ToStatement[TypoJsonb] = ToStatement[TypoJsonb]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoJsonb] = Reads.StringReads.map(TypoJsonb.apply)
+  implicit lazy val toStatement: ToStatement[TypoJsonb] = ToStatement[TypoJsonb]((s, index, v) => s.setObject(index, {
                                                                val obj = new PGobject
                                                                obj.setType("jsonb")
                                                                obj.setValue(v.value)
                                                                obj
                                                              }))
-  implicit val writes: Writes[TypoJsonb] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoJsonb] = Writes.StringWrites.contramap(_.value)
 }

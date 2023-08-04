@@ -43,7 +43,7 @@ case class IllustrationRowUnsaved(
     )
 }
 object IllustrationRowUnsaved {
-  implicit val reads: Reads[IllustrationRowUnsaved] = Reads[IllustrationRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[IllustrationRowUnsaved] = Reads[IllustrationRowUnsaved](json => JsResult.fromTry(
       Try(
         IllustrationRowUnsaved(
           diagram = json.\("diagram").toOption.map(_.as(TypoXml.reads)),
@@ -53,7 +53,7 @@ object IllustrationRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[IllustrationRowUnsaved] = OWrites[IllustrationRowUnsaved](o =>
+  implicit lazy val writes: OWrites[IllustrationRowUnsaved] = OWrites[IllustrationRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),
       "illustrationid" -> Defaulted.writes(IllustrationId.writes).writes(o.illustrationid),

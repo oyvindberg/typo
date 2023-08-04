@@ -27,7 +27,7 @@ case class PgForeignTableColumnsViewRow(
 )
 
 object PgForeignTableColumnsViewRow {
-  implicit val reads: Reads[PgForeignTableColumnsViewRow] = Reads[PgForeignTableColumnsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgForeignTableColumnsViewRow] = Reads[PgForeignTableColumnsViewRow](json => JsResult.fromTry(
       Try(
         PgForeignTableColumnsViewRow(
           nspname = json.\("nspname").toOption.map(_.as(Reads.StringReads)),
@@ -48,7 +48,7 @@ object PgForeignTableColumnsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgForeignTableColumnsViewRow] = OWrites[PgForeignTableColumnsViewRow](o =>
+  implicit lazy val writes: OWrites[PgForeignTableColumnsViewRow] = OWrites[PgForeignTableColumnsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "nspname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.nspname),
       "relname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.relname),

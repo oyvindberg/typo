@@ -20,8 +20,8 @@ import scala.util.Try
 /** Type for the composite primary key of table `person.emailaddress` */
 case class EmailaddressId(businessentityid: BusinessentityId, emailaddressid: Int)
 object EmailaddressId {
-  implicit val ordering: Ordering[EmailaddressId] = Ordering.by(x => (x.businessentityid, x.emailaddressid))
-  implicit val reads: Reads[EmailaddressId] = Reads[EmailaddressId](json => JsResult.fromTry(
+  implicit lazy val ordering: Ordering[EmailaddressId] = Ordering.by(x => (x.businessentityid, x.emailaddressid))
+  implicit lazy val reads: Reads[EmailaddressId] = Reads[EmailaddressId](json => JsResult.fromTry(
       Try(
         EmailaddressId(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -30,7 +30,7 @@ object EmailaddressId {
       )
     ),
   )
-  implicit val writes: OWrites[EmailaddressId] = OWrites[EmailaddressId](o =>
+  implicit lazy val writes: OWrites[EmailaddressId] = OWrites[EmailaddressId](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "emailaddressid" -> Writes.IntWrites.writes(o.emailaddressid)

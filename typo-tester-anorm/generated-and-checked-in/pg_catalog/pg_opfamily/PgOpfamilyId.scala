@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_opfamily` */
 case class PgOpfamilyId(value: /* oid */ Long) extends AnyVal
 object PgOpfamilyId {
-  implicit val arrayToStatement: ToStatement[Array[PgOpfamilyId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgOpfamilyId, /* oid */ Long] = Bijection[PgOpfamilyId, /* oid */ Long](_.value)(PgOpfamilyId.apply)
-  implicit val column: Column[PgOpfamilyId] = implicitly[Column[/* oid */ Long]].map(PgOpfamilyId.apply)
-  implicit val ordering: Ordering[PgOpfamilyId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgOpfamilyId] = new ParameterMetaData[PgOpfamilyId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgOpfamilyId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgOpfamilyId, /* oid */ Long] = Bijection[PgOpfamilyId, /* oid */ Long](_.value)(PgOpfamilyId.apply)
+  implicit lazy val column: Column[PgOpfamilyId] = implicitly[Column[/* oid */ Long]].map(PgOpfamilyId.apply)
+  implicit lazy val ordering: Ordering[PgOpfamilyId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgOpfamilyId] = new ParameterMetaData[PgOpfamilyId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgOpfamilyId] = Reads.LongReads.map(PgOpfamilyId.apply)
-  implicit val toStatement: ToStatement[PgOpfamilyId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgOpfamilyId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgOpfamilyId] = Reads.LongReads.map(PgOpfamilyId.apply)
+  implicit lazy val toStatement: ToStatement[PgOpfamilyId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgOpfamilyId] = Writes.LongWrites.contramap(_.value)
 }

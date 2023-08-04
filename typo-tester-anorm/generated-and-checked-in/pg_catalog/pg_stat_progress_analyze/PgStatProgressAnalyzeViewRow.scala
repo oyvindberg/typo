@@ -35,7 +35,7 @@ case class PgStatProgressAnalyzeViewRow(
 )
 
 object PgStatProgressAnalyzeViewRow {
-  implicit val reads: Reads[PgStatProgressAnalyzeViewRow] = Reads[PgStatProgressAnalyzeViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatProgressAnalyzeViewRow] = Reads[PgStatProgressAnalyzeViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressAnalyzeViewRow(
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
@@ -72,7 +72,7 @@ object PgStatProgressAnalyzeViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatProgressAnalyzeViewRow] = OWrites[PgStatProgressAnalyzeViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatProgressAnalyzeViewRow] = OWrites[PgStatProgressAnalyzeViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),

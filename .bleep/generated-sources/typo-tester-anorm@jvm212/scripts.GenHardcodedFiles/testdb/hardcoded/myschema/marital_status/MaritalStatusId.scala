@@ -18,15 +18,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `myschema.marital_status` */
 case class MaritalStatusId(value: Long) extends AnyVal
 object MaritalStatusId {
-  implicit val arrayToStatement: ToStatement[Array[MaritalStatusId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[MaritalStatusId, Long] = Bijection[MaritalStatusId, Long](_.value)(MaritalStatusId.apply)
-  implicit val column: Column[MaritalStatusId] = implicitly[Column[Long]].map(MaritalStatusId.apply)
-  implicit val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[MaritalStatusId] = new ParameterMetaData[MaritalStatusId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[MaritalStatusId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[MaritalStatusId, Long] = Bijection[MaritalStatusId, Long](_.value)(MaritalStatusId.apply)
+  implicit lazy val column: Column[MaritalStatusId] = implicitly[Column[Long]].map(MaritalStatusId.apply)
+  implicit lazy val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[MaritalStatusId] = new ParameterMetaData[MaritalStatusId] {
     override def sqlType: String = implicitly[ParameterMetaData[Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Long]].jdbcType
   }
-  implicit val reads: Reads[MaritalStatusId] = Reads.LongReads.map(MaritalStatusId.apply)
-  implicit val toStatement: ToStatement[MaritalStatusId] = implicitly[ToStatement[Long]].contramap(_.value)
-  implicit val writes: Writes[MaritalStatusId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[MaritalStatusId] = Reads.LongReads.map(MaritalStatusId.apply)
+  implicit lazy val toStatement: ToStatement[MaritalStatusId] = implicitly[ToStatement[Long]].contramap(_.value)
+  implicit lazy val writes: Writes[MaritalStatusId] = Writes.LongWrites.contramap(_.value)
 }

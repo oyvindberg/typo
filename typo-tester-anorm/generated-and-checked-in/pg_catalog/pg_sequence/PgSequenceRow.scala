@@ -31,7 +31,7 @@ case class PgSequenceRow(
 )
 
 object PgSequenceRow {
-  implicit val reads: Reads[PgSequenceRow] = Reads[PgSequenceRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgSequenceRow] = Reads[PgSequenceRow](json => JsResult.fromTry(
       Try(
         PgSequenceRow(
           seqrelid = json.\("seqrelid").as(PgSequenceId.reads),
@@ -60,7 +60,7 @@ object PgSequenceRow {
       )
     )
   }
-  implicit val writes: OWrites[PgSequenceRow] = OWrites[PgSequenceRow](o =>
+  implicit lazy val writes: OWrites[PgSequenceRow] = OWrites[PgSequenceRow](o =>
     new JsObject(ListMap[String, JsValue](
       "seqrelid" -> PgSequenceId.writes.writes(o.seqrelid),
       "seqtypid" -> Writes.LongWrites.writes(o.seqtypid),

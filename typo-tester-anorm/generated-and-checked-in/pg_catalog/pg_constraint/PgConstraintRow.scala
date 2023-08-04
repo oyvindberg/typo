@@ -49,7 +49,7 @@ case class PgConstraintRow(
 )
 
 object PgConstraintRow {
-  implicit val reads: Reads[PgConstraintRow] = Reads[PgConstraintRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgConstraintRow] = Reads[PgConstraintRow](json => JsResult.fromTry(
       Try(
         PgConstraintRow(
           oid = json.\("oid").as(PgConstraintId.reads),
@@ -112,7 +112,7 @@ object PgConstraintRow {
       )
     )
   }
-  implicit val writes: OWrites[PgConstraintRow] = OWrites[PgConstraintRow](o =>
+  implicit lazy val writes: OWrites[PgConstraintRow] = OWrites[PgConstraintRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgConstraintId.writes.writes(o.oid),
       "conname" -> Writes.StringWrites.writes(o.conname),

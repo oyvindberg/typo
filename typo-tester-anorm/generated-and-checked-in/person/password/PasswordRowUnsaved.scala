@@ -49,7 +49,7 @@ case class PasswordRowUnsaved(
     )
 }
 object PasswordRowUnsaved {
-  implicit val reads: Reads[PasswordRowUnsaved] = Reads[PasswordRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PasswordRowUnsaved] = Reads[PasswordRowUnsaved](json => JsResult.fromTry(
       Try(
         PasswordRowUnsaved(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -61,7 +61,7 @@ object PasswordRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[PasswordRowUnsaved] = OWrites[PasswordRowUnsaved](o =>
+  implicit lazy val writes: OWrites[PasswordRowUnsaved] = OWrites[PasswordRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "passwordhash" -> Writes.StringWrites.writes(o.passwordhash),

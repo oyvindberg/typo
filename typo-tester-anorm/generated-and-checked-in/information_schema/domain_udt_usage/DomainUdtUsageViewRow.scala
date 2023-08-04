@@ -30,7 +30,7 @@ case class DomainUdtUsageViewRow(
 )
 
 object DomainUdtUsageViewRow {
-  implicit val reads: Reads[DomainUdtUsageViewRow] = Reads[DomainUdtUsageViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[DomainUdtUsageViewRow] = Reads[DomainUdtUsageViewRow](json => JsResult.fromTry(
       Try(
         DomainUdtUsageViewRow(
           udtCatalog = json.\("udt_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -55,7 +55,7 @@ object DomainUdtUsageViewRow {
       )
     )
   }
-  implicit val writes: OWrites[DomainUdtUsageViewRow] = OWrites[DomainUdtUsageViewRow](o =>
+  implicit lazy val writes: OWrites[DomainUdtUsageViewRow] = OWrites[DomainUdtUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "udt_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtCatalog),
       "udt_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.udtSchema),

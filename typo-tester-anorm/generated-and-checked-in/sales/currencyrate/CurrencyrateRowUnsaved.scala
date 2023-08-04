@@ -57,7 +57,7 @@ case class CurrencyrateRowUnsaved(
     )
 }
 object CurrencyrateRowUnsaved {
-  implicit val reads: Reads[CurrencyrateRowUnsaved] = Reads[CurrencyrateRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CurrencyrateRowUnsaved] = Reads[CurrencyrateRowUnsaved](json => JsResult.fromTry(
       Try(
         CurrencyrateRowUnsaved(
           currencyratedate = json.\("currencyratedate").as(TypoLocalDateTime.reads),
@@ -71,7 +71,7 @@ object CurrencyrateRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[CurrencyrateRowUnsaved] = OWrites[CurrencyrateRowUnsaved](o =>
+  implicit lazy val writes: OWrites[CurrencyrateRowUnsaved] = OWrites[CurrencyrateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "currencyratedate" -> TypoLocalDateTime.writes.writes(o.currencyratedate),
       "fromcurrencycode" -> CurrencyId.writes.writes(o.fromcurrencycode),

@@ -33,7 +33,7 @@ case class UmViewRow(
 )
 
 object UmViewRow {
-  implicit val reads: Reads[UmViewRow] = Reads[UmViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[UmViewRow] = Reads[UmViewRow](json => JsResult.fromTry(
       Try(
         UmViewRow(
           id = json.\("id").toOption.map(_.as(Reads.StringReads)),
@@ -54,7 +54,7 @@ object UmViewRow {
       )
     )
   }
-  implicit val writes: OWrites[UmViewRow] = OWrites[UmViewRow](o =>
+  implicit lazy val writes: OWrites[UmViewRow] = OWrites[UmViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "id" -> Writes.OptionWrites(Writes.StringWrites).writes(o.id),
       "unitmeasurecode" -> Writes.OptionWrites(UnitmeasureId.writes).writes(o.unitmeasurecode),

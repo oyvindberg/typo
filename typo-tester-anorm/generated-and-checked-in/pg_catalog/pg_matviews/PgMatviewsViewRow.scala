@@ -30,7 +30,7 @@ case class PgMatviewsViewRow(
 )
 
 object PgMatviewsViewRow {
-  implicit val reads: Reads[PgMatviewsViewRow] = Reads[PgMatviewsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgMatviewsViewRow] = Reads[PgMatviewsViewRow](json => JsResult.fromTry(
       Try(
         PgMatviewsViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
@@ -57,7 +57,7 @@ object PgMatviewsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgMatviewsViewRow] = OWrites[PgMatviewsViewRow](o =>
+  implicit lazy val writes: OWrites[PgMatviewsViewRow] = OWrites[PgMatviewsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "matviewname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.matviewname),

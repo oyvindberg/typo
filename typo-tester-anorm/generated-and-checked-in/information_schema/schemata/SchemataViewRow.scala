@@ -32,7 +32,7 @@ case class SchemataViewRow(
 )
 
 object SchemataViewRow {
-  implicit val reads: Reads[SchemataViewRow] = Reads[SchemataViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SchemataViewRow] = Reads[SchemataViewRow](json => JsResult.fromTry(
       Try(
         SchemataViewRow(
           catalogName = json.\("catalog_name").toOption.map(_.as(SqlIdentifier.reads)),
@@ -59,7 +59,7 @@ object SchemataViewRow {
       )
     )
   }
-  implicit val writes: OWrites[SchemataViewRow] = OWrites[SchemataViewRow](o =>
+  implicit lazy val writes: OWrites[SchemataViewRow] = OWrites[SchemataViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "catalog_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.catalogName),
       "schema_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.schemaName),

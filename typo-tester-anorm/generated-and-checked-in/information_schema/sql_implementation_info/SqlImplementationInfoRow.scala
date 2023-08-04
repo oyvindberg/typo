@@ -30,7 +30,7 @@ case class SqlImplementationInfoRow(
 )
 
 object SqlImplementationInfoRow {
-  implicit val reads: Reads[SqlImplementationInfoRow] = Reads[SqlImplementationInfoRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SqlImplementationInfoRow] = Reads[SqlImplementationInfoRow](json => JsResult.fromTry(
       Try(
         SqlImplementationInfoRow(
           implementationInfoId = json.\("implementation_info_id").toOption.map(_.as(CharacterData.reads)),
@@ -53,7 +53,7 @@ object SqlImplementationInfoRow {
       )
     )
   }
-  implicit val writes: OWrites[SqlImplementationInfoRow] = OWrites[SqlImplementationInfoRow](o =>
+  implicit lazy val writes: OWrites[SqlImplementationInfoRow] = OWrites[SqlImplementationInfoRow](o =>
     new JsObject(ListMap[String, JsValue](
       "implementation_info_id" -> Writes.OptionWrites(CharacterData.writes).writes(o.implementationInfoId),
       "implementation_info_name" -> Writes.OptionWrites(CharacterData.writes).writes(o.implementationInfoName),

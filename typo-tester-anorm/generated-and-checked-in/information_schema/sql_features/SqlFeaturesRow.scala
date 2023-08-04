@@ -32,7 +32,7 @@ case class SqlFeaturesRow(
 )
 
 object SqlFeaturesRow {
-  implicit val reads: Reads[SqlFeaturesRow] = Reads[SqlFeaturesRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SqlFeaturesRow] = Reads[SqlFeaturesRow](json => JsResult.fromTry(
       Try(
         SqlFeaturesRow(
           featureId = json.\("feature_id").toOption.map(_.as(CharacterData.reads)),
@@ -59,7 +59,7 @@ object SqlFeaturesRow {
       )
     )
   }
-  implicit val writes: OWrites[SqlFeaturesRow] = OWrites[SqlFeaturesRow](o =>
+  implicit lazy val writes: OWrites[SqlFeaturesRow] = OWrites[SqlFeaturesRow](o =>
     new JsObject(ListMap[String, JsValue](
       "feature_id" -> Writes.OptionWrites(CharacterData.writes).writes(o.featureId),
       "feature_name" -> Writes.OptionWrites(CharacterData.writes).writes(o.featureName),

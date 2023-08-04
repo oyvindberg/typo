@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoPgNodeTree(value: String)
 
 object TypoPgNodeTree {
-  implicit val arrayColumn: Column[Array[TypoPgNodeTree]] = Column.nonNull[Array[TypoPgNodeTree]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoPgNodeTree]] = Column.nonNull[Array[TypoPgNodeTree]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoPgNodeTree {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoPgNodeTree]] = new ParameterMetaData[Array[TypoPgNodeTree]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPgNodeTree]] = new ParameterMetaData[Array[TypoPgNodeTree]] {
     override def sqlType: String = "_pg_node_tree"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoPgNodeTree]] = ToStatement[Array[TypoPgNodeTree]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("pg_node_tree", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoPgNodeTree]] = ToStatement[Array[TypoPgNodeTree]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("pg_node_tree", v.map(v => {
                                                                                                                                    val obj = new PGobject
                                                                                                                                    obj.setType("pg_node_tree")
                                                                                                                                    obj.setValue(v.value)
                                                                                                                                    obj
                                                                                                                                  }))))
-  implicit val bijection: Bijection[TypoPgNodeTree, String] = Bijection[TypoPgNodeTree, String](_.value)(TypoPgNodeTree.apply)
-  implicit val column: Column[TypoPgNodeTree] = Column.nonNull[TypoPgNodeTree]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoPgNodeTree, String] = Bijection[TypoPgNodeTree, String](_.value)(TypoPgNodeTree.apply)
+  implicit lazy val column: Column[TypoPgNodeTree] = Column.nonNull[TypoPgNodeTree]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoPgNodeTree(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoPgNodeTree] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoPgNodeTree] = new ParameterMetaData[TypoPgNodeTree] {
+  implicit lazy val ordering: Ordering[TypoPgNodeTree] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPgNodeTree] = new ParameterMetaData[TypoPgNodeTree] {
     override def sqlType: String = "pg_node_tree"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoPgNodeTree] = Reads.StringReads.map(TypoPgNodeTree.apply)
-  implicit val toStatement: ToStatement[TypoPgNodeTree] = ToStatement[TypoPgNodeTree]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoPgNodeTree] = Reads.StringReads.map(TypoPgNodeTree.apply)
+  implicit lazy val toStatement: ToStatement[TypoPgNodeTree] = ToStatement[TypoPgNodeTree]((s, index, v) => s.setObject(index, {
                                                                     val obj = new PGobject
                                                                     obj.setType("pg_node_tree")
                                                                     obj.setValue(v.value)
                                                                     obj
                                                                   }))
-  implicit val writes: Writes[TypoPgNodeTree] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoPgNodeTree] = Writes.StringWrites.contramap(_.value)
 }

@@ -33,7 +33,7 @@ case class ForeignTableOptionsViewRow(
 )
 
 object ForeignTableOptionsViewRow {
-  implicit val reads: Reads[ForeignTableOptionsViewRow] = Reads[ForeignTableOptionsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ForeignTableOptionsViewRow] = Reads[ForeignTableOptionsViewRow](json => JsResult.fromTry(
       Try(
         ForeignTableOptionsViewRow(
           foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -56,7 +56,7 @@ object ForeignTableOptionsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[ForeignTableOptionsViewRow] = OWrites[ForeignTableOptionsViewRow](o =>
+  implicit lazy val writes: OWrites[ForeignTableOptionsViewRow] = OWrites[ForeignTableOptionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "foreign_table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableCatalog),
       "foreign_table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableSchema),

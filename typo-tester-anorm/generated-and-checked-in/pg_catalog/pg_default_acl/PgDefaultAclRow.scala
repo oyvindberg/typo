@@ -29,7 +29,7 @@ case class PgDefaultAclRow(
 )
 
 object PgDefaultAclRow {
-  implicit val reads: Reads[PgDefaultAclRow] = Reads[PgDefaultAclRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgDefaultAclRow] = Reads[PgDefaultAclRow](json => JsResult.fromTry(
       Try(
         PgDefaultAclRow(
           oid = json.\("oid").as(PgDefaultAclId.reads),
@@ -52,7 +52,7 @@ object PgDefaultAclRow {
       )
     )
   }
-  implicit val writes: OWrites[PgDefaultAclRow] = OWrites[PgDefaultAclRow](o =>
+  implicit lazy val writes: OWrites[PgDefaultAclRow] = OWrites[PgDefaultAclRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgDefaultAclId.writes.writes(o.oid),
       "defaclrole" -> Writes.LongWrites.writes(o.defaclrole),

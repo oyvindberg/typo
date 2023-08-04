@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_attrdef` */
 case class PgAttrdefId(value: /* oid */ Long) extends AnyVal
 object PgAttrdefId {
-  implicit val arrayToStatement: ToStatement[Array[PgAttrdefId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgAttrdefId, /* oid */ Long] = Bijection[PgAttrdefId, /* oid */ Long](_.value)(PgAttrdefId.apply)
-  implicit val column: Column[PgAttrdefId] = implicitly[Column[/* oid */ Long]].map(PgAttrdefId.apply)
-  implicit val ordering: Ordering[PgAttrdefId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgAttrdefId] = new ParameterMetaData[PgAttrdefId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgAttrdefId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgAttrdefId, /* oid */ Long] = Bijection[PgAttrdefId, /* oid */ Long](_.value)(PgAttrdefId.apply)
+  implicit lazy val column: Column[PgAttrdefId] = implicitly[Column[/* oid */ Long]].map(PgAttrdefId.apply)
+  implicit lazy val ordering: Ordering[PgAttrdefId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgAttrdefId] = new ParameterMetaData[PgAttrdefId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgAttrdefId] = Reads.LongReads.map(PgAttrdefId.apply)
-  implicit val toStatement: ToStatement[PgAttrdefId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgAttrdefId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgAttrdefId] = Reads.LongReads.map(PgAttrdefId.apply)
+  implicit lazy val toStatement: ToStatement[PgAttrdefId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgAttrdefId] = Writes.LongWrites.contramap(_.value)
 }

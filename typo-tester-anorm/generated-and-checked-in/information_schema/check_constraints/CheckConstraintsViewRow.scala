@@ -29,7 +29,7 @@ case class CheckConstraintsViewRow(
 )
 
 object CheckConstraintsViewRow {
-  implicit val reads: Reads[CheckConstraintsViewRow] = Reads[CheckConstraintsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CheckConstraintsViewRow] = Reads[CheckConstraintsViewRow](json => JsResult.fromTry(
       Try(
         CheckConstraintsViewRow(
           constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -50,7 +50,7 @@ object CheckConstraintsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[CheckConstraintsViewRow] = OWrites[CheckConstraintsViewRow](o =>
+  implicit lazy val writes: OWrites[CheckConstraintsViewRow] = OWrites[CheckConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
       "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),

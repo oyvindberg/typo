@@ -70,7 +70,7 @@ case class TransactionhistoryRowUnsaved(
     )
 }
 object TransactionhistoryRowUnsaved {
-  implicit val reads: Reads[TransactionhistoryRowUnsaved] = Reads[TransactionhistoryRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TransactionhistoryRowUnsaved] = Reads[TransactionhistoryRowUnsaved](json => JsResult.fromTry(
       Try(
         TransactionhistoryRowUnsaved(
           productid = json.\("productid").as(ProductId.reads),
@@ -86,7 +86,7 @@ object TransactionhistoryRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[TransactionhistoryRowUnsaved] = OWrites[TransactionhistoryRowUnsaved](o =>
+  implicit lazy val writes: OWrites[TransactionhistoryRowUnsaved] = OWrites[TransactionhistoryRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "productid" -> ProductId.writes.writes(o.productid),
       "referenceorderid" -> Writes.IntWrites.writes(o.referenceorderid),

@@ -29,7 +29,7 @@ case class CollationsViewRow(
 )
 
 object CollationsViewRow {
-  implicit val reads: Reads[CollationsViewRow] = Reads[CollationsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CollationsViewRow] = Reads[CollationsViewRow](json => JsResult.fromTry(
       Try(
         CollationsViewRow(
           collationCatalog = json.\("collation_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -50,7 +50,7 @@ object CollationsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[CollationsViewRow] = OWrites[CollationsViewRow](o =>
+  implicit lazy val writes: OWrites[CollationsViewRow] = OWrites[CollationsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "collation_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationCatalog),
       "collation_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.collationSchema),

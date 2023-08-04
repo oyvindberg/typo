@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_amproc` */
 case class PgAmprocId(value: /* oid */ Long) extends AnyVal
 object PgAmprocId {
-  implicit val arrayToStatement: ToStatement[Array[PgAmprocId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgAmprocId, /* oid */ Long] = Bijection[PgAmprocId, /* oid */ Long](_.value)(PgAmprocId.apply)
-  implicit val column: Column[PgAmprocId] = implicitly[Column[/* oid */ Long]].map(PgAmprocId.apply)
-  implicit val ordering: Ordering[PgAmprocId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgAmprocId] = new ParameterMetaData[PgAmprocId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgAmprocId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgAmprocId, /* oid */ Long] = Bijection[PgAmprocId, /* oid */ Long](_.value)(PgAmprocId.apply)
+  implicit lazy val column: Column[PgAmprocId] = implicitly[Column[/* oid */ Long]].map(PgAmprocId.apply)
+  implicit lazy val ordering: Ordering[PgAmprocId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgAmprocId] = new ParameterMetaData[PgAmprocId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgAmprocId] = Reads.LongReads.map(PgAmprocId.apply)
-  implicit val toStatement: ToStatement[PgAmprocId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgAmprocId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgAmprocId] = Reads.LongReads.map(PgAmprocId.apply)
+  implicit lazy val toStatement: ToStatement[PgAmprocId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgAmprocId] = Writes.LongWrites.contramap(_.value)
 }

@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_statistic_ext` */
 case class PgStatisticExtId(value: /* oid */ Long) extends AnyVal
 object PgStatisticExtId {
-  implicit val arrayToStatement: ToStatement[Array[PgStatisticExtId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgStatisticExtId, /* oid */ Long] = Bijection[PgStatisticExtId, /* oid */ Long](_.value)(PgStatisticExtId.apply)
-  implicit val column: Column[PgStatisticExtId] = implicitly[Column[/* oid */ Long]].map(PgStatisticExtId.apply)
-  implicit val ordering: Ordering[PgStatisticExtId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgStatisticExtId] = new ParameterMetaData[PgStatisticExtId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgStatisticExtId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgStatisticExtId, /* oid */ Long] = Bijection[PgStatisticExtId, /* oid */ Long](_.value)(PgStatisticExtId.apply)
+  implicit lazy val column: Column[PgStatisticExtId] = implicitly[Column[/* oid */ Long]].map(PgStatisticExtId.apply)
+  implicit lazy val ordering: Ordering[PgStatisticExtId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgStatisticExtId] = new ParameterMetaData[PgStatisticExtId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgStatisticExtId] = Reads.LongReads.map(PgStatisticExtId.apply)
-  implicit val toStatement: ToStatement[PgStatisticExtId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgStatisticExtId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgStatisticExtId] = Reads.LongReads.map(PgStatisticExtId.apply)
+  implicit lazy val toStatement: ToStatement[PgStatisticExtId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgStatisticExtId] = Writes.LongWrites.contramap(_.value)
 }

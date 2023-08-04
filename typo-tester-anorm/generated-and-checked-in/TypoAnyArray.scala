@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoAnyArray(value: String)
 
 object TypoAnyArray {
-  implicit val arrayColumn: Column[Array[TypoAnyArray]] = Column.nonNull[Array[TypoAnyArray]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoAnyArray]] = Column.nonNull[Array[TypoAnyArray]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoAnyArray {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoAnyArray]] = new ParameterMetaData[Array[TypoAnyArray]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoAnyArray]] = new ParameterMetaData[Array[TypoAnyArray]] {
     override def sqlType: String = "_anyarray"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoAnyArray]] = ToStatement[Array[TypoAnyArray]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("anyarray", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoAnyArray]] = ToStatement[Array[TypoAnyArray]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("anyarray", v.map(v => {
                                                                                                                              val obj = new PGobject
                                                                                                                              obj.setType("anyarray")
                                                                                                                              obj.setValue(v.value)
                                                                                                                              obj
                                                                                                                            }))))
-  implicit val bijection: Bijection[TypoAnyArray, String] = Bijection[TypoAnyArray, String](_.value)(TypoAnyArray.apply)
-  implicit val column: Column[TypoAnyArray] = Column.nonNull[TypoAnyArray]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoAnyArray, String] = Bijection[TypoAnyArray, String](_.value)(TypoAnyArray.apply)
+  implicit lazy val column: Column[TypoAnyArray] = Column.nonNull[TypoAnyArray]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoAnyArray(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoAnyArray] = new ParameterMetaData[TypoAnyArray] {
+  implicit lazy val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoAnyArray] = new ParameterMetaData[TypoAnyArray] {
     override def sqlType: String = "anyarray"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoAnyArray] = Reads.StringReads.map(TypoAnyArray.apply)
-  implicit val toStatement: ToStatement[TypoAnyArray] = ToStatement[TypoAnyArray]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoAnyArray] = Reads.StringReads.map(TypoAnyArray.apply)
+  implicit lazy val toStatement: ToStatement[TypoAnyArray] = ToStatement[TypoAnyArray]((s, index, v) => s.setObject(index, {
                                                                   val obj = new PGobject
                                                                   obj.setType("anyarray")
                                                                   obj.setValue(v.value)
                                                                   obj
                                                                 }))
-  implicit val writes: Writes[TypoAnyArray] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoAnyArray] = Writes.StringWrites.contramap(_.value)
 }

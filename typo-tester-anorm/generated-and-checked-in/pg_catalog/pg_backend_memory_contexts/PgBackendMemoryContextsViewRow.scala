@@ -32,7 +32,7 @@ case class PgBackendMemoryContextsViewRow(
 )
 
 object PgBackendMemoryContextsViewRow {
-  implicit val reads: Reads[PgBackendMemoryContextsViewRow] = Reads[PgBackendMemoryContextsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgBackendMemoryContextsViewRow] = Reads[PgBackendMemoryContextsViewRow](json => JsResult.fromTry(
       Try(
         PgBackendMemoryContextsViewRow(
           name = json.\("name").toOption.map(_.as(Reads.StringReads)),
@@ -63,7 +63,7 @@ object PgBackendMemoryContextsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgBackendMemoryContextsViewRow] = OWrites[PgBackendMemoryContextsViewRow](o =>
+  implicit lazy val writes: OWrites[PgBackendMemoryContextsViewRow] = OWrites[PgBackendMemoryContextsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
       "ident" -> Writes.OptionWrites(Writes.StringWrites).writes(o.ident),

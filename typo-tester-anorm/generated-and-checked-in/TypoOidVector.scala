@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoOidVector(value: String)
 
 object TypoOidVector {
-  implicit val arrayColumn: Column[Array[TypoOidVector]] = Column.nonNull[Array[TypoOidVector]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoOidVector]] = Column.nonNull[Array[TypoOidVector]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoOidVector {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoOidVector]] = new ParameterMetaData[Array[TypoOidVector]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoOidVector]] = new ParameterMetaData[Array[TypoOidVector]] {
     override def sqlType: String = "_oidvector"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoOidVector]] = ToStatement[Array[TypoOidVector]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("oidvector", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoOidVector]] = ToStatement[Array[TypoOidVector]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("oidvector", v.map(v => {
                                                                                                                                val obj = new PGobject
                                                                                                                                obj.setType("oidvector")
                                                                                                                                obj.setValue(v.value)
                                                                                                                                obj
                                                                                                                              }))))
-  implicit val bijection: Bijection[TypoOidVector, String] = Bijection[TypoOidVector, String](_.value)(TypoOidVector.apply)
-  implicit val column: Column[TypoOidVector] = Column.nonNull[TypoOidVector]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoOidVector, String] = Bijection[TypoOidVector, String](_.value)(TypoOidVector.apply)
+  implicit lazy val column: Column[TypoOidVector] = Column.nonNull[TypoOidVector]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoOidVector(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoOidVector] = new ParameterMetaData[TypoOidVector] {
+  implicit lazy val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoOidVector] = new ParameterMetaData[TypoOidVector] {
     override def sqlType: String = "oidvector"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoOidVector] = Reads.StringReads.map(TypoOidVector.apply)
-  implicit val toStatement: ToStatement[TypoOidVector] = ToStatement[TypoOidVector]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoOidVector] = Reads.StringReads.map(TypoOidVector.apply)
+  implicit lazy val toStatement: ToStatement[TypoOidVector] = ToStatement[TypoOidVector]((s, index, v) => s.setObject(index, {
                                                                    val obj = new PGobject
                                                                    obj.setType("oidvector")
                                                                    obj.setValue(v.value)
                                                                    obj
                                                                  }))
-  implicit val writes: Writes[TypoOidVector] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoOidVector] = Writes.StringWrites.contramap(_.value)
 }

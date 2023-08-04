@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `person.stateprovince` */
 case class StateprovinceId(value: Int) extends AnyVal
 object StateprovinceId {
-  implicit val arrayToStatement: ToStatement[Array[StateprovinceId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[StateprovinceId, Int] = Bijection[StateprovinceId, Int](_.value)(StateprovinceId.apply)
-  implicit val column: Column[StateprovinceId] = implicitly[Column[Int]].map(StateprovinceId.apply)
-  implicit val ordering: Ordering[StateprovinceId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[StateprovinceId] = new ParameterMetaData[StateprovinceId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[StateprovinceId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[StateprovinceId, Int] = Bijection[StateprovinceId, Int](_.value)(StateprovinceId.apply)
+  implicit lazy val column: Column[StateprovinceId] = implicitly[Column[Int]].map(StateprovinceId.apply)
+  implicit lazy val ordering: Ordering[StateprovinceId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[StateprovinceId] = new ParameterMetaData[StateprovinceId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[StateprovinceId] = Reads.IntReads.map(StateprovinceId.apply)
-  implicit val toStatement: ToStatement[StateprovinceId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[StateprovinceId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[StateprovinceId] = Reads.IntReads.map(StateprovinceId.apply)
+  implicit lazy val toStatement: ToStatement[StateprovinceId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[StateprovinceId] = Writes.IntWrites.contramap(_.value)
 }

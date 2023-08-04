@@ -51,7 +51,7 @@ case class ProductphotoRowUnsaved(
     )
 }
 object ProductphotoRowUnsaved {
-  implicit val reads: Reads[ProductphotoRowUnsaved] = Reads[ProductphotoRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ProductphotoRowUnsaved] = Reads[ProductphotoRowUnsaved](json => JsResult.fromTry(
       Try(
         ProductphotoRowUnsaved(
           thumbnailphoto = json.\("thumbnailphoto").toOption.map(_.as(Reads.ArrayReads[Byte](Reads.ByteReads, implicitly))),
@@ -64,7 +64,7 @@ object ProductphotoRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[ProductphotoRowUnsaved] = OWrites[ProductphotoRowUnsaved](o =>
+  implicit lazy val writes: OWrites[ProductphotoRowUnsaved] = OWrites[ProductphotoRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "thumbnailphoto" -> Writes.OptionWrites(Writes.arrayWrites[Byte](implicitly, Writes.ByteWrites)).writes(o.thumbnailphoto),
       "thumbnailphotofilename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.thumbnailphotofilename),

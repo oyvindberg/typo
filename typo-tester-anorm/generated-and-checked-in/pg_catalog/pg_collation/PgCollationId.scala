@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_collation` */
 case class PgCollationId(value: /* oid */ Long) extends AnyVal
 object PgCollationId {
-  implicit val arrayToStatement: ToStatement[Array[PgCollationId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgCollationId, /* oid */ Long] = Bijection[PgCollationId, /* oid */ Long](_.value)(PgCollationId.apply)
-  implicit val column: Column[PgCollationId] = implicitly[Column[/* oid */ Long]].map(PgCollationId.apply)
-  implicit val ordering: Ordering[PgCollationId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgCollationId] = new ParameterMetaData[PgCollationId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgCollationId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgCollationId, /* oid */ Long] = Bijection[PgCollationId, /* oid */ Long](_.value)(PgCollationId.apply)
+  implicit lazy val column: Column[PgCollationId] = implicitly[Column[/* oid */ Long]].map(PgCollationId.apply)
+  implicit lazy val ordering: Ordering[PgCollationId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgCollationId] = new ParameterMetaData[PgCollationId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgCollationId] = Reads.LongReads.map(PgCollationId.apply)
-  implicit val toStatement: ToStatement[PgCollationId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgCollationId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgCollationId] = Reads.LongReads.map(PgCollationId.apply)
+  implicit lazy val toStatement: ToStatement[PgCollationId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgCollationId] = Writes.LongWrites.contramap(_.value)
 }

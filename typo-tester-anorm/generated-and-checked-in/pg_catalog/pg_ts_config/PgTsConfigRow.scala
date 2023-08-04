@@ -28,7 +28,7 @@ case class PgTsConfigRow(
 )
 
 object PgTsConfigRow {
-  implicit val reads: Reads[PgTsConfigRow] = Reads[PgTsConfigRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgTsConfigRow] = Reads[PgTsConfigRow](json => JsResult.fromTry(
       Try(
         PgTsConfigRow(
           oid = json.\("oid").as(PgTsConfigId.reads),
@@ -51,7 +51,7 @@ object PgTsConfigRow {
       )
     )
   }
-  implicit val writes: OWrites[PgTsConfigRow] = OWrites[PgTsConfigRow](o =>
+  implicit lazy val writes: OWrites[PgTsConfigRow] = OWrites[PgTsConfigRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgTsConfigId.writes.writes(o.oid),
       "cfgname" -> Writes.StringWrites.writes(o.cfgname),

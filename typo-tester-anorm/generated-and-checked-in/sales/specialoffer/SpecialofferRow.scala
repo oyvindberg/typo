@@ -45,7 +45,7 @@ case class SpecialofferRow(
 )
 
 object SpecialofferRow {
-  implicit val reads: Reads[SpecialofferRow] = Reads[SpecialofferRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SpecialofferRow] = Reads[SpecialofferRow](json => JsResult.fromTry(
       Try(
         SpecialofferRow(
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
@@ -80,7 +80,7 @@ object SpecialofferRow {
       )
     )
   }
-  implicit val writes: OWrites[SpecialofferRow] = OWrites[SpecialofferRow](o =>
+  implicit lazy val writes: OWrites[SpecialofferRow] = OWrites[SpecialofferRow](o =>
     new JsObject(ListMap[String, JsValue](
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "description" -> Writes.StringWrites.writes(o.description),

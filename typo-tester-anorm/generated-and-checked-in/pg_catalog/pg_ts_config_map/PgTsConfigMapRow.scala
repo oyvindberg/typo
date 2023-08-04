@@ -29,7 +29,7 @@ case class PgTsConfigMapRow(
  }
 
 object PgTsConfigMapRow {
-  implicit val reads: Reads[PgTsConfigMapRow] = Reads[PgTsConfigMapRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgTsConfigMapRow] = Reads[PgTsConfigMapRow](json => JsResult.fromTry(
       Try(
         PgTsConfigMapRow(
           mapcfg = json.\("mapcfg").as(Reads.LongReads),
@@ -50,7 +50,7 @@ object PgTsConfigMapRow {
       )
     )
   }
-  implicit val writes: OWrites[PgTsConfigMapRow] = OWrites[PgTsConfigMapRow](o =>
+  implicit lazy val writes: OWrites[PgTsConfigMapRow] = OWrites[PgTsConfigMapRow](o =>
     new JsObject(ListMap[String, JsValue](
       "mapcfg" -> Writes.LongWrites.writes(o.mapcfg),
       "maptokentype" -> Writes.IntWrites.writes(o.maptokentype),

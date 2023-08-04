@@ -31,7 +31,7 @@ case class PgStatArchiverViewRow(
 )
 
 object PgStatArchiverViewRow {
-  implicit val reads: Reads[PgStatArchiverViewRow] = Reads[PgStatArchiverViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatArchiverViewRow] = Reads[PgStatArchiverViewRow](json => JsResult.fromTry(
       Try(
         PgStatArchiverViewRow(
           archivedCount = json.\("archived_count").toOption.map(_.as(Reads.LongReads)),
@@ -58,7 +58,7 @@ object PgStatArchiverViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatArchiverViewRow] = OWrites[PgStatArchiverViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatArchiverViewRow] = OWrites[PgStatArchiverViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "archived_count" -> Writes.OptionWrites(Writes.LongWrites).writes(o.archivedCount),
       "last_archived_wal" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastArchivedWal),

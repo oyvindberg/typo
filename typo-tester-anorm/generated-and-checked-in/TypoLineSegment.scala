@@ -25,7 +25,7 @@ import scala.util.Try
 case class TypoLineSegment(p1: TypoPoint, p2: TypoPoint)
 
 object TypoLineSegment {
-  implicit val arrayColumn: Column[Array[TypoLineSegment]] = Column.nonNull[Array[TypoLineSegment]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoLineSegment]] = Column.nonNull[Array[TypoLineSegment]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -36,23 +36,23 @@ object TypoLineSegment {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLineSegment]] = new ParameterMetaData[Array[TypoLineSegment]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoLineSegment]] = new ParameterMetaData[Array[TypoLineSegment]] {
     override def sqlType: String = "_lseg"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoLineSegment]] = ToStatement[Array[TypoLineSegment]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("lseg", v.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))))
-  implicit val column: Column[TypoLineSegment] = Column.nonNull[TypoLineSegment]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoLineSegment]] = ToStatement[Array[TypoLineSegment]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("lseg", v.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))))
+  implicit lazy val column: Column[TypoLineSegment] = Column.nonNull[TypoLineSegment]((v1: Any, _) =>
     v1 match {
       case v: PGlseg => Right(TypoLineSegment(TypoPoint(v.point(0).x, v.point(0).y), TypoPoint(v.point(1).x, v.point(1).y)))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGlseg, got ${other.getClass.getName}"))
     }
   )
   implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoLineSegment] = Ordering.by(x => (x.p1, x.p2))
-  implicit val parameterMetadata: ParameterMetaData[TypoLineSegment] = new ParameterMetaData[TypoLineSegment] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLineSegment] = new ParameterMetaData[TypoLineSegment] {
     override def sqlType: String = "lseg"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoLineSegment] = Reads[TypoLineSegment](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TypoLineSegment] = Reads[TypoLineSegment](json => JsResult.fromTry(
       Try(
         TypoLineSegment(
           p1 = json.\("p1").as(TypoPoint.reads),
@@ -61,8 +61,8 @@ object TypoLineSegment {
       )
     ),
   )
-  implicit val toStatement: ToStatement[TypoLineSegment] = ToStatement[TypoLineSegment]((s, index, v) => s.setObject(index, new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
-  implicit val writes: OWrites[TypoLineSegment] = OWrites[TypoLineSegment](o =>
+  implicit lazy val toStatement: ToStatement[TypoLineSegment] = ToStatement[TypoLineSegment]((s, index, v) => s.setObject(index, new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
+  implicit lazy val writes: OWrites[TypoLineSegment] = OWrites[TypoLineSegment](o =>
     new JsObject(ListMap[String, JsValue](
       "p1" -> TypoPoint.writes.writes(o.p1),
       "p2" -> TypoPoint.writes.writes(o.p2)

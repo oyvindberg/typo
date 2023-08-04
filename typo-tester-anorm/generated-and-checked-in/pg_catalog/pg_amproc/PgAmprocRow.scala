@@ -30,7 +30,7 @@ case class PgAmprocRow(
 )
 
 object PgAmprocRow {
-  implicit val reads: Reads[PgAmprocRow] = Reads[PgAmprocRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgAmprocRow] = Reads[PgAmprocRow](json => JsResult.fromTry(
       Try(
         PgAmprocRow(
           oid = json.\("oid").as(PgAmprocId.reads),
@@ -55,7 +55,7 @@ object PgAmprocRow {
       )
     )
   }
-  implicit val writes: OWrites[PgAmprocRow] = OWrites[PgAmprocRow](o =>
+  implicit lazy val writes: OWrites[PgAmprocRow] = OWrites[PgAmprocRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgAmprocId.writes.writes(o.oid),
       "amprocfamily" -> Writes.LongWrites.writes(o.amprocfamily),

@@ -28,7 +28,7 @@ case class ContacttypeRow(
 )
 
 object ContacttypeRow {
-  implicit val reads: Reads[ContacttypeRow] = Reads[ContacttypeRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ContacttypeRow] = Reads[ContacttypeRow](json => JsResult.fromTry(
       Try(
         ContacttypeRow(
           contacttypeid = json.\("contacttypeid").as(ContacttypeId.reads),
@@ -47,7 +47,7 @@ object ContacttypeRow {
       )
     )
   }
-  implicit val writes: OWrites[ContacttypeRow] = OWrites[ContacttypeRow](o =>
+  implicit lazy val writes: OWrites[ContacttypeRow] = OWrites[ContacttypeRow](o =>
     new JsObject(ListMap[String, JsValue](
       "contacttypeid" -> ContacttypeId.writes.writes(o.contacttypeid),
       "name" -> Name.writes.writes(o.name),

@@ -26,7 +26,7 @@ case class PgForeignTableRow(
 )
 
 object PgForeignTableRow {
-  implicit val reads: Reads[PgForeignTableRow] = Reads[PgForeignTableRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgForeignTableRow] = Reads[PgForeignTableRow](json => JsResult.fromTry(
       Try(
         PgForeignTableRow(
           ftrelid = json.\("ftrelid").as(PgForeignTableId.reads),
@@ -45,7 +45,7 @@ object PgForeignTableRow {
       )
     )
   }
-  implicit val writes: OWrites[PgForeignTableRow] = OWrites[PgForeignTableRow](o =>
+  implicit lazy val writes: OWrites[PgForeignTableRow] = OWrites[PgForeignTableRow](o =>
     new JsObject(ListMap[String, JsValue](
       "ftrelid" -> PgForeignTableId.writes.writes(o.ftrelid),
       "ftserver" -> Writes.LongWrites.writes(o.ftserver),

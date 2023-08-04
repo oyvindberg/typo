@@ -39,7 +39,7 @@ case class PgStatSysIndexesViewRow(
 )
 
 object PgStatSysIndexesViewRow {
-  implicit val reads: Reads[PgStatSysIndexesViewRow] = Reads[PgStatSysIndexesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatSysIndexesViewRow] = Reads[PgStatSysIndexesViewRow](json => JsResult.fromTry(
       Try(
         PgStatSysIndexesViewRow(
           relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
@@ -68,7 +68,7 @@ object PgStatSysIndexesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatSysIndexesViewRow] = OWrites[PgStatSysIndexesViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatSysIndexesViewRow] = OWrites[PgStatSysIndexesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
       "indexrelid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexrelid),

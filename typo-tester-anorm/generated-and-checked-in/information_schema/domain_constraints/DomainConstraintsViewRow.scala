@@ -33,7 +33,7 @@ case class DomainConstraintsViewRow(
 )
 
 object DomainConstraintsViewRow {
-  implicit val reads: Reads[DomainConstraintsViewRow] = Reads[DomainConstraintsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[DomainConstraintsViewRow] = Reads[DomainConstraintsViewRow](json => JsResult.fromTry(
       Try(
         DomainConstraintsViewRow(
           constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -62,7 +62,7 @@ object DomainConstraintsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[DomainConstraintsViewRow] = OWrites[DomainConstraintsViewRow](o =>
+  implicit lazy val writes: OWrites[DomainConstraintsViewRow] = OWrites[DomainConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
       "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),

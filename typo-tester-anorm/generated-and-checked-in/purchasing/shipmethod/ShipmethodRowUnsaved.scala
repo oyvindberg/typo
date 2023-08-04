@@ -64,7 +64,7 @@ case class ShipmethodRowUnsaved(
     )
 }
 object ShipmethodRowUnsaved {
-  implicit val reads: Reads[ShipmethodRowUnsaved] = Reads[ShipmethodRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ShipmethodRowUnsaved] = Reads[ShipmethodRowUnsaved](json => JsResult.fromTry(
       Try(
         ShipmethodRowUnsaved(
           name = json.\("name").as(Name.reads),
@@ -77,7 +77,7 @@ object ShipmethodRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[ShipmethodRowUnsaved] = OWrites[ShipmethodRowUnsaved](o =>
+  implicit lazy val writes: OWrites[ShipmethodRowUnsaved] = OWrites[ShipmethodRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),
       "shipmethodid" -> Defaulted.writes(ShipmethodId.writes).writes(o.shipmethodid),

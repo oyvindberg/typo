@@ -39,7 +39,7 @@ case class PgStatProgressCreateIndexViewRow(
 )
 
 object PgStatProgressCreateIndexViewRow {
-  implicit val reads: Reads[PgStatProgressCreateIndexViewRow] = Reads[PgStatProgressCreateIndexViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatProgressCreateIndexViewRow] = Reads[PgStatProgressCreateIndexViewRow](json => JsResult.fromTry(
       Try(
         PgStatProgressCreateIndexViewRow(
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
@@ -84,7 +84,7 @@ object PgStatProgressCreateIndexViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatProgressCreateIndexViewRow] = OWrites[PgStatProgressCreateIndexViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatProgressCreateIndexViewRow] = OWrites[PgStatProgressCreateIndexViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),

@@ -30,7 +30,7 @@ case class UserMappingsViewRow(
 )
 
 object UserMappingsViewRow {
-  implicit val reads: Reads[UserMappingsViewRow] = Reads[UserMappingsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[UserMappingsViewRow] = Reads[UserMappingsViewRow](json => JsResult.fromTry(
       Try(
         UserMappingsViewRow(
           authorizationIdentifier = json.\("authorization_identifier").toOption.map(_.as(SqlIdentifier.reads)),
@@ -49,7 +49,7 @@ object UserMappingsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[UserMappingsViewRow] = OWrites[UserMappingsViewRow](o =>
+  implicit lazy val writes: OWrites[UserMappingsViewRow] = OWrites[UserMappingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "authorization_identifier" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.authorizationIdentifier),
       "foreign_server_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignServerCatalog),

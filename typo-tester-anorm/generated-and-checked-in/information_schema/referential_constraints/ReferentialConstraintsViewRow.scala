@@ -34,7 +34,7 @@ case class ReferentialConstraintsViewRow(
 )
 
 object ReferentialConstraintsViewRow {
-  implicit val reads: Reads[ReferentialConstraintsViewRow] = Reads[ReferentialConstraintsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ReferentialConstraintsViewRow] = Reads[ReferentialConstraintsViewRow](json => JsResult.fromTry(
       Try(
         ReferentialConstraintsViewRow(
           constraintCatalog = json.\("constraint_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -65,7 +65,7 @@ object ReferentialConstraintsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[ReferentialConstraintsViewRow] = OWrites[ReferentialConstraintsViewRow](o =>
+  implicit lazy val writes: OWrites[ReferentialConstraintsViewRow] = OWrites[ReferentialConstraintsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "constraint_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintCatalog),
       "constraint_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.constraintSchema),

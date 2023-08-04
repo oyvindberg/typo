@@ -27,7 +27,7 @@ case class PgReplicationOriginStatusViewRow(
 )
 
 object PgReplicationOriginStatusViewRow {
-  implicit val reads: Reads[PgReplicationOriginStatusViewRow] = Reads[PgReplicationOriginStatusViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgReplicationOriginStatusViewRow] = Reads[PgReplicationOriginStatusViewRow](json => JsResult.fromTry(
       Try(
         PgReplicationOriginStatusViewRow(
           localId = json.\("local_id").toOption.map(_.as(Reads.LongReads)),
@@ -48,7 +48,7 @@ object PgReplicationOriginStatusViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgReplicationOriginStatusViewRow] = OWrites[PgReplicationOriginStatusViewRow](o =>
+  implicit lazy val writes: OWrites[PgReplicationOriginStatusViewRow] = OWrites[PgReplicationOriginStatusViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "local_id" -> Writes.OptionWrites(Writes.LongWrites).writes(o.localId),
       "external_id" -> Writes.OptionWrites(Writes.StringWrites).writes(o.externalId),

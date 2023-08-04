@@ -21,7 +21,7 @@ import typo.dsl.Bijection
 case class TypoXml(value: String)
 
 object TypoXml {
-  implicit val arrayColumn: Column[Array[TypoXml]] = Column.nonNull[Array[TypoXml]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoXml]] = Column.nonNull[Array[TypoXml]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -32,29 +32,29 @@ object TypoXml {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoXml]] = new ParameterMetaData[Array[TypoXml]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoXml]] = new ParameterMetaData[Array[TypoXml]] {
     override def sqlType: String = "_xml"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoXml]] = ToStatement[Array[TypoXml]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("xml", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoXml]] = ToStatement[Array[TypoXml]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("xml", v.map(v => {
                                                                                                                    val obj = new PGobject
                                                                                                                    obj.setType("xml")
                                                                                                                    obj.setValue(v.value)
                                                                                                                    obj
                                                                                                                  }))))
-  implicit val bijection: Bijection[TypoXml, String] = Bijection[TypoXml, String](_.value)(TypoXml.apply)
-  implicit val column: Column[TypoXml] = Column.nonNull[TypoXml]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoXml, String] = Bijection[TypoXml, String](_.value)(TypoXml.apply)
+  implicit lazy val column: Column[TypoXml] = Column.nonNull[TypoXml]((v1: Any, _) =>
     v1 match {
       case v: PgSQLXML => Right(TypoXml(v.getString))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgSQLXML, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoXml] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoXml] = new ParameterMetaData[TypoXml] {
+  implicit lazy val ordering: Ordering[TypoXml] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoXml] = new ParameterMetaData[TypoXml] {
     override def sqlType: String = "xml"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoXml] = Reads.StringReads.map(TypoXml.apply)
-  implicit val toStatement: ToStatement[TypoXml] = ToStatement[TypoXml]((s, index, v) => s.setObject(index, v.value))
-  implicit val writes: Writes[TypoXml] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val reads: Reads[TypoXml] = Reads.StringReads.map(TypoXml.apply)
+  implicit lazy val toStatement: ToStatement[TypoXml] = ToStatement[TypoXml]((s, index, v) => s.setObject(index, v.value))
+  implicit lazy val writes: Writes[TypoXml] = Writes.StringWrites.contramap(_.value)
 }

@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.transactionhistory` */
 case class TransactionhistoryId(value: Int) extends AnyVal
 object TransactionhistoryId {
-  implicit val arrayToStatement: ToStatement[Array[TransactionhistoryId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[TransactionhistoryId, Int] = Bijection[TransactionhistoryId, Int](_.value)(TransactionhistoryId.apply)
-  implicit val column: Column[TransactionhistoryId] = implicitly[Column[Int]].map(TransactionhistoryId.apply)
-  implicit val ordering: Ordering[TransactionhistoryId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TransactionhistoryId] = new ParameterMetaData[TransactionhistoryId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[TransactionhistoryId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[TransactionhistoryId, Int] = Bijection[TransactionhistoryId, Int](_.value)(TransactionhistoryId.apply)
+  implicit lazy val column: Column[TransactionhistoryId] = implicitly[Column[Int]].map(TransactionhistoryId.apply)
+  implicit lazy val ordering: Ordering[TransactionhistoryId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TransactionhistoryId] = new ParameterMetaData[TransactionhistoryId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[TransactionhistoryId] = Reads.IntReads.map(TransactionhistoryId.apply)
-  implicit val toStatement: ToStatement[TransactionhistoryId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[TransactionhistoryId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[TransactionhistoryId] = Reads.IntReads.map(TransactionhistoryId.apply)
+  implicit lazy val toStatement: ToStatement[TransactionhistoryId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[TransactionhistoryId] = Writes.IntWrites.contramap(_.value)
 }

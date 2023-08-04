@@ -34,7 +34,7 @@ case class ForeignDataWrappersViewRow(
 )
 
 object ForeignDataWrappersViewRow {
-  implicit val reads: Reads[ForeignDataWrappersViewRow] = Reads[ForeignDataWrappersViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ForeignDataWrappersViewRow] = Reads[ForeignDataWrappersViewRow](json => JsResult.fromTry(
       Try(
         ForeignDataWrappersViewRow(
           foreignDataWrapperCatalog = json.\("foreign_data_wrapper_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -57,7 +57,7 @@ object ForeignDataWrappersViewRow {
       )
     )
   }
-  implicit val writes: OWrites[ForeignDataWrappersViewRow] = OWrites[ForeignDataWrappersViewRow](o =>
+  implicit lazy val writes: OWrites[ForeignDataWrappersViewRow] = OWrites[ForeignDataWrappersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "foreign_data_wrapper_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperCatalog),
       "foreign_data_wrapper_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignDataWrapperName),

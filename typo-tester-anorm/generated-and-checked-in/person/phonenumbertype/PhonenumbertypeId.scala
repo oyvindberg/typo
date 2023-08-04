@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `person.phonenumbertype` */
 case class PhonenumbertypeId(value: Int) extends AnyVal
 object PhonenumbertypeId {
-  implicit val arrayToStatement: ToStatement[Array[PhonenumbertypeId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PhonenumbertypeId, Int] = Bijection[PhonenumbertypeId, Int](_.value)(PhonenumbertypeId.apply)
-  implicit val column: Column[PhonenumbertypeId] = implicitly[Column[Int]].map(PhonenumbertypeId.apply)
-  implicit val ordering: Ordering[PhonenumbertypeId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PhonenumbertypeId] = new ParameterMetaData[PhonenumbertypeId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PhonenumbertypeId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PhonenumbertypeId, Int] = Bijection[PhonenumbertypeId, Int](_.value)(PhonenumbertypeId.apply)
+  implicit lazy val column: Column[PhonenumbertypeId] = implicitly[Column[Int]].map(PhonenumbertypeId.apply)
+  implicit lazy val ordering: Ordering[PhonenumbertypeId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PhonenumbertypeId] = new ParameterMetaData[PhonenumbertypeId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[PhonenumbertypeId] = Reads.IntReads.map(PhonenumbertypeId.apply)
-  implicit val toStatement: ToStatement[PhonenumbertypeId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[PhonenumbertypeId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PhonenumbertypeId] = Reads.IntReads.map(PhonenumbertypeId.apply)
+  implicit lazy val toStatement: ToStatement[PhonenumbertypeId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[PhonenumbertypeId] = Writes.IntWrites.contramap(_.value)
 }

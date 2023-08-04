@@ -46,7 +46,7 @@ case class WViewRow(
 )
 
 object WViewRow {
-  implicit val reads: Reads[WViewRow] = Reads[WViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[WViewRow] = Reads[WViewRow](json => JsResult.fromTry(
       Try(
         WViewRow(
           id = json.\("id").toOption.map(_.as(Reads.IntReads)),
@@ -79,7 +79,7 @@ object WViewRow {
       )
     )
   }
-  implicit val writes: OWrites[WViewRow] = OWrites[WViewRow](o =>
+  implicit lazy val writes: OWrites[WViewRow] = OWrites[WViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
       "workorderid" -> Writes.OptionWrites(WorkorderId.writes).writes(o.workorderid),

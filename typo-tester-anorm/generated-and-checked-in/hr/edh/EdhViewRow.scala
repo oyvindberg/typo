@@ -41,7 +41,7 @@ case class EdhViewRow(
 )
 
 object EdhViewRow {
-  implicit val reads: Reads[EdhViewRow] = Reads[EdhViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[EdhViewRow] = Reads[EdhViewRow](json => JsResult.fromTry(
       Try(
         EdhViewRow(
           id = json.\("id").toOption.map(_.as(Reads.IntReads)),
@@ -68,7 +68,7 @@ object EdhViewRow {
       )
     )
   }
-  implicit val writes: OWrites[EdhViewRow] = OWrites[EdhViewRow](o =>
+  implicit lazy val writes: OWrites[EdhViewRow] = OWrites[EdhViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),

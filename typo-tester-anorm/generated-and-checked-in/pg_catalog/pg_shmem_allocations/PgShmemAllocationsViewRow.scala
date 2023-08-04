@@ -27,7 +27,7 @@ case class PgShmemAllocationsViewRow(
 )
 
 object PgShmemAllocationsViewRow {
-  implicit val reads: Reads[PgShmemAllocationsViewRow] = Reads[PgShmemAllocationsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgShmemAllocationsViewRow] = Reads[PgShmemAllocationsViewRow](json => JsResult.fromTry(
       Try(
         PgShmemAllocationsViewRow(
           name = json.\("name").toOption.map(_.as(Reads.StringReads)),
@@ -48,7 +48,7 @@ object PgShmemAllocationsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgShmemAllocationsViewRow] = OWrites[PgShmemAllocationsViewRow](o =>
+  implicit lazy val writes: OWrites[PgShmemAllocationsViewRow] = OWrites[PgShmemAllocationsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
       "off" -> Writes.OptionWrites(Writes.LongWrites).writes(o.off),

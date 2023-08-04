@@ -26,7 +26,7 @@ case class PgGroupViewRow(
 )
 
 object PgGroupViewRow {
-  implicit val reads: Reads[PgGroupViewRow] = Reads[PgGroupViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgGroupViewRow] = Reads[PgGroupViewRow](json => JsResult.fromTry(
       Try(
         PgGroupViewRow(
           groname = json.\("groname").toOption.map(_.as(Reads.StringReads)),
@@ -45,7 +45,7 @@ object PgGroupViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgGroupViewRow] = OWrites[PgGroupViewRow](o =>
+  implicit lazy val writes: OWrites[PgGroupViewRow] = OWrites[PgGroupViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "groname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.groname),
       "grosysid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.grosysid),

@@ -19,8 +19,8 @@ import scala.util.Try
 /** Type for the composite primary key of table `pg_catalog.pg_description` */
 case class PgDescriptionId(objoid: /* oid */ Long, classoid: /* oid */ Long, objsubid: Int)
 object PgDescriptionId {
-  implicit val ordering: Ordering[PgDescriptionId] = Ordering.by(x => (x.objoid, x.classoid, x.objsubid))
-  implicit val reads: Reads[PgDescriptionId] = Reads[PgDescriptionId](json => JsResult.fromTry(
+  implicit lazy val ordering: Ordering[PgDescriptionId] = Ordering.by(x => (x.objoid, x.classoid, x.objsubid))
+  implicit lazy val reads: Reads[PgDescriptionId] = Reads[PgDescriptionId](json => JsResult.fromTry(
       Try(
         PgDescriptionId(
           objoid = json.\("objoid").as(Reads.LongReads),
@@ -30,7 +30,7 @@ object PgDescriptionId {
       )
     ),
   )
-  implicit val writes: OWrites[PgDescriptionId] = OWrites[PgDescriptionId](o =>
+  implicit lazy val writes: OWrites[PgDescriptionId] = OWrites[PgDescriptionId](o =>
     new JsObject(ListMap[String, JsValue](
       "objoid" -> Writes.LongWrites.writes(o.objoid),
       "classoid" -> Writes.LongWrites.writes(o.classoid),

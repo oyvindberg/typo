@@ -31,7 +31,7 @@ case class PgSeclabelsViewRow(
 )
 
 object PgSeclabelsViewRow {
-  implicit val reads: Reads[PgSeclabelsViewRow] = Reads[PgSeclabelsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgSeclabelsViewRow] = Reads[PgSeclabelsViewRow](json => JsResult.fromTry(
       Try(
         PgSeclabelsViewRow(
           objoid = json.\("objoid").toOption.map(_.as(Reads.LongReads)),
@@ -60,7 +60,7 @@ object PgSeclabelsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgSeclabelsViewRow] = OWrites[PgSeclabelsViewRow](o =>
+  implicit lazy val writes: OWrites[PgSeclabelsViewRow] = OWrites[PgSeclabelsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "objoid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.objoid),
       "classoid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.classoid),

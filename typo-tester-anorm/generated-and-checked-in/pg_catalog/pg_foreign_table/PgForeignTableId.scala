@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_foreign_table` */
 case class PgForeignTableId(value: /* oid */ Long) extends AnyVal
 object PgForeignTableId {
-  implicit val arrayToStatement: ToStatement[Array[PgForeignTableId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgForeignTableId, /* oid */ Long] = Bijection[PgForeignTableId, /* oid */ Long](_.value)(PgForeignTableId.apply)
-  implicit val column: Column[PgForeignTableId] = implicitly[Column[/* oid */ Long]].map(PgForeignTableId.apply)
-  implicit val ordering: Ordering[PgForeignTableId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgForeignTableId] = new ParameterMetaData[PgForeignTableId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgForeignTableId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgForeignTableId, /* oid */ Long] = Bijection[PgForeignTableId, /* oid */ Long](_.value)(PgForeignTableId.apply)
+  implicit lazy val column: Column[PgForeignTableId] = implicitly[Column[/* oid */ Long]].map(PgForeignTableId.apply)
+  implicit lazy val ordering: Ordering[PgForeignTableId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgForeignTableId] = new ParameterMetaData[PgForeignTableId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgForeignTableId] = Reads.LongReads.map(PgForeignTableId.apply)
-  implicit val toStatement: ToStatement[PgForeignTableId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgForeignTableId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgForeignTableId] = Reads.LongReads.map(PgForeignTableId.apply)
+  implicit lazy val toStatement: ToStatement[PgForeignTableId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgForeignTableId] = Writes.LongWrites.contramap(_.value)
 }

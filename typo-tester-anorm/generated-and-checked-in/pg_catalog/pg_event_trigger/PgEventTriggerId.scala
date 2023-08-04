@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_event_trigger` */
 case class PgEventTriggerId(value: /* oid */ Long) extends AnyVal
 object PgEventTriggerId {
-  implicit val arrayToStatement: ToStatement[Array[PgEventTriggerId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgEventTriggerId, /* oid */ Long] = Bijection[PgEventTriggerId, /* oid */ Long](_.value)(PgEventTriggerId.apply)
-  implicit val column: Column[PgEventTriggerId] = implicitly[Column[/* oid */ Long]].map(PgEventTriggerId.apply)
-  implicit val ordering: Ordering[PgEventTriggerId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgEventTriggerId] = new ParameterMetaData[PgEventTriggerId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgEventTriggerId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgEventTriggerId, /* oid */ Long] = Bijection[PgEventTriggerId, /* oid */ Long](_.value)(PgEventTriggerId.apply)
+  implicit lazy val column: Column[PgEventTriggerId] = implicitly[Column[/* oid */ Long]].map(PgEventTriggerId.apply)
+  implicit lazy val ordering: Ordering[PgEventTriggerId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgEventTriggerId] = new ParameterMetaData[PgEventTriggerId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgEventTriggerId] = Reads.LongReads.map(PgEventTriggerId.apply)
-  implicit val toStatement: ToStatement[PgEventTriggerId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgEventTriggerId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgEventTriggerId] = Reads.LongReads.map(PgEventTriggerId.apply)
+  implicit lazy val toStatement: ToStatement[PgEventTriggerId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgEventTriggerId] = Writes.LongWrites.contramap(_.value)
 }

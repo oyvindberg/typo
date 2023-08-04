@@ -25,7 +25,7 @@ case class PgReplicationOriginRow(
 )
 
 object PgReplicationOriginRow {
-  implicit val reads: Reads[PgReplicationOriginRow] = Reads[PgReplicationOriginRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgReplicationOriginRow] = Reads[PgReplicationOriginRow](json => JsResult.fromTry(
       Try(
         PgReplicationOriginRow(
           roident = json.\("roident").as(PgReplicationOriginId.reads),
@@ -42,7 +42,7 @@ object PgReplicationOriginRow {
       )
     )
   }
-  implicit val writes: OWrites[PgReplicationOriginRow] = OWrites[PgReplicationOriginRow](o =>
+  implicit lazy val writes: OWrites[PgReplicationOriginRow] = OWrites[PgReplicationOriginRow](o =>
     new JsObject(ListMap[String, JsValue](
       "roident" -> PgReplicationOriginId.writes.writes(o.roident),
       "roname" -> Writes.StringWrites.writes(o.roname)

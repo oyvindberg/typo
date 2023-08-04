@@ -25,7 +25,7 @@ import scala.util.Try
 case class TypoPoint(x: Double, y: Double)
 
 object TypoPoint {
-  implicit val arrayColumn: Column[Array[TypoPoint]] = Column.nonNull[Array[TypoPoint]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoPoint]] = Column.nonNull[Array[TypoPoint]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -36,23 +36,23 @@ object TypoPoint {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoPoint]] = new ParameterMetaData[Array[TypoPoint]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPoint]] = new ParameterMetaData[Array[TypoPoint]] {
     override def sqlType: String = "_point"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoPoint]] = ToStatement[Array[TypoPoint]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("point", v.map(v => new PGpoint(v.x, v.y)))))
-  implicit val column: Column[TypoPoint] = Column.nonNull[TypoPoint]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoPoint]] = ToStatement[Array[TypoPoint]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("point", v.map(v => new PGpoint(v.x, v.y)))))
+  implicit lazy val column: Column[TypoPoint] = Column.nonNull[TypoPoint]((v1: Any, _) =>
     v1 match {
       case v: PGpoint => Right(TypoPoint(v.x, v.y))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGpoint, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoPoint] = Ordering.by(x => (x.x, x.y))
-  implicit val parameterMetadata: ParameterMetaData[TypoPoint] = new ParameterMetaData[TypoPoint] {
+  implicit lazy val ordering: Ordering[TypoPoint] = Ordering.by(x => (x.x, x.y))
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPoint] = new ParameterMetaData[TypoPoint] {
     override def sqlType: String = "point"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoPoint] = Reads[TypoPoint](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TypoPoint] = Reads[TypoPoint](json => JsResult.fromTry(
       Try(
         TypoPoint(
           x = json.\("x").as(Reads.DoubleReads),
@@ -61,8 +61,8 @@ object TypoPoint {
       )
     ),
   )
-  implicit val toStatement: ToStatement[TypoPoint] = ToStatement[TypoPoint]((s, index, v) => s.setObject(index, new PGpoint(v.x, v.y)))
-  implicit val writes: OWrites[TypoPoint] = OWrites[TypoPoint](o =>
+  implicit lazy val toStatement: ToStatement[TypoPoint] = ToStatement[TypoPoint]((s, index, v) => s.setObject(index, new PGpoint(v.x, v.y)))
+  implicit lazy val writes: OWrites[TypoPoint] = OWrites[TypoPoint](o =>
     new JsObject(ListMap[String, JsValue](
       "x" -> Writes.DoubleWrites.writes(o.x),
       "y" -> Writes.DoubleWrites.writes(o.y)

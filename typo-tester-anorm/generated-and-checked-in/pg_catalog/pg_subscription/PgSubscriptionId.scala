@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_subscription` */
 case class PgSubscriptionId(value: /* oid */ Long) extends AnyVal
 object PgSubscriptionId {
-  implicit val arrayToStatement: ToStatement[Array[PgSubscriptionId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgSubscriptionId, /* oid */ Long] = Bijection[PgSubscriptionId, /* oid */ Long](_.value)(PgSubscriptionId.apply)
-  implicit val column: Column[PgSubscriptionId] = implicitly[Column[/* oid */ Long]].map(PgSubscriptionId.apply)
-  implicit val ordering: Ordering[PgSubscriptionId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgSubscriptionId] = new ParameterMetaData[PgSubscriptionId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgSubscriptionId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgSubscriptionId, /* oid */ Long] = Bijection[PgSubscriptionId, /* oid */ Long](_.value)(PgSubscriptionId.apply)
+  implicit lazy val column: Column[PgSubscriptionId] = implicitly[Column[/* oid */ Long]].map(PgSubscriptionId.apply)
+  implicit lazy val ordering: Ordering[PgSubscriptionId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgSubscriptionId] = new ParameterMetaData[PgSubscriptionId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgSubscriptionId] = Reads.LongReads.map(PgSubscriptionId.apply)
-  implicit val toStatement: ToStatement[PgSubscriptionId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgSubscriptionId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgSubscriptionId] = Reads.LongReads.map(PgSubscriptionId.apply)
+  implicit lazy val toStatement: ToStatement[PgSubscriptionId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgSubscriptionId] = Writes.LongWrites.contramap(_.value)
 }

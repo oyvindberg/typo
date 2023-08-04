@@ -32,7 +32,7 @@ case class PgForeignServerRow(
 )
 
 object PgForeignServerRow {
-  implicit val reads: Reads[PgForeignServerRow] = Reads[PgForeignServerRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgForeignServerRow] = Reads[PgForeignServerRow](json => JsResult.fromTry(
       Try(
         PgForeignServerRow(
           oid = json.\("oid").as(PgForeignServerId.reads),
@@ -61,7 +61,7 @@ object PgForeignServerRow {
       )
     )
   }
-  implicit val writes: OWrites[PgForeignServerRow] = OWrites[PgForeignServerRow](o =>
+  implicit lazy val writes: OWrites[PgForeignServerRow] = OWrites[PgForeignServerRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgForeignServerId.writes.writes(o.oid),
       "srvname" -> Writes.StringWrites.writes(o.srvname),

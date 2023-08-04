@@ -28,7 +28,7 @@ case class PgAttrdefRow(
 )
 
 object PgAttrdefRow {
-  implicit val reads: Reads[PgAttrdefRow] = Reads[PgAttrdefRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgAttrdefRow] = Reads[PgAttrdefRow](json => JsResult.fromTry(
       Try(
         PgAttrdefRow(
           oid = json.\("oid").as(PgAttrdefId.reads),
@@ -49,7 +49,7 @@ object PgAttrdefRow {
       )
     )
   }
-  implicit val writes: OWrites[PgAttrdefRow] = OWrites[PgAttrdefRow](o =>
+  implicit lazy val writes: OWrites[PgAttrdefRow] = OWrites[PgAttrdefRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgAttrdefId.writes.writes(o.oid),
       "adrelid" -> Writes.LongWrites.writes(o.adrelid),

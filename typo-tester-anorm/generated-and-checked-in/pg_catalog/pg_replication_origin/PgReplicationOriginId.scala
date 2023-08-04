@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_replication_origin` */
 case class PgReplicationOriginId(value: /* oid */ Long) extends AnyVal
 object PgReplicationOriginId {
-  implicit val arrayToStatement: ToStatement[Array[PgReplicationOriginId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgReplicationOriginId, /* oid */ Long] = Bijection[PgReplicationOriginId, /* oid */ Long](_.value)(PgReplicationOriginId.apply)
-  implicit val column: Column[PgReplicationOriginId] = implicitly[Column[/* oid */ Long]].map(PgReplicationOriginId.apply)
-  implicit val ordering: Ordering[PgReplicationOriginId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgReplicationOriginId] = new ParameterMetaData[PgReplicationOriginId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgReplicationOriginId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgReplicationOriginId, /* oid */ Long] = Bijection[PgReplicationOriginId, /* oid */ Long](_.value)(PgReplicationOriginId.apply)
+  implicit lazy val column: Column[PgReplicationOriginId] = implicitly[Column[/* oid */ Long]].map(PgReplicationOriginId.apply)
+  implicit lazy val ordering: Ordering[PgReplicationOriginId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgReplicationOriginId] = new ParameterMetaData[PgReplicationOriginId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgReplicationOriginId] = Reads.LongReads.map(PgReplicationOriginId.apply)
-  implicit val toStatement: ToStatement[PgReplicationOriginId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgReplicationOriginId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgReplicationOriginId] = Reads.LongReads.map(PgReplicationOriginId.apply)
+  implicit lazy val toStatement: ToStatement[PgReplicationOriginId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgReplicationOriginId] = Writes.LongWrites.contramap(_.value)
 }

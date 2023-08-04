@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_constraint` */
 case class PgConstraintId(value: /* oid */ Long) extends AnyVal
 object PgConstraintId {
-  implicit val arrayToStatement: ToStatement[Array[PgConstraintId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgConstraintId, /* oid */ Long] = Bijection[PgConstraintId, /* oid */ Long](_.value)(PgConstraintId.apply)
-  implicit val column: Column[PgConstraintId] = implicitly[Column[/* oid */ Long]].map(PgConstraintId.apply)
-  implicit val ordering: Ordering[PgConstraintId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgConstraintId] = new ParameterMetaData[PgConstraintId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgConstraintId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgConstraintId, /* oid */ Long] = Bijection[PgConstraintId, /* oid */ Long](_.value)(PgConstraintId.apply)
+  implicit lazy val column: Column[PgConstraintId] = implicitly[Column[/* oid */ Long]].map(PgConstraintId.apply)
+  implicit lazy val ordering: Ordering[PgConstraintId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgConstraintId] = new ParameterMetaData[PgConstraintId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgConstraintId] = Reads.LongReads.map(PgConstraintId.apply)
-  implicit val toStatement: ToStatement[PgConstraintId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgConstraintId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgConstraintId] = Reads.LongReads.map(PgConstraintId.apply)
+  implicit lazy val toStatement: ToStatement[PgConstraintId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgConstraintId] = Writes.LongWrites.contramap(_.value)
 }

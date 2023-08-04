@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoInt2Vector(value: String)
 
 object TypoInt2Vector {
-  implicit val arrayColumn: Column[Array[TypoInt2Vector]] = Column.nonNull[Array[TypoInt2Vector]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoInt2Vector]] = Column.nonNull[Array[TypoInt2Vector]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoInt2Vector {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoInt2Vector]] = new ParameterMetaData[Array[TypoInt2Vector]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoInt2Vector]] = new ParameterMetaData[Array[TypoInt2Vector]] {
     override def sqlType: String = "_int2vector"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoInt2Vector]] = ToStatement[Array[TypoInt2Vector]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("int2vector", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoInt2Vector]] = ToStatement[Array[TypoInt2Vector]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("int2vector", v.map(v => {
                                                                                                                                  val obj = new PGobject
                                                                                                                                  obj.setType("int2vector")
                                                                                                                                  obj.setValue(v.value)
                                                                                                                                  obj
                                                                                                                                }))))
-  implicit val bijection: Bijection[TypoInt2Vector, String] = Bijection[TypoInt2Vector, String](_.value)(TypoInt2Vector.apply)
-  implicit val column: Column[TypoInt2Vector] = Column.nonNull[TypoInt2Vector]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoInt2Vector, String] = Bijection[TypoInt2Vector, String](_.value)(TypoInt2Vector.apply)
+  implicit lazy val column: Column[TypoInt2Vector] = Column.nonNull[TypoInt2Vector]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoInt2Vector(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoInt2Vector] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoInt2Vector] = new ParameterMetaData[TypoInt2Vector] {
+  implicit lazy val ordering: Ordering[TypoInt2Vector] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoInt2Vector] = new ParameterMetaData[TypoInt2Vector] {
     override def sqlType: String = "int2vector"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoInt2Vector] = Reads.StringReads.map(TypoInt2Vector.apply)
-  implicit val toStatement: ToStatement[TypoInt2Vector] = ToStatement[TypoInt2Vector]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoInt2Vector] = Reads.StringReads.map(TypoInt2Vector.apply)
+  implicit lazy val toStatement: ToStatement[TypoInt2Vector] = ToStatement[TypoInt2Vector]((s, index, v) => s.setObject(index, {
                                                                     val obj = new PGobject
                                                                     obj.setType("int2vector")
                                                                     obj.setValue(v.value)
                                                                     obj
                                                                   }))
-  implicit val writes: Writes[TypoInt2Vector] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoInt2Vector] = Writes.StringWrites.contramap(_.value)
 }

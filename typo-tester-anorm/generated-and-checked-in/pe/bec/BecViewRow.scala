@@ -38,7 +38,7 @@ case class BecViewRow(
 )
 
 object BecViewRow {
-  implicit val reads: Reads[BecViewRow] = Reads[BecViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[BecViewRow] = Reads[BecViewRow](json => JsResult.fromTry(
       Try(
         BecViewRow(
           id = json.\("id").toOption.map(_.as(Reads.IntReads)),
@@ -63,7 +63,7 @@ object BecViewRow {
       )
     )
   }
-  implicit val writes: OWrites[BecViewRow] = OWrites[BecViewRow](o =>
+  implicit lazy val writes: OWrites[BecViewRow] = OWrites[BecViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),

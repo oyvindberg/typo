@@ -41,7 +41,7 @@ case class PgLocksViewRow(
 )
 
 object PgLocksViewRow {
-  implicit val reads: Reads[PgLocksViewRow] = Reads[PgLocksViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgLocksViewRow] = Reads[PgLocksViewRow](json => JsResult.fromTry(
       Try(
         PgLocksViewRow(
           locktype = json.\("locktype").toOption.map(_.as(Reads.StringReads)),
@@ -86,7 +86,7 @@ object PgLocksViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgLocksViewRow] = OWrites[PgLocksViewRow](o =>
+  implicit lazy val writes: OWrites[PgLocksViewRow] = OWrites[PgLocksViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "locktype" -> Writes.OptionWrites(Writes.StringWrites).writes(o.locktype),
       "database" -> Writes.OptionWrites(Writes.LongWrites).writes(o.database),

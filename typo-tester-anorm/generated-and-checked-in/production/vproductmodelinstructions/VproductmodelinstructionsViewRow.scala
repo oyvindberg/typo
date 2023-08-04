@@ -44,7 +44,7 @@ case class VproductmodelinstructionsViewRow(
 )
 
 object VproductmodelinstructionsViewRow {
-  implicit val reads: Reads[VproductmodelinstructionsViewRow] = Reads[VproductmodelinstructionsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[VproductmodelinstructionsViewRow] = Reads[VproductmodelinstructionsViewRow](json => JsResult.fromTry(
       Try(
         VproductmodelinstructionsViewRow(
           productmodelid = json.\("productmodelid").toOption.map(_.as(ProductmodelId.reads)),
@@ -79,7 +79,7 @@ object VproductmodelinstructionsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[VproductmodelinstructionsViewRow] = OWrites[VproductmodelinstructionsViewRow](o =>
+  implicit lazy val writes: OWrites[VproductmodelinstructionsViewRow] = OWrites[VproductmodelinstructionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "productmodelid" -> Writes.OptionWrites(ProductmodelId.writes).writes(o.productmodelid),
       "name" -> Writes.OptionWrites(Name.writes).writes(o.name),

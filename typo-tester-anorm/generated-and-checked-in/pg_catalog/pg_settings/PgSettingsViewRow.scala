@@ -40,7 +40,7 @@ case class PgSettingsViewRow(
 )
 
 object PgSettingsViewRow {
-  implicit val reads: Reads[PgSettingsViewRow] = Reads[PgSettingsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgSettingsViewRow] = Reads[PgSettingsViewRow](json => JsResult.fromTry(
       Try(
         PgSettingsViewRow(
           name = json.\("name").toOption.map(_.as(Reads.StringReads)),
@@ -87,7 +87,7 @@ object PgSettingsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgSettingsViewRow] = OWrites[PgSettingsViewRow](o =>
+  implicit lazy val writes: OWrites[PgSettingsViewRow] = OWrites[PgSettingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
       "setting" -> Writes.OptionWrites(Writes.StringWrites).writes(o.setting),

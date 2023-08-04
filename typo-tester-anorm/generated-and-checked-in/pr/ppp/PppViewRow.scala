@@ -35,7 +35,7 @@ case class PppViewRow(
 )
 
 object PppViewRow {
-  implicit val reads: Reads[PppViewRow] = Reads[PppViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PppViewRow] = Reads[PppViewRow](json => JsResult.fromTry(
       Try(
         PppViewRow(
           productid = json.\("productid").toOption.map(_.as(ProductId.reads)),
@@ -56,7 +56,7 @@ object PppViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PppViewRow] = OWrites[PppViewRow](o =>
+  implicit lazy val writes: OWrites[PppViewRow] = OWrites[PppViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "productid" -> Writes.OptionWrites(ProductId.writes).writes(o.productid),
       "productphotoid" -> Writes.OptionWrites(ProductphotoId.writes).writes(o.productphotoid),

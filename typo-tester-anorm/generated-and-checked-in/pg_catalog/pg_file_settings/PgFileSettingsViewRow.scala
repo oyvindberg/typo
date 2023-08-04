@@ -30,7 +30,7 @@ case class PgFileSettingsViewRow(
 )
 
 object PgFileSettingsViewRow {
-  implicit val reads: Reads[PgFileSettingsViewRow] = Reads[PgFileSettingsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgFileSettingsViewRow] = Reads[PgFileSettingsViewRow](json => JsResult.fromTry(
       Try(
         PgFileSettingsViewRow(
           sourcefile = json.\("sourcefile").toOption.map(_.as(Reads.StringReads)),
@@ -57,7 +57,7 @@ object PgFileSettingsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgFileSettingsViewRow] = OWrites[PgFileSettingsViewRow](o =>
+  implicit lazy val writes: OWrites[PgFileSettingsViewRow] = OWrites[PgFileSettingsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "sourcefile" -> Writes.OptionWrites(Writes.StringWrites).writes(o.sourcefile),
       "sourceline" -> Writes.OptionWrites(Writes.IntWrites).writes(o.sourceline),

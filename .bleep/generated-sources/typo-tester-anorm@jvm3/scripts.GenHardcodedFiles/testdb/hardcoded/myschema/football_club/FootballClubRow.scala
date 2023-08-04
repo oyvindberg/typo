@@ -26,7 +26,7 @@ case class FootballClubRow(
 )
 
 object FootballClubRow {
-  implicit val reads: Reads[FootballClubRow] = Reads[FootballClubRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[FootballClubRow] = Reads[FootballClubRow](json => JsResult.fromTry(
       Try(
         FootballClubRow(
           id = json.\("id").as(FootballClubId.reads),
@@ -43,7 +43,7 @@ object FootballClubRow {
       )
     )
   }
-  implicit val writes: OWrites[FootballClubRow] = OWrites[FootballClubRow](o =>
+  implicit lazy val writes: OWrites[FootballClubRow] = OWrites[FootballClubRow](o =>
     new JsObject(ListMap[String, JsValue](
       "id" -> FootballClubId.writes.writes(o.id),
       "name" -> Writes.StringWrites.writes(o.name)

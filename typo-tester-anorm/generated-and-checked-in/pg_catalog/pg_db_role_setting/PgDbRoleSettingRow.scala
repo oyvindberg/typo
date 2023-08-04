@@ -28,7 +28,7 @@ case class PgDbRoleSettingRow(
  }
 
 object PgDbRoleSettingRow {
-  implicit val reads: Reads[PgDbRoleSettingRow] = Reads[PgDbRoleSettingRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgDbRoleSettingRow] = Reads[PgDbRoleSettingRow](json => JsResult.fromTry(
       Try(
         PgDbRoleSettingRow(
           setdatabase = json.\("setdatabase").as(Reads.LongReads),
@@ -47,7 +47,7 @@ object PgDbRoleSettingRow {
       )
     )
   }
-  implicit val writes: OWrites[PgDbRoleSettingRow] = OWrites[PgDbRoleSettingRow](o =>
+  implicit lazy val writes: OWrites[PgDbRoleSettingRow] = OWrites[PgDbRoleSettingRow](o =>
     new JsObject(ListMap[String, JsValue](
       "setdatabase" -> Writes.LongWrites.writes(o.setdatabase),
       "setrole" -> Writes.LongWrites.writes(o.setrole),

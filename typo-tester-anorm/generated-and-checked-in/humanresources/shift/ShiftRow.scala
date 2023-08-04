@@ -33,7 +33,7 @@ case class ShiftRow(
 )
 
 object ShiftRow {
-  implicit val reads: Reads[ShiftRow] = Reads[ShiftRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ShiftRow] = Reads[ShiftRow](json => JsResult.fromTry(
       Try(
         ShiftRow(
           shiftid = json.\("shiftid").as(ShiftId.reads),
@@ -56,7 +56,7 @@ object ShiftRow {
       )
     )
   }
-  implicit val writes: OWrites[ShiftRow] = OWrites[ShiftRow](o =>
+  implicit lazy val writes: OWrites[ShiftRow] = OWrites[ShiftRow](o =>
     new JsObject(ListMap[String, JsValue](
       "shiftid" -> ShiftId.writes.writes(o.shiftid),
       "name" -> Name.writes.writes(o.name),

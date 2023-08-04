@@ -27,7 +27,7 @@ case class PgUserMappingRow(
 )
 
 object PgUserMappingRow {
-  implicit val reads: Reads[PgUserMappingRow] = Reads[PgUserMappingRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgUserMappingRow] = Reads[PgUserMappingRow](json => JsResult.fromTry(
       Try(
         PgUserMappingRow(
           oid = json.\("oid").as(PgUserMappingId.reads),
@@ -48,7 +48,7 @@ object PgUserMappingRow {
       )
     )
   }
-  implicit val writes: OWrites[PgUserMappingRow] = OWrites[PgUserMappingRow](o =>
+  implicit lazy val writes: OWrites[PgUserMappingRow] = OWrites[PgUserMappingRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgUserMappingId.writes.writes(o.oid),
       "umuser" -> Writes.LongWrites.writes(o.umuser),

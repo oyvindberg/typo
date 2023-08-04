@@ -53,7 +53,7 @@ case class WorkorderroutingRow(
  }
 
 object WorkorderroutingRow {
-  implicit val reads: Reads[WorkorderroutingRow] = Reads[WorkorderroutingRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[WorkorderroutingRow] = Reads[WorkorderroutingRow](json => JsResult.fromTry(
       Try(
         WorkorderroutingRow(
           workorderid = json.\("workorderid").as(WorkorderId.reads),
@@ -90,7 +90,7 @@ object WorkorderroutingRow {
       )
     )
   }
-  implicit val writes: OWrites[WorkorderroutingRow] = OWrites[WorkorderroutingRow](o =>
+  implicit lazy val writes: OWrites[WorkorderroutingRow] = OWrites[WorkorderroutingRow](o =>
     new JsObject(ListMap[String, JsValue](
       "workorderid" -> WorkorderId.writes.writes(o.workorderid),
       "productid" -> Writes.IntWrites.writes(o.productid),

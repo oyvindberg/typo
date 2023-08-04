@@ -31,7 +31,7 @@ case class PgTablesViewRow(
 )
 
 object PgTablesViewRow {
-  implicit val reads: Reads[PgTablesViewRow] = Reads[PgTablesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgTablesViewRow] = Reads[PgTablesViewRow](json => JsResult.fromTry(
       Try(
         PgTablesViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
@@ -60,7 +60,7 @@ object PgTablesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgTablesViewRow] = OWrites[PgTablesViewRow](o =>
+  implicit lazy val writes: OWrites[PgTablesViewRow] = OWrites[PgTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),

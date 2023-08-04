@@ -18,15 +18,15 @@ import typo.dsl.Bijection
   */
 case class CardinalNumber(value: Int) extends AnyVal
 object CardinalNumber {
-  implicit val arrayToStatement: ToStatement[Array[CardinalNumber]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[CardinalNumber, Int] = Bijection[CardinalNumber, Int](_.value)(CardinalNumber.apply)
-  implicit val column: Column[CardinalNumber] = implicitly[Column[Int]].map(CardinalNumber.apply)
-  implicit val ordering: Ordering[CardinalNumber] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[CardinalNumber] = new ParameterMetaData[CardinalNumber] {
+  implicit lazy val arrayToStatement: ToStatement[Array[CardinalNumber]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[CardinalNumber, Int] = Bijection[CardinalNumber, Int](_.value)(CardinalNumber.apply)
+  implicit lazy val column: Column[CardinalNumber] = implicitly[Column[Int]].map(CardinalNumber.apply)
+  implicit lazy val ordering: Ordering[CardinalNumber] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[CardinalNumber] = new ParameterMetaData[CardinalNumber] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[CardinalNumber] = Reads.IntReads.map(CardinalNumber.apply)
-  implicit val toStatement: ToStatement[CardinalNumber] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[CardinalNumber] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[CardinalNumber] = Reads.IntReads.map(CardinalNumber.apply)
+  implicit lazy val toStatement: ToStatement[CardinalNumber] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[CardinalNumber] = Writes.IntWrites.contramap(_.value)
 }

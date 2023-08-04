@@ -35,7 +35,7 @@ case class CreditcardRow(
 )
 
 object CreditcardRow {
-  implicit val reads: Reads[CreditcardRow] = Reads[CreditcardRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CreditcardRow] = Reads[CreditcardRow](json => JsResult.fromTry(
       Try(
         CreditcardRow(
           creditcardid = json.\("creditcardid").as(CreditcardId.reads),
@@ -60,7 +60,7 @@ object CreditcardRow {
       )
     )
   }
-  implicit val writes: OWrites[CreditcardRow] = OWrites[CreditcardRow](o =>
+  implicit lazy val writes: OWrites[CreditcardRow] = OWrites[CreditcardRow](o =>
     new JsObject(ListMap[String, JsValue](
       "creditcardid" -> CreditcardId.writes.writes(o.creditcardid),
       "cardtype" -> Writes.StringWrites.writes(o.cardtype),

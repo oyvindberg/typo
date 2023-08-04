@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.salesreason` */
 case class SalesreasonId(value: Int) extends AnyVal
 object SalesreasonId {
-  implicit val arrayToStatement: ToStatement[Array[SalesreasonId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[SalesreasonId, Int] = Bijection[SalesreasonId, Int](_.value)(SalesreasonId.apply)
-  implicit val column: Column[SalesreasonId] = implicitly[Column[Int]].map(SalesreasonId.apply)
-  implicit val ordering: Ordering[SalesreasonId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[SalesreasonId] = new ParameterMetaData[SalesreasonId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[SalesreasonId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[SalesreasonId, Int] = Bijection[SalesreasonId, Int](_.value)(SalesreasonId.apply)
+  implicit lazy val column: Column[SalesreasonId] = implicitly[Column[Int]].map(SalesreasonId.apply)
+  implicit lazy val ordering: Ordering[SalesreasonId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[SalesreasonId] = new ParameterMetaData[SalesreasonId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[SalesreasonId] = Reads.IntReads.map(SalesreasonId.apply)
-  implicit val toStatement: ToStatement[SalesreasonId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[SalesreasonId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[SalesreasonId] = Reads.IntReads.map(SalesreasonId.apply)
+  implicit lazy val toStatement: ToStatement[SalesreasonId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[SalesreasonId] = Writes.IntWrites.contramap(_.value)
 }

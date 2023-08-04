@@ -28,7 +28,7 @@ case class PgTimezoneNamesViewRow(
 )
 
 object PgTimezoneNamesViewRow {
-  implicit val reads: Reads[PgTimezoneNamesViewRow] = Reads[PgTimezoneNamesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgTimezoneNamesViewRow] = Reads[PgTimezoneNamesViewRow](json => JsResult.fromTry(
       Try(
         PgTimezoneNamesViewRow(
           name = json.\("name").toOption.map(_.as(Reads.StringReads)),
@@ -49,7 +49,7 @@ object PgTimezoneNamesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgTimezoneNamesViewRow] = OWrites[PgTimezoneNamesViewRow](o =>
+  implicit lazy val writes: OWrites[PgTimezoneNamesViewRow] = OWrites[PgTimezoneNamesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
       "abbrev" -> Writes.OptionWrites(Writes.StringWrites).writes(o.abbrev),

@@ -21,7 +21,7 @@ import typo.dsl.Bijection
 case class TypoPolygon(points: List[TypoPoint])
 
 object TypoPolygon {
-  implicit val arrayColumn: Column[Array[TypoPolygon]] = Column.nonNull[Array[TypoPolygon]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoPolygon]] = Column.nonNull[Array[TypoPolygon]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -32,24 +32,24 @@ object TypoPolygon {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoPolygon]] = new ParameterMetaData[Array[TypoPolygon]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPolygon]] = new ParameterMetaData[Array[TypoPolygon]] {
     override def sqlType: String = "_polygon"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoPolygon]] = ToStatement[Array[TypoPolygon]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("polygon", v.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))))
-  implicit val bijection: Bijection[TypoPolygon, List[TypoPoint]] = Bijection[TypoPolygon, List[TypoPoint]](_.points)(TypoPolygon.apply)
-  implicit val column: Column[TypoPolygon] = Column.nonNull[TypoPolygon]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoPolygon]] = ToStatement[Array[TypoPolygon]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("polygon", v.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))))
+  implicit lazy val bijection: Bijection[TypoPolygon, List[TypoPoint]] = Bijection[TypoPolygon, List[TypoPoint]](_.points)(TypoPolygon.apply)
+  implicit lazy val column: Column[TypoPolygon] = Column.nonNull[TypoPolygon]((v1: Any, _) =>
     v1 match {
       case v: PGpolygon => Right(TypoPolygon(v.points.map(p => TypoPoint(p.x, p.y)).toList))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGpolygon, got ${other.getClass.getName}"))
     }
   )
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPolygon] = Ordering.by(_.points)
-  implicit val parameterMetadata: ParameterMetaData[TypoPolygon] = new ParameterMetaData[TypoPolygon] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPolygon] = new ParameterMetaData[TypoPolygon] {
     override def sqlType: String = "polygon"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoPolygon] = implicitly[Reads[List[TypoPoint]]].map(TypoPolygon.apply)
-  implicit val toStatement: ToStatement[TypoPolygon] = ToStatement[TypoPolygon]((s, index, v) => s.setObject(index, new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
-  implicit val writes: Writes[TypoPolygon] = implicitly[Writes[List[TypoPoint]]].contramap(_.points)
+  implicit lazy val reads: Reads[TypoPolygon] = implicitly[Reads[List[TypoPoint]]].map(TypoPolygon.apply)
+  implicit lazy val toStatement: ToStatement[TypoPolygon] = ToStatement[TypoPolygon]((s, index, v) => s.setObject(index, new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
+  implicit lazy val writes: Writes[TypoPolygon] = implicitly[Writes[List[TypoPoint]]].contramap(_.points)
 }

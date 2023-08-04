@@ -27,7 +27,7 @@ case class PgTimezoneAbbrevsViewRow(
 )
 
 object PgTimezoneAbbrevsViewRow {
-  implicit val reads: Reads[PgTimezoneAbbrevsViewRow] = Reads[PgTimezoneAbbrevsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgTimezoneAbbrevsViewRow] = Reads[PgTimezoneAbbrevsViewRow](json => JsResult.fromTry(
       Try(
         PgTimezoneAbbrevsViewRow(
           abbrev = json.\("abbrev").toOption.map(_.as(Reads.StringReads)),
@@ -46,7 +46,7 @@ object PgTimezoneAbbrevsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgTimezoneAbbrevsViewRow] = OWrites[PgTimezoneAbbrevsViewRow](o =>
+  implicit lazy val writes: OWrites[PgTimezoneAbbrevsViewRow] = OWrites[PgTimezoneAbbrevsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "abbrev" -> Writes.OptionWrites(Writes.StringWrites).writes(o.abbrev),
       "utc_offset" -> Writes.OptionWrites(TypoInterval.writes).writes(o.utcOffset),

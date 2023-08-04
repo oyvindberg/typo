@@ -34,7 +34,7 @@ case class PasswordRow(
 )
 
 object PasswordRow {
-  implicit val reads: Reads[PasswordRow] = Reads[PasswordRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PasswordRow] = Reads[PasswordRow](json => JsResult.fromTry(
       Try(
         PasswordRow(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -57,7 +57,7 @@ object PasswordRow {
       )
     )
   }
-  implicit val writes: OWrites[PasswordRow] = OWrites[PasswordRow](o =>
+  implicit lazy val writes: OWrites[PasswordRow] = OWrites[PasswordRow](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "passwordhash" -> Writes.StringWrites.writes(o.passwordhash),

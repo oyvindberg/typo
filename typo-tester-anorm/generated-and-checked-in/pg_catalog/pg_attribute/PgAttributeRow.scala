@@ -53,7 +53,7 @@ case class PgAttributeRow(
  }
 
 object PgAttributeRow {
-  implicit val reads: Reads[PgAttributeRow] = Reads[PgAttributeRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgAttributeRow] = Reads[PgAttributeRow](json => JsResult.fromTry(
       Try(
         PgAttributeRow(
           attrelid = json.\("attrelid").as(Reads.LongReads),
@@ -118,7 +118,7 @@ object PgAttributeRow {
       )
     )
   }
-  implicit val writes: OWrites[PgAttributeRow] = OWrites[PgAttributeRow](o =>
+  implicit lazy val writes: OWrites[PgAttributeRow] = OWrites[PgAttributeRow](o =>
     new JsObject(ListMap[String, JsValue](
       "attrelid" -> Writes.LongWrites.writes(o.attrelid),
       "attname" -> Writes.StringWrites.writes(o.attname),

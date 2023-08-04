@@ -37,7 +37,7 @@ case class PgRolesViewRow(
 )
 
 object PgRolesViewRow {
-  implicit val reads: Reads[PgRolesViewRow] = Reads[PgRolesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgRolesViewRow] = Reads[PgRolesViewRow](json => JsResult.fromTry(
       Try(
         PgRolesViewRow(
           rolname = json.\("rolname").toOption.map(_.as(Reads.StringReads)),
@@ -76,7 +76,7 @@ object PgRolesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgRolesViewRow] = OWrites[PgRolesViewRow](o =>
+  implicit lazy val writes: OWrites[PgRolesViewRow] = OWrites[PgRolesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "rolname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.rolname),
       "rolsuper" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.rolsuper),

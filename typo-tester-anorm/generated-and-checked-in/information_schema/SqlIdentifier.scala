@@ -18,15 +18,15 @@ import typo.dsl.Bijection
   */
 case class SqlIdentifier(value: String) extends AnyVal
 object SqlIdentifier {
-  implicit val arrayToStatement: ToStatement[Array[SqlIdentifier]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[SqlIdentifier, String] = Bijection[SqlIdentifier, String](_.value)(SqlIdentifier.apply)
-  implicit val column: Column[SqlIdentifier] = implicitly[Column[String]].map(SqlIdentifier.apply)
-  implicit val ordering: Ordering[SqlIdentifier] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[SqlIdentifier] = new ParameterMetaData[SqlIdentifier] {
+  implicit lazy val arrayToStatement: ToStatement[Array[SqlIdentifier]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[SqlIdentifier, String] = Bijection[SqlIdentifier, String](_.value)(SqlIdentifier.apply)
+  implicit lazy val column: Column[SqlIdentifier] = implicitly[Column[String]].map(SqlIdentifier.apply)
+  implicit lazy val ordering: Ordering[SqlIdentifier] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[SqlIdentifier] = new ParameterMetaData[SqlIdentifier] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[SqlIdentifier] = Reads.StringReads.map(SqlIdentifier.apply)
-  implicit val toStatement: ToStatement[SqlIdentifier] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[SqlIdentifier] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val reads: Reads[SqlIdentifier] = Reads.StringReads.map(SqlIdentifier.apply)
+  implicit lazy val toStatement: ToStatement[SqlIdentifier] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val writes: Writes[SqlIdentifier] = Writes.StringWrites.contramap(_.value)
 }

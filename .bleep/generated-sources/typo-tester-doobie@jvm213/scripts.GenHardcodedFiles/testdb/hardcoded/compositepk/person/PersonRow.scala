@@ -24,9 +24,9 @@ case class PersonRow(
  }
 
 object PersonRow {
-  implicit val decoder: Decoder[PersonRow] = Decoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(PersonRow.apply)(Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PersonRow] = Encoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(x => (x.one, x.two, x.name))(Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PersonRow] = new Read[PersonRow](
+  implicit lazy val decoder: Decoder[PersonRow] = Decoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(PersonRow.apply)(Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PersonRow] = Encoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(x => (x.one, x.two, x.name))(Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PersonRow] = new Read[PersonRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),

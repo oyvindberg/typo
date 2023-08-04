@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoXid(value: String)
 
 object TypoXid {
-  implicit val arrayColumn: Column[Array[TypoXid]] = Column.nonNull[Array[TypoXid]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoXid]] = Column.nonNull[Array[TypoXid]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoXid {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoXid]] = new ParameterMetaData[Array[TypoXid]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoXid]] = new ParameterMetaData[Array[TypoXid]] {
     override def sqlType: String = "_xid"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoXid]] = ToStatement[Array[TypoXid]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("xid", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoXid]] = ToStatement[Array[TypoXid]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("xid", v.map(v => {
                                                                                                                    val obj = new PGobject
                                                                                                                    obj.setType("xid")
                                                                                                                    obj.setValue(v.value)
                                                                                                                    obj
                                                                                                                  }))))
-  implicit val bijection: Bijection[TypoXid, String] = Bijection[TypoXid, String](_.value)(TypoXid.apply)
-  implicit val column: Column[TypoXid] = Column.nonNull[TypoXid]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoXid, String] = Bijection[TypoXid, String](_.value)(TypoXid.apply)
+  implicit lazy val column: Column[TypoXid] = Column.nonNull[TypoXid]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoXid(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoXid] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoXid] = new ParameterMetaData[TypoXid] {
+  implicit lazy val ordering: Ordering[TypoXid] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoXid] = new ParameterMetaData[TypoXid] {
     override def sqlType: String = "xid"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoXid] = Reads.StringReads.map(TypoXid.apply)
-  implicit val toStatement: ToStatement[TypoXid] = ToStatement[TypoXid]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoXid] = Reads.StringReads.map(TypoXid.apply)
+  implicit lazy val toStatement: ToStatement[TypoXid] = ToStatement[TypoXid]((s, index, v) => s.setObject(index, {
                                                              val obj = new PGobject
                                                              obj.setType("xid")
                                                              obj.setValue(v.value)
                                                              obj
                                                            }))
-  implicit val writes: Writes[TypoXid] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoXid] = Writes.StringWrites.contramap(_.value)
 }

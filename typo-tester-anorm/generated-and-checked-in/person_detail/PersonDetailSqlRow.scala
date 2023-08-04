@@ -42,7 +42,7 @@ case class PersonDetailSqlRow(
 )
 
 object PersonDetailSqlRow {
-  implicit val reads: Reads[PersonDetailSqlRow] = Reads[PersonDetailSqlRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PersonDetailSqlRow] = Reads[PersonDetailSqlRow](json => JsResult.fromTry(
       Try(
         PersonDetailSqlRow(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -73,7 +73,7 @@ object PersonDetailSqlRow {
       )
     )
   }
-  implicit val writes: OWrites[PersonDetailSqlRow] = OWrites[PersonDetailSqlRow](o =>
+  implicit lazy val writes: OWrites[PersonDetailSqlRow] = OWrites[PersonDetailSqlRow](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),

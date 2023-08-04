@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoRegtype(value: String)
 
 object TypoRegtype {
-  implicit val arrayColumn: Column[Array[TypoRegtype]] = Column.nonNull[Array[TypoRegtype]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoRegtype]] = Column.nonNull[Array[TypoRegtype]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoRegtype {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoRegtype]] = new ParameterMetaData[Array[TypoRegtype]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoRegtype]] = new ParameterMetaData[Array[TypoRegtype]] {
     override def sqlType: String = "_regtype"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoRegtype]] = ToStatement[Array[TypoRegtype]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("regtype", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoRegtype]] = ToStatement[Array[TypoRegtype]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("regtype", v.map(v => {
                                                                                                                            val obj = new PGobject
                                                                                                                            obj.setType("regtype")
                                                                                                                            obj.setValue(v.value)
                                                                                                                            obj
                                                                                                                          }))))
-  implicit val bijection: Bijection[TypoRegtype, String] = Bijection[TypoRegtype, String](_.value)(TypoRegtype.apply)
-  implicit val column: Column[TypoRegtype] = Column.nonNull[TypoRegtype]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoRegtype, String] = Bijection[TypoRegtype, String](_.value)(TypoRegtype.apply)
+  implicit lazy val column: Column[TypoRegtype] = Column.nonNull[TypoRegtype]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoRegtype(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoRegtype] = new ParameterMetaData[TypoRegtype] {
+  implicit lazy val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoRegtype] = new ParameterMetaData[TypoRegtype] {
     override def sqlType: String = "regtype"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoRegtype] = Reads.StringReads.map(TypoRegtype.apply)
-  implicit val toStatement: ToStatement[TypoRegtype] = ToStatement[TypoRegtype]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoRegtype] = Reads.StringReads.map(TypoRegtype.apply)
+  implicit lazy val toStatement: ToStatement[TypoRegtype] = ToStatement[TypoRegtype]((s, index, v) => s.setObject(index, {
                                                                  val obj = new PGobject
                                                                  obj.setType("regtype")
                                                                  obj.setValue(v.value)
                                                                  obj
                                                                }))
-  implicit val writes: Writes[TypoRegtype] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoRegtype] = Writes.StringWrites.contramap(_.value)
 }

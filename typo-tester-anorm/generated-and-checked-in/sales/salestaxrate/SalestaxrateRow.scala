@@ -40,7 +40,7 @@ case class SalestaxrateRow(
 )
 
 object SalestaxrateRow {
-  implicit val reads: Reads[SalestaxrateRow] = Reads[SalestaxrateRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SalestaxrateRow] = Reads[SalestaxrateRow](json => JsResult.fromTry(
       Try(
         SalestaxrateRow(
           salestaxrateid = json.\("salestaxrateid").as(SalestaxrateId.reads),
@@ -67,7 +67,7 @@ object SalestaxrateRow {
       )
     )
   }
-  implicit val writes: OWrites[SalestaxrateRow] = OWrites[SalestaxrateRow](o =>
+  implicit lazy val writes: OWrites[SalestaxrateRow] = OWrites[SalestaxrateRow](o =>
     new JsObject(ListMap[String, JsValue](
       "salestaxrateid" -> SalestaxrateId.writes.writes(o.salestaxrateid),
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),

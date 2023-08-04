@@ -40,7 +40,7 @@ case class CrViewRow(
 )
 
 object CrViewRow {
-  implicit val reads: Reads[CrViewRow] = Reads[CrViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CrViewRow] = Reads[CrViewRow](json => JsResult.fromTry(
       Try(
         CrViewRow(
           currencyrateid = json.\("currencyrateid").toOption.map(_.as(CurrencyrateId.reads)),
@@ -67,7 +67,7 @@ object CrViewRow {
       )
     )
   }
-  implicit val writes: OWrites[CrViewRow] = OWrites[CrViewRow](o =>
+  implicit lazy val writes: OWrites[CrViewRow] = OWrites[CrViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "currencyrateid" -> Writes.OptionWrites(CurrencyrateId.writes).writes(o.currencyrateid),
       "currencyratedate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.currencyratedate),

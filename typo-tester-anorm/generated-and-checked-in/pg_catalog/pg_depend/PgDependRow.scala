@@ -30,7 +30,7 @@ case class PgDependRow(
 )
 
 object PgDependRow {
-  implicit val reads: Reads[PgDependRow] = Reads[PgDependRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgDependRow] = Reads[PgDependRow](json => JsResult.fromTry(
       Try(
         PgDependRow(
           classid = json.\("classid").as(Reads.LongReads),
@@ -57,7 +57,7 @@ object PgDependRow {
       )
     )
   }
-  implicit val writes: OWrites[PgDependRow] = OWrites[PgDependRow](o =>
+  implicit lazy val writes: OWrites[PgDependRow] = OWrites[PgDependRow](o =>
     new JsObject(ListMap[String, JsValue](
       "classid" -> Writes.LongWrites.writes(o.classid),
       "objid" -> Writes.LongWrites.writes(o.objid),

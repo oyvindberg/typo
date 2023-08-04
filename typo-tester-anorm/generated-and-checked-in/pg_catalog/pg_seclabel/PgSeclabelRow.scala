@@ -30,7 +30,7 @@ case class PgSeclabelRow(
  }
 
 object PgSeclabelRow {
-  implicit val reads: Reads[PgSeclabelRow] = Reads[PgSeclabelRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgSeclabelRow] = Reads[PgSeclabelRow](json => JsResult.fromTry(
       Try(
         PgSeclabelRow(
           objoid = json.\("objoid").as(Reads.LongReads),
@@ -53,7 +53,7 @@ object PgSeclabelRow {
       )
     )
   }
-  implicit val writes: OWrites[PgSeclabelRow] = OWrites[PgSeclabelRow](o =>
+  implicit lazy val writes: OWrites[PgSeclabelRow] = OWrites[PgSeclabelRow](o =>
     new JsObject(ListMap[String, JsValue](
       "objoid" -> Writes.LongWrites.writes(o.objoid),
       "classoid" -> Writes.LongWrites.writes(o.classoid),

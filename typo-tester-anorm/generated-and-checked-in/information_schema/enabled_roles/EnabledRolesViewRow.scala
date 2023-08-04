@@ -25,7 +25,7 @@ case class EnabledRolesViewRow(
 )
 
 object EnabledRolesViewRow {
-  implicit val reads: Reads[EnabledRolesViewRow] = Reads[EnabledRolesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[EnabledRolesViewRow] = Reads[EnabledRolesViewRow](json => JsResult.fromTry(
       Try(
         EnabledRolesViewRow(
           roleName = json.\("role_name").toOption.map(_.as(SqlIdentifier.reads))
@@ -40,7 +40,7 @@ object EnabledRolesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[EnabledRolesViewRow] = OWrites[EnabledRolesViewRow](o =>
+  implicit lazy val writes: OWrites[EnabledRolesViewRow] = OWrites[EnabledRolesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "role_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.roleName)
     ))

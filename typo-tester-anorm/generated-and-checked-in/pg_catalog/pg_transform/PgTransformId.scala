@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_transform` */
 case class PgTransformId(value: /* oid */ Long) extends AnyVal
 object PgTransformId {
-  implicit val arrayToStatement: ToStatement[Array[PgTransformId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgTransformId, /* oid */ Long] = Bijection[PgTransformId, /* oid */ Long](_.value)(PgTransformId.apply)
-  implicit val column: Column[PgTransformId] = implicitly[Column[/* oid */ Long]].map(PgTransformId.apply)
-  implicit val ordering: Ordering[PgTransformId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgTransformId] = new ParameterMetaData[PgTransformId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgTransformId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgTransformId, /* oid */ Long] = Bijection[PgTransformId, /* oid */ Long](_.value)(PgTransformId.apply)
+  implicit lazy val column: Column[PgTransformId] = implicitly[Column[/* oid */ Long]].map(PgTransformId.apply)
+  implicit lazy val ordering: Ordering[PgTransformId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgTransformId] = new ParameterMetaData[PgTransformId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgTransformId] = Reads.LongReads.map(PgTransformId.apply)
-  implicit val toStatement: ToStatement[PgTransformId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgTransformId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgTransformId] = Reads.LongReads.map(PgTransformId.apply)
+  implicit lazy val toStatement: ToStatement[PgTransformId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgTransformId] = Writes.LongWrites.contramap(_.value)
 }

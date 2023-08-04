@@ -33,7 +33,7 @@ case class RoutineSequenceUsageViewRow(
 )
 
 object RoutineSequenceUsageViewRow {
-  implicit val reads: Reads[RoutineSequenceUsageViewRow] = Reads[RoutineSequenceUsageViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[RoutineSequenceUsageViewRow] = Reads[RoutineSequenceUsageViewRow](json => JsResult.fromTry(
       Try(
         RoutineSequenceUsageViewRow(
           specificCatalog = json.\("specific_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -64,7 +64,7 @@ object RoutineSequenceUsageViewRow {
       )
     )
   }
-  implicit val writes: OWrites[RoutineSequenceUsageViewRow] = OWrites[RoutineSequenceUsageViewRow](o =>
+  implicit lazy val writes: OWrites[RoutineSequenceUsageViewRow] = OWrites[RoutineSequenceUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "specific_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificCatalog),
       "specific_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.specificSchema),

@@ -26,7 +26,7 @@ import scala.util.Try
 case class TypoPath(open: Boolean, points: List[TypoPoint])
 
 object TypoPath {
-  implicit val arrayColumn: Column[Array[TypoPath]] = Column.nonNull[Array[TypoPath]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoPath]] = Column.nonNull[Array[TypoPath]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -37,23 +37,23 @@ object TypoPath {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoPath]] = new ParameterMetaData[Array[TypoPath]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPath]] = new ParameterMetaData[Array[TypoPath]] {
     override def sqlType: String = "_path"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoPath]] = ToStatement[Array[TypoPath]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("path", v.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))))
-  implicit val column: Column[TypoPath] = Column.nonNull[TypoPath]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoPath]] = ToStatement[Array[TypoPath]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("path", v.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))))
+  implicit lazy val column: Column[TypoPath] = Column.nonNull[TypoPath]((v1: Any, _) =>
     v1 match {
       case v: PGpath => Right(TypoPath(v.isOpen, v.points.map(p => TypoPoint(p.x, p.y)).toList))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGpath, got ${other.getClass.getName}"))
     }
   )
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPath] = Ordering.by(x => (x.open, x.points))
-  implicit val parameterMetadata: ParameterMetaData[TypoPath] = new ParameterMetaData[TypoPath] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoPath] = new ParameterMetaData[TypoPath] {
     override def sqlType: String = "path"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoPath] = Reads[TypoPath](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TypoPath] = Reads[TypoPath](json => JsResult.fromTry(
       Try(
         TypoPath(
           open = json.\("open").as(Reads.BooleanReads),
@@ -62,8 +62,8 @@ object TypoPath {
       )
     ),
   )
-  implicit val toStatement: ToStatement[TypoPath] = ToStatement[TypoPath]((s, index, v) => s.setObject(index, new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
-  implicit val writes: OWrites[TypoPath] = OWrites[TypoPath](o =>
+  implicit lazy val toStatement: ToStatement[TypoPath] = ToStatement[TypoPath]((s, index, v) => s.setObject(index, new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
+  implicit lazy val writes: OWrites[TypoPath] = OWrites[TypoPath](o =>
     new JsObject(ListMap[String, JsValue](
       "open" -> Writes.BooleanWrites.writes(o.open),
       "points" -> implicitly[Writes[List[TypoPoint]]].writes(o.points)

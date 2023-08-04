@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.salesorderheader` */
 case class SalesorderheaderId(value: Int) extends AnyVal
 object SalesorderheaderId {
-  implicit val arrayToStatement: ToStatement[Array[SalesorderheaderId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[SalesorderheaderId, Int] = Bijection[SalesorderheaderId, Int](_.value)(SalesorderheaderId.apply)
-  implicit val column: Column[SalesorderheaderId] = implicitly[Column[Int]].map(SalesorderheaderId.apply)
-  implicit val ordering: Ordering[SalesorderheaderId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[SalesorderheaderId] = new ParameterMetaData[SalesorderheaderId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[SalesorderheaderId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[SalesorderheaderId, Int] = Bijection[SalesorderheaderId, Int](_.value)(SalesorderheaderId.apply)
+  implicit lazy val column: Column[SalesorderheaderId] = implicitly[Column[Int]].map(SalesorderheaderId.apply)
+  implicit lazy val ordering: Ordering[SalesorderheaderId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[SalesorderheaderId] = new ParameterMetaData[SalesorderheaderId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[SalesorderheaderId] = Reads.IntReads.map(SalesorderheaderId.apply)
-  implicit val toStatement: ToStatement[SalesorderheaderId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[SalesorderheaderId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[SalesorderheaderId] = Reads.IntReads.map(SalesorderheaderId.apply)
+  implicit lazy val toStatement: ToStatement[SalesorderheaderId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[SalesorderheaderId] = Writes.IntWrites.contramap(_.value)
 }

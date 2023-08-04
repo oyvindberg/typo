@@ -26,7 +26,7 @@ case class PgPublicationTablesViewRow(
 )
 
 object PgPublicationTablesViewRow {
-  implicit val reads: Reads[PgPublicationTablesViewRow] = Reads[PgPublicationTablesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgPublicationTablesViewRow] = Reads[PgPublicationTablesViewRow](json => JsResult.fromTry(
       Try(
         PgPublicationTablesViewRow(
           pubname = json.\("pubname").toOption.map(_.as(Reads.StringReads)),
@@ -45,7 +45,7 @@ object PgPublicationTablesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgPublicationTablesViewRow] = OWrites[PgPublicationTablesViewRow](o =>
+  implicit lazy val writes: OWrites[PgPublicationTablesViewRow] = OWrites[PgPublicationTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "pubname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.pubname),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),

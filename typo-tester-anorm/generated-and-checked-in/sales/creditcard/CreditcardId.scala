@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.creditcard` */
 case class CreditcardId(value: Int) extends AnyVal
 object CreditcardId {
-  implicit val arrayToStatement: ToStatement[Array[CreditcardId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[CreditcardId, Int] = Bijection[CreditcardId, Int](_.value)(CreditcardId.apply)
-  implicit val column: Column[CreditcardId] = implicitly[Column[Int]].map(CreditcardId.apply)
-  implicit val ordering: Ordering[CreditcardId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[CreditcardId] = new ParameterMetaData[CreditcardId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[CreditcardId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[CreditcardId, Int] = Bijection[CreditcardId, Int](_.value)(CreditcardId.apply)
+  implicit lazy val column: Column[CreditcardId] = implicitly[Column[Int]].map(CreditcardId.apply)
+  implicit lazy val ordering: Ordering[CreditcardId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[CreditcardId] = new ParameterMetaData[CreditcardId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[CreditcardId] = Reads.IntReads.map(CreditcardId.apply)
-  implicit val toStatement: ToStatement[CreditcardId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[CreditcardId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[CreditcardId] = Reads.IntReads.map(CreditcardId.apply)
+  implicit lazy val toStatement: ToStatement[CreditcardId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[CreditcardId] = Writes.IntWrites.contramap(_.value)
 }

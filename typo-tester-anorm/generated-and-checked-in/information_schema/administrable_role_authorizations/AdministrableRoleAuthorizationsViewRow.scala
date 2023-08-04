@@ -31,7 +31,7 @@ case class AdministrableRoleAuthorizationsViewRow(
 )
 
 object AdministrableRoleAuthorizationsViewRow {
-  implicit val reads: Reads[AdministrableRoleAuthorizationsViewRow] = Reads[AdministrableRoleAuthorizationsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[AdministrableRoleAuthorizationsViewRow] = Reads[AdministrableRoleAuthorizationsViewRow](json => JsResult.fromTry(
       Try(
         AdministrableRoleAuthorizationsViewRow(
           grantee = json.\("grantee").toOption.map(_.as(SqlIdentifier.reads)),
@@ -50,7 +50,7 @@ object AdministrableRoleAuthorizationsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[AdministrableRoleAuthorizationsViewRow] = OWrites[AdministrableRoleAuthorizationsViewRow](o =>
+  implicit lazy val writes: OWrites[AdministrableRoleAuthorizationsViewRow] = OWrites[AdministrableRoleAuthorizationsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "grantee" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantee),
       "role_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.roleName),

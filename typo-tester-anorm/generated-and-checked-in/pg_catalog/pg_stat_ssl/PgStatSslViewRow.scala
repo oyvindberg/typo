@@ -31,7 +31,7 @@ case class PgStatSslViewRow(
 )
 
 object PgStatSslViewRow {
-  implicit val reads: Reads[PgStatSslViewRow] = Reads[PgStatSslViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatSslViewRow] = Reads[PgStatSslViewRow](json => JsResult.fromTry(
       Try(
         PgStatSslViewRow(
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
@@ -60,7 +60,7 @@ object PgStatSslViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatSslViewRow] = OWrites[PgStatSslViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatSslViewRow] = OWrites[PgStatSslViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "ssl" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.ssl),

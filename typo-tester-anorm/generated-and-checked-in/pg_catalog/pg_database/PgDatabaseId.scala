@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_database` */
 case class PgDatabaseId(value: /* oid */ Long) extends AnyVal
 object PgDatabaseId {
-  implicit val arrayToStatement: ToStatement[Array[PgDatabaseId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgDatabaseId, /* oid */ Long] = Bijection[PgDatabaseId, /* oid */ Long](_.value)(PgDatabaseId.apply)
-  implicit val column: Column[PgDatabaseId] = implicitly[Column[/* oid */ Long]].map(PgDatabaseId.apply)
-  implicit val ordering: Ordering[PgDatabaseId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgDatabaseId] = new ParameterMetaData[PgDatabaseId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgDatabaseId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgDatabaseId, /* oid */ Long] = Bijection[PgDatabaseId, /* oid */ Long](_.value)(PgDatabaseId.apply)
+  implicit lazy val column: Column[PgDatabaseId] = implicitly[Column[/* oid */ Long]].map(PgDatabaseId.apply)
+  implicit lazy val ordering: Ordering[PgDatabaseId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgDatabaseId] = new ParameterMetaData[PgDatabaseId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgDatabaseId] = Reads.LongReads.map(PgDatabaseId.apply)
-  implicit val toStatement: ToStatement[PgDatabaseId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgDatabaseId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgDatabaseId] = Reads.LongReads.map(PgDatabaseId.apply)
+  implicit lazy val toStatement: ToStatement[PgDatabaseId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgDatabaseId] = Writes.LongWrites.contramap(_.value)
 }

@@ -31,7 +31,7 @@ case class PgForeignTablesViewRow(
 )
 
 object PgForeignTablesViewRow {
-  implicit val reads: Reads[PgForeignTablesViewRow] = Reads[PgForeignTablesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgForeignTablesViewRow] = Reads[PgForeignTablesViewRow](json => JsResult.fromTry(
       Try(
         PgForeignTablesViewRow(
           foreignTableCatalog = json.\("foreign_table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -58,7 +58,7 @@ object PgForeignTablesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgForeignTablesViewRow] = OWrites[PgForeignTablesViewRow](o =>
+  implicit lazy val writes: OWrites[PgForeignTablesViewRow] = OWrites[PgForeignTablesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "foreign_table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableCatalog),
       "foreign_table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.foreignTableSchema),

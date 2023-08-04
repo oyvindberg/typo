@@ -26,7 +26,7 @@ case class PgPublicationRelRow(
 )
 
 object PgPublicationRelRow {
-  implicit val reads: Reads[PgPublicationRelRow] = Reads[PgPublicationRelRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgPublicationRelRow] = Reads[PgPublicationRelRow](json => JsResult.fromTry(
       Try(
         PgPublicationRelRow(
           oid = json.\("oid").as(PgPublicationRelId.reads),
@@ -45,7 +45,7 @@ object PgPublicationRelRow {
       )
     )
   }
-  implicit val writes: OWrites[PgPublicationRelRow] = OWrites[PgPublicationRelRow](o =>
+  implicit lazy val writes: OWrites[PgPublicationRelRow] = OWrites[PgPublicationRelRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgPublicationRelId.writes.writes(o.oid),
       "prpubid" -> Writes.LongWrites.writes(o.prpubid),

@@ -19,15 +19,15 @@ import typo.dsl.Bijection
   */
 case class TimeStamp(value: TypoOffsetDateTime) extends AnyVal
 object TimeStamp {
-  implicit val arrayToStatement: ToStatement[Array[TimeStamp]] = implicitly[ToStatement[Array[TypoOffsetDateTime]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[TimeStamp, TypoOffsetDateTime] = Bijection[TimeStamp, TypoOffsetDateTime](_.value)(TimeStamp.apply)
-  implicit val column: Column[TimeStamp] = implicitly[Column[TypoOffsetDateTime]].map(TimeStamp.apply)
+  implicit lazy val arrayToStatement: ToStatement[Array[TimeStamp]] = implicitly[ToStatement[Array[TypoOffsetDateTime]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[TimeStamp, TypoOffsetDateTime] = Bijection[TimeStamp, TypoOffsetDateTime](_.value)(TimeStamp.apply)
+  implicit lazy val column: Column[TimeStamp] = implicitly[Column[TypoOffsetDateTime]].map(TimeStamp.apply)
   implicit def ordering(implicit O0: Ordering[TypoOffsetDateTime]): Ordering[TimeStamp] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TimeStamp] = new ParameterMetaData[TimeStamp] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TimeStamp] = new ParameterMetaData[TimeStamp] {
     override def sqlType: String = implicitly[ParameterMetaData[TypoOffsetDateTime]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[TypoOffsetDateTime]].jdbcType
   }
-  implicit val reads: Reads[TimeStamp] = TypoOffsetDateTime.reads.map(TimeStamp.apply)
-  implicit val toStatement: ToStatement[TimeStamp] = implicitly[ToStatement[TypoOffsetDateTime]].contramap(_.value)
-  implicit val writes: Writes[TimeStamp] = TypoOffsetDateTime.writes.contramap(_.value)
+  implicit lazy val reads: Reads[TimeStamp] = TypoOffsetDateTime.reads.map(TimeStamp.apply)
+  implicit lazy val toStatement: ToStatement[TimeStamp] = implicitly[ToStatement[TypoOffsetDateTime]].contramap(_.value)
+  implicit lazy val writes: Writes[TimeStamp] = TypoOffsetDateTime.writes.contramap(_.value)
 }

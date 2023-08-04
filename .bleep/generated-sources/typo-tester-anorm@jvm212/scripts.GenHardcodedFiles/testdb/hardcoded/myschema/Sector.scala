@@ -32,13 +32,13 @@ object Sector {
   val Names: String = All.map(_.value).mkString(", ")
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
-  implicit val arrayToStatement: ToStatement[Array[Sector]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit val column: Column[Sector] = implicitly[Column[String]].mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
-  implicit val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
+  implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit lazy val column: Column[Sector] = implicitly[Column[String]].mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
+  implicit lazy val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[Sector] = Reads[Sector]((value: JsValue) =>
+  implicit lazy val reads: Reads[Sector] = Reads[Sector]((value: JsValue) =>
     value.validate(Reads.StringReads).flatMap { str =>
       ByName.get(str) match {
         case Some(value) => JsSuccess(value)
@@ -46,6 +46,6 @@ object Sector {
       }
     }
   )
-  implicit val toStatement: ToStatement[Sector] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[Sector] = Writes[Sector](value => Writes.StringWrites.writes(value.value))
+  implicit lazy val toStatement: ToStatement[Sector] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val writes: Writes[Sector] = Writes[Sector](value => Writes.StringWrites.writes(value.value))
 }

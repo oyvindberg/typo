@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_foreign_data_wrapper` */
 case class PgForeignDataWrapperId(value: /* oid */ Long) extends AnyVal
 object PgForeignDataWrapperId {
-  implicit val arrayToStatement: ToStatement[Array[PgForeignDataWrapperId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgForeignDataWrapperId, /* oid */ Long] = Bijection[PgForeignDataWrapperId, /* oid */ Long](_.value)(PgForeignDataWrapperId.apply)
-  implicit val column: Column[PgForeignDataWrapperId] = implicitly[Column[/* oid */ Long]].map(PgForeignDataWrapperId.apply)
-  implicit val ordering: Ordering[PgForeignDataWrapperId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgForeignDataWrapperId] = new ParameterMetaData[PgForeignDataWrapperId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgForeignDataWrapperId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgForeignDataWrapperId, /* oid */ Long] = Bijection[PgForeignDataWrapperId, /* oid */ Long](_.value)(PgForeignDataWrapperId.apply)
+  implicit lazy val column: Column[PgForeignDataWrapperId] = implicitly[Column[/* oid */ Long]].map(PgForeignDataWrapperId.apply)
+  implicit lazy val ordering: Ordering[PgForeignDataWrapperId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgForeignDataWrapperId] = new ParameterMetaData[PgForeignDataWrapperId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgForeignDataWrapperId] = Reads.LongReads.map(PgForeignDataWrapperId.apply)
-  implicit val toStatement: ToStatement[PgForeignDataWrapperId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgForeignDataWrapperId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgForeignDataWrapperId] = Reads.LongReads.map(PgForeignDataWrapperId.apply)
+  implicit lazy val toStatement: ToStatement[PgForeignDataWrapperId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgForeignDataWrapperId] = Writes.LongWrites.contramap(_.value)
 }

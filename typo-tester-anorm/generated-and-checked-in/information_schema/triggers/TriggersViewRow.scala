@@ -44,7 +44,7 @@ case class TriggersViewRow(
 )
 
 object TriggersViewRow {
-  implicit val reads: Reads[TriggersViewRow] = Reads[TriggersViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TriggersViewRow] = Reads[TriggersViewRow](json => JsResult.fromTry(
       Try(
         TriggersViewRow(
           triggerCatalog = json.\("trigger_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -91,7 +91,7 @@ object TriggersViewRow {
       )
     )
   }
-  implicit val writes: OWrites[TriggersViewRow] = OWrites[TriggersViewRow](o =>
+  implicit lazy val writes: OWrites[TriggersViewRow] = OWrites[TriggersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "trigger_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.triggerCatalog),
       "trigger_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.triggerSchema),

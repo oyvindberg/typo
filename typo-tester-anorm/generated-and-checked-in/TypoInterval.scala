@@ -25,7 +25,7 @@ import scala.util.Try
 case class TypoInterval(years: Int, months: Int, days: Int, hours: Int, minutes: Int, seconds: Double)
 
 object TypoInterval {
-  implicit val arrayColumn: Column[Array[TypoInterval]] = Column.nonNull[Array[TypoInterval]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoInterval]] = Column.nonNull[Array[TypoInterval]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -36,23 +36,23 @@ object TypoInterval {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoInterval]] = new ParameterMetaData[Array[TypoInterval]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoInterval]] = new ParameterMetaData[Array[TypoInterval]] {
     override def sqlType: String = "_interval"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoInterval]] = ToStatement[Array[TypoInterval]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("interval", v.map(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))))
-  implicit val column: Column[TypoInterval] = Column.nonNull[TypoInterval]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoInterval]] = ToStatement[Array[TypoInterval]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("interval", v.map(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))))
+  implicit lazy val column: Column[TypoInterval] = Column.nonNull[TypoInterval]((v1: Any, _) =>
     v1 match {
       case v: PGInterval => Right(TypoInterval(v.getYears, v.getMonths, v.getDays, v.getHours, v.getMinutes, v.getSeconds))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGInterval, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
-  implicit val parameterMetadata: ParameterMetaData[TypoInterval] = new ParameterMetaData[TypoInterval] {
+  implicit lazy val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoInterval] = new ParameterMetaData[TypoInterval] {
     override def sqlType: String = "interval"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoInterval] = Reads[TypoInterval](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TypoInterval] = Reads[TypoInterval](json => JsResult.fromTry(
       Try(
         TypoInterval(
           years = json.\("years").as(Reads.IntReads),
@@ -65,8 +65,8 @@ object TypoInterval {
       )
     ),
   )
-  implicit val toStatement: ToStatement[TypoInterval] = ToStatement[TypoInterval]((s, index, v) => s.setObject(index, new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))
-  implicit val writes: OWrites[TypoInterval] = OWrites[TypoInterval](o =>
+  implicit lazy val toStatement: ToStatement[TypoInterval] = ToStatement[TypoInterval]((s, index, v) => s.setObject(index, new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))
+  implicit lazy val writes: OWrites[TypoInterval] = OWrites[TypoInterval](o =>
     new JsObject(ListMap[String, JsValue](
       "years" -> Writes.IntWrites.writes(o.years),
       "months" -> Writes.IntWrites.writes(o.months),

@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_ts_dict` */
 case class PgTsDictId(value: /* oid */ Long) extends AnyVal
 object PgTsDictId {
-  implicit val arrayToStatement: ToStatement[Array[PgTsDictId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgTsDictId, /* oid */ Long] = Bijection[PgTsDictId, /* oid */ Long](_.value)(PgTsDictId.apply)
-  implicit val column: Column[PgTsDictId] = implicitly[Column[/* oid */ Long]].map(PgTsDictId.apply)
-  implicit val ordering: Ordering[PgTsDictId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgTsDictId] = new ParameterMetaData[PgTsDictId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgTsDictId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgTsDictId, /* oid */ Long] = Bijection[PgTsDictId, /* oid */ Long](_.value)(PgTsDictId.apply)
+  implicit lazy val column: Column[PgTsDictId] = implicitly[Column[/* oid */ Long]].map(PgTsDictId.apply)
+  implicit lazy val ordering: Ordering[PgTsDictId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgTsDictId] = new ParameterMetaData[PgTsDictId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgTsDictId] = Reads.LongReads.map(PgTsDictId.apply)
-  implicit val toStatement: ToStatement[PgTsDictId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgTsDictId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgTsDictId] = Reads.LongReads.map(PgTsDictId.apply)
+  implicit lazy val toStatement: ToStatement[PgTsDictId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgTsDictId] = Writes.LongWrites.contramap(_.value)
 }

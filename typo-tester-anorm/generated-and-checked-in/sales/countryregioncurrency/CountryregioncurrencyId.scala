@@ -20,8 +20,8 @@ import scala.util.Try
 /** Type for the composite primary key of table `sales.countryregioncurrency` */
 case class CountryregioncurrencyId(countryregioncode: CountryregionId, currencycode: CurrencyId)
 object CountryregioncurrencyId {
-  implicit val ordering: Ordering[CountryregioncurrencyId] = Ordering.by(x => (x.countryregioncode, x.currencycode))
-  implicit val reads: Reads[CountryregioncurrencyId] = Reads[CountryregioncurrencyId](json => JsResult.fromTry(
+  implicit lazy val ordering: Ordering[CountryregioncurrencyId] = Ordering.by(x => (x.countryregioncode, x.currencycode))
+  implicit lazy val reads: Reads[CountryregioncurrencyId] = Reads[CountryregioncurrencyId](json => JsResult.fromTry(
       Try(
         CountryregioncurrencyId(
           countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
@@ -30,7 +30,7 @@ object CountryregioncurrencyId {
       )
     ),
   )
-  implicit val writes: OWrites[CountryregioncurrencyId] = OWrites[CountryregioncurrencyId](o =>
+  implicit lazy val writes: OWrites[CountryregioncurrencyId] = OWrites[CountryregioncurrencyId](o =>
     new JsObject(ListMap[String, JsValue](
       "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
       "currencycode" -> CurrencyId.writes.writes(o.currencycode)

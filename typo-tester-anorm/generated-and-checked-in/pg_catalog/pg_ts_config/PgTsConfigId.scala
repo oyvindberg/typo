@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_ts_config` */
 case class PgTsConfigId(value: /* oid */ Long) extends AnyVal
 object PgTsConfigId {
-  implicit val arrayToStatement: ToStatement[Array[PgTsConfigId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgTsConfigId, /* oid */ Long] = Bijection[PgTsConfigId, /* oid */ Long](_.value)(PgTsConfigId.apply)
-  implicit val column: Column[PgTsConfigId] = implicitly[Column[/* oid */ Long]].map(PgTsConfigId.apply)
-  implicit val ordering: Ordering[PgTsConfigId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgTsConfigId] = new ParameterMetaData[PgTsConfigId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgTsConfigId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgTsConfigId, /* oid */ Long] = Bijection[PgTsConfigId, /* oid */ Long](_.value)(PgTsConfigId.apply)
+  implicit lazy val column: Column[PgTsConfigId] = implicitly[Column[/* oid */ Long]].map(PgTsConfigId.apply)
+  implicit lazy val ordering: Ordering[PgTsConfigId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgTsConfigId] = new ParameterMetaData[PgTsConfigId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgTsConfigId] = Reads.LongReads.map(PgTsConfigId.apply)
-  implicit val toStatement: ToStatement[PgTsConfigId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgTsConfigId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgTsConfigId] = Reads.LongReads.map(PgTsConfigId.apply)
+  implicit lazy val toStatement: ToStatement[PgTsConfigId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgTsConfigId] = Writes.LongWrites.contramap(_.value)
 }

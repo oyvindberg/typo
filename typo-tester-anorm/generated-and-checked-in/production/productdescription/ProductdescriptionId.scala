@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.productdescription` */
 case class ProductdescriptionId(value: Int) extends AnyVal
 object ProductdescriptionId {
-  implicit val arrayToStatement: ToStatement[Array[ProductdescriptionId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[ProductdescriptionId, Int] = Bijection[ProductdescriptionId, Int](_.value)(ProductdescriptionId.apply)
-  implicit val column: Column[ProductdescriptionId] = implicitly[Column[Int]].map(ProductdescriptionId.apply)
-  implicit val ordering: Ordering[ProductdescriptionId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[ProductdescriptionId] = new ParameterMetaData[ProductdescriptionId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[ProductdescriptionId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[ProductdescriptionId, Int] = Bijection[ProductdescriptionId, Int](_.value)(ProductdescriptionId.apply)
+  implicit lazy val column: Column[ProductdescriptionId] = implicitly[Column[Int]].map(ProductdescriptionId.apply)
+  implicit lazy val ordering: Ordering[ProductdescriptionId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[ProductdescriptionId] = new ParameterMetaData[ProductdescriptionId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[ProductdescriptionId] = Reads.IntReads.map(ProductdescriptionId.apply)
-  implicit val toStatement: ToStatement[ProductdescriptionId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[ProductdescriptionId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[ProductdescriptionId] = Reads.IntReads.map(ProductdescriptionId.apply)
+  implicit lazy val toStatement: ToStatement[ProductdescriptionId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[ProductdescriptionId] = Writes.IntWrites.contramap(_.value)
 }

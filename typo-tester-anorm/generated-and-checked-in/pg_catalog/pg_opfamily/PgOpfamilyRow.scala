@@ -28,7 +28,7 @@ case class PgOpfamilyRow(
 )
 
 object PgOpfamilyRow {
-  implicit val reads: Reads[PgOpfamilyRow] = Reads[PgOpfamilyRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgOpfamilyRow] = Reads[PgOpfamilyRow](json => JsResult.fromTry(
       Try(
         PgOpfamilyRow(
           oid = json.\("oid").as(PgOpfamilyId.reads),
@@ -51,7 +51,7 @@ object PgOpfamilyRow {
       )
     )
   }
-  implicit val writes: OWrites[PgOpfamilyRow] = OWrites[PgOpfamilyRow](o =>
+  implicit lazy val writes: OWrites[PgOpfamilyRow] = OWrites[PgOpfamilyRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgOpfamilyId.writes.writes(o.oid),
       "opfmethod" -> Writes.LongWrites.writes(o.opfmethod),

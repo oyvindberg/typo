@@ -46,7 +46,7 @@ case class EmployeepayhistoryRowUnsaved(
     )
 }
 object EmployeepayhistoryRowUnsaved {
-  implicit val reads: Reads[EmployeepayhistoryRowUnsaved] = Reads[EmployeepayhistoryRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[EmployeepayhistoryRowUnsaved] = Reads[EmployeepayhistoryRowUnsaved](json => JsResult.fromTry(
       Try(
         EmployeepayhistoryRowUnsaved(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -58,7 +58,7 @@ object EmployeepayhistoryRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[EmployeepayhistoryRowUnsaved] = OWrites[EmployeepayhistoryRowUnsaved](o =>
+  implicit lazy val writes: OWrites[EmployeepayhistoryRowUnsaved] = OWrites[EmployeepayhistoryRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "ratechangedate" -> TypoLocalDateTime.writes.writes(o.ratechangedate),

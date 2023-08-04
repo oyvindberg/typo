@@ -31,7 +31,7 @@ case class PgForeignDataWrapperRow(
 )
 
 object PgForeignDataWrapperRow {
-  implicit val reads: Reads[PgForeignDataWrapperRow] = Reads[PgForeignDataWrapperRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgForeignDataWrapperRow] = Reads[PgForeignDataWrapperRow](json => JsResult.fromTry(
       Try(
         PgForeignDataWrapperRow(
           oid = json.\("oid").as(PgForeignDataWrapperId.reads),
@@ -58,7 +58,7 @@ object PgForeignDataWrapperRow {
       )
     )
   }
-  implicit val writes: OWrites[PgForeignDataWrapperRow] = OWrites[PgForeignDataWrapperRow](o =>
+  implicit lazy val writes: OWrites[PgForeignDataWrapperRow] = OWrites[PgForeignDataWrapperRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgForeignDataWrapperId.writes.writes(o.oid),
       "fdwname" -> Writes.StringWrites.writes(o.fdwname),

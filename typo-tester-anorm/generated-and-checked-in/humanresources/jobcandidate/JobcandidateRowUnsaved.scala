@@ -48,7 +48,7 @@ case class JobcandidateRowUnsaved(
     )
 }
 object JobcandidateRowUnsaved {
-  implicit val reads: Reads[JobcandidateRowUnsaved] = Reads[JobcandidateRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[JobcandidateRowUnsaved] = Reads[JobcandidateRowUnsaved](json => JsResult.fromTry(
       Try(
         JobcandidateRowUnsaved(
           businessentityid = json.\("businessentityid").toOption.map(_.as(BusinessentityId.reads)),
@@ -59,7 +59,7 @@ object JobcandidateRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[JobcandidateRowUnsaved] = OWrites[JobcandidateRowUnsaved](o =>
+  implicit lazy val writes: OWrites[JobcandidateRowUnsaved] = OWrites[JobcandidateRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),
       "resume" -> Writes.OptionWrites(TypoXml.writes).writes(o.resume),

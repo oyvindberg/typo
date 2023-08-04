@@ -38,7 +38,7 @@ case class CurrencyRowUnsaved(
     )
 }
 object CurrencyRowUnsaved {
-  implicit val reads: Reads[CurrencyRowUnsaved] = Reads[CurrencyRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CurrencyRowUnsaved] = Reads[CurrencyRowUnsaved](json => JsResult.fromTry(
       Try(
         CurrencyRowUnsaved(
           currencycode = json.\("currencycode").as(CurrencyId.reads),
@@ -48,7 +48,7 @@ object CurrencyRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[CurrencyRowUnsaved] = OWrites[CurrencyRowUnsaved](o =>
+  implicit lazy val writes: OWrites[CurrencyRowUnsaved] = OWrites[CurrencyRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "currencycode" -> CurrencyId.writes.writes(o.currencycode),
       "name" -> Name.writes.writes(o.name),

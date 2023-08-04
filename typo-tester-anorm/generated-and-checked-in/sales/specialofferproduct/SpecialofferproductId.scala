@@ -20,8 +20,8 @@ import scala.util.Try
 /** Type for the composite primary key of table `sales.specialofferproduct` */
 case class SpecialofferproductId(specialofferid: SpecialofferId, productid: ProductId)
 object SpecialofferproductId {
-  implicit val ordering: Ordering[SpecialofferproductId] = Ordering.by(x => (x.specialofferid, x.productid))
-  implicit val reads: Reads[SpecialofferproductId] = Reads[SpecialofferproductId](json => JsResult.fromTry(
+  implicit lazy val ordering: Ordering[SpecialofferproductId] = Ordering.by(x => (x.specialofferid, x.productid))
+  implicit lazy val reads: Reads[SpecialofferproductId] = Reads[SpecialofferproductId](json => JsResult.fromTry(
       Try(
         SpecialofferproductId(
           specialofferid = json.\("specialofferid").as(SpecialofferId.reads),
@@ -30,7 +30,7 @@ object SpecialofferproductId {
       )
     ),
   )
-  implicit val writes: OWrites[SpecialofferproductId] = OWrites[SpecialofferproductId](o =>
+  implicit lazy val writes: OWrites[SpecialofferproductId] = OWrites[SpecialofferproductId](o =>
     new JsObject(ListMap[String, JsValue](
       "specialofferid" -> SpecialofferId.writes.writes(o.specialofferid),
       "productid" -> ProductId.writes.writes(o.productid)

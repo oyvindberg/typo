@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.document` */
 case class DocumentId(value: String) extends AnyVal
 object DocumentId {
-  implicit val arrayToStatement: ToStatement[Array[DocumentId]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[DocumentId, String] = Bijection[DocumentId, String](_.value)(DocumentId.apply)
-  implicit val column: Column[DocumentId] = implicitly[Column[String]].map(DocumentId.apply)
-  implicit val ordering: Ordering[DocumentId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[DocumentId] = new ParameterMetaData[DocumentId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[DocumentId]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[DocumentId, String] = Bijection[DocumentId, String](_.value)(DocumentId.apply)
+  implicit lazy val column: Column[DocumentId] = implicitly[Column[String]].map(DocumentId.apply)
+  implicit lazy val ordering: Ordering[DocumentId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[DocumentId] = new ParameterMetaData[DocumentId] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit val reads: Reads[DocumentId] = Reads.StringReads.map(DocumentId.apply)
-  implicit val toStatement: ToStatement[DocumentId] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val writes: Writes[DocumentId] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val reads: Reads[DocumentId] = Reads.StringReads.map(DocumentId.apply)
+  implicit lazy val toStatement: ToStatement[DocumentId] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val writes: Writes[DocumentId] = Writes.StringWrites.contramap(_.value)
 }

@@ -34,6 +34,6 @@ case class PersonRowUnsaved(
     )
 }
 object PersonRowUnsaved {
-  implicit val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct3[PersonRowUnsaved, Option[String], Defaulted[Long], Defaulted[Option[String]]]("name", "one", "two")(PersonRowUnsaved.apply)(Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Decoder.decodeLong), Defaulted.decoder(Decoder.decodeOption(Decoder.decodeString)))
-  implicit val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct3[PersonRowUnsaved, Option[String], Defaulted[Long], Defaulted[Option[String]]]("name", "one", "two")(x => (x.name, x.one, x.two))(Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Encoder.encodeLong), Defaulted.encoder(Encoder.encodeOption(Encoder.encodeString)))
+  implicit lazy val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct3[PersonRowUnsaved, Option[String], Defaulted[Long], Defaulted[Option[String]]]("name", "one", "two")(PersonRowUnsaved.apply)(Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(Decoder.decodeLong), Defaulted.decoder(Decoder.decodeOption(Decoder.decodeString)))
+  implicit lazy val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct3[PersonRowUnsaved, Option[String], Defaulted[Long], Defaulted[Option[String]]]("name", "one", "two")(x => (x.name, x.one, x.two))(Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(Encoder.encodeLong), Defaulted.encoder(Encoder.encodeOption(Encoder.encodeString)))
 }

@@ -19,8 +19,8 @@ import scala.util.Try
 /** Type for the composite primary key of table `pg_catalog.pg_statistic` */
 case class PgStatisticId(starelid: /* oid */ Long, staattnum: Int, stainherit: Boolean)
 object PgStatisticId {
-  implicit val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
-  implicit val reads: Reads[PgStatisticId] = Reads[PgStatisticId](json => JsResult.fromTry(
+  implicit lazy val ordering: Ordering[PgStatisticId] = Ordering.by(x => (x.starelid, x.staattnum, x.stainherit))
+  implicit lazy val reads: Reads[PgStatisticId] = Reads[PgStatisticId](json => JsResult.fromTry(
       Try(
         PgStatisticId(
           starelid = json.\("starelid").as(Reads.LongReads),
@@ -30,7 +30,7 @@ object PgStatisticId {
       )
     ),
   )
-  implicit val writes: OWrites[PgStatisticId] = OWrites[PgStatisticId](o =>
+  implicit lazy val writes: OWrites[PgStatisticId] = OWrites[PgStatisticId](o =>
     new JsObject(ListMap[String, JsValue](
       "starelid" -> Writes.LongWrites.writes(o.starelid),
       "staattnum" -> Writes.IntWrites.writes(o.staattnum),

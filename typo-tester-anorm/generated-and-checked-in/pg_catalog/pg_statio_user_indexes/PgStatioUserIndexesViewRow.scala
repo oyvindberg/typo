@@ -37,7 +37,7 @@ case class PgStatioUserIndexesViewRow(
 )
 
 object PgStatioUserIndexesViewRow {
-  implicit val reads: Reads[PgStatioUserIndexesViewRow] = Reads[PgStatioUserIndexesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatioUserIndexesViewRow] = Reads[PgStatioUserIndexesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioUserIndexesViewRow(
           relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
@@ -64,7 +64,7 @@ object PgStatioUserIndexesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatioUserIndexesViewRow] = OWrites[PgStatioUserIndexesViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatioUserIndexesViewRow] = OWrites[PgStatioUserIndexesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
       "indexrelid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.indexrelid),

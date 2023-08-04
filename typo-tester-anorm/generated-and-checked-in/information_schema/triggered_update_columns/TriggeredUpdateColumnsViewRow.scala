@@ -31,7 +31,7 @@ case class TriggeredUpdateColumnsViewRow(
 )
 
 object TriggeredUpdateColumnsViewRow {
-  implicit val reads: Reads[TriggeredUpdateColumnsViewRow] = Reads[TriggeredUpdateColumnsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TriggeredUpdateColumnsViewRow] = Reads[TriggeredUpdateColumnsViewRow](json => JsResult.fromTry(
       Try(
         TriggeredUpdateColumnsViewRow(
           triggerCatalog = json.\("trigger_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -58,7 +58,7 @@ object TriggeredUpdateColumnsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[TriggeredUpdateColumnsViewRow] = OWrites[TriggeredUpdateColumnsViewRow](o =>
+  implicit lazy val writes: OWrites[TriggeredUpdateColumnsViewRow] = OWrites[TriggeredUpdateColumnsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "trigger_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.triggerCatalog),
       "trigger_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.triggerSchema),

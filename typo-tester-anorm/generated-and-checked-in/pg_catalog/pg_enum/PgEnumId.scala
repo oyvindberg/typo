@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_enum` */
 case class PgEnumId(value: /* oid */ Long) extends AnyVal
 object PgEnumId {
-  implicit val arrayToStatement: ToStatement[Array[PgEnumId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgEnumId, /* oid */ Long] = Bijection[PgEnumId, /* oid */ Long](_.value)(PgEnumId.apply)
-  implicit val column: Column[PgEnumId] = implicitly[Column[/* oid */ Long]].map(PgEnumId.apply)
-  implicit val ordering: Ordering[PgEnumId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgEnumId] = new ParameterMetaData[PgEnumId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgEnumId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgEnumId, /* oid */ Long] = Bijection[PgEnumId, /* oid */ Long](_.value)(PgEnumId.apply)
+  implicit lazy val column: Column[PgEnumId] = implicitly[Column[/* oid */ Long]].map(PgEnumId.apply)
+  implicit lazy val ordering: Ordering[PgEnumId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgEnumId] = new ParameterMetaData[PgEnumId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgEnumId] = Reads.LongReads.map(PgEnumId.apply)
-  implicit val toStatement: ToStatement[PgEnumId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgEnumId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgEnumId] = Reads.LongReads.map(PgEnumId.apply)
+  implicit lazy val toStatement: ToStatement[PgEnumId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgEnumId] = Writes.LongWrites.contramap(_.value)
 }

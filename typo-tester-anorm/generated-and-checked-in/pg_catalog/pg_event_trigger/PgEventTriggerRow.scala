@@ -30,7 +30,7 @@ case class PgEventTriggerRow(
 )
 
 object PgEventTriggerRow {
-  implicit val reads: Reads[PgEventTriggerRow] = Reads[PgEventTriggerRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgEventTriggerRow] = Reads[PgEventTriggerRow](json => JsResult.fromTry(
       Try(
         PgEventTriggerRow(
           oid = json.\("oid").as(PgEventTriggerId.reads),
@@ -57,7 +57,7 @@ object PgEventTriggerRow {
       )
     )
   }
-  implicit val writes: OWrites[PgEventTriggerRow] = OWrites[PgEventTriggerRow](o =>
+  implicit lazy val writes: OWrites[PgEventTriggerRow] = OWrites[PgEventTriggerRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgEventTriggerId.writes.writes(o.oid),
       "evtname" -> Writes.StringWrites.writes(o.evtname),

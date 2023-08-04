@@ -39,7 +39,7 @@ case class BeaViewRow(
 )
 
 object BeaViewRow {
-  implicit val reads: Reads[BeaViewRow] = Reads[BeaViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[BeaViewRow] = Reads[BeaViewRow](json => JsResult.fromTry(
       Try(
         BeaViewRow(
           id = json.\("id").toOption.map(_.as(Reads.IntReads)),
@@ -64,7 +64,7 @@ object BeaViewRow {
       )
     )
   }
-  implicit val writes: OWrites[BeaViewRow] = OWrites[BeaViewRow](o =>
+  implicit lazy val writes: OWrites[BeaViewRow] = OWrites[BeaViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "id" -> Writes.OptionWrites(Writes.IntWrites).writes(o.id),
       "businessentityid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.businessentityid),

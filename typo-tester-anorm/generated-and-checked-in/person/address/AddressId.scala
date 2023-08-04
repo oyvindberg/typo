@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `person.address` */
 case class AddressId(value: Int) extends AnyVal
 object AddressId {
-  implicit val arrayToStatement: ToStatement[Array[AddressId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[AddressId, Int] = Bijection[AddressId, Int](_.value)(AddressId.apply)
-  implicit val column: Column[AddressId] = implicitly[Column[Int]].map(AddressId.apply)
-  implicit val ordering: Ordering[AddressId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[AddressId] = new ParameterMetaData[AddressId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[AddressId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[AddressId, Int] = Bijection[AddressId, Int](_.value)(AddressId.apply)
+  implicit lazy val column: Column[AddressId] = implicitly[Column[Int]].map(AddressId.apply)
+  implicit lazy val ordering: Ordering[AddressId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[AddressId] = new ParameterMetaData[AddressId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[AddressId] = Reads.IntReads.map(AddressId.apply)
-  implicit val toStatement: ToStatement[AddressId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[AddressId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[AddressId] = Reads.IntReads.map(AddressId.apply)
+  implicit lazy val toStatement: ToStatement[AddressId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[AddressId] = Writes.IntWrites.contramap(_.value)
 }

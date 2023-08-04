@@ -21,7 +21,7 @@ case class TypoLocalDate(value: LocalDate)
 
 object TypoLocalDate {
   def now = TypoLocalDate(LocalDate.now)
-  implicit val arrayColumn: Column[Array[TypoLocalDate]] = Column.nonNull[Array[TypoLocalDate]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoLocalDate]] = Column.nonNull[Array[TypoLocalDate]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -32,24 +32,24 @@ object TypoLocalDate {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalDate]] = new ParameterMetaData[Array[TypoLocalDate]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalDate]] = new ParameterMetaData[Array[TypoLocalDate]] {
     override def sqlType: String = "_date"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoLocalDate]] = ToStatement[Array[TypoLocalDate]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("date", v.map(v => v.value.toString))))
-  implicit val bijection: Bijection[TypoLocalDate, LocalDate] = Bijection[TypoLocalDate, LocalDate](_.value)(TypoLocalDate.apply)
-  implicit val column: Column[TypoLocalDate] = Column.nonNull[TypoLocalDate]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoLocalDate]] = ToStatement[Array[TypoLocalDate]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("date", v.map(v => v.value.toString))))
+  implicit lazy val bijection: Bijection[TypoLocalDate, LocalDate] = Bijection[TypoLocalDate, LocalDate](_.value)(TypoLocalDate.apply)
+  implicit lazy val column: Column[TypoLocalDate] = Column.nonNull[TypoLocalDate]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoLocalDate(LocalDate.parse(v)))
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
   implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[TypoLocalDate] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoLocalDate] = new ParameterMetaData[TypoLocalDate] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalDate] = new ParameterMetaData[TypoLocalDate] {
     override def sqlType: String = "date"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoLocalDate] = Reads.DefaultLocalDateReads.map(TypoLocalDate.apply)
-  implicit val toStatement: ToStatement[TypoLocalDate] = ToStatement[TypoLocalDate]((s, index, v) => s.setObject(index, v.value.toString))
-  implicit val writes: Writes[TypoLocalDate] = Writes.DefaultLocalDateWrites.contramap(_.value)
+  implicit lazy val reads: Reads[TypoLocalDate] = Reads.DefaultLocalDateReads.map(TypoLocalDate.apply)
+  implicit lazy val toStatement: ToStatement[TypoLocalDate] = ToStatement[TypoLocalDate]((s, index, v) => s.setObject(index, v.value.toString))
+  implicit lazy val writes: Writes[TypoLocalDate] = Writes.DefaultLocalDateWrites.contramap(_.value)
 }

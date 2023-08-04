@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_language` */
 case class PgLanguageId(value: /* oid */ Long) extends AnyVal
 object PgLanguageId {
-  implicit val arrayToStatement: ToStatement[Array[PgLanguageId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgLanguageId, /* oid */ Long] = Bijection[PgLanguageId, /* oid */ Long](_.value)(PgLanguageId.apply)
-  implicit val column: Column[PgLanguageId] = implicitly[Column[/* oid */ Long]].map(PgLanguageId.apply)
-  implicit val ordering: Ordering[PgLanguageId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgLanguageId] = new ParameterMetaData[PgLanguageId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgLanguageId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgLanguageId, /* oid */ Long] = Bijection[PgLanguageId, /* oid */ Long](_.value)(PgLanguageId.apply)
+  implicit lazy val column: Column[PgLanguageId] = implicitly[Column[/* oid */ Long]].map(PgLanguageId.apply)
+  implicit lazy val ordering: Ordering[PgLanguageId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgLanguageId] = new ParameterMetaData[PgLanguageId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgLanguageId] = Reads.LongReads.map(PgLanguageId.apply)
-  implicit val toStatement: ToStatement[PgLanguageId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgLanguageId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgLanguageId] = Reads.LongReads.map(PgLanguageId.apply)
+  implicit lazy val toStatement: ToStatement[PgLanguageId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgLanguageId] = Writes.LongWrites.contramap(_.value)
 }

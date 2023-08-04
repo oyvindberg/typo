@@ -46,7 +46,7 @@ case class PgAggregateRow(
 )
 
 object PgAggregateRow {
-  implicit val reads: Reads[PgAggregateRow] = Reads[PgAggregateRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgAggregateRow] = Reads[PgAggregateRow](json => JsResult.fromTry(
       Try(
         PgAggregateRow(
           aggfnoid = json.\("aggfnoid").as(PgAggregateId.reads),
@@ -103,7 +103,7 @@ object PgAggregateRow {
       )
     )
   }
-  implicit val writes: OWrites[PgAggregateRow] = OWrites[PgAggregateRow](o =>
+  implicit lazy val writes: OWrites[PgAggregateRow] = OWrites[PgAggregateRow](o =>
     new JsObject(ListMap[String, JsValue](
       "aggfnoid" -> PgAggregateId.writes.writes(o.aggfnoid),
       "aggkind" -> Writes.StringWrites.writes(o.aggkind),

@@ -31,7 +31,7 @@ case class PgExtensionRow(
 )
 
 object PgExtensionRow {
-  implicit val reads: Reads[PgExtensionRow] = Reads[PgExtensionRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgExtensionRow] = Reads[PgExtensionRow](json => JsResult.fromTry(
       Try(
         PgExtensionRow(
           oid = json.\("oid").as(PgExtensionId.reads),
@@ -60,7 +60,7 @@ object PgExtensionRow {
       )
     )
   }
-  implicit val writes: OWrites[PgExtensionRow] = OWrites[PgExtensionRow](o =>
+  implicit lazy val writes: OWrites[PgExtensionRow] = OWrites[PgExtensionRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgExtensionId.writes.writes(o.oid),
       "extname" -> Writes.StringWrites.writes(o.extname),

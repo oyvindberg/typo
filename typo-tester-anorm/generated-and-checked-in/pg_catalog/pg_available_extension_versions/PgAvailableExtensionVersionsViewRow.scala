@@ -32,7 +32,7 @@ case class PgAvailableExtensionVersionsViewRow(
 )
 
 object PgAvailableExtensionVersionsViewRow {
-  implicit val reads: Reads[PgAvailableExtensionVersionsViewRow] = Reads[PgAvailableExtensionVersionsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgAvailableExtensionVersionsViewRow] = Reads[PgAvailableExtensionVersionsViewRow](json => JsResult.fromTry(
       Try(
         PgAvailableExtensionVersionsViewRow(
           name = json.\("name").toOption.map(_.as(Reads.StringReads)),
@@ -63,7 +63,7 @@ object PgAvailableExtensionVersionsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgAvailableExtensionVersionsViewRow] = OWrites[PgAvailableExtensionVersionsViewRow](o =>
+  implicit lazy val writes: OWrites[PgAvailableExtensionVersionsViewRow] = OWrites[PgAvailableExtensionVersionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
       "version" -> Writes.OptionWrites(Writes.StringWrites).writes(o.version),

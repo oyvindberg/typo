@@ -53,7 +53,7 @@ case class DomainsViewRow(
 )
 
 object DomainsViewRow {
-  implicit val reads: Reads[DomainsViewRow] = Reads[DomainsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[DomainsViewRow] = Reads[DomainsViewRow](json => JsResult.fromTry(
       Try(
         DomainsViewRow(
           domainCatalog = json.\("domain_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -120,7 +120,7 @@ object DomainsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[DomainsViewRow] = OWrites[DomainsViewRow](o =>
+  implicit lazy val writes: OWrites[DomainsViewRow] = OWrites[DomainsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "domain_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainCatalog),
       "domain_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.domainSchema),

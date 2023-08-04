@@ -38,7 +38,7 @@ case class UnitmeasureRowUnsaved(
     )
 }
 object UnitmeasureRowUnsaved {
-  implicit val reads: Reads[UnitmeasureRowUnsaved] = Reads[UnitmeasureRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[UnitmeasureRowUnsaved] = Reads[UnitmeasureRowUnsaved](json => JsResult.fromTry(
       Try(
         UnitmeasureRowUnsaved(
           unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
@@ -48,7 +48,7 @@ object UnitmeasureRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[UnitmeasureRowUnsaved] = OWrites[UnitmeasureRowUnsaved](o =>
+  implicit lazy val writes: OWrites[UnitmeasureRowUnsaved] = OWrites[UnitmeasureRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
       "name" -> Name.writes.writes(o.name),

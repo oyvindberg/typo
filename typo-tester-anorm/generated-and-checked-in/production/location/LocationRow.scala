@@ -34,7 +34,7 @@ case class LocationRow(
 )
 
 object LocationRow {
-  implicit val reads: Reads[LocationRow] = Reads[LocationRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[LocationRow] = Reads[LocationRow](json => JsResult.fromTry(
       Try(
         LocationRow(
           locationid = json.\("locationid").as(LocationId.reads),
@@ -57,7 +57,7 @@ object LocationRow {
       )
     )
   }
-  implicit val writes: OWrites[LocationRow] = OWrites[LocationRow](o =>
+  implicit lazy val writes: OWrites[LocationRow] = OWrites[LocationRow](o =>
     new JsObject(ListMap[String, JsValue](
       "locationid" -> LocationId.writes.writes(o.locationid),
       "name" -> Name.writes.writes(o.name),

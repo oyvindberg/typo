@@ -32,7 +32,7 @@ case class CharacterSetsViewRow(
 )
 
 object CharacterSetsViewRow {
-  implicit val reads: Reads[CharacterSetsViewRow] = Reads[CharacterSetsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CharacterSetsViewRow] = Reads[CharacterSetsViewRow](json => JsResult.fromTry(
       Try(
         CharacterSetsViewRow(
           characterSetCatalog = json.\("character_set_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -61,7 +61,7 @@ object CharacterSetsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[CharacterSetsViewRow] = OWrites[CharacterSetsViewRow](o =>
+  implicit lazy val writes: OWrites[CharacterSetsViewRow] = OWrites[CharacterSetsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "character_set_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetCatalog),
       "character_set_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.characterSetSchema),

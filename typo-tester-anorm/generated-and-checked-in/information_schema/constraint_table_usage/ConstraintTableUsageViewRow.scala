@@ -30,7 +30,7 @@ case class ConstraintTableUsageViewRow(
 )
 
 object ConstraintTableUsageViewRow {
-  implicit val reads: Reads[ConstraintTableUsageViewRow] = Reads[ConstraintTableUsageViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ConstraintTableUsageViewRow] = Reads[ConstraintTableUsageViewRow](json => JsResult.fromTry(
       Try(
         ConstraintTableUsageViewRow(
           tableCatalog = json.\("table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -55,7 +55,7 @@ object ConstraintTableUsageViewRow {
       )
     )
   }
-  implicit val writes: OWrites[ConstraintTableUsageViewRow] = OWrites[ConstraintTableUsageViewRow](o =>
+  implicit lazy val writes: OWrites[ConstraintTableUsageViewRow] = OWrites[ConstraintTableUsageViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableCatalog),
       "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),

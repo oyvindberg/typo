@@ -48,7 +48,7 @@ case class PgStatActivityViewRow(
 )
 
 object PgStatActivityViewRow {
-  implicit val reads: Reads[PgStatActivityViewRow] = Reads[PgStatActivityViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatActivityViewRow] = Reads[PgStatActivityViewRow](json => JsResult.fromTry(
       Try(
         PgStatActivityViewRow(
           datid = json.\("datid").toOption.map(_.as(Reads.LongReads)),
@@ -105,7 +105,7 @@ object PgStatActivityViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatActivityViewRow] = OWrites[PgStatActivityViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatActivityViewRow] = OWrites[PgStatActivityViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "datid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.datid),
       "datname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.datname),

@@ -32,7 +32,7 @@ case class PgForeignDataWrappersViewRow(
 )
 
 object PgForeignDataWrappersViewRow {
-  implicit val reads: Reads[PgForeignDataWrappersViewRow] = Reads[PgForeignDataWrappersViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgForeignDataWrappersViewRow] = Reads[PgForeignDataWrappersViewRow](json => JsResult.fromTry(
       Try(
         PgForeignDataWrappersViewRow(
           oid = json.\("oid").toOption.map(_.as(Reads.LongReads)),
@@ -59,7 +59,7 @@ object PgForeignDataWrappersViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgForeignDataWrappersViewRow] = OWrites[PgForeignDataWrappersViewRow](o =>
+  implicit lazy val writes: OWrites[PgForeignDataWrappersViewRow] = OWrites[PgForeignDataWrappersViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.oid),
       "fdwowner" -> Writes.OptionWrites(Writes.LongWrites).writes(o.fdwowner),

@@ -19,9 +19,9 @@ case class MaritalStatusRow(
 )
 
 object MaritalStatusRow {
-  implicit val decoder: Decoder[MaritalStatusRow] = Decoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(MaritalStatusRow.apply)(MaritalStatusId.decoder)
-  implicit val encoder: Encoder[MaritalStatusRow] = Encoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(x => (x.id))(MaritalStatusId.encoder)
-  implicit val read: Read[MaritalStatusRow] = new Read[MaritalStatusRow](
+  implicit lazy val decoder: Decoder[MaritalStatusRow] = Decoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(MaritalStatusRow.apply)(MaritalStatusId.decoder)
+  implicit lazy val encoder: Encoder[MaritalStatusRow] = Encoder.forProduct1[MaritalStatusRow, MaritalStatusId]("id")(x => (x.id))(MaritalStatusId.encoder)
+  implicit lazy val read: Read[MaritalStatusRow] = new Read[MaritalStatusRow](
     gets = List(
       (MaritalStatusId.get, Nullability.NoNulls)
     ),

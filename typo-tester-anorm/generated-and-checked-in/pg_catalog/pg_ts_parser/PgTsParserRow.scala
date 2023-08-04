@@ -32,7 +32,7 @@ case class PgTsParserRow(
 )
 
 object PgTsParserRow {
-  implicit val reads: Reads[PgTsParserRow] = Reads[PgTsParserRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgTsParserRow] = Reads[PgTsParserRow](json => JsResult.fromTry(
       Try(
         PgTsParserRow(
           oid = json.\("oid").as(PgTsParserId.reads),
@@ -61,7 +61,7 @@ object PgTsParserRow {
       )
     )
   }
-  implicit val writes: OWrites[PgTsParserRow] = OWrites[PgTsParserRow](o =>
+  implicit lazy val writes: OWrites[PgTsParserRow] = OWrites[PgTsParserRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgTsParserId.writes.writes(o.oid),
       "prsname" -> Writes.StringWrites.writes(o.prsname),

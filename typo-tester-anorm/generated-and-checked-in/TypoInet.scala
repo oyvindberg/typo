@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoInet(value: String)
 
 object TypoInet {
-  implicit val arrayColumn: Column[Array[TypoInet]] = Column.nonNull[Array[TypoInet]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoInet]] = Column.nonNull[Array[TypoInet]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -31,34 +31,34 @@ object TypoInet {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoInet]] = new ParameterMetaData[Array[TypoInet]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoInet]] = new ParameterMetaData[Array[TypoInet]] {
     override def sqlType: String = "_inet"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoInet]] = ToStatement[Array[TypoInet]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("inet", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoInet]] = ToStatement[Array[TypoInet]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("inet", v.map(v => {
                                                                                                                      val obj = new PGobject
                                                                                                                      obj.setType("inet")
                                                                                                                      obj.setValue(v.value)
                                                                                                                      obj
                                                                                                                    }))))
-  implicit val bijection: Bijection[TypoInet, String] = Bijection[TypoInet, String](_.value)(TypoInet.apply)
-  implicit val column: Column[TypoInet] = Column.nonNull[TypoInet]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoInet, String] = Bijection[TypoInet, String](_.value)(TypoInet.apply)
+  implicit lazy val column: Column[TypoInet] = Column.nonNull[TypoInet]((v1: Any, _) =>
     v1 match {
       case v: PGobject => Right(TypoInet(v.getValue))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoInet] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoInet] = new ParameterMetaData[TypoInet] {
+  implicit lazy val ordering: Ordering[TypoInet] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoInet] = new ParameterMetaData[TypoInet] {
     override def sqlType: String = "inet"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoInet] = Reads.StringReads.map(TypoInet.apply)
-  implicit val toStatement: ToStatement[TypoInet] = ToStatement[TypoInet]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoInet] = Reads.StringReads.map(TypoInet.apply)
+  implicit lazy val toStatement: ToStatement[TypoInet] = ToStatement[TypoInet]((s, index, v) => s.setObject(index, {
                                                               val obj = new PGobject
                                                               obj.setType("inet")
                                                               obj.setValue(v.value)
                                                               obj
                                                             }))
-  implicit val writes: Writes[TypoInet] = Writes.StringWrites.contramap(_.value)
+  implicit lazy val writes: Writes[TypoInet] = Writes.StringWrites.contramap(_.value)
 }

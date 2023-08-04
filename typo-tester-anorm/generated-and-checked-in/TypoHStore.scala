@@ -20,7 +20,7 @@ import typo.dsl.Bijection
 case class TypoHStore(value: Map[String, String])
 
 object TypoHStore {
-  implicit val arrayColumn: Column[Array[TypoHStore]] = Column.nonNull[Array[TypoHStore]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoHStore]] = Column.nonNull[Array[TypoHStore]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -35,17 +35,17 @@ object TypoHStore {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoHStore]] = new ParameterMetaData[Array[TypoHStore]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoHStore]] = new ParameterMetaData[Array[TypoHStore]] {
     override def sqlType: String = "_hstore"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoHStore]] = ToStatement[Array[TypoHStore]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("hstore", v.map(v => {
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoHStore]] = ToStatement[Array[TypoHStore]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("hstore", v.map(v => {
                                                                                                                          val b = new HashMap[String, String]
                                                                                                                          v.value.foreach { case (k, v) => b.put(k, v)}
                                                                                                                          b
                                                                                                                        }))))
-  implicit val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
-  implicit val column: Column[TypoHStore] = Column.nonNull[TypoHStore]((v1: Any, _) =>
+  implicit lazy val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
+  implicit lazy val column: Column[TypoHStore] = Column.nonNull[TypoHStore]((v1: Any, _) =>
     v1 match {
       case v: java.util.Map[?, ?] => Right({
                                              val b = Map.newBuilder[String, String]
@@ -56,15 +56,15 @@ object TypoHStore {
     }
   )
   implicit def ordering(implicit O0: Ordering[Map[String, String]]): Ordering[TypoHStore] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoHStore] = new ParameterMetaData[TypoHStore] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoHStore] = new ParameterMetaData[TypoHStore] {
     override def sqlType: String = "hstore"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoHStore] = implicitly[Reads[Map[String, String]]].map(TypoHStore.apply)
-  implicit val toStatement: ToStatement[TypoHStore] = ToStatement[TypoHStore]((s, index, v) => s.setObject(index, {
+  implicit lazy val reads: Reads[TypoHStore] = implicitly[Reads[Map[String, String]]].map(TypoHStore.apply)
+  implicit lazy val toStatement: ToStatement[TypoHStore] = ToStatement[TypoHStore]((s, index, v) => s.setObject(index, {
                                                                 val b = new HashMap[String, String]
                                                                 v.value.foreach { case (k, v) => b.put(k, v)}
                                                                 b
                                                               }))
-  implicit val writes: Writes[TypoHStore] = implicitly[Writes[Map[String, String]]].contramap(_.value)
+  implicit lazy val writes: Writes[TypoHStore] = implicitly[Writes[Map[String, String]]].contramap(_.value)
 }

@@ -29,7 +29,7 @@ case class SqlSizingRow(
 )
 
 object SqlSizingRow {
-  implicit val reads: Reads[SqlSizingRow] = Reads[SqlSizingRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SqlSizingRow] = Reads[SqlSizingRow](json => JsResult.fromTry(
       Try(
         SqlSizingRow(
           sizingId = json.\("sizing_id").toOption.map(_.as(CardinalNumber.reads)),
@@ -50,7 +50,7 @@ object SqlSizingRow {
       )
     )
   }
-  implicit val writes: OWrites[SqlSizingRow] = OWrites[SqlSizingRow](o =>
+  implicit lazy val writes: OWrites[SqlSizingRow] = OWrites[SqlSizingRow](o =>
     new JsObject(ListMap[String, JsValue](
       "sizing_id" -> Writes.OptionWrites(CardinalNumber.writes).writes(o.sizingId),
       "sizing_name" -> Writes.OptionWrites(CharacterData.writes).writes(o.sizingName),

@@ -19,8 +19,8 @@ import scala.util.Try
 /** Type for the composite primary key of table `pg_catalog.pg_ts_config_map` */
 case class PgTsConfigMapId(mapcfg: /* oid */ Long, maptokentype: Int, mapseqno: Int)
 object PgTsConfigMapId {
-  implicit val ordering: Ordering[PgTsConfigMapId] = Ordering.by(x => (x.mapcfg, x.maptokentype, x.mapseqno))
-  implicit val reads: Reads[PgTsConfigMapId] = Reads[PgTsConfigMapId](json => JsResult.fromTry(
+  implicit lazy val ordering: Ordering[PgTsConfigMapId] = Ordering.by(x => (x.mapcfg, x.maptokentype, x.mapseqno))
+  implicit lazy val reads: Reads[PgTsConfigMapId] = Reads[PgTsConfigMapId](json => JsResult.fromTry(
       Try(
         PgTsConfigMapId(
           mapcfg = json.\("mapcfg").as(Reads.LongReads),
@@ -30,7 +30,7 @@ object PgTsConfigMapId {
       )
     ),
   )
-  implicit val writes: OWrites[PgTsConfigMapId] = OWrites[PgTsConfigMapId](o =>
+  implicit lazy val writes: OWrites[PgTsConfigMapId] = OWrites[PgTsConfigMapId](o =>
     new JsObject(ListMap[String, JsValue](
       "mapcfg" -> Writes.LongWrites.writes(o.mapcfg),
       "maptokentype" -> Writes.IntWrites.writes(o.maptokentype),

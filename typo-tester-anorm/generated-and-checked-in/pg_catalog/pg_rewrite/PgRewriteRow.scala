@@ -32,7 +32,7 @@ case class PgRewriteRow(
 )
 
 object PgRewriteRow {
-  implicit val reads: Reads[PgRewriteRow] = Reads[PgRewriteRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgRewriteRow] = Reads[PgRewriteRow](json => JsResult.fromTry(
       Try(
         PgRewriteRow(
           oid = json.\("oid").as(PgRewriteId.reads),
@@ -61,7 +61,7 @@ object PgRewriteRow {
       )
     )
   }
-  implicit val writes: OWrites[PgRewriteRow] = OWrites[PgRewriteRow](o =>
+  implicit lazy val writes: OWrites[PgRewriteRow] = OWrites[PgRewriteRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgRewriteId.writes.writes(o.oid),
       "rulename" -> Writes.StringWrites.writes(o.rulename),

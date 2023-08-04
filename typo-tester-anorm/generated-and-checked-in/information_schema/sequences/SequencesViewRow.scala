@@ -39,7 +39,7 @@ case class SequencesViewRow(
 )
 
 object SequencesViewRow {
-  implicit val reads: Reads[SequencesViewRow] = Reads[SequencesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SequencesViewRow] = Reads[SequencesViewRow](json => JsResult.fromTry(
       Try(
         SequencesViewRow(
           sequenceCatalog = json.\("sequence_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -76,7 +76,7 @@ object SequencesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[SequencesViewRow] = OWrites[SequencesViewRow](o =>
+  implicit lazy val writes: OWrites[SequencesViewRow] = OWrites[SequencesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "sequence_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.sequenceCatalog),
       "sequence_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.sequenceSchema),

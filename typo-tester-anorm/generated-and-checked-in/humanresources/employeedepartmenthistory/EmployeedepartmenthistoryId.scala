@@ -23,7 +23,7 @@ import scala.util.Try
 case class EmployeedepartmenthistoryId(businessentityid: BusinessentityId, startdate: TypoLocalDate, departmentid: DepartmentId, shiftid: ShiftId)
 object EmployeedepartmenthistoryId {
   implicit def ordering(implicit O0: Ordering[TypoLocalDate]): Ordering[EmployeedepartmenthistoryId] = Ordering.by(x => (x.businessentityid, x.startdate, x.departmentid, x.shiftid))
-  implicit val reads: Reads[EmployeedepartmenthistoryId] = Reads[EmployeedepartmenthistoryId](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[EmployeedepartmenthistoryId] = Reads[EmployeedepartmenthistoryId](json => JsResult.fromTry(
       Try(
         EmployeedepartmenthistoryId(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -34,7 +34,7 @@ object EmployeedepartmenthistoryId {
       )
     ),
   )
-  implicit val writes: OWrites[EmployeedepartmenthistoryId] = OWrites[EmployeedepartmenthistoryId](o =>
+  implicit lazy val writes: OWrites[EmployeedepartmenthistoryId] = OWrites[EmployeedepartmenthistoryId](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "startdate" -> TypoLocalDate.writes.writes(o.startdate),

@@ -29,7 +29,7 @@ case class PgSubscriptionRelRow(
  }
 
 object PgSubscriptionRelRow {
-  implicit val reads: Reads[PgSubscriptionRelRow] = Reads[PgSubscriptionRelRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgSubscriptionRelRow] = Reads[PgSubscriptionRelRow](json => JsResult.fromTry(
       Try(
         PgSubscriptionRelRow(
           srsubid = json.\("srsubid").as(Reads.LongReads),
@@ -50,7 +50,7 @@ object PgSubscriptionRelRow {
       )
     )
   }
-  implicit val writes: OWrites[PgSubscriptionRelRow] = OWrites[PgSubscriptionRelRow](o =>
+  implicit lazy val writes: OWrites[PgSubscriptionRelRow] = OWrites[PgSubscriptionRelRow](o =>
     new JsObject(ListMap[String, JsValue](
       "srsubid" -> Writes.LongWrites.writes(o.srsubid),
       "srrelid" -> Writes.LongWrites.writes(o.srrelid),

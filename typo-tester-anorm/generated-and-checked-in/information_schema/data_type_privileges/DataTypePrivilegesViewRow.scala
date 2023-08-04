@@ -31,7 +31,7 @@ case class DataTypePrivilegesViewRow(
 )
 
 object DataTypePrivilegesViewRow {
-  implicit val reads: Reads[DataTypePrivilegesViewRow] = Reads[DataTypePrivilegesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[DataTypePrivilegesViewRow] = Reads[DataTypePrivilegesViewRow](json => JsResult.fromTry(
       Try(
         DataTypePrivilegesViewRow(
           objectCatalog = json.\("object_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -54,7 +54,7 @@ object DataTypePrivilegesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[DataTypePrivilegesViewRow] = OWrites[DataTypePrivilegesViewRow](o =>
+  implicit lazy val writes: OWrites[DataTypePrivilegesViewRow] = OWrites[DataTypePrivilegesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "object_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectCatalog),
       "object_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.objectSchema),

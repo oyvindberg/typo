@@ -66,7 +66,7 @@ case class VendorRowUnsaved(
     )
 }
 object VendorRowUnsaved {
-  implicit val reads: Reads[VendorRowUnsaved] = Reads[VendorRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[VendorRowUnsaved] = Reads[VendorRowUnsaved](json => JsResult.fromTry(
       Try(
         VendorRowUnsaved(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -81,7 +81,7 @@ object VendorRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[VendorRowUnsaved] = OWrites[VendorRowUnsaved](o =>
+  implicit lazy val writes: OWrites[VendorRowUnsaved] = OWrites[VendorRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "accountnumber" -> AccountNumber.writes.writes(o.accountnumber),

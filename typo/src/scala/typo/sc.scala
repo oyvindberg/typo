@@ -384,7 +384,7 @@ object sc {
         val renderedBody = body.render
 
         if (tparams.isEmpty && implicitParams.isEmpty)
-          s"implicit val $renderedName: $renderedTpe = $renderedBody"
+          s"implicit lazy val $renderedName: $renderedTpe = $renderedBody"
         else {
           val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
           val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")

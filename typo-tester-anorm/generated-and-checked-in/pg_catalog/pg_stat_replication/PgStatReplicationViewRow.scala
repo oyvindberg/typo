@@ -47,7 +47,7 @@ case class PgStatReplicationViewRow(
 )
 
 object PgStatReplicationViewRow {
-  implicit val reads: Reads[PgStatReplicationViewRow] = Reads[PgStatReplicationViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatReplicationViewRow] = Reads[PgStatReplicationViewRow](json => JsResult.fromTry(
       Try(
         PgStatReplicationViewRow(
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
@@ -100,7 +100,7 @@ object PgStatReplicationViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatReplicationViewRow] = OWrites[PgStatReplicationViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatReplicationViewRow] = OWrites[PgStatReplicationViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "usesysid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.usesysid),

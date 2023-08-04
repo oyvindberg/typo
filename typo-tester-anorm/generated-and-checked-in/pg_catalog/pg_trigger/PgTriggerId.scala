@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_trigger` */
 case class PgTriggerId(value: /* oid */ Long) extends AnyVal
 object PgTriggerId {
-  implicit val arrayToStatement: ToStatement[Array[PgTriggerId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgTriggerId, /* oid */ Long] = Bijection[PgTriggerId, /* oid */ Long](_.value)(PgTriggerId.apply)
-  implicit val column: Column[PgTriggerId] = implicitly[Column[/* oid */ Long]].map(PgTriggerId.apply)
-  implicit val ordering: Ordering[PgTriggerId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgTriggerId] = new ParameterMetaData[PgTriggerId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgTriggerId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgTriggerId, /* oid */ Long] = Bijection[PgTriggerId, /* oid */ Long](_.value)(PgTriggerId.apply)
+  implicit lazy val column: Column[PgTriggerId] = implicitly[Column[/* oid */ Long]].map(PgTriggerId.apply)
+  implicit lazy val ordering: Ordering[PgTriggerId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgTriggerId] = new ParameterMetaData[PgTriggerId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgTriggerId] = Reads.LongReads.map(PgTriggerId.apply)
-  implicit val toStatement: ToStatement[PgTriggerId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgTriggerId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgTriggerId] = Reads.LongReads.map(PgTriggerId.apply)
+  implicit lazy val toStatement: ToStatement[PgTriggerId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgTriggerId] = Writes.LongWrites.contramap(_.value)
 }

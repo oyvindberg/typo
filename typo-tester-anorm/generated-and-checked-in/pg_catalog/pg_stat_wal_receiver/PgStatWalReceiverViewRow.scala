@@ -39,7 +39,7 @@ case class PgStatWalReceiverViewRow(
 )
 
 object PgStatWalReceiverViewRow {
-  implicit val reads: Reads[PgStatWalReceiverViewRow] = Reads[PgStatWalReceiverViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatWalReceiverViewRow] = Reads[PgStatWalReceiverViewRow](json => JsResult.fromTry(
       Try(
         PgStatWalReceiverViewRow(
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
@@ -82,7 +82,7 @@ object PgStatWalReceiverViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatWalReceiverViewRow] = OWrites[PgStatWalReceiverViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatWalReceiverViewRow] = OWrites[PgStatWalReceiverViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "status" -> Writes.OptionWrites(Writes.StringWrites).writes(o.status),

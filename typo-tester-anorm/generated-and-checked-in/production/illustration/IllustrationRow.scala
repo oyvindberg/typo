@@ -30,7 +30,7 @@ case class IllustrationRow(
 )
 
 object IllustrationRow {
-  implicit val reads: Reads[IllustrationRow] = Reads[IllustrationRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[IllustrationRow] = Reads[IllustrationRow](json => JsResult.fromTry(
       Try(
         IllustrationRow(
           illustrationid = json.\("illustrationid").as(IllustrationId.reads),
@@ -49,7 +49,7 @@ object IllustrationRow {
       )
     )
   }
-  implicit val writes: OWrites[IllustrationRow] = OWrites[IllustrationRow](o =>
+  implicit lazy val writes: OWrites[IllustrationRow] = OWrites[IllustrationRow](o =>
     new JsObject(ListMap[String, JsValue](
       "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
       "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),

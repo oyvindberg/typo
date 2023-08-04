@@ -56,7 +56,7 @@ case class UserDefinedTypesViewRow(
 )
 
 object UserDefinedTypesViewRow {
-  implicit val reads: Reads[UserDefinedTypesViewRow] = Reads[UserDefinedTypesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[UserDefinedTypesViewRow] = Reads[UserDefinedTypesViewRow](json => JsResult.fromTry(
       Try(
         UserDefinedTypesViewRow(
           userDefinedTypeCatalog = json.\("user_defined_type_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -127,7 +127,7 @@ object UserDefinedTypesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[UserDefinedTypesViewRow] = OWrites[UserDefinedTypesViewRow](o =>
+  implicit lazy val writes: OWrites[UserDefinedTypesViewRow] = OWrites[UserDefinedTypesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "user_defined_type_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.userDefinedTypeCatalog),
       "user_defined_type_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.userDefinedTypeSchema),

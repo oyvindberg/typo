@@ -37,7 +37,7 @@ case class PgStatsExtViewRow(
 )
 
 object PgStatsExtViewRow {
-  implicit val reads: Reads[PgStatsExtViewRow] = Reads[PgStatsExtViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatsExtViewRow] = Reads[PgStatsExtViewRow](json => JsResult.fromTry(
       Try(
         PgStatsExtViewRow(
           schemaname = json.\("schemaname").toOption.map(_.as(Reads.StringReads)),
@@ -78,7 +78,7 @@ object PgStatsExtViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatsExtViewRow] = OWrites[PgStatsExtViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatsExtViewRow] = OWrites[PgStatsExtViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),
       "tablename" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tablename),

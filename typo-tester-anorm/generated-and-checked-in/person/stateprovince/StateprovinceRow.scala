@@ -45,7 +45,7 @@ case class StateprovinceRow(
 )
 
 object StateprovinceRow {
-  implicit val reads: Reads[StateprovinceRow] = Reads[StateprovinceRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[StateprovinceRow] = Reads[StateprovinceRow](json => JsResult.fromTry(
       Try(
         StateprovinceRow(
           stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
@@ -74,7 +74,7 @@ object StateprovinceRow {
       )
     )
   }
-  implicit val writes: OWrites[StateprovinceRow] = OWrites[StateprovinceRow](o =>
+  implicit lazy val writes: OWrites[StateprovinceRow] = OWrites[StateprovinceRow](o =>
     new JsObject(ListMap[String, JsValue](
       "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
       "stateprovincecode" -> Writes.StringWrites.writes(o.stateprovincecode),

@@ -21,8 +21,8 @@ import scala.util.Try
 /** Type for the composite primary key of table `person.personphone` */
 case class PersonphoneId(businessentityid: BusinessentityId, phonenumber: Phone, phonenumbertypeid: PhonenumbertypeId)
 object PersonphoneId {
-  implicit val ordering: Ordering[PersonphoneId] = Ordering.by(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))
-  implicit val reads: Reads[PersonphoneId] = Reads[PersonphoneId](json => JsResult.fromTry(
+  implicit lazy val ordering: Ordering[PersonphoneId] = Ordering.by(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid))
+  implicit lazy val reads: Reads[PersonphoneId] = Reads[PersonphoneId](json => JsResult.fromTry(
       Try(
         PersonphoneId(
           businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
@@ -32,7 +32,7 @@ object PersonphoneId {
       )
     ),
   )
-  implicit val writes: OWrites[PersonphoneId] = OWrites[PersonphoneId](o =>
+  implicit lazy val writes: OWrites[PersonphoneId] = OWrites[PersonphoneId](o =>
     new JsObject(ListMap[String, JsValue](
       "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
       "phonenumber" -> Phone.writes.writes(o.phonenumber),

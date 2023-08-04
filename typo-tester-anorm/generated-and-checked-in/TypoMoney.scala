@@ -19,7 +19,7 @@ import typo.dsl.Bijection
 case class TypoMoney(value: BigDecimal)
 
 object TypoMoney {
-  implicit val arrayColumn: Column[Array[TypoMoney]] = Column.nonNull[Array[TypoMoney]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoMoney]] = Column.nonNull[Array[TypoMoney]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -30,24 +30,24 @@ object TypoMoney {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoMoney]] = new ParameterMetaData[Array[TypoMoney]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoMoney]] = new ParameterMetaData[Array[TypoMoney]] {
     override def sqlType: String = "_money"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoMoney]] = ToStatement[Array[TypoMoney]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("money", v.map(v => v.value.bigDecimal))))
-  implicit val bijection: Bijection[TypoMoney, BigDecimal] = Bijection[TypoMoney, BigDecimal](_.value)(TypoMoney.apply)
-  implicit val column: Column[TypoMoney] = Column.nonNull[TypoMoney]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoMoney]] = ToStatement[Array[TypoMoney]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("money", v.map(v => v.value.bigDecimal))))
+  implicit lazy val bijection: Bijection[TypoMoney, BigDecimal] = Bijection[TypoMoney, BigDecimal](_.value)(TypoMoney.apply)
+  implicit lazy val column: Column[TypoMoney] = Column.nonNull[TypoMoney]((v1: Any, _) =>
     v1 match {
       case v: java.math.BigDecimal => Right(TypoMoney(BigDecimal(v)))
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.math.BigDecimal, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoMoney] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoMoney] = new ParameterMetaData[TypoMoney] {
+  implicit lazy val ordering: Ordering[TypoMoney] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoMoney] = new ParameterMetaData[TypoMoney] {
     override def sqlType: String = "money"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoMoney] = Reads.bigDecReads.map(TypoMoney.apply)
-  implicit val toStatement: ToStatement[TypoMoney] = ToStatement[TypoMoney]((s, index, v) => s.setObject(index, v.value.bigDecimal))
-  implicit val writes: Writes[TypoMoney] = Writes.BigDecimalWrites.contramap(_.value)
+  implicit lazy val reads: Reads[TypoMoney] = Reads.bigDecReads.map(TypoMoney.apply)
+  implicit lazy val toStatement: ToStatement[TypoMoney] = ToStatement[TypoMoney]((s, index, v) => s.setObject(index, v.value.bigDecimal))
+  implicit lazy val writes: Writes[TypoMoney] = Writes.BigDecimalWrites.contramap(_.value)
 }

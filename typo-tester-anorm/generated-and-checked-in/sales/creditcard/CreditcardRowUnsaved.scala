@@ -51,7 +51,7 @@ case class CreditcardRowUnsaved(
     )
 }
 object CreditcardRowUnsaved {
-  implicit val reads: Reads[CreditcardRowUnsaved] = Reads[CreditcardRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CreditcardRowUnsaved] = Reads[CreditcardRowUnsaved](json => JsResult.fromTry(
       Try(
         CreditcardRowUnsaved(
           cardtype = json.\("cardtype").as(Reads.StringReads),
@@ -64,7 +64,7 @@ object CreditcardRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[CreditcardRowUnsaved] = OWrites[CreditcardRowUnsaved](o =>
+  implicit lazy val writes: OWrites[CreditcardRowUnsaved] = OWrites[CreditcardRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "cardtype" -> Writes.StringWrites.writes(o.cardtype),
       "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),

@@ -28,7 +28,7 @@ object TypoOffsetTime {
     new DateTimeFormatterBuilder().appendPattern("HH:mm:ss").appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
   def apply(value: OffsetTime): TypoOffsetTime = new TypoOffsetTime(value.truncatedTo(ChronoUnit.MICROS))
   def now = TypoOffsetTime(OffsetTime.now)
-  implicit val arrayColumn: Column[Array[TypoOffsetTime]] = Column.nonNull[Array[TypoOffsetTime]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoOffsetTime]] = Column.nonNull[Array[TypoOffsetTime]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -39,24 +39,24 @@ object TypoOffsetTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoOffsetTime]] = new ParameterMetaData[Array[TypoOffsetTime]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoOffsetTime]] = new ParameterMetaData[Array[TypoOffsetTime]] {
     override def sqlType: String = "_timetz"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoOffsetTime]] = ToStatement[Array[TypoOffsetTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("timetz", v.map(v => v.value.toString))))
-  implicit val bijection: Bijection[TypoOffsetTime, OffsetTime] = Bijection[TypoOffsetTime, OffsetTime](_.value)(TypoOffsetTime.apply)
-  implicit val column: Column[TypoOffsetTime] = Column.nonNull[TypoOffsetTime]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoOffsetTime]] = ToStatement[Array[TypoOffsetTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("timetz", v.map(v => v.value.toString))))
+  implicit lazy val bijection: Bijection[TypoOffsetTime, OffsetTime] = Bijection[TypoOffsetTime, OffsetTime](_.value)(TypoOffsetTime.apply)
+  implicit lazy val column: Column[TypoOffsetTime] = Column.nonNull[TypoOffsetTime]((v1: Any, _) =>
     v1 match {
       case v: String => Right(TypoOffsetTime(OffsetTime.parse(v, parser)))
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
   implicit def ordering(implicit O0: Ordering[OffsetTime]): Ordering[TypoOffsetTime] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[TypoOffsetTime] = new ParameterMetaData[TypoOffsetTime] {
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoOffsetTime] = new ParameterMetaData[TypoOffsetTime] {
     override def sqlType: String = "timetz"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoOffsetTime] = adventureworks.OffsetTimeReads.map(TypoOffsetTime.apply)
-  implicit val toStatement: ToStatement[TypoOffsetTime] = ToStatement[TypoOffsetTime]((s, index, v) => s.setObject(index, v.value.toString))
-  implicit val writes: Writes[TypoOffsetTime] = adventureworks.OffsetTimeWrites.contramap(_.value)
+  implicit lazy val reads: Reads[TypoOffsetTime] = adventureworks.OffsetTimeReads.map(TypoOffsetTime.apply)
+  implicit lazy val toStatement: ToStatement[TypoOffsetTime] = ToStatement[TypoOffsetTime]((s, index, v) => s.setObject(index, v.value.toString))
+  implicit lazy val writes: Writes[TypoOffsetTime] = adventureworks.OffsetTimeWrites.contramap(_.value)
 }

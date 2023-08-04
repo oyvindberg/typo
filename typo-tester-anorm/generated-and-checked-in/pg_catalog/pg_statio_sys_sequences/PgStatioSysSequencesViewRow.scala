@@ -33,7 +33,7 @@ case class PgStatioSysSequencesViewRow(
 )
 
 object PgStatioSysSequencesViewRow {
-  implicit val reads: Reads[PgStatioSysSequencesViewRow] = Reads[PgStatioSysSequencesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatioSysSequencesViewRow] = Reads[PgStatioSysSequencesViewRow](json => JsResult.fromTry(
       Try(
         PgStatioSysSequencesViewRow(
           relid = json.\("relid").toOption.map(_.as(Reads.LongReads)),
@@ -56,7 +56,7 @@ object PgStatioSysSequencesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatioSysSequencesViewRow] = OWrites[PgStatioSysSequencesViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatioSysSequencesViewRow] = OWrites[PgStatioSysSequencesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "relid" -> Writes.OptionWrites(Writes.LongWrites).writes(o.relid),
       "schemaname" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schemaname),

@@ -31,7 +31,7 @@ case class ColumnOptionsViewRow(
 )
 
 object ColumnOptionsViewRow {
-  implicit val reads: Reads[ColumnOptionsViewRow] = Reads[ColumnOptionsViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ColumnOptionsViewRow] = Reads[ColumnOptionsViewRow](json => JsResult.fromTry(
       Try(
         ColumnOptionsViewRow(
           tableCatalog = json.\("table_catalog").toOption.map(_.as(SqlIdentifier.reads)),
@@ -56,7 +56,7 @@ object ColumnOptionsViewRow {
       )
     )
   }
-  implicit val writes: OWrites[ColumnOptionsViewRow] = OWrites[ColumnOptionsViewRow](o =>
+  implicit lazy val writes: OWrites[ColumnOptionsViewRow] = OWrites[ColumnOptionsViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "table_catalog" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableCatalog),
       "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),

@@ -49,7 +49,7 @@ case class ShiftRowUnsaved(
     )
 }
 object ShiftRowUnsaved {
-  implicit val reads: Reads[ShiftRowUnsaved] = Reads[ShiftRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[ShiftRowUnsaved] = Reads[ShiftRowUnsaved](json => JsResult.fromTry(
       Try(
         ShiftRowUnsaved(
           name = json.\("name").as(Name.reads),
@@ -61,7 +61,7 @@ object ShiftRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[ShiftRowUnsaved] = OWrites[ShiftRowUnsaved](o =>
+  implicit lazy val writes: OWrites[ShiftRowUnsaved] = OWrites[ShiftRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> Name.writes.writes(o.name),
       "starttime" -> TypoLocalTime.writes.writes(o.starttime),

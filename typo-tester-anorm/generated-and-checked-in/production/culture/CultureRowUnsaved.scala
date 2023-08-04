@@ -38,7 +38,7 @@ case class CultureRowUnsaved(
     )
 }
 object CultureRowUnsaved {
-  implicit val reads: Reads[CultureRowUnsaved] = Reads[CultureRowUnsaved](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[CultureRowUnsaved] = Reads[CultureRowUnsaved](json => JsResult.fromTry(
       Try(
         CultureRowUnsaved(
           cultureid = json.\("cultureid").as(CultureId.reads),
@@ -48,7 +48,7 @@ object CultureRowUnsaved {
       )
     ),
   )
-  implicit val writes: OWrites[CultureRowUnsaved] = OWrites[CultureRowUnsaved](o =>
+  implicit lazy val writes: OWrites[CultureRowUnsaved] = OWrites[CultureRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "cultureid" -> CultureId.writes.writes(o.cultureid),
       "name" -> Name.writes.writes(o.name),

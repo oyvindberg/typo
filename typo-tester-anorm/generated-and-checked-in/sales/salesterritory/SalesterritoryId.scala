@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.salesterritory` */
 case class SalesterritoryId(value: Int) extends AnyVal
 object SalesterritoryId {
-  implicit val arrayToStatement: ToStatement[Array[SalesterritoryId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[SalesterritoryId, Int] = Bijection[SalesterritoryId, Int](_.value)(SalesterritoryId.apply)
-  implicit val column: Column[SalesterritoryId] = implicitly[Column[Int]].map(SalesterritoryId.apply)
-  implicit val ordering: Ordering[SalesterritoryId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[SalesterritoryId] = new ParameterMetaData[SalesterritoryId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[SalesterritoryId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[SalesterritoryId, Int] = Bijection[SalesterritoryId, Int](_.value)(SalesterritoryId.apply)
+  implicit lazy val column: Column[SalesterritoryId] = implicitly[Column[Int]].map(SalesterritoryId.apply)
+  implicit lazy val ordering: Ordering[SalesterritoryId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[SalesterritoryId] = new ParameterMetaData[SalesterritoryId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[SalesterritoryId] = Reads.IntReads.map(SalesterritoryId.apply)
-  implicit val toStatement: ToStatement[SalesterritoryId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[SalesterritoryId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[SalesterritoryId] = Reads.IntReads.map(SalesterritoryId.apply)
+  implicit lazy val toStatement: ToStatement[SalesterritoryId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[SalesterritoryId] = Writes.IntWrites.contramap(_.value)
 }

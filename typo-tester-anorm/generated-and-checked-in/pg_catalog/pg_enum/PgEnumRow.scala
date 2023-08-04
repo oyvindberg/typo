@@ -27,7 +27,7 @@ case class PgEnumRow(
 )
 
 object PgEnumRow {
-  implicit val reads: Reads[PgEnumRow] = Reads[PgEnumRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgEnumRow] = Reads[PgEnumRow](json => JsResult.fromTry(
       Try(
         PgEnumRow(
           oid = json.\("oid").as(PgEnumId.reads),
@@ -48,7 +48,7 @@ object PgEnumRow {
       )
     )
   }
-  implicit val writes: OWrites[PgEnumRow] = OWrites[PgEnumRow](o =>
+  implicit lazy val writes: OWrites[PgEnumRow] = OWrites[PgEnumRow](o =>
     new JsObject(ListMap[String, JsValue](
       "oid" -> PgEnumId.writes.writes(o.oid),
       "enumtypid" -> Writes.LongWrites.writes(o.enumtypid),

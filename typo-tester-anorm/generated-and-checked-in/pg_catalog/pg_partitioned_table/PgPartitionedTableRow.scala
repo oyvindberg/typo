@@ -34,7 +34,7 @@ case class PgPartitionedTableRow(
 )
 
 object PgPartitionedTableRow {
-  implicit val reads: Reads[PgPartitionedTableRow] = Reads[PgPartitionedTableRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgPartitionedTableRow] = Reads[PgPartitionedTableRow](json => JsResult.fromTry(
       Try(
         PgPartitionedTableRow(
           partrelid = json.\("partrelid").as(PgPartitionedTableId.reads),
@@ -63,7 +63,7 @@ object PgPartitionedTableRow {
       )
     )
   }
-  implicit val writes: OWrites[PgPartitionedTableRow] = OWrites[PgPartitionedTableRow](o =>
+  implicit lazy val writes: OWrites[PgPartitionedTableRow] = OWrites[PgPartitionedTableRow](o =>
     new JsObject(ListMap[String, JsValue](
       "partrelid" -> PgPartitionedTableId.writes.writes(o.partrelid),
       "partstrat" -> Writes.StringWrites.writes(o.partstrat),

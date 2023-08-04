@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.workorder` */
 case class WorkorderId(value: Int) extends AnyVal
 object WorkorderId {
-  implicit val arrayToStatement: ToStatement[Array[WorkorderId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[WorkorderId, Int] = Bijection[WorkorderId, Int](_.value)(WorkorderId.apply)
-  implicit val column: Column[WorkorderId] = implicitly[Column[Int]].map(WorkorderId.apply)
-  implicit val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[WorkorderId] = new ParameterMetaData[WorkorderId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[WorkorderId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[WorkorderId, Int] = Bijection[WorkorderId, Int](_.value)(WorkorderId.apply)
+  implicit lazy val column: Column[WorkorderId] = implicitly[Column[Int]].map(WorkorderId.apply)
+  implicit lazy val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[WorkorderId] = new ParameterMetaData[WorkorderId] {
     override def sqlType: String = implicitly[ParameterMetaData[Int]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[Int]].jdbcType
   }
-  implicit val reads: Reads[WorkorderId] = Reads.IntReads.map(WorkorderId.apply)
-  implicit val toStatement: ToStatement[WorkorderId] = implicitly[ToStatement[Int]].contramap(_.value)
-  implicit val writes: Writes[WorkorderId] = Writes.IntWrites.contramap(_.value)
+  implicit lazy val reads: Reads[WorkorderId] = Reads.IntReads.map(WorkorderId.apply)
+  implicit lazy val toStatement: ToStatement[WorkorderId] = implicitly[ToStatement[Int]].contramap(_.value)
+  implicit lazy val writes: Writes[WorkorderId] = Writes.IntWrites.contramap(_.value)
 }

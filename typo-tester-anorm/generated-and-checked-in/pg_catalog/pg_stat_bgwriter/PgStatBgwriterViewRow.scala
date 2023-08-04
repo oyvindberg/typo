@@ -35,7 +35,7 @@ case class PgStatBgwriterViewRow(
 )
 
 object PgStatBgwriterViewRow {
-  implicit val reads: Reads[PgStatBgwriterViewRow] = Reads[PgStatBgwriterViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatBgwriterViewRow] = Reads[PgStatBgwriterViewRow](json => JsResult.fromTry(
       Try(
         PgStatBgwriterViewRow(
           checkpointsTimed = json.\("checkpoints_timed").toOption.map(_.as(Reads.LongReads)),
@@ -70,7 +70,7 @@ object PgStatBgwriterViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatBgwriterViewRow] = OWrites[PgStatBgwriterViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatBgwriterViewRow] = OWrites[PgStatBgwriterViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "checkpoints_timed" -> Writes.OptionWrites(Writes.LongWrites).writes(o.checkpointsTimed),
       "checkpoints_req" -> Writes.OptionWrites(Writes.LongWrites).writes(o.checkpointsReq),

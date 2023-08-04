@@ -28,7 +28,7 @@ case class PgLargeobjectRow(
  }
 
 object PgLargeobjectRow {
-  implicit val reads: Reads[PgLargeobjectRow] = Reads[PgLargeobjectRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgLargeobjectRow] = Reads[PgLargeobjectRow](json => JsResult.fromTry(
       Try(
         PgLargeobjectRow(
           loid = json.\("loid").as(Reads.LongReads),
@@ -47,7 +47,7 @@ object PgLargeobjectRow {
       )
     )
   }
-  implicit val writes: OWrites[PgLargeobjectRow] = OWrites[PgLargeobjectRow](o =>
+  implicit lazy val writes: OWrites[PgLargeobjectRow] = OWrites[PgLargeobjectRow](o =>
     new JsObject(ListMap[String, JsValue](
       "loid" -> Writes.LongWrites.writes(o.loid),
       "pageno" -> Writes.IntWrites.writes(o.pageno),

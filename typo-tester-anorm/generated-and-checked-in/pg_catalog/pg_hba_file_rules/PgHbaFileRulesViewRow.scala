@@ -32,7 +32,7 @@ case class PgHbaFileRulesViewRow(
 )
 
 object PgHbaFileRulesViewRow {
-  implicit val reads: Reads[PgHbaFileRulesViewRow] = Reads[PgHbaFileRulesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgHbaFileRulesViewRow] = Reads[PgHbaFileRulesViewRow](json => JsResult.fromTry(
       Try(
         PgHbaFileRulesViewRow(
           lineNumber = json.\("line_number").toOption.map(_.as(Reads.IntReads)),
@@ -63,7 +63,7 @@ object PgHbaFileRulesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgHbaFileRulesViewRow] = OWrites[PgHbaFileRulesViewRow](o =>
+  implicit lazy val writes: OWrites[PgHbaFileRulesViewRow] = OWrites[PgHbaFileRulesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "line_number" -> Writes.OptionWrites(Writes.IntWrites).writes(o.lineNumber),
       "type" -> Writes.OptionWrites(Writes.StringWrites).writes(o.`type`),

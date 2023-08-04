@@ -27,7 +27,7 @@ case class PgStatGssapiViewRow(
 )
 
 object PgStatGssapiViewRow {
-  implicit val reads: Reads[PgStatGssapiViewRow] = Reads[PgStatGssapiViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[PgStatGssapiViewRow] = Reads[PgStatGssapiViewRow](json => JsResult.fromTry(
       Try(
         PgStatGssapiViewRow(
           pid = json.\("pid").toOption.map(_.as(Reads.IntReads)),
@@ -48,7 +48,7 @@ object PgStatGssapiViewRow {
       )
     )
   }
-  implicit val writes: OWrites[PgStatGssapiViewRow] = OWrites[PgStatGssapiViewRow](o =>
+  implicit lazy val writes: OWrites[PgStatGssapiViewRow] = OWrites[PgStatGssapiViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "pid" -> Writes.OptionWrites(Writes.IntWrites).writes(o.pid),
       "gss_authenticated" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.gssAuthenticated),

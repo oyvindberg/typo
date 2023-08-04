@@ -91,7 +91,7 @@ case class SalesorderheaderRow(
 )
 
 object SalesorderheaderRow {
-  implicit val reads: Reads[SalesorderheaderRow] = Reads[SalesorderheaderRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[SalesorderheaderRow] = Reads[SalesorderheaderRow](json => JsResult.fromTry(
       Try(
         SalesorderheaderRow(
           salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
@@ -154,7 +154,7 @@ object SalesorderheaderRow {
       )
     )
   }
-  implicit val writes: OWrites[SalesorderheaderRow] = OWrites[SalesorderheaderRow](o =>
+  implicit lazy val writes: OWrites[SalesorderheaderRow] = OWrites[SalesorderheaderRow](o =>
     new JsObject(ListMap[String, JsValue](
       "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
       "revisionnumber" -> Writes.IntWrites.writes(o.revisionnumber),

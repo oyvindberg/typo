@@ -34,7 +34,7 @@ case class UsagePrivilegesViewRow(
 )
 
 object UsagePrivilegesViewRow {
-  implicit val reads: Reads[UsagePrivilegesViewRow] = Reads[UsagePrivilegesViewRow](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[UsagePrivilegesViewRow] = Reads[UsagePrivilegesViewRow](json => JsResult.fromTry(
       Try(
         UsagePrivilegesViewRow(
           grantor = json.\("grantor").toOption.map(_.as(SqlIdentifier.reads)),
@@ -63,7 +63,7 @@ object UsagePrivilegesViewRow {
       )
     )
   }
-  implicit val writes: OWrites[UsagePrivilegesViewRow] = OWrites[UsagePrivilegesViewRow](o =>
+  implicit lazy val writes: OWrites[UsagePrivilegesViewRow] = OWrites[UsagePrivilegesViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "grantor" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantor),
       "grantee" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.grantee),

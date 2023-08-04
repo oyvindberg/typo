@@ -25,7 +25,7 @@ import scala.util.Try
 case class TypoBox(x1: Double, y1: Double, x2: Double, y2: Double)
 
 object TypoBox {
-  implicit val arrayColumn: Column[Array[TypoBox]] = Column.nonNull[Array[TypoBox]]((v1: Any, _) =>
+  implicit lazy val arrayColumn: Column[Array[TypoBox]] = Column.nonNull[Array[TypoBox]]((v1: Any, _) =>
     v1 match {
         case v: PgArray =>
          v.getArray match {
@@ -36,23 +36,23 @@ object TypoBox {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit val arrayParameterMetaData: ParameterMetaData[Array[TypoBox]] = new ParameterMetaData[Array[TypoBox]] {
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoBox]] = new ParameterMetaData[Array[TypoBox]] {
     override def sqlType: String = "_box"
     override def jdbcType: Int = Types.ARRAY
   }
-  implicit val arrayToStatement: ToStatement[Array[TypoBox]] = ToStatement[Array[TypoBox]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("box", v.map(v => new PGbox(v.x1, v.y1, v.x2, v.y2)))))
-  implicit val column: Column[TypoBox] = Column.nonNull[TypoBox]((v1: Any, _) =>
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoBox]] = ToStatement[Array[TypoBox]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("box", v.map(v => new PGbox(v.x1, v.y1, v.x2, v.y2)))))
+  implicit lazy val column: Column[TypoBox] = Column.nonNull[TypoBox]((v1: Any, _) =>
     v1 match {
       case v: PGbox => Right(TypoBox(v.point(0).x, v.point(0).y, v.point(1).x, v.point(1).y))
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.geometric.PGbox, got ${other.getClass.getName}"))
     }
   )
-  implicit val ordering: Ordering[TypoBox] = Ordering.by(x => (x.x1, x.y1, x.x2, x.y2))
-  implicit val parameterMetadata: ParameterMetaData[TypoBox] = new ParameterMetaData[TypoBox] {
+  implicit lazy val ordering: Ordering[TypoBox] = Ordering.by(x => (x.x1, x.y1, x.x2, x.y2))
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoBox] = new ParameterMetaData[TypoBox] {
     override def sqlType: String = "box"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit val reads: Reads[TypoBox] = Reads[TypoBox](json => JsResult.fromTry(
+  implicit lazy val reads: Reads[TypoBox] = Reads[TypoBox](json => JsResult.fromTry(
       Try(
         TypoBox(
           x1 = json.\("x1").as(Reads.DoubleReads),
@@ -63,8 +63,8 @@ object TypoBox {
       )
     ),
   )
-  implicit val toStatement: ToStatement[TypoBox] = ToStatement[TypoBox]((s, index, v) => s.setObject(index, new PGbox(v.x1, v.y1, v.x2, v.y2)))
-  implicit val writes: OWrites[TypoBox] = OWrites[TypoBox](o =>
+  implicit lazy val toStatement: ToStatement[TypoBox] = ToStatement[TypoBox]((s, index, v) => s.setObject(index, new PGbox(v.x1, v.y1, v.x2, v.y2)))
+  implicit lazy val writes: OWrites[TypoBox] = OWrites[TypoBox](o =>
     new JsObject(ListMap[String, JsValue](
       "x1" -> Writes.DoubleWrites.writes(o.x1),
       "y1" -> Writes.DoubleWrites.writes(o.y1),

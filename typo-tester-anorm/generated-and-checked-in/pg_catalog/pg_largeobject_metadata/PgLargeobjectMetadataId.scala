@@ -17,15 +17,15 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_largeobject_metadata` */
 case class PgLargeobjectMetadataId(value: /* oid */ Long) extends AnyVal
 object PgLargeobjectMetadataId {
-  implicit val arrayToStatement: ToStatement[Array[PgLargeobjectMetadataId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgLargeobjectMetadataId, /* oid */ Long] = Bijection[PgLargeobjectMetadataId, /* oid */ Long](_.value)(PgLargeobjectMetadataId.apply)
-  implicit val column: Column[PgLargeobjectMetadataId] = implicitly[Column[/* oid */ Long]].map(PgLargeobjectMetadataId.apply)
-  implicit val ordering: Ordering[PgLargeobjectMetadataId] = Ordering.by(_.value)
-  implicit val parameterMetadata: ParameterMetaData[PgLargeobjectMetadataId] = new ParameterMetaData[PgLargeobjectMetadataId] {
+  implicit lazy val arrayToStatement: ToStatement[Array[PgLargeobjectMetadataId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgLargeobjectMetadataId, /* oid */ Long] = Bijection[PgLargeobjectMetadataId, /* oid */ Long](_.value)(PgLargeobjectMetadataId.apply)
+  implicit lazy val column: Column[PgLargeobjectMetadataId] = implicitly[Column[/* oid */ Long]].map(PgLargeobjectMetadataId.apply)
+  implicit lazy val ordering: Ordering[PgLargeobjectMetadataId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgLargeobjectMetadataId] = new ParameterMetaData[PgLargeobjectMetadataId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-  implicit val reads: Reads[PgLargeobjectMetadataId] = Reads.LongReads.map(PgLargeobjectMetadataId.apply)
-  implicit val toStatement: ToStatement[PgLargeobjectMetadataId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val writes: Writes[PgLargeobjectMetadataId] = Writes.LongWrites.contramap(_.value)
+  implicit lazy val reads: Reads[PgLargeobjectMetadataId] = Reads.LongReads.map(PgLargeobjectMetadataId.apply)
+  implicit lazy val toStatement: ToStatement[PgLargeobjectMetadataId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgLargeobjectMetadataId] = Writes.LongWrites.contramap(_.value)
 }
