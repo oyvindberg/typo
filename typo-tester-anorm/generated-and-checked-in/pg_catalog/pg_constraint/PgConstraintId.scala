@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_constraint` */
 case class PgConstraintId(value: /* oid */ Long) extends AnyVal
 object PgConstraintId {
+  implicit lazy val arrayColumn: Column[Array[PgConstraintId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[PgConstraintId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PgConstraintId, /* oid */ Long] = Bijection[PgConstraintId, /* oid */ Long](_.value)(PgConstraintId.apply)
   implicit lazy val column: Column[PgConstraintId] = implicitly[Column[/* oid */ Long]].map(PgConstraintId.apply)

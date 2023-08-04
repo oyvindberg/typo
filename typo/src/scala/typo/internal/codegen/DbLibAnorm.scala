@@ -417,6 +417,13 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     List(
       sc.Given(
         tparams = Nil,
+        name = arrayColumnName,
+        implicitParams = Nil,
+        tpe = Column.of(sc.Type.Array.of(wrapperType)),
+        body = code"""$Column.columnToArray($columnName, implicitly)"""
+      ),
+      sc.Given(
+        tparams = Nil,
         name = columnName,
         implicitParams = Nil,
         tpe = Column.of(wrapperType),
@@ -463,6 +470,13 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         implicitParams = Nil,
         tpe = ToStatement.of(sc.Type.Array.of(wrapperType)),
         body = code"${sc.Summon(ToStatement.of(sc.Type.Array.of(underlying)))}.contramap(_.map(_.value))"
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = arrayColumnName,
+        implicitParams = Nil,
+        tpe = Column.of(sc.Type.Array.of(wrapperType)),
+        body = code"$Column.columnToArray($columnName, implicitly)"
       ),
       sc.Given(
         tparams = Nil,

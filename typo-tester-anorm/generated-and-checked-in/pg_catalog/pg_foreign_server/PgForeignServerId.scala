@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_foreign_server` */
 case class PgForeignServerId(value: /* oid */ Long) extends AnyVal
 object PgForeignServerId {
+  implicit lazy val arrayColumn: Column[Array[PgForeignServerId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[PgForeignServerId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PgForeignServerId, /* oid */ Long] = Bijection[PgForeignServerId, /* oid */ Long](_.value)(PgForeignServerId.apply)
   implicit lazy val column: Column[PgForeignServerId] = implicitly[Column[/* oid */ Long]].map(PgForeignServerId.apply)

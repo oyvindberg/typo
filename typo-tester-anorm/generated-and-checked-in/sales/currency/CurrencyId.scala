@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.currency` */
 case class CurrencyId(value: /* bpchar */ String) extends AnyVal
 object CurrencyId {
+  implicit lazy val arrayColumn: Column[Array[CurrencyId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[CurrencyId]] = implicitly[ToStatement[Array[/* bpchar */ String]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[CurrencyId, /* bpchar */ String] = Bijection[CurrencyId, /* bpchar */ String](_.value)(CurrencyId.apply)
   implicit lazy val column: Column[CurrencyId] = implicitly[Column[/* bpchar */ String]].map(CurrencyId.apply)

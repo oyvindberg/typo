@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_largeobject_metadata` */
 case class PgLargeobjectMetadataId(value: /* oid */ Long) extends AnyVal
 object PgLargeobjectMetadataId {
+  implicit lazy val arrayColumn: Column[Array[PgLargeobjectMetadataId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[PgLargeobjectMetadataId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PgLargeobjectMetadataId, /* oid */ Long] = Bijection[PgLargeobjectMetadataId, /* oid */ Long](_.value)(PgLargeobjectMetadataId.apply)
   implicit lazy val column: Column[PgLargeobjectMetadataId] = implicitly[Column[/* oid */ Long]].map(PgLargeobjectMetadataId.apply)

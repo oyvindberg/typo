@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `person.countryregion` */
 case class CountryregionId(value: /* max 3 chars */ String) extends AnyVal
 object CountryregionId {
+  implicit lazy val arrayColumn: Column[Array[CountryregionId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[CountryregionId]] = implicitly[ToStatement[Array[/* max 3 chars */ String]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[CountryregionId, /* max 3 chars */ String] = Bijection[CountryregionId, /* max 3 chars */ String](_.value)(CountryregionId.apply)
   implicit lazy val column: Column[CountryregionId] = implicitly[Column[/* max 3 chars */ String]].map(CountryregionId.apply)

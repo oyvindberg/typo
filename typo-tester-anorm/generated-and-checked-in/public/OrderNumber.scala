@@ -18,6 +18,7 @@ import typo.dsl.Bijection
   */
 case class OrderNumber(value: String) extends AnyVal
 object OrderNumber {
+  implicit lazy val arrayColumn: Column[Array[OrderNumber]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[OrderNumber]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[OrderNumber, String] = Bijection[OrderNumber, String](_.value)(OrderNumber.apply)
   implicit lazy val column: Column[OrderNumber] = implicitly[Column[String]].map(OrderNumber.apply)

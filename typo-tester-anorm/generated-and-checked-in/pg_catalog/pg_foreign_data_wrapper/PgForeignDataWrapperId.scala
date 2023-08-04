@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_foreign_data_wrapper` */
 case class PgForeignDataWrapperId(value: /* oid */ Long) extends AnyVal
 object PgForeignDataWrapperId {
+  implicit lazy val arrayColumn: Column[Array[PgForeignDataWrapperId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[PgForeignDataWrapperId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PgForeignDataWrapperId, /* oid */ Long] = Bijection[PgForeignDataWrapperId, /* oid */ Long](_.value)(PgForeignDataWrapperId.apply)
   implicit lazy val column: Column[PgForeignDataWrapperId] = implicitly[Column[/* oid */ Long]].map(PgForeignDataWrapperId.apply)

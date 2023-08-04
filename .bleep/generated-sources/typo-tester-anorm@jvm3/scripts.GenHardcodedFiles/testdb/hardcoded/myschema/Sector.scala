@@ -32,6 +32,7 @@ object Sector {
   val Names: String = All.map(_.value).mkString(", ")
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
+  implicit lazy val arrayColumn: Column[Array[Sector]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit lazy val column: Column[Sector] = implicitly[Column[String]].mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
   implicit lazy val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {

@@ -18,6 +18,7 @@ import typo.dsl.Bijection
   */
 case class CardinalNumber(value: Int) extends AnyVal
 object CardinalNumber {
+  implicit lazy val arrayColumn: Column[Array[CardinalNumber]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[CardinalNumber]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[CardinalNumber, Int] = Bijection[CardinalNumber, Int](_.value)(CardinalNumber.apply)
   implicit lazy val column: Column[CardinalNumber] = implicitly[Column[Int]].map(CardinalNumber.apply)

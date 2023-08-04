@@ -18,6 +18,7 @@ import typo.dsl.Bijection
   */
 case class SqlIdentifier(value: String) extends AnyVal
 object SqlIdentifier {
+  implicit lazy val arrayColumn: Column[Array[SqlIdentifier]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[SqlIdentifier]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[SqlIdentifier, String] = Bijection[SqlIdentifier, String](_.value)(SqlIdentifier.apply)
   implicit lazy val column: Column[SqlIdentifier] = implicitly[Column[String]].map(SqlIdentifier.apply)

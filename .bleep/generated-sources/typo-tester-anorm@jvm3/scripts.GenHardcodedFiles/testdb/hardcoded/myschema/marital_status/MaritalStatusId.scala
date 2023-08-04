@@ -18,6 +18,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `myschema.marital_status` */
 case class MaritalStatusId(value: Long) extends AnyVal
 object MaritalStatusId {
+  implicit lazy val arrayColumn: Column[Array[MaritalStatusId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[MaritalStatusId]] = implicitly[ToStatement[Array[Long]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[MaritalStatusId, Long] = Bijection[MaritalStatusId, Long](_.value)(MaritalStatusId.apply)
   implicit lazy val column: Column[MaritalStatusId] = implicitly[Column[Long]].map(MaritalStatusId.apply)

@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_partitioned_table` */
 case class PgPartitionedTableId(value: /* oid */ Long) extends AnyVal
 object PgPartitionedTableId {
+  implicit lazy val arrayColumn: Column[Array[PgPartitionedTableId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[PgPartitionedTableId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PgPartitionedTableId, /* oid */ Long] = Bijection[PgPartitionedTableId, /* oid */ Long](_.value)(PgPartitionedTableId.apply)
   implicit lazy val column: Column[PgPartitionedTableId] = implicitly[Column[/* oid */ Long]].map(PgPartitionedTableId.apply)

@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.specialoffer` */
 case class SpecialofferId(value: Int) extends AnyVal
 object SpecialofferId {
+  implicit lazy val arrayColumn: Column[Array[SpecialofferId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[SpecialofferId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[SpecialofferId, Int] = Bijection[SpecialofferId, Int](_.value)(SpecialofferId.apply)
   implicit lazy val column: Column[SpecialofferId] = implicitly[Column[Int]].map(SpecialofferId.apply)

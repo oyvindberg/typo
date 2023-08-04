@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.creditcard` */
 case class CreditcardId(value: Int) extends AnyVal
 object CreditcardId {
+  implicit lazy val arrayColumn: Column[Array[CreditcardId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[CreditcardId]] = implicitly[ToStatement[Array[Int]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[CreditcardId, Int] = Bijection[CreditcardId, Int](_.value)(CreditcardId.apply)
   implicit lazy val column: Column[CreditcardId] = implicitly[Column[Int]].map(CreditcardId.apply)

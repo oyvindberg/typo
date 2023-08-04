@@ -18,6 +18,7 @@ import typo.dsl.Bijection
   */
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
+  implicit lazy val arrayColumn: Column[Array[NameStyle]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[NameStyle]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)
   implicit lazy val column: Column[NameStyle] = implicitly[Column[Boolean]].map(NameStyle.apply)

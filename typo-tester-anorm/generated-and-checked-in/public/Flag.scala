@@ -18,6 +18,7 @@ import typo.dsl.Bijection
   */
 case class Flag(value: Boolean) extends AnyVal
 object Flag {
+  implicit lazy val arrayColumn: Column[Array[Flag]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[Flag]] = implicitly[ToStatement[Array[Boolean]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[Flag, Boolean] = Bijection[Flag, Boolean](_.value)(Flag.apply)
   implicit lazy val column: Column[Flag] = implicitly[Column[Boolean]].map(Flag.apply)

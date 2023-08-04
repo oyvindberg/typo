@@ -17,6 +17,7 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_ts_template` */
 case class PgTsTemplateId(value: /* oid */ Long) extends AnyVal
 object PgTsTemplateId {
+  implicit lazy val arrayColumn: Column[Array[PgTsTemplateId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[PgTsTemplateId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PgTsTemplateId, /* oid */ Long] = Bijection[PgTsTemplateId, /* oid */ Long](_.value)(PgTsTemplateId.apply)
   implicit lazy val column: Column[PgTsTemplateId] = implicitly[Column[/* oid */ Long]].map(PgTsTemplateId.apply)

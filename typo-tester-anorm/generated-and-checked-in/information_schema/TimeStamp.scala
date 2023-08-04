@@ -19,6 +19,7 @@ import typo.dsl.Bijection
   */
 case class TimeStamp(value: TypoOffsetDateTime) extends AnyVal
 object TimeStamp {
+  implicit lazy val arrayColumn: Column[Array[TimeStamp]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[TimeStamp]] = implicitly[ToStatement[Array[TypoOffsetDateTime]]].contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[TimeStamp, TypoOffsetDateTime] = Bijection[TimeStamp, TypoOffsetDateTime](_.value)(TimeStamp.apply)
   implicit lazy val column: Column[TimeStamp] = implicitly[Column[TypoOffsetDateTime]].map(TimeStamp.apply)
