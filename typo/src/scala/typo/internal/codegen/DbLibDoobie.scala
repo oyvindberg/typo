@@ -466,7 +466,6 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case x if missingInstancesByType.contains(Meta.of(x)) =>
           code"${missingInstancesByType(Meta.of(x))}.get"
         case other =>
-          println(other)
           code"${Get.of(other)}"
       }
 
@@ -492,7 +491,6 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         case x if missingInstancesByType.contains(Meta.of(x)) =>
           code"${missingInstancesByType(Meta.of(x))}.put"
         case other =>
-          println(other)
           code"${Put.of(other)}"
       }
 

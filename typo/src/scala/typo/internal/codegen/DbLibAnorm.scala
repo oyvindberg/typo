@@ -73,7 +73,6 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         // fallback array case. implementation looks loco, but I guess it works
         case sc.Type.TApply(sc.Type.Array, List(targ)) => code"$Column.columnToArray[$targ](${lookupColumnFor(targ)}, implicitly)"
         case other =>
-          println(other)
           sc.Summon(Column.of(other)).code
       }
 
