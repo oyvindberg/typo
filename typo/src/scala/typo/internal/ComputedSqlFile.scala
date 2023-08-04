@@ -1,7 +1,7 @@
 package typo
 package internal
 
-import typo.internal.rewriteDependentData.Eval
+import typo.internal.rewriteDependentData.EvalMaybe
 import typo.internal.sqlfiles.{DecomposedSql, SqlFile}
 
 case class ComputedSqlFile(
@@ -9,14 +9,14 @@ case class ComputedSqlFile(
     pkg0: sc.QIdent,
     naming: Naming,
     scalaTypeMapper: TypeMapperScala,
-    eval: Eval[db.RelationName, HasSource]
+    eval: EvalMaybe[db.RelationName, HasSource]
 ) {
   val source = Source.SqlFile(sqlFile.relPath)
 
   val cols: NonEmptyList[ComputedColumn] =
     sqlFile.cols.map { dbCol =>
       ComputedColumn(
-        pointsTo = sqlFile.dependencies.get(dbCol.name).map { case (relName, colName) => eval(relName).forceGet.source -> colName },
+        pointsTo = sqlFile.dependencies.get(dbCol.name).flatMap { case (relName, colName) => eval(relName).flatMap(_.get.map(foo => foo.source -> colName)) },
         name = naming.field(dbCol.name),
         tpe = deriveType(dbCol),
         dbCol = dbCol
@@ -28,8 +28,11 @@ case class ComputedSqlFile(
     val typeFromFk: Option[sc.Type] =
       sqlFile.dependencies.get(dbCol.name) match {
         case Some((otherTableName, otherColName)) =>
-          val otherTable = eval(otherTableName).forceGet
-          otherTable.cols.find(_.dbName == otherColName).map(_.tpe)
+          for {
+            existingTable <- eval(otherTableName)
+            nonCircular <- existingTable.get
+            col <- nonCircular.cols.find(_.dbName == otherColName)
+          } yield col.tpe
         case _ => None
       }
 

@@ -51,9 +51,9 @@ package object typo {
       }
 
     // note, these statements will force the evaluation of some of the lazy values
-    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.apply))
+    val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.get))
     computeds.foreach { case (relName, lazyValue) =>
-      if (selector.include(relName)) lazyValue.forceGet
+      if (selector.include(relName)) lazyValue.get
     }
     // here we keep only the values which have been evaluated. as such, the selector pattern should be safe
     val computedRelations = computeds.flatMap { case (_, lazyValue) => lazyValue.getIfEvaluated }

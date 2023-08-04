@@ -10,6 +10,10 @@ object rewriteDependentData {
   trait Eval[K, V] {
     def apply(key: K): Lazy[V]
   }
+  @FunctionalInterface
+  trait EvalMaybe[K, V] {
+    def apply(key: K): Option[Lazy[V]]
+  }
 
   def apply[K, V](in: Map[K, V]) = new Api(in)
 
