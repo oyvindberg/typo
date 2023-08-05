@@ -145,7 +145,7 @@ object load {
 
             for {
               mappedCols <- NonEmptyList.fromList(mappedCols)
-            } yield db.View(relationName, mappedCols, view.viewDefinition.get, isMaterialized = view.relkind == "m", deps)
+            } yield db.View(relationName, mappedCols, view.viewDefinition, isMaterialized = view.relkind == "m", deps)
 
           case None =>
             for {

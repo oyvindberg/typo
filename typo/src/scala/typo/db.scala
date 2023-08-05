@@ -104,7 +104,7 @@ object db {
   case class View(
       name: RelationName,
       cols: NonEmptyList[Col],
-      sql: String,
+      sql: Option[String],
       isMaterialized: Boolean,
       dependencies: Map[ColName, (RelationName, ColName)]
   ) extends Relation
