@@ -28,9 +28,9 @@ case class PccViewRow(
 )
 
 object PccViewRow {
-  implicit val decoder: Decoder[PccViewRow] = Decoder.forProduct4[PccViewRow, Option[Int], Option[BusinessentityId], Option[CreditcardId], Option[TypoLocalDateTime]]("id", "businessentityid", "creditcardid", "modifieddate")(PccViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(CreditcardId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PccViewRow] = Encoder.forProduct4[PccViewRow, Option[Int], Option[BusinessentityId], Option[CreditcardId], Option[TypoLocalDateTime]]("id", "businessentityid", "creditcardid", "modifieddate")(x => (x.id, x.businessentityid, x.creditcardid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(CreditcardId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[PccViewRow] = new Read[PccViewRow](
+  implicit lazy val decoder: Decoder[PccViewRow] = Decoder.forProduct4[PccViewRow, Option[Int], Option[BusinessentityId], Option[CreditcardId], Option[TypoLocalDateTime]]("id", "businessentityid", "creditcardid", "modifieddate")(PccViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(CreditcardId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PccViewRow] = Encoder.forProduct4[PccViewRow, Option[Int], Option[BusinessentityId], Option[CreditcardId], Option[TypoLocalDateTime]]("id", "businessentityid", "creditcardid", "modifieddate")(x => (x.id, x.businessentityid, x.creditcardid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(CreditcardId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[PccViewRow] = new Read[PccViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (BusinessentityId.get, Nullability.Nullable),

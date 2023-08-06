@@ -81,7 +81,7 @@ case class PgtestnullRow(
 )
 
 object PgtestnullRow {
-  implicit val decoder: Decoder[PgtestnullRow] = Decoder.instanceTry[PgtestnullRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgtestnullRow] = Decoder.instanceTry[PgtestnullRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -131,7 +131,7 @@ object PgtestnullRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgtestnullRow] = Encoder[PgtestnullRow](row =>
+  implicit lazy val encoder: Encoder[PgtestnullRow] = Encoder[PgtestnullRow](row =>
     Json.obj(
       "box" -> Encoder.encodeOption(TypoBox.encoder).apply(row.box),
       "circle" -> Encoder.encodeOption(TypoCircle.encoder).apply(row.circle),
@@ -175,7 +175,7 @@ object PgtestnullRow {
       "uuids" -> Encoder.encodeOption(Encoder.encodeIterable[UUID, Array](Encoder.encodeUUID, implicitly)).apply(row.uuids)
     )
   )
-  implicit val read: Read[PgtestnullRow] = new Read[PgtestnullRow](
+  implicit lazy val read: Read[PgtestnullRow] = new Read[PgtestnullRow](
     gets = List(
       (TypoBox.get, Nullability.Nullable),
       (TypoCircle.get, Nullability.Nullable),

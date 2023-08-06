@@ -24,9 +24,9 @@ case class PhonenumbertypeRow(
 )
 
 object PhonenumbertypeRow {
-  implicit val decoder: Decoder[PhonenumbertypeRow] = Decoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(PhonenumbertypeRow.apply)(PhonenumbertypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[PhonenumbertypeRow] = Encoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(x => (x.phonenumbertypeid, x.name, x.modifieddate))(PhonenumbertypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[PhonenumbertypeRow] = new Read[PhonenumbertypeRow](
+  implicit lazy val decoder: Decoder[PhonenumbertypeRow] = Decoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(PhonenumbertypeRow.apply)(PhonenumbertypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PhonenumbertypeRow] = Encoder.forProduct3[PhonenumbertypeRow, PhonenumbertypeId, Name, TypoLocalDateTime]("phonenumbertypeid", "name", "modifieddate")(x => (x.phonenumbertypeid, x.name, x.modifieddate))(PhonenumbertypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[PhonenumbertypeRow] = new Read[PhonenumbertypeRow](
     gets = List(
       (PhonenumbertypeId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

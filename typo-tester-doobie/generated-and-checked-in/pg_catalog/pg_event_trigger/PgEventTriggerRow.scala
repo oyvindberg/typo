@@ -25,9 +25,9 @@ case class PgEventTriggerRow(
 )
 
 object PgEventTriggerRow {
-  implicit val decoder: Decoder[PgEventTriggerRow] = Decoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(PgEventTriggerRow.apply)(PgEventTriggerId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit val encoder: Encoder[PgEventTriggerRow] = Encoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(x => (x.oid, x.evtname, x.evtevent, x.evtowner, x.evtfoid, x.evtenabled, x.evttags))(PgEventTriggerId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
-  implicit val read: Read[PgEventTriggerRow] = new Read[PgEventTriggerRow](
+  implicit lazy val decoder: Decoder[PgEventTriggerRow] = Decoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(PgEventTriggerRow.apply)(PgEventTriggerId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgEventTriggerRow] = Encoder.forProduct7[PgEventTriggerRow, PgEventTriggerId, String, String, /* oid */ Long, /* oid */ Long, String, Option[Array[String]]]("oid", "evtname", "evtevent", "evtowner", "evtfoid", "evtenabled", "evttags")(x => (x.oid, x.evtname, x.evtevent, x.evtowner, x.evtfoid, x.evtenabled, x.evttags))(PgEventTriggerId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val read: Read[PgEventTriggerRow] = new Read[PgEventTriggerRow](
     gets = List(
       (PgEventTriggerId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

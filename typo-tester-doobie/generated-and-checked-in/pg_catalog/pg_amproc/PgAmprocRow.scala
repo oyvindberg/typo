@@ -25,9 +25,9 @@ case class PgAmprocRow(
 )
 
 object PgAmprocRow {
-  implicit val decoder: Decoder[PgAmprocRow] = Decoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(PgAmprocRow.apply)(PgAmprocId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, TypoRegproc.decoder)
-  implicit val encoder: Encoder[PgAmprocRow] = Encoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(x => (x.oid, x.amprocfamily, x.amproclefttype, x.amprocrighttype, x.amprocnum, x.amproc))(PgAmprocId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, TypoRegproc.encoder)
-  implicit val read: Read[PgAmprocRow] = new Read[PgAmprocRow](
+  implicit lazy val decoder: Decoder[PgAmprocRow] = Decoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(PgAmprocRow.apply)(PgAmprocId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, TypoRegproc.decoder)
+  implicit lazy val encoder: Encoder[PgAmprocRow] = Encoder.forProduct6[PgAmprocRow, PgAmprocId, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, TypoRegproc]("oid", "amprocfamily", "amproclefttype", "amprocrighttype", "amprocnum", "amproc")(x => (x.oid, x.amprocfamily, x.amproclefttype, x.amprocrighttype, x.amprocnum, x.amproc))(PgAmprocId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, TypoRegproc.encoder)
+  implicit lazy val read: Read[PgAmprocRow] = new Read[PgAmprocRow](
     gets = List(
       (PgAmprocId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

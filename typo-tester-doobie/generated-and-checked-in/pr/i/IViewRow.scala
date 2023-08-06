@@ -28,9 +28,9 @@ case class IViewRow(
 )
 
 object IViewRow {
-  implicit val decoder: Decoder[IViewRow] = Decoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(IViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[IViewRow] = Encoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(x => (x.id, x.illustrationid, x.diagram, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[IViewRow] = new Read[IViewRow](
+  implicit lazy val decoder: Decoder[IViewRow] = Decoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(IViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[IViewRow] = Encoder.forProduct4[IViewRow, Option[Int], Option[IllustrationId], Option[TypoXml], Option[TypoLocalDateTime]]("id", "illustrationid", "diagram", "modifieddate")(x => (x.id, x.illustrationid, x.diagram, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[IViewRow] = new Read[IViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (IllustrationId.get, Nullability.Nullable),

@@ -18,12 +18,12 @@ import typo.dsl.Bijection
   */
 case class AccountNumber(value: String) extends AnyVal
 object AccountNumber {
-  implicit val arrayGet: Get[Array[AccountNumber]] = adventureworks.StringArrayMeta.get.map(_.map(AccountNumber.apply))
-  implicit val arrayPut: Put[Array[AccountNumber]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[AccountNumber, String] = Bijection[AccountNumber, String](_.value)(AccountNumber.apply)
-  implicit val decoder: Decoder[AccountNumber] = Decoder.decodeString.map(AccountNumber.apply)
-  implicit val encoder: Encoder[AccountNumber] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[AccountNumber] = Meta.StringMeta.get.map(AccountNumber.apply)
-  implicit val ordering: Ordering[AccountNumber] = Ordering.by(_.value)
-  implicit val put: Put[AccountNumber] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[AccountNumber]] = adventureworks.StringArrayMeta.get.map(_.map(AccountNumber.apply))
+  implicit lazy val arrayPut: Put[Array[AccountNumber]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[AccountNumber, String] = Bijection[AccountNumber, String](_.value)(AccountNumber.apply)
+  implicit lazy val decoder: Decoder[AccountNumber] = Decoder.decodeString.map(AccountNumber.apply)
+  implicit lazy val encoder: Encoder[AccountNumber] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[AccountNumber] = Meta.StringMeta.get.map(AccountNumber.apply)
+  implicit lazy val ordering: Ordering[AccountNumber] = Ordering.by(_.value)
+  implicit lazy val put: Put[AccountNumber] = Meta.StringMeta.put.contramap(_.value)
 }

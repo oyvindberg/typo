@@ -34,9 +34,9 @@ case class StoreRow(
 )
 
 object StoreRow {
-  implicit val decoder: Decoder[StoreRow] = Decoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(StoreRow.apply)(BusinessentityId.decoder, Name.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[StoreRow] = Encoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.name, x.salespersonid, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Name.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[StoreRow] = new Read[StoreRow](
+  implicit lazy val decoder: Decoder[StoreRow] = Decoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(StoreRow.apply)(BusinessentityId.decoder, Name.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[StoreRow] = Encoder.forProduct6[StoreRow, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], UUID, TypoLocalDateTime]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.name, x.salespersonid, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Name.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[StoreRow] = new Read[StoreRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

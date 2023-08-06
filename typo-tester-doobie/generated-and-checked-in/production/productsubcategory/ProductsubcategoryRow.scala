@@ -30,9 +30,9 @@ case class ProductsubcategoryRow(
 )
 
 object ProductsubcategoryRow {
-  implicit val decoder: Decoder[ProductsubcategoryRow] = Decoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(ProductsubcategoryRow.apply)(ProductsubcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ProductsubcategoryRow] = Encoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductsubcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[ProductsubcategoryRow] = new Read[ProductsubcategoryRow](
+  implicit lazy val decoder: Decoder[ProductsubcategoryRow] = Decoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(ProductsubcategoryRow.apply)(ProductsubcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductsubcategoryRow] = Encoder.forProduct5[ProductsubcategoryRow, ProductsubcategoryId, ProductcategoryId, Name, UUID, TypoLocalDateTime]("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productsubcategoryid, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductsubcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ProductsubcategoryRow] = new Read[ProductsubcategoryRow](
     gets = List(
       (ProductsubcategoryId.get, Nullability.NoNulls),
       (ProductcategoryId.get, Nullability.NoNulls),

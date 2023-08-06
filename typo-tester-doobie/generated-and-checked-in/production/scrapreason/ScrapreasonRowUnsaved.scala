@@ -37,6 +37,6 @@ case class ScrapreasonRowUnsaved(
     )
 }
 object ScrapreasonRowUnsaved {
-  implicit val decoder: Decoder[ScrapreasonRowUnsaved] = Decoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(ScrapreasonRowUnsaved.apply)(Name.decoder, Defaulted.decoder(ScrapreasonId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[ScrapreasonRowUnsaved] = Encoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(x => (x.name, x.scrapreasonid, x.modifieddate))(Name.encoder, Defaulted.encoder(ScrapreasonId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[ScrapreasonRowUnsaved] = Decoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(ScrapreasonRowUnsaved.apply)(Name.decoder, Defaulted.decoder(ScrapreasonId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[ScrapreasonRowUnsaved] = Encoder.forProduct3[ScrapreasonRowUnsaved, Name, Defaulted[ScrapreasonId], Defaulted[TypoLocalDateTime]]("name", "scrapreasonid", "modifieddate")(x => (x.name, x.scrapreasonid, x.modifieddate))(Name.encoder, Defaulted.encoder(ScrapreasonId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

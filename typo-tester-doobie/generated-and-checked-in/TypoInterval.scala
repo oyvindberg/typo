@@ -16,14 +16,14 @@ import org.postgresql.util.PGInterval
 case class TypoInterval(years: Int, months: Int, days: Int, hours: Int, minutes: Int, seconds: Double)
 
 object TypoInterval {
-  implicit val arrayGet: Get[Array[TypoInterval]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_interval"))
+  implicit lazy val arrayGet: Get[Array[TypoInterval]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_interval"))
     .map(_.map(v => TypoInterval(v.asInstanceOf[PGInterval].getYears, v.asInstanceOf[PGInterval].getMonths, v.asInstanceOf[PGInterval].getDays, v.asInstanceOf[PGInterval].getHours, v.asInstanceOf[PGInterval].getMinutes, v.asInstanceOf[PGInterval].getSeconds)))
-  implicit val arrayPut: Put[Array[TypoInterval]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_interval"), "interval")
+  implicit lazy val arrayPut: Put[Array[TypoInterval]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_interval"), "interval")
     .contramap(_.map(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))
-  implicit val decoder: Decoder[TypoInterval] = Decoder.forProduct6[TypoInterval, Int, Int, Int, Int, Int, Double]("years", "months", "days", "hours", "minutes", "seconds")(TypoInterval.apply)(Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeDouble)
-  implicit val encoder: Encoder[TypoInterval] = Encoder.forProduct6[TypoInterval, Int, Int, Int, Int, Int, Double]("years", "months", "days", "hours", "minutes", "seconds")(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))(Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeDouble)
-  implicit val get: Get[TypoInterval] = Get.Advanced.other[PGInterval](NonEmptyList.one("interval"))
+  implicit lazy val decoder: Decoder[TypoInterval] = Decoder.forProduct6[TypoInterval, Int, Int, Int, Int, Int, Double]("years", "months", "days", "hours", "minutes", "seconds")(TypoInterval.apply)(Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeDouble)
+  implicit lazy val encoder: Encoder[TypoInterval] = Encoder.forProduct6[TypoInterval, Int, Int, Int, Int, Int, Double]("years", "months", "days", "hours", "minutes", "seconds")(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))(Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeDouble)
+  implicit lazy val get: Get[TypoInterval] = Get.Advanced.other[PGInterval](NonEmptyList.one("interval"))
     .map(v => TypoInterval(v.getYears, v.getMonths, v.getDays, v.getHours, v.getMinutes, v.getSeconds))
-  implicit val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
-  implicit val put: Put[TypoInterval] = Put.Advanced.other[PGInterval](NonEmptyList.one("interval")).contramap(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds))
+  implicit lazy val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
+  implicit lazy val put: Put[TypoInterval] = Put.Advanced.other[PGInterval](NonEmptyList.one("interval")).contramap(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds))
 }

@@ -24,9 +24,9 @@ case class PgTransformRow(
 )
 
 object PgTransformRow {
-  implicit val decoder: Decoder[PgTransformRow] = Decoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(PgTransformRow.apply)(PgTransformId.decoder, Decoder.decodeLong, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder)
-  implicit val encoder: Encoder[PgTransformRow] = Encoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(x => (x.oid, x.trftype, x.trflang, x.trffromsql, x.trftosql))(PgTransformId.encoder, Encoder.encodeLong, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder)
-  implicit val read: Read[PgTransformRow] = new Read[PgTransformRow](
+  implicit lazy val decoder: Decoder[PgTransformRow] = Decoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(PgTransformRow.apply)(PgTransformId.decoder, Decoder.decodeLong, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder)
+  implicit lazy val encoder: Encoder[PgTransformRow] = Encoder.forProduct5[PgTransformRow, PgTransformId, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "trftype", "trflang", "trffromsql", "trftosql")(x => (x.oid, x.trftype, x.trflang, x.trffromsql, x.trftosql))(PgTransformId.encoder, Encoder.encodeLong, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder)
+  implicit lazy val read: Read[PgTransformRow] = new Read[PgTransformRow](
     gets = List(
       (PgTransformId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

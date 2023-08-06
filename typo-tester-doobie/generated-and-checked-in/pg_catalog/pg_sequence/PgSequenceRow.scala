@@ -26,9 +26,9 @@ case class PgSequenceRow(
 )
 
 object PgSequenceRow {
-  implicit val decoder: Decoder[PgSequenceRow] = Decoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(PgSequenceRow.apply)(PgSequenceId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean)
-  implicit val encoder: Encoder[PgSequenceRow] = Encoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(x => (x.seqrelid, x.seqtypid, x.seqstart, x.seqincrement, x.seqmax, x.seqmin, x.seqcache, x.seqcycle))(PgSequenceId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean)
-  implicit val read: Read[PgSequenceRow] = new Read[PgSequenceRow](
+  implicit lazy val decoder: Decoder[PgSequenceRow] = Decoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(PgSequenceRow.apply)(PgSequenceId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean)
+  implicit lazy val encoder: Encoder[PgSequenceRow] = Encoder.forProduct8[PgSequenceRow, PgSequenceId, /* oid */ Long, Long, Long, Long, Long, Long, Boolean]("seqrelid", "seqtypid", "seqstart", "seqincrement", "seqmax", "seqmin", "seqcache", "seqcycle")(x => (x.seqrelid, x.seqtypid, x.seqstart, x.seqincrement, x.seqmax, x.seqmin, x.seqcache, x.seqcycle))(PgSequenceId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean)
+  implicit lazy val read: Read[PgSequenceRow] = new Read[PgSequenceRow](
     gets = List(
       (PgSequenceId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

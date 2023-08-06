@@ -34,9 +34,9 @@ case class CustomerRow(
 )
 
 object CustomerRow {
-  implicit val decoder: Decoder[CustomerRow] = Decoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CustomerRow.apply)(CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[CustomerRow] = Encoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[CustomerRow] = new Read[CustomerRow](
+  implicit lazy val decoder: Decoder[CustomerRow] = Decoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CustomerRow.apply)(CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CustomerRow] = Encoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], UUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[CustomerRow] = new Read[CustomerRow](
     gets = List(
       (CustomerId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.Nullable),

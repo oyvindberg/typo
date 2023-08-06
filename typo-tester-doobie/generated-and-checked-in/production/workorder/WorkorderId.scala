@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.workorder` */
 case class WorkorderId(value: Int) extends AnyVal
 object WorkorderId {
-  implicit val arrayGet: Get[Array[WorkorderId]] = adventureworks.IntegerArrayMeta.get.map(_.map(WorkorderId.apply))
-  implicit val arrayPut: Put[Array[WorkorderId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[WorkorderId, Int] = Bijection[WorkorderId, Int](_.value)(WorkorderId.apply)
-  implicit val decoder: Decoder[WorkorderId] = Decoder.decodeInt.map(WorkorderId.apply)
-  implicit val encoder: Encoder[WorkorderId] = Encoder.encodeInt.contramap(_.value)
-  implicit val get: Get[WorkorderId] = Meta.IntMeta.get.map(WorkorderId.apply)
-  implicit val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
-  implicit val put: Put[WorkorderId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[WorkorderId]] = adventureworks.IntegerArrayMeta.get.map(_.map(WorkorderId.apply))
+  implicit lazy val arrayPut: Put[Array[WorkorderId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[WorkorderId, Int] = Bijection[WorkorderId, Int](_.value)(WorkorderId.apply)
+  implicit lazy val decoder: Decoder[WorkorderId] = Decoder.decodeInt.map(WorkorderId.apply)
+  implicit lazy val encoder: Encoder[WorkorderId] = Encoder.encodeInt.contramap(_.value)
+  implicit lazy val get: Get[WorkorderId] = Meta.IntMeta.get.map(WorkorderId.apply)
+  implicit lazy val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
+  implicit lazy val put: Put[WorkorderId] = Meta.IntMeta.put.contramap(_.value)
 }

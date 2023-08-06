@@ -24,9 +24,9 @@ case class PgCastRow(
 )
 
 object PgCastRow {
-  implicit val decoder: Decoder[PgCastRow] = Decoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(PgCastRow.apply)(PgCastId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString)
-  implicit val encoder: Encoder[PgCastRow] = Encoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(x => (x.oid, x.castsource, x.casttarget, x.castfunc, x.castcontext, x.castmethod))(PgCastId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString)
-  implicit val read: Read[PgCastRow] = new Read[PgCastRow](
+  implicit lazy val decoder: Decoder[PgCastRow] = Decoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(PgCastRow.apply)(PgCastId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PgCastRow] = Encoder.forProduct6[PgCastRow, PgCastId, /* oid */ Long, /* oid */ Long, /* oid */ Long, String, String]("oid", "castsource", "casttarget", "castfunc", "castcontext", "castmethod")(x => (x.oid, x.castsource, x.casttarget, x.castfunc, x.castcontext, x.castmethod))(PgCastId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString)
+  implicit lazy val read: Read[PgCastRow] = new Read[PgCastRow](
     gets = List(
       (PgCastId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

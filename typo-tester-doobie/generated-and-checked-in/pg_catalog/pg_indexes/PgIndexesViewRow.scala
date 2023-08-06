@@ -23,9 +23,9 @@ case class PgIndexesViewRow(
 )
 
 object PgIndexesViewRow {
-  implicit val decoder: Decoder[PgIndexesViewRow] = Decoder.forProduct5[PgIndexesViewRow, Option[String], Option[String], Option[String], Option[String], Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(PgIndexesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PgIndexesViewRow] = Encoder.forProduct5[PgIndexesViewRow, Option[String], Option[String], Option[String], Option[String], Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(x => (x.schemaname, x.tablename, x.indexname, x.tablespace, x.indexdef))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PgIndexesViewRow] = new Read[PgIndexesViewRow](
+  implicit lazy val decoder: Decoder[PgIndexesViewRow] = Decoder.forProduct5[PgIndexesViewRow, Option[String], Option[String], Option[String], Option[String], Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(PgIndexesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgIndexesViewRow] = Encoder.forProduct5[PgIndexesViewRow, Option[String], Option[String], Option[String], Option[String], Option[String]]("schemaname", "tablename", "indexname", "tablespace", "indexdef")(x => (x.schemaname, x.tablename, x.indexname, x.tablespace, x.indexdef))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PgIndexesViewRow] = new Read[PgIndexesViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

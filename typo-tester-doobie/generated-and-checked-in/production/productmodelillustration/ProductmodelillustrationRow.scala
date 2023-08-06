@@ -29,9 +29,9 @@ case class ProductmodelillustrationRow(
  }
 
 object ProductmodelillustrationRow {
-  implicit val decoder: Decoder[ProductmodelillustrationRow] = Decoder.forProduct3[ProductmodelillustrationRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(ProductmodelillustrationRow.apply)(ProductmodelId.decoder, IllustrationId.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ProductmodelillustrationRow] = Encoder.forProduct3[ProductmodelillustrationRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(ProductmodelId.encoder, IllustrationId.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[ProductmodelillustrationRow] = new Read[ProductmodelillustrationRow](
+  implicit lazy val decoder: Decoder[ProductmodelillustrationRow] = Decoder.forProduct3[ProductmodelillustrationRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(ProductmodelillustrationRow.apply)(ProductmodelId.decoder, IllustrationId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductmodelillustrationRow] = Encoder.forProduct3[ProductmodelillustrationRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(ProductmodelId.encoder, IllustrationId.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ProductmodelillustrationRow] = new Read[ProductmodelillustrationRow](
     gets = List(
       (ProductmodelId.get, Nullability.NoNulls),
       (IllustrationId.get, Nullability.NoNulls),

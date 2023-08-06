@@ -35,9 +35,9 @@ case class BusinessentityaddressRow(
  }
 
 object BusinessentityaddressRow {
-  implicit val decoder: Decoder[BusinessentityaddressRow] = Decoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BusinessentityaddressRow.apply)(BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[BusinessentityaddressRow] = Encoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[BusinessentityaddressRow] = new Read[BusinessentityaddressRow](
+  implicit lazy val decoder: Decoder[BusinessentityaddressRow] = Decoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BusinessentityaddressRow.apply)(BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BusinessentityaddressRow] = Encoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, UUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[BusinessentityaddressRow] = new Read[BusinessentityaddressRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (AddressId.get, Nullability.NoNulls),

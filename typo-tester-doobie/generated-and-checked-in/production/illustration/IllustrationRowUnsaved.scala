@@ -37,6 +37,6 @@ case class IllustrationRowUnsaved(
     )
 }
 object IllustrationRowUnsaved {
-  implicit val decoder: Decoder[IllustrationRowUnsaved] = Decoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(IllustrationRowUnsaved.apply)(Decoder.decodeOption(TypoXml.decoder), Defaulted.decoder(IllustrationId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[IllustrationRowUnsaved] = Encoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(x => (x.diagram, x.illustrationid, x.modifieddate))(Encoder.encodeOption(TypoXml.encoder), Defaulted.encoder(IllustrationId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[IllustrationRowUnsaved] = Decoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(IllustrationRowUnsaved.apply)(Decoder.decodeOption(TypoXml.decoder), Defaulted.decoder(IllustrationId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[IllustrationRowUnsaved] = Encoder.forProduct3[IllustrationRowUnsaved, Option[TypoXml], Defaulted[IllustrationId], Defaulted[TypoLocalDateTime]]("diagram", "illustrationid", "modifieddate")(x => (x.diagram, x.illustrationid, x.modifieddate))(Encoder.encodeOption(TypoXml.encoder), Defaulted.encoder(IllustrationId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

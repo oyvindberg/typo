@@ -22,9 +22,9 @@ case class PgViewsViewRow(
 )
 
 object PgViewsViewRow {
-  implicit val decoder: Decoder[PgViewsViewRow] = Decoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(PgViewsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PgViewsViewRow] = Encoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(x => (x.schemaname, x.viewname, x.viewowner, x.definition))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PgViewsViewRow] = new Read[PgViewsViewRow](
+  implicit lazy val decoder: Decoder[PgViewsViewRow] = Decoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(PgViewsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgViewsViewRow] = Encoder.forProduct4[PgViewsViewRow, Option[String], Option[String], Option[String], Option[String]]("schemaname", "viewname", "viewowner", "definition")(x => (x.schemaname, x.viewname, x.viewowner, x.definition))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PgViewsViewRow] = new Read[PgViewsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

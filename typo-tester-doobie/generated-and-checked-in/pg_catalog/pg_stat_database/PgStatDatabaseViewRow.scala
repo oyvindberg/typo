@@ -51,7 +51,7 @@ case class PgStatDatabaseViewRow(
 )
 
 object PgStatDatabaseViewRow {
-  implicit val decoder: Decoder[PgStatDatabaseViewRow] = Decoder.instanceTry[PgStatDatabaseViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgStatDatabaseViewRow] = Decoder.instanceTry[PgStatDatabaseViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -89,7 +89,7 @@ object PgStatDatabaseViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgStatDatabaseViewRow] = Encoder[PgStatDatabaseViewRow](row =>
+  implicit lazy val encoder: Encoder[PgStatDatabaseViewRow] = Encoder[PgStatDatabaseViewRow](row =>
     Json.obj(
       "datid" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.datid),
       "datname" -> Encoder.encodeOption(Encoder.encodeString).apply(row.datname),
@@ -121,7 +121,7 @@ object PgStatDatabaseViewRow {
       "stats_reset" -> Encoder.encodeOption(TypoOffsetDateTime.encoder).apply(row.statsReset)
     )
   )
-  implicit val read: Read[PgStatDatabaseViewRow] = new Read[PgStatDatabaseViewRow](
+  implicit lazy val read: Read[PgStatDatabaseViewRow] = new Read[PgStatDatabaseViewRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

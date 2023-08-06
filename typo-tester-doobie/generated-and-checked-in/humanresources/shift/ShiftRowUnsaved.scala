@@ -44,6 +44,6 @@ case class ShiftRowUnsaved(
     )
 }
 object ShiftRowUnsaved {
-  implicit val decoder: Decoder[ShiftRowUnsaved] = Decoder.forProduct5[ShiftRowUnsaved, Name, TypoLocalTime, TypoLocalTime, Defaulted[ShiftId], Defaulted[TypoLocalDateTime]]("name", "starttime", "endtime", "shiftid", "modifieddate")(ShiftRowUnsaved.apply)(Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, Defaulted.decoder(ShiftId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[ShiftRowUnsaved] = Encoder.forProduct5[ShiftRowUnsaved, Name, TypoLocalTime, TypoLocalTime, Defaulted[ShiftId], Defaulted[TypoLocalDateTime]]("name", "starttime", "endtime", "shiftid", "modifieddate")(x => (x.name, x.starttime, x.endtime, x.shiftid, x.modifieddate))(Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, Defaulted.encoder(ShiftId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[ShiftRowUnsaved] = Decoder.forProduct5[ShiftRowUnsaved, Name, TypoLocalTime, TypoLocalTime, Defaulted[ShiftId], Defaulted[TypoLocalDateTime]]("name", "starttime", "endtime", "shiftid", "modifieddate")(ShiftRowUnsaved.apply)(Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, Defaulted.decoder(ShiftId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[ShiftRowUnsaved] = Encoder.forProduct5[ShiftRowUnsaved, Name, TypoLocalTime, TypoLocalTime, Defaulted[ShiftId], Defaulted[TypoLocalDateTime]]("name", "starttime", "endtime", "shiftid", "modifieddate")(x => (x.name, x.starttime, x.endtime, x.shiftid, x.modifieddate))(Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, Defaulted.encoder(ShiftId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

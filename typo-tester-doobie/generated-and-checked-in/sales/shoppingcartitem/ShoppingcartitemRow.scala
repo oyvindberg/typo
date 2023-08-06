@@ -32,9 +32,9 @@ case class ShoppingcartitemRow(
 )
 
 object ShoppingcartitemRow {
-  implicit val decoder: Decoder[ShoppingcartitemRow] = Decoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(ShoppingcartitemRow.apply)(ShoppingcartitemId.decoder, Decoder.decodeString, Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ShoppingcartitemRow] = Encoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))(ShoppingcartitemId.encoder, Encoder.encodeString, Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[ShoppingcartitemRow] = new Read[ShoppingcartitemRow](
+  implicit lazy val decoder: Decoder[ShoppingcartitemRow] = Decoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(ShoppingcartitemRow.apply)(ShoppingcartitemId.decoder, Decoder.decodeString, Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ShoppingcartitemRow] = Encoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))(ShoppingcartitemId.encoder, Encoder.encodeString, Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ShoppingcartitemRow] = new Read[ShoppingcartitemRow](
     gets = List(
       (ShoppingcartitemId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

@@ -29,9 +29,9 @@ case class PmpdcViewRow(
 )
 
 object PmpdcViewRow {
-  implicit val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(ProductdescriptionId.decoder), Decoder.decodeOption(CultureId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(ProductdescriptionId.encoder), Encoder.encodeOption(CultureId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[PmpdcViewRow] = new Read[PmpdcViewRow](
+  implicit lazy val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(ProductdescriptionId.decoder), Decoder.decodeOption(CultureId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, Option[ProductmodelId], Option[ProductdescriptionId], Option[CultureId], Option[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(ProductdescriptionId.encoder), Encoder.encodeOption(CultureId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[PmpdcViewRow] = new Read[PmpdcViewRow](
     gets = List(
       (ProductmodelId.get, Nullability.Nullable),
       (ProductdescriptionId.get, Nullability.Nullable),

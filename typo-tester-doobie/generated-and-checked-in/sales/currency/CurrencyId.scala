@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `sales.currency` */
 case class CurrencyId(value: /* bpchar */ String) extends AnyVal
 object CurrencyId {
-  implicit val arrayGet: Get[Array[CurrencyId]] = adventureworks.StringArrayMeta.get.map(_.map(CurrencyId.apply))
-  implicit val arrayPut: Put[Array[CurrencyId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[CurrencyId, /* bpchar */ String] = Bijection[CurrencyId, /* bpchar */ String](_.value)(CurrencyId.apply)
-  implicit val decoder: Decoder[CurrencyId] = Decoder.decodeString.map(CurrencyId.apply)
-  implicit val encoder: Encoder[CurrencyId] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[CurrencyId] = Meta.StringMeta.get.map(CurrencyId.apply)
-  implicit val ordering: Ordering[CurrencyId] = Ordering.by(_.value)
-  implicit val put: Put[CurrencyId] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[CurrencyId]] = adventureworks.StringArrayMeta.get.map(_.map(CurrencyId.apply))
+  implicit lazy val arrayPut: Put[Array[CurrencyId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[CurrencyId, /* bpchar */ String] = Bijection[CurrencyId, /* bpchar */ String](_.value)(CurrencyId.apply)
+  implicit lazy val decoder: Decoder[CurrencyId] = Decoder.decodeString.map(CurrencyId.apply)
+  implicit lazy val encoder: Encoder[CurrencyId] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[CurrencyId] = Meta.StringMeta.get.map(CurrencyId.apply)
+  implicit lazy val ordering: Ordering[CurrencyId] = Ordering.by(_.value)
+  implicit lazy val put: Put[CurrencyId] = Meta.StringMeta.put.contramap(_.value)
 }

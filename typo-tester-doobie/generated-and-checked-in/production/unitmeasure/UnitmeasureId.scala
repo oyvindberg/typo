@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar */ String) extends AnyVal
 object UnitmeasureId {
-  implicit val arrayGet: Get[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.get.map(_.map(UnitmeasureId.apply))
-  implicit val arrayPut: Put[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[UnitmeasureId, /* bpchar */ String] = Bijection[UnitmeasureId, /* bpchar */ String](_.value)(UnitmeasureId.apply)
-  implicit val decoder: Decoder[UnitmeasureId] = Decoder.decodeString.map(UnitmeasureId.apply)
-  implicit val encoder: Encoder[UnitmeasureId] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[UnitmeasureId] = Meta.StringMeta.get.map(UnitmeasureId.apply)
-  implicit val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
-  implicit val put: Put[UnitmeasureId] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.get.map(_.map(UnitmeasureId.apply))
+  implicit lazy val arrayPut: Put[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[UnitmeasureId, /* bpchar */ String] = Bijection[UnitmeasureId, /* bpchar */ String](_.value)(UnitmeasureId.apply)
+  implicit lazy val decoder: Decoder[UnitmeasureId] = Decoder.decodeString.map(UnitmeasureId.apply)
+  implicit lazy val encoder: Encoder[UnitmeasureId] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[UnitmeasureId] = Meta.StringMeta.get.map(UnitmeasureId.apply)
+  implicit lazy val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
+  implicit lazy val put: Put[UnitmeasureId] = Meta.StringMeta.put.contramap(_.value)
 }

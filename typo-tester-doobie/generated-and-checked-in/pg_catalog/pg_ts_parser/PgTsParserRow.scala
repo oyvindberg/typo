@@ -27,9 +27,9 @@ case class PgTsParserRow(
 )
 
 object PgTsParserRow {
-  implicit val decoder: Decoder[PgTsParserRow] = Decoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(PgTsParserRow.apply)(PgTsParserId.decoder, Decoder.decodeString, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder)
-  implicit val encoder: Encoder[PgTsParserRow] = Encoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(x => (x.oid, x.prsname, x.prsnamespace, x.prsstart, x.prstoken, x.prsend, x.prsheadline, x.prslextype))(PgTsParserId.encoder, Encoder.encodeString, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder)
-  implicit val read: Read[PgTsParserRow] = new Read[PgTsParserRow](
+  implicit lazy val decoder: Decoder[PgTsParserRow] = Decoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(PgTsParserRow.apply)(PgTsParserId.decoder, Decoder.decodeString, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder, TypoRegproc.decoder)
+  implicit lazy val encoder: Encoder[PgTsParserRow] = Encoder.forProduct8[PgTsParserRow, PgTsParserId, String, /* oid */ Long, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc, TypoRegproc]("oid", "prsname", "prsnamespace", "prsstart", "prstoken", "prsend", "prsheadline", "prslextype")(x => (x.oid, x.prsname, x.prsnamespace, x.prsstart, x.prstoken, x.prsend, x.prsheadline, x.prslextype))(PgTsParserId.encoder, Encoder.encodeString, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder, TypoRegproc.encoder)
+  implicit lazy val read: Read[PgTsParserRow] = new Read[PgTsParserRow](
     gets = List(
       (PgTsParserId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

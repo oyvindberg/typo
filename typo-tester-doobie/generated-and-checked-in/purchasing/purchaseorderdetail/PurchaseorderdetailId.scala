@@ -14,7 +14,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `purchasing.purchaseorderdetail` */
 case class PurchaseorderdetailId(purchaseorderid: PurchaseorderheaderId, purchaseorderdetailid: Int)
 object PurchaseorderdetailId {
-  implicit val decoder: Decoder[PurchaseorderdetailId] = Decoder.forProduct2[PurchaseorderdetailId, PurchaseorderheaderId, Int]("purchaseorderid", "purchaseorderdetailid")(PurchaseorderdetailId.apply)(PurchaseorderheaderId.decoder, Decoder.decodeInt)
-  implicit val encoder: Encoder[PurchaseorderdetailId] = Encoder.forProduct2[PurchaseorderdetailId, PurchaseorderheaderId, Int]("purchaseorderid", "purchaseorderdetailid")(x => (x.purchaseorderid, x.purchaseorderdetailid))(PurchaseorderheaderId.encoder, Encoder.encodeInt)
-  implicit val ordering: Ordering[PurchaseorderdetailId] = Ordering.by(x => (x.purchaseorderid, x.purchaseorderdetailid))
+  implicit lazy val decoder: Decoder[PurchaseorderdetailId] = Decoder.forProduct2[PurchaseorderdetailId, PurchaseorderheaderId, Int]("purchaseorderid", "purchaseorderdetailid")(PurchaseorderdetailId.apply)(PurchaseorderheaderId.decoder, Decoder.decodeInt)
+  implicit lazy val encoder: Encoder[PurchaseorderdetailId] = Encoder.forProduct2[PurchaseorderdetailId, PurchaseorderheaderId, Int]("purchaseorderid", "purchaseorderdetailid")(x => (x.purchaseorderid, x.purchaseorderdetailid))(PurchaseorderheaderId.encoder, Encoder.encodeInt)
+  implicit lazy val ordering: Ordering[PurchaseorderdetailId] = Ordering.by(x => (x.purchaseorderid, x.purchaseorderdetailid))
 }

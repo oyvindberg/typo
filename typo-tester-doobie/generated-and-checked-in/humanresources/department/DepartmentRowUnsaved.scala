@@ -40,6 +40,6 @@ case class DepartmentRowUnsaved(
     )
 }
 object DepartmentRowUnsaved {
-  implicit val decoder: Decoder[DepartmentRowUnsaved] = Decoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(DepartmentRowUnsaved.apply)(Name.decoder, Name.decoder, Defaulted.decoder(DepartmentId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[DepartmentRowUnsaved] = Encoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(x => (x.name, x.groupname, x.departmentid, x.modifieddate))(Name.encoder, Name.encoder, Defaulted.encoder(DepartmentId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[DepartmentRowUnsaved] = Decoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(DepartmentRowUnsaved.apply)(Name.decoder, Name.decoder, Defaulted.decoder(DepartmentId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[DepartmentRowUnsaved] = Encoder.forProduct4[DepartmentRowUnsaved, Name, Name, Defaulted[DepartmentId], Defaulted[TypoLocalDateTime]]("name", "groupname", "departmentid", "modifieddate")(x => (x.name, x.groupname, x.departmentid, x.modifieddate))(Name.encoder, Name.encoder, Defaulted.encoder(DepartmentId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
 }

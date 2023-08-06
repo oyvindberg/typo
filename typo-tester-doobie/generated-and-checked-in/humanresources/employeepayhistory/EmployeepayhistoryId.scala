@@ -15,7 +15,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `humanresources.employeepayhistory` */
 case class EmployeepayhistoryId(businessentityid: BusinessentityId, ratechangedate: TypoLocalDateTime)
 object EmployeepayhistoryId {
-  implicit val decoder: Decoder[EmployeepayhistoryId] = Decoder.forProduct2[EmployeepayhistoryId, BusinessentityId, TypoLocalDateTime]("businessentityid", "ratechangedate")(EmployeepayhistoryId.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[EmployeepayhistoryId] = Encoder.forProduct2[EmployeepayhistoryId, BusinessentityId, TypoLocalDateTime]("businessentityid", "ratechangedate")(x => (x.businessentityid, x.ratechangedate))(BusinessentityId.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[EmployeepayhistoryId] = Decoder.forProduct2[EmployeepayhistoryId, BusinessentityId, TypoLocalDateTime]("businessentityid", "ratechangedate")(EmployeepayhistoryId.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[EmployeepayhistoryId] = Encoder.forProduct2[EmployeepayhistoryId, BusinessentityId, TypoLocalDateTime]("businessentityid", "ratechangedate")(x => (x.businessentityid, x.ratechangedate))(BusinessentityId.encoder, TypoLocalDateTime.encoder)
   implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[EmployeepayhistoryId] = Ordering.by(x => (x.businessentityid, x.ratechangedate))
 }

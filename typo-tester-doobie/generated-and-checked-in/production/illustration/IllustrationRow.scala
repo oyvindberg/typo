@@ -24,9 +24,9 @@ case class IllustrationRow(
 )
 
 object IllustrationRow {
-  implicit val decoder: Decoder[IllustrationRow] = Decoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(IllustrationRow.apply)(IllustrationId.decoder, Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[IllustrationRow] = Encoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(x => (x.illustrationid, x.diagram, x.modifieddate))(IllustrationId.encoder, Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
-  implicit val read: Read[IllustrationRow] = new Read[IllustrationRow](
+  implicit lazy val decoder: Decoder[IllustrationRow] = Decoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(IllustrationRow.apply)(IllustrationId.decoder, Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[IllustrationRow] = Encoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(x => (x.illustrationid, x.diagram, x.modifieddate))(IllustrationId.encoder, Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[IllustrationRow] = new Read[IllustrationRow](
     gets = List(
       (IllustrationId.get, Nullability.NoNulls),
       (TypoXml.get, Nullability.Nullable),

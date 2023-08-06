@@ -22,9 +22,9 @@ case class PgShmemAllocationsViewRow(
 )
 
 object PgShmemAllocationsViewRow {
-  implicit val decoder: Decoder[PgShmemAllocationsViewRow] = Decoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(PgShmemAllocationsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit val encoder: Encoder[PgShmemAllocationsViewRow] = Encoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(x => (x.name, x.off, x.size, x.allocatedSize))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
-  implicit val read: Read[PgShmemAllocationsViewRow] = new Read[PgShmemAllocationsViewRow](
+  implicit lazy val decoder: Decoder[PgShmemAllocationsViewRow] = Decoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(PgShmemAllocationsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgShmemAllocationsViewRow] = Encoder.forProduct4[PgShmemAllocationsViewRow, Option[String], Option[Long], Option[Long], Option[Long]]("name", "off", "size", "allocated_size")(x => (x.name, x.off, x.size, x.allocatedSize))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val read: Read[PgShmemAllocationsViewRow] = new Read[PgShmemAllocationsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),

@@ -127,7 +127,7 @@ case class ProductRowUnsaved(
     )
 }
 object ProductRowUnsaved {
-  implicit val decoder: Decoder[ProductRowUnsaved] = Decoder.instanceTry[ProductRowUnsaved]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[ProductRowUnsaved] = Decoder.instanceTry[ProductRowUnsaved]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -162,7 +162,7 @@ object ProductRowUnsaved {
       )
     }
   )
-  implicit val encoder: Encoder[ProductRowUnsaved] = Encoder[ProductRowUnsaved](row =>
+  implicit lazy val encoder: Encoder[ProductRowUnsaved] = Encoder[ProductRowUnsaved](row =>
     Json.obj(
       "name" -> Name.encoder.apply(row.name),
       "productnumber" -> Encoder.encodeString.apply(row.productnumber),

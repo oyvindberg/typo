@@ -24,9 +24,9 @@ case class SqlPartsRow(
 )
 
 object SqlPartsRow {
-  implicit val decoder: Decoder[SqlPartsRow] = Decoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(SqlPartsRow.apply)(Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit val encoder: Encoder[SqlPartsRow] = Encoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(x => (x.featureId, x.featureName, x.isSupported, x.isVerifiedBy, x.comments))(Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
-  implicit val read: Read[SqlPartsRow] = new Read[SqlPartsRow](
+  implicit lazy val decoder: Decoder[SqlPartsRow] = Decoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(SqlPartsRow.apply)(Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(YesOrNo.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit lazy val encoder: Encoder[SqlPartsRow] = Encoder.forProduct5[SqlPartsRow, Option[CharacterData], Option[CharacterData], Option[YesOrNo], Option[CharacterData], Option[CharacterData]]("feature_id", "feature_name", "is_supported", "is_verified_by", "comments")(x => (x.featureId, x.featureName, x.isSupported, x.isVerifiedBy, x.comments))(Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(YesOrNo.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val read: Read[SqlPartsRow] = new Read[SqlPartsRow](
     gets = List(
       (CharacterData.get, Nullability.Nullable),
       (CharacterData.get, Nullability.Nullable),

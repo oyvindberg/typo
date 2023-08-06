@@ -56,7 +56,7 @@ case class AttributesViewRow(
 )
 
 object AttributesViewRow {
-  implicit val decoder: Decoder[AttributesViewRow] = Decoder.instanceTry[AttributesViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[AttributesViewRow] = Decoder.instanceTry[AttributesViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -97,7 +97,7 @@ object AttributesViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[AttributesViewRow] = Encoder[AttributesViewRow](row =>
+  implicit lazy val encoder: Encoder[AttributesViewRow] = Encoder[AttributesViewRow](row =>
     Json.obj(
       "udt_catalog" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.udtCatalog),
       "udt_schema" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.udtSchema),
@@ -132,7 +132,7 @@ object AttributesViewRow {
       "is_derived_reference_attribute" -> Encoder.encodeOption(YesOrNo.encoder).apply(row.isDerivedReferenceAttribute)
     )
   )
-  implicit val read: Read[AttributesViewRow] = new Read[AttributesViewRow](
+  implicit lazy val read: Read[AttributesViewRow] = new Read[AttributesViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

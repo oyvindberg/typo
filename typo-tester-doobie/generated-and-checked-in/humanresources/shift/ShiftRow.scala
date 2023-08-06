@@ -29,9 +29,9 @@ case class ShiftRow(
 )
 
 object ShiftRow {
-  implicit val decoder: Decoder[ShiftRow] = Decoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(ShiftRow.apply)(ShiftId.decoder, Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ShiftRow] = Encoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(ShiftId.encoder, Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[ShiftRow] = new Read[ShiftRow](
+  implicit lazy val decoder: Decoder[ShiftRow] = Decoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(ShiftRow.apply)(ShiftId.decoder, Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ShiftRow] = Encoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(ShiftId.encoder, Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ShiftRow] = new Read[ShiftRow](
     gets = List(
       (ShiftId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

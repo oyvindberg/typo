@@ -23,9 +23,9 @@ case class PgDbRoleSettingRow(
  }
 
 object PgDbRoleSettingRow {
-  implicit val decoder: Decoder[PgDbRoleSettingRow] = Decoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(PgDbRoleSettingRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit val encoder: Encoder[PgDbRoleSettingRow] = Encoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(x => (x.setdatabase, x.setrole, x.setconfig))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
-  implicit val read: Read[PgDbRoleSettingRow] = new Read[PgDbRoleSettingRow](
+  implicit lazy val decoder: Decoder[PgDbRoleSettingRow] = Decoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(PgDbRoleSettingRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgDbRoleSettingRow] = Encoder.forProduct3[PgDbRoleSettingRow, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("setdatabase", "setrole", "setconfig")(x => (x.setdatabase, x.setrole, x.setconfig))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val read: Read[PgDbRoleSettingRow] = new Read[PgDbRoleSettingRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

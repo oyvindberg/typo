@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `person.stateprovince` */
 case class StateprovinceId(value: Int) extends AnyVal
 object StateprovinceId {
-  implicit val arrayGet: Get[Array[StateprovinceId]] = adventureworks.IntegerArrayMeta.get.map(_.map(StateprovinceId.apply))
-  implicit val arrayPut: Put[Array[StateprovinceId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[StateprovinceId, Int] = Bijection[StateprovinceId, Int](_.value)(StateprovinceId.apply)
-  implicit val decoder: Decoder[StateprovinceId] = Decoder.decodeInt.map(StateprovinceId.apply)
-  implicit val encoder: Encoder[StateprovinceId] = Encoder.encodeInt.contramap(_.value)
-  implicit val get: Get[StateprovinceId] = Meta.IntMeta.get.map(StateprovinceId.apply)
-  implicit val ordering: Ordering[StateprovinceId] = Ordering.by(_.value)
-  implicit val put: Put[StateprovinceId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[StateprovinceId]] = adventureworks.IntegerArrayMeta.get.map(_.map(StateprovinceId.apply))
+  implicit lazy val arrayPut: Put[Array[StateprovinceId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[StateprovinceId, Int] = Bijection[StateprovinceId, Int](_.value)(StateprovinceId.apply)
+  implicit lazy val decoder: Decoder[StateprovinceId] = Decoder.decodeInt.map(StateprovinceId.apply)
+  implicit lazy val encoder: Encoder[StateprovinceId] = Encoder.encodeInt.contramap(_.value)
+  implicit lazy val get: Get[StateprovinceId] = Meta.IntMeta.get.map(StateprovinceId.apply)
+  implicit lazy val ordering: Ordering[StateprovinceId] = Ordering.by(_.value)
+  implicit lazy val put: Put[StateprovinceId] = Meta.IntMeta.put.contramap(_.value)
 }

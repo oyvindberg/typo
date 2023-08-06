@@ -22,9 +22,9 @@ case class PgTimezoneAbbrevsViewRow(
 )
 
 object PgTimezoneAbbrevsViewRow {
-  implicit val decoder: Decoder[PgTimezoneAbbrevsViewRow] = Decoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(PgTimezoneAbbrevsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(Decoder.decodeBoolean))
-  implicit val encoder: Encoder[PgTimezoneAbbrevsViewRow] = Encoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(x => (x.abbrev, x.utcOffset, x.isDst))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(Encoder.encodeBoolean))
-  implicit val read: Read[PgTimezoneAbbrevsViewRow] = new Read[PgTimezoneAbbrevsViewRow](
+  implicit lazy val decoder: Decoder[PgTimezoneAbbrevsViewRow] = Decoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(PgTimezoneAbbrevsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(Decoder.decodeBoolean))
+  implicit lazy val encoder: Encoder[PgTimezoneAbbrevsViewRow] = Encoder.forProduct3[PgTimezoneAbbrevsViewRow, Option[String], Option[TypoInterval], Option[Boolean]]("abbrev", "utc_offset", "is_dst")(x => (x.abbrev, x.utcOffset, x.isDst))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(Encoder.encodeBoolean))
+  implicit lazy val read: Read[PgTimezoneAbbrevsViewRow] = new Read[PgTimezoneAbbrevsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (TypoInterval.get, Nullability.Nullable),

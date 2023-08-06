@@ -31,9 +31,9 @@ case class ShipmethodRow(
 )
 
 object ShipmethodRow {
-  implicit val decoder: Decoder[ShipmethodRow] = Decoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRow.apply)(ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ShipmethodRow] = Encoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[ShipmethodRow] = new Read[ShipmethodRow](
+  implicit lazy val decoder: Decoder[ShipmethodRow] = Decoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRow.apply)(ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ShipmethodRow] = Encoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, UUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ShipmethodRow] = new Read[ShipmethodRow](
     gets = List(
       (ShipmethodId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

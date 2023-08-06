@@ -81,7 +81,7 @@ case class PViewRow(
 )
 
 object PViewRow {
-  implicit val decoder: Decoder[PViewRow] = Decoder.instanceTry[PViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PViewRow] = Decoder.instanceTry[PViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -117,7 +117,7 @@ object PViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[PViewRow] = Encoder[PViewRow](row =>
+  implicit lazy val encoder: Encoder[PViewRow] = Encoder[PViewRow](row =>
     Json.obj(
       "id" -> Encoder.encodeOption(Encoder.encodeInt).apply(row.id),
       "productid" -> Encoder.encodeOption(ProductId.encoder).apply(row.productid),
@@ -147,7 +147,7 @@ object PViewRow {
       "modifieddate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.modifieddate)
     )
   )
-  implicit val read: Read[PViewRow] = new Read[PViewRow](
+  implicit lazy val read: Read[PViewRow] = new Read[PViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (ProductId.get, Nullability.Nullable),

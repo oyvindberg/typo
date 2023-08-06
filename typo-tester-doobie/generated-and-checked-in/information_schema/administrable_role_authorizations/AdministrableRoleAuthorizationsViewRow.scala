@@ -25,9 +25,9 @@ case class AdministrableRoleAuthorizationsViewRow(
 )
 
 object AdministrableRoleAuthorizationsViewRow {
-  implicit val decoder: Decoder[AdministrableRoleAuthorizationsViewRow] = Decoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(AdministrableRoleAuthorizationsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(YesOrNo.decoder))
-  implicit val encoder: Encoder[AdministrableRoleAuthorizationsViewRow] = Encoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(YesOrNo.encoder))
-  implicit val read: Read[AdministrableRoleAuthorizationsViewRow] = new Read[AdministrableRoleAuthorizationsViewRow](
+  implicit lazy val decoder: Decoder[AdministrableRoleAuthorizationsViewRow] = Decoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(AdministrableRoleAuthorizationsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(YesOrNo.decoder))
+  implicit lazy val encoder: Encoder[AdministrableRoleAuthorizationsViewRow] = Encoder.forProduct3[AdministrableRoleAuthorizationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[YesOrNo]]("grantee", "role_name", "is_grantable")(x => (x.grantee, x.roleName, x.isGrantable))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(YesOrNo.encoder))
+  implicit lazy val read: Read[AdministrableRoleAuthorizationsViewRow] = new Read[AdministrableRoleAuthorizationsViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

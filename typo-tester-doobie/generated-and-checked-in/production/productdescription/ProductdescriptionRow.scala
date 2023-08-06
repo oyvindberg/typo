@@ -26,9 +26,9 @@ case class ProductdescriptionRow(
 )
 
 object ProductdescriptionRow {
-  implicit val decoder: Decoder[ProductdescriptionRow] = Decoder.forProduct4[ProductdescriptionRow, ProductdescriptionId, /* max 400 chars */ String, UUID, TypoLocalDateTime]("productdescriptionid", "description", "rowguid", "modifieddate")(ProductdescriptionRow.apply)(ProductdescriptionId.decoder, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ProductdescriptionRow] = Encoder.forProduct4[ProductdescriptionRow, ProductdescriptionId, /* max 400 chars */ String, UUID, TypoLocalDateTime]("productdescriptionid", "description", "rowguid", "modifieddate")(x => (x.productdescriptionid, x.description, x.rowguid, x.modifieddate))(ProductdescriptionId.encoder, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[ProductdescriptionRow] = new Read[ProductdescriptionRow](
+  implicit lazy val decoder: Decoder[ProductdescriptionRow] = Decoder.forProduct4[ProductdescriptionRow, ProductdescriptionId, /* max 400 chars */ String, UUID, TypoLocalDateTime]("productdescriptionid", "description", "rowguid", "modifieddate")(ProductdescriptionRow.apply)(ProductdescriptionId.decoder, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductdescriptionRow] = Encoder.forProduct4[ProductdescriptionRow, ProductdescriptionId, /* max 400 chars */ String, UUID, TypoLocalDateTime]("productdescriptionid", "description", "rowguid", "modifieddate")(x => (x.productdescriptionid, x.description, x.rowguid, x.modifieddate))(ProductdescriptionId.encoder, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ProductdescriptionRow] = new Read[ProductdescriptionRow](
     gets = List(
       (ProductdescriptionId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

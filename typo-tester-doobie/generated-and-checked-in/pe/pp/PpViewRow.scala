@@ -31,9 +31,9 @@ case class PpViewRow(
 )
 
 object PpViewRow {
-  implicit val decoder: Decoder[PpViewRow] = Decoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PpViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(PhonenumbertypeId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PpViewRow] = Encoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.id, x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(PhonenumbertypeId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[PpViewRow] = new Read[PpViewRow](
+  implicit lazy val decoder: Decoder[PpViewRow] = Decoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PpViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(PhonenumbertypeId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PpViewRow] = Encoder.forProduct5[PpViewRow, Option[Int], Option[BusinessentityId], Option[Phone], Option[PhonenumbertypeId], Option[TypoLocalDateTime]]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.id, x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(PhonenumbertypeId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[PpViewRow] = new Read[PpViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (BusinessentityId.get, Nullability.Nullable),

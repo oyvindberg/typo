@@ -57,7 +57,7 @@ case class ParametersViewRow(
 )
 
 object ParametersViewRow {
-  implicit val decoder: Decoder[ParametersViewRow] = Decoder.instanceTry[ParametersViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[ParametersViewRow] = Decoder.instanceTry[ParametersViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -99,7 +99,7 @@ object ParametersViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[ParametersViewRow] = Encoder[ParametersViewRow](row =>
+  implicit lazy val encoder: Encoder[ParametersViewRow] = Encoder[ParametersViewRow](row =>
     Json.obj(
       "specific_catalog" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.specificCatalog),
       "specific_schema" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.specificSchema),
@@ -135,7 +135,7 @@ object ParametersViewRow {
       "parameter_default" -> Encoder.encodeOption(CharacterData.encoder).apply(row.parameterDefault)
     )
   )
-  implicit val read: Read[ParametersViewRow] = new Read[ParametersViewRow](
+  implicit lazy val read: Read[ParametersViewRow] = new Read[ParametersViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

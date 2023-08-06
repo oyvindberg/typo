@@ -31,9 +31,9 @@ case class SopViewRow(
 )
 
 object SopViewRow {
-  implicit val decoder: Decoder[SopViewRow] = Decoder.forProduct5[SopViewRow, Option[Int], Option[SpecialofferId], Option[ProductId], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "productid", "rowguid", "modifieddate")(SopViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SpecialofferId.decoder), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[SopViewRow] = Encoder.forProduct5[SopViewRow, Option[Int], Option[SpecialofferId], Option[ProductId], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "productid", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.productid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SpecialofferId.encoder), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[SopViewRow] = new Read[SopViewRow](
+  implicit lazy val decoder: Decoder[SopViewRow] = Decoder.forProduct5[SopViewRow, Option[Int], Option[SpecialofferId], Option[ProductId], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "productid", "rowguid", "modifieddate")(SopViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SpecialofferId.decoder), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[SopViewRow] = Encoder.forProduct5[SopViewRow, Option[Int], Option[SpecialofferId], Option[ProductId], Option[UUID], Option[TypoLocalDateTime]]("id", "specialofferid", "productid", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.productid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SpecialofferId.encoder), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[SopViewRow] = new Read[SopViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (SpecialofferId.get, Nullability.Nullable),

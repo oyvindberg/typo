@@ -58,7 +58,7 @@ case class PgClassRow(
 )
 
 object PgClassRow {
-  implicit val decoder: Decoder[PgClassRow] = Decoder.instanceTry[PgClassRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgClassRow] = Decoder.instanceTry[PgClassRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -101,7 +101,7 @@ object PgClassRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgClassRow] = Encoder[PgClassRow](row =>
+  implicit lazy val encoder: Encoder[PgClassRow] = Encoder[PgClassRow](row =>
     Json.obj(
       "oid" -> PgClassId.encoder.apply(row.oid),
       "relname" -> Encoder.encodeString.apply(row.relname),
@@ -138,7 +138,7 @@ object PgClassRow {
       "relpartbound" -> Encoder.encodeOption(TypoPgNodeTree.encoder).apply(row.relpartbound)
     )
   )
-  implicit val read: Read[PgClassRow] = new Read[PgClassRow](
+  implicit lazy val read: Read[PgClassRow] = new Read[PgClassRow](
     gets = List(
       (PgClassId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

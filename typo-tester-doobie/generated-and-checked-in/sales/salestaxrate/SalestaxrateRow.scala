@@ -35,9 +35,9 @@ case class SalestaxrateRow(
 )
 
 object SalestaxrateRow {
-  implicit val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)(SalestaxrateId.decoder, StateprovinceId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(SalestaxrateId.encoder, StateprovinceId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[SalestaxrateRow] = new Read[SalestaxrateRow](
+  implicit lazy val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)(SalestaxrateId.decoder, StateprovinceId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, Int, BigDecimal, Name, UUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(SalestaxrateId.encoder, StateprovinceId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[SalestaxrateRow] = new Read[SalestaxrateRow](
     gets = List(
       (SalestaxrateId.get, Nullability.NoNulls),
       (StateprovinceId.get, Nullability.NoNulls),

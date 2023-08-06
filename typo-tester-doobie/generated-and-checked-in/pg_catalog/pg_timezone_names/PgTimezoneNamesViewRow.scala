@@ -23,9 +23,9 @@ case class PgTimezoneNamesViewRow(
 )
 
 object PgTimezoneNamesViewRow {
-  implicit val decoder: Decoder[PgTimezoneNamesViewRow] = Decoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(PgTimezoneNamesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(Decoder.decodeBoolean))
-  implicit val encoder: Encoder[PgTimezoneNamesViewRow] = Encoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(x => (x.name, x.abbrev, x.utcOffset, x.isDst))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(Encoder.encodeBoolean))
-  implicit val read: Read[PgTimezoneNamesViewRow] = new Read[PgTimezoneNamesViewRow](
+  implicit lazy val decoder: Decoder[PgTimezoneNamesViewRow] = Decoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(PgTimezoneNamesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoInterval.decoder), Decoder.decodeOption(Decoder.decodeBoolean))
+  implicit lazy val encoder: Encoder[PgTimezoneNamesViewRow] = Encoder.forProduct4[PgTimezoneNamesViewRow, Option[String], Option[String], Option[TypoInterval], Option[Boolean]]("name", "abbrev", "utc_offset", "is_dst")(x => (x.name, x.abbrev, x.utcOffset, x.isDst))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoInterval.encoder), Encoder.encodeOption(Encoder.encodeBoolean))
+  implicit lazy val read: Read[PgTimezoneNamesViewRow] = new Read[PgTimezoneNamesViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

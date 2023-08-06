@@ -23,9 +23,9 @@ case class PgLargeobjectRow(
  }
 
 object PgLargeobjectRow {
-  implicit val decoder: Decoder[PgLargeobjectRow] = Decoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(PgLargeobjectRow.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly))
-  implicit val encoder: Encoder[PgLargeobjectRow] = Encoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(x => (x.loid, x.pageno, x.data))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly))
-  implicit val read: Read[PgLargeobjectRow] = new Read[PgLargeobjectRow](
+  implicit lazy val decoder: Decoder[PgLargeobjectRow] = Decoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(PgLargeobjectRow.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeArray[Byte](Decoder.decodeByte, implicitly))
+  implicit lazy val encoder: Encoder[PgLargeobjectRow] = Encoder.forProduct3[PgLargeobjectRow, /* oid */ Long, Int, Array[Byte]]("loid", "pageno", "data")(x => (x.loid, x.pageno, x.data))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeIterable[Byte, Array](Encoder.encodeByte, implicitly))
+  implicit lazy val read: Read[PgLargeobjectRow] = new Read[PgLargeobjectRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),

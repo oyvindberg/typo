@@ -18,12 +18,12 @@ import typo.dsl.Bijection
   */
 case class YesOrNo(value: String) extends AnyVal
 object YesOrNo {
-  implicit val arrayGet: Get[Array[YesOrNo]] = adventureworks.StringArrayMeta.get.map(_.map(YesOrNo.apply))
-  implicit val arrayPut: Put[Array[YesOrNo]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[YesOrNo, String] = Bijection[YesOrNo, String](_.value)(YesOrNo.apply)
-  implicit val decoder: Decoder[YesOrNo] = Decoder.decodeString.map(YesOrNo.apply)
-  implicit val encoder: Encoder[YesOrNo] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[YesOrNo] = Meta.StringMeta.get.map(YesOrNo.apply)
-  implicit val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
-  implicit val put: Put[YesOrNo] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[YesOrNo]] = adventureworks.StringArrayMeta.get.map(_.map(YesOrNo.apply))
+  implicit lazy val arrayPut: Put[Array[YesOrNo]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[YesOrNo, String] = Bijection[YesOrNo, String](_.value)(YesOrNo.apply)
+  implicit lazy val decoder: Decoder[YesOrNo] = Decoder.decodeString.map(YesOrNo.apply)
+  implicit lazy val encoder: Encoder[YesOrNo] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[YesOrNo] = Meta.StringMeta.get.map(YesOrNo.apply)
+  implicit lazy val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
+  implicit lazy val put: Put[YesOrNo] = Meta.StringMeta.put.contramap(_.value)
 }

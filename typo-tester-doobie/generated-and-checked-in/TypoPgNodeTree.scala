@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoPgNodeTree(value: String)
 
 object TypoPgNodeTree {
-  implicit val arrayGet: Get[Array[TypoPgNodeTree]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"))
+  implicit lazy val arrayGet: Get[Array[TypoPgNodeTree]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"))
     .map(_.map(v => TypoPgNodeTree(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoPgNodeTree]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"), "pg_node_tree")
+  implicit lazy val arrayPut: Put[Array[TypoPgNodeTree]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_pg_node_tree"), "pg_node_tree")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("pg_node_tree")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoPgNodeTree, String] = Bijection[TypoPgNodeTree, String](_.value)(TypoPgNodeTree.apply)
-  implicit val decoder: Decoder[TypoPgNodeTree] = Decoder.decodeString.map(TypoPgNodeTree.apply)
-  implicit val encoder: Encoder[TypoPgNodeTree] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoPgNodeTree] = Get.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree"))
+  implicit lazy val bijection: Bijection[TypoPgNodeTree, String] = Bijection[TypoPgNodeTree, String](_.value)(TypoPgNodeTree.apply)
+  implicit lazy val decoder: Decoder[TypoPgNodeTree] = Decoder.decodeString.map(TypoPgNodeTree.apply)
+  implicit lazy val encoder: Encoder[TypoPgNodeTree] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoPgNodeTree] = Get.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree"))
     .map(v => TypoPgNodeTree(v.getValue))
-  implicit val ordering: Ordering[TypoPgNodeTree] = Ordering.by(_.value)
-  implicit val put: Put[TypoPgNodeTree] = Put.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoPgNodeTree] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoPgNodeTree] = Put.Advanced.other[PGobject](NonEmptyList.one("pg_node_tree")).contramap(v => {
                                                                                   val obj = new PGobject
                                                                                   obj.setType("pg_node_tree")
                                                                                   obj.setValue(v.value)

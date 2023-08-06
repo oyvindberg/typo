@@ -15,7 +15,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `sales.personcreditcard` */
 case class PersoncreditcardId(businessentityid: BusinessentityId, creditcardid: CreditcardId)
 object PersoncreditcardId {
-  implicit val decoder: Decoder[PersoncreditcardId] = Decoder.forProduct2[PersoncreditcardId, BusinessentityId, CreditcardId]("businessentityid", "creditcardid")(PersoncreditcardId.apply)(BusinessentityId.decoder, CreditcardId.decoder)
-  implicit val encoder: Encoder[PersoncreditcardId] = Encoder.forProduct2[PersoncreditcardId, BusinessentityId, CreditcardId]("businessentityid", "creditcardid")(x => (x.businessentityid, x.creditcardid))(BusinessentityId.encoder, CreditcardId.encoder)
-  implicit val ordering: Ordering[PersoncreditcardId] = Ordering.by(x => (x.businessentityid, x.creditcardid))
+  implicit lazy val decoder: Decoder[PersoncreditcardId] = Decoder.forProduct2[PersoncreditcardId, BusinessentityId, CreditcardId]("businessentityid", "creditcardid")(PersoncreditcardId.apply)(BusinessentityId.decoder, CreditcardId.decoder)
+  implicit lazy val encoder: Encoder[PersoncreditcardId] = Encoder.forProduct2[PersoncreditcardId, BusinessentityId, CreditcardId]("businessentityid", "creditcardid")(x => (x.businessentityid, x.creditcardid))(BusinessentityId.encoder, CreditcardId.encoder)
+  implicit lazy val ordering: Ordering[PersoncreditcardId] = Ordering.by(x => (x.businessentityid, x.creditcardid))
 }

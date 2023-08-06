@@ -30,9 +30,9 @@ case class SrViewRow(
 )
 
 object SrViewRow {
-  implicit val decoder: Decoder[SrViewRow] = Decoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(SrViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SalesreasonId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[SrViewRow] = Encoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(x => (x.id, x.salesreasonid, x.name, x.reasontype, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SalesreasonId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[SrViewRow] = new Read[SrViewRow](
+  implicit lazy val decoder: Decoder[SrViewRow] = Decoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(SrViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(SalesreasonId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[SrViewRow] = Encoder.forProduct5[SrViewRow, Option[Int], Option[SalesreasonId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "salesreasonid", "name", "reasontype", "modifieddate")(x => (x.id, x.salesreasonid, x.name, x.reasontype, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(SalesreasonId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[SrViewRow] = new Read[SrViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (SalesreasonId.get, Nullability.Nullable),

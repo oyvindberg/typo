@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_event_trigger` */
 case class PgEventTriggerId(value: /* oid */ Long) extends AnyVal
 object PgEventTriggerId {
-  implicit val arrayGet: Get[Array[PgEventTriggerId]] = adventureworks.LongArrayMeta.get.map(_.map(PgEventTriggerId.apply))
-  implicit val arrayPut: Put[Array[PgEventTriggerId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgEventTriggerId, /* oid */ Long] = Bijection[PgEventTriggerId, /* oid */ Long](_.value)(PgEventTriggerId.apply)
-  implicit val decoder: Decoder[PgEventTriggerId] = Decoder.decodeLong.map(PgEventTriggerId.apply)
-  implicit val encoder: Encoder[PgEventTriggerId] = Encoder.encodeLong.contramap(_.value)
-  implicit val get: Get[PgEventTriggerId] = Meta.LongMeta.get.map(PgEventTriggerId.apply)
-  implicit val ordering: Ordering[PgEventTriggerId] = Ordering.by(_.value)
-  implicit val put: Put[PgEventTriggerId] = Meta.LongMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[PgEventTriggerId]] = adventureworks.LongArrayMeta.get.map(_.map(PgEventTriggerId.apply))
+  implicit lazy val arrayPut: Put[Array[PgEventTriggerId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgEventTriggerId, /* oid */ Long] = Bijection[PgEventTriggerId, /* oid */ Long](_.value)(PgEventTriggerId.apply)
+  implicit lazy val decoder: Decoder[PgEventTriggerId] = Decoder.decodeLong.map(PgEventTriggerId.apply)
+  implicit lazy val encoder: Encoder[PgEventTriggerId] = Encoder.encodeLong.contramap(_.value)
+  implicit lazy val get: Get[PgEventTriggerId] = Meta.LongMeta.get.map(PgEventTriggerId.apply)
+  implicit lazy val ordering: Ordering[PgEventTriggerId] = Ordering.by(_.value)
+  implicit lazy val put: Put[PgEventTriggerId] = Meta.LongMeta.put.contramap(_.value)
 }

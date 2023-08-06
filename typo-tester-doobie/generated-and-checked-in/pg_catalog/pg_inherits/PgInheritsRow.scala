@@ -24,9 +24,9 @@ case class PgInheritsRow(
  }
 
 object PgInheritsRow {
-  implicit val decoder: Decoder[PgInheritsRow] = Decoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(PgInheritsRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeBoolean)
-  implicit val encoder: Encoder[PgInheritsRow] = Encoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(x => (x.inhrelid, x.inhparent, x.inhseqno, x.inhdetachpending))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeBoolean)
-  implicit val read: Read[PgInheritsRow] = new Read[PgInheritsRow](
+  implicit lazy val decoder: Decoder[PgInheritsRow] = Decoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(PgInheritsRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeBoolean)
+  implicit lazy val encoder: Encoder[PgInheritsRow] = Encoder.forProduct4[PgInheritsRow, /* oid */ Long, /* oid */ Long, Int, Boolean]("inhrelid", "inhparent", "inhseqno", "inhdetachpending")(x => (x.inhrelid, x.inhparent, x.inhseqno, x.inhdetachpending))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeBoolean)
+  implicit lazy val read: Read[PgInheritsRow] = new Read[PgInheritsRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

@@ -29,9 +29,9 @@ case class LocationRow(
 )
 
 object LocationRow {
-  implicit val decoder: Decoder[LocationRow] = Decoder.forProduct5[LocationRow, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("locationid", "name", "costrate", "availability", "modifieddate")(LocationRow.apply)(LocationId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[LocationRow] = Encoder.forProduct5[LocationRow, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("locationid", "name", "costrate", "availability", "modifieddate")(x => (x.locationid, x.name, x.costrate, x.availability, x.modifieddate))(LocationId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit val read: Read[LocationRow] = new Read[LocationRow](
+  implicit lazy val decoder: Decoder[LocationRow] = Decoder.forProduct5[LocationRow, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("locationid", "name", "costrate", "availability", "modifieddate")(LocationRow.apply)(LocationId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[LocationRow] = Encoder.forProduct5[LocationRow, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("locationid", "name", "costrate", "availability", "modifieddate")(x => (x.locationid, x.name, x.costrate, x.availability, x.modifieddate))(LocationId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[LocationRow] = new Read[LocationRow](
     gets = List(
       (LocationId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

@@ -31,9 +31,9 @@ case class SpecialofferproductRow(
  }
 
 object SpecialofferproductRow {
-  implicit val decoder: Decoder[SpecialofferproductRow] = Decoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRow.apply)(SpecialofferId.decoder, ProductId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[SpecialofferproductRow] = Encoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))(SpecialofferId.encoder, ProductId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[SpecialofferproductRow] = new Read[SpecialofferproductRow](
+  implicit lazy val decoder: Decoder[SpecialofferproductRow] = Decoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRow.apply)(SpecialofferId.decoder, ProductId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SpecialofferproductRow] = Encoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, UUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))(SpecialofferId.encoder, ProductId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[SpecialofferproductRow] = new Read[SpecialofferproductRow](
     gets = List(
       (SpecialofferId.get, Nullability.NoNulls),
       (ProductId.get, Nullability.NoNulls),

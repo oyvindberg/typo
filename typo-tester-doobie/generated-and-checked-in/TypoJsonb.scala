@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoJsonb(value: String)
 
 object TypoJsonb {
-  implicit val arrayGet: Get[Array[TypoJsonb]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"))
+  implicit lazy val arrayGet: Get[Array[TypoJsonb]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"))
     .map(_.map(v => TypoJsonb(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoJsonb]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"), "jsonb")
+  implicit lazy val arrayPut: Put[Array[TypoJsonb]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"), "jsonb")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("jsonb")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoJsonb, String] = Bijection[TypoJsonb, String](_.value)(TypoJsonb.apply)
-  implicit val decoder: Decoder[TypoJsonb] = Decoder.decodeString.map(TypoJsonb.apply)
-  implicit val encoder: Encoder[TypoJsonb] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoJsonb] = Get.Advanced.other[PGobject](NonEmptyList.one("jsonb"))
+  implicit lazy val bijection: Bijection[TypoJsonb, String] = Bijection[TypoJsonb, String](_.value)(TypoJsonb.apply)
+  implicit lazy val decoder: Decoder[TypoJsonb] = Decoder.decodeString.map(TypoJsonb.apply)
+  implicit lazy val encoder: Encoder[TypoJsonb] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoJsonb] = Get.Advanced.other[PGobject](NonEmptyList.one("jsonb"))
     .map(v => TypoJsonb(v.getValue))
-  implicit val ordering: Ordering[TypoJsonb] = Ordering.by(_.value)
-  implicit val put: Put[TypoJsonb] = Put.Advanced.other[PGobject](NonEmptyList.one("jsonb")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoJsonb] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoJsonb] = Put.Advanced.other[PGobject](NonEmptyList.one("jsonb")).contramap(v => {
                                                                            val obj = new PGobject
                                                                            obj.setType("jsonb")
                                                                            obj.setValue(v.value)

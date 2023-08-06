@@ -24,9 +24,9 @@ case class PgTsTemplateRow(
 )
 
 object PgTsTemplateRow {
-  implicit val decoder: Decoder[PgTsTemplateRow] = Decoder.forProduct5[PgTsTemplateRow, PgTsTemplateId, String, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")(PgTsTemplateRow.apply)(PgTsTemplateId.decoder, Decoder.decodeString, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder)
-  implicit val encoder: Encoder[PgTsTemplateRow] = Encoder.forProduct5[PgTsTemplateRow, PgTsTemplateId, String, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")(x => (x.oid, x.tmplname, x.tmplnamespace, x.tmplinit, x.tmpllexize))(PgTsTemplateId.encoder, Encoder.encodeString, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder)
-  implicit val read: Read[PgTsTemplateRow] = new Read[PgTsTemplateRow](
+  implicit lazy val decoder: Decoder[PgTsTemplateRow] = Decoder.forProduct5[PgTsTemplateRow, PgTsTemplateId, String, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")(PgTsTemplateRow.apply)(PgTsTemplateId.decoder, Decoder.decodeString, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder)
+  implicit lazy val encoder: Encoder[PgTsTemplateRow] = Encoder.forProduct5[PgTsTemplateRow, PgTsTemplateId, String, /* oid */ Long, TypoRegproc, TypoRegproc]("oid", "tmplname", "tmplnamespace", "tmplinit", "tmpllexize")(x => (x.oid, x.tmplname, x.tmplnamespace, x.tmplinit, x.tmpllexize))(PgTsTemplateId.encoder, Encoder.encodeString, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder)
+  implicit lazy val read: Read[PgTsTemplateRow] = new Read[PgTsTemplateRow](
     gets = List(
       (PgTsTemplateId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

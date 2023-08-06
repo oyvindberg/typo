@@ -23,9 +23,9 @@ case class CollationsViewRow(
 )
 
 object CollationsViewRow {
-  implicit val decoder: Decoder[CollationsViewRow] = Decoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(CollationsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit val encoder: Encoder[CollationsViewRow] = Encoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.padAttribute))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
-  implicit val read: Read[CollationsViewRow] = new Read[CollationsViewRow](
+  implicit lazy val decoder: Decoder[CollationsViewRow] = Decoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(CollationsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit lazy val encoder: Encoder[CollationsViewRow] = Encoder.forProduct4[CollationsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier], Option[CharacterData]]("collation_catalog", "collation_schema", "collation_name", "pad_attribute")(x => (x.collationCatalog, x.collationSchema, x.collationName, x.padAttribute))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val read: Read[CollationsViewRow] = new Read[CollationsViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

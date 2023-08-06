@@ -18,12 +18,12 @@ import typo.dsl.Bijection
   */
 case class Phone(value: String) extends AnyVal
 object Phone {
-  implicit val arrayGet: Get[Array[Phone]] = adventureworks.StringArrayMeta.get.map(_.map(Phone.apply))
-  implicit val arrayPut: Put[Array[Phone]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[Phone, String] = Bijection[Phone, String](_.value)(Phone.apply)
-  implicit val decoder: Decoder[Phone] = Decoder.decodeString.map(Phone.apply)
-  implicit val encoder: Encoder[Phone] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[Phone] = Meta.StringMeta.get.map(Phone.apply)
-  implicit val ordering: Ordering[Phone] = Ordering.by(_.value)
-  implicit val put: Put[Phone] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[Phone]] = adventureworks.StringArrayMeta.get.map(_.map(Phone.apply))
+  implicit lazy val arrayPut: Put[Array[Phone]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[Phone, String] = Bijection[Phone, String](_.value)(Phone.apply)
+  implicit lazy val decoder: Decoder[Phone] = Decoder.decodeString.map(Phone.apply)
+  implicit lazy val encoder: Encoder[Phone] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[Phone] = Meta.StringMeta.get.map(Phone.apply)
+  implicit lazy val ordering: Ordering[Phone] = Ordering.by(_.value)
+  implicit lazy val put: Put[Phone] = Meta.StringMeta.put.contramap(_.value)
 }

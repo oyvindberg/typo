@@ -23,9 +23,9 @@ case class PgAttrdefRow(
 )
 
 object PgAttrdefRow {
-  implicit val decoder: Decoder[PgAttrdefRow] = Decoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(PgAttrdefRow.apply)(PgAttrdefId.decoder, Decoder.decodeLong, Decoder.decodeInt, TypoPgNodeTree.decoder)
-  implicit val encoder: Encoder[PgAttrdefRow] = Encoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(x => (x.oid, x.adrelid, x.adnum, x.adbin))(PgAttrdefId.encoder, Encoder.encodeLong, Encoder.encodeInt, TypoPgNodeTree.encoder)
-  implicit val read: Read[PgAttrdefRow] = new Read[PgAttrdefRow](
+  implicit lazy val decoder: Decoder[PgAttrdefRow] = Decoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(PgAttrdefRow.apply)(PgAttrdefId.decoder, Decoder.decodeLong, Decoder.decodeInt, TypoPgNodeTree.decoder)
+  implicit lazy val encoder: Encoder[PgAttrdefRow] = Encoder.forProduct4[PgAttrdefRow, PgAttrdefId, /* oid */ Long, Int, TypoPgNodeTree]("oid", "adrelid", "adnum", "adbin")(x => (x.oid, x.adrelid, x.adnum, x.adbin))(PgAttrdefId.encoder, Encoder.encodeLong, Encoder.encodeInt, TypoPgNodeTree.encoder)
+  implicit lazy val read: Read[PgAttrdefRow] = new Read[PgAttrdefRow](
     gets = List(
       (PgAttrdefId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

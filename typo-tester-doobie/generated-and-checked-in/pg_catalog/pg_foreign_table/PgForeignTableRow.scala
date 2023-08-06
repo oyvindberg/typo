@@ -21,9 +21,9 @@ case class PgForeignTableRow(
 )
 
 object PgForeignTableRow {
-  implicit val decoder: Decoder[PgForeignTableRow] = Decoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(PgForeignTableRow.apply)(PgForeignTableId.decoder, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit val encoder: Encoder[PgForeignTableRow] = Encoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(x => (x.ftrelid, x.ftserver, x.ftoptions))(PgForeignTableId.encoder, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
-  implicit val read: Read[PgForeignTableRow] = new Read[PgForeignTableRow](
+  implicit lazy val decoder: Decoder[PgForeignTableRow] = Decoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(PgForeignTableRow.apply)(PgForeignTableId.decoder, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgForeignTableRow] = Encoder.forProduct3[PgForeignTableRow, PgForeignTableId, /* oid */ Long, Option[Array[String]]]("ftrelid", "ftserver", "ftoptions")(x => (x.ftrelid, x.ftserver, x.ftoptions))(PgForeignTableId.encoder, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val read: Read[PgForeignTableRow] = new Read[PgForeignTableRow](
     gets = List(
       (PgForeignTableId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

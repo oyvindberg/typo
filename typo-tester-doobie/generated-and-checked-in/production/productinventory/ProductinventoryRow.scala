@@ -38,9 +38,9 @@ case class ProductinventoryRow(
  }
 
 object ProductinventoryRow {
-  implicit val decoder: Decoder[ProductinventoryRow] = Decoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(ProductinventoryRow.apply)(ProductId.decoder, LocationId.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ProductinventoryRow] = Encoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, LocationId.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[ProductinventoryRow] = new Read[ProductinventoryRow](
+  implicit lazy val decoder: Decoder[ProductinventoryRow] = Decoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(ProductinventoryRow.apply)(ProductId.decoder, LocationId.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductinventoryRow] = Encoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, Int, Int, UUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, LocationId.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ProductinventoryRow] = new Read[ProductinventoryRow](
     gets = List(
       (ProductId.get, Nullability.NoNulls),
       (LocationId.get, Nullability.NoNulls),

@@ -21,9 +21,9 @@ case class PgGroupViewRow(
 )
 
 object PgGroupViewRow {
-  implicit val decoder: Decoder[PgGroupViewRow] = Decoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(PgGroupViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))
-  implicit val encoder: Encoder[PgGroupViewRow] = Encoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(x => (x.groname, x.grosysid, x.grolist))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)))
-  implicit val read: Read[PgGroupViewRow] = new Read[PgGroupViewRow](
+  implicit lazy val decoder: Decoder[PgGroupViewRow] = Decoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(PgGroupViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))
+  implicit lazy val encoder: Encoder[PgGroupViewRow] = Encoder.forProduct3[PgGroupViewRow, Option[String], Option[/* oid */ Long], Option[Array[/* oid */ Long]]]("groname", "grosysid", "grolist")(x => (x.groname, x.grosysid, x.grolist))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)))
+  implicit lazy val read: Read[PgGroupViewRow] = new Read[PgGroupViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.LongMeta.get, Nullability.Nullable),

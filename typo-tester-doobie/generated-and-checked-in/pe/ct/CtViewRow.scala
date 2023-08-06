@@ -28,9 +28,9 @@ case class CtViewRow(
 )
 
 object CtViewRow {
-  implicit val decoder: Decoder[CtViewRow] = Decoder.forProduct4[CtViewRow, Option[Int], Option[ContacttypeId], Option[Name], Option[TypoLocalDateTime]]("id", "contacttypeid", "name", "modifieddate")(CtViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ContacttypeId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[CtViewRow] = Encoder.forProduct4[CtViewRow, Option[Int], Option[ContacttypeId], Option[Name], Option[TypoLocalDateTime]]("id", "contacttypeid", "name", "modifieddate")(x => (x.id, x.contacttypeid, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ContacttypeId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[CtViewRow] = new Read[CtViewRow](
+  implicit lazy val decoder: Decoder[CtViewRow] = Decoder.forProduct4[CtViewRow, Option[Int], Option[ContacttypeId], Option[Name], Option[TypoLocalDateTime]]("id", "contacttypeid", "name", "modifieddate")(CtViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ContacttypeId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[CtViewRow] = Encoder.forProduct4[CtViewRow, Option[Int], Option[ContacttypeId], Option[Name], Option[TypoLocalDateTime]]("id", "contacttypeid", "name", "modifieddate")(x => (x.id, x.contacttypeid, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ContacttypeId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[CtViewRow] = new Read[CtViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (ContacttypeId.get, Nullability.Nullable),

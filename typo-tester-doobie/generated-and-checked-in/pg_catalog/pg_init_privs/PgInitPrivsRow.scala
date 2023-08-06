@@ -26,9 +26,9 @@ case class PgInitPrivsRow(
  }
 
 object PgInitPrivsRow {
-  implicit val decoder: Decoder[PgInitPrivsRow] = Decoder.forProduct5[PgInitPrivsRow, /* oid */ Long, /* oid */ Long, Int, String, Array[TypoAclItem]]("objoid", "classoid", "objsubid", "privtype", "initprivs")(PgInitPrivsRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly))
-  implicit val encoder: Encoder[PgInitPrivsRow] = Encoder.forProduct5[PgInitPrivsRow, /* oid */ Long, /* oid */ Long, Int, String, Array[TypoAclItem]]("objoid", "classoid", "objsubid", "privtype", "initprivs")(x => (x.objoid, x.classoid, x.objsubid, x.privtype, x.initprivs))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly))
-  implicit val read: Read[PgInitPrivsRow] = new Read[PgInitPrivsRow](
+  implicit lazy val decoder: Decoder[PgInitPrivsRow] = Decoder.forProduct5[PgInitPrivsRow, /* oid */ Long, /* oid */ Long, Int, String, Array[TypoAclItem]]("objoid", "classoid", "objsubid", "privtype", "initprivs")(PgInitPrivsRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeString, Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly))
+  implicit lazy val encoder: Encoder[PgInitPrivsRow] = Encoder.forProduct5[PgInitPrivsRow, /* oid */ Long, /* oid */ Long, Int, String, Array[TypoAclItem]]("objoid", "classoid", "objsubid", "privtype", "initprivs")(x => (x.objoid, x.classoid, x.objsubid, x.privtype, x.initprivs))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeString, Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly))
+  implicit lazy val read: Read[PgInitPrivsRow] = new Read[PgInitPrivsRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

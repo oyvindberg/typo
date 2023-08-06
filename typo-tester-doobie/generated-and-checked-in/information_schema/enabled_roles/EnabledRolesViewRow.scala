@@ -19,9 +19,9 @@ case class EnabledRolesViewRow(
 )
 
 object EnabledRolesViewRow {
-  implicit val decoder: Decoder[EnabledRolesViewRow] = Decoder.forProduct1[EnabledRolesViewRow, Option[SqlIdentifier]]("role_name")(EnabledRolesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit val encoder: Encoder[EnabledRolesViewRow] = Encoder.forProduct1[EnabledRolesViewRow, Option[SqlIdentifier]]("role_name")(x => (x.roleName))(Encoder.encodeOption(SqlIdentifier.encoder))
-  implicit val read: Read[EnabledRolesViewRow] = new Read[EnabledRolesViewRow](
+  implicit lazy val decoder: Decoder[EnabledRolesViewRow] = Decoder.forProduct1[EnabledRolesViewRow, Option[SqlIdentifier]]("role_name")(EnabledRolesViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit lazy val encoder: Encoder[EnabledRolesViewRow] = Encoder.forProduct1[EnabledRolesViewRow, Option[SqlIdentifier]]("role_name")(x => (x.roleName))(Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val read: Read[EnabledRolesViewRow] = new Read[EnabledRolesViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable)
     ),

@@ -33,9 +33,9 @@ case class SViewRow(
 )
 
 object SViewRow {
-  implicit val decoder: Decoder[SViewRow] = Decoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(SViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ShiftId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalTime.decoder), Decoder.decodeOption(TypoLocalTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[SViewRow] = Encoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.id, x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ShiftId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalTime.encoder), Encoder.encodeOption(TypoLocalTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[SViewRow] = new Read[SViewRow](
+  implicit lazy val decoder: Decoder[SViewRow] = Decoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(SViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ShiftId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalTime.decoder), Decoder.decodeOption(TypoLocalTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[SViewRow] = Encoder.forProduct6[SViewRow, Option[Int], Option[ShiftId], Option[Name], Option[TypoLocalTime], Option[TypoLocalTime], Option[TypoLocalDateTime]]("id", "shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.id, x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ShiftId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalTime.encoder), Encoder.encodeOption(TypoLocalTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[SViewRow] = new Read[SViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (ShiftId.get, Nullability.Nullable),

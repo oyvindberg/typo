@@ -23,9 +23,9 @@ case class PgNamespaceRow(
 )
 
 object PgNamespaceRow {
-  implicit val decoder: Decoder[PgNamespaceRow] = Decoder.forProduct4[PgNamespaceRow, PgNamespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "nspname", "nspowner", "nspacl")(PgNamespaceRow.apply)(PgNamespaceId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)))
-  implicit val encoder: Encoder[PgNamespaceRow] = Encoder.forProduct4[PgNamespaceRow, PgNamespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "nspname", "nspowner", "nspacl")(x => (x.oid, x.nspname, x.nspowner, x.nspacl))(PgNamespaceId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)))
-  implicit val read: Read[PgNamespaceRow] = new Read[PgNamespaceRow](
+  implicit lazy val decoder: Decoder[PgNamespaceRow] = Decoder.forProduct4[PgNamespaceRow, PgNamespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "nspname", "nspowner", "nspacl")(PgNamespaceRow.apply)(PgNamespaceId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)))
+  implicit lazy val encoder: Encoder[PgNamespaceRow] = Encoder.forProduct4[PgNamespaceRow, PgNamespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "nspname", "nspowner", "nspacl")(x => (x.oid, x.nspname, x.nspowner, x.nspacl))(PgNamespaceId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)))
+  implicit lazy val read: Read[PgNamespaceRow] = new Read[PgNamespaceRow](
     gets = List(
       (PgNamespaceId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

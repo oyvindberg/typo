@@ -32,9 +32,9 @@ case class SalespersonquotahistoryRow(
  }
 
 object SalespersonquotahistoryRow {
-  implicit val decoder: Decoder[SalespersonquotahistoryRow] = Decoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SalespersonquotahistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[SalespersonquotahistoryRow] = Encoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[SalespersonquotahistoryRow] = new Read[SalespersonquotahistoryRow](
+  implicit lazy val decoder: Decoder[SalespersonquotahistoryRow] = Decoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SalespersonquotahistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[SalespersonquotahistoryRow] = Encoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, UUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[SalespersonquotahistoryRow] = new Read[SalespersonquotahistoryRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),

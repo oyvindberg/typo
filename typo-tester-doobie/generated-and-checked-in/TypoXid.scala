@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoXid(value: String)
 
 object TypoXid {
-  implicit val arrayGet: Get[Array[TypoXid]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_xid"))
+  implicit lazy val arrayGet: Get[Array[TypoXid]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_xid"))
     .map(_.map(v => TypoXid(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoXid]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_xid"), "xid")
+  implicit lazy val arrayPut: Put[Array[TypoXid]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_xid"), "xid")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("xid")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoXid, String] = Bijection[TypoXid, String](_.value)(TypoXid.apply)
-  implicit val decoder: Decoder[TypoXid] = Decoder.decodeString.map(TypoXid.apply)
-  implicit val encoder: Encoder[TypoXid] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoXid] = Get.Advanced.other[PGobject](NonEmptyList.one("xid"))
+  implicit lazy val bijection: Bijection[TypoXid, String] = Bijection[TypoXid, String](_.value)(TypoXid.apply)
+  implicit lazy val decoder: Decoder[TypoXid] = Decoder.decodeString.map(TypoXid.apply)
+  implicit lazy val encoder: Encoder[TypoXid] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoXid] = Get.Advanced.other[PGobject](NonEmptyList.one("xid"))
     .map(v => TypoXid(v.getValue))
-  implicit val ordering: Ordering[TypoXid] = Ordering.by(_.value)
-  implicit val put: Put[TypoXid] = Put.Advanced.other[PGobject](NonEmptyList.one("xid")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoXid] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoXid] = Put.Advanced.other[PGobject](NonEmptyList.one("xid")).contramap(v => {
                                                                          val obj = new PGobject
                                                                          obj.setType("xid")
                                                                          obj.setValue(v.value)

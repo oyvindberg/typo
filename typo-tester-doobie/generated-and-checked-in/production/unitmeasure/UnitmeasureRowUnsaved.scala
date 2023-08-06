@@ -33,6 +33,6 @@ case class UnitmeasureRowUnsaved(
     )
 }
 object UnitmeasureRowUnsaved {
-  implicit val decoder: Decoder[UnitmeasureRowUnsaved] = Decoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRowUnsaved.apply)(UnitmeasureId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[UnitmeasureRowUnsaved] = Encoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))(UnitmeasureId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[UnitmeasureRowUnsaved] = Decoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRowUnsaved.apply)(UnitmeasureId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[UnitmeasureRowUnsaved] = Encoder.forProduct3[UnitmeasureRowUnsaved, UnitmeasureId, Name, Defaulted[TypoLocalDateTime]]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))(UnitmeasureId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }

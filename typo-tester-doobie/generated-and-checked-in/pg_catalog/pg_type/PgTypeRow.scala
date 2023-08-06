@@ -57,7 +57,7 @@ case class PgTypeRow(
 )
 
 object PgTypeRow {
-  implicit val decoder: Decoder[PgTypeRow] = Decoder.instanceTry[PgTypeRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgTypeRow] = Decoder.instanceTry[PgTypeRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -99,7 +99,7 @@ object PgTypeRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgTypeRow] = Encoder[PgTypeRow](row =>
+  implicit lazy val encoder: Encoder[PgTypeRow] = Encoder[PgTypeRow](row =>
     Json.obj(
       "oid" -> PgTypeId.encoder.apply(row.oid),
       "typname" -> Encoder.encodeString.apply(row.typname),
@@ -135,7 +135,7 @@ object PgTypeRow {
       "typacl" -> Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)).apply(row.typacl)
     )
   )
-  implicit val read: Read[PgTypeRow] = new Read[PgTypeRow](
+  implicit lazy val read: Read[PgTypeRow] = new Read[PgTypeRow](
     gets = List(
       (PgTypeId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

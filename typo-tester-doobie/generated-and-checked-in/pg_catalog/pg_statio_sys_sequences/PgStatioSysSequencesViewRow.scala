@@ -28,9 +28,9 @@ case class PgStatioSysSequencesViewRow(
 )
 
 object PgStatioSysSequencesViewRow {
-  implicit val decoder: Decoder[PgStatioSysSequencesViewRow] = Decoder.forProduct5[PgStatioSysSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioSysSequencesViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit val encoder: Encoder[PgStatioSysSequencesViewRow] = Encoder.forProduct5[PgStatioSysSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
-  implicit val read: Read[PgStatioSysSequencesViewRow] = new Read[PgStatioSysSequencesViewRow](
+  implicit lazy val decoder: Decoder[PgStatioSysSequencesViewRow] = Decoder.forProduct5[PgStatioSysSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(PgStatioSysSequencesViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgStatioSysSequencesViewRow] = Encoder.forProduct5[PgStatioSysSequencesViewRow, Option[/* oid */ Long], Option[String], Option[String], Option[Long], Option[Long]]("relid", "schemaname", "relname", "blks_read", "blks_hit")(x => (x.relid, x.schemaname, x.relname, x.blksRead, x.blksHit))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val read: Read[PgStatioSysSequencesViewRow] = new Read[PgStatioSysSequencesViewRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

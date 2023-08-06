@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoRegtype(value: String)
 
 object TypoRegtype {
-  implicit val arrayGet: Get[Array[TypoRegtype]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_regtype"))
+  implicit lazy val arrayGet: Get[Array[TypoRegtype]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_regtype"))
     .map(_.map(v => TypoRegtype(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoRegtype]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_regtype"), "regtype")
+  implicit lazy val arrayPut: Put[Array[TypoRegtype]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_regtype"), "regtype")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("regtype")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoRegtype, String] = Bijection[TypoRegtype, String](_.value)(TypoRegtype.apply)
-  implicit val decoder: Decoder[TypoRegtype] = Decoder.decodeString.map(TypoRegtype.apply)
-  implicit val encoder: Encoder[TypoRegtype] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoRegtype] = Get.Advanced.other[PGobject](NonEmptyList.one("regtype"))
+  implicit lazy val bijection: Bijection[TypoRegtype, String] = Bijection[TypoRegtype, String](_.value)(TypoRegtype.apply)
+  implicit lazy val decoder: Decoder[TypoRegtype] = Decoder.decodeString.map(TypoRegtype.apply)
+  implicit lazy val encoder: Encoder[TypoRegtype] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoRegtype] = Get.Advanced.other[PGobject](NonEmptyList.one("regtype"))
     .map(v => TypoRegtype(v.getValue))
-  implicit val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)
-  implicit val put: Put[TypoRegtype] = Put.Advanced.other[PGobject](NonEmptyList.one("regtype")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoRegtype] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoRegtype] = Put.Advanced.other[PGobject](NonEmptyList.one("regtype")).contramap(v => {
                                                                              val obj = new PGobject
                                                                              obj.setType("regtype")
                                                                              obj.setValue(v.value)

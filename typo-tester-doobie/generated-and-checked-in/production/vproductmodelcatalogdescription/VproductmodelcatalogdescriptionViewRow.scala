@@ -55,7 +55,7 @@ case class VproductmodelcatalogdescriptionViewRow(
 )
 
 object VproductmodelcatalogdescriptionViewRow {
-  implicit val decoder: Decoder[VproductmodelcatalogdescriptionViewRow] = Decoder.instanceTry[VproductmodelcatalogdescriptionViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[VproductmodelcatalogdescriptionViewRow] = Decoder.instanceTry[VproductmodelcatalogdescriptionViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -90,7 +90,7 @@ object VproductmodelcatalogdescriptionViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[VproductmodelcatalogdescriptionViewRow] = Encoder[VproductmodelcatalogdescriptionViewRow](row =>
+  implicit lazy val encoder: Encoder[VproductmodelcatalogdescriptionViewRow] = Encoder[VproductmodelcatalogdescriptionViewRow](row =>
     Json.obj(
       "productmodelid" -> Encoder.encodeOption(ProductmodelId.encoder).apply(row.productmodelid),
       "name" -> Encoder.encodeOption(Name.encoder).apply(row.name),
@@ -119,7 +119,7 @@ object VproductmodelcatalogdescriptionViewRow {
       "modifieddate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.modifieddate)
     )
   )
-  implicit val read: Read[VproductmodelcatalogdescriptionViewRow] = new Read[VproductmodelcatalogdescriptionViewRow](
+  implicit lazy val read: Read[VproductmodelcatalogdescriptionViewRow] = new Read[VproductmodelcatalogdescriptionViewRow](
     gets = List(
       (ProductmodelId.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),

@@ -36,6 +36,6 @@ case class PersoncreditcardRowUnsaved(
     )
 }
 object PersoncreditcardRowUnsaved {
-  implicit val decoder: Decoder[PersoncreditcardRowUnsaved] = Decoder.forProduct3[PersoncreditcardRowUnsaved, BusinessentityId, CreditcardId, Defaulted[TypoLocalDateTime]]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRowUnsaved.apply)(BusinessentityId.decoder, CreditcardId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PersoncreditcardRowUnsaved] = Encoder.forProduct3[PersoncreditcardRowUnsaved, BusinessentityId, CreditcardId, Defaulted[TypoLocalDateTime]]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CreditcardId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[PersoncreditcardRowUnsaved] = Decoder.forProduct3[PersoncreditcardRowUnsaved, BusinessentityId, CreditcardId, Defaulted[TypoLocalDateTime]]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRowUnsaved.apply)(BusinessentityId.decoder, CreditcardId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PersoncreditcardRowUnsaved] = Encoder.forProduct3[PersoncreditcardRowUnsaved, BusinessentityId, CreditcardId, Defaulted[TypoLocalDateTime]]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CreditcardId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }

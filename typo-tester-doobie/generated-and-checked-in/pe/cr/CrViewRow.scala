@@ -26,9 +26,9 @@ case class CrViewRow(
 )
 
 object CrViewRow {
-  implicit val decoder: Decoder[CrViewRow] = Decoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(CrViewRow.apply)(Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[CrViewRow] = Encoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[CrViewRow] = new Read[CrViewRow](
+  implicit lazy val decoder: Decoder[CrViewRow] = Decoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(CrViewRow.apply)(Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[CrViewRow] = Encoder.forProduct3[CrViewRow, Option[CountryregionId], Option[Name], Option[TypoLocalDateTime]]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[CrViewRow] = new Read[CrViewRow](
     gets = List(
       (CountryregionId.get, Nullability.Nullable),
       (Name.get, Nullability.Nullable),

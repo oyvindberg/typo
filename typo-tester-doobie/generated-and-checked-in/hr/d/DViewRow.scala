@@ -30,9 +30,9 @@ case class DViewRow(
 )
 
 object DViewRow {
-  implicit val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(DepartmentId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(DepartmentId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[DViewRow] = new Read[DViewRow](
+  implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(DepartmentId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, Option[Int], Option[DepartmentId], Option[Name], Option[Name], Option[TypoLocalDateTime]]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(DepartmentId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[DViewRow] = new Read[DViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (DepartmentId.get, Nullability.Nullable),

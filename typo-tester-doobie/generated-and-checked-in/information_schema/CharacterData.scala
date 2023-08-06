@@ -18,12 +18,12 @@ import typo.dsl.Bijection
   */
 case class CharacterData(value: String) extends AnyVal
 object CharacterData {
-  implicit val arrayGet: Get[Array[CharacterData]] = adventureworks.StringArrayMeta.get.map(_.map(CharacterData.apply))
-  implicit val arrayPut: Put[Array[CharacterData]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[CharacterData, String] = Bijection[CharacterData, String](_.value)(CharacterData.apply)
-  implicit val decoder: Decoder[CharacterData] = Decoder.decodeString.map(CharacterData.apply)
-  implicit val encoder: Encoder[CharacterData] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[CharacterData] = Meta.StringMeta.get.map(CharacterData.apply)
-  implicit val ordering: Ordering[CharacterData] = Ordering.by(_.value)
-  implicit val put: Put[CharacterData] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[CharacterData]] = adventureworks.StringArrayMeta.get.map(_.map(CharacterData.apply))
+  implicit lazy val arrayPut: Put[Array[CharacterData]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[CharacterData, String] = Bijection[CharacterData, String](_.value)(CharacterData.apply)
+  implicit lazy val decoder: Decoder[CharacterData] = Decoder.decodeString.map(CharacterData.apply)
+  implicit lazy val encoder: Encoder[CharacterData] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[CharacterData] = Meta.StringMeta.get.map(CharacterData.apply)
+  implicit lazy val ordering: Ordering[CharacterData] = Ordering.by(_.value)
+  implicit lazy val put: Put[CharacterData] = Meta.StringMeta.put.contramap(_.value)
 }

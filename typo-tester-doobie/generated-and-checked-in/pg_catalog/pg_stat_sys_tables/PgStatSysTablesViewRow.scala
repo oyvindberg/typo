@@ -69,7 +69,7 @@ case class PgStatSysTablesViewRow(
 )
 
 object PgStatSysTablesViewRow {
-  implicit val decoder: Decoder[PgStatSysTablesViewRow] = Decoder.instanceTry[PgStatSysTablesViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgStatSysTablesViewRow] = Decoder.instanceTry[PgStatSysTablesViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -102,7 +102,7 @@ object PgStatSysTablesViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgStatSysTablesViewRow] = Encoder[PgStatSysTablesViewRow](row =>
+  implicit lazy val encoder: Encoder[PgStatSysTablesViewRow] = Encoder[PgStatSysTablesViewRow](row =>
     Json.obj(
       "relid" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.relid),
       "schemaname" -> Encoder.encodeOption(Encoder.encodeString).apply(row.schemaname),
@@ -129,7 +129,7 @@ object PgStatSysTablesViewRow {
       "autoanalyze_count" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.autoanalyzeCount)
     )
   )
-  implicit val read: Read[PgStatSysTablesViewRow] = new Read[PgStatSysTablesViewRow](
+  implicit lazy val read: Read[PgStatSysTablesViewRow] = new Read[PgStatSysTablesViewRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

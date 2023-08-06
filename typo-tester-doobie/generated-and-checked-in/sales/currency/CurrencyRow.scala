@@ -24,9 +24,9 @@ case class CurrencyRow(
 )
 
 object CurrencyRow {
-  implicit val decoder: Decoder[CurrencyRow] = Decoder.forProduct3[CurrencyRow, CurrencyId, Name, TypoLocalDateTime]("currencycode", "name", "modifieddate")(CurrencyRow.apply)(CurrencyId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[CurrencyRow] = Encoder.forProduct3[CurrencyRow, CurrencyId, Name, TypoLocalDateTime]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))(CurrencyId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[CurrencyRow] = new Read[CurrencyRow](
+  implicit lazy val decoder: Decoder[CurrencyRow] = Decoder.forProduct3[CurrencyRow, CurrencyId, Name, TypoLocalDateTime]("currencycode", "name", "modifieddate")(CurrencyRow.apply)(CurrencyId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CurrencyRow] = Encoder.forProduct3[CurrencyRow, CurrencyId, Name, TypoLocalDateTime]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))(CurrencyId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[CurrencyRow] = new Read[CurrencyRow](
     gets = List(
       (CurrencyId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

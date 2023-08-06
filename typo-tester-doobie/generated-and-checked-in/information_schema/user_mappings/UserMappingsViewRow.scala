@@ -24,9 +24,9 @@ case class UserMappingsViewRow(
 )
 
 object UserMappingsViewRow {
-  implicit val decoder: Decoder[UserMappingsViewRow] = Decoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(UserMappingsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit val encoder: Encoder[UserMappingsViewRow] = Encoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
-  implicit val read: Read[UserMappingsViewRow] = new Read[UserMappingsViewRow](
+  implicit lazy val decoder: Decoder[UserMappingsViewRow] = Decoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(UserMappingsViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder), Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit lazy val encoder: Encoder[UserMappingsViewRow] = Encoder.forProduct3[UserMappingsViewRow, Option[SqlIdentifier], Option[SqlIdentifier], Option[SqlIdentifier]]("authorization_identifier", "foreign_server_catalog", "foreign_server_name")(x => (x.authorizationIdentifier, x.foreignServerCatalog, x.foreignServerName))(Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder), Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val read: Read[UserMappingsViewRow] = new Read[UserMappingsViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

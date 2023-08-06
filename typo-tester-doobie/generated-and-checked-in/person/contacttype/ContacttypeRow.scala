@@ -24,9 +24,9 @@ case class ContacttypeRow(
 )
 
 object ContacttypeRow {
-  implicit val decoder: Decoder[ContacttypeRow] = Decoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(ContacttypeRow.apply)(ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ContacttypeRow] = Encoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(x => (x.contacttypeid, x.name, x.modifieddate))(ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[ContacttypeRow] = new Read[ContacttypeRow](
+  implicit lazy val decoder: Decoder[ContacttypeRow] = Decoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(ContacttypeRow.apply)(ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ContacttypeRow] = Encoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(x => (x.contacttypeid, x.name, x.modifieddate))(ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ContacttypeRow] = new Read[ContacttypeRow](
     gets = List(
       (ContacttypeId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

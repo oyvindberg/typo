@@ -26,9 +26,9 @@ case class CrcViewRow(
 )
 
 object CrcViewRow {
-  implicit val decoder: Decoder[CrcViewRow] = Decoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CrcViewRow.apply)(Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[CrcViewRow] = Encoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[CrcViewRow] = new Read[CrcViewRow](
+  implicit lazy val decoder: Decoder[CrcViewRow] = Decoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CrcViewRow.apply)(Decoder.decodeOption(CountryregionId.decoder), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[CrcViewRow] = Encoder.forProduct3[CrcViewRow, Option[CountryregionId], Option[CurrencyId], Option[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(Encoder.encodeOption(CountryregionId.encoder), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[CrcViewRow] = new Read[CrcViewRow](
     gets = List(
       (CountryregionId.get, Nullability.Nullable),
       (CurrencyId.get, Nullability.Nullable),

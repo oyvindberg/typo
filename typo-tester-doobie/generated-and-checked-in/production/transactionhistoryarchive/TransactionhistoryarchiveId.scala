@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.transactionhistoryarchive` */
 case class TransactionhistoryarchiveId(value: Int) extends AnyVal
 object TransactionhistoryarchiveId {
-  implicit val arrayGet: Get[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.get.map(_.map(TransactionhistoryarchiveId.apply))
-  implicit val arrayPut: Put[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[TransactionhistoryarchiveId, Int] = Bijection[TransactionhistoryarchiveId, Int](_.value)(TransactionhistoryarchiveId.apply)
-  implicit val decoder: Decoder[TransactionhistoryarchiveId] = Decoder.decodeInt.map(TransactionhistoryarchiveId.apply)
-  implicit val encoder: Encoder[TransactionhistoryarchiveId] = Encoder.encodeInt.contramap(_.value)
-  implicit val get: Get[TransactionhistoryarchiveId] = Meta.IntMeta.get.map(TransactionhistoryarchiveId.apply)
-  implicit val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
-  implicit val put: Put[TransactionhistoryarchiveId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.get.map(_.map(TransactionhistoryarchiveId.apply))
+  implicit lazy val arrayPut: Put[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[TransactionhistoryarchiveId, Int] = Bijection[TransactionhistoryarchiveId, Int](_.value)(TransactionhistoryarchiveId.apply)
+  implicit lazy val decoder: Decoder[TransactionhistoryarchiveId] = Decoder.decodeInt.map(TransactionhistoryarchiveId.apply)
+  implicit lazy val encoder: Encoder[TransactionhistoryarchiveId] = Encoder.encodeInt.contramap(_.value)
+  implicit lazy val get: Get[TransactionhistoryarchiveId] = Meta.IntMeta.get.map(TransactionhistoryarchiveId.apply)
+  implicit lazy val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
+  implicit lazy val put: Put[TransactionhistoryarchiveId] = Meta.IntMeta.put.contramap(_.value)
 }

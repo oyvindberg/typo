@@ -28,9 +28,9 @@ case class CViewRow(
 )
 
 object CViewRow {
-  implicit val decoder: Decoder[CViewRow] = Decoder.forProduct4[CViewRow, Option[/* bpchar */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(CViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(CultureId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[CViewRow] = Encoder.forProduct4[CViewRow, Option[/* bpchar */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(x => (x.id, x.cultureid, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(CultureId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[CViewRow] = new Read[CViewRow](
+  implicit lazy val decoder: Decoder[CViewRow] = Decoder.forProduct4[CViewRow, Option[/* bpchar */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(CViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(CultureId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[CViewRow] = Encoder.forProduct4[CViewRow, Option[/* bpchar */ String], Option[CultureId], Option[Name], Option[TypoLocalDateTime]]("id", "cultureid", "name", "modifieddate")(x => (x.id, x.cultureid, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(CultureId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[CViewRow] = new Read[CViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (CultureId.get, Nullability.Nullable),

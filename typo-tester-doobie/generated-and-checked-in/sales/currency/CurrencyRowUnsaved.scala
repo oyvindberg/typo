@@ -33,6 +33,6 @@ case class CurrencyRowUnsaved(
     )
 }
 object CurrencyRowUnsaved {
-  implicit val decoder: Decoder[CurrencyRowUnsaved] = Decoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(CurrencyRowUnsaved.apply)(CurrencyId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[CurrencyRowUnsaved] = Encoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))(CurrencyId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[CurrencyRowUnsaved] = Decoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(CurrencyRowUnsaved.apply)(CurrencyId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[CurrencyRowUnsaved] = Encoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))(CurrencyId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }

@@ -24,9 +24,9 @@ case class CountryregionRow(
 )
 
 object CountryregionRow {
-  implicit val decoder: Decoder[CountryregionRow] = Decoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CountryregionRow.apply)(CountryregionId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[CountryregionRow] = Encoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(CountryregionId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[CountryregionRow] = new Read[CountryregionRow](
+  implicit lazy val decoder: Decoder[CountryregionRow] = Decoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CountryregionRow.apply)(CountryregionId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CountryregionRow] = Encoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(CountryregionId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[CountryregionRow] = new Read[CountryregionRow](
     gets = List(
       (CountryregionId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

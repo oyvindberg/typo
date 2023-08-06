@@ -28,9 +28,9 @@ case class CuViewRow(
 )
 
 object CuViewRow {
-  implicit val decoder: Decoder[CuViewRow] = Decoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(CuViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[CuViewRow] = Encoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(x => (x.id, x.currencycode, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[CuViewRow] = new Read[CuViewRow](
+  implicit lazy val decoder: Decoder[CuViewRow] = Decoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(CuViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(CurrencyId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[CuViewRow] = Encoder.forProduct4[CuViewRow, Option[/* bpchar */ String], Option[CurrencyId], Option[Name], Option[TypoLocalDateTime]]("id", "currencycode", "name", "modifieddate")(x => (x.id, x.currencycode, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(CurrencyId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[CuViewRow] = new Read[CuViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (CurrencyId.get, Nullability.Nullable),

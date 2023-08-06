@@ -69,7 +69,7 @@ case class ColumnsViewRow(
 )
 
 object ColumnsViewRow {
-  implicit val decoder: Decoder[ColumnsViewRow] = Decoder.instanceTry[ColumnsViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[ColumnsViewRow] = Decoder.instanceTry[ColumnsViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -123,7 +123,7 @@ object ColumnsViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[ColumnsViewRow] = Encoder[ColumnsViewRow](row =>
+  implicit lazy val encoder: Encoder[ColumnsViewRow] = Encoder[ColumnsViewRow](row =>
     Json.obj(
       "table_catalog" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.tableCatalog),
       "table_schema" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.tableSchema),
@@ -171,7 +171,7 @@ object ColumnsViewRow {
       "is_updatable" -> Encoder.encodeOption(YesOrNo.encoder).apply(row.isUpdatable)
     )
   )
-  implicit val read: Read[ColumnsViewRow] = new Read[ColumnsViewRow](
+  implicit lazy val read: Read[ColumnsViewRow] = new Read[ColumnsViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

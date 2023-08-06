@@ -31,9 +31,9 @@ case class PcViewRow(
 )
 
 object PcViewRow {
-  implicit val decoder: Decoder[PcViewRow] = Decoder.forProduct5[PcViewRow, Option[Int], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productcategoryid", "name", "rowguid", "modifieddate")(PcViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductcategoryId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PcViewRow] = Encoder.forProduct5[PcViewRow, Option[Int], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductcategoryId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[PcViewRow] = new Read[PcViewRow](
+  implicit lazy val decoder: Decoder[PcViewRow] = Decoder.forProduct5[PcViewRow, Option[Int], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productcategoryid", "name", "rowguid", "modifieddate")(PcViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductcategoryId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PcViewRow] = Encoder.forProduct5[PcViewRow, Option[Int], Option[ProductcategoryId], Option[Name], Option[UUID], Option[TypoLocalDateTime]]("id", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductcategoryId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[PcViewRow] = new Read[PcViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (ProductcategoryId.get, Nullability.Nullable),

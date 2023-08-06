@@ -22,9 +22,9 @@ case class PgUserMappingRow(
 )
 
 object PgUserMappingRow {
-  implicit val decoder: Decoder[PgUserMappingRow] = Decoder.forProduct4[PgUserMappingRow, PgUserMappingId, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("oid", "umuser", "umserver", "umoptions")(PgUserMappingRow.apply)(PgUserMappingId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit val encoder: Encoder[PgUserMappingRow] = Encoder.forProduct4[PgUserMappingRow, PgUserMappingId, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("oid", "umuser", "umserver", "umoptions")(x => (x.oid, x.umuser, x.umserver, x.umoptions))(PgUserMappingId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
-  implicit val read: Read[PgUserMappingRow] = new Read[PgUserMappingRow](
+  implicit lazy val decoder: Decoder[PgUserMappingRow] = Decoder.forProduct4[PgUserMappingRow, PgUserMappingId, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("oid", "umuser", "umserver", "umoptions")(PgUserMappingRow.apply)(PgUserMappingId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgUserMappingRow] = Encoder.forProduct4[PgUserMappingRow, PgUserMappingId, /* oid */ Long, /* oid */ Long, Option[Array[String]]]("oid", "umuser", "umserver", "umoptions")(x => (x.oid, x.umuser, x.umserver, x.umoptions))(PgUserMappingId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val read: Read[PgUserMappingRow] = new Read[PgUserMappingRow](
     gets = List(
       (PgUserMappingId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

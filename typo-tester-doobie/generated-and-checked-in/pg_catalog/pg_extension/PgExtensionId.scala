@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_extension` */
 case class PgExtensionId(value: /* oid */ Long) extends AnyVal
 object PgExtensionId {
-  implicit val arrayGet: Get[Array[PgExtensionId]] = adventureworks.LongArrayMeta.get.map(_.map(PgExtensionId.apply))
-  implicit val arrayPut: Put[Array[PgExtensionId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgExtensionId, /* oid */ Long] = Bijection[PgExtensionId, /* oid */ Long](_.value)(PgExtensionId.apply)
-  implicit val decoder: Decoder[PgExtensionId] = Decoder.decodeLong.map(PgExtensionId.apply)
-  implicit val encoder: Encoder[PgExtensionId] = Encoder.encodeLong.contramap(_.value)
-  implicit val get: Get[PgExtensionId] = Meta.LongMeta.get.map(PgExtensionId.apply)
-  implicit val ordering: Ordering[PgExtensionId] = Ordering.by(_.value)
-  implicit val put: Put[PgExtensionId] = Meta.LongMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[PgExtensionId]] = adventureworks.LongArrayMeta.get.map(_.map(PgExtensionId.apply))
+  implicit lazy val arrayPut: Put[Array[PgExtensionId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgExtensionId, /* oid */ Long] = Bijection[PgExtensionId, /* oid */ Long](_.value)(PgExtensionId.apply)
+  implicit lazy val decoder: Decoder[PgExtensionId] = Decoder.decodeLong.map(PgExtensionId.apply)
+  implicit lazy val encoder: Encoder[PgExtensionId] = Encoder.encodeLong.contramap(_.value)
+  implicit lazy val get: Get[PgExtensionId] = Meta.LongMeta.get.map(PgExtensionId.apply)
+  implicit lazy val ordering: Ordering[PgExtensionId] = Ordering.by(_.value)
+  implicit lazy val put: Put[PgExtensionId] = Meta.LongMeta.put.contramap(_.value)
 }

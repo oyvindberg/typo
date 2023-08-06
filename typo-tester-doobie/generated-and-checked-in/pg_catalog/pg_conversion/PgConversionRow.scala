@@ -27,9 +27,9 @@ case class PgConversionRow(
 )
 
 object PgConversionRow {
-  implicit val decoder: Decoder[PgConversionRow] = Decoder.forProduct8[PgConversionRow, PgConversionId, String, /* oid */ Long, /* oid */ Long, Int, Int, TypoRegproc, Boolean]("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")(PgConversionRow.apply)(PgConversionId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeInt, TypoRegproc.decoder, Decoder.decodeBoolean)
-  implicit val encoder: Encoder[PgConversionRow] = Encoder.forProduct8[PgConversionRow, PgConversionId, String, /* oid */ Long, /* oid */ Long, Int, Int, TypoRegproc, Boolean]("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")(x => (x.oid, x.conname, x.connamespace, x.conowner, x.conforencoding, x.contoencoding, x.conproc, x.condefault))(PgConversionId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeInt, TypoRegproc.encoder, Encoder.encodeBoolean)
-  implicit val read: Read[PgConversionRow] = new Read[PgConversionRow](
+  implicit lazy val decoder: Decoder[PgConversionRow] = Decoder.forProduct8[PgConversionRow, PgConversionId, String, /* oid */ Long, /* oid */ Long, Int, Int, TypoRegproc, Boolean]("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")(PgConversionRow.apply)(PgConversionId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeInt, TypoRegproc.decoder, Decoder.decodeBoolean)
+  implicit lazy val encoder: Encoder[PgConversionRow] = Encoder.forProduct8[PgConversionRow, PgConversionId, String, /* oid */ Long, /* oid */ Long, Int, Int, TypoRegproc, Boolean]("oid", "conname", "connamespace", "conowner", "conforencoding", "contoencoding", "conproc", "condefault")(x => (x.oid, x.conname, x.connamespace, x.conowner, x.conforencoding, x.contoencoding, x.conproc, x.condefault))(PgConversionId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeInt, TypoRegproc.encoder, Encoder.encodeBoolean)
+  implicit lazy val read: Read[PgConversionRow] = new Read[PgConversionRow](
     gets = List(
       (PgConversionId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `person.contacttype` */
 case class ContacttypeId(value: Int) extends AnyVal
 object ContacttypeId {
-  implicit val arrayGet: Get[Array[ContacttypeId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ContacttypeId.apply))
-  implicit val arrayPut: Put[Array[ContacttypeId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[ContacttypeId, Int] = Bijection[ContacttypeId, Int](_.value)(ContacttypeId.apply)
-  implicit val decoder: Decoder[ContacttypeId] = Decoder.decodeInt.map(ContacttypeId.apply)
-  implicit val encoder: Encoder[ContacttypeId] = Encoder.encodeInt.contramap(_.value)
-  implicit val get: Get[ContacttypeId] = Meta.IntMeta.get.map(ContacttypeId.apply)
-  implicit val ordering: Ordering[ContacttypeId] = Ordering.by(_.value)
-  implicit val put: Put[ContacttypeId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[ContacttypeId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ContacttypeId.apply))
+  implicit lazy val arrayPut: Put[Array[ContacttypeId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[ContacttypeId, Int] = Bijection[ContacttypeId, Int](_.value)(ContacttypeId.apply)
+  implicit lazy val decoder: Decoder[ContacttypeId] = Decoder.decodeInt.map(ContacttypeId.apply)
+  implicit lazy val encoder: Encoder[ContacttypeId] = Encoder.encodeInt.contramap(_.value)
+  implicit lazy val get: Get[ContacttypeId] = Meta.IntMeta.get.map(ContacttypeId.apply)
+  implicit lazy val ordering: Ordering[ContacttypeId] = Ordering.by(_.value)
+  implicit lazy val put: Put[ContacttypeId] = Meta.IntMeta.put.contramap(_.value)
 }

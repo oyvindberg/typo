@@ -24,9 +24,9 @@ case class PgTsDictRow(
 )
 
 object PgTsDictRow {
-  implicit val decoder: Decoder[PgTsDictRow] = Decoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(PgTsDictRow.apply)(PgTsDictId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PgTsDictRow] = Encoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(x => (x.oid, x.dictname, x.dictnamespace, x.dictowner, x.dicttemplate, x.dictinitoption))(PgTsDictId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PgTsDictRow] = new Read[PgTsDictRow](
+  implicit lazy val decoder: Decoder[PgTsDictRow] = Decoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(PgTsDictRow.apply)(PgTsDictId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgTsDictRow] = Encoder.forProduct6[PgTsDictRow, PgTsDictId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long, Option[String]]("oid", "dictname", "dictnamespace", "dictowner", "dicttemplate", "dictinitoption")(x => (x.oid, x.dictname, x.dictnamespace, x.dictowner, x.dicttemplate, x.dictinitoption))(PgTsDictId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PgTsDictRow] = new Read[PgTsDictRow](
     gets = List(
       (PgTsDictId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

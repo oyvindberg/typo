@@ -33,6 +33,6 @@ case class CultureRowUnsaved(
     )
 }
 object CultureRowUnsaved {
-  implicit val decoder: Decoder[CultureRowUnsaved] = Decoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(CultureRowUnsaved.apply)(CultureId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[CultureRowUnsaved] = Encoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
+  implicit lazy val decoder: Decoder[CultureRowUnsaved] = Decoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(CultureRowUnsaved.apply)(CultureId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[CultureRowUnsaved] = Encoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
 }

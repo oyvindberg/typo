@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.document` */
 case class DocumentId(value: String) extends AnyVal
 object DocumentId {
-  implicit val arrayGet: Get[Array[DocumentId]] = adventureworks.StringArrayMeta.get.map(_.map(DocumentId.apply))
-  implicit val arrayPut: Put[Array[DocumentId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[DocumentId, String] = Bijection[DocumentId, String](_.value)(DocumentId.apply)
-  implicit val decoder: Decoder[DocumentId] = Decoder.decodeString.map(DocumentId.apply)
-  implicit val encoder: Encoder[DocumentId] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[DocumentId] = Meta.StringMeta.get.map(DocumentId.apply)
-  implicit val ordering: Ordering[DocumentId] = Ordering.by(_.value)
-  implicit val put: Put[DocumentId] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[DocumentId]] = adventureworks.StringArrayMeta.get.map(_.map(DocumentId.apply))
+  implicit lazy val arrayPut: Put[Array[DocumentId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[DocumentId, String] = Bijection[DocumentId, String](_.value)(DocumentId.apply)
+  implicit lazy val decoder: Decoder[DocumentId] = Decoder.decodeString.map(DocumentId.apply)
+  implicit lazy val encoder: Encoder[DocumentId] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[DocumentId] = Meta.StringMeta.get.map(DocumentId.apply)
+  implicit lazy val ordering: Ordering[DocumentId] = Ordering.by(_.value)
+  implicit lazy val put: Put[DocumentId] = Meta.StringMeta.put.contramap(_.value)
 }

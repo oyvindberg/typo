@@ -24,9 +24,9 @@ case class PgTsConfigMapRow(
  }
 
 object PgTsConfigMapRow {
-  implicit val decoder: Decoder[PgTsConfigMapRow] = Decoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(PgTsConfigMapRow.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeLong)
-  implicit val encoder: Encoder[PgTsConfigMapRow] = Encoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(x => (x.mapcfg, x.maptokentype, x.mapseqno, x.mapdict))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeLong)
-  implicit val read: Read[PgTsConfigMapRow] = new Read[PgTsConfigMapRow](
+  implicit lazy val decoder: Decoder[PgTsConfigMapRow] = Decoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(PgTsConfigMapRow.apply)(Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgTsConfigMapRow] = Encoder.forProduct4[PgTsConfigMapRow, /* oid */ Long, Int, Int, /* oid */ Long]("mapcfg", "maptokentype", "mapseqno", "mapdict")(x => (x.mapcfg, x.maptokentype, x.mapseqno, x.mapdict))(Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeLong)
+  implicit lazy val read: Read[PgTsConfigMapRow] = new Read[PgTsConfigMapRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),

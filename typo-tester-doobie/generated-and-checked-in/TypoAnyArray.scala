@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoAnyArray(value: String)
 
 object TypoAnyArray {
-  implicit val arrayGet: Get[Array[TypoAnyArray]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_anyarray"))
+  implicit lazy val arrayGet: Get[Array[TypoAnyArray]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_anyarray"))
     .map(_.map(v => TypoAnyArray(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoAnyArray]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_anyarray"), "anyarray")
+  implicit lazy val arrayPut: Put[Array[TypoAnyArray]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_anyarray"), "anyarray")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("anyarray")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoAnyArray, String] = Bijection[TypoAnyArray, String](_.value)(TypoAnyArray.apply)
-  implicit val decoder: Decoder[TypoAnyArray] = Decoder.decodeString.map(TypoAnyArray.apply)
-  implicit val encoder: Encoder[TypoAnyArray] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoAnyArray] = Get.Advanced.other[PGobject](NonEmptyList.one("anyarray"))
+  implicit lazy val bijection: Bijection[TypoAnyArray, String] = Bijection[TypoAnyArray, String](_.value)(TypoAnyArray.apply)
+  implicit lazy val decoder: Decoder[TypoAnyArray] = Decoder.decodeString.map(TypoAnyArray.apply)
+  implicit lazy val encoder: Encoder[TypoAnyArray] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoAnyArray] = Get.Advanced.other[PGobject](NonEmptyList.one("anyarray"))
     .map(v => TypoAnyArray(v.getValue))
-  implicit val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
-  implicit val put: Put[TypoAnyArray] = Put.Advanced.other[PGobject](NonEmptyList.one("anyarray")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoAnyArray] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoAnyArray] = Put.Advanced.other[PGobject](NonEmptyList.one("anyarray")).contramap(v => {
                                                                               val obj = new PGobject
                                                                               obj.setType("anyarray")
                                                                               obj.setValue(v.value)

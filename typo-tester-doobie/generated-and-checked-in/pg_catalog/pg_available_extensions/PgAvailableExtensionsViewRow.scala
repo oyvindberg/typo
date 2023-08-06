@@ -22,9 +22,9 @@ case class PgAvailableExtensionsViewRow(
 )
 
 object PgAvailableExtensionsViewRow {
-  implicit val decoder: Decoder[PgAvailableExtensionsViewRow] = Decoder.forProduct4[PgAvailableExtensionsViewRow, Option[String], Option[String], Option[String], Option[String]]("name", "default_version", "installed_version", "comment")(PgAvailableExtensionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PgAvailableExtensionsViewRow] = Encoder.forProduct4[PgAvailableExtensionsViewRow, Option[String], Option[String], Option[String], Option[String]]("name", "default_version", "installed_version", "comment")(x => (x.name, x.defaultVersion, x.installedVersion, x.comment))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PgAvailableExtensionsViewRow] = new Read[PgAvailableExtensionsViewRow](
+  implicit lazy val decoder: Decoder[PgAvailableExtensionsViewRow] = Decoder.forProduct4[PgAvailableExtensionsViewRow, Option[String], Option[String], Option[String], Option[String]]("name", "default_version", "installed_version", "comment")(PgAvailableExtensionsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgAvailableExtensionsViewRow] = Encoder.forProduct4[PgAvailableExtensionsViewRow, Option[String], Option[String], Option[String], Option[String]]("name", "default_version", "installed_version", "comment")(x => (x.name, x.defaultVersion, x.installedVersion, x.comment))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PgAvailableExtensionsViewRow] = new Read[PgAvailableExtensionsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

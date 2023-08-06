@@ -81,7 +81,7 @@ case class ProductRow(
 )
 
 object ProductRow {
-  implicit val decoder: Decoder[ProductRow] = Decoder.instanceTry[ProductRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[ProductRow] = Decoder.instanceTry[ProductRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -116,7 +116,7 @@ object ProductRow {
       )
     }
   )
-  implicit val encoder: Encoder[ProductRow] = Encoder[ProductRow](row =>
+  implicit lazy val encoder: Encoder[ProductRow] = Encoder[ProductRow](row =>
     Json.obj(
       "productid" -> ProductId.encoder.apply(row.productid),
       "name" -> Name.encoder.apply(row.name),
@@ -145,7 +145,7 @@ object ProductRow {
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
-  implicit val read: Read[ProductRow] = new Read[ProductRow](
+  implicit lazy val read: Read[ProductRow] = new Read[ProductRow](
     gets = List(
       (ProductId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

@@ -24,9 +24,9 @@ case class CultureRow(
 )
 
 object CultureRow {
-  implicit val decoder: Decoder[CultureRow] = Decoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(CultureRow.apply)(CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[CultureRow] = Encoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[CultureRow] = new Read[CultureRow](
+  implicit lazy val decoder: Decoder[CultureRow] = Decoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(CultureRow.apply)(CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[CultureRow] = Encoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[CultureRow] = new Read[CultureRow](
     gets = List(
       (CultureId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

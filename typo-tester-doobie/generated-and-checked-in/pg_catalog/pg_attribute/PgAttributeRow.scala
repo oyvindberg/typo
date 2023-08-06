@@ -52,7 +52,7 @@ case class PgAttributeRow(
  }
 
 object PgAttributeRow {
-  implicit val decoder: Decoder[PgAttributeRow] = Decoder.instanceTry[PgAttributeRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgAttributeRow] = Decoder.instanceTry[PgAttributeRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -88,7 +88,7 @@ object PgAttributeRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgAttributeRow] = Encoder[PgAttributeRow](row =>
+  implicit lazy val encoder: Encoder[PgAttributeRow] = Encoder[PgAttributeRow](row =>
     Json.obj(
       "attrelid" -> Encoder.encodeLong.apply(row.attrelid),
       "attname" -> Encoder.encodeString.apply(row.attname),
@@ -118,7 +118,7 @@ object PgAttributeRow {
       "attmissingval" -> Encoder.encodeOption(TypoAnyArray.encoder).apply(row.attmissingval)
     )
   )
-  implicit val read: Read[PgAttributeRow] = new Read[PgAttributeRow](
+  implicit lazy val read: Read[PgAttributeRow] = new Read[PgAttributeRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

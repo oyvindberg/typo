@@ -22,9 +22,9 @@ case class PgReplicationOriginStatusViewRow(
 )
 
 object PgReplicationOriginStatusViewRow {
-  implicit val decoder: Decoder[PgReplicationOriginStatusViewRow] = Decoder.forProduct4[PgReplicationOriginStatusViewRow, Option[/* oid */ Long], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long]]("local_id", "external_id", "remote_lsn", "local_lsn")(PgReplicationOriginStatusViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
-  implicit val encoder: Encoder[PgReplicationOriginStatusViewRow] = Encoder.forProduct4[PgReplicationOriginStatusViewRow, Option[/* oid */ Long], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long]]("local_id", "external_id", "remote_lsn", "local_lsn")(x => (x.localId, x.externalId, x.remoteLsn, x.localLsn))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
-  implicit val read: Read[PgReplicationOriginStatusViewRow] = new Read[PgReplicationOriginStatusViewRow](
+  implicit lazy val decoder: Decoder[PgReplicationOriginStatusViewRow] = Decoder.forProduct4[PgReplicationOriginStatusViewRow, Option[/* oid */ Long], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long]]("local_id", "external_id", "remote_lsn", "local_lsn")(PgReplicationOriginStatusViewRow.apply)(Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeLong), Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgReplicationOriginStatusViewRow] = Encoder.forProduct4[PgReplicationOriginStatusViewRow, Option[/* oid */ Long], Option[String], Option[/* pg_lsn */ Long], Option[/* pg_lsn */ Long]]("local_id", "external_id", "remote_lsn", "local_lsn")(x => (x.localId, x.externalId, x.remoteLsn, x.localLsn))(Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeLong), Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val read: Read[PgReplicationOriginStatusViewRow] = new Read[PgReplicationOriginStatusViewRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

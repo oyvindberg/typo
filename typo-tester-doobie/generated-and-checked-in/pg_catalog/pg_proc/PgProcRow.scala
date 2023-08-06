@@ -56,7 +56,7 @@ case class PgProcRow(
 )
 
 object PgProcRow {
-  implicit val decoder: Decoder[PgProcRow] = Decoder.instanceTry[PgProcRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgProcRow] = Decoder.instanceTry[PgProcRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -96,7 +96,7 @@ object PgProcRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgProcRow] = Encoder[PgProcRow](row =>
+  implicit lazy val encoder: Encoder[PgProcRow] = Encoder[PgProcRow](row =>
     Json.obj(
       "oid" -> PgProcId.encoder.apply(row.oid),
       "proname" -> Encoder.encodeString.apply(row.proname),
@@ -130,7 +130,7 @@ object PgProcRow {
       "proacl" -> Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)).apply(row.proacl)
     )
   )
-  implicit val read: Read[PgProcRow] = new Read[PgProcRow](
+  implicit lazy val read: Read[PgProcRow] = new Read[PgProcRow](
     gets = List(
       (PgProcId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

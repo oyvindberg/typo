@@ -22,9 +22,9 @@ case class PgEnumRow(
 )
 
 object PgEnumRow {
-  implicit val decoder: Decoder[PgEnumRow] = Decoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(PgEnumRow.apply)(PgEnumId.decoder, Decoder.decodeLong, Decoder.decodeFloat, Decoder.decodeString)
-  implicit val encoder: Encoder[PgEnumRow] = Encoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(x => (x.oid, x.enumtypid, x.enumsortorder, x.enumlabel))(PgEnumId.encoder, Encoder.encodeLong, Encoder.encodeFloat, Encoder.encodeString)
-  implicit val read: Read[PgEnumRow] = new Read[PgEnumRow](
+  implicit lazy val decoder: Decoder[PgEnumRow] = Decoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(PgEnumRow.apply)(PgEnumId.decoder, Decoder.decodeLong, Decoder.decodeFloat, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PgEnumRow] = Encoder.forProduct4[PgEnumRow, PgEnumId, /* oid */ Long, Float, String]("oid", "enumtypid", "enumsortorder", "enumlabel")(x => (x.oid, x.enumtypid, x.enumsortorder, x.enumlabel))(PgEnumId.encoder, Encoder.encodeLong, Encoder.encodeFloat, Encoder.encodeString)
+  implicit lazy val read: Read[PgEnumRow] = new Read[PgEnumRow](
     gets = List(
       (PgEnumId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

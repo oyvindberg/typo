@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoOidVector(value: String)
 
 object TypoOidVector {
-  implicit val arrayGet: Get[Array[TypoOidVector]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_oidvector"))
+  implicit lazy val arrayGet: Get[Array[TypoOidVector]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_oidvector"))
     .map(_.map(v => TypoOidVector(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoOidVector]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_oidvector"), "oidvector")
+  implicit lazy val arrayPut: Put[Array[TypoOidVector]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_oidvector"), "oidvector")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("oidvector")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoOidVector, String] = Bijection[TypoOidVector, String](_.value)(TypoOidVector.apply)
-  implicit val decoder: Decoder[TypoOidVector] = Decoder.decodeString.map(TypoOidVector.apply)
-  implicit val encoder: Encoder[TypoOidVector] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoOidVector] = Get.Advanced.other[PGobject](NonEmptyList.one("oidvector"))
+  implicit lazy val bijection: Bijection[TypoOidVector, String] = Bijection[TypoOidVector, String](_.value)(TypoOidVector.apply)
+  implicit lazy val decoder: Decoder[TypoOidVector] = Decoder.decodeString.map(TypoOidVector.apply)
+  implicit lazy val encoder: Encoder[TypoOidVector] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoOidVector] = Get.Advanced.other[PGobject](NonEmptyList.one("oidvector"))
     .map(v => TypoOidVector(v.getValue))
-  implicit val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)
-  implicit val put: Put[TypoOidVector] = Put.Advanced.other[PGobject](NonEmptyList.one("oidvector")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoOidVector] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoOidVector] = Put.Advanced.other[PGobject](NonEmptyList.one("oidvector")).contramap(v => {
                                                                                val obj = new PGobject
                                                                                obj.setType("oidvector")
                                                                                obj.setValue(v.value)

@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_aggregate` */
 case class PgAggregateId(value: TypoRegproc) extends AnyVal
 object PgAggregateId {
-  implicit val arrayGet: Get[Array[PgAggregateId]] = TypoRegproc.arrayGet.map(_.map(PgAggregateId.apply))
-  implicit val arrayPut: Put[Array[PgAggregateId]] = TypoRegproc.arrayPut.contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgAggregateId, TypoRegproc] = Bijection[PgAggregateId, TypoRegproc](_.value)(PgAggregateId.apply)
-  implicit val decoder: Decoder[PgAggregateId] = TypoRegproc.decoder.map(PgAggregateId.apply)
-  implicit val encoder: Encoder[PgAggregateId] = TypoRegproc.encoder.contramap(_.value)
-  implicit val get: Get[PgAggregateId] = TypoRegproc.get.map(PgAggregateId.apply)
+  implicit lazy val arrayGet: Get[Array[PgAggregateId]] = TypoRegproc.arrayGet.map(_.map(PgAggregateId.apply))
+  implicit lazy val arrayPut: Put[Array[PgAggregateId]] = TypoRegproc.arrayPut.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgAggregateId, TypoRegproc] = Bijection[PgAggregateId, TypoRegproc](_.value)(PgAggregateId.apply)
+  implicit lazy val decoder: Decoder[PgAggregateId] = TypoRegproc.decoder.map(PgAggregateId.apply)
+  implicit lazy val encoder: Encoder[PgAggregateId] = TypoRegproc.encoder.contramap(_.value)
+  implicit lazy val get: Get[PgAggregateId] = TypoRegproc.get.map(PgAggregateId.apply)
   implicit def ordering(implicit O0: Ordering[TypoRegproc]): Ordering[PgAggregateId] = Ordering.by(_.value)
-  implicit val put: Put[PgAggregateId] = TypoRegproc.put.contramap(_.value)
+  implicit lazy val put: Put[PgAggregateId] = TypoRegproc.put.contramap(_.value)
 }

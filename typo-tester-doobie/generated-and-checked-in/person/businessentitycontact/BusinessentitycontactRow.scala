@@ -34,9 +34,9 @@ case class BusinessentitycontactRow(
  }
 
 object BusinessentitycontactRow {
-  implicit val decoder: Decoder[BusinessentitycontactRow] = Decoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BusinessentitycontactRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[BusinessentitycontactRow] = Encoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[BusinessentitycontactRow] = new Read[BusinessentitycontactRow](
+  implicit lazy val decoder: Decoder[BusinessentitycontactRow] = Decoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BusinessentitycontactRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[BusinessentitycontactRow] = Encoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, UUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[BusinessentitycontactRow] = new Read[BusinessentitycontactRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.NoNulls),

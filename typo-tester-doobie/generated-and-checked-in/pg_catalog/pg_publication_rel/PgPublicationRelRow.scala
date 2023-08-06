@@ -21,9 +21,9 @@ case class PgPublicationRelRow(
 )
 
 object PgPublicationRelRow {
-  implicit val decoder: Decoder[PgPublicationRelRow] = Decoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(PgPublicationRelRow.apply)(PgPublicationRelId.decoder, Decoder.decodeLong, Decoder.decodeLong)
-  implicit val encoder: Encoder[PgPublicationRelRow] = Encoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(x => (x.oid, x.prpubid, x.prrelid))(PgPublicationRelId.encoder, Encoder.encodeLong, Encoder.encodeLong)
-  implicit val read: Read[PgPublicationRelRow] = new Read[PgPublicationRelRow](
+  implicit lazy val decoder: Decoder[PgPublicationRelRow] = Decoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(PgPublicationRelRow.apply)(PgPublicationRelId.decoder, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgPublicationRelRow] = Encoder.forProduct3[PgPublicationRelRow, PgPublicationRelId, /* oid */ Long, /* oid */ Long]("oid", "prpubid", "prrelid")(x => (x.oid, x.prpubid, x.prrelid))(PgPublicationRelId.encoder, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val read: Read[PgPublicationRelRow] = new Read[PgPublicationRelRow](
     gets = List(
       (PgPublicationRelId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

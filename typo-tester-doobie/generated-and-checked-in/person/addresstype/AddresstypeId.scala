@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `person.addresstype` */
 case class AddresstypeId(value: Int) extends AnyVal
 object AddresstypeId {
-  implicit val arrayGet: Get[Array[AddresstypeId]] = adventureworks.IntegerArrayMeta.get.map(_.map(AddresstypeId.apply))
-  implicit val arrayPut: Put[Array[AddresstypeId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[AddresstypeId, Int] = Bijection[AddresstypeId, Int](_.value)(AddresstypeId.apply)
-  implicit val decoder: Decoder[AddresstypeId] = Decoder.decodeInt.map(AddresstypeId.apply)
-  implicit val encoder: Encoder[AddresstypeId] = Encoder.encodeInt.contramap(_.value)
-  implicit val get: Get[AddresstypeId] = Meta.IntMeta.get.map(AddresstypeId.apply)
-  implicit val ordering: Ordering[AddresstypeId] = Ordering.by(_.value)
-  implicit val put: Put[AddresstypeId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[AddresstypeId]] = adventureworks.IntegerArrayMeta.get.map(_.map(AddresstypeId.apply))
+  implicit lazy val arrayPut: Put[Array[AddresstypeId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[AddresstypeId, Int] = Bijection[AddresstypeId, Int](_.value)(AddresstypeId.apply)
+  implicit lazy val decoder: Decoder[AddresstypeId] = Decoder.decodeInt.map(AddresstypeId.apply)
+  implicit lazy val encoder: Encoder[AddresstypeId] = Encoder.encodeInt.contramap(_.value)
+  implicit lazy val get: Get[AddresstypeId] = Meta.IntMeta.get.map(AddresstypeId.apply)
+  implicit lazy val ordering: Ordering[AddresstypeId] = Ordering.by(_.value)
+  implicit lazy val put: Put[AddresstypeId] = Meta.IntMeta.put.contramap(_.value)
 }

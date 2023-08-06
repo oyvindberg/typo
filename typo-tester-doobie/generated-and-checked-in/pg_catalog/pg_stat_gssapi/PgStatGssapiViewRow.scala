@@ -22,9 +22,9 @@ case class PgStatGssapiViewRow(
 )
 
 object PgStatGssapiViewRow {
-  implicit val decoder: Decoder[PgStatGssapiViewRow] = Decoder.forProduct4[PgStatGssapiViewRow, Option[Int], Option[Boolean], Option[String], Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(PgStatGssapiViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean))
-  implicit val encoder: Encoder[PgStatGssapiViewRow] = Encoder.forProduct4[PgStatGssapiViewRow, Option[Int], Option[Boolean], Option[String], Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(x => (x.pid, x.gssAuthenticated, x.principal, x.encrypted))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean))
-  implicit val read: Read[PgStatGssapiViewRow] = new Read[PgStatGssapiViewRow](
+  implicit lazy val decoder: Decoder[PgStatGssapiViewRow] = Decoder.forProduct4[PgStatGssapiViewRow, Option[Int], Option[Boolean], Option[String], Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(PgStatGssapiViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBoolean), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeBoolean))
+  implicit lazy val encoder: Encoder[PgStatGssapiViewRow] = Encoder.forProduct4[PgStatGssapiViewRow, Option[Int], Option[Boolean], Option[String], Option[Boolean]]("pid", "gss_authenticated", "principal", "encrypted")(x => (x.pid, x.gssAuthenticated, x.principal, x.encrypted))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBoolean), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeBoolean))
+  implicit lazy val read: Read[PgStatGssapiViewRow] = new Read[PgStatGssapiViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (Meta.BooleanMeta.get, Nullability.Nullable),

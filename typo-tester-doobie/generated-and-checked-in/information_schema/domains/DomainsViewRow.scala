@@ -51,7 +51,7 @@ case class DomainsViewRow(
 )
 
 object DomainsViewRow {
-  implicit val decoder: Decoder[DomainsViewRow] = Decoder.instanceTry[DomainsViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[DomainsViewRow] = Decoder.instanceTry[DomainsViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -88,7 +88,7 @@ object DomainsViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[DomainsViewRow] = Encoder[DomainsViewRow](row =>
+  implicit lazy val encoder: Encoder[DomainsViewRow] = Encoder[DomainsViewRow](row =>
     Json.obj(
       "domain_catalog" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.domainCatalog),
       "domain_schema" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.domainSchema),
@@ -119,7 +119,7 @@ object DomainsViewRow {
       "dtd_identifier" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.dtdIdentifier)
     )
   )
-  implicit val read: Read[DomainsViewRow] = new Read[DomainsViewRow](
+  implicit lazy val read: Read[DomainsViewRow] = new Read[DomainsViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

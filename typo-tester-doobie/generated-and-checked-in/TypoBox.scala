@@ -16,14 +16,14 @@ import org.postgresql.geometric.PGbox
 case class TypoBox(x1: Double, y1: Double, x2: Double, y2: Double)
 
 object TypoBox {
-  implicit val arrayGet: Get[Array[TypoBox]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_box"))
+  implicit lazy val arrayGet: Get[Array[TypoBox]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_box"))
     .map(_.map(v => TypoBox(v.asInstanceOf[PGbox].point(0).x, v.asInstanceOf[PGbox].point(0).y, v.asInstanceOf[PGbox].point(1).x, v.asInstanceOf[PGbox].point(1).y)))
-  implicit val arrayPut: Put[Array[TypoBox]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_box"), "box")
+  implicit lazy val arrayPut: Put[Array[TypoBox]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_box"), "box")
     .contramap(_.map(v => new PGbox(v.x1, v.y1, v.x2, v.y2)))
-  implicit val decoder: Decoder[TypoBox] = Decoder.forProduct4[TypoBox, Double, Double, Double, Double]("x1", "y1", "x2", "y2")(TypoBox.apply)(Decoder.decodeDouble, Decoder.decodeDouble, Decoder.decodeDouble, Decoder.decodeDouble)
-  implicit val encoder: Encoder[TypoBox] = Encoder.forProduct4[TypoBox, Double, Double, Double, Double]("x1", "y1", "x2", "y2")(x => (x.x1, x.y1, x.x2, x.y2))(Encoder.encodeDouble, Encoder.encodeDouble, Encoder.encodeDouble, Encoder.encodeDouble)
-  implicit val get: Get[TypoBox] = Get.Advanced.other[PGbox](NonEmptyList.one("box"))
+  implicit lazy val decoder: Decoder[TypoBox] = Decoder.forProduct4[TypoBox, Double, Double, Double, Double]("x1", "y1", "x2", "y2")(TypoBox.apply)(Decoder.decodeDouble, Decoder.decodeDouble, Decoder.decodeDouble, Decoder.decodeDouble)
+  implicit lazy val encoder: Encoder[TypoBox] = Encoder.forProduct4[TypoBox, Double, Double, Double, Double]("x1", "y1", "x2", "y2")(x => (x.x1, x.y1, x.x2, x.y2))(Encoder.encodeDouble, Encoder.encodeDouble, Encoder.encodeDouble, Encoder.encodeDouble)
+  implicit lazy val get: Get[TypoBox] = Get.Advanced.other[PGbox](NonEmptyList.one("box"))
     .map(v => TypoBox(v.point(0).x, v.point(0).y, v.point(1).x, v.point(1).y))
-  implicit val ordering: Ordering[TypoBox] = Ordering.by(x => (x.x1, x.y1, x.x2, x.y2))
-  implicit val put: Put[TypoBox] = Put.Advanced.other[PGbox](NonEmptyList.one("box")).contramap(v => new PGbox(v.x1, v.y1, v.x2, v.y2))
+  implicit lazy val ordering: Ordering[TypoBox] = Ordering.by(x => (x.x1, x.y1, x.x2, x.y2))
+  implicit lazy val put: Put[TypoBox] = Put.Advanced.other[PGbox](NonEmptyList.one("box")).contramap(v => new PGbox(v.x1, v.y1, v.x2, v.y2))
 }

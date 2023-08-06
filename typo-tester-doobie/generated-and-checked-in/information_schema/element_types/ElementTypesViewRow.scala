@@ -57,7 +57,7 @@ case class ElementTypesViewRow(
 )
 
 object ElementTypesViewRow {
-  implicit val decoder: Decoder[ElementTypesViewRow] = Decoder.instanceTry[ElementTypesViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[ElementTypesViewRow] = Decoder.instanceTry[ElementTypesViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -96,7 +96,7 @@ object ElementTypesViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[ElementTypesViewRow] = Encoder[ElementTypesViewRow](row =>
+  implicit lazy val encoder: Encoder[ElementTypesViewRow] = Encoder[ElementTypesViewRow](row =>
     Json.obj(
       "object_catalog" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.objectCatalog),
       "object_schema" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.objectSchema),
@@ -129,7 +129,7 @@ object ElementTypesViewRow {
       "dtd_identifier" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.dtdIdentifier)
     )
   )
-  implicit val read: Read[ElementTypesViewRow] = new Read[ElementTypesViewRow](
+  implicit lazy val read: Read[ElementTypesViewRow] = new Read[ElementTypesViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

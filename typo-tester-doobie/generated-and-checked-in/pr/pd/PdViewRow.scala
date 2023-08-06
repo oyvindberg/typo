@@ -30,9 +30,9 @@ case class PdViewRow(
 )
 
 object PdViewRow {
-  implicit val decoder: Decoder[PdViewRow] = Decoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(PdViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductdescriptionId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PdViewRow] = Encoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(x => (x.id, x.productdescriptionid, x.description, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductdescriptionId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[PdViewRow] = new Read[PdViewRow](
+  implicit lazy val decoder: Decoder[PdViewRow] = Decoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(PdViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductdescriptionId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PdViewRow] = Encoder.forProduct5[PdViewRow, Option[Int], Option[ProductdescriptionId], Option[/* max 400 chars */ String], Option[UUID], Option[TypoLocalDateTime]]("id", "productdescriptionid", "description", "rowguid", "modifieddate")(x => (x.id, x.productdescriptionid, x.description, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductdescriptionId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[PdViewRow] = new Read[PdViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (ProductdescriptionId.get, Nullability.Nullable),

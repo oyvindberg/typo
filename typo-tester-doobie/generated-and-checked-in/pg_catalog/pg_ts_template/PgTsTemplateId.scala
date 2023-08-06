@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_ts_template` */
 case class PgTsTemplateId(value: /* oid */ Long) extends AnyVal
 object PgTsTemplateId {
-  implicit val arrayGet: Get[Array[PgTsTemplateId]] = adventureworks.LongArrayMeta.get.map(_.map(PgTsTemplateId.apply))
-  implicit val arrayPut: Put[Array[PgTsTemplateId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgTsTemplateId, /* oid */ Long] = Bijection[PgTsTemplateId, /* oid */ Long](_.value)(PgTsTemplateId.apply)
-  implicit val decoder: Decoder[PgTsTemplateId] = Decoder.decodeLong.map(PgTsTemplateId.apply)
-  implicit val encoder: Encoder[PgTsTemplateId] = Encoder.encodeLong.contramap(_.value)
-  implicit val get: Get[PgTsTemplateId] = Meta.LongMeta.get.map(PgTsTemplateId.apply)
-  implicit val ordering: Ordering[PgTsTemplateId] = Ordering.by(_.value)
-  implicit val put: Put[PgTsTemplateId] = Meta.LongMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[PgTsTemplateId]] = adventureworks.LongArrayMeta.get.map(_.map(PgTsTemplateId.apply))
+  implicit lazy val arrayPut: Put[Array[PgTsTemplateId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgTsTemplateId, /* oid */ Long] = Bijection[PgTsTemplateId, /* oid */ Long](_.value)(PgTsTemplateId.apply)
+  implicit lazy val decoder: Decoder[PgTsTemplateId] = Decoder.decodeLong.map(PgTsTemplateId.apply)
+  implicit lazy val encoder: Encoder[PgTsTemplateId] = Encoder.encodeLong.contramap(_.value)
+  implicit lazy val get: Get[PgTsTemplateId] = Meta.LongMeta.get.map(PgTsTemplateId.apply)
+  implicit lazy val ordering: Ordering[PgTsTemplateId] = Ordering.by(_.value)
+  implicit lazy val put: Put[PgTsTemplateId] = Meta.LongMeta.put.contramap(_.value)
 }

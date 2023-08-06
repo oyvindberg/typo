@@ -23,9 +23,9 @@ case class PgOpfamilyRow(
 )
 
 object PgOpfamilyRow {
-  implicit val decoder: Decoder[PgOpfamilyRow] = Decoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(PgOpfamilyRow.apply)(PgOpfamilyId.decoder, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong)
-  implicit val encoder: Encoder[PgOpfamilyRow] = Encoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(x => (x.oid, x.opfmethod, x.opfname, x.opfnamespace, x.opfowner))(PgOpfamilyId.encoder, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong)
-  implicit val read: Read[PgOpfamilyRow] = new Read[PgOpfamilyRow](
+  implicit lazy val decoder: Decoder[PgOpfamilyRow] = Decoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(PgOpfamilyRow.apply)(PgOpfamilyId.decoder, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgOpfamilyRow] = Encoder.forProduct5[PgOpfamilyRow, PgOpfamilyId, /* oid */ Long, String, /* oid */ Long, /* oid */ Long]("oid", "opfmethod", "opfname", "opfnamespace", "opfowner")(x => (x.oid, x.opfmethod, x.opfname, x.opfnamespace, x.opfowner))(PgOpfamilyId.encoder, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val read: Read[PgOpfamilyRow] = new Read[PgOpfamilyRow](
     gets = List(
       (PgOpfamilyId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

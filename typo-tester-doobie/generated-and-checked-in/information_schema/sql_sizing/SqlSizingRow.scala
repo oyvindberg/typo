@@ -23,9 +23,9 @@ case class SqlSizingRow(
 )
 
 object SqlSizingRow {
-  implicit val decoder: Decoder[SqlSizingRow] = Decoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(SqlSizingRow.apply)(Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder))
-  implicit val encoder: Encoder[SqlSizingRow] = Encoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(x => (x.sizingId, x.sizingName, x.supportedValue, x.comments))(Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder))
-  implicit val read: Read[SqlSizingRow] = new Read[SqlSizingRow](
+  implicit lazy val decoder: Decoder[SqlSizingRow] = Decoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(SqlSizingRow.apply)(Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder), Decoder.decodeOption(CardinalNumber.decoder), Decoder.decodeOption(CharacterData.decoder))
+  implicit lazy val encoder: Encoder[SqlSizingRow] = Encoder.forProduct4[SqlSizingRow, Option[CardinalNumber], Option[CharacterData], Option[CardinalNumber], Option[CharacterData]]("sizing_id", "sizing_name", "supported_value", "comments")(x => (x.sizingId, x.sizingName, x.supportedValue, x.comments))(Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder), Encoder.encodeOption(CardinalNumber.encoder), Encoder.encodeOption(CharacterData.encoder))
+  implicit lazy val read: Read[SqlSizingRow] = new Read[SqlSizingRow](
     gets = List(
       (CardinalNumber.get, Nullability.Nullable),
       (CharacterData.get, Nullability.Nullable),

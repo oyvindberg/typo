@@ -26,9 +26,9 @@ case class AddresstypeRow(
 )
 
 object AddresstypeRow {
-  implicit val decoder: Decoder[AddresstypeRow] = Decoder.forProduct4[AddresstypeRow, AddresstypeId, Name, UUID, TypoLocalDateTime]("addresstypeid", "name", "rowguid", "modifieddate")(AddresstypeRow.apply)(AddresstypeId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[AddresstypeRow] = Encoder.forProduct4[AddresstypeRow, AddresstypeId, Name, UUID, TypoLocalDateTime]("addresstypeid", "name", "rowguid", "modifieddate")(x => (x.addresstypeid, x.name, x.rowguid, x.modifieddate))(AddresstypeId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[AddresstypeRow] = new Read[AddresstypeRow](
+  implicit lazy val decoder: Decoder[AddresstypeRow] = Decoder.forProduct4[AddresstypeRow, AddresstypeId, Name, UUID, TypoLocalDateTime]("addresstypeid", "name", "rowguid", "modifieddate")(AddresstypeRow.apply)(AddresstypeId.decoder, Name.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[AddresstypeRow] = Encoder.forProduct4[AddresstypeRow, AddresstypeId, Name, UUID, TypoLocalDateTime]("addresstypeid", "name", "rowguid", "modifieddate")(x => (x.addresstypeid, x.name, x.rowguid, x.modifieddate))(AddresstypeId.encoder, Name.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[AddresstypeRow] = new Read[AddresstypeRow](
     gets = List(
       (AddresstypeId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

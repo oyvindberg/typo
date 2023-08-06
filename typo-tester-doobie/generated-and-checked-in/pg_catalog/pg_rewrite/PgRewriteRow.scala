@@ -27,9 +27,9 @@ case class PgRewriteRow(
 )
 
 object PgRewriteRow {
-  implicit val decoder: Decoder[PgRewriteRow] = Decoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(PgRewriteRow.apply)(PgRewriteId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, TypoPgNodeTree.decoder, TypoPgNodeTree.decoder)
-  implicit val encoder: Encoder[PgRewriteRow] = Encoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(x => (x.oid, x.rulename, x.evClass, x.evType, x.evEnabled, x.isInstead, x.evQual, x.evAction))(PgRewriteId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, TypoPgNodeTree.encoder, TypoPgNodeTree.encoder)
-  implicit val read: Read[PgRewriteRow] = new Read[PgRewriteRow](
+  implicit lazy val decoder: Decoder[PgRewriteRow] = Decoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(PgRewriteRow.apply)(PgRewriteId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, TypoPgNodeTree.decoder, TypoPgNodeTree.decoder)
+  implicit lazy val encoder: Encoder[PgRewriteRow] = Encoder.forProduct8[PgRewriteRow, PgRewriteId, String, /* oid */ Long, String, String, Boolean, TypoPgNodeTree, TypoPgNodeTree]("oid", "rulename", "ev_class", "ev_type", "ev_enabled", "is_instead", "ev_qual", "ev_action")(x => (x.oid, x.rulename, x.evClass, x.evType, x.evEnabled, x.isInstead, x.evQual, x.evAction))(PgRewriteId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, TypoPgNodeTree.encoder, TypoPgNodeTree.encoder)
+  implicit lazy val read: Read[PgRewriteRow] = new Read[PgRewriteRow](
     gets = List(
       (PgRewriteId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

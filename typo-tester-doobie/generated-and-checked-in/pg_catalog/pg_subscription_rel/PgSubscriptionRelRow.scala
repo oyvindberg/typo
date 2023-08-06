@@ -24,9 +24,9 @@ case class PgSubscriptionRelRow(
  }
 
 object PgSubscriptionRelRow {
-  implicit val decoder: Decoder[PgSubscriptionRelRow] = Decoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(PgSubscriptionRelRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeLong))
-  implicit val encoder: Encoder[PgSubscriptionRelRow] = Encoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(x => (x.srsubid, x.srrelid, x.srsubstate, x.srsublsn))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeLong))
-  implicit val read: Read[PgSubscriptionRelRow] = new Read[PgSubscriptionRelRow](
+  implicit lazy val decoder: Decoder[PgSubscriptionRelRow] = Decoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(PgSubscriptionRelRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeLong))
+  implicit lazy val encoder: Encoder[PgSubscriptionRelRow] = Encoder.forProduct4[PgSubscriptionRelRow, /* oid */ Long, /* oid */ Long, String, Option[/* pg_lsn */ Long]]("srsubid", "srrelid", "srsubstate", "srsublsn")(x => (x.srsubid, x.srrelid, x.srsubstate, x.srsublsn))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeLong))
+  implicit lazy val read: Read[PgSubscriptionRelRow] = new Read[PgSubscriptionRelRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

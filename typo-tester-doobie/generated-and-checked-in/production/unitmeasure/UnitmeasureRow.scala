@@ -24,9 +24,9 @@ case class UnitmeasureRow(
 )
 
 object UnitmeasureRow {
-  implicit val decoder: Decoder[UnitmeasureRow] = Decoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRow.apply)(UnitmeasureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[UnitmeasureRow] = Encoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))(UnitmeasureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[UnitmeasureRow] = new Read[UnitmeasureRow](
+  implicit lazy val decoder: Decoder[UnitmeasureRow] = Decoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRow.apply)(UnitmeasureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[UnitmeasureRow] = Encoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))(UnitmeasureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[UnitmeasureRow] = new Read[UnitmeasureRow](
     gets = List(
       (UnitmeasureId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

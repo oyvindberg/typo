@@ -24,9 +24,9 @@ case class PgTablespaceRow(
 )
 
 object PgTablespaceRow {
-  implicit val decoder: Decoder[PgTablespaceRow] = Decoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(PgTablespaceRow.apply)(PgTablespaceId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit val encoder: Encoder[PgTablespaceRow] = Encoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(x => (x.oid, x.spcname, x.spcowner, x.spcacl, x.spcoptions))(PgTablespaceId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
-  implicit val read: Read[PgTablespaceRow] = new Read[PgTablespaceRow](
+  implicit lazy val decoder: Decoder[PgTablespaceRow] = Decoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(PgTablespaceRow.apply)(PgTablespaceId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgTablespaceRow] = Encoder.forProduct5[PgTablespaceRow, PgTablespaceId, String, /* oid */ Long, Option[Array[TypoAclItem]], Option[Array[String]]]("oid", "spcname", "spcowner", "spcacl", "spcoptions")(x => (x.oid, x.spcname, x.spcowner, x.spcacl, x.spcoptions))(PgTablespaceId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val read: Read[PgTablespaceRow] = new Read[PgTablespaceRow](
     gets = List(
       (PgTablespaceId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

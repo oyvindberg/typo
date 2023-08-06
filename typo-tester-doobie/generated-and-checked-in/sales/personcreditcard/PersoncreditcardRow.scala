@@ -29,9 +29,9 @@ case class PersoncreditcardRow(
  }
 
 object PersoncreditcardRow {
-  implicit val decoder: Decoder[PersoncreditcardRow] = Decoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRow.apply)(BusinessentityId.decoder, CreditcardId.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[PersoncreditcardRow] = Encoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CreditcardId.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[PersoncreditcardRow] = new Read[PersoncreditcardRow](
+  implicit lazy val decoder: Decoder[PersoncreditcardRow] = Decoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRow.apply)(BusinessentityId.decoder, CreditcardId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PersoncreditcardRow] = Encoder.forProduct3[PersoncreditcardRow, BusinessentityId, CreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CreditcardId.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[PersoncreditcardRow] = new Read[PersoncreditcardRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (CreditcardId.get, Nullability.NoNulls),

@@ -18,12 +18,12 @@ import typo.dsl.Bijection
   */
 case class SqlIdentifier(value: String) extends AnyVal
 object SqlIdentifier {
-  implicit val arrayGet: Get[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.get.map(_.map(SqlIdentifier.apply))
-  implicit val arrayPut: Put[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[SqlIdentifier, String] = Bijection[SqlIdentifier, String](_.value)(SqlIdentifier.apply)
-  implicit val decoder: Decoder[SqlIdentifier] = Decoder.decodeString.map(SqlIdentifier.apply)
-  implicit val encoder: Encoder[SqlIdentifier] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[SqlIdentifier] = Meta.StringMeta.get.map(SqlIdentifier.apply)
-  implicit val ordering: Ordering[SqlIdentifier] = Ordering.by(_.value)
-  implicit val put: Put[SqlIdentifier] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.get.map(_.map(SqlIdentifier.apply))
+  implicit lazy val arrayPut: Put[Array[SqlIdentifier]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[SqlIdentifier, String] = Bijection[SqlIdentifier, String](_.value)(SqlIdentifier.apply)
+  implicit lazy val decoder: Decoder[SqlIdentifier] = Decoder.decodeString.map(SqlIdentifier.apply)
+  implicit lazy val encoder: Encoder[SqlIdentifier] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[SqlIdentifier] = Meta.StringMeta.get.map(SqlIdentifier.apply)
+  implicit lazy val ordering: Ordering[SqlIdentifier] = Ordering.by(_.value)
+  implicit lazy val put: Put[SqlIdentifier] = Meta.StringMeta.put.contramap(_.value)
 }

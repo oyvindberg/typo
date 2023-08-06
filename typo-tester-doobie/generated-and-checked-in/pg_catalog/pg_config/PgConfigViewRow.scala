@@ -20,9 +20,9 @@ case class PgConfigViewRow(
 )
 
 object PgConfigViewRow {
-  implicit val decoder: Decoder[PgConfigViewRow] = Decoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(PgConfigViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PgConfigViewRow] = Encoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(x => (x.name, x.setting))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PgConfigViewRow] = new Read[PgConfigViewRow](
+  implicit lazy val decoder: Decoder[PgConfigViewRow] = Decoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(PgConfigViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgConfigViewRow] = Encoder.forProduct2[PgConfigViewRow, Option[String], Option[String]]("name", "setting")(x => (x.name, x.setting))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PgConfigViewRow] = new Read[PgConfigViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable)

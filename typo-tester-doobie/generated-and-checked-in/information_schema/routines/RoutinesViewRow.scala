@@ -108,7 +108,7 @@ case class RoutinesViewRow(
 )
 
 object RoutinesViewRow {
-  implicit val decoder: Decoder[RoutinesViewRow] = Decoder.instanceTry[RoutinesViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[RoutinesViewRow] = Decoder.instanceTry[RoutinesViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -200,7 +200,7 @@ object RoutinesViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[RoutinesViewRow] = Encoder[RoutinesViewRow](row =>
+  implicit lazy val encoder: Encoder[RoutinesViewRow] = Encoder[RoutinesViewRow](row =>
     Json.obj(
       "specific_catalog" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.specificCatalog),
       "specific_schema" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.specificSchema),
@@ -286,7 +286,7 @@ object RoutinesViewRow {
       "result_cast_dtd_identifier" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.resultCastDtdIdentifier)
     )
   )
-  implicit val read: Read[RoutinesViewRow] = new Read[RoutinesViewRow](
+  implicit lazy val read: Read[RoutinesViewRow] = new Read[RoutinesViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

@@ -26,9 +26,9 @@ case class PmiViewRow(
 )
 
 object PmiViewRow {
-  implicit val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[PmiViewRow] = new Read[PmiViewRow](
+  implicit lazy val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)(Decoder.decodeOption(ProductmodelId.decoder), Decoder.decodeOption(IllustrationId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, Option[ProductmodelId], Option[IllustrationId], Option[TypoLocalDateTime]]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(Encoder.encodeOption(ProductmodelId.encoder), Encoder.encodeOption(IllustrationId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[PmiViewRow] = new Read[PmiViewRow](
     gets = List(
       (ProductmodelId.get, Nullability.Nullable),
       (IllustrationId.get, Nullability.Nullable),

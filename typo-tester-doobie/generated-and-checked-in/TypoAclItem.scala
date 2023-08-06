@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoAclItem(value: String)
 
 object TypoAclItem {
-  implicit val arrayGet: Get[Array[TypoAclItem]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"))
+  implicit lazy val arrayGet: Get[Array[TypoAclItem]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"))
     .map(_.map(v => TypoAclItem(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoAclItem]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"), "aclitem")
+  implicit lazy val arrayPut: Put[Array[TypoAclItem]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_aclitem"), "aclitem")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("aclitem")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoAclItem, String] = Bijection[TypoAclItem, String](_.value)(TypoAclItem.apply)
-  implicit val decoder: Decoder[TypoAclItem] = Decoder.decodeString.map(TypoAclItem.apply)
-  implicit val encoder: Encoder[TypoAclItem] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoAclItem] = Get.Advanced.other[PGobject](NonEmptyList.one("aclitem"))
+  implicit lazy val bijection: Bijection[TypoAclItem, String] = Bijection[TypoAclItem, String](_.value)(TypoAclItem.apply)
+  implicit lazy val decoder: Decoder[TypoAclItem] = Decoder.decodeString.map(TypoAclItem.apply)
+  implicit lazy val encoder: Encoder[TypoAclItem] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoAclItem] = Get.Advanced.other[PGobject](NonEmptyList.one("aclitem"))
     .map(v => TypoAclItem(v.getValue))
-  implicit val ordering: Ordering[TypoAclItem] = Ordering.by(_.value)
-  implicit val put: Put[TypoAclItem] = Put.Advanced.other[PGobject](NonEmptyList.one("aclitem")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoAclItem] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoAclItem] = Put.Advanced.other[PGobject](NonEmptyList.one("aclitem")).contramap(v => {
                                                                              val obj = new PGobject
                                                                              obj.setType("aclitem")
                                                                              obj.setValue(v.value)

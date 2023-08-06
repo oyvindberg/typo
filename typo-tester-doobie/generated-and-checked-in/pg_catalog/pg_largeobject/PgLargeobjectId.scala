@@ -13,7 +13,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `pg_catalog.pg_largeobject` */
 case class PgLargeobjectId(loid: /* oid */ Long, pageno: Int)
 object PgLargeobjectId {
-  implicit val decoder: Decoder[PgLargeobjectId] = Decoder.forProduct2[PgLargeobjectId, /* oid */ Long, Int]("loid", "pageno")(PgLargeobjectId.apply)(Decoder.decodeLong, Decoder.decodeInt)
-  implicit val encoder: Encoder[PgLargeobjectId] = Encoder.forProduct2[PgLargeobjectId, /* oid */ Long, Int]("loid", "pageno")(x => (x.loid, x.pageno))(Encoder.encodeLong, Encoder.encodeInt)
-  implicit val ordering: Ordering[PgLargeobjectId] = Ordering.by(x => (x.loid, x.pageno))
+  implicit lazy val decoder: Decoder[PgLargeobjectId] = Decoder.forProduct2[PgLargeobjectId, /* oid */ Long, Int]("loid", "pageno")(PgLargeobjectId.apply)(Decoder.decodeLong, Decoder.decodeInt)
+  implicit lazy val encoder: Encoder[PgLargeobjectId] = Encoder.forProduct2[PgLargeobjectId, /* oid */ Long, Int]("loid", "pageno")(x => (x.loid, x.pageno))(Encoder.encodeLong, Encoder.encodeInt)
+  implicit lazy val ordering: Ordering[PgLargeobjectId] = Ordering.by(x => (x.loid, x.pageno))
 }

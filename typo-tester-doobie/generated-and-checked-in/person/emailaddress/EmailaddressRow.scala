@@ -32,9 +32,9 @@ case class EmailaddressRow(
  }
 
 object EmailaddressRow {
-  implicit val decoder: Decoder[EmailaddressRow] = Decoder.forProduct5[EmailaddressRow, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EmailaddressRow.apply)(BusinessentityId.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[EmailaddressRow] = Encoder.forProduct5[EmailaddressRow, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[EmailaddressRow] = new Read[EmailaddressRow](
+  implicit lazy val decoder: Decoder[EmailaddressRow] = Decoder.forProduct5[EmailaddressRow, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EmailaddressRow.apply)(BusinessentityId.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[EmailaddressRow] = Encoder.forProduct5[EmailaddressRow, BusinessentityId, Int, Option[/* max 50 chars */ String], UUID, TypoLocalDateTime]("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[EmailaddressRow] = new Read[EmailaddressRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (Meta.IntMeta.get, Nullability.NoNulls),

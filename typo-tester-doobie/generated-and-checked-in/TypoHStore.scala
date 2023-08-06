@@ -17,29 +17,29 @@ import typo.dsl.Bijection
 case class TypoHStore(value: Map[String, String])
 
 object TypoHStore {
-  implicit val arrayGet: Get[Array[TypoHStore]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_hstore"))
+  implicit lazy val arrayGet: Get[Array[TypoHStore]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_hstore"))
     .map(_.map(v => {
                       val b = Map.newBuilder[String, String]
                       v.asInstanceOf[java.util.Map[?, ?]].forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                       TypoHStore(b.result())
                     }))
-  implicit val arrayPut: Put[Array[TypoHStore]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_hstore"), "hstore")
+  implicit lazy val arrayPut: Put[Array[TypoHStore]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_hstore"), "hstore")
     .contramap(_.map(v => {
                             val b = new HashMap[String, String]
                             v.value.foreach { case (k, v) => b.put(k, v)}
                             b
                           }))
-  implicit val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
-  implicit val decoder: Decoder[TypoHStore] = Decoder[Map[String, String]].map(TypoHStore.apply)
-  implicit val encoder: Encoder[TypoHStore] = Encoder[Map[String, String]].contramap(_.value)
-  implicit val get: Get[TypoHStore] = Get.Advanced.other[java.util.Map[?, ?]](NonEmptyList.one("hstore"))
+  implicit lazy val bijection: Bijection[TypoHStore, Map[String, String]] = Bijection[TypoHStore, Map[String, String]](_.value)(TypoHStore.apply)
+  implicit lazy val decoder: Decoder[TypoHStore] = Decoder[Map[String, String]].map(TypoHStore.apply)
+  implicit lazy val encoder: Encoder[TypoHStore] = Encoder[Map[String, String]].contramap(_.value)
+  implicit lazy val get: Get[TypoHStore] = Get.Advanced.other[java.util.Map[?, ?]](NonEmptyList.one("hstore"))
     .map(v => {
                 val b = Map.newBuilder[String, String]
                 v.forEach { case (k, v) => b += k.asInstanceOf[String] -> v.asInstanceOf[String]}
                 TypoHStore(b.result())
               })
   implicit def ordering(implicit O0: Ordering[Map[String, String]]): Ordering[TypoHStore] = Ordering.by(_.value)
-  implicit val put: Put[TypoHStore] = Put.Advanced.other[java.util.Map[String, String]](NonEmptyList.one("hstore")).contramap(v => {
+  implicit lazy val put: Put[TypoHStore] = Put.Advanced.other[java.util.Map[String, String]](NonEmptyList.one("hstore")).contramap(v => {
                                                                                                  val b = new HashMap[String, String]
                                                                                                  v.value.foreach { case (k, v) => b.put(k, v)}
                                                                                                  b

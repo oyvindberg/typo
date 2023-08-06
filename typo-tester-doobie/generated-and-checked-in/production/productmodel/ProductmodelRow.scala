@@ -31,9 +31,9 @@ case class ProductmodelRow(
 )
 
 object ProductmodelRow {
-  implicit val decoder: Decoder[ProductmodelRow] = Decoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(ProductmodelRow.apply)(ProductmodelId.decoder, Name.decoder, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ProductmodelRow] = Encoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))(ProductmodelId.encoder, Name.encoder, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[ProductmodelRow] = new Read[ProductmodelRow](
+  implicit lazy val decoder: Decoder[ProductmodelRow] = Decoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(ProductmodelRow.apply)(ProductmodelId.decoder, Name.decoder, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductmodelRow] = Encoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], UUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))(ProductmodelId.encoder, Name.encoder, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ProductmodelRow] = new Read[ProductmodelRow](
     gets = List(
       (ProductmodelId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

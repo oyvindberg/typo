@@ -54,7 +54,7 @@ case class UserDefinedTypesViewRow(
 )
 
 object UserDefinedTypesViewRow {
-  implicit val decoder: Decoder[UserDefinedTypesViewRow] = Decoder.instanceTry[UserDefinedTypesViewRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[UserDefinedTypesViewRow] = Decoder.instanceTry[UserDefinedTypesViewRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -93,7 +93,7 @@ object UserDefinedTypesViewRow {
       )
     }
   )
-  implicit val encoder: Encoder[UserDefinedTypesViewRow] = Encoder[UserDefinedTypesViewRow](row =>
+  implicit lazy val encoder: Encoder[UserDefinedTypesViewRow] = Encoder[UserDefinedTypesViewRow](row =>
     Json.obj(
       "user_defined_type_catalog" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.userDefinedTypeCatalog),
       "user_defined_type_schema" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.userDefinedTypeSchema),
@@ -126,7 +126,7 @@ object UserDefinedTypesViewRow {
       "ref_dtd_identifier" -> Encoder.encodeOption(SqlIdentifier.encoder).apply(row.refDtdIdentifier)
     )
   )
-  implicit val read: Read[UserDefinedTypesViewRow] = new Read[UserDefinedTypesViewRow](
+  implicit lazy val read: Read[UserDefinedTypesViewRow] = new Read[UserDefinedTypesViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable),
       (SqlIdentifier.get, Nullability.Nullable),

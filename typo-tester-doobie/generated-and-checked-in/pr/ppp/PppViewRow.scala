@@ -29,9 +29,9 @@ case class PppViewRow(
 )
 
 object PppViewRow {
-  implicit val decoder: Decoder[PppViewRow] = Decoder.forProduct4[PppViewRow, Option[ProductId], Option[ProductphotoId], Flag, Option[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(PppViewRow.apply)(Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(ProductphotoId.decoder), Flag.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[PppViewRow] = Encoder.forProduct4[PppViewRow, Option[ProductId], Option[ProductphotoId], Flag, Option[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))(Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(ProductphotoId.encoder), Flag.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[PppViewRow] = new Read[PppViewRow](
+  implicit lazy val decoder: Decoder[PppViewRow] = Decoder.forProduct4[PppViewRow, Option[ProductId], Option[ProductphotoId], Flag, Option[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(PppViewRow.apply)(Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(ProductphotoId.decoder), Flag.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[PppViewRow] = Encoder.forProduct4[PppViewRow, Option[ProductId], Option[ProductphotoId], Flag, Option[TypoLocalDateTime]]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))(Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(ProductphotoId.encoder), Flag.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[PppViewRow] = new Read[PppViewRow](
     gets = List(
       (ProductId.get, Nullability.Nullable),
       (ProductphotoId.get, Nullability.Nullable),

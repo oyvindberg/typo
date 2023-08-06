@@ -32,9 +32,9 @@ case class EmployeepayhistoryRow(
  }
 
 object EmployeepayhistoryRow {
-  implicit val decoder: Decoder[EmployeepayhistoryRow] = Decoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeInt, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[EmployeepayhistoryRow] = Encoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeInt, TypoLocalDateTime.encoder)
-  implicit val read: Read[EmployeepayhistoryRow] = new Read[EmployeepayhistoryRow](
+  implicit lazy val decoder: Decoder[EmployeepayhistoryRow] = Decoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, Decoder.decodeInt, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[EmployeepayhistoryRow] = Encoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, Int, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, Encoder.encodeInt, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[EmployeepayhistoryRow] = new Read[EmployeepayhistoryRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (TypoLocalDateTime.get, Nullability.NoNulls),

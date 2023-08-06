@@ -24,9 +24,9 @@ case class PgAuthMembersRow(
  }
 
 object PgAuthMembersRow {
-  implicit val decoder: Decoder[PgAuthMembersRow] = Decoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(PgAuthMembersRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean)
-  implicit val encoder: Encoder[PgAuthMembersRow] = Encoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(x => (x.roleid, x.member, x.grantor, x.adminOption))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean)
-  implicit val read: Read[PgAuthMembersRow] = new Read[PgAuthMembersRow](
+  implicit lazy val decoder: Decoder[PgAuthMembersRow] = Decoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(PgAuthMembersRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeBoolean)
+  implicit lazy val encoder: Encoder[PgAuthMembersRow] = Encoder.forProduct4[PgAuthMembersRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Boolean]("roleid", "member", "grantor", "admin_option")(x => (x.roleid, x.member, x.grantor, x.adminOption))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeBoolean)
+  implicit lazy val read: Read[PgAuthMembersRow] = new Read[PgAuthMembersRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

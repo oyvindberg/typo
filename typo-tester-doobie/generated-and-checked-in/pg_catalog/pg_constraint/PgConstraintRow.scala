@@ -48,7 +48,7 @@ case class PgConstraintRow(
 )
 
 object PgConstraintRow {
-  implicit val decoder: Decoder[PgConstraintRow] = Decoder.instanceTry[PgConstraintRow]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[PgConstraintRow] = Decoder.instanceTry[PgConstraintRow]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -83,7 +83,7 @@ object PgConstraintRow {
       )
     }
   )
-  implicit val encoder: Encoder[PgConstraintRow] = Encoder[PgConstraintRow](row =>
+  implicit lazy val encoder: Encoder[PgConstraintRow] = Encoder[PgConstraintRow](row =>
     Json.obj(
       "oid" -> PgConstraintId.encoder.apply(row.oid),
       "conname" -> Encoder.encodeString.apply(row.conname),
@@ -112,7 +112,7 @@ object PgConstraintRow {
       "conbin" -> Encoder.encodeOption(TypoPgNodeTree.encoder).apply(row.conbin)
     )
   )
-  implicit val read: Read[PgConstraintRow] = new Read[PgConstraintRow](
+  implicit lazy val read: Read[PgConstraintRow] = new Read[PgConstraintRow](
     gets = List(
       (PgConstraintId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

@@ -14,7 +14,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `sales.salesorderdetail` */
 case class SalesorderdetailId(salesorderid: SalesorderheaderId, salesorderdetailid: Int)
 object SalesorderdetailId {
-  implicit val decoder: Decoder[SalesorderdetailId] = Decoder.forProduct2[SalesorderdetailId, SalesorderheaderId, Int]("salesorderid", "salesorderdetailid")(SalesorderdetailId.apply)(SalesorderheaderId.decoder, Decoder.decodeInt)
-  implicit val encoder: Encoder[SalesorderdetailId] = Encoder.forProduct2[SalesorderdetailId, SalesorderheaderId, Int]("salesorderid", "salesorderdetailid")(x => (x.salesorderid, x.salesorderdetailid))(SalesorderheaderId.encoder, Encoder.encodeInt)
-  implicit val ordering: Ordering[SalesorderdetailId] = Ordering.by(x => (x.salesorderid, x.salesorderdetailid))
+  implicit lazy val decoder: Decoder[SalesorderdetailId] = Decoder.forProduct2[SalesorderdetailId, SalesorderheaderId, Int]("salesorderid", "salesorderdetailid")(SalesorderdetailId.apply)(SalesorderheaderId.decoder, Decoder.decodeInt)
+  implicit lazy val encoder: Encoder[SalesorderdetailId] = Encoder.forProduct2[SalesorderdetailId, SalesorderheaderId, Int]("salesorderid", "salesorderdetailid")(x => (x.salesorderid, x.salesorderdetailid))(SalesorderheaderId.encoder, Encoder.encodeInt)
+  implicit lazy val ordering: Ordering[SalesorderdetailId] = Ordering.by(x => (x.salesorderid, x.salesorderdetailid))
 }

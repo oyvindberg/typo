@@ -17,22 +17,22 @@ import typo.dsl.Bijection
 case class TypoJson(value: String)
 
 object TypoJson {
-  implicit val arrayGet: Get[Array[TypoJson]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_json"))
+  implicit lazy val arrayGet: Get[Array[TypoJson]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_json"))
     .map(_.map(v => TypoJson(v.asInstanceOf[String])))
-  implicit val arrayPut: Put[Array[TypoJson]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_json"), "json")
+  implicit lazy val arrayPut: Put[Array[TypoJson]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_json"), "json")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("json")
                             obj.setValue(v.value)
                             obj
                           }))
-  implicit val bijection: Bijection[TypoJson, String] = Bijection[TypoJson, String](_.value)(TypoJson.apply)
-  implicit val decoder: Decoder[TypoJson] = Decoder.decodeString.map(TypoJson.apply)
-  implicit val encoder: Encoder[TypoJson] = Encoder.encodeString.contramap(_.value)
-  implicit val get: Get[TypoJson] = Get.Advanced.other[PGobject](NonEmptyList.one("json"))
+  implicit lazy val bijection: Bijection[TypoJson, String] = Bijection[TypoJson, String](_.value)(TypoJson.apply)
+  implicit lazy val decoder: Decoder[TypoJson] = Decoder.decodeString.map(TypoJson.apply)
+  implicit lazy val encoder: Encoder[TypoJson] = Encoder.encodeString.contramap(_.value)
+  implicit lazy val get: Get[TypoJson] = Get.Advanced.other[PGobject](NonEmptyList.one("json"))
     .map(v => TypoJson(v.getValue))
-  implicit val ordering: Ordering[TypoJson] = Ordering.by(_.value)
-  implicit val put: Put[TypoJson] = Put.Advanced.other[PGobject](NonEmptyList.one("json")).contramap(v => {
+  implicit lazy val ordering: Ordering[TypoJson] = Ordering.by(_.value)
+  implicit lazy val put: Put[TypoJson] = Put.Advanced.other[PGobject](NonEmptyList.one("json")).contramap(v => {
                                                                           val obj = new PGobject
                                                                           obj.setType("json")
                                                                           obj.setValue(v.value)

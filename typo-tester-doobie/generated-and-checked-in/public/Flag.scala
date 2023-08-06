@@ -18,12 +18,12 @@ import typo.dsl.Bijection
   */
 case class Flag(value: Boolean) extends AnyVal
 object Flag {
-  implicit val arrayGet: Get[Array[Flag]] = adventureworks.BooleanArrayMeta.get.map(_.map(Flag.apply))
-  implicit val arrayPut: Put[Array[Flag]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[Flag, Boolean] = Bijection[Flag, Boolean](_.value)(Flag.apply)
-  implicit val decoder: Decoder[Flag] = Decoder.decodeBoolean.map(Flag.apply)
-  implicit val encoder: Encoder[Flag] = Encoder.encodeBoolean.contramap(_.value)
-  implicit val get: Get[Flag] = Meta.BooleanMeta.get.map(Flag.apply)
-  implicit val ordering: Ordering[Flag] = Ordering.by(_.value)
-  implicit val put: Put[Flag] = Meta.BooleanMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[Flag]] = adventureworks.BooleanArrayMeta.get.map(_.map(Flag.apply))
+  implicit lazy val arrayPut: Put[Array[Flag]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[Flag, Boolean] = Bijection[Flag, Boolean](_.value)(Flag.apply)
+  implicit lazy val decoder: Decoder[Flag] = Decoder.decodeBoolean.map(Flag.apply)
+  implicit lazy val encoder: Encoder[Flag] = Encoder.encodeBoolean.contramap(_.value)
+  implicit lazy val get: Get[Flag] = Meta.BooleanMeta.get.map(Flag.apply)
+  implicit lazy val ordering: Ordering[Flag] = Ordering.by(_.value)
+  implicit lazy val put: Put[Flag] = Meta.BooleanMeta.put.contramap(_.value)
 }

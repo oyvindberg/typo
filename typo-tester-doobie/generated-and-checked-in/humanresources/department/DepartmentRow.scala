@@ -26,9 +26,9 @@ case class DepartmentRow(
 )
 
 object DepartmentRow {
-  implicit val decoder: Decoder[DepartmentRow] = Decoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(DepartmentRow.apply)(DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[DepartmentRow] = Encoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(x => (x.departmentid, x.name, x.groupname, x.modifieddate))(DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[DepartmentRow] = new Read[DepartmentRow](
+  implicit lazy val decoder: Decoder[DepartmentRow] = Decoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(DepartmentRow.apply)(DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[DepartmentRow] = Encoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(x => (x.departmentid, x.name, x.groupname, x.modifieddate))(DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[DepartmentRow] = new Read[DepartmentRow](
     gets = List(
       (DepartmentId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

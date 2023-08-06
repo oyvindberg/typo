@@ -24,9 +24,9 @@ case class PgShseclabelRow(
  }
 
 object PgShseclabelRow {
-  implicit val decoder: Decoder[PgShseclabelRow] = Decoder.forProduct4[PgShseclabelRow, /* oid */ Long, /* oid */ Long, String, String]("objoid", "classoid", "provider", "label")(PgShseclabelRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString)
-  implicit val encoder: Encoder[PgShseclabelRow] = Encoder.forProduct4[PgShseclabelRow, /* oid */ Long, /* oid */ Long, String, String]("objoid", "classoid", "provider", "label")(x => (x.objoid, x.classoid, x.provider, x.label))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString)
-  implicit val read: Read[PgShseclabelRow] = new Read[PgShseclabelRow](
+  implicit lazy val decoder: Decoder[PgShseclabelRow] = Decoder.forProduct4[PgShseclabelRow, /* oid */ Long, /* oid */ Long, String, String]("objoid", "classoid", "provider", "label")(PgShseclabelRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PgShseclabelRow] = Encoder.forProduct4[PgShseclabelRow, /* oid */ Long, /* oid */ Long, String, String]("objoid", "classoid", "provider", "label")(x => (x.objoid, x.classoid, x.provider, x.label))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString, Encoder.encodeString)
+  implicit lazy val read: Read[PgShseclabelRow] = new Read[PgShseclabelRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

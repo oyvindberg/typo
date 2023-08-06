@@ -28,9 +28,9 @@ case class JobcandidateRow(
 )
 
 object JobcandidateRow {
-  implicit val decoder: Decoder[JobcandidateRow] = Decoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(JobcandidateRow.apply)(JobcandidateId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[JobcandidateRow] = Encoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))(JobcandidateId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
-  implicit val read: Read[JobcandidateRow] = new Read[JobcandidateRow](
+  implicit lazy val decoder: Decoder[JobcandidateRow] = Decoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(JobcandidateRow.apply)(JobcandidateId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[JobcandidateRow] = Encoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))(JobcandidateId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[JobcandidateRow] = new Read[JobcandidateRow](
     gets = List(
       (JobcandidateId.get, Nullability.NoNulls),
       (BusinessentityId.get, Nullability.Nullable),

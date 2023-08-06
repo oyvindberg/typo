@@ -25,9 +25,9 @@ case class PgShdependRow(
 )
 
 object PgShdependRow {
-  implicit val decoder: Decoder[PgShdependRow] = Decoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(PgShdependRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString)
-  implicit val encoder: Encoder[PgShdependRow] = Encoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(x => (x.dbid, x.classid, x.objid, x.objsubid, x.refclassid, x.refobjid, x.deptype))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString)
-  implicit val read: Read[PgShdependRow] = new Read[PgShdependRow](
+  implicit lazy val decoder: Decoder[PgShdependRow] = Decoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(PgShdependRow.apply)(Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeInt, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PgShdependRow] = Encoder.forProduct7[PgShdependRow, /* oid */ Long, /* oid */ Long, /* oid */ Long, Int, /* oid */ Long, /* oid */ Long, String]("dbid", "classid", "objid", "objsubid", "refclassid", "refobjid", "deptype")(x => (x.dbid, x.classid, x.objid, x.objsubid, x.refclassid, x.refobjid, x.deptype))(Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeInt, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeString)
+  implicit lazy val read: Read[PgShdependRow] = new Read[PgShdependRow](
     gets = List(
       (Meta.LongMeta.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

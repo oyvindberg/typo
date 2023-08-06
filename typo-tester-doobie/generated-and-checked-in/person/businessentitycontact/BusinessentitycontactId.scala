@@ -15,7 +15,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `person.businessentitycontact` */
 case class BusinessentitycontactId(businessentityid: BusinessentityId, personid: BusinessentityId, contacttypeid: ContacttypeId)
 object BusinessentitycontactId {
-  implicit val decoder: Decoder[BusinessentitycontactId] = Decoder.forProduct3[BusinessentitycontactId, BusinessentityId, BusinessentityId, ContacttypeId]("businessentityid", "personid", "contacttypeid")(BusinessentitycontactId.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder)
-  implicit val encoder: Encoder[BusinessentitycontactId] = Encoder.forProduct3[BusinessentitycontactId, BusinessentityId, BusinessentityId, ContacttypeId]("businessentityid", "personid", "contacttypeid")(x => (x.businessentityid, x.personid, x.contacttypeid))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder)
-  implicit val ordering: Ordering[BusinessentitycontactId] = Ordering.by(x => (x.businessentityid, x.personid, x.contacttypeid))
+  implicit lazy val decoder: Decoder[BusinessentitycontactId] = Decoder.forProduct3[BusinessentitycontactId, BusinessentityId, BusinessentityId, ContacttypeId]("businessentityid", "personid", "contacttypeid")(BusinessentitycontactId.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder)
+  implicit lazy val encoder: Encoder[BusinessentitycontactId] = Encoder.forProduct3[BusinessentitycontactId, BusinessentityId, BusinessentityId, ContacttypeId]("businessentityid", "personid", "contacttypeid")(x => (x.businessentityid, x.personid, x.contacttypeid))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder)
+  implicit lazy val ordering: Ordering[BusinessentitycontactId] = Ordering.by(x => (x.businessentityid, x.personid, x.contacttypeid))
 }

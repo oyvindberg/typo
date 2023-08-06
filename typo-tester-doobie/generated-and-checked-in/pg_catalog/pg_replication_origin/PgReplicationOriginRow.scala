@@ -20,9 +20,9 @@ case class PgReplicationOriginRow(
 )
 
 object PgReplicationOriginRow {
-  implicit val decoder: Decoder[PgReplicationOriginRow] = Decoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(PgReplicationOriginRow.apply)(PgReplicationOriginId.decoder, Decoder.decodeString)
-  implicit val encoder: Encoder[PgReplicationOriginRow] = Encoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(x => (x.roident, x.roname))(PgReplicationOriginId.encoder, Encoder.encodeString)
-  implicit val read: Read[PgReplicationOriginRow] = new Read[PgReplicationOriginRow](
+  implicit lazy val decoder: Decoder[PgReplicationOriginRow] = Decoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(PgReplicationOriginRow.apply)(PgReplicationOriginId.decoder, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PgReplicationOriginRow] = Encoder.forProduct2[PgReplicationOriginRow, PgReplicationOriginId, String]("roident", "roname")(x => (x.roident, x.roname))(PgReplicationOriginId.encoder, Encoder.encodeString)
+  implicit lazy val read: Read[PgReplicationOriginRow] = new Read[PgReplicationOriginRow](
     gets = List(
       (PgReplicationOriginId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls)

@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `pg_catalog.pg_largeobject_metadata` */
 case class PgLargeobjectMetadataId(value: /* oid */ Long) extends AnyVal
 object PgLargeobjectMetadataId {
-  implicit val arrayGet: Get[Array[PgLargeobjectMetadataId]] = adventureworks.LongArrayMeta.get.map(_.map(PgLargeobjectMetadataId.apply))
-  implicit val arrayPut: Put[Array[PgLargeobjectMetadataId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[PgLargeobjectMetadataId, /* oid */ Long] = Bijection[PgLargeobjectMetadataId, /* oid */ Long](_.value)(PgLargeobjectMetadataId.apply)
-  implicit val decoder: Decoder[PgLargeobjectMetadataId] = Decoder.decodeLong.map(PgLargeobjectMetadataId.apply)
-  implicit val encoder: Encoder[PgLargeobjectMetadataId] = Encoder.encodeLong.contramap(_.value)
-  implicit val get: Get[PgLargeobjectMetadataId] = Meta.LongMeta.get.map(PgLargeobjectMetadataId.apply)
-  implicit val ordering: Ordering[PgLargeobjectMetadataId] = Ordering.by(_.value)
-  implicit val put: Put[PgLargeobjectMetadataId] = Meta.LongMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[PgLargeobjectMetadataId]] = adventureworks.LongArrayMeta.get.map(_.map(PgLargeobjectMetadataId.apply))
+  implicit lazy val arrayPut: Put[Array[PgLargeobjectMetadataId]] = adventureworks.LongArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[PgLargeobjectMetadataId, /* oid */ Long] = Bijection[PgLargeobjectMetadataId, /* oid */ Long](_.value)(PgLargeobjectMetadataId.apply)
+  implicit lazy val decoder: Decoder[PgLargeobjectMetadataId] = Decoder.decodeLong.map(PgLargeobjectMetadataId.apply)
+  implicit lazy val encoder: Encoder[PgLargeobjectMetadataId] = Encoder.encodeLong.contramap(_.value)
+  implicit lazy val get: Get[PgLargeobjectMetadataId] = Meta.LongMeta.get.map(PgLargeobjectMetadataId.apply)
+  implicit lazy val ordering: Ordering[PgLargeobjectMetadataId] = Ordering.by(_.value)
+  implicit lazy val put: Put[PgLargeobjectMetadataId] = Meta.LongMeta.put.contramap(_.value)
 }

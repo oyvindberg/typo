@@ -19,9 +19,9 @@ case class InformationSchemaCatalogNameViewRow(
 )
 
 object InformationSchemaCatalogNameViewRow {
-  implicit val decoder: Decoder[InformationSchemaCatalogNameViewRow] = Decoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(InformationSchemaCatalogNameViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder))
-  implicit val encoder: Encoder[InformationSchemaCatalogNameViewRow] = Encoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(x => (x.catalogName))(Encoder.encodeOption(SqlIdentifier.encoder))
-  implicit val read: Read[InformationSchemaCatalogNameViewRow] = new Read[InformationSchemaCatalogNameViewRow](
+  implicit lazy val decoder: Decoder[InformationSchemaCatalogNameViewRow] = Decoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(InformationSchemaCatalogNameViewRow.apply)(Decoder.decodeOption(SqlIdentifier.decoder))
+  implicit lazy val encoder: Encoder[InformationSchemaCatalogNameViewRow] = Encoder.forProduct1[InformationSchemaCatalogNameViewRow, Option[SqlIdentifier]]("catalog_name")(x => (x.catalogName))(Encoder.encodeOption(SqlIdentifier.encoder))
+  implicit lazy val read: Read[InformationSchemaCatalogNameViewRow] = new Read[InformationSchemaCatalogNameViewRow](
     gets = List(
       (SqlIdentifier.get, Nullability.Nullable)
     ),

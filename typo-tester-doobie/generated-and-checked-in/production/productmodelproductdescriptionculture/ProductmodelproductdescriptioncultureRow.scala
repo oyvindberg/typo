@@ -33,9 +33,9 @@ case class ProductmodelproductdescriptioncultureRow(
  }
 
 object ProductmodelproductdescriptioncultureRow {
-  implicit val decoder: Decoder[ProductmodelproductdescriptioncultureRow] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRow.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[ProductmodelproductdescriptioncultureRow] = new Read[ProductmodelproductdescriptioncultureRow](
+  implicit lazy val decoder: Decoder[ProductmodelproductdescriptioncultureRow] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRow.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ProductmodelproductdescriptioncultureRow] = new Read[ProductmodelproductdescriptioncultureRow](
     gets = List(
       (ProductmodelId.get, Nullability.NoNulls),
       (ProductdescriptionId.get, Nullability.NoNulls),

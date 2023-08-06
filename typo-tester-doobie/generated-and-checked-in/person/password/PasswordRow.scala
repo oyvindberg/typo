@@ -29,9 +29,9 @@ case class PasswordRow(
 )
 
 object PasswordRow {
-  implicit val decoder: Decoder[PasswordRow] = Decoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PasswordRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[PasswordRow] = Encoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
-  implicit val read: Read[PasswordRow] = new Read[PasswordRow](
+  implicit lazy val decoder: Decoder[PasswordRow] = Decoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(PasswordRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PasswordRow] = Encoder.forProduct5[PasswordRow, BusinessentityId, /* max 128 chars */ String, /* max 10 chars */ String, UUID, TypoLocalDateTime]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(x => (x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[PasswordRow] = new Read[PasswordRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

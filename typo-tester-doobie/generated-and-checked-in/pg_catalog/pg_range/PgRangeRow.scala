@@ -26,9 +26,9 @@ case class PgRangeRow(
 )
 
 object PgRangeRow {
-  implicit val decoder: Decoder[PgRangeRow] = Decoder.forProduct7[PgRangeRow, PgRangeId, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff")(PgRangeRow.apply)(PgRangeId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder)
-  implicit val encoder: Encoder[PgRangeRow] = Encoder.forProduct7[PgRangeRow, PgRangeId, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff")(x => (x.rngtypid, x.rngsubtype, x.rngmultitypid, x.rngcollation, x.rngsubopc, x.rngcanonical, x.rngsubdiff))(PgRangeId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder)
-  implicit val read: Read[PgRangeRow] = new Read[PgRangeRow](
+  implicit lazy val decoder: Decoder[PgRangeRow] = Decoder.forProduct7[PgRangeRow, PgRangeId, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff")(PgRangeRow.apply)(PgRangeId.decoder, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong, TypoRegproc.decoder, TypoRegproc.decoder)
+  implicit lazy val encoder: Encoder[PgRangeRow] = Encoder.forProduct7[PgRangeRow, PgRangeId, /* oid */ Long, /* oid */ Long, /* oid */ Long, /* oid */ Long, TypoRegproc, TypoRegproc]("rngtypid", "rngsubtype", "rngmultitypid", "rngcollation", "rngsubopc", "rngcanonical", "rngsubdiff")(x => (x.rngtypid, x.rngsubtype, x.rngmultitypid, x.rngcollation, x.rngsubopc, x.rngcanonical, x.rngsubdiff))(PgRangeId.encoder, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong, TypoRegproc.encoder, TypoRegproc.encoder)
+  implicit lazy val read: Read[PgRangeRow] = new Read[PgRangeRow](
     gets = List(
       (PgRangeId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),

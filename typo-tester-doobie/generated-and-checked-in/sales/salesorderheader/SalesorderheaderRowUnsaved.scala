@@ -156,7 +156,7 @@ case class SalesorderheaderRowUnsaved(
     )
 }
 object SalesorderheaderRowUnsaved {
-  implicit val decoder: Decoder[SalesorderheaderRowUnsaved] = Decoder.instanceTry[SalesorderheaderRowUnsaved]((c: HCursor) =>
+  implicit lazy val decoder: Decoder[SalesorderheaderRowUnsaved] = Decoder.instanceTry[SalesorderheaderRowUnsaved]((c: HCursor) =>
     Try {
       def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
         case Left(err) => throw err
@@ -191,7 +191,7 @@ object SalesorderheaderRowUnsaved {
       )
     }
   )
-  implicit val encoder: Encoder[SalesorderheaderRowUnsaved] = Encoder[SalesorderheaderRowUnsaved](row =>
+  implicit lazy val encoder: Encoder[SalesorderheaderRowUnsaved] = Encoder[SalesorderheaderRowUnsaved](row =>
     Json.obj(
       "duedate" -> TypoLocalDateTime.encoder.apply(row.duedate),
       "shipdate" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.shipdate),

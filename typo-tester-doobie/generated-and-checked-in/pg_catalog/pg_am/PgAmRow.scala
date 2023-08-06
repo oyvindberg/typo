@@ -23,9 +23,9 @@ case class PgAmRow(
 )
 
 object PgAmRow {
-  implicit val decoder: Decoder[PgAmRow] = Decoder.forProduct4[PgAmRow, PgAmId, String, TypoRegproc, String]("oid", "amname", "amhandler", "amtype")(PgAmRow.apply)(PgAmId.decoder, Decoder.decodeString, TypoRegproc.decoder, Decoder.decodeString)
-  implicit val encoder: Encoder[PgAmRow] = Encoder.forProduct4[PgAmRow, PgAmId, String, TypoRegproc, String]("oid", "amname", "amhandler", "amtype")(x => (x.oid, x.amname, x.amhandler, x.amtype))(PgAmId.encoder, Encoder.encodeString, TypoRegproc.encoder, Encoder.encodeString)
-  implicit val read: Read[PgAmRow] = new Read[PgAmRow](
+  implicit lazy val decoder: Decoder[PgAmRow] = Decoder.forProduct4[PgAmRow, PgAmId, String, TypoRegproc, String]("oid", "amname", "amhandler", "amtype")(PgAmRow.apply)(PgAmId.decoder, Decoder.decodeString, TypoRegproc.decoder, Decoder.decodeString)
+  implicit lazy val encoder: Encoder[PgAmRow] = Encoder.forProduct4[PgAmRow, PgAmId, String, TypoRegproc, String]("oid", "amname", "amhandler", "amtype")(x => (x.oid, x.amname, x.amhandler, x.amtype))(PgAmId.encoder, Encoder.encodeString, TypoRegproc.encoder, Encoder.encodeString)
+  implicit lazy val read: Read[PgAmRow] = new Read[PgAmRow](
     gets = List(
       (PgAmId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

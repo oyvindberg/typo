@@ -32,9 +32,9 @@ case class LViewRow(
 )
 
 object LViewRow {
-  implicit val decoder: Decoder[LViewRow] = Decoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(LViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(LocationId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[LViewRow] = Encoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(x => (x.id, x.locationid, x.name, x.costrate, x.availability, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(LocationId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[LViewRow] = new Read[LViewRow](
+  implicit lazy val decoder: Decoder[LViewRow] = Decoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(LViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(LocationId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[LViewRow] = Encoder.forProduct6[LViewRow, Option[Int], Option[LocationId], Option[Name], Option[BigDecimal], Option[BigDecimal], Option[TypoLocalDateTime]]("id", "locationid", "name", "costrate", "availability", "modifieddate")(x => (x.id, x.locationid, x.name, x.costrate, x.availability, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(LocationId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[LViewRow] = new Read[LViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (LocationId.get, Nullability.Nullable),

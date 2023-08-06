@@ -32,9 +32,9 @@ case class PersonphoneRow(
  }
 
 object PersonphoneRow {
-  implicit val decoder: Decoder[PersonphoneRow] = Decoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRow.apply)(BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[PersonphoneRow] = Encoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[PersonphoneRow] = new Read[PersonphoneRow](
+  implicit lazy val decoder: Decoder[PersonphoneRow] = Decoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRow.apply)(BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[PersonphoneRow] = Encoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[PersonphoneRow] = new Read[PersonphoneRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
       (Phone.get, Nullability.NoNulls),

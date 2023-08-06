@@ -22,9 +22,9 @@ case class PgForeignTableColumnsViewRow(
 )
 
 object PgForeignTableColumnsViewRow {
-  implicit val decoder: Decoder[PgForeignTableColumnsViewRow] = Decoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(PgForeignTableColumnsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
-  implicit val encoder: Encoder[PgForeignTableColumnsViewRow] = Encoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(x => (x.nspname, x.relname, x.attname, x.attfdwoptions))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
-  implicit val read: Read[PgForeignTableColumnsViewRow] = new Read[PgForeignTableColumnsViewRow](
+  implicit lazy val decoder: Decoder[PgForeignTableColumnsViewRow] = Decoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(PgForeignTableColumnsViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))
+  implicit lazy val encoder: Encoder[PgForeignTableColumnsViewRow] = Encoder.forProduct4[PgForeignTableColumnsViewRow, Option[String], Option[String], Option[String], Option[Array[String]]]("nspname", "relname", "attname", "attfdwoptions")(x => (x.nspname, x.relname, x.attname, x.attfdwoptions))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)))
+  implicit lazy val read: Read[PgForeignTableColumnsViewRow] = new Read[PgForeignTableColumnsViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

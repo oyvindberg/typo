@@ -26,9 +26,9 @@ case class SohsrViewRow(
 )
 
 object SohsrViewRow {
-  implicit val decoder: Decoder[SohsrViewRow] = Decoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(SohsrViewRow.apply)(Decoder.decodeOption(SalesorderheaderId.decoder), Decoder.decodeOption(SalesreasonId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[SohsrViewRow] = Encoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(Encoder.encodeOption(SalesorderheaderId.encoder), Encoder.encodeOption(SalesreasonId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[SohsrViewRow] = new Read[SohsrViewRow](
+  implicit lazy val decoder: Decoder[SohsrViewRow] = Decoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(SohsrViewRow.apply)(Decoder.decodeOption(SalesorderheaderId.decoder), Decoder.decodeOption(SalesreasonId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[SohsrViewRow] = Encoder.forProduct3[SohsrViewRow, Option[SalesorderheaderId], Option[SalesreasonId], Option[TypoLocalDateTime]]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(Encoder.encodeOption(SalesorderheaderId.encoder), Encoder.encodeOption(SalesreasonId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[SohsrViewRow] = new Read[SohsrViewRow](
     gets = List(
       (SalesorderheaderId.get, Nullability.Nullable),
       (SalesreasonId.get, Nullability.Nullable),

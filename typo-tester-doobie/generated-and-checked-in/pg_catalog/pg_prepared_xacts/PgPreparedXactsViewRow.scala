@@ -25,9 +25,9 @@ case class PgPreparedXactsViewRow(
 )
 
 object PgPreparedXactsViewRow {
-  implicit val decoder: Decoder[PgPreparedXactsViewRow] = Decoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(PgPreparedXactsViewRow.apply)(Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PgPreparedXactsViewRow] = Encoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(x => (x.transaction, x.gid, x.prepared, x.owner, x.database))(Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PgPreparedXactsViewRow] = new Read[PgPreparedXactsViewRow](
+  implicit lazy val decoder: Decoder[PgPreparedXactsViewRow] = Decoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(PgPreparedXactsViewRow.apply)(Decoder.decodeOption(TypoXid.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoOffsetDateTime.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgPreparedXactsViewRow] = Encoder.forProduct5[PgPreparedXactsViewRow, Option[TypoXid], Option[String], Option[TypoOffsetDateTime], Option[String], Option[String]]("transaction", "gid", "prepared", "owner", "database")(x => (x.transaction, x.gid, x.prepared, x.owner, x.database))(Encoder.encodeOption(TypoXid.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoOffsetDateTime.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PgPreparedXactsViewRow] = new Read[PgPreparedXactsViewRow](
     gets = List(
       (TypoXid.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

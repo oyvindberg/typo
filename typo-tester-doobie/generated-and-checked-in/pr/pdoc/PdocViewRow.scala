@@ -28,9 +28,9 @@ case class PdocViewRow(
 )
 
 object PdocViewRow {
-  implicit val decoder: Decoder[PdocViewRow] = Decoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(PdocViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(DocumentId.decoder))
-  implicit val encoder: Encoder[PdocViewRow] = Encoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(x => (x.id, x.productid, x.modifieddate, x.documentnode))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(DocumentId.encoder))
-  implicit val read: Read[PdocViewRow] = new Read[PdocViewRow](
+  implicit lazy val decoder: Decoder[PdocViewRow] = Decoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(PdocViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(ProductId.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(DocumentId.decoder))
+  implicit lazy val encoder: Encoder[PdocViewRow] = Encoder.forProduct4[PdocViewRow, Option[Int], Option[ProductId], Option[TypoLocalDateTime], Option[DocumentId]]("id", "productid", "modifieddate", "documentnode")(x => (x.id, x.productid, x.modifieddate, x.documentnode))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(ProductId.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(DocumentId.encoder))
+  implicit lazy val read: Read[PdocViewRow] = new Read[PdocViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (ProductId.get, Nullability.Nullable),

@@ -15,7 +15,7 @@ import io.circe.Encoder
 /** Type for the composite primary key of table `production.productdocument` */
 case class ProductdocumentId(productid: ProductId, documentnode: DocumentId)
 object ProductdocumentId {
-  implicit val decoder: Decoder[ProductdocumentId] = Decoder.forProduct2[ProductdocumentId, ProductId, DocumentId]("productid", "documentnode")(ProductdocumentId.apply)(ProductId.decoder, DocumentId.decoder)
-  implicit val encoder: Encoder[ProductdocumentId] = Encoder.forProduct2[ProductdocumentId, ProductId, DocumentId]("productid", "documentnode")(x => (x.productid, x.documentnode))(ProductId.encoder, DocumentId.encoder)
-  implicit val ordering: Ordering[ProductdocumentId] = Ordering.by(x => (x.productid, x.documentnode))
+  implicit lazy val decoder: Decoder[ProductdocumentId] = Decoder.forProduct2[ProductdocumentId, ProductId, DocumentId]("productid", "documentnode")(ProductdocumentId.apply)(ProductId.decoder, DocumentId.decoder)
+  implicit lazy val encoder: Encoder[ProductdocumentId] = Encoder.forProduct2[ProductdocumentId, ProductId, DocumentId]("productid", "documentnode")(x => (x.productid, x.documentnode))(ProductId.encoder, DocumentId.encoder)
+  implicit lazy val ordering: Ordering[ProductdocumentId] = Ordering.by(x => (x.productid, x.documentnode))
 }

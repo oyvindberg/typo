@@ -23,9 +23,9 @@ case class PgTsConfigRow(
 )
 
 object PgTsConfigRow {
-  implicit val decoder: Decoder[PgTsConfigRow] = Decoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(PgTsConfigRow.apply)(PgTsConfigId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
-  implicit val encoder: Encoder[PgTsConfigRow] = Encoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(x => (x.oid, x.cfgname, x.cfgnamespace, x.cfgowner, x.cfgparser))(PgTsConfigId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
-  implicit val read: Read[PgTsConfigRow] = new Read[PgTsConfigRow](
+  implicit lazy val decoder: Decoder[PgTsConfigRow] = Decoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(PgTsConfigRow.apply)(PgTsConfigId.decoder, Decoder.decodeString, Decoder.decodeLong, Decoder.decodeLong, Decoder.decodeLong)
+  implicit lazy val encoder: Encoder[PgTsConfigRow] = Encoder.forProduct5[PgTsConfigRow, PgTsConfigId, String, /* oid */ Long, /* oid */ Long, /* oid */ Long]("oid", "cfgname", "cfgnamespace", "cfgowner", "cfgparser")(x => (x.oid, x.cfgname, x.cfgnamespace, x.cfgowner, x.cfgparser))(PgTsConfigId.encoder, Encoder.encodeString, Encoder.encodeLong, Encoder.encodeLong, Encoder.encodeLong)
+  implicit lazy val read: Read[PgTsConfigRow] = new Read[PgTsConfigRow](
     gets = List(
       (PgTsConfigId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.NoNulls),

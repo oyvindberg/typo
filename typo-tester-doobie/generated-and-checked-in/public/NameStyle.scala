@@ -18,12 +18,12 @@ import typo.dsl.Bijection
   */
 case class NameStyle(value: Boolean) extends AnyVal
 object NameStyle {
-  implicit val arrayGet: Get[Array[NameStyle]] = adventureworks.BooleanArrayMeta.get.map(_.map(NameStyle.apply))
-  implicit val arrayPut: Put[Array[NameStyle]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)
-  implicit val decoder: Decoder[NameStyle] = Decoder.decodeBoolean.map(NameStyle.apply)
-  implicit val encoder: Encoder[NameStyle] = Encoder.encodeBoolean.contramap(_.value)
-  implicit val get: Get[NameStyle] = Meta.BooleanMeta.get.map(NameStyle.apply)
-  implicit val ordering: Ordering[NameStyle] = Ordering.by(_.value)
-  implicit val put: Put[NameStyle] = Meta.BooleanMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[NameStyle]] = adventureworks.BooleanArrayMeta.get.map(_.map(NameStyle.apply))
+  implicit lazy val arrayPut: Put[Array[NameStyle]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)
+  implicit lazy val decoder: Decoder[NameStyle] = Decoder.decodeBoolean.map(NameStyle.apply)
+  implicit lazy val encoder: Encoder[NameStyle] = Encoder.encodeBoolean.contramap(_.value)
+  implicit lazy val get: Get[NameStyle] = Meta.BooleanMeta.get.map(NameStyle.apply)
+  implicit lazy val ordering: Ordering[NameStyle] = Ordering.by(_.value)
+  implicit lazy val put: Put[NameStyle] = Meta.BooleanMeta.put.contramap(_.value)
 }

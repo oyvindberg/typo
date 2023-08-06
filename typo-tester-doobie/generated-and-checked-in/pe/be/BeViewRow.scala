@@ -28,9 +28,9 @@ case class BeViewRow(
 )
 
 object BeViewRow {
-  implicit val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[BeViewRow] = new Read[BeViewRow](
+  implicit lazy val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)(Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeUUID), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, Option[Int], Option[BusinessentityId], Option[UUID], Option[TypoLocalDateTime]]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))(Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeUUID), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[BeViewRow] = new Read[BeViewRow](
     gets = List(
       (Meta.IntMeta.get, Nullability.Nullable),
       (BusinessentityId.get, Nullability.Nullable),

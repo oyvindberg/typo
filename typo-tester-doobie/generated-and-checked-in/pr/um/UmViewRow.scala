@@ -28,9 +28,9 @@ case class UmViewRow(
 )
 
 object UmViewRow {
-  implicit val decoder: Decoder[UmViewRow] = Decoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(UmViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(UnitmeasureId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
-  implicit val encoder: Encoder[UmViewRow] = Encoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(x => (x.id, x.unitmeasurecode, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(UnitmeasureId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
-  implicit val read: Read[UmViewRow] = new Read[UmViewRow](
+  implicit lazy val decoder: Decoder[UmViewRow] = Decoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(UmViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(UnitmeasureId.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder))
+  implicit lazy val encoder: Encoder[UmViewRow] = Encoder.forProduct4[UmViewRow, Option[/* bpchar */ String], Option[UnitmeasureId], Option[Name], Option[TypoLocalDateTime]]("id", "unitmeasurecode", "name", "modifieddate")(x => (x.id, x.unitmeasurecode, x.name, x.modifieddate))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(UnitmeasureId.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder))
+  implicit lazy val read: Read[UmViewRow] = new Read[UmViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (UnitmeasureId.get, Nullability.Nullable),

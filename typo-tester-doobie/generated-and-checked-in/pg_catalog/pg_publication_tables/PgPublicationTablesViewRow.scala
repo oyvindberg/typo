@@ -21,9 +21,9 @@ case class PgPublicationTablesViewRow(
 )
 
 object PgPublicationTablesViewRow {
-  implicit val decoder: Decoder[PgPublicationTablesViewRow] = Decoder.forProduct3[PgPublicationTablesViewRow, Option[String], Option[String], Option[String]]("pubname", "schemaname", "tablename")(PgPublicationTablesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
-  implicit val encoder: Encoder[PgPublicationTablesViewRow] = Encoder.forProduct3[PgPublicationTablesViewRow, Option[String], Option[String], Option[String]]("pubname", "schemaname", "tablename")(x => (x.pubname, x.schemaname, x.tablename))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit val read: Read[PgPublicationTablesViewRow] = new Read[PgPublicationTablesViewRow](
+  implicit lazy val decoder: Decoder[PgPublicationTablesViewRow] = Decoder.forProduct3[PgPublicationTablesViewRow, Option[String], Option[String], Option[String]]("pubname", "schemaname", "tablename")(PgPublicationTablesViewRow.apply)(Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
+  implicit lazy val encoder: Encoder[PgPublicationTablesViewRow] = Encoder.forProduct3[PgPublicationTablesViewRow, Option[String], Option[String], Option[String]]("pubname", "schemaname", "tablename")(x => (x.pubname, x.schemaname, x.tablename))(Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
+  implicit lazy val read: Read[PgPublicationTablesViewRow] = new Read[PgPublicationTablesViewRow](
     gets = List(
       (Meta.StringMeta.get, Nullability.Nullable),
       (Meta.StringMeta.get, Nullability.Nullable),

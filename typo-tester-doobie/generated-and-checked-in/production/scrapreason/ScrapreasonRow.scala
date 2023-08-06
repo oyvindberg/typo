@@ -24,9 +24,9 @@ case class ScrapreasonRow(
 )
 
 object ScrapreasonRow {
-  implicit val decoder: Decoder[ScrapreasonRow] = Decoder.forProduct3[ScrapreasonRow, ScrapreasonId, Name, TypoLocalDateTime]("scrapreasonid", "name", "modifieddate")(ScrapreasonRow.apply)(ScrapreasonId.decoder, Name.decoder, TypoLocalDateTime.decoder)
-  implicit val encoder: Encoder[ScrapreasonRow] = Encoder.forProduct3[ScrapreasonRow, ScrapreasonId, Name, TypoLocalDateTime]("scrapreasonid", "name", "modifieddate")(x => (x.scrapreasonid, x.name, x.modifieddate))(ScrapreasonId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit val read: Read[ScrapreasonRow] = new Read[ScrapreasonRow](
+  implicit lazy val decoder: Decoder[ScrapreasonRow] = Decoder.forProduct3[ScrapreasonRow, ScrapreasonId, Name, TypoLocalDateTime]("scrapreasonid", "name", "modifieddate")(ScrapreasonRow.apply)(ScrapreasonId.decoder, Name.decoder, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[ScrapreasonRow] = Encoder.forProduct3[ScrapreasonRow, ScrapreasonId, Name, TypoLocalDateTime]("scrapreasonid", "name", "modifieddate")(x => (x.scrapreasonid, x.name, x.modifieddate))(ScrapreasonId.encoder, Name.encoder, TypoLocalDateTime.encoder)
+  implicit lazy val read: Read[ScrapreasonRow] = new Read[ScrapreasonRow](
     gets = List(
       (ScrapreasonId.get, Nullability.NoNulls),
       (Name.get, Nullability.NoNulls),

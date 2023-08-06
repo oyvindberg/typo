@@ -17,12 +17,12 @@ import typo.dsl.Bijection
 /** Type for the primary key of table `production.productmodel` */
 case class ProductmodelId(value: Int) extends AnyVal
 object ProductmodelId {
-  implicit val arrayGet: Get[Array[ProductmodelId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ProductmodelId.apply))
-  implicit val arrayPut: Put[Array[ProductmodelId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
-  implicit val bijection: Bijection[ProductmodelId, Int] = Bijection[ProductmodelId, Int](_.value)(ProductmodelId.apply)
-  implicit val decoder: Decoder[ProductmodelId] = Decoder.decodeInt.map(ProductmodelId.apply)
-  implicit val encoder: Encoder[ProductmodelId] = Encoder.encodeInt.contramap(_.value)
-  implicit val get: Get[ProductmodelId] = Meta.IntMeta.get.map(ProductmodelId.apply)
-  implicit val ordering: Ordering[ProductmodelId] = Ordering.by(_.value)
-  implicit val put: Put[ProductmodelId] = Meta.IntMeta.put.contramap(_.value)
+  implicit lazy val arrayGet: Get[Array[ProductmodelId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ProductmodelId.apply))
+  implicit lazy val arrayPut: Put[Array[ProductmodelId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val bijection: Bijection[ProductmodelId, Int] = Bijection[ProductmodelId, Int](_.value)(ProductmodelId.apply)
+  implicit lazy val decoder: Decoder[ProductmodelId] = Decoder.decodeInt.map(ProductmodelId.apply)
+  implicit lazy val encoder: Encoder[ProductmodelId] = Encoder.encodeInt.contramap(_.value)
+  implicit lazy val get: Get[ProductmodelId] = Meta.IntMeta.get.map(ProductmodelId.apply)
+  implicit lazy val ordering: Ordering[ProductmodelId] = Ordering.by(_.value)
+  implicit lazy val put: Put[ProductmodelId] = Meta.IntMeta.put.contramap(_.value)
 }

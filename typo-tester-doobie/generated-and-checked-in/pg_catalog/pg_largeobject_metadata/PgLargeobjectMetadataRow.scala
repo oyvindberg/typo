@@ -22,9 +22,9 @@ case class PgLargeobjectMetadataRow(
 )
 
 object PgLargeobjectMetadataRow {
-  implicit val decoder: Decoder[PgLargeobjectMetadataRow] = Decoder.forProduct3[PgLargeobjectMetadataRow, PgLargeobjectMetadataId, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lomowner", "lomacl")(PgLargeobjectMetadataRow.apply)(PgLargeobjectMetadataId.decoder, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)))
-  implicit val encoder: Encoder[PgLargeobjectMetadataRow] = Encoder.forProduct3[PgLargeobjectMetadataRow, PgLargeobjectMetadataId, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lomowner", "lomacl")(x => (x.oid, x.lomowner, x.lomacl))(PgLargeobjectMetadataId.encoder, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)))
-  implicit val read: Read[PgLargeobjectMetadataRow] = new Read[PgLargeobjectMetadataRow](
+  implicit lazy val decoder: Decoder[PgLargeobjectMetadataRow] = Decoder.forProduct3[PgLargeobjectMetadataRow, PgLargeobjectMetadataId, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lomowner", "lomacl")(PgLargeobjectMetadataRow.apply)(PgLargeobjectMetadataId.decoder, Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeArray[TypoAclItem](TypoAclItem.decoder, implicitly)))
+  implicit lazy val encoder: Encoder[PgLargeobjectMetadataRow] = Encoder.forProduct3[PgLargeobjectMetadataRow, PgLargeobjectMetadataId, /* oid */ Long, Option[Array[TypoAclItem]]]("oid", "lomowner", "lomacl")(x => (x.oid, x.lomowner, x.lomacl))(PgLargeobjectMetadataId.encoder, Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeIterable[TypoAclItem, Array](TypoAclItem.encoder, implicitly)))
+  implicit lazy val read: Read[PgLargeobjectMetadataRow] = new Read[PgLargeobjectMetadataRow](
     gets = List(
       (PgLargeobjectMetadataId.get, Nullability.NoNulls),
       (Meta.LongMeta.get, Nullability.NoNulls),
