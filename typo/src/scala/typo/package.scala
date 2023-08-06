@@ -7,14 +7,20 @@ import java.sql.Connection
 import scala.collection.immutable.SortedMap
 
 package object typo {
-  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated =
+  def fromDbAndScripts(options: Options, scriptsPath: Path, selector: Selector)(implicit c: Connection): Generated = {
+    Banner.maybePrint(options)
     fromMetaDb(options, load(maybeScriptPath = Some(scriptsPath)), selector)
+  }
 
-  def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated =
+  def fromDb(options: Options, selector: Selector)(implicit c: Connection): Generated = {
+    Banner.maybePrint(options)
     fromMetaDb(options, load(maybeScriptPath = None), selector)
+  }
 
   // use this constructor if you need to run `typo` multiple times with different options but same database/scripts
   def fromMetaDb(publicOptions: Options, metaDb: MetaDb, selector: Selector): Generated = {
+    Banner.maybePrint(publicOptions)
+
     val pkg = sc.Type.Qualified(publicOptions.pkg).value
     val naming = publicOptions.naming(pkg)
     val default: ComputedDefault =

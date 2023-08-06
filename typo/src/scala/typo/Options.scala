@@ -12,7 +12,8 @@ case class Options(
     enableFieldValue: Boolean = false,
     enableDsl: Boolean = true,
     debugTypes: Boolean = false,
-    inlineImplicits: Boolean = true
+    inlineImplicits: Boolean = true,
+    silentBanner: Boolean = false
 )
 
 object Options {

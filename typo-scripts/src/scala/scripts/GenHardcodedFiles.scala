@@ -129,7 +129,8 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
               new Naming(pkg) {
                 override def enumValue(name: String): sc.Ident = sc.Ident("_" + name.toLowerCase)
               },
-            header = header
+            header = header,
+            silentBanner = true
           ),
           metaDb,
           Selector.All
