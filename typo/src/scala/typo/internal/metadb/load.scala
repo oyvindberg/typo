@@ -54,7 +54,7 @@ object load {
     }
   }
 
-  def apply(maybeScriptPath: Option[Path])(implicit c: Connection): (MetaDb, TypeMapperDb) = {
+  def apply(maybeScriptPath: Option[Path])(implicit c: Connection): MetaDb = {
     val input = load.Input.fromDb
     val groupedViewRows: Map[db.RelationName, ViewFindAllSqlRow] =
       input.viewRows.map { view => (db.RelationName(view.tableSchema, view.tableName.get), view) }.toMap
@@ -63,9 +63,9 @@ object load {
     val primaryKeys = PrimaryKeys(input.tableConstraints, input.keyColumnUsage)
     val uniqueKeys = UniqueKeys(input.tableConstraints, input.keyColumnUsage)
     val enums = Enums(input.pgEnums)
-    val enumsByName = enums.flatMap(e => List((e.name.name, e), (e.name.value, e))).toMap
+
     val domains = input.domains.map { d =>
-      val tpe = TypeMapperDb(enumsByName, Map.empty)
+      val tpe = TypeMapperDb(enums, Nil)
         .dbTypeFrom(
           d.`type`,
           characterMaximumLength = None // todo: this can likely be set
@@ -84,10 +84,7 @@ object load {
       )
     }
 
-    val typeMapperDb = TypeMapperDb(
-      enumsByName,
-      domains.map(e => (e.name.name, e)).toMap
-    )
+    val typeMapperDb = TypeMapperDb(enums, domains)
 
     val comments: Map[(db.RelationName, db.ColName), String] =
       input.comments.collect { case CommentsSqlRow(maybeSchema, Some(SqlIdentifier(table)), Some(SqlIdentifier(column)), description) =>
@@ -165,6 +162,6 @@ object load {
       case None             => Nil
     }
 
-    (MetaDb(relations, enums, domains, sqlScripts), typeMapperDb)
+    MetaDb(relations, enums, domains, sqlScripts, typeMapperDb)
   }
 }

@@ -11,12 +11,13 @@ case class MetaDb(
     relations: List[db.Relation],
     enums: List[db.StringEnum],
     domains: List[db.Domain],
-    sqlFiles: List[SqlFile]
+    sqlFiles: List[SqlFile],
+    typeMapperDb: TypeMapperDb
 )
 object MetaDb {
-  def fromDb(implicit c: Connection): (MetaDb, TypeMapperDb) =
+  def fromDb(implicit c: Connection): MetaDb =
     load(maybeScriptPath = None)
 
-  def fromDbAndScripts(scriptPath: Path)(implicit c: Connection): (MetaDb, TypeMapperDb) =
+  def fromDbAndScripts(scriptPath: Path)(implicit c: Connection): MetaDb =
     load(maybeScriptPath = Some(scriptPath))
 }

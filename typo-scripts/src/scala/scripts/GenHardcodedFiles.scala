@@ -3,7 +3,7 @@ package scripts
 import bleep.*
 import bleep.logging.Logger
 import typo.*
-import typo.internal.DebugJson
+import typo.internal.{DebugJson, TypeMapperDb}
 
 // this runs automatically at build time to instantly see results.
 // it does not need a running database
@@ -116,7 +116,9 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         if (target.project.value.contains("doobie"))
           (DbLibName.Doobie, JsonLibName.Circe)
         else (DbLibName.Anorm, JsonLibName.PlayJson)
-      val metaDb = MetaDb(relations = all, enums = enums, domains = Nil, sqlFiles = Nil)
+      val domains = Nil
+      val typeMapperDb = TypeMapperDb(enums, domains)
+      val metaDb = MetaDb(relations = all, enums = enums, domains = domains, sqlFiles = Nil, typeMapperDb)
       val generated: Generated =
         fromMetaDb(
           Options(

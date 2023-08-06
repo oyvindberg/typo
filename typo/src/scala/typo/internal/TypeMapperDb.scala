@@ -3,7 +3,9 @@ package internal
 
 import typo.generated.information_schema.columns.ColumnsViewRow
 
-case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, db.Domain]) {
+case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
+  val domainsByName: Map[String, db.Domain] = domains.flatMap(e => List((e.name.name, e), (e.name.value, e))).toMap
+  val enumsByName = enums.flatMap(e => List((e.name.name, e), (e.name.value, e))).toMap
   def col(c: ColumnsViewRow): Option[db.Type] = {
     val fromDomain: Option[db.Type.DomainRef] =
       c.domainName.map(domainName => db.Type.DomainRef(db.RelationName(c.domainSchema.map(_.value), domainName.value)))
@@ -67,10 +69,10 @@ case class TypeMapperDb(enums: Map[String, db.StringEnum], domains: Map[String, 
       case "xid"                               => Some(db.Type.xid)
       case str if str.startsWith("_")          => dbTypeFrom(udtName.drop(1), characterMaximumLength).map(tpe => db.Type.Array(tpe))
       case typeName =>
-        enums
+        enumsByName
           .get(typeName.replaceAll("\"", ""))
           .map(`enum` => db.Type.EnumRef(`enum`.name))
-          .orElse(domains.get(typeName).map(domain => db.Type.DomainRef(domain.name)))
+          .orElse(domainsByName.get(typeName).map(domain => db.Type.DomainRef(domain.name)))
     }
   }
 }

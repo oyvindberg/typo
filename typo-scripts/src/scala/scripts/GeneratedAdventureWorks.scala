@@ -23,7 +23,7 @@ object GeneratedAdventureWorks {
           "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
         )
         val scriptsPath = buildDir.resolve("adventureworks_sql")
-        val metadb = typo.MetaDb.fromDbAndScripts(scriptsPath)._1
+        val metadb = typo.MetaDb.fromDbAndScripts(scriptsPath)
 
         List(
           (typo.DbLibName.Anorm, typo.JsonLibName.PlayJson, "typo-tester-anorm"),
