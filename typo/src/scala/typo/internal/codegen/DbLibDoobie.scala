@@ -373,7 +373,14 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = getName,
         implicitParams = Nil,
         tpe = Get.of(wrapperType),
-        body = code"""${Get.of(underlying)}.temap($wrapperType.apply)"""
+        body = code"""${lookupGetFor(underlying)}.temap($wrapperType.apply)"""
+      ),
+      sc.Given(
+        tparams = Nil,
+        name = arrayGetName,
+        implicitParams = Nil,
+        tpe = Get.of(sc.Type.Array.of(wrapperType)),
+        body = code"""${lookupGetFor(sc.Type.Array.of(underlying))}.map(_.map(force))"""
       ),
       sc.Given(
         tparams = Nil,
