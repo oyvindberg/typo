@@ -14,5 +14,4 @@ import java.sql.Connection
 
 trait KeyColumnUsageViewRepo {
   def selectAll(implicit c: Connection): List[KeyColumnUsageViewRow]
-  def selectByFieldValues(fieldValues: List[KeyColumnUsageViewFieldOrIdValue[_]])(implicit c: Connection): List[KeyColumnUsageViewRow]
 }

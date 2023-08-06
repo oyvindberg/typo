@@ -12,20 +12,23 @@ package information_schema
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Domain `information_schema.yes_or_no`
   * Constraint: CHECK (((VALUE)::text = ANY ((ARRAY['YES'::character varying, 'NO'::character varying])::text[])))
   */
 case class YesOrNo(value: String) extends AnyVal
 object YesOrNo {
-  implicit def ordering(implicit ev: Ordering[String]): Ordering[YesOrNo] = Ordering.by(_.value)
-  implicit val format: Format[YesOrNo] = implicitly[Format[String]].bimap(YesOrNo.apply, _.value)
-  implicit val toStatement: ToStatement[YesOrNo] = implicitly[ToStatement[String]].contramap(_.value)
-  implicit val column: Column[YesOrNo] = implicitly[Column[String]].map(YesOrNo.apply)
-  implicit val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {
+  implicit lazy val arrayColumn: Column[Array[YesOrNo]] = Column.columnToArray(column, implicitly)
+  implicit lazy val arrayToStatement: ToStatement[Array[YesOrNo]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
+  implicit lazy val column: Column[YesOrNo] = implicitly[Column[String]].map(YesOrNo.apply)
+  implicit lazy val ordering: Ordering[YesOrNo] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[YesOrNo] = new ParameterMetaData[YesOrNo] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-
+  implicit lazy val reads: Reads[YesOrNo] = Reads.StringReads.map(YesOrNo.apply)
+  implicit lazy val toStatement: ToStatement[YesOrNo] = implicitly[ToStatement[String]].contramap(_.value)
+  implicit lazy val writes: Writes[YesOrNo] = Writes.StringWrites.contramap(_.value)
 }

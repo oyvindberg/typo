@@ -29,8 +29,8 @@ object DomainsSqlRepoImpl extends DomainsSqlRepo {
                      inner join pg_catalog.pg_type tt on typ.typbasetype = tt.oid
                      left join pg_collation pc on typ.typcollation = pc.oid
                      left JOIN pg_catalog.pg_constraint con ON con.contypid = typ.oid
-         """
+      """
     sql.as(DomainsSqlRow.rowParser(1).*)
-  
+    
   }
 }

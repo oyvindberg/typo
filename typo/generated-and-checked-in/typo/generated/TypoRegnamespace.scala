@@ -9,78 +9,57 @@ package typo
 package generated
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import scala.util.Try
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** regnamespace (via PGObject) */
 case class TypoRegnamespace(value: String)
+
 object TypoRegnamespace {
-  implicit val oFormat: OFormat[TypoRegnamespace] = new OFormat[TypoRegnamespace]{
-    override def writes(o: TypoRegnamespace): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoRegnamespace] = {
-      JsResult.fromTry(
-        Try(
-          TypoRegnamespace(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoRegnamespaceDb: ToStatement[TypoRegnamespace] with ParameterMetaData[TypoRegnamespace] with Column[TypoRegnamespace] = new ToStatement[TypoRegnamespace] with ParameterMetaData[TypoRegnamespace] with Column[TypoRegnamespace] {
-    override def sqlType: String = "regnamespace"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoRegnamespace): Unit =
-      s.setObject(index, {
-                           val obj = new PGobject
-                           obj.setType("regnamespace")
-                           obj.setValue(v.value)
-                           obj
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoRegnamespace] =
-      v match {
-        case v: PGobject => Right(TypoRegnamespace(v.getValue))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGobject from JDBC to produce a TypoRegnamespace, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoRegnamespaceDbArray: ToStatement[Array[TypoRegnamespace]] with ParameterMetaData[Array[TypoRegnamespace]] with Column[Array[TypoRegnamespace]] = new ToStatement[Array[TypoRegnamespace]] with ParameterMetaData[Array[TypoRegnamespace]] with Column[Array[TypoRegnamespace]] {
-    override def sqlType: String = "_regnamespace"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoRegnamespace]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("regnamespace", v.map(v => {
-                                                                                   val obj = new PGobject
-                                                                                   obj.setType("regnamespace")
-                                                                                   obj.setValue(v.value)
-                                                                                   obj
-                                                                                 })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoRegnamespace]] =
-      v match {
+  implicit lazy val arrayColumn: Column[Array[TypoRegnamespace]] = Column.nonNull[Array[TypoRegnamespace]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoRegnamespace(v.asInstanceOf[String])))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoRegnamespace, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoRegnamespace, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoRegnamespace]] = new ParameterMetaData[Array[TypoRegnamespace]] {
+    override def sqlType: String = "_regnamespace"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoRegnamespace]] = ToStatement[Array[TypoRegnamespace]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("regnamespace", v.map(v => {
+                                                                                                                                     val obj = new PGobject
+                                                                                                                                     obj.setType("regnamespace")
+                                                                                                                                     obj.setValue(v.value)
+                                                                                                                                     obj
+                                                                                                                                   }))))
+  implicit lazy val column: Column[TypoRegnamespace] = Column.nonNull[TypoRegnamespace]((v1: Any, _) =>
+    v1 match {
+      case v: PGobject => Right(TypoRegnamespace(v.getValue))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
+    }
+  )
+  implicit lazy val ordering: Ordering[TypoRegnamespace] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoRegnamespace] = new ParameterMetaData[TypoRegnamespace] {
+    override def sqlType: String = "regnamespace"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit lazy val reads: Reads[TypoRegnamespace] = Reads.StringReads.map(TypoRegnamespace.apply)
+  implicit lazy val toStatement: ToStatement[TypoRegnamespace] = ToStatement[TypoRegnamespace]((s, index, v) => s.setObject(index, {
+                                                                      val obj = new PGobject
+                                                                      obj.setType("regnamespace")
+                                                                      obj.setValue(v.value)
+                                                                      obj
+                                                                    }))
+  implicit lazy val writes: Writes[TypoRegnamespace] = Writes.StringWrites.contramap(_.value)
 }

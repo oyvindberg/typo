@@ -28,9 +28,8 @@ object CommentsSqlRepoImpl extends CommentsSqlRepo {
                         pgd.objsubid = c.ordinal_position and
                         c.table_schema = st.schemaname and
                         c.table_name = st.relname
-                )
-         """
+                )"""
     sql.as(CommentsSqlRow.rowParser(1).*)
-  
+    
   }
 }

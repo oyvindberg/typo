@@ -56,7 +56,8 @@ object GeneratedSources {
         dbLib = Some(typo.DbLibName.Anorm),
         header = header,
         nullabilityOverride = nullabilityOverride,
-        debugTypes = true
+        debugTypes = true,
+        enableDsl = false
       )
       typo.fromDbAndScripts(options, sqlScriptDir, selector)
     }

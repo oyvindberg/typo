@@ -10,13 +10,16 @@ package generated
 package custom
 package view_find_all
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import scala.collection.immutable.ListMap
 import scala.util.Try
 import typo.generated.pg_catalog.pg_namespace.PgNamespaceId
 
@@ -36,40 +39,36 @@ case class ViewFindAllSqlRow(
 )
 
 object ViewFindAllSqlRow {
-  def rowParser(idx: Int): RowParser[ViewFindAllSqlRow] =
-    RowParser[ViewFindAllSqlRow] { row =>
-      Success(
+  implicit lazy val reads: Reads[ViewFindAllSqlRow] = Reads[ViewFindAllSqlRow](json => JsResult.fromTry(
+      Try(
         ViewFindAllSqlRow(
-          tableOid = row[PgNamespaceId](idx + 0),
-          tableSchema = row[/* nullability unknown */ Option[String]](idx + 1),
-          tableName = row[/* nullability unknown */ Option[String]](idx + 2),
-          relkind = row[String](idx + 3),
-          viewDefinition = row[/* nullability unknown */ Option[String]](idx + 4)
+          tableOid = json.\("table_oid").as(PgNamespaceId.reads),
+          tableSchema = json.\("table_schema").toOption.map(_.as(Reads.StringReads)),
+          tableName = json.\("table_name").toOption.map(_.as(Reads.StringReads)),
+          relkind = json.\("relkind").as(Reads.StringReads),
+          viewDefinition = json.\("view_definition").toOption.map(_.as(Reads.StringReads))
         )
       )
-    }
-  implicit val oFormat: OFormat[ViewFindAllSqlRow] = new OFormat[ViewFindAllSqlRow]{
-    override def writes(o: ViewFindAllSqlRow): JsObject =
-      Json.obj(
-        "table_oid" -> o.tableOid,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "relkind" -> o.relkind,
-        "view_definition" -> o.viewDefinition
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ViewFindAllSqlRow] = RowParser[ViewFindAllSqlRow] { row =>
+    Success(
+      ViewFindAllSqlRow(
+        tableOid = row(idx + 0)(PgNamespaceId.column),
+        tableSchema = row(idx + 1)(Column.columnToOption(Column.columnToString)),
+        tableName = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        relkind = row(idx + 3)(Column.columnToString),
+        viewDefinition = row(idx + 4)(Column.columnToOption(Column.columnToString))
       )
-  
-    override def reads(json: JsValue): JsResult[ViewFindAllSqlRow] = {
-      JsResult.fromTry(
-        Try(
-          ViewFindAllSqlRow(
-            tableOid = json.\("table_oid").as[PgNamespaceId],
-            tableSchema = json.\("table_schema").toOption.map(_.as[String]),
-            tableName = json.\("table_name").toOption.map(_.as[String]),
-            relkind = json.\("relkind").as[String],
-            viewDefinition = json.\("view_definition").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit lazy val writes: OWrites[ViewFindAllSqlRow] = OWrites[ViewFindAllSqlRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "table_oid" -> PgNamespaceId.writes.writes(o.tableOid),
+      "table_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.tableName),
+      "relkind" -> Writes.StringWrites.writes(o.relkind),
+      "view_definition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.viewDefinition)
+    ))
+  )
 }

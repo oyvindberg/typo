@@ -9,78 +9,57 @@ package typo
 package generated
 
 import anorm.Column
-import anorm.MetaDataItem
 import anorm.ParameterMetaData
-import anorm.SqlRequestError
 import anorm.ToStatement
 import anorm.TypeDoesNotMatch
-import java.sql.PreparedStatement
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import org.postgresql.util.PGobject
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import scala.util.Try
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** aclitem (via PGObject) */
 case class TypoAclItem(value: String)
+
 object TypoAclItem {
-  implicit val oFormat: OFormat[TypoAclItem] = new OFormat[TypoAclItem]{
-    override def writes(o: TypoAclItem): JsObject =
-      Json.obj(
-        "value" -> o.value
-      )
-  
-    override def reads(json: JsValue): JsResult[TypoAclItem] = {
-      JsResult.fromTry(
-        Try(
-          TypoAclItem(
-            value = json.\("value").as[String]
-          )
-        )
-      )
-    }
-  }
-  implicit val TypoAclItemDb: ToStatement[TypoAclItem] with ParameterMetaData[TypoAclItem] with Column[TypoAclItem] = new ToStatement[TypoAclItem] with ParameterMetaData[TypoAclItem] with Column[TypoAclItem] {
-    override def sqlType: String = "aclitem"
-    override def jdbcType: Int = Types.OTHER
-    override def set(s: PreparedStatement, index: Int, v: TypoAclItem): Unit =
-      s.setObject(index, {
-                           val obj = new PGobject
-                           obj.setType("aclitem")
-                           obj.setValue(v.value)
-                           obj
-                         })
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, TypoAclItem] =
-      v match {
-        case v: PGobject => Right(TypoAclItem(v.getValue))
-        case other => Left(TypeDoesNotMatch(s"Expected instance of PGobject from JDBC to produce a TypoAclItem, got ${other.getClass.getName}"))
-      }
-  }
-  
-  implicit val TypoAclItemDbArray: ToStatement[Array[TypoAclItem]] with ParameterMetaData[Array[TypoAclItem]] with Column[Array[TypoAclItem]] = new ToStatement[Array[TypoAclItem]] with ParameterMetaData[Array[TypoAclItem]] with Column[Array[TypoAclItem]] {
-    override def sqlType: String = "_aclitem"
-    override def jdbcType: Int = Types.ARRAY
-    override def set(s: PreparedStatement, index: Int, v: Array[TypoAclItem]): Unit =
-      s.setArray(index, s.getConnection.createArrayOf("aclitem", v.map(v => {
-                                                                              val obj = new PGobject
-                                                                              obj.setType("aclitem")
-                                                                              obj.setValue(v.value)
-                                                                              obj
-                                                                            })))
-    override def apply(v: Any, v2: MetaDataItem): Either[SqlRequestError, Array[TypoAclItem]] =
-      v match {
+  implicit lazy val arrayColumn: Column[Array[TypoAclItem]] = Column.nonNull[Array[TypoAclItem]]((v1: Any, _) =>
+    v1 match {
         case v: PgArray =>
          v.getArray match {
-           case v: Array[_] =>
+           case v: Array[?] =>
              Right(v.map(v => TypoAclItem(v.asInstanceOf[String])))
            case other => Left(TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of TypoAclItem, got ${other.getClass.getName}"))
          }
-        case other => Left(TypeDoesNotMatch(s"Expected PgArray from JDBC to produce an array of TypoAclItem, got ${other.getClass.getName}"))
-      }
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
+    }
+  )
+  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoAclItem]] = new ParameterMetaData[Array[TypoAclItem]] {
+    override def sqlType: String = "_aclitem"
+    override def jdbcType: Int = Types.ARRAY
   }
-
+  implicit lazy val arrayToStatement: ToStatement[Array[TypoAclItem]] = ToStatement[Array[TypoAclItem]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("aclitem", v.map(v => {
+                                                                                                                           val obj = new PGobject
+                                                                                                                           obj.setType("aclitem")
+                                                                                                                           obj.setValue(v.value)
+                                                                                                                           obj
+                                                                                                                         }))))
+  implicit lazy val column: Column[TypoAclItem] = Column.nonNull[TypoAclItem]((v1: Any, _) =>
+    v1 match {
+      case v: PGobject => Right(TypoAclItem(v.getValue))
+      case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.util.PGobject, got ${other.getClass.getName}"))
+    }
+  )
+  implicit lazy val ordering: Ordering[TypoAclItem] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[TypoAclItem] = new ParameterMetaData[TypoAclItem] {
+    override def sqlType: String = "aclitem"
+    override def jdbcType: Int = Types.OTHER
+  }
+  implicit lazy val reads: Reads[TypoAclItem] = Reads.StringReads.map(TypoAclItem.apply)
+  implicit lazy val toStatement: ToStatement[TypoAclItem] = ToStatement[TypoAclItem]((s, index, v) => s.setObject(index, {
+                                                                 val obj = new PGobject
+                                                                 obj.setType("aclitem")
+                                                                 obj.setValue(v.value)
+                                                                 obj
+                                                               }))
+  implicit lazy val writes: Writes[TypoAclItem] = Writes.StringWrites.contramap(_.value)
 }

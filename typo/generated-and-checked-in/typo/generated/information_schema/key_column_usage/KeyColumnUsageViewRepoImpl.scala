@@ -10,8 +10,6 @@ package generated
 package information_schema
 package key_column_usage
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -20,33 +18,5 @@ object KeyColumnUsageViewRepoImpl extends KeyColumnUsageViewRepo {
     SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", "column_name", ordinal_position, position_in_unique_constraint
           from information_schema.key_column_usage
        """.as(KeyColumnUsageViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[KeyColumnUsageViewFieldOrIdValue[_]])(implicit c: Connection): List[KeyColumnUsageViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case KeyColumnUsageViewFieldValue.constraintCatalog(value) => NamedParameter("constraint_catalog", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.constraintSchema(value) => NamedParameter("constraint_schema", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.constraintName(value) => NamedParameter("constraint_name", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.tableCatalog(value) => NamedParameter("table_catalog", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.tableSchema(value) => NamedParameter("table_schema", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.tableName(value) => NamedParameter("table_name", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.columnName(value) => NamedParameter("column_name", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.ordinalPosition(value) => NamedParameter("ordinal_position", ParameterValue.from(value))
-          case KeyColumnUsageViewFieldValue.positionInUniqueConstraint(value) => NamedParameter("position_in_unique_constraint", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", "column_name", ordinal_position, position_in_unique_constraint
-                    from information_schema.key_column_usage
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(KeyColumnUsageViewRow.rowParser(1).*)
-    }
-  
   }
 }

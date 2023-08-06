@@ -14,5 +14,4 @@ import java.sql.Connection
 
 trait ReferentialConstraintsViewRepo {
   def selectAll(implicit c: Connection): List[ReferentialConstraintsViewRow]
-  def selectByFieldValues(fieldValues: List[ReferentialConstraintsViewFieldOrIdValue[_]])(implicit c: Connection): List[ReferentialConstraintsViewRow]
 }

@@ -13,18 +13,21 @@ package pg_namespace
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
-import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 /** Type for the primary key of table `pg_catalog.pg_namespace` */
 case class PgNamespaceId(value: /* oid */ Long) extends AnyVal
 object PgNamespaceId {
-  implicit val ordering: Ordering[PgNamespaceId] = Ordering.by(x => (x.value))
-  implicit val format: Format[PgNamespaceId] = implicitly[Format[/* oid */ Long]].bimap(PgNamespaceId.apply, _.value)
-  implicit val toStatement: ToStatement[PgNamespaceId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
-  implicit val column: Column[PgNamespaceId] = implicitly[Column[/* oid */ Long]].map(PgNamespaceId.apply)
-  implicit val parameterMetadata: ParameterMetaData[PgNamespaceId] = new ParameterMetaData[PgNamespaceId] {
+  implicit lazy val arrayColumn: Column[Array[PgNamespaceId]] = Column.columnToArray(column, implicitly)
+  implicit lazy val arrayToStatement: ToStatement[Array[PgNamespaceId]] = implicitly[ToStatement[Array[/* oid */ Long]]].contramap(_.map(_.value))
+  implicit lazy val column: Column[PgNamespaceId] = implicitly[Column[/* oid */ Long]].map(PgNamespaceId.apply)
+  implicit lazy val ordering: Ordering[PgNamespaceId] = Ordering.by(_.value)
+  implicit lazy val parameterMetadata: ParameterMetaData[PgNamespaceId] = new ParameterMetaData[PgNamespaceId] {
     override def sqlType: String = implicitly[ParameterMetaData[/* oid */ Long]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[/* oid */ Long]].jdbcType
   }
-
+  implicit lazy val reads: Reads[PgNamespaceId] = Reads.LongReads.map(PgNamespaceId.apply)
+  implicit lazy val toStatement: ToStatement[PgNamespaceId] = implicitly[ToStatement[/* oid */ Long]].contramap(_.value)
+  implicit lazy val writes: Writes[PgNamespaceId] = Writes.LongWrites.contramap(_.value)
 }

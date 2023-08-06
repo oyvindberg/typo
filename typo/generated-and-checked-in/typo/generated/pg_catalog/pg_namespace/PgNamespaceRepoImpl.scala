@@ -10,12 +10,8 @@ package generated
 package pg_catalog
 package pg_namespace
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
-import anorm.ToStatement
 import java.sql.Connection
-import java.sql.PreparedStatement
 
 object PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def delete(oid: PgNamespaceId)(implicit c: Connection): Boolean = {
@@ -27,35 +23,12 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           returning oid, nspname, nspowner, nspacl
        """
       .executeInsert(PgNamespaceRow.rowParser(1).single)
-  
+    
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
        """.as(PgNamespaceRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[PgNamespaceFieldOrIdValue[_]])(implicit c: Connection): List[PgNamespaceRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PgNamespaceFieldValue.oid(value) => NamedParameter("oid", ParameterValue.from(value))
-          case PgNamespaceFieldValue.nspname(value) => NamedParameter("nspname", ParameterValue.from(value))
-          case PgNamespaceFieldValue.nspowner(value) => NamedParameter("nspowner", ParameterValue.from(value))
-          case PgNamespaceFieldValue.nspacl(value) => NamedParameter("nspacl", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select oid, nspname, nspowner, nspacl
-                    from pg_catalog.pg_namespace
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(PgNamespaceRow.rowParser(1).*)
-    }
-  
   }
   override def selectById(oid: PgNamespaceId)(implicit c: Connection): Option[PgNamespaceRow] = {
     SQL"""select oid, nspname, nspowner, nspacl
@@ -64,18 +37,11 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
        """.as(PgNamespaceRow.rowParser(1).singleOpt)
   }
   override def selectByIds(oids: Array[PgNamespaceId])(implicit c: Connection): List[PgNamespaceRow] = {
-    implicit val toStatement: ToStatement[Array[PgNamespaceId]] =
-      (s: PreparedStatement, index: Int, v: Array[PgNamespaceId]) =>
-        s.setArray(index, s.getConnection.createArrayOf("oid", v.map(x => x.value: java.lang.Long)))
-    
     SQL"""select oid, nspname, nspowner, nspacl
           from pg_catalog.pg_namespace
           where oid = ANY($oids)
        """.as(PgNamespaceRow.rowParser(1).*)
-  
-  }
-  override def selectByUnique(nspname: String)(implicit c: Connection): Option[PgNamespaceRow] = {
-    selectByFieldValues(List(PgNamespaceFieldValue.nspname(nspname))).headOption
+    
   }
   override def update(row: PgNamespaceRow)(implicit c: Connection): Boolean = {
     val oid = row.oid
@@ -85,29 +51,6 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
               nspacl = ${row.nspacl}::_aclitem
           where oid = $oid
        """.executeUpdate() > 0
-  }
-  override def updateFieldValues(oid: PgNamespaceId, fieldValues: List[PgNamespaceFieldValue[_]])(implicit c: Connection): Boolean = {
-    fieldValues match {
-      case Nil => false
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case PgNamespaceFieldValue.nspname(value) => NamedParameter("nspname", ParameterValue.from(value))
-          case PgNamespaceFieldValue.nspowner(value) => NamedParameter("nspowner", ParameterValue.from(value))
-          case PgNamespaceFieldValue.nspacl(value) => NamedParameter("nspacl", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""update pg_catalog.pg_namespace
-                    set ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
-                    where oid = {oid}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .on(NamedParameter("oid", ParameterValue.from(oid)))
-          .executeUpdate() > 0
-    }
-  
   }
   override def upsert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     SQL"""insert into pg_catalog.pg_namespace(oid, nspname, nspowner, nspacl)
@@ -125,6 +68,6 @@ object PgNamespaceRepoImpl extends PgNamespaceRepo {
           returning oid, nspname, nspowner, nspacl
        """
       .executeInsert(PgNamespaceRow.rowParser(1).single)
-  
+    
   }
 }

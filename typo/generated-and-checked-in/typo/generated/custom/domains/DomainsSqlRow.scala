@@ -10,13 +10,16 @@ package generated
 package custom
 package domains
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class DomainsSqlRow(
@@ -46,49 +49,45 @@ case class DomainsSqlRow(
 )
 
 object DomainsSqlRow {
-  def rowParser(idx: Int): RowParser[DomainsSqlRow] =
-    RowParser[DomainsSqlRow] { row =>
-      Success(
+  implicit lazy val reads: Reads[DomainsSqlRow] = Reads[DomainsSqlRow](json => JsResult.fromTry(
+      Try(
         DomainsSqlRow(
-          schema = row[String](idx + 0),
-          name = row[String](idx + 1),
-          `type` = row[String](idx + 2),
-          collation = row[Option[String]](idx + 3),
-          isNotNull = row[Boolean](idx + 4),
-          default = row[Option[String]](idx + 5),
-          constraintName = row[Option[String]](idx + 6),
-          constraintDefinition = row[/* nullability unknown */ Option[String]](idx + 7)
+          schema = json.\("schema").as(Reads.StringReads),
+          name = json.\("name").as(Reads.StringReads),
+          `type` = json.\("type").as(Reads.StringReads),
+          collation = json.\("collation").toOption.map(_.as(Reads.StringReads)),
+          isNotNull = json.\("isNotNull").as(Reads.BooleanReads),
+          default = json.\("default").toOption.map(_.as(Reads.StringReads)),
+          constraintName = json.\("constraintName").toOption.map(_.as(Reads.StringReads)),
+          constraintDefinition = json.\("constraintDefinition").toOption.map(_.as(Reads.StringReads))
         )
       )
-    }
-  implicit val oFormat: OFormat[DomainsSqlRow] = new OFormat[DomainsSqlRow]{
-    override def writes(o: DomainsSqlRow): JsObject =
-      Json.obj(
-        "schema" -> o.schema,
-        "name" -> o.name,
-        "type" -> o.`type`,
-        "collation" -> o.collation,
-        "isNotNull" -> o.isNotNull,
-        "default" -> o.default,
-        "constraintName" -> o.constraintName,
-        "constraintDefinition" -> o.constraintDefinition
+    ),
+  )
+  def rowParser(idx: Int): RowParser[DomainsSqlRow] = RowParser[DomainsSqlRow] { row =>
+    Success(
+      DomainsSqlRow(
+        schema = row(idx + 0)(Column.columnToString),
+        name = row(idx + 1)(Column.columnToString),
+        `type` = row(idx + 2)(Column.columnToString),
+        collation = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        isNotNull = row(idx + 4)(Column.columnToBoolean),
+        default = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        constraintName = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        constraintDefinition = row(idx + 7)(Column.columnToOption(Column.columnToString))
       )
-  
-    override def reads(json: JsValue): JsResult[DomainsSqlRow] = {
-      JsResult.fromTry(
-        Try(
-          DomainsSqlRow(
-            schema = json.\("schema").as[String],
-            name = json.\("name").as[String],
-            `type` = json.\("type").as[String],
-            collation = json.\("collation").toOption.map(_.as[String]),
-            isNotNull = json.\("isNotNull").as[Boolean],
-            default = json.\("default").toOption.map(_.as[String]),
-            constraintName = json.\("constraintName").toOption.map(_.as[String]),
-            constraintDefinition = json.\("constraintDefinition").toOption.map(_.as[String])
-          )
-        )
-      )
-    }
+    )
   }
+  implicit lazy val writes: OWrites[DomainsSqlRow] = OWrites[DomainsSqlRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "schema" -> Writes.StringWrites.writes(o.schema),
+      "name" -> Writes.StringWrites.writes(o.name),
+      "type" -> Writes.StringWrites.writes(o.`type`),
+      "collation" -> Writes.OptionWrites(Writes.StringWrites).writes(o.collation),
+      "isNotNull" -> Writes.BooleanWrites.writes(o.isNotNull),
+      "default" -> Writes.OptionWrites(Writes.StringWrites).writes(o.default),
+      "constraintName" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintName),
+      "constraintDefinition" -> Writes.OptionWrites(Writes.StringWrites).writes(o.constraintDefinition)
+    ))
+  )
 }

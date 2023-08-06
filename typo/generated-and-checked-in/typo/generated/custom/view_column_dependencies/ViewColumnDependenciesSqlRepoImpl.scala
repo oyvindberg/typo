@@ -31,8 +31,8 @@ object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
                 AND rewrite.is_instead -- INSTEAD rule
                 AND view_class.relname = coalesce($viewName, view_class.relname)
             
-         """
+      """
     sql.as(ViewColumnDependenciesSqlRow.rowParser(1).*)
-  
+    
   }
 }

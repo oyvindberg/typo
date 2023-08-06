@@ -29,8 +29,8 @@ object ViewFindAllSqlRepoImpl extends ViewFindAllSqlRepo {
             WHERE c.relnamespace = nc.oid
               AND c.relkind in ('m'::"char", 'v'::char)
             order by 1, 2, 3
-         """
+      """
     sql.as(ViewFindAllSqlRow.rowParser(1).*)
-  
+    
   }
 }

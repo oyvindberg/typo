@@ -10,13 +10,16 @@ package generated
 package custom
 package comments
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import scala.collection.immutable.ListMap
 import scala.util.Try
 import typo.generated.information_schema.SqlIdentifier
 
@@ -36,37 +39,33 @@ case class CommentsSqlRow(
 )
 
 object CommentsSqlRow {
-  def rowParser(idx: Int): RowParser[CommentsSqlRow] =
-    RowParser[CommentsSqlRow] { row =>
-      Success(
+  implicit lazy val reads: Reads[CommentsSqlRow] = Reads[CommentsSqlRow](json => JsResult.fromTry(
+      Try(
         CommentsSqlRow(
-          tableSchema = row[Option[SqlIdentifier]](idx + 0),
-          tableName = row[Option[SqlIdentifier]](idx + 1),
-          columnName = row[Option[SqlIdentifier]](idx + 2),
-          description = row[String](idx + 3)
+          tableSchema = json.\("table_schema").toOption.map(_.as(SqlIdentifier.reads)),
+          tableName = json.\("table_name").toOption.map(_.as(SqlIdentifier.reads)),
+          columnName = json.\("column_name").toOption.map(_.as(SqlIdentifier.reads)),
+          description = json.\("description").as(Reads.StringReads)
         )
       )
-    }
-  implicit val oFormat: OFormat[CommentsSqlRow] = new OFormat[CommentsSqlRow]{
-    override def writes(o: CommentsSqlRow): JsObject =
-      Json.obj(
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "column_name" -> o.columnName,
-        "description" -> o.description
+    ),
+  )
+  def rowParser(idx: Int): RowParser[CommentsSqlRow] = RowParser[CommentsSqlRow] { row =>
+    Success(
+      CommentsSqlRow(
+        tableSchema = row(idx + 0)(Column.columnToOption(SqlIdentifier.column)),
+        tableName = row(idx + 1)(Column.columnToOption(SqlIdentifier.column)),
+        columnName = row(idx + 2)(Column.columnToOption(SqlIdentifier.column)),
+        description = row(idx + 3)(Column.columnToString)
       )
-  
-    override def reads(json: JsValue): JsResult[CommentsSqlRow] = {
-      JsResult.fromTry(
-        Try(
-          CommentsSqlRow(
-            tableSchema = json.\("table_schema").toOption.map(_.as[SqlIdentifier]),
-            tableName = json.\("table_name").toOption.map(_.as[SqlIdentifier]),
-            columnName = json.\("column_name").toOption.map(_.as[SqlIdentifier]),
-            description = json.\("description").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit lazy val writes: OWrites[CommentsSqlRow] = OWrites[CommentsSqlRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "table_schema" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableSchema),
+      "table_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.tableName),
+      "column_name" -> Writes.OptionWrites(SqlIdentifier.writes).writes(o.columnName),
+      "description" -> Writes.StringWrites.writes(o.description)
+    ))
+  )
 }

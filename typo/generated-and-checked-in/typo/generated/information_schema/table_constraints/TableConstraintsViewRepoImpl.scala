@@ -10,8 +10,6 @@ package generated
 package information_schema
 package table_constraints
 
-import anorm.NamedParameter
-import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
@@ -20,34 +18,5 @@ object TableConstraintsViewRepoImpl extends TableConstraintsViewRepo {
     SQL"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced"
           from information_schema.table_constraints
        """.as(TableConstraintsViewRow.rowParser(1).*)
-  }
-  override def selectByFieldValues(fieldValues: List[TableConstraintsViewFieldOrIdValue[_]])(implicit c: Connection): List[TableConstraintsViewRow] = {
-    fieldValues match {
-      case Nil => selectAll
-      case nonEmpty =>
-        val namedParams = nonEmpty.map{
-          case TableConstraintsViewFieldValue.constraintCatalog(value) => NamedParameter("constraint_catalog", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.constraintSchema(value) => NamedParameter("constraint_schema", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.constraintName(value) => NamedParameter("constraint_name", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.tableCatalog(value) => NamedParameter("table_catalog", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.tableSchema(value) => NamedParameter("table_schema", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.tableName(value) => NamedParameter("table_name", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.constraintType(value) => NamedParameter("constraint_type", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.isDeferrable(value) => NamedParameter("is_deferrable", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.initiallyDeferred(value) => NamedParameter("initially_deferred", ParameterValue.from(value))
-          case TableConstraintsViewFieldValue.enforced(value) => NamedParameter("enforced", ParameterValue.from(value))
-        }
-        val quote = '"'.toString
-        val q = s"""select "constraint_catalog", "constraint_schema", "constraint_name", table_catalog, table_schema, "table_name", constraint_type, is_deferrable, initially_deferred, "enforced"
-                    from information_schema.table_constraints
-                    where ${namedParams.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
-                 """
-        // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-        import anorm._
-        SQL(q)
-          .on(namedParams: _*)
-          .as(TableConstraintsViewRow.rowParser(1).*)
-    }
-  
   }
 }

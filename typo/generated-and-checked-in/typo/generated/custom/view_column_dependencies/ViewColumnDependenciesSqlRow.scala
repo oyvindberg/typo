@@ -10,13 +10,16 @@ package generated
 package custom
 package view_column_dependencies
 
+import anorm.Column
 import anorm.RowParser
 import anorm.Success
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import scala.collection.immutable.ListMap
 import scala.util.Try
 import typo.generated.TypoRegnamespace
 
@@ -37,40 +40,36 @@ case class ViewColumnDependenciesSqlRow(
 )
 
 object ViewColumnDependenciesSqlRow {
-  def rowParser(idx: Int): RowParser[ViewColumnDependenciesSqlRow] =
-    RowParser[ViewColumnDependenciesSqlRow] { row =>
-      Success(
+  implicit lazy val reads: Reads[ViewColumnDependenciesSqlRow] = Reads[ViewColumnDependenciesSqlRow](json => JsResult.fromTry(
+      Try(
         ViewColumnDependenciesSqlRow(
-          viewSchema = row[/* nullability unknown */ Option[TypoRegnamespace]](idx + 0),
-          viewName = row[String](idx + 1),
-          tableSchema = row[/* nullability unknown */ Option[TypoRegnamespace]](idx + 2),
-          tableName = row[String](idx + 3),
-          columnName = row[String](idx + 4)
+          viewSchema = json.\("view_schema").toOption.map(_.as(TypoRegnamespace.reads)),
+          viewName = json.\("view_name").as(Reads.StringReads),
+          tableSchema = json.\("table_schema").toOption.map(_.as(TypoRegnamespace.reads)),
+          tableName = json.\("table_name").as(Reads.StringReads),
+          columnName = json.\("column_name").as(Reads.StringReads)
         )
       )
-    }
-  implicit val oFormat: OFormat[ViewColumnDependenciesSqlRow] = new OFormat[ViewColumnDependenciesSqlRow]{
-    override def writes(o: ViewColumnDependenciesSqlRow): JsObject =
-      Json.obj(
-        "view_schema" -> o.viewSchema,
-        "view_name" -> o.viewName,
-        "table_schema" -> o.tableSchema,
-        "table_name" -> o.tableName,
-        "column_name" -> o.columnName
+    ),
+  )
+  def rowParser(idx: Int): RowParser[ViewColumnDependenciesSqlRow] = RowParser[ViewColumnDependenciesSqlRow] { row =>
+    Success(
+      ViewColumnDependenciesSqlRow(
+        viewSchema = row(idx + 0)(Column.columnToOption(TypoRegnamespace.column)),
+        viewName = row(idx + 1)(Column.columnToString),
+        tableSchema = row(idx + 2)(Column.columnToOption(TypoRegnamespace.column)),
+        tableName = row(idx + 3)(Column.columnToString),
+        columnName = row(idx + 4)(Column.columnToString)
       )
-  
-    override def reads(json: JsValue): JsResult[ViewColumnDependenciesSqlRow] = {
-      JsResult.fromTry(
-        Try(
-          ViewColumnDependenciesSqlRow(
-            viewSchema = json.\("view_schema").toOption.map(_.as[TypoRegnamespace]),
-            viewName = json.\("view_name").as[String],
-            tableSchema = json.\("table_schema").toOption.map(_.as[TypoRegnamespace]),
-            tableName = json.\("table_name").as[String],
-            columnName = json.\("column_name").as[String]
-          )
-        )
-      )
-    }
+    )
   }
+  implicit lazy val writes: OWrites[ViewColumnDependenciesSqlRow] = OWrites[ViewColumnDependenciesSqlRow](o =>
+    new JsObject(ListMap[String, JsValue](
+      "view_schema" -> Writes.OptionWrites(TypoRegnamespace.writes).writes(o.viewSchema),
+      "view_name" -> Writes.StringWrites.writes(o.viewName),
+      "table_schema" -> Writes.OptionWrites(TypoRegnamespace.writes).writes(o.tableSchema),
+      "table_name" -> Writes.StringWrites.writes(o.tableName),
+      "column_name" -> Writes.StringWrites.writes(o.columnName)
+    ))
+  )
 }

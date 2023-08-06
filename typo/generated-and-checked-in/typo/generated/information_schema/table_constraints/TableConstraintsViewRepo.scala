@@ -14,5 +14,4 @@ import java.sql.Connection
 
 trait TableConstraintsViewRepo {
   def selectAll(implicit c: Connection): List[TableConstraintsViewRow]
-  def selectByFieldValues(fieldValues: List[TableConstraintsViewFieldOrIdValue[_]])(implicit c: Connection): List[TableConstraintsViewRow]
 }
