@@ -39,8 +39,8 @@ object Sector {
               
   implicit lazy val arrayGet: Get[Array[Sector]] = testdb.hardcoded.StringArrayMeta.get.map(_.map(force))
   implicit lazy val arrayPut: Put[Array[Sector]] = testdb.hardcoded.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit lazy val decoder: Decoder[Sector] = Decoder[String].emap(Sector.apply)
-  implicit lazy val encoder: Encoder[Sector] = Encoder[String].contramap(_.value)
+  implicit lazy val decoder: Decoder[Sector] = Decoder.decodeString.emap(Sector.apply)
+  implicit lazy val encoder: Encoder[Sector] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Sector] = Meta.StringMeta.get.temap(Sector.apply)
   implicit lazy val put: Put[Sector] = Meta.StringMeta.put.contramap(_.value)
   implicit lazy val read: Read[Sector] = Read.fromGet(get)

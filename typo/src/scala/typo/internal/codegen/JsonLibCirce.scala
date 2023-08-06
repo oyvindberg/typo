@@ -119,14 +119,14 @@ case class JsonLibCirce(pkg: sc.QIdent, default: ComputedDefault, inlineImplicit
         name = decoderName,
         implicitParams = Nil,
         tpe = Decoder.of(wrapperType),
-        body = code"""${Decoder.of(underlying)}.emap($wrapperType.apply)"""
+        body = code"""${lookupDecoderFor(underlying)}.emap($wrapperType.apply)"""
       ),
       sc.Given(
         tparams = Nil,
         name = encoderName,
         implicitParams = Nil,
         tpe = Encoder.of(wrapperType),
-        body = code"${Encoder.of(underlying)}.contramap(_.value)"
+        body = code"${lookupEncoderFor(underlying)}.contramap(_.value)"
       )
     )
 
