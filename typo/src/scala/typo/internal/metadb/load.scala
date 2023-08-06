@@ -119,7 +119,7 @@ object load {
                 case other                => throw new Exception(s"Unknown nullability: $other")
               },
               tpe = typeMapperDb.col(c).getOrElse {
-                System.err.println(s"Couldn't translate type from column ${jsonDescription.maybeJson.getOrElse(colName.value)}")
+                System.err.println(s"Couldn't translate type from relation ${relationName.value} column ${colName.value} with type ${colName.value}. Falling back to text")
                 db.Type.Text
               },
               udtName = c.udtName.map(_.value),

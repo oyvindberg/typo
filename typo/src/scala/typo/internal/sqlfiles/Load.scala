@@ -95,7 +95,7 @@ object Load {
       db.Col(
         name = col.name,
         tpe = typeMapperDb.dbTypeFrom(col.columnTypeName, Some(col.precision)).getOrElse {
-          System.err.println(s"$relativePath Couldn't translate type from column ${jsonDescription.maybeJson.getOrElse(col.name)}")
+          System.err.println(s"Couldn't translate type from file $relativePath column ${col.name.value} with type ${col.columnTypeName}. Falling back to text")
           db.Type.Text
         },
         udtName = None,
