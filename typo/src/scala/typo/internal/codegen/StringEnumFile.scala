@@ -13,27 +13,34 @@ object StringEnumFile {
       val name = naming.enumValue(value)
       name -> code"case object $name extends ${qident.name}(${sc.StrLit(value)})"
     }
-    val ByName = sc.Ident("ByName")
+    val str = sc.Ident("str")
 
     val instances = List(
-      options.dbLib.toList.flatMap(_.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName)),
-      options.jsonLibs.flatMap(_.stringEnumInstances(EnumType, sc.Type.String, lookup = ByName))
+      options.dbLib.toList.flatMap(_.stringEnumInstances(EnumType, sc.Type.String)),
+      options.jsonLibs.flatMap(_.stringEnumInstances(EnumType, sc.Type.String))
     ).flatten
 
     val obj = genObject.withBody(qident, instances)(
-      code"""|${members.map { case (_, definition) => definition }.mkCode("\n")}
+      code"""|def apply($str: ${sc.Type.String}): ${sc.Type.Either.of(sc.Type.String, EnumType)} =
+             |  ByName.get($str).toRight(s"'$$str' does not match any of the following legal values: $$Names")
+             |def force($str: String): Sector =
+             |  apply($str) match {
+             |    case ${sc.Type.Left}(msg) => sys.error(msg)
+             |    case ${sc.Type.Right}(value) => value
+             |  }
+             |${members.map { case (_, definition) => definition }.mkCode("\n")}
              |val All: ${sc.Type.List.of(EnumType)} = ${sc.Type.List}(${members.map { case (ident, _) => ident.code }.mkCode(", ")})
              |val Names: ${sc.Type.String} = All.map(_.value).mkString(", ")
              |val ByName: ${sc.Type.Map.of(sc.Type.String, EnumType)} = All.map(x => (x.value, x)).toMap
             """.stripMargin
     )
-    val str =
+    val body =
       code"""|$comments
              |sealed abstract class ${qident.name}(val value: ${sc.Type.String})
              |
              |$obj
              |""".stripMargin
 
-    sc.File(EnumType, str, secondaryTypes = Nil)
+    sc.File(EnumType, body, secondaryTypes = Nil)
   }
 }

@@ -25,6 +25,13 @@ import play.api.libs.json.Writes
 sealed abstract class Sector(val value: String)
 
 object Sector {
+  def apply(str: String): Either[String, Sector] =
+    ByName.get(str).toRight(s"'$str' does not match any of the following legal values: $Names")
+  def force(str: String): Sector =
+    apply(str) match {
+      case Left(msg) => sys.error(msg)
+      case Right(value) => value
+    }
   case object `_public` extends Sector("PUBLIC")
   case object `_private` extends Sector("PRIVATE")
   case object `_other` extends Sector("OTHER")
@@ -34,19 +41,12 @@ object Sector {
               
   implicit lazy val arrayColumn: Column[Array[Sector]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = implicitly[ToStatement[Array[String]]].contramap(_.map(_.value))
-  implicit lazy val column: Column[Sector] = implicitly[Column[String]].mapResult { str => ByName.get(str).toRight(SqlMappingError(s"$str was not among ${ByName.keys}")) }
+  implicit lazy val column: Column[Sector] = implicitly[Column[String]].mapResult(str => Sector(str).left.map(SqlMappingError.apply))
   implicit lazy val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
     override def sqlType: String = implicitly[ParameterMetaData[String]].sqlType
     override def jdbcType: Int = implicitly[ParameterMetaData[String]].jdbcType
   }
-  implicit lazy val reads: Reads[Sector] = Reads[Sector]((value: JsValue) =>
-    value.validate(Reads.StringReads).flatMap { str =>
-      ByName.get(str) match {
-        case Some(value) => JsSuccess(value)
-        case None => JsError(s"'$str' does not match any of the following legal values: $Names")
-      }
-    }
-  )
+  implicit lazy val reads: Reads[Sector] = Reads[Sector]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Sector(str).fold(JsError.apply, JsSuccess(_)))}
   implicit lazy val toStatement: ToStatement[Sector] = implicitly[ToStatement[String]].contramap(_.value)
   implicit lazy val writes: Writes[Sector] = Writes[Sector](value => Writes.StringWrites.writes(value.value))
 }

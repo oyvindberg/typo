@@ -112,14 +112,14 @@ case class JsonLibCirce(pkg: sc.QIdent, default: ComputedDefault, inlineImplicit
     )
   }
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Given] =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
     List(
       sc.Given(
         tparams = Nil,
         name = decoderName,
         implicitParams = Nil,
         tpe = Decoder.of(wrapperType),
-        body = code"""${Decoder.of(underlying)}.emap(str => $lookup.get(str).toRight(s"'$$str' does not match any of the following legal values: $$Names"))"""
+        body = code"""${Decoder.of(underlying)}.emap($wrapperType.apply)"""
       ),
       sc.Given(
         tparams = Nil,

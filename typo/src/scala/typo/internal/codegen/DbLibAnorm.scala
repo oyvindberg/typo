@@ -412,7 +412,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     }
   }
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Given] =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
     List(
       sc.Given(
         tparams = Nil,
@@ -426,7 +426,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = columnName,
         implicitParams = Nil,
         tpe = Column.of(wrapperType),
-        body = code"""${sc.Summon(Column.of(underlying))}.mapResult { str => $lookup.get(str).toRight($SqlMappingError(s"$$str was not among $${$lookup.keys}")) }"""
+        body = code"""${sc.Summon(Column.of(underlying))}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"""
       ),
       sc.Given(
         tparams = Nil,

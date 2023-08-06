@@ -23,6 +23,13 @@ import io.circe.Encoder
 sealed abstract class Sector(val value: String)
 
 object Sector {
+  def apply(str: String): Either[String, Sector] =
+    ByName.get(str).toRight(s"'$str' does not match any of the following legal values: $Names")
+  def force(str: String): Sector =
+    apply(str) match {
+      case Left(msg) => sys.error(msg)
+      case Right(value) => value
+    }
   case object `_public` extends Sector("PUBLIC")
   case object `_private` extends Sector("PRIVATE")
   case object `_other` extends Sector("OTHER")
@@ -31,9 +38,9 @@ object Sector {
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayPut: Put[Array[Sector]] = testdb.hardcoded.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit lazy val decoder: Decoder[Sector] = Decoder[String].emap(str => ByName.get(str).toRight(s"'$str' does not match any of the following legal values: $Names"))
+  implicit lazy val decoder: Decoder[Sector] = Decoder[String].emap(Sector.apply)
   implicit lazy val encoder: Encoder[Sector] = Encoder[String].contramap(_.value)
-  implicit lazy val get: Get[Sector] = Get[String].temap { str => ByName.get(str).toRight(s"$str was not among ${ByName.keys}") }
+  implicit lazy val get: Get[Sector] = Get[String].temap(Sector.apply)
   implicit lazy val put: Put[Sector] = Meta.StringMeta.put.contramap(_.value)
   implicit lazy val read: Read[Sector] = Read.fromGet(get)
   implicit lazy val write: Write[Sector] = Write.fromPut(put)

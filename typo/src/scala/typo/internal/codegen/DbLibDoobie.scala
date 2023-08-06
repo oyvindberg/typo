@@ -352,7 +352,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     }
   }
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, lookup: sc.Ident): List[sc.Given] = {
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] = {
     List(
       sc.Given(
         tparams = Nil,
@@ -373,7 +373,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         name = getName,
         implicitParams = Nil,
         tpe = Get.of(wrapperType),
-        body = code"""${Get.of(underlying)}.temap { str => ByName.get(str).toRight(s"$$str was not among $${ByName.keys}") }"""
+        body = code"""${Get.of(underlying)}.temap($wrapperType.apply)"""
       ),
       sc.Given(
         tparams = Nil,
