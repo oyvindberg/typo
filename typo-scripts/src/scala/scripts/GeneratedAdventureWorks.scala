@@ -1,14 +1,11 @@
 package scripts
 
-import bleep.logging.{Logger, Loggers, LogLevel}
+import bleep.logging.{LogLevel, Loggers}
 import bleep.{LogPatterns, cli}
+import typo.internal.FileSync
 
-import java.net.URI
-import java.net.http.{HttpClient, HttpRequest, HttpResponse}
-import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
-import java.util
 
 object GeneratedAdventureWorks {
   val buildDir = Path.of(sys.props("user.dir"))
@@ -35,7 +32,26 @@ object GeneratedAdventureWorks {
           typo
             .fromMetaDb(options, metadb, typo.Selector.All)
             .overwriteFolder(typoSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
+            .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
+            .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
 
+          // demonstrate how you can `watch` for changes in sql files and immediately regenerate code
+          // note that this does not listen to changes in db schema naturally, though I'm sure that's possible to do as well
+          if (args.contains("--watch")) {
+            logger.warn(s"watching for changes in .sql files under $scriptsPath")
+            bleep
+              .FileWatching(logger, Map(scriptsPath -> List(()))) { changed =>
+                logger.warn("regenerating sql scripts")
+                val newSqlScripts = typo.internal.sqlfiles.Load(scriptsPath, metadb.typeMapperDb)
+                typo
+                  .fromMetaDb(options, metadb.copy(sqlFiles = newSqlScripts), typo.Selector.All)
+                  .overwriteFolder(typoSources, soft = true, relPath => relPath.mapSegments(_.drop(1)))
+                  .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
+                  .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
+
+              }
+              .run(bleep.FileWatching.StopWhen.OnStdInput)
+          }
           cli(
             "add files to git",
             buildDir,
