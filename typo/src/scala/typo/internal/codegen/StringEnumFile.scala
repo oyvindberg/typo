@@ -23,7 +23,7 @@ object StringEnumFile {
     val obj = genObject.withBody(qident, instances)(
       code"""|def apply($str: ${sc.Type.String}): ${sc.Type.Either.of(sc.Type.String, EnumType)} =
              |  ByName.get($str).toRight(s"'$$str' does not match any of the following legal values: $$Names")
-             |def force($str: String): Sector =
+             |def force($str: String): $EnumType =
              |  apply($str) match {
              |    case ${sc.Type.Left}(msg) => sys.error(msg)
              |    case ${sc.Type.Right}(value) => value
