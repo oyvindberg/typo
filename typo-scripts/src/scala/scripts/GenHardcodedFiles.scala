@@ -9,7 +9,8 @@ import typo.internal.{DebugJson, TypeMapperDb}
 // it does not need a running database
 object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   val enums = List(
-    db.StringEnum(db.RelationName(Some("myschema"), "sector"), List("PUBLIC", "PRIVATE", "OTHER"))
+    db.StringEnum(db.RelationName(Some("myschema"), "sector"), List("PUBLIC", "PRIVATE", "OTHER")),
+    db.StringEnum(db.RelationName(Some("myschema"), "number"), List("one", "two", "three"))
   )
 
   val person = db.Table(
@@ -47,6 +48,15 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         Some("myschema.sector"),
         Nullability.NoNulls,
         columnDefault = Some("PUBLIC"),
+        None,
+        DebugJson.Empty
+      ),
+      db.Col(
+        db.ColName("favorite_number"),
+        db.Type.EnumRef(db.RelationName(Some("myschema"), "number")),
+        Some("myschema.number"),
+        Nullability.NoNulls,
+        columnDefault = Some("one"),
         None,
         DebugJson.Empty
       )

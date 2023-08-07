@@ -13,6 +13,7 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import testdb.hardcoded.Defaulted
+import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 import typo.dsl.DeleteBuilder
@@ -28,9 +29,9 @@ object PersonRepoImpl extends PersonRepo {
     DeleteBuilder("myschema.person", PersonFields)
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
-          values (${unsaved.id}::int8, ${unsaved.favouriteFootballClubId}, ${unsaved.name}, ${unsaved.nickName}, ${unsaved.blogUrl}, ${unsaved.email}, ${unsaved.phone}, ${unsaved.likesPizza}, ${unsaved.maritalStatusId}, ${unsaved.workEmail}, ${unsaved.sector}::myschema.sector)
-          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)
+          values (${unsaved.id}::int8, ${unsaved.favouriteFootballClubId}, ${unsaved.name}, ${unsaved.nickName}, ${unsaved.blogUrl}, ${unsaved.email}, ${unsaved.phone}, ${unsaved.likesPizza}, ${unsaved.maritalStatusId}, ${unsaved.workEmail}, ${unsaved.sector}::myschema.sector, ${unsaved.favoriteNumber}::myschema."number")
+          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
@@ -56,18 +57,22 @@ object PersonRepoImpl extends PersonRepo {
       unsaved.sector match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("sector", ParameterValue.from[Sector](value)), "::myschema.sector"))
+      },
+      unsaved.favoriteNumber match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((NamedParameter("favorite_number", ParameterValue.from[Number](value)), """::myschema."number""""))
       }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into myschema.person default values
-            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
          """
         .executeInsert(PersonRow.rowParser(1).single)
     } else {
       val q = s"""insert into myschema.person(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+                  returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
                """
       // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
       import anorm._
@@ -81,18 +86,18 @@ object PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("myschema.person", PersonFields, PersonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonRow] = {
-    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
           from myschema.person
        """.as(PersonRow.rowParser(1).*)
   }
   override def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
           from myschema.person
           where "id" = $id
        """.as(PersonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow] = {
-    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    SQL"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
           from myschema.person
           where "id" = ANY($ids)
        """.as(PersonRow.rowParser(1).*)
@@ -110,7 +115,8 @@ object PersonRepoImpl extends PersonRepo {
               likes_pizza = ${row.likesPizza},
               marital_status_id = ${row.maritalStatusId},
               work_email = ${row.workEmail},
-              sector = ${row.sector}::myschema.sector
+              sector = ${row.sector}::myschema.sector,
+              favorite_number = ${row.favoriteNumber}::myschema."number"
           where "id" = $id
        """.executeUpdate() > 0
   }
@@ -118,7 +124,7 @@ object PersonRepoImpl extends PersonRepo {
     UpdateBuilder("myschema.person", PersonFields, PersonRow.rowParser)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
+    SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)
           values (
             ${unsaved.id}::int8,
             ${unsaved.favouriteFootballClubId},
@@ -130,7 +136,8 @@ object PersonRepoImpl extends PersonRepo {
             ${unsaved.likesPizza},
             ${unsaved.maritalStatusId},
             ${unsaved.workEmail},
-            ${unsaved.sector}::myschema.sector
+            ${unsaved.sector}::myschema.sector,
+            ${unsaved.favoriteNumber}::myschema."number"
           )
           on conflict ("id")
           do update set
@@ -143,8 +150,9 @@ object PersonRepoImpl extends PersonRepo {
             likes_pizza = EXCLUDED.likes_pizza,
             marital_status_id = EXCLUDED.marital_status_id,
             work_email = EXCLUDED.work_email,
-            sector = EXCLUDED.sector
-          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+            sector = EXCLUDED.sector,
+            favorite_number = EXCLUDED.favorite_number
+          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
        """
       .executeInsert(PersonRow.rowParser(1).single)
     

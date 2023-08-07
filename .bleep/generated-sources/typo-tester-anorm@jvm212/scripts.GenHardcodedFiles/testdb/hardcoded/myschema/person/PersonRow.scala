@@ -19,6 +19,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
+import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -36,7 +37,8 @@ case class PersonRow(
   /** Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
   workEmail: Option[/* max 254 chars */ String],
-  sector: Sector
+  sector: Sector,
+  favoriteNumber: Number
 )
 
 object PersonRow {
@@ -53,7 +55,8 @@ object PersonRow {
           likesPizza = json.\("likes_pizza").as(Reads.BooleanReads),
           maritalStatusId = json.\("marital_status_id").as(MaritalStatusId.reads),
           workEmail = json.\("work_email").toOption.map(_.as(Reads.StringReads)),
-          sector = json.\("sector").as(Sector.reads)
+          sector = json.\("sector").as(Sector.reads),
+          favoriteNumber = json.\("favorite_number").as(Number.reads)
         )
       )
     ),
@@ -71,7 +74,8 @@ object PersonRow {
         likesPizza = row(idx + 7)(Column.columnToBoolean),
         maritalStatusId = row(idx + 8)(MaritalStatusId.column),
         workEmail = row(idx + 9)(Column.columnToOption(Column.columnToString)),
-        sector = row(idx + 10)(Sector.column)
+        sector = row(idx + 10)(Sector.column),
+        favoriteNumber = row(idx + 11)(Number.column)
       )
     )
   }
@@ -87,7 +91,8 @@ object PersonRow {
       "likes_pizza" -> Writes.BooleanWrites.writes(o.likesPizza),
       "marital_status_id" -> MaritalStatusId.writes.writes(o.maritalStatusId),
       "work_email" -> Writes.OptionWrites(Writes.StringWrites).writes(o.workEmail),
-      "sector" -> Sector.writes.writes(o.sector)
+      "sector" -> Sector.writes.writes(o.sector),
+      "favorite_number" -> Number.writes.writes(o.favoriteNumber)
     ))
   )
 }

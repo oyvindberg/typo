@@ -11,6 +11,7 @@ package person
 import io.circe.Decoder
 import io.circe.Encoder
 import testdb.hardcoded.Defaulted
+import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -32,9 +33,11 @@ case class PersonRowUnsaved(
       Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault,
   /** Default: PUBLIC */
-  sector: Defaulted[Sector] = Defaulted.UseDefault
+  sector: Defaulted[Sector] = Defaulted.UseDefault,
+  /** Default: one */
+  favoriteNumber: Defaulted[Number] = Defaulted.UseDefault
 ) {
-  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, sectorDefault: => Sector): PersonRow =
+  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, sectorDefault: => Sector, favoriteNumberDefault: => Number): PersonRow =
     PersonRow(
       favouriteFootballClubId = favouriteFootballClubId,
       name = name,
@@ -55,10 +58,14 @@ case class PersonRowUnsaved(
       sector = sector match {
                  case Defaulted.UseDefault => sectorDefault
                  case Defaulted.Provided(value) => value
-               }
+               },
+      favoriteNumber = favoriteNumber match {
+                         case Defaulted.UseDefault => favoriteNumberDefault
+                         case Defaulted.Provided(value) => value
+                       }
     )
 }
 object PersonRowUnsaved {
-  implicit lazy val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct11[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Sector]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector")(PersonRowUnsaved.apply)(FootballClubId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(PersonId.decoder), Defaulted.decoder(MaritalStatusId.decoder), Defaulted.decoder(Sector.decoder))
-  implicit lazy val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct11[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Sector]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector")(x => (x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.workEmail, x.id, x.maritalStatusId, x.sector))(FootballClubId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(PersonId.encoder), Defaulted.encoder(MaritalStatusId.encoder), Defaulted.encoder(Sector.encoder))
+  implicit lazy val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct12[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Sector], Defaulted[Number]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number")(PersonRowUnsaved.apply)(FootballClubId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(PersonId.decoder), Defaulted.decoder(MaritalStatusId.decoder), Defaulted.decoder(Sector.decoder), Defaulted.decoder(Number.decoder))
+  implicit lazy val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct12[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Sector], Defaulted[Number]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number")(x => (x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.workEmail, x.id, x.maritalStatusId, x.sector, x.favoriteNumber))(FootballClubId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(PersonId.encoder), Defaulted.encoder(MaritalStatusId.encoder), Defaulted.encoder(Sector.encoder), Defaulted.encoder(Number.encoder))
 }

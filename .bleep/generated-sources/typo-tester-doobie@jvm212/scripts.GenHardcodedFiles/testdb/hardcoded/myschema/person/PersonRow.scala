@@ -14,6 +14,7 @@ import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
+import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -31,12 +32,13 @@ case class PersonRow(
   /** Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
   workEmail: Option[/* max 254 chars */ String],
-  sector: Sector
+  sector: Sector,
+  favoriteNumber: Number
 )
 
 object PersonRow {
-  implicit lazy val decoder: Decoder[PersonRow] = Decoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(PersonRow.apply)(PersonId.decoder, FootballClubId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, MaritalStatusId.decoder, Decoder.decodeOption(Decoder.decodeString), Sector.decoder)
-  implicit lazy val encoder: Encoder[PersonRow] = Encoder.forProduct11[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector")(x => (x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.sector))(PersonId.encoder, FootballClubId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, MaritalStatusId.encoder, Encoder.encodeOption(Encoder.encodeString), Sector.encoder)
+  implicit lazy val decoder: Decoder[PersonRow] = Decoder.forProduct12[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector, Number]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")(PersonRow.apply)(PersonId.decoder, FootballClubId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, MaritalStatusId.decoder, Decoder.decodeOption(Decoder.decodeString), Sector.decoder, Number.decoder)
+  implicit lazy val encoder: Encoder[PersonRow] = Encoder.forProduct12[PersonRow, PersonId, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, MaritalStatusId, Option[/* max 254 chars */ String], Sector, Number]("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")(x => (x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.sector, x.favoriteNumber))(PersonId.encoder, FootballClubId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, MaritalStatusId.encoder, Encoder.encodeOption(Encoder.encodeString), Sector.encoder, Number.encoder)
   implicit lazy val read: Read[PersonRow] = new Read[PersonRow](
     gets = List(
       (PersonId.get, Nullability.NoNulls),
@@ -49,7 +51,8 @@ object PersonRow {
       (Meta.BooleanMeta.get, Nullability.NoNulls),
       (MaritalStatusId.get, Nullability.NoNulls),
       (Meta.StringMeta.get, Nullability.Nullable),
-      (Sector.get, Nullability.NoNulls)
+      (Sector.get, Nullability.NoNulls),
+      (Number.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
       id = PersonId.get.unsafeGetNonNullable(rs, i + 0),
@@ -62,7 +65,8 @@ object PersonRow {
       likesPizza = Meta.BooleanMeta.get.unsafeGetNonNullable(rs, i + 7),
       maritalStatusId = MaritalStatusId.get.unsafeGetNonNullable(rs, i + 8),
       workEmail = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      sector = Sector.get.unsafeGetNonNullable(rs, i + 10)
+      sector = Sector.get.unsafeGetNonNullable(rs, i + 10),
+      favoriteNumber = Number.get.unsafeGetNonNullable(rs, i + 11)
     )
   )
 }

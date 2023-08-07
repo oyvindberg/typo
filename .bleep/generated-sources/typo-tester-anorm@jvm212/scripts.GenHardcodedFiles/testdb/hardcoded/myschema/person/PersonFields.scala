@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package person
 
+import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -27,6 +28,7 @@ trait PersonFields[Row] {
   val maritalStatusId: Field[MaritalStatusId, Row]
   val workEmail: OptField[/* max 254 chars */ String, Row]
   val sector: Field[Sector, Row]
+  val favoriteNumber: Field[Number, Row]
 }
 object PersonFields extends PersonStructure[PersonRow](None, identity, (_, x) => x)
 

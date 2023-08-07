@@ -16,6 +16,7 @@ import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
 import testdb.hardcoded.Defaulted
+import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -32,9 +33,9 @@ object PersonRepoImpl extends PersonRepo {
     DeleteBuilder("myschema.person", PersonFields)
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
-          values (${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8, ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.maritalStatusId)(Write.fromPut(MaritalStatusId.put))}, ${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector)
-          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+    sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)
+          values (${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8, ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.maritalStatusId)(Write.fromPut(MaritalStatusId.put))}, ${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector, ${fromWrite(unsaved.favoriteNumber)(Write.fromPut(Number.put))}::myschema."number")
+          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
        """.query(PersonRow.read).unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
@@ -58,18 +59,22 @@ object PersonRepoImpl extends PersonRepo {
       unsaved.sector match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((Fragment.const(s"sector"), fr"${fromWrite(value: Sector)(Write.fromPut(Sector.put))}::myschema.sector"))
+      },
+      unsaved.favoriteNumber match {
+        case Defaulted.UseDefault => None
+        case Defaulted.Provided(value) => Some((Fragment.const(s"favorite_number"), fr"""${fromWrite(value: Number)(Write.fromPut(Number.put))}::myschema."number""""))
       }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into myschema.person default values
-            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
          """
     } else {
       import cats.syntax.foldable.toFoldableOps
       sql"""insert into myschema.person(${fs.map { case (n, _) => n }.intercalate(fr", ")})
             values (${fs.map { case (_, f) => f }.intercalate(fr", ")})
-            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+            returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
          """
     }
     q.query(PersonRow.read).unique
@@ -79,13 +84,13 @@ object PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("myschema.person", PersonFields, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person""".query(PersonRow.read).stream
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person""".query(PersonRow.read).stream
   }
   override def selectById(id: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".query(PersonRow.read).option
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".query(PersonRow.read).option
   }
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector from myschema.person where "id" = ANY(${fromWrite(ids)(Write.fromPut(PersonId.arrayPut))})""".query(PersonRow.read).stream
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ANY(${fromWrite(ids)(Write.fromPut(PersonId.arrayPut))})""".query(PersonRow.read).stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val id = row.id
@@ -99,7 +104,8 @@ object PersonRepoImpl extends PersonRepo {
               likes_pizza = ${fromWrite(row.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))},
               marital_status_id = ${fromWrite(row.maritalStatusId)(Write.fromPut(MaritalStatusId.put))},
               work_email = ${fromWrite(row.workEmail)(Write.fromPutOption(Meta.StringMeta.put))},
-              sector = ${fromWrite(row.sector)(Write.fromPut(Sector.put))}::myschema.sector
+              sector = ${fromWrite(row.sector)(Write.fromPut(Sector.put))}::myschema.sector,
+              favorite_number = ${fromWrite(row.favoriteNumber)(Write.fromPut(Number.put))}::myschema."number"
           where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}"""
       .update
       .run
@@ -109,7 +115,7 @@ object PersonRepoImpl extends PersonRepo {
     UpdateBuilder("myschema.person", PersonFields, PersonRow.read)
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector)
+    sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)
           values (
             ${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8,
             ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))},
@@ -121,7 +127,8 @@ object PersonRepoImpl extends PersonRepo {
             ${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))},
             ${fromWrite(unsaved.maritalStatusId)(Write.fromPut(MaritalStatusId.put))},
             ${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector
+            ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector,
+            ${fromWrite(unsaved.favoriteNumber)(Write.fromPut(Number.put))}::myschema."number"
           )
           on conflict ("id")
           do update set
@@ -134,8 +141,9 @@ object PersonRepoImpl extends PersonRepo {
             likes_pizza = EXCLUDED.likes_pizza,
             marital_status_id = EXCLUDED.marital_status_id,
             work_email = EXCLUDED.work_email,
-            sector = EXCLUDED.sector
-          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector
+            sector = EXCLUDED.sector,
+            favorite_number = EXCLUDED.favorite_number
+          returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
        """.query(PersonRow.read).unique
   }
 }
