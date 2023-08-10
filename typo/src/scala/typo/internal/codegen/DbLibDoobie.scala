@@ -74,7 +74,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
       }
     case RepoMethod.SelectByUnique(params, _, rowType) =>
-      val ident = Naming.camelCase(Array("selectByUnique"))
+      val ident = Naming.camelCaseIdent(Array("selectByUnique"))
       code"def $ident(${params.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(sc.Type.Option.of(rowType))}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
@@ -391,6 +391,16 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"???"
     }
   }
+
+  override def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value =
+    sc.Value(
+      Nil,
+      x.name,
+      x.params,
+      Nil,
+      ConnectionIO.of(x.table.names.RowName),
+      code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
+    )
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] = {
     List(

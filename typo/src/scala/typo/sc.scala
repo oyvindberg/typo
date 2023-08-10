@@ -59,6 +59,7 @@ object sc {
       tparams: List[Type.Abstract],
       name: sc.Ident,
       params: List[Param],
+      implicitParams: List[Param],
       tpe: sc.Type,
       body: sc.Code
   ) extends ClassMember
@@ -392,17 +393,18 @@ object sc {
           val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
           s"implicit def $renderedName$renderedTparams$renderedImplicitParams: $renderedTpe = $renderedBody"
         }
-      case Value(tparams, name, implicitParams, tpe, body) =>
+      case Value(tparams, name, params, implicitParams, tpe, body) =>
         val renderedName = renderTree(name)
         val renderedTpe = renderTree(tpe)
         val renderedBody = body.render
 
-        if (tparams.isEmpty && implicitParams.isEmpty)
+        if (tparams.isEmpty && params.isEmpty && implicitParams.isEmpty)
           s"val $renderedName: $renderedTpe = $renderedBody"
         else {
           val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
-          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(", ", ", ")")
-          s"def $renderedName$renderedTparams$renderedImplicitParams: $renderedTpe = $renderedBody"
+          val renderedParams = if (params.isEmpty) "" else params.map(renderTree).mkString("(", ", ", ")")
+          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
+          s"def $renderedName$renderedTparams$renderedParams$renderedImplicitParams: $renderedTpe = $renderedBody"
         }
       case Obj(name, members, body) =>
         if (members.isEmpty && body.isEmpty) ""

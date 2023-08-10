@@ -11,6 +11,7 @@ case class Options(
     header: String = Options.header,
     enableFieldValue: Boolean = false,
     enableDsl: Boolean = true,
+    enableTestInserts: Boolean = false,
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true,
     keepDependencies: Boolean = false,
