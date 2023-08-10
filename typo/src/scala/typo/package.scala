@@ -42,6 +42,7 @@ package object typo {
       header = publicOptions.header,
       enableFieldValue = publicOptions.enableFieldValue,
       enableDsl = publicOptions.enableDsl,
+      keepDependencies = publicOptions.keepDependencies,
       debugTypes = publicOptions.debugTypes
     )
     val customTypes = new CustomTypes(options.pkg)
@@ -84,10 +85,13 @@ package object typo {
         sqlFileFiles
       ).flatten
 
-    val entryPoints: Iterable[sc.File] =
-      sqlFileFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if selector.include(name) => f }
-
-    val keptMostFiles: List[sc.File] = minimize(mostFiles, entryPoints)
+    val keptMostFiles: List[sc.File] =
+      if (options.keepDependencies) mostFiles
+      else {
+        val entryPoints: Iterable[sc.File] =
+          sqlFileFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if selector.include(name) => f }
+        minimize(mostFiles, entryPoints)
+      }
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
       keptMostFiles.groupBy(_.pkg).map { case (pkg, files) =>

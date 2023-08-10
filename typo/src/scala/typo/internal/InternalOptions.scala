@@ -13,5 +13,6 @@ case class InternalOptions(
     header: String,
     enableFieldValue: Boolean,
     enableDsl: Boolean,
+    keepDependencies: Boolean,
     debugTypes: Boolean
 )

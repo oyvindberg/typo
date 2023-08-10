@@ -13,6 +13,7 @@ case class Options(
     enableDsl: Boolean = true,
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true,
+    keepDependencies: Boolean = false,
     silentBanner: Boolean = false
 )
 
