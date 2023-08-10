@@ -263,8 +263,21 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           val param = sqlScript.params.find(_.underlying.indices.contains(paramAtIndex)).get
           s"$$${param.name.value}"
         }
+        // this is necessary to make custom types work with sql scripts, unfortunately.
+        val renderedWithCasts: sc.Code =
+          sqlScript.cols.toList.flatMap(c => sqlCast.fromPg(c.dbCol)) match {
+            case Nil => renderedScript.code
+            case _ =>
+              val row = sc.Ident("row")
+
+              code"""|select ${sqlScript.cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")} from (
+                     |  $renderedScript
+                     |) $row""".stripMargin
+
+          }
+
         code"""|val sql =
-               |  ${SQL(renderedScript)}
+               |  ${SQL(renderedWithCasts)}
                |sql.query(${sqlScript.RowName}.$readName).stream
                |""".stripMargin
     }
