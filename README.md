@@ -93,7 +93,10 @@ trait PersonDetailSqlRepo {
 
 
 
-https://github.com/oyvindberg/typo/assets/247937/d07744de-208c-4c13-a5b8-9b77d9eaf9b9
+
+https://github.com/oyvindberg/typo/assets/247937/cd8c0bce-907f-4acc-a359-7158a85c36b4
+
+
 
 
 
