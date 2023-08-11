@@ -91,6 +91,12 @@ trait PersonDetailSqlRepo {
 
 ```
 
+
+
+https://github.com/oyvindberg/typo/assets/247937/d07744de-208c-4c13-a5b8-9b77d9eaf9b9
+
+
+
 You also get an implementation of course. 
 
 Note that postgres is not able to decide nullability for parameters. You can override that (and any other type) through customization.
