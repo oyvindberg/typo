@@ -2,22 +2,28 @@ package typo
 package internal
 package codegen
 
+import typo.internal.sqlfiles.SqlFile
+
 object sqlCast {
 
   /** cast to correctly insert into PG
     */
   def toPg(dbCol: db.Col): Option[String] =
-    dbCol.tpe match {
+    toPg(dbCol.tpe, dbCol.udtName)
+
+  def toPg(param: SqlFile.Param): Option[String] =
+    toPg(param.tpe, Some(param.udtName))
+
+  /** cast to correctly insert into PG
+    */
+  def toPg(dbType: db.Type, udtName: Option[String]): Option[String] =
+    dbType match {
       case db.Type.EnumRef(name) =>
         Some(tableName.toCode(name).render.asString)
       case db.Type.DomainRef(name) =>
         Some(tableName.toCode(name).render.asString)
       case db.Type.Boolean | db.Type.Text | db.Type.VarChar(_) => None
-      case _ =>
-        dbCol.udtName match {
-          case Some(value) => Some(value)
-          case None        => None
-        }
+      case _                                                   => udtName
     }
 
   def toPgCode(c: ComputedColumn): sc.Code =
@@ -25,7 +31,7 @@ object sqlCast {
       case Some(value) => code"::$value"
       case None        => sc.Code.Empty
     }
-
+  
   /** avoid whatever the postgres driver does for these data formats by going through basic data types
     */
   def fromPg(dbCol: db.Col): Option[String] =

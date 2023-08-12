@@ -117,7 +117,7 @@ object Load {
         System.err.println(s"$relativePath: Couldn't translate type from param $maybeName")
         db.Type.Text
       }
-      SqlFile.Param(maybeName, indices, tpe, jdbcParam.isNullable.toNullability)
+      SqlFile.Param(maybeName, indices, jdbcParam.parameterTypeName, tpe, jdbcParam.isNullable.toNullability)
     }
 
     for {

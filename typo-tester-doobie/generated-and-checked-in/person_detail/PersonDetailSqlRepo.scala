@@ -6,9 +6,11 @@
 package adventureworks
 package person_detail
 
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
 
 trait PersonDetailSqlRepo {
-  def apply(businessentityid: /* nullability unknown */ Option[Int]): Stream[ConnectionIO, PersonDetailSqlRow]
+  def apply(businessentityid: /* nullability unknown */ Option[Int],
+            modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime]): Stream[ConnectionIO, PersonDetailSqlRow]
 }
