@@ -149,9 +149,15 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
     }
 
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+    val members = repoMethods.map {
+      case x: RepoMethod.Virtual => dbLib.repoSig(x)
+      case x: RepoMethod.Final =>
+        code"""|final ${dbLib.repoSig(x)} =
+               |  ${dbLib.repoFinalImpl(x)}"""
+    }
     val str =
       code"""trait ${names.RepoName.name} {
-            |  ${repoMethods.map(dbLib.repoSig).mkCode("\n")}
+            |  ${members.mkCode("\n")}
             |}
             |""".stripMargin
 
@@ -159,9 +165,9 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
   }
 
   def RepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
-    val renderedMethods: NonEmptyList[sc.Code] = repoMethods.map { repoMethod =>
+    val renderedMethods: List[sc.Code] = repoMethods.toList.collect { case (repoMethod: RepoMethod.Virtual) =>
       code"""|override ${dbLib.repoSig(repoMethod)} = {
-             |  ${dbLib.repoImpl(repoMethod)}
+             |  ${dbLib.repoVirtualImpl(repoMethod)}
              |}""".stripMargin
     }
     val str =
@@ -179,10 +185,10 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
         sc.Param(sc.Ident("toRow"), sc.Type.Function1.of(unsaved.tpe, names.RowName), None)
       }
 
-    val methods: NonEmptyList[sc.Code] =
-      repoMethods.map { repoMethod =>
+    val methods: List[sc.Code] =
+      repoMethods.toList.collect { case (repoMethod: RepoMethod.Virtual) =>
         code"""|override ${dbLib.repoSig(repoMethod)} = {
-               |  ${dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
+               |  ${dbLib.mockVirtualRepoImpl(idComputed, repoMethod, maybeToRowParam)}
                |}""".stripMargin
       }
 

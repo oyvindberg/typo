@@ -11,8 +11,8 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
-  override def apply(businessentityid: /* nullability unknown */ Option[Int],
-                     modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow] = {
+  override def opt(businessentityid: Option[Int],
+                   modifiedAfter: Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow] = {
     val sql =
       SQL"""SELECT s.businessentityid
                    , p.title

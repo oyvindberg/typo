@@ -11,5 +11,5 @@ case class SqlFile(
 )
 
 object SqlFile {
-  case class Param(maybeName: DecomposedSql.Param, indices: List[Int], udtName: String, tpe: db.Type, nullability: Nullability)
+  case class Param(maybeName: DecomposedSql.Param, indices: List[Int], udtName: String, tpe: db.Type)
 }

@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class PersonDetailTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("timestamp works") {
     withConnection {
-      PersonDetailSqlRepoImpl(Some(1), Some(TypoLocalDateTime.now)).compile.toList
+      PersonDetailSqlRepoImpl(1, TypoLocalDateTime.now).compile.toList
     }
   }
 }

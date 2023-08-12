@@ -10,6 +10,9 @@ import adventureworks.TypoLocalDateTime
 import java.sql.Connection
 
 trait PersonDetailSqlRepo {
-  def apply(businessentityid: /* nullability unknown */ Option[Int],
-            modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow]
+  def opt(businessentityid: Option[Int],
+          modifiedAfter: Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow]
+  final def apply(businessentityid: Int,
+                  modifiedAfter: TypoLocalDateTime)(implicit c: Connection): List[PersonDetailSqlRow] =
+    opt(Option(businessentityid), Option(modifiedAfter))
 }
