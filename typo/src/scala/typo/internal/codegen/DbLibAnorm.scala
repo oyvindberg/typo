@@ -112,14 +112,19 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.SqlFile(sqlScript) =>
-      val params = sqlScript.params match {
-        case Nil      => sc.Code.Empty
-        case nonEmpty => nonEmpty.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
-      }
+      val params = sqlScript.nullableParams.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
+      code"def opt($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sqlScript.RowName)}"
+    case RepoMethod.SqlFileRequiredParams(sqlScript) =>
+      val params = sqlScript.params.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
       code"def apply($params)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(sqlScript.RowName)}"
   }
 
-  override def repoImpl(repoMethod: RepoMethod): sc.Code =
+  override def repoFinalImpl(repoMethod: RepoMethod.Final): sc.Code = repoMethod match {
+    case RepoMethod.SqlFileRequiredParams(sqlScript) =>
+      code"opt(${sqlScript.params.map(p => code"${sc.Type.Option}(${p.name})").mkCode(", ")})"
+  }
+
+  override def repoVirtualImpl(repoMethod: RepoMethod.Virtual): sc.Code =
     repoMethod match {
       case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
         code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType, $rowType.rowParser)"""
@@ -328,9 +333,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"""delete from $relName where ${matchId(id)}"""
         }
         code"$sql.executeUpdate() > 0"
+
       case RepoMethod.SqlFile(sqlScript) =>
         val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.render { (paramAtIndex: Int) =>
-          val param = sqlScript.params.find(_.underlying.indices.contains(paramAtIndex)).get
+          val param = sqlScript.nullableParams.find(_.underlying.indices.contains(paramAtIndex)).get
           val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
           s"$$${param.name.value}$cast"
         }
@@ -352,7 +358,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |""".stripMargin
     }
 
-  override def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code = {
+  override def mockVirtualRepoImpl(id: IdComputed, repoMethod: RepoMethod.Virtual, maybeToRow: Option[sc.Param]): sc.Code = {
     repoMethod match {
       case RepoMethod.SelectBuilder(_, fieldsType, _) =>
         code"${sc.Type.dsl.SelectBuilderMock}($fieldsType, () => map.values.toList, ${sc.Type.dsl.SelectParams}.empty)"

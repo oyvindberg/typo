@@ -41,6 +41,7 @@ case class ComputedSqlFile(
     tpe
   }
 
+  // nullability for parameters is undecided. here we compute nullable and non-nullable versions
   val params: List[ComputedSqlFile.ParamComputed] = {
     val source = Source.SqlFileParam(sqlFile.relPath)
 
@@ -55,17 +56,22 @@ case class ComputedSqlFile(
         case None       => sc.Ident(s"param${param.indices.head}")
         case Some(name) => naming.field(name)
       }
-      val tpe = scalaTypeMapper.param(source, maybeNameInScript, param.tpe, param.nullability)
+      val tpe = scalaTypeMapper.param(source, maybeNameInScript, param.tpe, Nullability.NoNulls)
       ComputedSqlFile.ParamComputed(scalaName, tpe, param)
     }
   }
+
+  val nullableParams: List[ComputedSqlFile.ParamComputed] =
+    params.map { case ComputedSqlFile.ParamComputed(name, tpe, underlying) =>
+      ComputedSqlFile.ParamComputed(name, sc.Type.Option.of(tpe), underlying)
+    }
 
   val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue = false, enableDsl = false)
 
   val RowName: sc.Type.Qualified = names.RowName
 
   val repoMethods: NonEmptyList[RepoMethod] =
-    NonEmptyList(RepoMethod.SqlFile(this))
+    NonEmptyList(RepoMethod.SqlFile(this), RepoMethod.SqlFileRequiredParams(this))
 }
 
 object ComputedSqlFile {

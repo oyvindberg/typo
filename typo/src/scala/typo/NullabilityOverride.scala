@@ -39,12 +39,4 @@ object NullabilityOverride {
         case _                       => None
       }
     }
-
-  def sqlFileParam(pf: PartialFunction[(RelPath, /* column name */ String), Nullability]): NullabilityOverride =
-    (from, colName) => {
-      from match {
-        case Source.SqlFileParam(relPath) => pf.lift((relPath, colName.value))
-        case _                            => None
-      }
-    }
 }
