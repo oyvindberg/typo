@@ -8,6 +8,7 @@ package person_detail
 
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import adventureworks.public.NameStyle
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -29,8 +30,8 @@ case class PersonDetailSqlRow(
   firstname: Name,
   /** Points to [[person.person.PersonRow.middlename]] */
   middlename: Option[Name],
-  /** Points to [[person.person.PersonRow.lastname]] */
-  lastname: Name,
+  /** Points to [[person.person.PersonRow.namestyle]] */
+  namestyle: NameStyle,
   /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
   jobtitle: /* max 50 chars */ String,
   /** Points to [[person.address.AddressRow.addressline1]] */
@@ -49,7 +50,7 @@ object PersonDetailSqlRow {
           title = json.\("title").toOption.map(_.as(Reads.StringReads)),
           firstname = json.\("firstname").as(Name.reads),
           middlename = json.\("middlename").toOption.map(_.as(Name.reads)),
-          lastname = json.\("lastname").as(Name.reads),
+          namestyle = json.\("namestyle").as(NameStyle.reads),
           jobtitle = json.\("jobtitle").as(Reads.StringReads),
           addressline1 = json.\("addressline1").as(Reads.StringReads),
           city = json.\("city").as(Reads.StringReads),
@@ -65,7 +66,7 @@ object PersonDetailSqlRow {
         title = row(idx + 1)(Column.columnToOption(Column.columnToString)),
         firstname = row(idx + 2)(Name.column),
         middlename = row(idx + 3)(Column.columnToOption(Name.column)),
-        lastname = row(idx + 4)(Name.column),
+        namestyle = row(idx + 4)(NameStyle.column),
         jobtitle = row(idx + 5)(Column.columnToString),
         addressline1 = row(idx + 6)(Column.columnToString),
         city = row(idx + 7)(Column.columnToString),
@@ -79,7 +80,7 @@ object PersonDetailSqlRow {
       "title" -> Writes.OptionWrites(Writes.StringWrites).writes(o.title),
       "firstname" -> Name.writes.writes(o.firstname),
       "middlename" -> Writes.OptionWrites(Name.writes).writes(o.middlename),
-      "lastname" -> Name.writes.writes(o.lastname),
+      "namestyle" -> NameStyle.writes.writes(o.namestyle),
       "jobtitle" -> Writes.StringWrites.writes(o.jobtitle),
       "addressline1" -> Writes.StringWrites.writes(o.addressline1),
       "city" -> Writes.StringWrites.writes(o.city),

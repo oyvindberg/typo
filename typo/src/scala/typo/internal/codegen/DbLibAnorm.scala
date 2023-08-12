@@ -329,9 +329,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         }
         code"$sql.executeUpdate() > 0"
       case RepoMethod.SqlFile(sqlScript) =>
-        val renderedScript = sqlScript.sqlFile.decomposedSql.render { (paramAtIndex: Int) =>
+        val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.render { (paramAtIndex: Int) =>
           val param = sqlScript.params.find(_.underlying.indices.contains(paramAtIndex)).get
-          s"$$${param.name.value}"
+          val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
+          s"$$${param.name.value}$cast"
         }
         // this is necessary to make custom types work with sql scripts, unfortunately.
         val renderedWithCasts: sc.Code =

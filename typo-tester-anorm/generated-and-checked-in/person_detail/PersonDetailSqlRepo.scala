@@ -6,8 +6,10 @@
 package adventureworks
 package person_detail
 
+import adventureworks.TypoLocalDateTime
 import java.sql.Connection
 
 trait PersonDetailSqlRepo {
-  def apply(businessentityid: /* nullability unknown */ Option[Int])(implicit c: Connection): List[PersonDetailSqlRow]
+  def apply(businessentityid: /* nullability unknown */ Option[Int],
+            modifiedAfter: /* nullability unknown */ Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow]
 }
