@@ -62,7 +62,7 @@ object Load {
     val viewName = relativePath.segments.mkString("_").replace(".sql", "")
     val sql = s"""create temporary view $viewName as (${decomposedSql.sqlWithNulls})"""
     SQL(sql).execute()
-    val ret = ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
+    val ret = ViewColumnDependenciesSqlRepoImpl(viewName).map { row =>
       val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
       (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
     }.toMap

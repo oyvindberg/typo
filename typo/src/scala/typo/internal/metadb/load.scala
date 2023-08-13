@@ -47,7 +47,7 @@ object load {
         tablesViewRows = timed("tablesViewRows")(TablesViewRepoImpl.selectAll),
         columnsViewRows = timed("columnsViewRows")(ColumnsViewRepoImpl.selectAll),
         viewRows = timed("viewRows")(ViewFindAllSqlRepoImpl()),
-        viewColumnDeps = timed("viewColumnDeps")(ViewColumnDependenciesSqlRepoImpl(None)),
+        viewColumnDeps = timed("viewColumnDeps")(ViewColumnDependenciesSqlRepoImpl.opt(None)),
         domains = timed("domains")(DomainsSqlRepoImpl()),
         comments = timed("comments")(CommentsSqlRepoImpl())
       )
