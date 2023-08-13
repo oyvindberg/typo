@@ -1,7 +1,7 @@
 package typo
 package internal
 
-case class ComputedNames(naming: Naming, source: Source, cols: NonEmptyList[ComputedColumn], maybeId: Option[IdComputed], enableFieldValue: Boolean, enableDsl: Boolean) {
+case class ComputedNames(naming: Naming, source: Source, maybeId: Option[IdComputed], enableFieldValue: Boolean, enableDsl: Boolean) {
   val RepoName: sc.Type.Qualified = sc.Type.Qualified(naming.repoName(source))
   val RepoImplName: sc.Type.Qualified = sc.Type.Qualified(naming.repoImplName(source))
   val RepoMockName: sc.Type.Qualified = sc.Type.Qualified(naming.repoMockName(source))

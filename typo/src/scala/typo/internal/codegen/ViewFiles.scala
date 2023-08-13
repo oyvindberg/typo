@@ -3,9 +3,9 @@ package internal
 package codegen
 
 case class ViewFiles(view: ComputedView, options: InternalOptions) {
-  val relation = RelationFiles(view.naming, view.names, options)
+  val relation = RelationFiles(view.naming, view.names, Some(view.cols), options)
   val all: List[sc.File] = List(
-    Some(relation.RowFile),
+    relation.RowFile,
     relation.FieldsFile,
     relation.StructureFile,
     for {

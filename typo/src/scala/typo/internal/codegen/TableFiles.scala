@@ -5,75 +5,79 @@ package codegen
 import play.api.libs.json.Json
 
 case class TableFiles(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
-  val relation = RelationFiles(table.naming, table.names, options)
+  val relation = RelationFiles(table.naming, table.names, Some(table.cols), options)
 
-  val UnsavedRowFile: Option[sc.File] = table.maybeUnsavedRow.map { unsaved =>
-    val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
+  val UnsavedRowFile: Option[sc.File] =
+    for {
+      unsaved <- table.maybeUnsavedRow
+      rowFile <- relation.RowFile
+    } yield {
+      val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
 
-    val toRow: sc.Code = {
-      def mkDefaultParamName(col: ComputedColumn): sc.Ident =
-        sc.Ident(col.name.value).appended("Default")
+      val toRow: sc.Code = {
+        def mkDefaultParamName(col: ComputedColumn): sc.Ident =
+          sc.Ident(col.name.value).appended("Default")
 
-      val params: NonEmptyList[sc.Param] =
-        unsaved.defaultCols.map { case (col, originalType) =>
-          sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType), None)
-        }
+        val params: NonEmptyList[sc.Param] =
+          unsaved.defaultCols.map { case (col, originalType) =>
+            sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType), None)
+          }
 
-      val keyValues1 =
-        unsaved.defaultCols.map { case (col, _) =>
-          val defaultParamName = mkDefaultParamName(col)
-          val impl = code"""|${col.name} match {
+        val keyValues1 =
+          unsaved.defaultCols.map { case (col, _) =>
+            val defaultParamName = mkDefaultParamName(col)
+            val impl = code"""|${col.name} match {
                    |  case ${table.default.Defaulted}.${table.default.UseDefault} => $defaultParamName
                    |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
                    |}""".stripMargin
-          (col.name, impl)
-        }
+            (col.name, impl)
+          }
 
-      val keyValues2 =
-        unsaved.restCols.map { col =>
-          (col.name, sc.QIdent.of(col.name).code)
-        }
+        val keyValues2 =
+          unsaved.restCols.map { col =>
+            (col.name, sc.QIdent.of(col.name).code)
+          }
 
-      val keyValues: List[(sc.Ident, sc.Code)] =
-        keyValues2 ::: keyValues1.toList
+        val keyValues: List[(sc.Ident, sc.Code)] =
+          keyValues2 ::: keyValues1.toList
 
-      code"""|def toRow(${params.map(_.code).mkCode(", ")}): ${table.names.RowName} =
+        code"""|def toRow(${params.map(_.code).mkCode(", ")}): ${table.names.RowName} =
              |  ${table.names.RowName}(
              |    ${keyValues.map { case (k, v) => code"$k = $v" }.mkCode(",\n")}
              |  )""".stripMargin
-    }
+      }
 
-    val formattedCols = unsaved.allCols.map { col =>
-      val commentPieces = List(
-        col.dbCol.columnDefault.map(x => s"Default: $x"),
-        col.dbCol.comment,
-        col.pointsTo map { case (relationName, columnName) =>
-          val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, relation.RowFile.tpe.value.idents))
-          s"Points to [[${sc.renderTree(shortened)}.${table.naming.field(columnName).value}]]"
-        },
-        if (options.debugTypes)
-          col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
-        else None
-      ).flatten
+      val formattedCols = unsaved.allCols.map { col =>
+        val commentPieces = List(
+          col.dbCol.columnDefault.map(x => s"Default: $x"),
+          col.dbCol.comment,
+          col.pointsTo map { case (relationName, columnName) =>
+            val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, rowFile.tpe.value.idents))
+            s"Points to [[${sc.renderTree(shortened)}.${table.naming.field(columnName).value}]]"
+          },
+          if (options.debugTypes)
+            col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
+          else None
+        ).flatten
 
-      val comment = commentPieces match {
-        case Nil => sc.Code.Empty
-        case nonEmpty =>
-          val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
-          code"""|/** ${lines.mkCode("\n")} */
+        val comment = commentPieces match {
+          case Nil => sc.Code.Empty
+          case nonEmpty =>
+            val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
+            code"""|/** ${lines.mkCode("\n")} */
                  |""".stripMargin
+        }
+
+        val default = col.dbCol.columnDefault match {
+          case Some(_) => code" = ${table.default.Defaulted}.${table.default.UseDefault}"
+          case None    => sc.Code.Empty
+        }
+        code"$comment${col.param.code}$default"
       }
 
-      val default = col.dbCol.columnDefault match {
-        case Some(_) => code" = ${table.default.Defaulted}.${table.default.UseDefault}"
-        case None    => sc.Code.Empty
-      }
-      code"$comment${col.param.code}$default"
-    }
-
-    sc.File(
-      unsaved.tpe,
-      code"""|$comments
+      sc.File(
+        unsaved.tpe,
+        code"""|$comments
              |case class ${unsaved.tpe.name}(
              |  ${formattedCols.mkCode(",\n")}
              |) {
@@ -81,9 +85,9 @@ case class TableFiles(table: ComputedTable, options: InternalOptions, genOrderin
              |}
              |${genObject(unsaved.tpe.value, options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)))}
              |""".stripMargin,
-      secondaryTypes = Nil
-    )
-  }
+        secondaryTypes = Nil
+      )
+    }
 
   val IdFile: Option[sc.File] = {
     table.maybeId.flatMap {
@@ -148,7 +152,7 @@ case class TableFiles(table: ComputedTable, options: InternalOptions, genOrderin
     } yield relation.RepoMockFile(dbLib, id, repoMethods)
 
   val all: List[sc.File] = List(
-    Some(relation.RowFile),
+    relation.RowFile,
     relation.FieldsFile,
     relation.StructureFile,
     UnsavedRowFile,

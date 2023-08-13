@@ -2,6 +2,8 @@ package typo
 package internal
 package codegen
 
+import typo.internal.sqlfiles.MaybeReturnsRows
+
 class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
   val SqlInterpolator = sc.Type.Qualified("doobie.syntax.string.toSqlInterpolator")
@@ -94,10 +96,20 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
       code"def delete(${id.param}): ${ConnectionIO.of(sc.Type.Boolean)}"
     case RepoMethod.SqlFile(sqlScript) =>
       val params = sqlScript.nullableParams.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
-      code"def opt($params): ${fs2Stream.of(ConnectionIO, sqlScript.RowName)}"
+
+      val retType = sqlScript.maybeRowName match {
+        case MaybeReturnsRows.Query(rowName) => fs2Stream.of(ConnectionIO, rowName)
+        case MaybeReturnsRows.Update         => ConnectionIO.of(sc.Type.Int)
+      }
+
+      code"def opt($params): $retType"
     case RepoMethod.SqlFileRequiredParams(sqlScript) =>
       val params = sqlScript.params.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
-      code"def apply($params): ${fs2Stream.of(ConnectionIO, sqlScript.RowName)}"
+      val retType = sqlScript.maybeRowName match {
+        case MaybeReturnsRows.Query(rowName) => fs2Stream.of(ConnectionIO, rowName)
+        case MaybeReturnsRows.Update         => ConnectionIO.of(sc.Type.Int)
+      }
+      code"def apply($params): $retType"
   }
 
   override def repoFinalImpl(repoMethod: RepoMethod.Final): sc.Code =
@@ -270,23 +282,30 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
           s"$$${param.name.value}$cast"
         }
-        // this is necessary to make custom types work with sql scripts, unfortunately.
-        val renderedWithCasts: sc.Code =
-          sqlScript.cols.toList.flatMap(c => sqlCast.fromPg(c.dbCol)) match {
-            case Nil => renderedScript.code
-            case _ =>
-              val row = sc.Ident("row")
+        sqlScript.maybeCols.toOption.zip(sqlScript.maybeRowName.toOption).headOption match {
+          case Some((cols, rowName)) =>
+            // this is necessary to make custom types work with sql scripts, unfortunately.
+            val renderedWithCasts: sc.Code =
+              cols.toList.flatMap(c => sqlCast.fromPg(c.dbCol)) match {
+                case Nil => renderedScript.code
+                case _ =>
+                  val row = sc.Ident("row")
 
-              code"""|select ${sqlScript.cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")} from (
-                     |  $renderedScript
-                     |) $row""".stripMargin
+                  code"""|with $row as (
+                         |  $renderedScript
+                         |)
+                         |select ${cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")}
+                         |from $row""".stripMargin
+              }
 
-          }
+            code"""|val sql =
+                   |  ${SQL(renderedWithCasts)}
+                   |sql.query($rowName.$readName).stream
+                   |""".stripMargin
 
-        code"""|val sql =
-               |  ${SQL(renderedWithCasts)}
-               |sql.query(${sqlScript.RowName}.$readName).stream
-               |""".stripMargin
+          case None =>
+            code"${SQL(renderedScript)}.update.run"
+        }
     }
 
   override def mockVirtualRepoImpl(id: IdComputed, repoMethod: RepoMethod.Virtual, maybeToRow: Option[sc.Param]): sc.Code = {
