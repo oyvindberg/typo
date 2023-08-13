@@ -14,7 +14,7 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object DomainsSqlRepoImpl extends DomainsSqlRepo {
-  override def apply()(implicit c: Connection): List[DomainsSqlRow] = {
+  override def opt()(implicit c: Connection): List[DomainsSqlRow] = {
     val sql =
       SQL"""SELECT nsp.nspname                   as "schema",
                    typ.typname                   as "name",
@@ -31,6 +31,5 @@ object DomainsSqlRepoImpl extends DomainsSqlRepo {
                      left JOIN pg_catalog.pg_constraint con ON con.contypid = typ.oid
       """
     sql.as(DomainsSqlRow.rowParser(1).*)
-    
   }
 }

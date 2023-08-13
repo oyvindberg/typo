@@ -14,7 +14,7 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
-  override def apply(viewName: /* nullability unknown */ Option[String])(implicit c: Connection): List[ViewColumnDependenciesSqlRow] = {
+  override def opt(viewName: Option[String])(implicit c: Connection): List[ViewColumnDependenciesSqlRow] = {
     val sql =
       SQL"""SELECT view_class.relnamespace::regnamespace  AS view_schema
                  , view_class.relname                     AS view_name
@@ -29,10 +29,9 @@ object ViewColumnDependenciesSqlRepoImpl extends ViewColumnDependenciesSqlRepo {
                 AND dep.classid = 'pg_rewrite'::regclass -- it's a view
                 AND rewrite.ev_type = '1' -- only SELECT
                 AND rewrite.is_instead -- INSTEAD rule
-                AND view_class.relname = coalesce($viewName, view_class.relname)
+                AND view_class.relname = coalesce($viewName::name, view_class.relname)
             
       """
     sql.as(ViewColumnDependenciesSqlRow.rowParser(1).*)
-    
   }
 }

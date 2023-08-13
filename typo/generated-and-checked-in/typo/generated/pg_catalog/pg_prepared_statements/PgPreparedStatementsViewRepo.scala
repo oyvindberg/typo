@@ -7,13 +7,11 @@
  */
 package typo
 package generated
-package custom
-package comments
+package pg_catalog
+package pg_prepared_statements
 
 import java.sql.Connection
 
-trait CommentsSqlRepo {
-  def opt()(implicit c: Connection): List[CommentsSqlRow]
-  final def apply()(implicit c: Connection): List[CommentsSqlRow] =
-    opt()
+trait PgPreparedStatementsViewRepo {
+  def selectAll(implicit c: Connection): List[PgPreparedStatementsViewRow]
 }

@@ -13,5 +13,7 @@ package domains
 import java.sql.Connection
 
 trait DomainsSqlRepo {
-  def apply()(implicit c: Connection): List[DomainsSqlRow]
+  def opt()(implicit c: Connection): List[DomainsSqlRow]
+  final def apply()(implicit c: Connection): List[DomainsSqlRow] =
+    opt()
 }

@@ -14,7 +14,7 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object CommentsSqlRepoImpl extends CommentsSqlRepo {
-  override def apply()(implicit c: Connection): List[CommentsSqlRow] = {
+  override def opt()(implicit c: Connection): List[CommentsSqlRow] = {
     val sql =
       SQL"""select c.table_schema,
                    c.table_name,
@@ -30,6 +30,5 @@ object CommentsSqlRepoImpl extends CommentsSqlRepo {
                         c.table_name = st.relname
                 )"""
     sql.as(CommentsSqlRow.rowParser(1).*)
-    
   }
 }
