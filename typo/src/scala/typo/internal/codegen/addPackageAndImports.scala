@@ -49,6 +49,8 @@ object addPackageAndImports {
         x
       case x: sc.Param =>
         shortenNamesParam(x, f)
+      case sc.Params(params) =>
+        sc.Params(params.map(p => shortenNamesParam(p, f)))
       case x: sc.StrLit =>
         x
       case x: sc.Summon =>

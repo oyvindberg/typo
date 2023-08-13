@@ -7,12 +7,12 @@ package adventureworks
 package person_detail
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
-  override def opt(businessentityid: Option[Int],
-                   modifiedAfter: Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow] = {
+  override def opt(businessentityid: Option[/* user-picked */ BusinessentityId], modifiedAfter: Option[TypoLocalDateTime])(implicit c: Connection): List[PersonDetailSqlRow] = {
     val sql =
       SQL"""SELECT s.businessentityid
                    , p.title
@@ -31,6 +31,5 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
             where s.businessentityid = $businessentityid::int4
             and p.modifieddate > $modifiedAfter::timestamp"""
     sql.as(PersonDetailSqlRow.rowParser(1).*)
-    
   }
 }

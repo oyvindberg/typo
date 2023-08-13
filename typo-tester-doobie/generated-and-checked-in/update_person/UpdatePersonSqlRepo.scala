@@ -10,9 +10,7 @@ import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 
 trait UpdatePersonSqlRepo {
-  def opt(suffix: Option[String],
-          cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int]
-  final def apply(suffix: String,
-                  cutoff: TypoLocalDateTime): ConnectionIO[Int] =
+  def opt(suffix: Option[String], cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int]
+  final def apply(suffix: String, cutoff: TypoLocalDateTime): ConnectionIO[Int] =
     opt(Option(suffix), Option(cutoff))
 }

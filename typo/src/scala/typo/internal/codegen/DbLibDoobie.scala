@@ -95,21 +95,21 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param}): ${ConnectionIO.of(sc.Type.Boolean)}"
     case RepoMethod.SqlFile(sqlScript) =>
-      val params = sqlScript.nullableParams.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
+      val params = sc.Params(sqlScript.nullableParams.map(p => sc.Param(p.name, p.tpe, None)))
 
       val retType = sqlScript.maybeRowName match {
         case MaybeReturnsRows.Query(rowName) => fs2Stream.of(ConnectionIO, rowName)
         case MaybeReturnsRows.Update         => ConnectionIO.of(sc.Type.Int)
       }
 
-      code"def opt($params): $retType"
+      code"def opt$params: $retType"
     case RepoMethod.SqlFileRequiredParams(sqlScript) =>
-      val params = sqlScript.params.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
+      val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
       val retType = sqlScript.maybeRowName match {
         case MaybeReturnsRows.Query(rowName) => fs2Stream.of(ConnectionIO, rowName)
         case MaybeReturnsRows.Update         => ConnectionIO.of(sc.Type.Int)
       }
-      code"def apply($params): $retType"
+      code"def apply$params: $retType"
   }
 
   override def repoFinalImpl(repoMethod: RepoMethod.Final): sc.Code =
@@ -155,8 +155,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |    ${cases.mkCode("\n")}
               |  }
               |)
-              |$sql.query($rowType.$readName).stream
-              |""".stripMargin
+              |$sql.query($rowType.$readName).stream""".stripMargin
 
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
         val cases: NonEmptyList[sc.Code] =
@@ -282,29 +281,31 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
           s"$$${param.name.value}$cast"
         }
-        sqlScript.maybeCols.toOption.zip(sqlScript.maybeRowName.toOption).headOption match {
-          case Some((cols, rowName)) =>
-            // this is necessary to make custom types work with sql scripts, unfortunately.
-            val renderedWithCasts: sc.Code =
-              cols.toList.flatMap(c => sqlCast.fromPg(c.dbCol)) match {
-                case Nil => renderedScript.code
-                case _ =>
-                  val row = sc.Ident("row")
+        val ret = for {
+          cols <- sqlScript.maybeCols.toOption
+          rowName <- sqlScript.maybeRowName.toOption
+        } yield {
+          // this is necessary to make custom types work with sql scripts, unfortunately.
+          val renderedWithCasts: sc.Code =
+            cols.toList.flatMap(c => sqlCast.fromPg(c.dbCol)) match {
+              case Nil => renderedScript.code
+              case _ =>
+                val row = sc.Ident("row")
 
-                  code"""|with $row as (
-                         |  $renderedScript
-                         |)
-                         |select ${cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")}
-                         |from $row""".stripMargin
-              }
+                code"""|with $row as (
+                       |  $renderedScript
+                       |)
+                       |select ${cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")}
+                       |from $row""".stripMargin
+            }
 
-            code"""|val sql =
-                   |  ${SQL(renderedWithCasts)}
-                   |sql.query($rowName.$readName).stream
-                   |""".stripMargin
+          code"""|val sql =
+                 |  ${SQL(renderedWithCasts)}
+                 |sql.query($rowName.$readName).stream""".stripMargin
 
-          case None =>
-            code"${SQL(renderedScript)}.update.run"
+        }
+        ret.getOrElse {
+          code"${SQL(renderedScript)}.update.run"
         }
     }
 

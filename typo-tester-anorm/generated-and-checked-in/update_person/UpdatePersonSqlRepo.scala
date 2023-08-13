@@ -10,9 +10,7 @@ import adventureworks.TypoLocalDateTime
 import java.sql.Connection
 
 trait UpdatePersonSqlRepo {
-  def opt(suffix: Option[String],
-          cutoff: Option[TypoLocalDateTime])(implicit c: Connection): Int
-  final def apply(suffix: String,
-                  cutoff: TypoLocalDateTime)(implicit c: Connection): Int =
+  def opt(suffix: Option[String], cutoff: Option[TypoLocalDateTime])(implicit c: Connection): Int
+  final def apply(suffix: String, cutoff: TypoLocalDateTime)(implicit c: Connection): Int =
     opt(Option(suffix), Option(cutoff))
 }

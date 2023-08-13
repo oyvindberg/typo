@@ -114,19 +114,19 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param})(implicit c: ${sc.Type.Connection}): ${sc.Type.Boolean}"
     case RepoMethod.SqlFile(sqlScript) =>
-      val params = sqlScript.nullableParams.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
+      val params = sc.Params(sqlScript.nullableParams.map(p => sc.Param(p.name, p.tpe, None)))
       val retType = sqlScript.maybeRowName match {
         case MaybeReturnsRows.Query(rowName) => sc.Type.List.of(rowName)
         case MaybeReturnsRows.Update         => sc.Type.Int
       }
-      code"def opt($params)(implicit c: ${sc.Type.Connection}): $retType"
+      code"def opt$params(implicit c: ${sc.Type.Connection}): $retType"
     case RepoMethod.SqlFileRequiredParams(sqlScript) =>
-      val params = sqlScript.params.map { param => sc.Param(param.name, param.tpe, None).code }.mkCode(",\n")
+      val params = sc.Params(sqlScript.params.map(param => sc.Param(param.name, param.tpe, None)))
       val retType = sqlScript.maybeRowName match {
         case MaybeReturnsRows.Query(rowName) => sc.Type.List.of(rowName)
         case MaybeReturnsRows.Update         => sc.Type.Int
       }
-      code"def apply($params)(implicit c: ${sc.Type.Connection}): $retType"
+      code"def apply$params(implicit c: ${sc.Type.Connection}): $retType"
   }
 
   override def repoFinalImpl(repoMethod: RepoMethod.Final): sc.Code = repoMethod match {
@@ -350,32 +350,32 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           val cast = sqlCast.toPg(param.underlying).fold("")(udtType => s"::$udtType")
           s"$$${param.name.value}$cast"
         }
+        val ret = for {
+          cols <- sqlScript.maybeCols.toOption
+          rowName <- sqlScript.maybeRowName.toOption
+        } yield {
+          // this is necessary to make custom types work with sql scripts, unfortunately.
+          val renderedWithCasts: sc.Code =
+            cols.toList.flatMap(c => sqlCast.fromPg(c.dbCol)) match {
+              case Nil => renderedScript.code
+              case _ =>
+                val row = sc.Ident("row")
 
-        sqlScript.maybeCols.toOption.zip(sqlScript.maybeRowName.toOption).headOption match {
-          case Some((cols, rowName)) =>
-            // this is necessary to make custom types work with sql scripts, unfortunately.
-            val renderedWithCasts: sc.Code =
-              cols.toList.flatMap(c => sqlCast.fromPg(c.dbCol)) match {
-                case Nil => renderedScript.code
-                case _ =>
-                  val row = sc.Ident("row")
+                code"""|with $row as (
+                       |  $renderedScript
+                       |)
+                       |select ${cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")}
+                       |from $row""".stripMargin
+            }
 
-                  code"""|with $row as (
-                         |  $renderedScript
-                         |)
-                         |select ${cols.map(c => code"$row.${maybeQuoted(c.dbName)}${sqlCast.fromPgCode(c)}").mkCode(", ")}
-                         |from $row""".stripMargin
-              }
-
-            code"""|val sql =
-                   |  ${SQL(renderedWithCasts)}
-                   |sql.as(${rowParserFor(rowName)}.*)
-                   |""".stripMargin
-
-          case _ =>
-            code"${SQL(renderedScript)}.executeUpdate()"
+          code"""|val sql =
+                 |  ${SQL(renderedWithCasts)}
+                 |sql.as(${rowParserFor(rowName)}.*)""".stripMargin
         }
 
+        ret.getOrElse {
+          code"${SQL(renderedScript)}.executeUpdate()"
+        }
     }
 
   override def mockVirtualRepoImpl(id: IdComputed, repoMethod: RepoMethod.Virtual, maybeToRow: Option[sc.Param]): sc.Code = {

@@ -11,8 +11,7 @@ import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 
 object UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
-  override def opt(suffix: Option[String],
-                   cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int] = {
+  override def opt(suffix: Option[String], cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int] = {
     sql"""update person.person
           set firstname = firstname || '-' || $suffix
           where modifieddate < $cutoff::timestamp""".update.run
