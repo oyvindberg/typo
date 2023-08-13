@@ -127,6 +127,8 @@ package object typo {
             case sc.Param(_, tpe, maybeCode) =>
               goTree(tpe)
               maybeCode.foreach(go)
+            case sc.Params(params) =>
+              params.foreach(goTree)
             case sc.StrLit(_) => ()
             case sc.Summon(tpe) =>
               goTree(tpe)

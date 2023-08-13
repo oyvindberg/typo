@@ -12,8 +12,7 @@ import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
 
 object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
-  override def opt(suffix: Option[String],
-                   cutoff: Option[TypoLocalDateTime]): Stream[ConnectionIO, UpdatePersonReturningSqlRow] = {
+  override def opt(suffix: Option[String], cutoff: Option[TypoLocalDateTime]): Stream[ConnectionIO, UpdatePersonReturningSqlRow] = {
     val sql =
       sql"""with row as (
               update person.person
@@ -24,6 +23,5 @@ object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
             select row.firstname, row.modifieddate::text
             from row"""
     sql.query(UpdatePersonReturningSqlRow.read).stream
-    
   }
 }

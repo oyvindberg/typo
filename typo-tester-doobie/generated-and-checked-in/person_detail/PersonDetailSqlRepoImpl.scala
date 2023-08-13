@@ -7,13 +7,13 @@ package adventureworks
 package person_detail
 
 import adventureworks.TypoLocalDateTime
+import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream
 
 object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
-  override def opt(businessentityid: Option[Int],
-                   modifiedAfter: Option[TypoLocalDateTime]): Stream[ConnectionIO, PersonDetailSqlRow] = {
+  override def opt(businessentityid: Option[/* user-picked */ BusinessentityId], modifiedAfter: Option[TypoLocalDateTime]): Stream[ConnectionIO, PersonDetailSqlRow] = {
     val sql =
       sql"""SELECT s.businessentityid
                    , p.title
@@ -32,6 +32,5 @@ object PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
             where s.businessentityid = $businessentityid::int4
             and p.modifieddate > $modifiedAfter::timestamp"""
     sql.query(PersonDetailSqlRow.read).stream
-    
   }
 }

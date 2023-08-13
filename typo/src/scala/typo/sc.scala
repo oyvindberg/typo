@@ -33,6 +33,7 @@ object sc {
       QIdent(idents.toList)
   }
   case class Param(name: Ident, tpe: Type, default: Option[sc.Code]) extends Tree
+  case class Params(params: List[Param]) extends Tree
 
   case class StrLit(str: String) extends Tree {
     def prefixed(prefix: String) = StrLit(prefix + str)
@@ -344,6 +345,7 @@ object sc {
       case QIdent(value)                      => value.map(renderTree).mkString(".")
       case Param(name, tpe, Some(default))    => renderTree(name) + ": " + renderTree(tpe) + " = " + default.render
       case Param(name, tpe, None)             => renderTree(name) + ": " + renderTree(tpe)
+      case Params(params)                     => params.map(renderTree).mkString("(", ", ", ")")
       case StrLit(str) if str.contains(Quote) => TripleQuote + str + TripleQuote
       case StrLit(str)                        => Quote + str + Quote
       case Summon(tpe)                        => s"implicitly[${renderTree(tpe)}]"

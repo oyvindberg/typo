@@ -11,8 +11,7 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
-  override def opt(suffix: Option[String],
-                   cutoff: Option[TypoLocalDateTime])(implicit c: Connection): List[UpdatePersonReturningSqlRow] = {
+  override def opt(suffix: Option[String], cutoff: Option[TypoLocalDateTime])(implicit c: Connection): List[UpdatePersonReturningSqlRow] = {
     val sql =
       SQL"""with row as (
               update person.person
@@ -23,6 +22,5 @@ object UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
             select row.firstname, row.modifieddate::text
             from row"""
     sql.as(UpdatePersonReturningSqlRow.rowParser(1).*)
-    
   }
 }

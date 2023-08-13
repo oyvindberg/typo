@@ -11,8 +11,7 @@ import anorm.SqlStringInterpolation
 import java.sql.Connection
 
 object UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
-  override def opt(suffix: Option[String],
-                   cutoff: Option[TypoLocalDateTime])(implicit c: Connection): Int = {
+  override def opt(suffix: Option[String], cutoff: Option[TypoLocalDateTime])(implicit c: Connection): Int = {
     SQL"""update person.person
           set firstname = firstname || '-' || $suffix
           where modifieddate < $cutoff::timestamp""".executeUpdate()

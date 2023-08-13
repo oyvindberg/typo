@@ -19,63 +19,55 @@ object Load {
       val decomposedSql = DecomposedSql.parse(sqlContent)
       val relativePath = RelPath.relativeTo(scriptsPath, sqlFile)
 
-      val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
-        if (isSelect(decomposedSql, c))
-          fetchDepsViaTemporaryView(sqlFile, decomposedSql, relativePath)
-        else
-          Map.empty
-
-      try {
-        val jdbcMetadata = JdbcMetadata.from(decomposedSql.sqlWithQuestionMarks)
-        Some(
-          parseSqlFile(
-            typeMapperDb,
-            RelPath.relativeTo(scriptsPath, sqlFile),
-            decomposedSql,
-            jdbcMetadata,
-            deps
-          )
-        )
-
-      } catch {
-        case e: PSQLException =>
-          System.err.println(s"Error while parsing $sqlFile : ${e.getMessage}. Will ignore the file. SQL: ${decomposedSql.sqlWithQuestionMarks}")
+      val queryType = queryTypeFor(decomposedSql, c)
+      queryType match {
+        case SqlCommandType.BLANK =>
+          System.err.println(s"Skipping $sqlFile because it's empty")
           None
+        case _ =>
+          try {
+            val maybeSqlData = JdbcMetadata.from(decomposedSql.sqlWithQuestionMarks)
+            maybeSqlData match {
+              case Left(msg) =>
+                System.err.println(s"Error while parsing $sqlFile : $msg. Will ignore the file.")
+                None
+              case Right(jdbcMetadata) =>
+                val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+                  queryType match {
+                    case SqlCommandType.SELECT =>
+                      fetchDepsViaTemporaryView(decomposedSql, relativePath)
+                    case _ =>
+                      Map.empty
+                  }
+                Some(parseSqlFile(typeMapperDb, RelPath.relativeTo(scriptsPath, sqlFile), decomposedSql, jdbcMetadata, deps))
+            }
+          } catch {
+            case e: PSQLException =>
+              System.err.println(s"Error while parsing $sqlFile : ${e.getMessage}. Will ignore the file.")
+              None
+          }
       }
     }
 
-  def isSelect(decomposedSql: DecomposedSql, c: Connection) = {
+  def queryTypeFor(decomposedSql: DecomposedSql, c: Connection): SqlCommandType = {
     val pc = c.unwrap(classOf[PgConnection])
     val q = pc.createQuery(decomposedSql.sqlWithNulls, true, false)
-    val isSelect = q.query.getSqlCommand.getType match {
-      case SqlCommandType.SELECT => true
-      case _                     => false
-    }
-    isSelect
+    q.query.getSqlCommand.getType
   }
 
   /** believe it or not the dependency information we get through prepared statements and for views are not the same. It's too valuable information to leave out, so let's try to read it from a
     * temporary view.
     */
-  def fetchDepsViaTemporaryView(sqlFile: Path, decomposedSql: DecomposedSql, relativePath: RelPath)(implicit c: Connection): Map[db.ColName, (db.RelationName, db.ColName)] = {
+  def fetchDepsViaTemporaryView(decomposedSql: DecomposedSql, relativePath: RelPath)(implicit c: Connection): Map[db.ColName, (db.RelationName, db.ColName)] = {
     val viewName = relativePath.segments.mkString("_").replace(".sql", "")
     val sql = s"""create temporary view $viewName as (${decomposedSql.sqlWithNulls})"""
-    try {
-      SQL(sql).execute()
-      val ret = ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
-        val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
-        (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
-      }.toMap
-      SQL(s"drop view $viewName").execute()
-      ret
-    } catch {
-      case e: PSQLException =>
-        if (e.getMessage.contains("syntax error")) {
-          System.err.println(s"Couldn't read dependencies for $sqlFile through a temporary view: ${e.getMessage}. SQL: $sql")
-        }
-        System.err.println(s"Couldn't read dependencies for $sqlFile through a temporary view: ${e.getMessage}. SQL: $sql")
-        Map.empty
-    }
+    SQL(sql).execute()
+    val ret = ViewColumnDependenciesSqlRepoImpl(Some(viewName)).map { row =>
+      val table = db.RelationName(row.tableSchema.map(_.value), row.tableName)
+      (db.ColName(row.columnName), (table, db.ColName(row.columnName)))
+    }.toMap
+    SQL(s"drop view $viewName").execute()
+    ret
   }
 
   def findSqlFilesUnder(scriptsPath: Path): List[Path] = {
