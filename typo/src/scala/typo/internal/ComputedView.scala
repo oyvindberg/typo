@@ -35,7 +35,7 @@ case class ComputedView(view: db.View, naming: Naming, scalaTypeMapper: TypeMapp
     tpe
   }
 
-  val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue, enableDsl = enableDsl)
+  val names = ComputedNames(naming, source, maybeId = None, enableFieldValue, enableDsl = enableDsl)
 
   val repoMethods: NonEmptyList[RepoMethod] = {
     val maybeSelectByFieldValues = for {

@@ -12,7 +12,7 @@ case class ComputedTable(
     scalaTypeMapper: TypeMapperScala,
     eval: Eval[db.RelationName, HasSource]
 ) extends HasSource {
-  val source = Source.Table(dbTable.name)
+  override val source = Source.Table(dbTable.name)
   val pointsTo: Map[db.ColName, (Source.Relation, db.ColName)] =
     dbTable.foreignKeys.flatMap { fk =>
       val maybeOtherTable: Option[HasSource] =
@@ -113,7 +113,7 @@ case class ComputedTable(
     tpe
   }
 
-  val names = ComputedNames(naming, source, cols, maybeId, options.enableFieldValue, options.enableDsl)
+  val names = ComputedNames(naming, source, maybeId, options.enableFieldValue, options.enableDsl)
 
   val colsNotId: Option[NonEmptyList[ComputedColumn]] =
     maybeId.flatMap { id =>

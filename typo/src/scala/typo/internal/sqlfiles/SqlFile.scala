@@ -6,7 +6,7 @@ case class SqlFile(
     relPath: RelPath,
     decomposedSql: DecomposedSql,
     params: List[SqlFile.Param],
-    cols: NonEmptyList[db.Col],
+    cols: MaybeReturnsRows[NonEmptyList[db.Col]],
     dependencies: Map[db.ColName, (db.RelationName, db.ColName)]
 )
 

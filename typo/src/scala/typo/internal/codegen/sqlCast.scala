@@ -31,7 +31,7 @@ object sqlCast {
       case Some(value) => code"::$value"
       case None        => sc.Code.Empty
     }
-  
+
   /** avoid whatever the postgres driver does for these data formats by going through basic data types
     */
   def fromPg(dbCol: db.Col): Option[String] =

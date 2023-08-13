@@ -4,8 +4,8 @@ package codegen
 
 import play.api.libs.json.Json
 
-case class RelationFiles(naming: Naming, names: ComputedNames, options: InternalOptions) {
-  val RowFile: sc.File = {
+case class RelationFiles(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
+  val RowFile: Option[sc.File] = maybeCols.map { cols =>
     val compositeId = names.maybeId match {
       case Some(x: IdComputed.Composite) =>
         code"""|{
@@ -14,7 +14,7 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
       case _ => code""
     }
 
-    val formattedCols = names.cols.map { col =>
+    val formattedCols = cols.map { col =>
       val commentPieces = List(
         col.dbCol.comment,
         col.pointsTo map { case (relationName, columnName) =>
@@ -37,8 +37,8 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
       code"$comment${col.param.code}"
     }
     val instances =
-      options.jsonLibs.flatMap(_.instances(names.RowName, names.cols)) ++
-        options.dbLib.toList.flatMap(_.rowInstances(names.RowName, names.cols))
+      options.jsonLibs.flatMap(_.instances(names.RowName, cols)) ++
+        options.dbLib.toList.flatMap(_.rowInstances(names.RowName, cols))
 
     val str =
       code"""case class ${names.RowName.name}(
@@ -50,13 +50,15 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
 
     sc.File(names.RowName, str, secondaryTypes = Nil)
   }
+
   val FieldValueFile: Option[sc.File] =
     for {
       fieldOrIdValueName <- names.FieldOrIdValueName
       fieldValueName <- names.FieldValueName
+      cols <- maybeCols
     } yield {
       val members = {
-        names.cols.map { col =>
+        cols.map { col =>
           val parent = if (names.isIdColumn(col.dbName)) fieldOrIdValueName else fieldValueName
           code"case class ${col.name}(override val value: ${col.tpe}) extends $parent(${sc.StrLit(col.dbName.value)}, value)"
         }
@@ -72,10 +74,14 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
     }
 
   val FieldsFile: Option[sc.File] =
-    names.StructureName.zip(names.FieldsName).headOption.map { case (structureName, fieldsName) =>
+    for {
+      structureName <- names.StructureName
+      fieldsName <- names.FieldsName
+      cols <- maybeCols
+    } yield {
       val Row = sc.Type.Abstract(sc.Ident("Row"))
       val members =
-        names.cols
+        cols
           .map { col =>
             val (cls, tpe) =
               if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
@@ -100,11 +106,15 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
     }
 
   val StructureFile: Option[sc.File] =
-    names.StructureName.zip(names.FieldsName).headOption.map { case (structureName, fieldsName) =>
+    for {
+      structureName <- names.StructureName
+      fieldsName <- names.FieldsName
+      cols <- maybeCols
+    } yield {
       val Row = sc.Type.Abstract(sc.Ident("Row"))
       val NewRow = sc.Type.Abstract(sc.Ident("NewRow"))
       val members =
-        names.cols
+        cols
           .map { col =>
             val (cls, tpe) =
               if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
@@ -138,7 +148,7 @@ case class RelationFiles(naming: Naming, names: ComputedNames, options: Internal
             |  $members
             |
             |  override val columns: $columnsList =
-            |    $columnsList(${names.cols.map(x => x.name.code).mkCode(", ")})
+            |    $columnsList(${cols.map(x => x.name.code).mkCode(", ")})
             |
             |  override def copy[$NewRow](prefix: $optString, extract: $NewRow => ${names.RowName}, merge: ($NewRow, ${names.RowName}) => $NewRow): ${structureName.of(NewRow)} =
             |    new ${structureName.name}(prefix, extract, merge)

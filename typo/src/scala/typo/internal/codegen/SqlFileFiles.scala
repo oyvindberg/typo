@@ -3,9 +3,9 @@ package internal
 package codegen
 
 case class SqlFileFiles(script: ComputedSqlFile, naming: Naming, options: InternalOptions) {
-  val relation = RelationFiles(naming, script.names, options)
+  val relation = RelationFiles(naming, script.names, script.maybeCols.toOption, options)
   val all: List[sc.File] = List(
-    Some(relation.RowFile),
+    relation.RowFile,
     relation.FieldsFile,
     relation.StructureFile,
     for {

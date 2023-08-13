@@ -2,7 +2,8 @@ package typo
 package internal
 
 import typo.internal.rewriteDependentData.EvalMaybe
-import typo.internal.sqlfiles.{DecomposedSql, SqlFile}
+import typo.internal.sqlfiles.{DecomposedSql, MaybeReturnsRows, SqlFile}
+import typo.sc.Type
 
 case class ComputedSqlFile(
     sqlFile: SqlFile,
@@ -13,14 +14,16 @@ case class ComputedSqlFile(
 ) {
   val source = Source.SqlFile(sqlFile.relPath)
 
-  val cols: NonEmptyList[ComputedColumn] =
-    sqlFile.cols.map { dbCol =>
-      ComputedColumn(
-        pointsTo = sqlFile.dependencies.get(dbCol.name).flatMap { case (relName, colName) => eval(relName).flatMap(_.get.map(foo => foo.source -> colName)) },
-        name = naming.field(dbCol.name),
-        tpe = deriveType(dbCol),
-        dbCol = dbCol
-      )
+  val maybeCols: MaybeReturnsRows[NonEmptyList[ComputedColumn]] =
+    sqlFile.cols.map { cols =>
+      cols.map { dbCol =>
+        ComputedColumn(
+          pointsTo = sqlFile.dependencies.get(dbCol.name).flatMap { case (relName, colName) => eval(relName).flatMap(_.get.map(foo => foo.source -> colName)) },
+          name = naming.field(dbCol.name),
+          tpe = deriveType(dbCol),
+          dbCol = dbCol
+        )
+      }
     }
 
   def deriveType(dbCol: db.Col): sc.Type = {
@@ -66,9 +69,10 @@ case class ComputedSqlFile(
       ComputedSqlFile.ParamComputed(name, sc.Type.Option.of(tpe), underlying)
     }
 
-  val names = ComputedNames(naming, source, cols, maybeId = None, enableFieldValue = false, enableDsl = false)
+  val names = ComputedNames(naming, source, maybeId = None, enableFieldValue = false, enableDsl = false)
 
-  val RowName: sc.Type.Qualified = names.RowName
+  val maybeRowName: MaybeReturnsRows[Type.Qualified] =
+    maybeCols.map(_ => names.RowName)
 
   val repoMethods: NonEmptyList[RepoMethod] =
     NonEmptyList(RepoMethod.SqlFile(this), RepoMethod.SqlFileRequiredParams(this))

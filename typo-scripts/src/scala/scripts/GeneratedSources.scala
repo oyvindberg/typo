@@ -38,7 +38,8 @@ object GeneratedSources {
       "referential_constraints",
       "table_constraints",
       "tables",
-      "foo"
+      "foo",
+      "pg_prepared_statements"
     )
 
     val nullabilityOverride: NullabilityOverride = {
