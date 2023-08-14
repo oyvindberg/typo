@@ -7,6 +7,7 @@ package testdb
 package hardcoded
 
 import java.sql.Connection
+import scala.util.Random
 import testdb.hardcoded.compositepk.person.PersonRepoImpl
 import testdb.hardcoded.compositepk.person.PersonRow
 import testdb.hardcoded.compositepk.person.PersonRowUnsaved
@@ -20,9 +21,9 @@ import testdb.hardcoded.myschema.marital_status.MaritalStatusRepoImpl
 import testdb.hardcoded.myschema.marital_status.MaritalStatusRow
 import testdb.hardcoded.myschema.person.PersonId
 
-object testInsert {
-  def compositepkPerson(name: Option[String] = None, one: Defaulted[Long] = Defaulted.UseDefault, two: Defaulted[Option[String]] = Defaulted.UseDefault)(implicit c: Connection): PersonRow = PersonRepoImpl.insert(new PersonRowUnsaved(name = name, one = one, two = two))
-  def myschemaFootballClub(id: FootballClubId, name: /* max 100 chars */ String = "name")(implicit c: Connection): FootballClubRow = FootballClubRepoImpl.insert(new FootballClubRow(id = id, name = name))
+class testInsert(random: Random) {
+  def compositepkPerson(name: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString), one: Defaulted[Long] = Defaulted.UseDefault, two: Defaulted[Option[String]] = Defaulted.UseDefault)(implicit c: Connection): PersonRow = PersonRepoImpl.insert(new PersonRowUnsaved(name = name, one = one, two = two))
+  def myschemaFootballClub(id: FootballClubId, name: /* max 100 chars */ String = random.alphanumeric.take(20).mkString)(implicit c: Connection): FootballClubRow = FootballClubRepoImpl.insert(new FootballClubRow(id = id, name = name))
   def myschemaMaritalStatus(id: MaritalStatusId)(implicit c: Connection): MaritalStatusRow = MaritalStatusRepoImpl.insert(new MaritalStatusRow(id = id))
-  def myschemaPerson(favouriteFootballClubId: FootballClubId, name: /* max 100 chars */ String = "name", nickName: Option[/* max 30 chars */ String] = None, blogUrl: Option[/* max 100 chars */ String] = None, email: /* max 254 chars */ String = "email", phone: /* max 8 chars */ String = "phone", likesPizza: Boolean = false, workEmail: Option[/* max 254 chars */ String] = None, id: Defaulted[PersonId] = Defaulted.UseDefault, maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault, sector: Defaulted[Sector] = Defaulted.UseDefault, favoriteNumber: Defaulted[Number] = Defaulted.UseDefault)(implicit c: Connection): testdb.hardcoded.myschema.person.PersonRow = testdb.hardcoded.myschema.person.PersonRepoImpl.insert(new testdb.hardcoded.myschema.person.PersonRowUnsaved(favouriteFootballClubId = favouriteFootballClubId, name = name, nickName = nickName, blogUrl = blogUrl, email = email, phone = phone, likesPizza = likesPizza, workEmail = workEmail, id = id, maritalStatusId = maritalStatusId, sector = sector, favoriteNumber = favoriteNumber))
+  def myschemaPerson(favouriteFootballClubId: FootballClubId, name: /* max 100 chars */ String = random.alphanumeric.take(20).mkString, nickName: Option[/* max 30 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString), blogUrl: Option[/* max 100 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString), email: /* max 254 chars */ String = random.alphanumeric.take(20).mkString, phone: /* max 8 chars */ String = random.alphanumeric.take(8).mkString, likesPizza: Boolean = random.nextBoolean(), workEmail: Option[/* max 254 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString), id: Defaulted[PersonId] = Defaulted.UseDefault, maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault, sector: Defaulted[Sector] = Defaulted.UseDefault, favoriteNumber: Defaulted[Number] = Defaulted.UseDefault)(implicit c: Connection): testdb.hardcoded.myschema.person.PersonRow = testdb.hardcoded.myschema.person.PersonRepoImpl.insert(new testdb.hardcoded.myschema.person.PersonRowUnsaved(favouriteFootballClubId = favouriteFootballClubId, name = name, nickName = nickName, blogUrl = blogUrl, email = email, phone = phone, likesPizza = likesPizza, workEmail = workEmail, id = id, maritalStatusId = maritalStatusId, sector = sector, favoriteNumber = favoriteNumber))
 }
