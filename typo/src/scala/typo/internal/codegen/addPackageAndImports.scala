@@ -72,8 +72,15 @@ object addPackageAndImports {
     cm match {
       case sc.Given(tparams, name, implicitParams, tpe, body) =>
         sc.Given(tparams, name, implicitParams.map(p => shortenNamesParam(p, f)), shortenNamesType(tpe, f), body.mapTrees(t => shortenNames(t, f)))
-      case sc.Value(tparams, name, params, tpe, body) =>
-        sc.Value(tparams, name, params.map(p => shortenNamesParam(p, f)), shortenNamesType(tpe, f), body.mapTrees(t => shortenNames(t, f)))
+      case sc.Value(tparams, name, params, implicitParams, tpe, body) =>
+        sc.Value(
+          tparams,
+          name,
+          params.map(p => shortenNamesParam(p, f)),
+          implicitParams.map(p => shortenNamesParam(p, f)),
+          shortenNamesType(tpe, f),
+          body.mapTrees(t => shortenNames(t, f))
+        )
     }
 
   // traverse type tree and rewrite qualified names

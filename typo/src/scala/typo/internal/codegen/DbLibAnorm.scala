@@ -93,7 +93,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           code"def selectByIds($idsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
       }
     case RepoMethod.SelectByUnique(params, _, rowType) =>
-      val ident = Naming.camelCase(Array("selectByUnique"))
+      val ident = Naming.camelCaseIdent(Array("selectByUnique"))
       code"def $ident(${params.map(_.param.code).mkCode(", ")})(implicit c: ${sc.Type.Connection}): ${sc.Type.Option.of(rowType)}"
     case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
       code"def selectByFieldValues($fieldValueOrIdsParam)(implicit c: ${sc.Type.Connection}): ${sc.Type.List.of(rowType)}"
@@ -450,6 +450,15 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"???"
     }
   }
+  override def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value =
+    sc.Value(
+      Nil,
+      x.name,
+      x.params,
+      List(sc.Param(sc.Ident("c"), sc.Type.Connection, None)),
+      x.table.names.RowName,
+      code"${x.table.names.RepoImplName}.insert(new ${x.cls}(${x.params.map(p => code"${p.name} = ${p.name}").mkCode(", ")}))"
+    )
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
     List(
@@ -582,6 +591,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         Nil,
         rowParserName,
         params = List(sc.Param(sc.Ident("idx"), sc.Type.Int, None)),
+        Nil,
         RowParser.of(tpe),
         code"""|${RowParser.of(tpe)} { row =>
                |  $Success(

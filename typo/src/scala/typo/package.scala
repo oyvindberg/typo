@@ -42,6 +42,7 @@ package object typo {
       header = publicOptions.header,
       enableFieldValue = publicOptions.enableFieldValue,
       enableDsl = publicOptions.enableDsl,
+      enableTestInserts = publicOptions.enableTestInserts,
       keepDependencies = publicOptions.keepDependencies,
       debugTypes = publicOptions.debugTypes
     )
@@ -92,6 +93,7 @@ package object typo {
           sqlFileFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if selector.include(name) => f }
         minimize(mostFiles, entryPoints)
       }
+    lazy val keptTypes = keptMostFiles.flatMap(x => x.tpe :: x.secondaryTypes).toSet
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
       keptMostFiles.groupBy(_.pkg).map { case (pkg, files) =>
@@ -102,11 +104,20 @@ package object typo {
     // this should be a stop-gap solution anyway
     val pkgObject = PackageObjectFile.packageObject(options)
 
-    val allFiles = keptMostFiles.map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
+    val testDataFile = options.dbLib match {
+      case Some(dbLib) if options.enableTestInserts =>
+        val keptTables = computedRelations.collect { case x: ComputedTable if keptTypes(x.names.RepoImplName) => x }
+        val computed = ComputedTestInserts(options, customTypes, keptTables)
+        Some(FileTestInserts(computed, dbLib))
+      case _ => None
+    }
+
+    val allFiles = (testDataFile.toList ::: keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file)) ++ pkgObject
     Generated(allFiles.map(file => file.copy(contents = options.header.code ++ file.contents)))
   }
 
   /** Keep those files among `allFiles` which are part of or reachable (through type references) from `entryPoints`.
+    *
     * @return
     */
   def minimize(allFiles: List[sc.File], entryPoints: Iterable[sc.File]): List[sc.File] = {
@@ -142,10 +153,11 @@ package object typo {
               implicitParams.foreach(goTree)
               goTree(tpe)
               go(body)
-            case sc.Value(tparams, name, params, tpe, body) =>
+            case sc.Value(tparams, name, params, implicitParams, tpe, body) =>
               tparams.foreach(goTree)
               goTree(name)
               params.foreach(goTree)
+              implicitParams.foreach(goTree)
               goTree(tpe)
               go(body)
             case sc.Obj(name, members, body) =>

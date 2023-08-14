@@ -57,23 +57,27 @@ class Naming(val pkg: sc.QIdent) {
 
   // field names
   def field(name: db.ColName): sc.Ident =
-    Naming.camelCase(name.value.split('_'))
+    Naming.camelCaseIdent(name.value.split('_'))
 
   // multiple field names together into one name
   def field(colNames: NonEmptyList[db.ColName]): sc.Ident =
-    Naming.camelCase(colNames.map(field).map(_.value).toArray)
+    Naming.camelCaseIdent(colNames.map(field).map(_.value).toArray)
 }
 
 object Naming {
-  def camelCase(strings: Array[String]): sc.Ident =
-    sc.Ident(
-      strings.zipWithIndex
-        .map {
-          case (s, 0) => s
-          case (s, _) => s.capitalize
-        }
-        .mkString("")
-    )
+  def camelCaseIdent(strings: Array[String]): sc.Ident =
+    sc.Ident(camelCase(strings))
+
+  def camelCase(strings: Array[String]): String =
+    strings.zipWithIndex
+      .map {
+        case (s, 0) => s
+        case (s, _) => s.capitalize
+      }
+      .mkString("")
+
+  def camelCase(string: String): String =
+    camelCase(string.split('_'))
 
   def titleCase(name: String): String =
     name.split('_').map(_.capitalize).mkString("")

@@ -59,6 +59,7 @@ object sc {
       tparams: List[Type.Abstract],
       name: sc.Ident,
       params: List[Param],
+      implicitParams: List[Param],
       tpe: sc.Type,
       body: sc.Code
   ) extends ClassMember
@@ -113,6 +114,7 @@ object sc {
     val LocalTime = Qualified("java.time.LocalTime")
     val OffsetDateTime = Qualified("java.time.OffsetDateTime")
     val OffsetTime = Qualified("java.time.OffsetTime")
+    val ZoneOffset = Qualified("java.time.ZoneOffset")
     val DateTimeParseException = Qualified("java.time.format.DateTimeParseException")
     val JavaHashMap = Qualified("java.util.HashMap")
     val JavaMap = Qualified("java.util.Map")
@@ -146,6 +148,7 @@ object sc {
     val Long = Qualified("scala.Long")
     val None = Qualified("scala.None")
     val Option = Qualified("scala.Option")
+    val Random = Qualified("scala.util.Random")
     val Right = Qualified("scala.Right")
     val Short = Qualified("scala.Short")
     val Some = Qualified("scala.Some")
@@ -392,17 +395,18 @@ object sc {
           val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
           s"implicit def $renderedName$renderedTparams$renderedImplicitParams: $renderedTpe = $renderedBody"
         }
-      case Value(tparams, name, implicitParams, tpe, body) =>
+      case Value(tparams, name, params, implicitParams, tpe, body) =>
         val renderedName = renderTree(name)
         val renderedTpe = renderTree(tpe)
         val renderedBody = body.render
 
-        if (tparams.isEmpty && implicitParams.isEmpty)
+        if (tparams.isEmpty && params.isEmpty && implicitParams.isEmpty)
           s"val $renderedName: $renderedTpe = $renderedBody"
         else {
           val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
-          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(", ", ", ")")
-          s"def $renderedName$renderedTparams$renderedImplicitParams: $renderedTpe = $renderedBody"
+          val renderedParams = if (params.isEmpty) "" else params.map(renderTree).mkString("(", ", ", ")")
+          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
+          s"def $renderedName$renderedTparams$renderedParams$renderedImplicitParams: $renderedTpe = $renderedBody"
         }
       case Obj(name, members, body) =>
         if (members.isEmpty && body.isEmpty) ""
