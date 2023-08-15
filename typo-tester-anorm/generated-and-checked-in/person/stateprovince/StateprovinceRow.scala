@@ -29,7 +29,7 @@ case class StateprovinceRow(
   /** Primary key for StateProvince records. */
   stateprovinceid: StateprovinceId,
   /** ISO standard state or province code. */
-  stateprovincecode: /* bpchar */ String,
+  stateprovincecode: /* bpchar, max 3 chars */ String,
   /** ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
       Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,

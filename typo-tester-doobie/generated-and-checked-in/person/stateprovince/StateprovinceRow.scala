@@ -24,7 +24,7 @@ case class StateprovinceRow(
   /** Primary key for StateProvince records. */
   stateprovinceid: StateprovinceId,
   /** ISO standard state or province code. */
-  stateprovincecode: /* bpchar */ String,
+  stateprovincecode: /* bpchar, max 3 chars */ String,
   /** ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
       Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,
@@ -40,8 +40,8 @@ case class StateprovinceRow(
 )
 
 object StateprovinceRow {
-  implicit lazy val decoder: Decoder[StateprovinceRow] = Decoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(StateprovinceRow.apply)(StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[StateprovinceRow] = Encoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[StateprovinceRow] = Decoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(StateprovinceRow.apply)(StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, Decoder.decodeUUID, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[StateprovinceRow] = Encoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, UUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, Encoder.encodeUUID, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[StateprovinceRow] = new Read[StateprovinceRow](
     gets = List(
       (StateprovinceId.get, Nullability.NoNulls),

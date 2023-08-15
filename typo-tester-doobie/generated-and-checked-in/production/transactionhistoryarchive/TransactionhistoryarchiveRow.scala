@@ -27,7 +27,7 @@ case class TransactionhistoryarchiveRow(
   /** Date and time of the transaction. */
   transactiondate: TypoLocalDateTime,
   /** W = Work Order, S = Sales Order, P = Purchase Order */
-  transactiontype: /* bpchar */ String,
+  transactiontype: /* bpchar, max 1 chars */ String,
   /** Product quantity. */
   quantity: Int,
   /** Product cost. */
@@ -36,8 +36,8 @@ case class TransactionhistoryarchiveRow(
 )
 
 object TransactionhistoryarchiveRow {
-  implicit lazy val decoder: Decoder[TransactionhistoryarchiveRow] = Decoder.forProduct9[TransactionhistoryarchiveRow, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(TransactionhistoryarchiveRow.apply)(TransactionhistoryarchiveId.decoder, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
-  implicit lazy val encoder: Encoder[TransactionhistoryarchiveRow] = Encoder.forProduct9[TransactionhistoryarchiveRow, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(TransactionhistoryarchiveId.encoder, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
+  implicit lazy val decoder: Decoder[TransactionhistoryarchiveRow] = Decoder.forProduct9[TransactionhistoryarchiveRow, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(TransactionhistoryarchiveRow.apply)(TransactionhistoryarchiveId.decoder, Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
+  implicit lazy val encoder: Encoder[TransactionhistoryarchiveRow] = Encoder.forProduct9[TransactionhistoryarchiveRow, TransactionhistoryarchiveId, Int, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(TransactionhistoryarchiveId.encoder, Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[TransactionhistoryarchiveRow] = new Read[TransactionhistoryarchiveRow](
     gets = List(
       (TransactionhistoryarchiveId.get, Nullability.NoNulls),

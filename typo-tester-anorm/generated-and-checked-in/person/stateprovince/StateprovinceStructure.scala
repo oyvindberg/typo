@@ -23,7 +23,7 @@ class StateprovinceStructure[Row](val prefix: Option[String], val extract: Row =
     with StateprovinceFields[Row] { outer =>
 
   override val stateprovinceid = new IdField[StateprovinceId, Row](prefix, "stateprovinceid", None, Some("int4"))(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
-  override val stateprovincecode = new Field[/* bpchar */ String, Row](prefix, "stateprovincecode", None, Some("bpchar"))(x => extract(x).stateprovincecode, (row, value) => merge(row, extract(row).copy(stateprovincecode = value)))
+  override val stateprovincecode = new Field[/* bpchar, max 3 chars */ String, Row](prefix, "stateprovincecode", None, Some("bpchar"))(x => extract(x).stateprovincecode, (row, value) => merge(row, extract(row).copy(stateprovincecode = value)))
   override val countryregioncode = new Field[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
   override val isonlystateprovinceflag = new Field[Flag, Row](prefix, "isonlystateprovinceflag", None, Some(""""public"."Flag""""))(x => extract(x).isonlystateprovinceflag, (row, value) => merge(row, extract(row).copy(isonlystateprovinceflag = value)))
   override val name = new Field[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))

@@ -26,7 +26,7 @@ import scala.util.Try
 /** This class corresponds to a row in table `person.stateprovince` which has not been persisted yet */
 case class StateprovinceRowUnsaved(
   /** ISO standard state or province code. */
-  stateprovincecode: /* bpchar */ String,
+  stateprovincecode: /* bpchar, max 3 chars */ String,
   /** ISO standard country or region code. Foreign key to CountryRegion.CountryRegionCode.
       Points to [[countryregion.CountryregionRow.countryregioncode]] */
   countryregioncode: CountryregionId,

@@ -31,7 +31,7 @@ case class SpViewRow(
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: Option[StateprovinceId],
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovincecode]] */
-  stateprovincecode: Option[/* bpchar */ String],
+  stateprovincecode: Option[/* bpchar, max 3 chars */ String],
   /** Points to [[person.stateprovince.StateprovinceRow.countryregioncode]] */
   countryregioncode: Option[CountryregionId],
   /** Points to [[person.stateprovince.StateprovinceRow.isonlystateprovinceflag]] */

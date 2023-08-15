@@ -37,9 +37,9 @@ case class EmployeeRow(
   /** Date of birth. */
   birthdate: TypoLocalDate,
   /** M = Married, S = Single */
-  maritalstatus: /* bpchar */ String,
+  maritalstatus: /* bpchar, max 1 chars */ String,
   /** M = Male, F = Female */
-  gender: /* bpchar */ String,
+  gender: /* bpchar, max 1 chars */ String,
   /** Employee hired on this date. */
   hiredate: TypoLocalDate,
   /** Job classification. 0 = Hourly, not exempt from collective bargaining. 1 = Salaried, exempt from collective bargaining. */

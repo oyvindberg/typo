@@ -60,11 +60,11 @@ case class ProductRow(
   /** Number of days required to manufacture the product. */
   daystomanufacture: Int,
   /** R = Road, M = Mountain, T = Touring, S = Standard */
-  productline: Option[/* bpchar */ String],
+  productline: Option[/* bpchar, max 2 chars */ String],
   /** H = High, M = Medium, L = Low */
-  `class`: Option[/* bpchar */ String],
+  `class`: Option[/* bpchar, max 2 chars */ String],
   /** W = Womens, M = Mens, U = Universal */
-  style: Option[/* bpchar */ String],
+  style: Option[/* bpchar, max 2 chars */ String],
   /** Product is a member of this product subcategory. Foreign key to ProductSubCategory.ProductSubCategoryID.
       Points to [[productsubcategory.ProductsubcategoryRow.productsubcategoryid]] */
   productsubcategoryid: Option[ProductsubcategoryId],

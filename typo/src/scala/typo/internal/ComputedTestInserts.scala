@@ -23,17 +23,27 @@ object ComputedTestInserts {
           case sc.Type.String =>
             val max: Int =
               Option(dbType)
-                .collect { case db.Type.VarChar(Some(maxLength)) if maxLength < 20 => maxLength }
+                .collect {
+                  case db.Type.VarChar(Some(maxLength)) => maxLength
+                  case db.Type.Bpchar(Some(maxLength))  => maxLength
+                }
                 .getOrElse(20)
+                .min(20)
             Some(code"$random.alphanumeric.take($max).mkString")
           case sc.Type.Boolean => Some(code"$random.nextBoolean()")
           case sc.Type.Char    => Some(code"$random.nextPrintableChar()")
           case sc.Type.Byte    => Some(code"$random.nextInt(${sc.Type.Byte}.MaxValue).toByte")
           case sc.Type.Short   => Some(code"$random.nextInt(${sc.Type.Short}.MaxValue).toShort")
-          case sc.Type.Int     => Some(code"$random.nextInt()")
-          case sc.Type.Long    => Some(code"$random.nextLong()")
-          case sc.Type.Float   => Some(code"$random.nextFloat()")
-          case sc.Type.Double  => Some(code"$random.nextDouble()")
+          case sc.Type.Int =>
+            dbType match {
+              case db.Type.Int2 => Some(code"$random.nextInt(${sc.Type.Short}.MaxValue)")
+              case _            => Some(code"$random.nextInt()")
+            }
+          case sc.Type.Long       => Some(code"$random.nextLong()")
+          case sc.Type.Float      => Some(code"$random.nextFloat()")
+          case sc.Type.Double     => Some(code"$random.nextDouble()")
+          case sc.Type.BigDecimal => Some(code"${sc.Type.BigDecimal}.decimal($random.nextDouble())")
+          case sc.Type.UUID       => Some(code"${sc.Type.UUID}.nameUUIDFromBytes{val bs = ${sc.Type.Array}.ofDim[${sc.Type.Byte}](16); $random.nextBytes(bs); bs}")
           case sc.Type.Optional(underlying) =>
             go(underlying, dbType) match {
               case None          => Some(sc.Type.None.code)

@@ -18,7 +18,7 @@ import typo.dsl.SqlExpr.IdField
 
 trait StateprovinceFields[Row] {
   val stateprovinceid: IdField[StateprovinceId, Row]
-  val stateprovincecode: Field[/* bpchar */ String, Row]
+  val stateprovincecode: Field[/* bpchar, max 3 chars */ String, Row]
   val countryregioncode: Field[CountryregionId, Row]
   val isonlystateprovinceflag: Field[Flag, Row]
   val name: Field[Name, Row]

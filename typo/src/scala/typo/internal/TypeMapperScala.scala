@@ -62,10 +62,14 @@ case class TypeMapperScala(
 
   private def baseType(tpe: db.Type): sc.Type = {
     tpe match {
-      case db.Type.Array(_)        => sys.error("no idea what to do with nested array types")
-      case db.Type.Boolean         => sc.Type.Boolean
-      case db.Type.Bytea           => sc.Type.Array.of(sc.Type.Byte)
-      case db.Type.Bpchar          => sc.Type.String.withComment("bpchar")
+      case db.Type.Array(_) => sys.error("no idea what to do with nested array types")
+      case db.Type.Boolean  => sc.Type.Boolean
+      case db.Type.Bytea    => sc.Type.Array.of(sc.Type.Byte)
+      case db.Type.Bpchar(maybeN) =>
+        maybeN match {
+          case Some(n) if n != 2147483647 => sc.Type.String.withComment(s"bpchar, max $n chars")
+          case _                          => sc.Type.String.withComment(s"bpchar")
+        }
       case db.Type.Char            => sc.Type.String
       case db.Type.Date            => customTypes.TypoLocalDate.typoType
       case db.Type.DomainRef(name) => sc.Type.Qualified(naming.domainName(name))
@@ -117,9 +121,8 @@ case class TypeMapperScala(
       case db.Type.Xml             => customTypes.TypoXml.typoType
       case db.Type.VarChar(maybeN) =>
         maybeN match {
-          case Some(n) if n != 2147483647 =>
-            sc.Type.String.withComment(s"max $n chars")
-          case _ => sc.Type.String
+          case Some(n) if n != 2147483647 => sc.Type.String.withComment(s"max $n chars")
+          case _                          => sc.Type.String
         }
     }
   }

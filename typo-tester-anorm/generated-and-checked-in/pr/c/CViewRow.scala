@@ -23,7 +23,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CViewRow(
-  id: Option[/* bpchar */ String],
+  id: Option[/* bpchar, max 6 chars */ String],
   /** Points to [[production.culture.CultureRow.cultureid]] */
   cultureid: Option[CultureId],
   /** Points to [[production.culture.CultureRow.name]] */

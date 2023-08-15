@@ -25,7 +25,7 @@ class SpViewStructure[Row](val prefix: Option[String], val extract: Row => SpVie
 
   override val id = new OptField[Int, Row](prefix, "id", None, Some("int4"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
   override val stateprovinceid = new OptField[StateprovinceId, Row](prefix, "stateprovinceid", None, Some("int4"))(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
-  override val stateprovincecode = new OptField[/* bpchar */ String, Row](prefix, "stateprovincecode", None, Some("bpchar"))(x => extract(x).stateprovincecode, (row, value) => merge(row, extract(row).copy(stateprovincecode = value)))
+  override val stateprovincecode = new OptField[/* bpchar, max 3 chars */ String, Row](prefix, "stateprovincecode", None, Some("bpchar"))(x => extract(x).stateprovincecode, (row, value) => merge(row, extract(row).copy(stateprovincecode = value)))
   override val countryregioncode = new OptField[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
   override val isonlystateprovinceflag = new Field[Flag, Row](prefix, "isonlystateprovinceflag", None, Some(""""public"."Flag""""))(x => extract(x).isonlystateprovinceflag, (row, value) => merge(row, extract(row).copy(isonlystateprovinceflag = value)))
   override val name = new OptField[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))

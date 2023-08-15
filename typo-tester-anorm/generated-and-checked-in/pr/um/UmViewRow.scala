@@ -23,7 +23,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class UmViewRow(
-  id: Option[/* bpchar */ String],
+  id: Option[/* bpchar, max 3 chars */ String],
   /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: Option[UnitmeasureId],
   /** Points to [[production.unitmeasure.UnitmeasureRow.name]] */

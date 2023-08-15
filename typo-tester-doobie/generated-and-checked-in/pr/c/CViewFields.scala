@@ -13,7 +13,7 @@ import adventureworks.public.Name
 import typo.dsl.SqlExpr.OptField
 
 trait CViewFields[Row] {
-  val id: OptField[/* bpchar */ String, Row]
+  val id: OptField[/* bpchar, max 6 chars */ String, Row]
   val cultureid: OptField[CultureId, Row]
   val name: OptField[Name, Row]
   val modifieddate: OptField[TypoLocalDateTime, Row]

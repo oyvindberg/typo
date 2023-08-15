@@ -21,7 +21,7 @@ trait DocumentFields[Row] {
   val folderflag: Field[Flag, Row]
   val filename: Field[/* max 400 chars */ String, Row]
   val fileextension: OptField[/* max 8 chars */ String, Row]
-  val revision: Field[/* bpchar */ String, Row]
+  val revision: Field[/* bpchar, max 5 chars */ String, Row]
   val changenumber: Field[Int, Row]
   val status: Field[Int, Row]
   val documentsummary: OptField[String, Row]

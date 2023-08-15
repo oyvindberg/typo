@@ -27,7 +27,7 @@ case class TransactionhistoryRowUnsaved(
   /** Purchase order, sales order, or work order identification number. */
   referenceorderid: Int,
   /** W = WorkOrder, S = SalesOrder, P = PurchaseOrder */
-  transactiontype: /* bpchar */ String,
+  transactiontype: /* bpchar, max 1 chars */ String,
   /** Product quantity. */
   quantity: Int,
   /** Product cost. */

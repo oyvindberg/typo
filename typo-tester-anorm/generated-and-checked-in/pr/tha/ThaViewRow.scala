@@ -34,7 +34,7 @@ case class ThaViewRow(
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiondate]] */
   transactiondate: Option[TypoLocalDateTime],
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactiontype]] */
-  transactiontype: Option[/* bpchar */ String],
+  transactiontype: Option[/* bpchar, max 1 chars */ String],
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.quantity]] */
   quantity: Option[Int],
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.actualcost]] */

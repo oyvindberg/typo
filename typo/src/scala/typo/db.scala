@@ -9,7 +9,7 @@ object db {
   object Type {
     case class Array(tpe: Type) extends Type
     case object Boolean extends Type
-    case object Bpchar extends Type // blank padded character
+    case class Bpchar(maxLength: Option[Int]) extends Type // blank padded character
     case object Bytea extends Type
     case object Char extends Type
     case object Date extends Type

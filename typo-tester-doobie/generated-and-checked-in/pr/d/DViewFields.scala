@@ -21,7 +21,7 @@ trait DViewFields[Row] {
   val folderflag: Field[Flag, Row]
   val filename: OptField[/* max 400 chars */ String, Row]
   val fileextension: OptField[/* max 8 chars */ String, Row]
-  val revision: OptField[/* bpchar */ String, Row]
+  val revision: OptField[/* bpchar, max 5 chars */ String, Row]
   val changenumber: OptField[Int, Row]
   val status: OptField[Int, Row]
   val documentsummary: OptField[String, Row]

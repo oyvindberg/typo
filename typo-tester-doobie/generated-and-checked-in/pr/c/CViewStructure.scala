@@ -18,7 +18,7 @@ class CViewStructure[Row](val prefix: Option[String], val extract: Row => CViewR
   extends Relation[CViewFields, CViewRow, Row]
     with CViewFields[Row] { outer =>
 
-  override val id = new OptField[/* bpchar */ String, Row](prefix, "id", None, Some("bpchar"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+  override val id = new OptField[/* bpchar, max 6 chars */ String, Row](prefix, "id", None, Some("bpchar"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
   override val cultureid = new OptField[CultureId, Row](prefix, "cultureid", None, Some("bpchar"))(x => extract(x).cultureid, (row, value) => merge(row, extract(row).copy(cultureid = value)))
   override val name = new OptField[Name, Row](prefix, "name", None, Some(""""public"."Name""""))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
   override val modifieddate = new OptField[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))

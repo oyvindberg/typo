@@ -35,7 +35,7 @@ case class ThViewRow(
   /** Points to [[production.transactionhistory.TransactionhistoryRow.transactiondate]] */
   transactiondate: Option[TypoLocalDateTime],
   /** Points to [[production.transactionhistory.TransactionhistoryRow.transactiontype]] */
-  transactiontype: Option[/* bpchar */ String],
+  transactiontype: Option[/* bpchar, max 1 chars */ String],
   /** Points to [[production.transactionhistory.TransactionhistoryRow.quantity]] */
   quantity: Option[Int],
   /** Points to [[production.transactionhistory.TransactionhistoryRow.actualcost]] */

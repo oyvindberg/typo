@@ -19,7 +19,7 @@ import typo.dsl.SqlExpr.OptField
 
 trait PersonFields[Row] {
   val businessentityid: IdField[BusinessentityId, Row]
-  val persontype: Field[/* bpchar */ String, Row]
+  val persontype: Field[/* bpchar, max 2 chars */ String, Row]
   val namestyle: Field[NameStyle, Row]
   val title: OptField[/* max 8 chars */ String, Row]
   val firstname: Field[Name, Row]

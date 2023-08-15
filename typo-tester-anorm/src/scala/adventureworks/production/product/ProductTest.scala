@@ -5,17 +5,38 @@ import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
 import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
-import adventureworks.{Defaulted, TypoLocalDateTime, TypoXml, withConnection}
+import adventureworks.{Defaulted, TypoLocalDateTime, TypoXml, testInsert, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
 import java.util.UUID
+import scala.util.Random
 
 class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
   // for scala 2.12
   implicit val `Ordering[LocalDateTime]` : Ordering[LocalDateTime] = (x: LocalDateTime, y: LocalDateTime) => x.compareTo(y)
+
+  test("foo") {
+    withConnection { implicit c =>
+      val testInsert = new testInsert(new Random(0))
+      val unitmeasure = testInsert.productionUnitmeasure(UnitmeasureId("kgg"))
+      val productCategory = testInsert.productionProductcategory()
+      val productSubcategory = testInsert.productionProductsubcategory(productCategory.productcategoryid)
+      val productModel = testInsert.productionProductmodel(catalogdescription = Some(new TypoXml("<xml/>")), instructions = Some(new TypoXml("<instructions/>")))
+      val product = testInsert.productionProduct(
+        sizeunitmeasurecode = Some(unitmeasure.unitmeasurecode),
+        weightunitmeasurecode = Some(unitmeasure.unitmeasurecode),
+        `class` = Some("H "),
+        style = Some("W "),
+        productsubcategoryid = Some(productSubcategory.productsubcategoryid),
+        productmodelid = Some(productModel.productmodelid)
+      )
+      println(product)
+      succeed
+    }
+  }
 
   def runTest(
       productRepo: ProductRepo,

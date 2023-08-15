@@ -18,7 +18,7 @@ trait TransactionhistoryFields[Row] {
   val referenceorderid: Field[Int, Row]
   val referenceorderlineid: Field[Int, Row]
   val transactiondate: Field[TypoLocalDateTime, Row]
-  val transactiontype: Field[/* bpchar */ String, Row]
+  val transactiontype: Field[/* bpchar, max 1 chars */ String, Row]
   val quantity: Field[Int, Row]
   val actualcost: Field[BigDecimal, Row]
   val modifieddate: Field[TypoLocalDateTime, Row]

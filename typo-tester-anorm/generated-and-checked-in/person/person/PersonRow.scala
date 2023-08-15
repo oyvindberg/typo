@@ -30,7 +30,7 @@ case class PersonRow(
       Points to [[businessentity.BusinessentityRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Primary type of person: SC = Store Contact, IN = Individual (retail) customer, SP = Sales person, EM = Employee (non-sales), VC = Vendor contact, GC = General contact */
-  persontype: /* bpchar */ String,
+  persontype: /* bpchar, max 2 chars */ String,
   /** 0 = The data in FirstName and LastName are stored in western style (first name, last name) order.  1 = Eastern style (last name, first name) order. */
   namestyle: NameStyle,
   /** A courtesy title. For example, Mr. or Ms. */

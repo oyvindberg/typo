@@ -19,7 +19,7 @@ trait ThViewFields[Row] {
   val referenceorderid: OptField[Int, Row]
   val referenceorderlineid: OptField[Int, Row]
   val transactiondate: OptField[TypoLocalDateTime, Row]
-  val transactiontype: OptField[/* bpchar */ String, Row]
+  val transactiontype: OptField[/* bpchar, max 1 chars */ String, Row]
   val quantity: OptField[Int, Row]
   val actualcost: OptField[BigDecimal, Row]
   val modifieddate: OptField[TypoLocalDateTime, Row]

@@ -30,7 +30,7 @@ case class PViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
   /** Points to [[person.person.PersonRow.persontype]] */
-  persontype: Option[/* bpchar */ String],
+  persontype: Option[/* bpchar, max 2 chars */ String],
   /** Points to [[person.person.PersonRow.namestyle]] */
   namestyle: NameStyle,
   /** Points to [[person.person.PersonRow.title]] */

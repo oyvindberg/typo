@@ -60,11 +60,11 @@ case class PViewRow(
   /** Points to [[production.product.ProductRow.daystomanufacture]] */
   daystomanufacture: Option[Int],
   /** Points to [[production.product.ProductRow.productline]] */
-  productline: Option[/* bpchar */ String],
+  productline: Option[/* bpchar, max 2 chars */ String],
   /** Points to [[production.product.ProductRow.class]] */
-  `class`: Option[/* bpchar */ String],
+  `class`: Option[/* bpchar, max 2 chars */ String],
   /** Points to [[production.product.ProductRow.style]] */
-  style: Option[/* bpchar */ String],
+  style: Option[/* bpchar, max 2 chars */ String],
   /** Points to [[production.product.ProductRow.productsubcategoryid]] */
   productsubcategoryid: Option[ProductsubcategoryId],
   /** Points to [[production.product.ProductRow.productmodelid]] */

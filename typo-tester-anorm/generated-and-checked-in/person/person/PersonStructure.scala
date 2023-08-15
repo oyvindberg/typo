@@ -24,7 +24,7 @@ class PersonStructure[Row](val prefix: Option[String], val extract: Row => Perso
     with PersonFields[Row] { outer =>
 
   override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-  override val persontype = new Field[/* bpchar */ String, Row](prefix, "persontype", None, Some("bpchar"))(x => extract(x).persontype, (row, value) => merge(row, extract(row).copy(persontype = value)))
+  override val persontype = new Field[/* bpchar, max 2 chars */ String, Row](prefix, "persontype", None, Some("bpchar"))(x => extract(x).persontype, (row, value) => merge(row, extract(row).copy(persontype = value)))
   override val namestyle = new Field[NameStyle, Row](prefix, "namestyle", None, Some(""""public".NameStyle"""))(x => extract(x).namestyle, (row, value) => merge(row, extract(row).copy(namestyle = value)))
   override val title = new OptField[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
   override val firstname = new Field[Name, Row](prefix, "firstname", None, Some(""""public"."Name""""))(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))

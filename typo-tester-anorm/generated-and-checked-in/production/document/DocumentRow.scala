@@ -36,7 +36,7 @@ case class DocumentRow(
   /** File extension indicating the document type. For example, .doc or .txt. */
   fileextension: Option[/* max 8 chars */ String],
   /** Revision number of the document. */
-  revision: /* bpchar */ String,
+  revision: /* bpchar, max 5 chars */ String,
   /** Engineering change approval number. */
   changenumber: Int,
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete */

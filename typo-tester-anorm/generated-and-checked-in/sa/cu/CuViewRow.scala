@@ -23,7 +23,7 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 case class CuViewRow(
-  id: Option[/* bpchar */ String],
+  id: Option[/* bpchar, max 3 chars */ String],
   /** Points to [[sales.currency.CurrencyRow.currencycode]] */
   currencycode: Option[CurrencyId],
   /** Points to [[sales.currency.CurrencyRow.name]] */

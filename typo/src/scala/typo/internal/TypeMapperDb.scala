@@ -17,7 +17,7 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
     udtName match {
       case "bool"                              => Some(db.Type.Boolean)
       case "box"                               => Some(db.Type.PGbox)
-      case "bpchar"                            => Some(db.Type.Bpchar)
+      case "bpchar"                            => Some(db.Type.Bpchar(characterMaximumLength))
       case "bytea"                             => Some(db.Type.Bytea)
       case "char"                              => Some(db.Type.Char)
       case "cid"                               => Some(db.Type.Int4) // command identifier

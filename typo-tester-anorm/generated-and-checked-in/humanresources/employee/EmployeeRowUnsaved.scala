@@ -36,9 +36,9 @@ case class EmployeeRowUnsaved(
   /** Date of birth. */
   birthdate: TypoLocalDate,
   /** M = Married, S = Single */
-  maritalstatus: /* bpchar */ String,
+  maritalstatus: /* bpchar, max 1 chars */ String,
   /** M = Male, F = Female */
-  gender: /* bpchar */ String,
+  gender: /* bpchar, max 1 chars */ String,
   /** Employee hired on this date. */
   hiredate: TypoLocalDate,
   /** Default: true

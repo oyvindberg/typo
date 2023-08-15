@@ -15,11 +15,11 @@ import io.circe.Encoder
 import typo.dsl.Bijection
 
 /** Type for the primary key of table `production.culture` */
-case class CultureId(value: /* bpchar */ String) extends AnyVal
+case class CultureId(value: /* bpchar, max 6 chars */ String) extends AnyVal
 object CultureId {
   implicit lazy val arrayGet: Get[Array[CultureId]] = adventureworks.StringArrayMeta.get.map(_.map(CultureId.apply))
   implicit lazy val arrayPut: Put[Array[CultureId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
-  implicit lazy val bijection: Bijection[CultureId, /* bpchar */ String] = Bijection[CultureId, /* bpchar */ String](_.value)(CultureId.apply)
+  implicit lazy val bijection: Bijection[CultureId, /* bpchar, max 6 chars */ String] = Bijection[CultureId, /* bpchar, max 6 chars */ String](_.value)(CultureId.apply)
   implicit lazy val decoder: Decoder[CultureId] = Decoder.decodeString.map(CultureId.apply)
   implicit lazy val encoder: Encoder[CultureId] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[CultureId] = Meta.StringMeta.get.map(CultureId.apply)

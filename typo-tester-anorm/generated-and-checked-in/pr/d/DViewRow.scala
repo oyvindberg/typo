@@ -36,7 +36,7 @@ case class DViewRow(
   /** Points to [[production.document.DocumentRow.fileextension]] */
   fileextension: Option[/* max 8 chars */ String],
   /** Points to [[production.document.DocumentRow.revision]] */
-  revision: Option[/* bpchar */ String],
+  revision: Option[/* bpchar, max 5 chars */ String],
   /** Points to [[production.document.DocumentRow.changenumber]] */
   changenumber: Option[Int],
   /** Points to [[production.document.DocumentRow.status]] */

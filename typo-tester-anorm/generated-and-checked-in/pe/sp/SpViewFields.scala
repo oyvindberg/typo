@@ -20,7 +20,7 @@ import typo.dsl.SqlExpr.OptField
 trait SpViewFields[Row] {
   val id: OptField[Int, Row]
   val stateprovinceid: OptField[StateprovinceId, Row]
-  val stateprovincecode: OptField[/* bpchar */ String, Row]
+  val stateprovincecode: OptField[/* bpchar, max 3 chars */ String, Row]
   val countryregioncode: OptField[CountryregionId, Row]
   val isonlystateprovinceflag: Field[Flag, Row]
   val name: OptField[Name, Row]

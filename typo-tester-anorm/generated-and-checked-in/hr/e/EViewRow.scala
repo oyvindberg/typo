@@ -37,9 +37,9 @@ case class EViewRow(
   /** Points to [[humanresources.employee.EmployeeRow.birthdate]] */
   birthdate: Option[TypoLocalDate],
   /** Points to [[humanresources.employee.EmployeeRow.maritalstatus]] */
-  maritalstatus: Option[/* bpchar */ String],
+  maritalstatus: Option[/* bpchar, max 1 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.gender]] */
-  gender: Option[/* bpchar */ String],
+  gender: Option[/* bpchar, max 1 chars */ String],
   /** Points to [[humanresources.employee.EmployeeRow.hiredate]] */
   hiredate: Option[TypoLocalDate],
   /** Points to [[humanresources.employee.EmployeeRow.salariedflag]] */
