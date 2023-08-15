@@ -88,13 +88,11 @@ package object typo {
         sqlFileFiles
       ).flatten
 
-    val keptMostFiles: List[sc.File] =
-      if (options.keepDependencies) mostFiles
-      else {
-        val entryPoints: Iterable[sc.File] =
-          sqlFileFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if selector.include(name) => f }
-        internal.minimize(mostFiles, entryPoints)
-      }
+    val keptMostFiles: List[sc.File] = {
+      val entryPoints: Iterable[sc.File] =
+        sqlFileFiles.map { f => f } ++ relationFilesByName.collect { case (name, f) if options.keepDependencies || selector.include(name) => f }
+      internal.minimize(mostFiles, entryPoints)
+    }
     lazy val keptTypes = keptMostFiles.flatMap(x => x.tpe :: x.secondaryTypes).toSet
 
     val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
