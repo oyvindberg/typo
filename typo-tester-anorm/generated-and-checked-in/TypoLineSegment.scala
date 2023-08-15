@@ -36,10 +36,6 @@ object TypoLineSegment {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoLineSegment]] = new ParameterMetaData[Array[TypoLineSegment]] {
-    override def sqlType: String = "_lseg"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoLineSegment]] = ToStatement[Array[TypoLineSegment]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("lseg", v.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))))
   implicit lazy val column: Column[TypoLineSegment] = Column.nonNull[TypoLineSegment]((v1: Any, _) =>
     v1 match {

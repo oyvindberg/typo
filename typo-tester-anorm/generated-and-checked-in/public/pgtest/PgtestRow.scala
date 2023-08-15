@@ -60,6 +60,7 @@ case class PgtestRow(
   timez: TypoOffsetTime,
   date: TypoLocalDate,
   uuid: UUID,
+  numeric: BigDecimal,
   boxes: Array[TypoBox],
   circlees: Array[TypoCircle],
   linees: Array[TypoLine],
@@ -79,7 +80,8 @@ case class PgtestRow(
   times: Array[TypoLocalTime],
   timezs: Array[TypoOffsetTime],
   dates: Array[TypoLocalDate],
-  uuids: Array[UUID]
+  uuids: Array[UUID],
+  numerics: Array[BigDecimal]
 )
 
 object PgtestRow {
@@ -106,6 +108,7 @@ object PgtestRow {
           timez = json.\("timez").as(TypoOffsetTime.reads),
           date = json.\("date").as(TypoLocalDate.reads),
           uuid = json.\("uuid").as(Reads.uuidReads),
+          numeric = json.\("numeric").as(Reads.bigDecReads),
           boxes = json.\("boxes").as(Reads.ArrayReads[TypoBox](TypoBox.reads, implicitly)),
           circlees = json.\("circlees").as(Reads.ArrayReads[TypoCircle](TypoCircle.reads, implicitly)),
           linees = json.\("linees").as(Reads.ArrayReads[TypoLine](TypoLine.reads, implicitly)),
@@ -125,7 +128,8 @@ object PgtestRow {
           times = json.\("times").as(Reads.ArrayReads[TypoLocalTime](TypoLocalTime.reads, implicitly)),
           timezs = json.\("timezs").as(Reads.ArrayReads[TypoOffsetTime](TypoOffsetTime.reads, implicitly)),
           dates = json.\("dates").as(Reads.ArrayReads[TypoLocalDate](TypoLocalDate.reads, implicitly)),
-          uuids = json.\("uuids").as(Reads.ArrayReads[UUID](Reads.uuidReads, implicitly))
+          uuids = json.\("uuids").as(Reads.ArrayReads[UUID](Reads.uuidReads, implicitly)),
+          numerics = json.\("numerics").as(Reads.ArrayReads[BigDecimal](Reads.bigDecReads, implicitly))
         )
       )
     ),
@@ -153,26 +157,28 @@ object PgtestRow {
         timez = row(idx + 17)(TypoOffsetTime.column),
         date = row(idx + 18)(TypoLocalDate.column),
         uuid = row(idx + 19)(Column.columnToUUID),
-        boxes = row(idx + 20)(TypoBox.arrayColumn),
-        circlees = row(idx + 21)(TypoCircle.arrayColumn),
-        linees = row(idx + 22)(TypoLine.arrayColumn),
-        lseges = row(idx + 23)(TypoLineSegment.arrayColumn),
-        pathes = row(idx + 24)(TypoPath.arrayColumn),
-        pointes = row(idx + 25)(TypoPoint.arrayColumn),
-        polygones = row(idx + 26)(TypoPolygon.arrayColumn),
-        intervales = row(idx + 27)(TypoInterval.arrayColumn),
-        moneyes = row(idx + 28)(TypoMoney.arrayColumn),
-        xmles = row(idx + 29)(TypoXml.arrayColumn),
-        jsones = row(idx + 30)(TypoJson.arrayColumn),
-        jsonbes = row(idx + 31)(TypoJsonb.arrayColumn),
-        hstores = row(idx + 32)(TypoHStore.arrayColumn),
-        inets = row(idx + 33)(TypoInet.arrayColumn),
-        timestamps = row(idx + 34)(TypoLocalDateTime.arrayColumn),
-        timestampzs = row(idx + 35)(TypoOffsetDateTime.arrayColumn),
-        times = row(idx + 36)(TypoLocalTime.arrayColumn),
-        timezs = row(idx + 37)(TypoOffsetTime.arrayColumn),
-        dates = row(idx + 38)(TypoLocalDate.arrayColumn),
-        uuids = row(idx + 39)(Column.columnToArray[UUID](Column.columnToUUID, implicitly))
+        numeric = row(idx + 20)(Column.columnToScalaBigDecimal),
+        boxes = row(idx + 21)(TypoBox.arrayColumn),
+        circlees = row(idx + 22)(TypoCircle.arrayColumn),
+        linees = row(idx + 23)(TypoLine.arrayColumn),
+        lseges = row(idx + 24)(TypoLineSegment.arrayColumn),
+        pathes = row(idx + 25)(TypoPath.arrayColumn),
+        pointes = row(idx + 26)(TypoPoint.arrayColumn),
+        polygones = row(idx + 27)(TypoPolygon.arrayColumn),
+        intervales = row(idx + 28)(TypoInterval.arrayColumn),
+        moneyes = row(idx + 29)(TypoMoney.arrayColumn),
+        xmles = row(idx + 30)(TypoXml.arrayColumn),
+        jsones = row(idx + 31)(TypoJson.arrayColumn),
+        jsonbes = row(idx + 32)(TypoJsonb.arrayColumn),
+        hstores = row(idx + 33)(TypoHStore.arrayColumn),
+        inets = row(idx + 34)(TypoInet.arrayColumn),
+        timestamps = row(idx + 35)(TypoLocalDateTime.arrayColumn),
+        timestampzs = row(idx + 36)(TypoOffsetDateTime.arrayColumn),
+        times = row(idx + 37)(TypoLocalTime.arrayColumn),
+        timezs = row(idx + 38)(TypoOffsetTime.arrayColumn),
+        dates = row(idx + 39)(TypoLocalDate.arrayColumn),
+        uuids = row(idx + 40)(Column.columnToArray[UUID](Column.columnToUUID, implicitly)),
+        numerics = row(idx + 41)(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly))
       )
     )
   }
@@ -198,6 +204,7 @@ object PgtestRow {
       "timez" -> TypoOffsetTime.writes.writes(o.timez),
       "date" -> TypoLocalDate.writes.writes(o.date),
       "uuid" -> Writes.UuidWrites.writes(o.uuid),
+      "numeric" -> Writes.BigDecimalWrites.writes(o.numeric),
       "boxes" -> Writes.arrayWrites[TypoBox](implicitly, TypoBox.writes).writes(o.boxes),
       "circlees" -> Writes.arrayWrites[TypoCircle](implicitly, TypoCircle.writes).writes(o.circlees),
       "linees" -> Writes.arrayWrites[TypoLine](implicitly, TypoLine.writes).writes(o.linees),
@@ -217,7 +224,8 @@ object PgtestRow {
       "times" -> Writes.arrayWrites[TypoLocalTime](implicitly, TypoLocalTime.writes).writes(o.times),
       "timezs" -> Writes.arrayWrites[TypoOffsetTime](implicitly, TypoOffsetTime.writes).writes(o.timezs),
       "dates" -> Writes.arrayWrites[TypoLocalDate](implicitly, TypoLocalDate.writes).writes(o.dates),
-      "uuids" -> Writes.arrayWrites[UUID](implicitly, Writes.UuidWrites).writes(o.uuids)
+      "uuids" -> Writes.arrayWrites[UUID](implicitly, Writes.UuidWrites).writes(o.uuids),
+      "numerics" -> Writes.arrayWrites[BigDecimal](implicitly, Writes.BigDecimalWrites).writes(o.numerics)
     ))
   )
 }

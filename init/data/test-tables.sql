@@ -22,6 +22,7 @@ create table pgtest
     timez       time with time zone        not null,
     date        date                       not null,
     uuid        uuid                       not null,
+    numeric     numeric                    not null,
     boxes       box[]                      not null,
     circlees    circle[]                   not null,
     linees      line[]                     not null,
@@ -41,7 +42,8 @@ create table pgtest
     times       time[]                     not null,
     timezs      time with time zone[]      not null,
     dates       date[]                     not null,
-    uuids       uuid[]                     not null
+    uuids       uuid[]                     not null,
+    numerics    numeric[]                  not null
 );
 
 create table pgtestnull
@@ -66,6 +68,7 @@ create table pgtestnull
     timez       time with time zone,
     date        date,
     uuid        uuid,
+    numeric     numeric,
     boxes       box[],
     circlees    circle[],
     linees      line[],
@@ -85,6 +88,6 @@ create table pgtestnull
     times       time[],
     timezs      time with time zone[],
     dates       date[],
-    uuids       uuid[]
-
+    uuids       uuid[],
+    numerics    numeric[]
 );

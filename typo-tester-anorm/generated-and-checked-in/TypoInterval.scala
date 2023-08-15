@@ -36,10 +36,6 @@ object TypoInterval {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoInterval]] = new ParameterMetaData[Array[TypoInterval]] {
-    override def sqlType: String = "_interval"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoInterval]] = ToStatement[Array[TypoInterval]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("interval", v.map(v => new PGInterval(v.years, v.months, v.days, v.hours, v.minutes, v.seconds)))))
   implicit lazy val column: Column[TypoInterval] = Column.nonNull[TypoInterval]((v1: Any, _) =>
     v1 match {

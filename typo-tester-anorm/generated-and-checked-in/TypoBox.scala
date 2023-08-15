@@ -36,10 +36,6 @@ object TypoBox {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoBox]] = new ParameterMetaData[Array[TypoBox]] {
-    override def sqlType: String = "_box"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoBox]] = ToStatement[Array[TypoBox]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("box", v.map(v => new PGbox(v.x1, v.y1, v.x2, v.y2)))))
   implicit lazy val column: Column[TypoBox] = Column.nonNull[TypoBox]((v1: Any, _) =>
     v1 match {

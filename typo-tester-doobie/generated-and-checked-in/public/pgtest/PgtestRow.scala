@@ -28,6 +28,7 @@ import adventureworks.TypoPolygon
 import adventureworks.TypoXml
 import doobie.enumerated.Nullability
 import doobie.util.Read
+import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.DecodingFailure
 import io.circe.Encoder
@@ -58,6 +59,7 @@ case class PgtestRow(
   timez: TypoOffsetTime,
   date: TypoLocalDate,
   uuid: UUID,
+  numeric: BigDecimal,
   boxes: Array[TypoBox],
   circlees: Array[TypoCircle],
   linees: Array[TypoLine],
@@ -77,7 +79,8 @@ case class PgtestRow(
   times: Array[TypoLocalTime],
   timezs: Array[TypoOffsetTime],
   dates: Array[TypoLocalDate],
-  uuids: Array[UUID]
+  uuids: Array[UUID],
+  numerics: Array[BigDecimal]
 )
 
 object PgtestRow {
@@ -108,6 +111,7 @@ object PgtestRow {
         timez = orThrow(c.get("timez")(TypoOffsetTime.decoder)),
         date = orThrow(c.get("date")(TypoLocalDate.decoder)),
         uuid = orThrow(c.get("uuid")(Decoder.decodeUUID)),
+        numeric = orThrow(c.get("numeric")(Decoder.decodeBigDecimal)),
         boxes = orThrow(c.get("boxes")(Decoder.decodeArray[TypoBox](TypoBox.decoder, implicitly))),
         circlees = orThrow(c.get("circlees")(Decoder.decodeArray[TypoCircle](TypoCircle.decoder, implicitly))),
         linees = orThrow(c.get("linees")(Decoder.decodeArray[TypoLine](TypoLine.decoder, implicitly))),
@@ -127,7 +131,8 @@ object PgtestRow {
         times = orThrow(c.get("times")(Decoder.decodeArray[TypoLocalTime](TypoLocalTime.decoder, implicitly))),
         timezs = orThrow(c.get("timezs")(Decoder.decodeArray[TypoOffsetTime](TypoOffsetTime.decoder, implicitly))),
         dates = orThrow(c.get("dates")(Decoder.decodeArray[TypoLocalDate](TypoLocalDate.decoder, implicitly))),
-        uuids = orThrow(c.get("uuids")(Decoder.decodeArray[UUID](Decoder.decodeUUID, implicitly)))
+        uuids = orThrow(c.get("uuids")(Decoder.decodeArray[UUID](Decoder.decodeUUID, implicitly))),
+        numerics = orThrow(c.get("numerics")(Decoder.decodeArray[BigDecimal](Decoder.decodeBigDecimal, implicitly)))
       )
     }
   )
@@ -153,6 +158,7 @@ object PgtestRow {
       "timez" -> TypoOffsetTime.encoder.apply(row.timez),
       "date" -> TypoLocalDate.encoder.apply(row.date),
       "uuid" -> Encoder.encodeUUID.apply(row.uuid),
+      "numeric" -> Encoder.encodeBigDecimal.apply(row.numeric),
       "boxes" -> Encoder.encodeIterable[TypoBox, Array](TypoBox.encoder, implicitly).apply(row.boxes),
       "circlees" -> Encoder.encodeIterable[TypoCircle, Array](TypoCircle.encoder, implicitly).apply(row.circlees),
       "linees" -> Encoder.encodeIterable[TypoLine, Array](TypoLine.encoder, implicitly).apply(row.linees),
@@ -172,7 +178,8 @@ object PgtestRow {
       "times" -> Encoder.encodeIterable[TypoLocalTime, Array](TypoLocalTime.encoder, implicitly).apply(row.times),
       "timezs" -> Encoder.encodeIterable[TypoOffsetTime, Array](TypoOffsetTime.encoder, implicitly).apply(row.timezs),
       "dates" -> Encoder.encodeIterable[TypoLocalDate, Array](TypoLocalDate.encoder, implicitly).apply(row.dates),
-      "uuids" -> Encoder.encodeIterable[UUID, Array](Encoder.encodeUUID, implicitly).apply(row.uuids)
+      "uuids" -> Encoder.encodeIterable[UUID, Array](Encoder.encodeUUID, implicitly).apply(row.uuids),
+      "numerics" -> Encoder.encodeIterable[BigDecimal, Array](Encoder.encodeBigDecimal, implicitly).apply(row.numerics)
     )
   )
   implicit lazy val read: Read[PgtestRow] = new Read[PgtestRow](
@@ -197,6 +204,7 @@ object PgtestRow {
       (TypoOffsetTime.get, Nullability.NoNulls),
       (TypoLocalDate.get, Nullability.NoNulls),
       (adventureworks.UUIDMeta.get, Nullability.NoNulls),
+      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
       (TypoBox.arrayGet, Nullability.NoNulls),
       (TypoCircle.arrayGet, Nullability.NoNulls),
       (TypoLine.arrayGet, Nullability.NoNulls),
@@ -216,7 +224,8 @@ object PgtestRow {
       (TypoLocalTime.arrayGet, Nullability.NoNulls),
       (TypoOffsetTime.arrayGet, Nullability.NoNulls),
       (TypoLocalDate.arrayGet, Nullability.NoNulls),
-      (adventureworks.UUIDArrayMeta.get, Nullability.NoNulls)
+      (adventureworks.UUIDArrayMeta.get, Nullability.NoNulls),
+      (adventureworks.BigDecimalMeta.get, Nullability.NoNulls)
     ),
     unsafeGet = (rs: ResultSet, i: Int) => PgtestRow(
       box = TypoBox.get.unsafeGetNonNullable(rs, i + 0),
@@ -239,26 +248,28 @@ object PgtestRow {
       timez = TypoOffsetTime.get.unsafeGetNonNullable(rs, i + 17),
       date = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 18),
       uuid = adventureworks.UUIDMeta.get.unsafeGetNonNullable(rs, i + 19),
-      boxes = TypoBox.arrayGet.unsafeGetNonNullable(rs, i + 20),
-      circlees = TypoCircle.arrayGet.unsafeGetNonNullable(rs, i + 21),
-      linees = TypoLine.arrayGet.unsafeGetNonNullable(rs, i + 22),
-      lseges = TypoLineSegment.arrayGet.unsafeGetNonNullable(rs, i + 23),
-      pathes = TypoPath.arrayGet.unsafeGetNonNullable(rs, i + 24),
-      pointes = TypoPoint.arrayGet.unsafeGetNonNullable(rs, i + 25),
-      polygones = TypoPolygon.arrayGet.unsafeGetNonNullable(rs, i + 26),
-      intervales = TypoInterval.arrayGet.unsafeGetNonNullable(rs, i + 27),
-      moneyes = TypoMoney.arrayGet.unsafeGetNonNullable(rs, i + 28),
-      xmles = TypoXml.arrayGet.unsafeGetNonNullable(rs, i + 29),
-      jsones = TypoJson.arrayGet.unsafeGetNonNullable(rs, i + 30),
-      jsonbes = TypoJsonb.arrayGet.unsafeGetNonNullable(rs, i + 31),
-      hstores = TypoHStore.arrayGet.unsafeGetNonNullable(rs, i + 32),
-      inets = TypoInet.arrayGet.unsafeGetNonNullable(rs, i + 33),
-      timestamps = TypoLocalDateTime.arrayGet.unsafeGetNonNullable(rs, i + 34),
-      timestampzs = TypoOffsetDateTime.arrayGet.unsafeGetNonNullable(rs, i + 35),
-      times = TypoLocalTime.arrayGet.unsafeGetNonNullable(rs, i + 36),
-      timezs = TypoOffsetTime.arrayGet.unsafeGetNonNullable(rs, i + 37),
-      dates = TypoLocalDate.arrayGet.unsafeGetNonNullable(rs, i + 38),
-      uuids = adventureworks.UUIDArrayMeta.get.unsafeGetNonNullable(rs, i + 39)
+      numeric = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 20),
+      boxes = TypoBox.arrayGet.unsafeGetNonNullable(rs, i + 21),
+      circlees = TypoCircle.arrayGet.unsafeGetNonNullable(rs, i + 22),
+      linees = TypoLine.arrayGet.unsafeGetNonNullable(rs, i + 23),
+      lseges = TypoLineSegment.arrayGet.unsafeGetNonNullable(rs, i + 24),
+      pathes = TypoPath.arrayGet.unsafeGetNonNullable(rs, i + 25),
+      pointes = TypoPoint.arrayGet.unsafeGetNonNullable(rs, i + 26),
+      polygones = TypoPolygon.arrayGet.unsafeGetNonNullable(rs, i + 27),
+      intervales = TypoInterval.arrayGet.unsafeGetNonNullable(rs, i + 28),
+      moneyes = TypoMoney.arrayGet.unsafeGetNonNullable(rs, i + 29),
+      xmles = TypoXml.arrayGet.unsafeGetNonNullable(rs, i + 30),
+      jsones = TypoJson.arrayGet.unsafeGetNonNullable(rs, i + 31),
+      jsonbes = TypoJsonb.arrayGet.unsafeGetNonNullable(rs, i + 32),
+      hstores = TypoHStore.arrayGet.unsafeGetNonNullable(rs, i + 33),
+      inets = TypoInet.arrayGet.unsafeGetNonNullable(rs, i + 34),
+      timestamps = TypoLocalDateTime.arrayGet.unsafeGetNonNullable(rs, i + 35),
+      timestampzs = TypoOffsetDateTime.arrayGet.unsafeGetNonNullable(rs, i + 36),
+      times = TypoLocalTime.arrayGet.unsafeGetNonNullable(rs, i + 37),
+      timezs = TypoOffsetTime.arrayGet.unsafeGetNonNullable(rs, i + 38),
+      dates = TypoLocalDate.arrayGet.unsafeGetNonNullable(rs, i + 39),
+      uuids = adventureworks.UUIDArrayMeta.get.unsafeGetNonNullable(rs, i + 40),
+      numerics = adventureworks.BigDecimalMeta.get.unsafeGetNonNullable(rs, i + 41)
     )
   )
 }

@@ -32,6 +32,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         timez = TypoOffsetTime.now,
         date = TypoLocalDate.now,
         uuid = UUID.randomUUID(),
+        numeric = BigDecimal("3.14159"),
         boxes = Array(TypoBox(3.0, 4.0, 1.0, 2.0)),
         circlees = Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0)),
         linees = Array(TypoLine(3.0, 4.5, 5.5)),
@@ -51,7 +52,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         times = Array(TypoLocalTime.now),
         timezs = Array(TypoOffsetTime.now),
         dates = Array(TypoLocalDate.now),
-        uuids = Array(UUID.randomUUID())
+        uuids = Array(UUID.randomUUID()),
+        numerics = Array(BigDecimal("3.14159"))
       )
       val after = PgtestRepoImpl.insert(before)
 
@@ -75,6 +77,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.timez === before.timez)
       assert(after.date === before.date)
       assert(after.uuid === before.uuid)
+      assert(after.numeric === before.numeric)
       assert(after.boxes === before.boxes)
       assert(after.circlees === before.circlees)
       assert(after.linees === before.linees)
@@ -95,6 +98,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.timezs === before.timezs)
       assert(after.dates === before.dates)
       assert(after.uuids === before.uuids)
+      assert(after.numerics === before.numerics)
     }
   }
 
@@ -121,6 +125,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         timez = None,
         date = None,
         uuid = None,
+        numeric = None,
         boxes = None,
         circlees = None,
         linees = None,
@@ -140,7 +145,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         times = None,
         timezs = None,
         dates = None,
-        uuids = None
+        uuids = None,
+        numerics = None
       )
       val after = PgtestnullRepoImpl.insert(before)
       assert(after === before)
@@ -170,6 +176,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         timez = Some(TypoOffsetTime.now),
         date = Some(TypoLocalDate(LocalDate.now)),
         uuid = Some(UUID.randomUUID()),
+        numeric = Some(BigDecimal("3.14159")),
         boxes = Some(Array(TypoBox(3.0, 4.0, 1.0, 2.0))),
         circlees = Some(Array(TypoCircle(TypoPoint(1.0, 2.0), 3.0))),
         linees = Some(Array(TypoLine(3.0, 4.5, 5.5))),
@@ -189,7 +196,8 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         times = Some(Array(TypoLocalTime.now)),
         timezs = Some(Array(TypoOffsetTime.now)),
         dates = Some(Array(TypoLocalDate(LocalDate.now))),
-        uuids = Some(Array(UUID.randomUUID()))
+        uuids = Some(Array(UUID.randomUUID())),
+        numerics = Some(Array(BigDecimal("3.14159")))
       )
       val after = PgtestnullRepoImpl.insert(before)
       assert(after.box === before.box)
@@ -212,6 +220,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.timez === before.timez)
       assert(after.date === before.date)
       assert(after.uuid === before.uuid)
+      assert(after.numeric === before.numeric)
       assert(after.boxes.map(_.toList) === before.boxes.map(_.toList))
       assert(after.circlees.map(_.toList) === before.circlees.map(_.toList))
       assert(after.linees.map(_.toList) === before.linees.map(_.toList))
@@ -232,6 +241,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(after.timezs.map(_.toList) === before.timezs.map(_.toList))
       assert(after.dates.map(_.toList) === before.dates.map(_.toList))
       assert(after.uuids.map(_.toList) === before.uuids.map(_.toList))
+      assert(after.numerics.map(_.toList) === before.numerics.map(_.toList))
     }
   }
 }

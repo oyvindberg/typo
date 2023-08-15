@@ -36,10 +36,6 @@ object TypoCircle {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoCircle]] = new ParameterMetaData[Array[TypoCircle]] {
-    override def sqlType: String = "_circle"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoCircle]] = ToStatement[Array[TypoCircle]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("circle", v.map(v => new PGcircle(v.center.x, v.center.y, v.radius)))))
   implicit lazy val column: Column[TypoCircle] = Column.nonNull[TypoCircle]((v1: Any, _) =>
     v1 match {

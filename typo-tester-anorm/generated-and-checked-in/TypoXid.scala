@@ -31,10 +31,6 @@ object TypoXid {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoXid]] = new ParameterMetaData[Array[TypoXid]] {
-    override def sqlType: String = "_xid"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoXid]] = ToStatement[Array[TypoXid]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("xid", v.map(v => {
                                                                                                                    val obj = new PGobject
                                                                                                                    obj.setType("xid")

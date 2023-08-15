@@ -36,10 +36,6 @@ object TypoPoint {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPoint]] = new ParameterMetaData[Array[TypoPoint]] {
-    override def sqlType: String = "_point"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoPoint]] = ToStatement[Array[TypoPoint]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("point", v.map(v => new PGpoint(v.x, v.y)))))
   implicit lazy val column: Column[TypoPoint] = Column.nonNull[TypoPoint]((v1: Any, _) =>
     v1 match {

@@ -32,10 +32,6 @@ object TypoPolygon {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPolygon]] = new ParameterMetaData[Array[TypoPolygon]] {
-    override def sqlType: String = "_polygon"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoPolygon]] = ToStatement[Array[TypoPolygon]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("polygon", v.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))))
   implicit lazy val bijection: Bijection[TypoPolygon, List[TypoPoint]] = Bijection[TypoPolygon, List[TypoPoint]](_.points)(TypoPolygon.apply)
   implicit lazy val column: Column[TypoPolygon] = Column.nonNull[TypoPolygon]((v1: Any, _) =>

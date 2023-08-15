@@ -60,6 +60,7 @@ case class PgtestnullRow(
   timez: Option[TypoOffsetTime],
   date: Option[TypoLocalDate],
   uuid: Option[UUID],
+  numeric: Option[BigDecimal],
   boxes: Option[Array[TypoBox]],
   circlees: Option[Array[TypoCircle]],
   linees: Option[Array[TypoLine]],
@@ -79,7 +80,8 @@ case class PgtestnullRow(
   times: Option[Array[TypoLocalTime]],
   timezs: Option[Array[TypoOffsetTime]],
   dates: Option[Array[TypoLocalDate]],
-  uuids: Option[Array[UUID]]
+  uuids: Option[Array[UUID]],
+  numerics: Option[Array[BigDecimal]]
 )
 
 object PgtestnullRow {
@@ -106,6 +108,7 @@ object PgtestnullRow {
           timez = json.\("timez").toOption.map(_.as(TypoOffsetTime.reads)),
           date = json.\("date").toOption.map(_.as(TypoLocalDate.reads)),
           uuid = json.\("uuid").toOption.map(_.as(Reads.uuidReads)),
+          numeric = json.\("numeric").toOption.map(_.as(Reads.bigDecReads)),
           boxes = json.\("boxes").toOption.map(_.as(Reads.ArrayReads[TypoBox](TypoBox.reads, implicitly))),
           circlees = json.\("circlees").toOption.map(_.as(Reads.ArrayReads[TypoCircle](TypoCircle.reads, implicitly))),
           linees = json.\("linees").toOption.map(_.as(Reads.ArrayReads[TypoLine](TypoLine.reads, implicitly))),
@@ -125,7 +128,8 @@ object PgtestnullRow {
           times = json.\("times").toOption.map(_.as(Reads.ArrayReads[TypoLocalTime](TypoLocalTime.reads, implicitly))),
           timezs = json.\("timezs").toOption.map(_.as(Reads.ArrayReads[TypoOffsetTime](TypoOffsetTime.reads, implicitly))),
           dates = json.\("dates").toOption.map(_.as(Reads.ArrayReads[TypoLocalDate](TypoLocalDate.reads, implicitly))),
-          uuids = json.\("uuids").toOption.map(_.as(Reads.ArrayReads[UUID](Reads.uuidReads, implicitly)))
+          uuids = json.\("uuids").toOption.map(_.as(Reads.ArrayReads[UUID](Reads.uuidReads, implicitly))),
+          numerics = json.\("numerics").toOption.map(_.as(Reads.ArrayReads[BigDecimal](Reads.bigDecReads, implicitly)))
         )
       )
     ),
@@ -153,26 +157,28 @@ object PgtestnullRow {
         timez = row(idx + 17)(Column.columnToOption(TypoOffsetTime.column)),
         date = row(idx + 18)(Column.columnToOption(TypoLocalDate.column)),
         uuid = row(idx + 19)(Column.columnToOption(Column.columnToUUID)),
-        boxes = row(idx + 20)(Column.columnToOption(TypoBox.arrayColumn)),
-        circlees = row(idx + 21)(Column.columnToOption(TypoCircle.arrayColumn)),
-        linees = row(idx + 22)(Column.columnToOption(TypoLine.arrayColumn)),
-        lseges = row(idx + 23)(Column.columnToOption(TypoLineSegment.arrayColumn)),
-        pathes = row(idx + 24)(Column.columnToOption(TypoPath.arrayColumn)),
-        pointes = row(idx + 25)(Column.columnToOption(TypoPoint.arrayColumn)),
-        polygones = row(idx + 26)(Column.columnToOption(TypoPolygon.arrayColumn)),
-        intervales = row(idx + 27)(Column.columnToOption(TypoInterval.arrayColumn)),
-        moneyes = row(idx + 28)(Column.columnToOption(TypoMoney.arrayColumn)),
-        xmles = row(idx + 29)(Column.columnToOption(TypoXml.arrayColumn)),
-        jsones = row(idx + 30)(Column.columnToOption(TypoJson.arrayColumn)),
-        jsonbes = row(idx + 31)(Column.columnToOption(TypoJsonb.arrayColumn)),
-        hstores = row(idx + 32)(Column.columnToOption(TypoHStore.arrayColumn)),
-        inets = row(idx + 33)(Column.columnToOption(TypoInet.arrayColumn)),
-        timestamps = row(idx + 34)(Column.columnToOption(TypoLocalDateTime.arrayColumn)),
-        timestampzs = row(idx + 35)(Column.columnToOption(TypoOffsetDateTime.arrayColumn)),
-        times = row(idx + 36)(Column.columnToOption(TypoLocalTime.arrayColumn)),
-        timezs = row(idx + 37)(Column.columnToOption(TypoOffsetTime.arrayColumn)),
-        dates = row(idx + 38)(Column.columnToOption(TypoLocalDate.arrayColumn)),
-        uuids = row(idx + 39)(Column.columnToOption(Column.columnToArray[UUID](Column.columnToUUID, implicitly)))
+        numeric = row(idx + 20)(Column.columnToOption(Column.columnToScalaBigDecimal)),
+        boxes = row(idx + 21)(Column.columnToOption(TypoBox.arrayColumn)),
+        circlees = row(idx + 22)(Column.columnToOption(TypoCircle.arrayColumn)),
+        linees = row(idx + 23)(Column.columnToOption(TypoLine.arrayColumn)),
+        lseges = row(idx + 24)(Column.columnToOption(TypoLineSegment.arrayColumn)),
+        pathes = row(idx + 25)(Column.columnToOption(TypoPath.arrayColumn)),
+        pointes = row(idx + 26)(Column.columnToOption(TypoPoint.arrayColumn)),
+        polygones = row(idx + 27)(Column.columnToOption(TypoPolygon.arrayColumn)),
+        intervales = row(idx + 28)(Column.columnToOption(TypoInterval.arrayColumn)),
+        moneyes = row(idx + 29)(Column.columnToOption(TypoMoney.arrayColumn)),
+        xmles = row(idx + 30)(Column.columnToOption(TypoXml.arrayColumn)),
+        jsones = row(idx + 31)(Column.columnToOption(TypoJson.arrayColumn)),
+        jsonbes = row(idx + 32)(Column.columnToOption(TypoJsonb.arrayColumn)),
+        hstores = row(idx + 33)(Column.columnToOption(TypoHStore.arrayColumn)),
+        inets = row(idx + 34)(Column.columnToOption(TypoInet.arrayColumn)),
+        timestamps = row(idx + 35)(Column.columnToOption(TypoLocalDateTime.arrayColumn)),
+        timestampzs = row(idx + 36)(Column.columnToOption(TypoOffsetDateTime.arrayColumn)),
+        times = row(idx + 37)(Column.columnToOption(TypoLocalTime.arrayColumn)),
+        timezs = row(idx + 38)(Column.columnToOption(TypoOffsetTime.arrayColumn)),
+        dates = row(idx + 39)(Column.columnToOption(TypoLocalDate.arrayColumn)),
+        uuids = row(idx + 40)(Column.columnToOption(Column.columnToArray[UUID](Column.columnToUUID, implicitly))),
+        numerics = row(idx + 41)(Column.columnToOption(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly)))
       )
     )
   }
@@ -198,6 +204,7 @@ object PgtestnullRow {
       "timez" -> Writes.OptionWrites(TypoOffsetTime.writes).writes(o.timez),
       "date" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.date),
       "uuid" -> Writes.OptionWrites(Writes.UuidWrites).writes(o.uuid),
+      "numeric" -> Writes.OptionWrites(Writes.BigDecimalWrites).writes(o.numeric),
       "boxes" -> Writes.OptionWrites(Writes.arrayWrites[TypoBox](implicitly, TypoBox.writes)).writes(o.boxes),
       "circlees" -> Writes.OptionWrites(Writes.arrayWrites[TypoCircle](implicitly, TypoCircle.writes)).writes(o.circlees),
       "linees" -> Writes.OptionWrites(Writes.arrayWrites[TypoLine](implicitly, TypoLine.writes)).writes(o.linees),
@@ -217,7 +224,8 @@ object PgtestnullRow {
       "times" -> Writes.OptionWrites(Writes.arrayWrites[TypoLocalTime](implicitly, TypoLocalTime.writes)).writes(o.times),
       "timezs" -> Writes.OptionWrites(Writes.arrayWrites[TypoOffsetTime](implicitly, TypoOffsetTime.writes)).writes(o.timezs),
       "dates" -> Writes.OptionWrites(Writes.arrayWrites[TypoLocalDate](implicitly, TypoLocalDate.writes)).writes(o.dates),
-      "uuids" -> Writes.OptionWrites(Writes.arrayWrites[UUID](implicitly, Writes.UuidWrites)).writes(o.uuids)
+      "uuids" -> Writes.OptionWrites(Writes.arrayWrites[UUID](implicitly, Writes.UuidWrites)).writes(o.uuids),
+      "numerics" -> Writes.OptionWrites(Writes.arrayWrites[BigDecimal](implicitly, Writes.BigDecimalWrites)).writes(o.numerics)
     ))
   )
 }

@@ -50,6 +50,7 @@ trait PgtestnullFields[Row] {
   val timez: OptField[TypoOffsetTime, Row]
   val date: OptField[TypoLocalDate, Row]
   val uuid: OptField[UUID, Row]
+  val numeric: OptField[BigDecimal, Row]
   val boxes: OptField[Array[TypoBox], Row]
   val circlees: OptField[Array[TypoCircle], Row]
   val linees: OptField[Array[TypoLine], Row]
@@ -70,6 +71,7 @@ trait PgtestnullFields[Row] {
   val timezs: OptField[Array[TypoOffsetTime], Row]
   val dates: OptField[Array[TypoLocalDate], Row]
   val uuids: OptField[Array[UUID], Row]
+  val numerics: OptField[Array[BigDecimal], Row]
 }
 object PgtestnullFields extends PgtestnullStructure[PgtestnullRow](None, identity, (_, x) => x)
 

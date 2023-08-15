@@ -31,10 +31,6 @@ object TypoPgNodeTree {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPgNodeTree]] = new ParameterMetaData[Array[TypoPgNodeTree]] {
-    override def sqlType: String = "_pg_node_tree"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoPgNodeTree]] = ToStatement[Array[TypoPgNodeTree]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("pg_node_tree", v.map(v => {
                                                                                                                                    val obj = new PGobject
                                                                                                                                    obj.setType("pg_node_tree")

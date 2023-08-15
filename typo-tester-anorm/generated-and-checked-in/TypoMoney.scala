@@ -30,10 +30,6 @@ object TypoMoney {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoMoney]] = new ParameterMetaData[Array[TypoMoney]] {
-    override def sqlType: String = "_money"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoMoney]] = ToStatement[Array[TypoMoney]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("money", v.map(v => v.value.bigDecimal))))
   implicit lazy val bijection: Bijection[TypoMoney, BigDecimal] = Bijection[TypoMoney, BigDecimal](_.value)(TypoMoney.apply)
   implicit lazy val column: Column[TypoMoney] = Column.nonNull[TypoMoney]((v1: Any, _) =>

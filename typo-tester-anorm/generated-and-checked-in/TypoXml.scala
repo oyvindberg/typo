@@ -32,10 +32,6 @@ object TypoXml {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoXml]] = new ParameterMetaData[Array[TypoXml]] {
-    override def sqlType: String = "_xml"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoXml]] = ToStatement[Array[TypoXml]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("xml", v.map(v => {
                                                                                                                    val obj = new PGobject
                                                                                                                    obj.setType("xml")

@@ -39,10 +39,6 @@ object TypoLocalDateTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoLocalDateTime]] = new ParameterMetaData[Array[TypoLocalDateTime]] {
-    override def sqlType: String = "_timestamp"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoLocalDateTime]] = ToStatement[Array[TypoLocalDateTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("timestamp", v.map(v => v.value.toString))))
   implicit lazy val bijection: Bijection[TypoLocalDateTime, LocalDateTime] = Bijection[TypoLocalDateTime, LocalDateTime](_.value)(TypoLocalDateTime.apply)
   implicit lazy val column: Column[TypoLocalDateTime] = Column.nonNull[TypoLocalDateTime]((v1: Any, _) =>

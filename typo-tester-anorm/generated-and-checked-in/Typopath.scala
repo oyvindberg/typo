@@ -37,10 +37,6 @@ object TypoPath {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoPath]] = new ParameterMetaData[Array[TypoPath]] {
-    override def sqlType: String = "_path"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoPath]] = ToStatement[Array[TypoPath]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("path", v.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))))
   implicit lazy val column: Column[TypoPath] = Column.nonNull[TypoPath]((v1: Any, _) =>
     v1 match {

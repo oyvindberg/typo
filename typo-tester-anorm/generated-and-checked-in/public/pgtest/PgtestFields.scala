@@ -50,6 +50,7 @@ trait PgtestFields[Row] {
   val timez: Field[TypoOffsetTime, Row]
   val date: Field[TypoLocalDate, Row]
   val uuid: Field[UUID, Row]
+  val numeric: Field[BigDecimal, Row]
   val boxes: Field[Array[TypoBox], Row]
   val circlees: Field[Array[TypoCircle], Row]
   val linees: Field[Array[TypoLine], Row]
@@ -70,6 +71,7 @@ trait PgtestFields[Row] {
   val timezs: Field[Array[TypoOffsetTime], Row]
   val dates: Field[Array[TypoLocalDate], Row]
   val uuids: Field[Array[UUID], Row]
+  val numerics: Field[Array[BigDecimal], Row]
 }
 object PgtestFields extends PgtestStructure[PgtestRow](None, identity, (_, x) => x)
 

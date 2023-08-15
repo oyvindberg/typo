@@ -31,10 +31,6 @@ object TypoInt2Vector {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoInt2Vector]] = new ParameterMetaData[Array[TypoInt2Vector]] {
-    override def sqlType: String = "_int2vector"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoInt2Vector]] = ToStatement[Array[TypoInt2Vector]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("int2vector", v.map(v => {
                                                                                                                                  val obj = new PGobject
                                                                                                                                  obj.setType("int2vector")

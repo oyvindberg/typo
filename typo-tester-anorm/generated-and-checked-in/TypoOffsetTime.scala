@@ -39,10 +39,6 @@ object TypoOffsetTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoOffsetTime]] = new ParameterMetaData[Array[TypoOffsetTime]] {
-    override def sqlType: String = "_timetz"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoOffsetTime]] = ToStatement[Array[TypoOffsetTime]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("timetz", v.map(v => v.value.toString))))
   implicit lazy val bijection: Bijection[TypoOffsetTime, OffsetTime] = Bijection[TypoOffsetTime, OffsetTime](_.value)(TypoOffsetTime.apply)
   implicit lazy val column: Column[TypoOffsetTime] = Column.nonNull[TypoOffsetTime]((v1: Any, _) =>

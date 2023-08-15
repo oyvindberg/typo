@@ -35,10 +35,6 @@ object TypoHStore {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoHStore]] = new ParameterMetaData[Array[TypoHStore]] {
-    override def sqlType: String = "_hstore"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoHStore]] = ToStatement[Array[TypoHStore]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("hstore", v.map(v => {
                                                                                                                          val b = new HashMap[String, String]
                                                                                                                          v.value.foreach { case (k, v) => b.put(k, v)}

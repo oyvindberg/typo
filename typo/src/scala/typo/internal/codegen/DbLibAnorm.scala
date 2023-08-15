@@ -24,7 +24,6 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     sc.StringInterpolate(SqlStringInterpolation, sc.Ident("SQL"), content)
 
   val arrayColumnName = sc.Ident("arrayColumn")
-  val arrayParameterMetaDataName = sc.Ident("arrayParameterMetaData")
   val arrayToStatementName: sc.Ident = sc.Ident("arrayToStatement")
   val columnName: sc.Ident = sc.Ident("column")
   val parameterMetadataName: sc.Ident = sc.Ident("parameterMetadata")
@@ -545,15 +544,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
     )
   override val missingInstances: List[sc.ClassMember] = {
     val arrayInstances = List[(sc.Type.Qualified, sc.StrLit)](
-      (sc.Type.String, sc.StrLit("varchar")),
       (sc.Type.Float, sc.StrLit("float4")),
       (sc.Type.Short, sc.StrLit("int2")),
       (sc.Type.Int, sc.StrLit("int4")),
       (sc.Type.Long, sc.StrLit("int8")),
       (sc.Type.Boolean, sc.StrLit("bool")),
-      (sc.Type.Double, sc.StrLit("float8")),
-      (sc.Type.UUID, sc.StrLit("uuid")),
-      (sc.Type.BigDecimal, sc.StrLit("decimal"))
+      (sc.Type.Double, sc.StrLit("float8"))
     ).flatMap { case (tpe, elemType) =>
       val arrayType = sc.Type.Array.of(tpe)
       val boxedType = sc.Type.boxedType(tpe).getOrElse(sc.Type.AnyRef)
@@ -564,21 +560,33 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           Nil,
           ToStatement.of(arrayType),
           code"${ToStatement.of(arrayType)}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $boxedType))))"
-        ),
-        sc.Given(
-          Nil,
-          tpe.value.name.appended("ArrayParameterMetaData"),
-          Nil,
-          ParameterMetaData.of(arrayType),
-          code"""|new ${ParameterMetaData.of(arrayType)} {
-                 |  override def sqlType: ${sc.Type.String} = ${elemType.prefixed("_")}
-                 |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
-                 |}""".stripMargin
         )
       )
     }
+    val bigDecimalArrayToStatement =
+      sc.Given(
+        Nil,
+        sc.Ident("BigDecimalArrayToStatement"),
+        Nil,
+        ToStatement.of(sc.Type.Array.of(sc.Type.BigDecimal)),
+        code"${ToStatement.of(sc.Type.Array.of(sc.Type.BigDecimal))}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf(${sc.StrLit("numeric")}, v.map(v => v.bigDecimal))))"
+      )
 
-    arrayInstances
+    val arrayParameterMetaData = {
+      val T = sc.Type.Abstract(sc.Ident("T"))
+      sc.Given(
+        List(T),
+        sc.Ident("arrayParameterMetaData"),
+        List(sc.Param(T.value, ParameterMetaData.of(T), None)),
+        ParameterMetaData.of(sc.Type.Array.of(T)),
+        code"""|new ${ParameterMetaData.of(sc.Type.Array.of(T))} {
+               |  override def sqlType: ${sc.Type.String} = ${sc.StrLit("_")} + $T.sqlType
+               |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
+               |}""".stripMargin
+      )
+    }
+
+    arrayInstances ++ List(arrayParameterMetaData, bigDecimalArrayToStatement)
   }
 
   val missingInstancesByType: Map[sc.Type, sc.QIdent] =
@@ -652,16 +660,6 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
           Nil,
           ToStatement.of(sc.Type.Array.of(tpe)),
           code"${ToStatement.of(sc.Type.Array.of(tpe))}((s, index, v) => s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)}))))"
-        ),
-        sc.Given(
-          Nil,
-          arrayParameterMetaDataName,
-          Nil,
-          ParameterMetaData.of(sc.Type.Array.of(tpe)),
-          code"""|new ${ParameterMetaData.of(sc.Type.Array.of(tpe))} {
-                 |  override def sqlType: ${sc.Type.String} = ${sc.StrLit("_" + ct.sqlType)}
-                 |  override def jdbcType: ${sc.Type.Int} = ${sc.Type.Types}.ARRAY
-                 |}""".stripMargin
         ),
         sc.Given(
           Nil,

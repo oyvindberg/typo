@@ -55,6 +55,7 @@ class PgtestnullStructure[Row](val prefix: Option[String], val extract: Row => P
   override val timez = new OptField[TypoOffsetTime, Row](prefix, "timez", Some("text"), Some("timetz"))(x => extract(x).timez, (row, value) => merge(row, extract(row).copy(timez = value)))
   override val date = new OptField[TypoLocalDate, Row](prefix, "date", Some("text"), Some("date"))(x => extract(x).date, (row, value) => merge(row, extract(row).copy(date = value)))
   override val uuid = new OptField[UUID, Row](prefix, "uuid", None, Some("uuid"))(x => extract(x).uuid, (row, value) => merge(row, extract(row).copy(uuid = value)))
+  override val numeric = new OptField[BigDecimal, Row](prefix, "numeric", None, Some("numeric"))(x => extract(x).numeric, (row, value) => merge(row, extract(row).copy(numeric = value)))
   override val boxes = new OptField[Array[TypoBox], Row](prefix, "boxes", None, Some("_box"))(x => extract(x).boxes, (row, value) => merge(row, extract(row).copy(boxes = value)))
   override val circlees = new OptField[Array[TypoCircle], Row](prefix, "circlees", None, Some("_circle"))(x => extract(x).circlees, (row, value) => merge(row, extract(row).copy(circlees = value)))
   override val linees = new OptField[Array[TypoLine], Row](prefix, "linees", None, Some("_line"))(x => extract(x).linees, (row, value) => merge(row, extract(row).copy(linees = value)))
@@ -75,9 +76,10 @@ class PgtestnullStructure[Row](val prefix: Option[String], val extract: Row => P
   override val timezs = new OptField[Array[TypoOffsetTime], Row](prefix, "timezs", Some("text[]"), Some("_timetz"))(x => extract(x).timezs, (row, value) => merge(row, extract(row).copy(timezs = value)))
   override val dates = new OptField[Array[TypoLocalDate], Row](prefix, "dates", Some("text[]"), Some("_date"))(x => extract(x).dates, (row, value) => merge(row, extract(row).copy(dates = value)))
   override val uuids = new OptField[Array[UUID], Row](prefix, "uuids", None, Some("_uuid"))(x => extract(x).uuids, (row, value) => merge(row, extract(row).copy(uuids = value)))
+  override val numerics = new OptField[Array[BigDecimal], Row](prefix, "numerics", None, Some("_numeric"))(x => extract(x).numerics, (row, value) => merge(row, extract(row).copy(numerics = value)))
 
   override val columns: List[FieldLikeNoHkt[?, Row]] =
-    List[FieldLikeNoHkt[?, Row]](box, circle, line, lseg, path, point, polygon, interval, money, xml, json, jsonb, hstore, inet, timestamp, timestampz, time, timez, date, uuid, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets, timestamps, timestampzs, times, timezs, dates, uuids)
+    List[FieldLikeNoHkt[?, Row]](box, circle, line, lseg, path, point, polygon, interval, money, xml, json, jsonb, hstore, inet, timestamp, timestampz, time, timez, date, uuid, numeric, boxes, circlees, linees, lseges, pathes, pointes, polygones, intervales, moneyes, xmles, jsones, jsonbes, hstores, inets, timestamps, timestampzs, times, timezs, dates, uuids, numerics)
 
   override def copy[NewRow](prefix: Option[String], extract: NewRow => PgtestnullRow, merge: (NewRow, PgtestnullRow) => NewRow): PgtestnullStructure[NewRow] =
     new PgtestnullStructure(prefix, extract, merge)

@@ -31,10 +31,6 @@ object TypoJson {
       case other => Left(TypeDoesNotMatch(s"Expected instance of org.postgresql.jdbc.PgArray, got ${other.getClass.getName}"))
     }
   )
-  implicit lazy val arrayParameterMetaData: ParameterMetaData[Array[TypoJson]] = new ParameterMetaData[Array[TypoJson]] {
-    override def sqlType: String = "_json"
-    override def jdbcType: Int = Types.ARRAY
-  }
   implicit lazy val arrayToStatement: ToStatement[Array[TypoJson]] = ToStatement[Array[TypoJson]]((s, index, v) => s.setArray(index, s.getConnection.createArrayOf("json", v.map(v => {
                                                                                                                      val obj = new PGobject
                                                                                                                      obj.setType("json")
