@@ -36,8 +36,9 @@ object GeneratedAdventureWorks {
               pkg = "adventureworks",
               List(jsonLib),
               Some(dbLib),
-              enableTestInserts = true,
-              typeOverride = typo.TypeOverride.sqlFileParam { case (_, "businessentityid") => "adventureworks.person.businessentity.BusinessentityId" }
+              typeOverride = typo.TypeOverride.sqlFileParam { case (_, "businessentityid") => "adventureworks.person.businessentity.BusinessentityId" },
+              enableDsl = true,
+              enableTestInserts = true
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
