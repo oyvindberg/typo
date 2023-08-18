@@ -17,6 +17,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
   val ParameterMetaData = sc.Type.Qualified("anorm.ParameterMetaData")
   val SQL = sc.Type.Qualified("anorm.SQL")
   val TypeDoesNotMatch = sc.Type.Qualified("anorm.TypeDoesNotMatch")
+  val SimpleSql = sc.Type.Qualified("anorm.SimpleSql")
+  val Row = sc.Type.Qualified("anorm.Row")
 
   def rowParserFor(rowType: sc.Type) = code"$rowType.$rowParserName(1)"
 
@@ -186,6 +188,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |where $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(" AND ")}
                  |""".stripMargin
         }
+        // the weird block and wildcard import is to avoid warnings in scala 2 and 3, and to get the implicit `on` in scala 3
         code"""${fieldValueOrIdsParam.name} match {
               |  case Nil => selectAll
               |  case nonEmpty =>
@@ -194,10 +197,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |    }
               |    val quote = '"'.toString
               |    val q = $sql
-              |    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-              |    import anorm._
-              |    SQL(q)
-              |      .on(namedParams: _*)
+              |    $SimpleSql($SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, $RowParser($Success(_)))
               |      .as(${rowParserFor(rowType)}.*)
               |}
               |""".stripMargin
@@ -213,10 +213,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val idCases: NonEmptyList[sc.Code] =
           id match {
             case unary: IdComputed.Unary =>
-              NonEmptyList(code"$NamedParameter(${sc.StrLit(unary.col.dbName.value)}, $ParameterValue.from(${id.paramName}))")
+              NonEmptyList(code"(${sc.StrLit(unary.col.dbName.value)}, $ParameterValue.from(${id.paramName}))")
             case IdComputed.Composite(cols, _, paramName) =>
               cols.map { col =>
-                code"$NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue.from($paramName.${col.name}))"
+                code"(${sc.StrLit(col.dbName.value)}, $ParameterValue.from($paramName.${col.name}))"
               }
           }
 
@@ -226,6 +226,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                 |where $where
                 |""".stripMargin
         }
+
+        // the weird block and wildcard import is to avoid warnings in scala 2 and 3, and to get the implicit `on` in scala 3
         code"""${varargs.name} match {
               |  case Nil => false
               |  case nonEmpty =>
@@ -234,11 +236,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
               |    }
               |    val quote = '"'.toString
               |    val q = $sql
-              |    // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-              |    import anorm._
-              |    SQL(q)
-              |      .on(namedParams: _*)
-              |      .on(${idCases.mkCode(", ")})
+              |    $SimpleSql($SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap ++ ${sc.Type.List}(${idCases.mkCode(", ")}), $RowParser($Success(_)))
               |      .executeUpdate() > 0
               |}
               |""".stripMargin
@@ -318,6 +316,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                  |""".stripMargin
         }
 
+        // the weird block and wildcard import is to avoid warnings in scala 2 and 3, and to get the implicit `on` in scala 3
         code"""|val namedParameters = List(
                |  ${(cases0 ++ cases1.toList).mkCode(",\n")}
                |).flatten
@@ -327,10 +326,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |    .executeInsert(${rowParserFor(rowType)}.single)
                |} else {
                |  val q = $sql
-               |  // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-               |  import anorm._
-               |  SQL(q)
-               |    .on(namedParameters.map(_._1) :_*)
+               |  $SimpleSql($SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, $RowParser($Success(_)))
                |    .executeInsert(${rowParserFor(rowType)}.single)
                |}
                |"""

@@ -11,7 +11,11 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SQL
+import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -64,10 +68,7 @@ object VendorRepoImpl extends VendorRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning businessentityid, accountnumber, "name", creditrating, preferredvendorstatus, activeflag, purchasingwebserviceurl, modifieddate::text
                """
-      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-      import anorm._
-      SQL(q)
-        .on(namedParameters.map(_._1) :_*)
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
         .executeInsert(VendorRow.rowParser(1).single)
     }
     

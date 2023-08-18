@@ -10,7 +10,11 @@ package document
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SQL
+import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.Success
 import java.sql.Connection
 import java.util.UUID
 import typo.dsl.DeleteBuilder
@@ -75,10 +79,7 @@ object DocumentRepoImpl extends DocumentRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning title, "owner", folderflag, filename, fileextension, revision, changenumber, status, documentsummary, "document", rowguid, modifieddate::text, documentnode
                """
-      // this line is here to include an extension method which is only needed for scala 3. no import is emitted for `SQL` to avoid warning for scala 2
-      import anorm._
-      SQL(q)
-        .on(namedParameters.map(_._1) :_*)
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
         .executeInsert(DocumentRow.rowParser(1).single)
     }
     
