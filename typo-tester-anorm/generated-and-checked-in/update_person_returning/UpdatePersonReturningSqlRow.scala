@@ -6,6 +6,7 @@
 package adventureworks
 package update_person_returning
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success

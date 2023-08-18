@@ -7,6 +7,7 @@ package adventureworks
 package information_schema
 package character_sets
 
+import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait CharacterSetsViewFields[Row] {

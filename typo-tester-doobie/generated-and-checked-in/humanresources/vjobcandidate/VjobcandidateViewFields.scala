@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package vjobcandidate
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.OptField

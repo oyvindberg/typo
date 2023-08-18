@@ -7,6 +7,8 @@ package adventureworks
 package pe
 package p
 
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle

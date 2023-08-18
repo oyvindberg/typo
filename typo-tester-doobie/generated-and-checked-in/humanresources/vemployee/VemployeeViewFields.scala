@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package vemployee
 
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone

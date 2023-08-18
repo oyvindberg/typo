@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.TypoLocalDateTime
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField

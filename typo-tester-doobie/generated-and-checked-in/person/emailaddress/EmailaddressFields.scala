@@ -7,6 +7,7 @@ package adventureworks
 package person
 package emailaddress
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field

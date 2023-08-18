@@ -7,6 +7,7 @@ package adventureworks
 package information_schema
 package triggered_update_columns
 
+import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait TriggeredUpdateColumnsViewFields[Row] {

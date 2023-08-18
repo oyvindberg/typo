@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package so
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.enumerated.Nullability
 import doobie.util.Read

@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderdetail
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId

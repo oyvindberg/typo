@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderheadersalesreason
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
 import doobie.enumerated.Nullability

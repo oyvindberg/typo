@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesreason
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success

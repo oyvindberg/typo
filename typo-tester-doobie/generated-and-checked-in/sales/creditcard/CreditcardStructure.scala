@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package creditcard
 
+import adventureworks.TypoLocalDateTime
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

@@ -7,6 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_stat_activity
 
+import adventureworks.TypoInet
+import adventureworks.TypoOffsetDateTime
+import adventureworks.TypoXid
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatActivityViewFields[Row] {

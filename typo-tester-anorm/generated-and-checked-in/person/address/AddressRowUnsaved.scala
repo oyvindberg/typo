@@ -7,6 +7,8 @@ package adventureworks
 package person
 package address
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import java.util.UUID
 import play.api.libs.json.JsObject

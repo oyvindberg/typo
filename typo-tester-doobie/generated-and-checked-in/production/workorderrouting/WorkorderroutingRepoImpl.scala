@@ -7,6 +7,8 @@ package adventureworks
 package production
 package workorderrouting
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
 import doobie.free.connection.ConnectionIO

@@ -6,6 +6,7 @@
 package adventureworks
 package person_detail
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.SqlStringInterpolation
 import java.sql.Connection

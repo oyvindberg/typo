@@ -7,6 +7,8 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue

@@ -7,6 +7,9 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue

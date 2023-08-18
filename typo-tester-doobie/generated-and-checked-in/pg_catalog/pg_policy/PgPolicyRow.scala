@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_policy
 
+import adventureworks.TypoPgNodeTree
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_largeobject_metadata
 
+import adventureworks.TypoAclItem
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField

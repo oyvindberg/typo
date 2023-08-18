@@ -7,6 +7,8 @@ package adventureworks
 package information_schema
 package check_constraints
 
+import adventureworks.information_schema.CharacterData
+import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

@@ -7,6 +7,8 @@ package adventureworks
 package person
 package address
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite

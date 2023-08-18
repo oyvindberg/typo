@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package tr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import adventureworks.sales.salestaxrate.SalestaxrateId

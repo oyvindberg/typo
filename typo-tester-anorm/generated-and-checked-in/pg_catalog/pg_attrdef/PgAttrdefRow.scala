@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
+import adventureworks.TypoPgNodeTree
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

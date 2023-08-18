@@ -7,6 +7,8 @@ package adventureworks
 package hr
 package e
 
+import adventureworks.TypoLocalDate
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.Column

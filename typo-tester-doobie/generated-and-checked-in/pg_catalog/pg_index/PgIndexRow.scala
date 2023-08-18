@@ -7,6 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_index
 
+import adventureworks.TypoInt2Vector
+import adventureworks.TypoOidVector
+import adventureworks.TypoPgNodeTree
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

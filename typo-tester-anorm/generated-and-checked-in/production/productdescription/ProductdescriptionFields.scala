@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productdescription
 
+import adventureworks.TypoLocalDateTime
 import java.util.UUID
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField

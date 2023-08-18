@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package shoppingcartitem
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
 import doobie.util.Read

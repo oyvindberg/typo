@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_trigger
 
+import adventureworks.TypoInt2Vector
+import adventureworks.TypoPgNodeTree
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

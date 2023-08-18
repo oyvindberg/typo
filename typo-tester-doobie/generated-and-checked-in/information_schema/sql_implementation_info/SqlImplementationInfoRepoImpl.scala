@@ -7,6 +7,8 @@ package adventureworks
 package information_schema
 package sql_implementation_info
 
+import adventureworks.information_schema.CardinalNumber
+import adventureworks.information_schema.CharacterData
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

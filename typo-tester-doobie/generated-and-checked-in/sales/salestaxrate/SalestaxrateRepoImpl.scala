@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package salestaxrate
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO

@@ -7,6 +7,7 @@ package adventureworks
 package pu
 package pod
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import typo.dsl.SqlExpr.OptField

@@ -7,6 +7,8 @@ package adventureworks
 package purchasing
 package shipmethod
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import java.util.UUID
 import play.api.libs.json.JsObject

@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package creditcard
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
 

@@ -7,6 +7,7 @@ package adventureworks
 package person
 package addresstype
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import java.util.UUID
 import typo.dsl.SqlExpr.Field

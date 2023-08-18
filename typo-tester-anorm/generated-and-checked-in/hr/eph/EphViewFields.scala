@@ -7,6 +7,7 @@ package adventureworks
 package hr
 package eph
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.OptField
 

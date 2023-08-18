@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package sp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag

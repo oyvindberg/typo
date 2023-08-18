@@ -7,6 +7,8 @@ package adventureworks
 package information_schema
 package sql_features
 
+import adventureworks.information_schema.CharacterData
+import adventureworks.information_schema.YesOrNo
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder

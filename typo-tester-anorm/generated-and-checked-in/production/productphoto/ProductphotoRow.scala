@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productphoto
 
+import adventureworks.TypoLocalDateTime
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

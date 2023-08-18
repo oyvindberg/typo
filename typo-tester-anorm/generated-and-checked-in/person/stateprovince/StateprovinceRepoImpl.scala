@@ -7,6 +7,8 @@ package adventureworks
 package person
 package stateprovince
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Flag
 import anorm.NamedParameter
 import anorm.ParameterValue

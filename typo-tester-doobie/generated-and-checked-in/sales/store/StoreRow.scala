@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package store
 
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability

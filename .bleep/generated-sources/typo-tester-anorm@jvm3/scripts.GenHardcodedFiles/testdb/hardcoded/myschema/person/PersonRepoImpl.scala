@@ -16,6 +16,9 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.Success
 import java.sql.Connection
+import testdb.hardcoded.Defaulted
+import testdb.hardcoded.myschema.Number
+import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder

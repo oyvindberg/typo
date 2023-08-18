@@ -7,6 +7,7 @@ package adventureworks
 package production
 package document
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import doobie.enumerated.Nullability

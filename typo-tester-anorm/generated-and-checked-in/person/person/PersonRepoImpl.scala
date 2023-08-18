@@ -7,6 +7,8 @@ package adventureworks
 package person
 package person
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.NameStyle
 import anorm.NamedParameter

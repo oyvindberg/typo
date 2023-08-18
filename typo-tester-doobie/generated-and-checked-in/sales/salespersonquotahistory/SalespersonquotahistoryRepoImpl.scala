@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package salespersonquotahistory
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite

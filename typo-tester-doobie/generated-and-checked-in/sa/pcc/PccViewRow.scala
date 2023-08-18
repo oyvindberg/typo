@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package pcc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
 import doobie.enumerated.Nullability

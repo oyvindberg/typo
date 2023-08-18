@@ -7,6 +7,9 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

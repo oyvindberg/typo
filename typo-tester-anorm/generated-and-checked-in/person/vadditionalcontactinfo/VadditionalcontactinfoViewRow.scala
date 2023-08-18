@@ -7,6 +7,8 @@ package adventureworks
 package person
 package vadditionalcontactinfo
 
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.Column

@@ -1,5 +1,6 @@
 package typo
 
+import org.postgresql.util.PSQLException
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 import typo.generated.custom.domains.DomainsSqlRepoImpl

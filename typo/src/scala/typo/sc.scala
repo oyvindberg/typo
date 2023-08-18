@@ -423,7 +423,6 @@ object sc {
   case class File(tpe: Type.Qualified, contents: Code, secondaryTypes: List[Type.Qualified]) {
     val name: Ident = tpe.value.name
     val pkg = QIdent(tpe.value.idents.dropRight(1))
-    val superPkgs: List[QIdent] = pkg.idents.indices.iterator.map(n => QIdent(pkg.idents.take(n + 1))).toList
   }
 
   /** Semi-structured generated code. We keep all `Tree`s as long as possible so we can write imports based on what is used

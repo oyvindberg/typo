@@ -7,6 +7,8 @@ package adventureworks
 package production
 package location
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder

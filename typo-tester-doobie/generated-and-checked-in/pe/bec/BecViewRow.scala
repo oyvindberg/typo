@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package bec
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
 import doobie.enumerated.Nullability

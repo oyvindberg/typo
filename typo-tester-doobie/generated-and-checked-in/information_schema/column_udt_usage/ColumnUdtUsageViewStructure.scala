@@ -7,6 +7,7 @@ package adventureworks
 package information_schema
 package column_udt_usage
 
+import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

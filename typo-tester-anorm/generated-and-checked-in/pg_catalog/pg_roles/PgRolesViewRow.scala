@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_roles
 
+import adventureworks.TypoOffsetDateTime
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

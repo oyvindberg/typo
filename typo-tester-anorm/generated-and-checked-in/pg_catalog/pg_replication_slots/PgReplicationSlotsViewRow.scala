@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_replication_slots
 
+import adventureworks.TypoXid
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

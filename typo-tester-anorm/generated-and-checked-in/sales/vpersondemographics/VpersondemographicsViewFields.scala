@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package vpersondemographics
 
+import adventureworks.TypoLocalDate
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.SqlExpr.OptField
 

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_roles
 
+import adventureworks.TypoOffsetDateTime
 import typo.dsl.SqlExpr.OptField
 
 trait PgRolesViewFields[Row] {

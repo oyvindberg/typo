@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package salesperson
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import io.circe.Decoder

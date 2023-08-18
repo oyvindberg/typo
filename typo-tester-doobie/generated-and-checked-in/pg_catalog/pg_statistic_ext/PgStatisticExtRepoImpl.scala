@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_statistic_ext
 
+import adventureworks.TypoInt2Vector
+import adventureworks.TypoPgNodeTree
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package pnt
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.OptField

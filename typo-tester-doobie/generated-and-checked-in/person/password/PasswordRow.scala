@@ -7,6 +7,7 @@ package adventureworks
 package person
 package password
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.util.Read

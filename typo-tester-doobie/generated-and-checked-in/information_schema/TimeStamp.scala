@@ -6,6 +6,7 @@
 package adventureworks
 package information_schema
 
+import adventureworks.TypoOffsetDateTime
 import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder

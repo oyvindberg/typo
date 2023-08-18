@@ -7,6 +7,9 @@ package adventureworks
 package production
 package productmodel
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import adventureworks.public.Name
 import java.util.UUID
 import play.api.libs.json.JsObject

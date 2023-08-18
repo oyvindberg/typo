@@ -7,6 +7,7 @@ package adventureworks
 package production
 package culture
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField

@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_attribute
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoAnyArray
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

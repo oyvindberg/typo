@@ -7,6 +7,10 @@ package adventureworks
 package information_schema
 package user_defined_types
 
+import adventureworks.information_schema.CardinalNumber
+import adventureworks.information_schema.CharacterData
+import adventureworks.information_schema.SqlIdentifier
+import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

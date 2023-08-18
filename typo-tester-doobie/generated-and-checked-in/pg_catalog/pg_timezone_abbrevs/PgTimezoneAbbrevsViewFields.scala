@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_timezone_abbrevs
 
+import adventureworks.TypoInterval
 import typo.dsl.SqlExpr.OptField
 
 trait PgTimezoneAbbrevsViewFields[Row] {

@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productreview
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field

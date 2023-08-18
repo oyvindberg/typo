@@ -7,6 +7,8 @@ package adventureworks
 package information_schema
 package foreign_data_wrapper_options
 
+import adventureworks.information_schema.CharacterData
+import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait ForeignDataWrapperOptionsViewFields[Row] {

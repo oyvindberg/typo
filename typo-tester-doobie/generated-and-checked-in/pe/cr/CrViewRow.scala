@@ -7,6 +7,7 @@ package adventureworks
 package pe
 package cr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability

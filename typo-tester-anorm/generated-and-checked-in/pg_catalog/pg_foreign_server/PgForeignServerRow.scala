@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_foreign_server
 
+import adventureworks.TypoAclItem
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

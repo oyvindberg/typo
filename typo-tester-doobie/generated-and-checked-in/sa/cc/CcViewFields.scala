@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package cc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.creditcard.CreditcardId
 import typo.dsl.SqlExpr.OptField
 

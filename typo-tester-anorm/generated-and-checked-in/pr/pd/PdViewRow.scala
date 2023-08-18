@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package pd
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productdescription.ProductdescriptionId
 import anorm.Column
 import anorm.RowParser

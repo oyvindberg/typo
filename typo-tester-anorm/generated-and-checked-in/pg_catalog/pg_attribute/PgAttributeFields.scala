@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_attribute
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoAnyArray
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField

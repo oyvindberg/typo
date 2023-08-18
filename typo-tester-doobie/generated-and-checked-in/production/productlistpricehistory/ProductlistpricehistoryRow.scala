@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productlistpricehistory
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
 import doobie.util.Read

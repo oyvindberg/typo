@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package creditcard
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

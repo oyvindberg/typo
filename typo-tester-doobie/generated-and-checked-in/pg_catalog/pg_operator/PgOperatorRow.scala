@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_operator
 
+import adventureworks.TypoRegproc
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

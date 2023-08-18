@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package creditcard
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_default_acl
 
+import adventureworks.TypoAclItem
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

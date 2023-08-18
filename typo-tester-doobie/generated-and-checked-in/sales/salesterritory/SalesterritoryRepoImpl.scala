@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package salesterritory
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO

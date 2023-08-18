@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package pmpdc
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId

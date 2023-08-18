@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package currencyrate
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite

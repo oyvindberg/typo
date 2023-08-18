@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package sohsr
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
 import typo.dsl.SqlExpr.OptField

@@ -7,6 +7,9 @@ package adventureworks
 package production
 package illustration
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoXml
 import io.circe.Decoder
 import io.circe.Encoder
 

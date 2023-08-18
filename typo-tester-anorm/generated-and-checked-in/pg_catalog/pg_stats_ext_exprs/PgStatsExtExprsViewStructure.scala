@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stats_ext_exprs
 
+import adventureworks.TypoAnyArray
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

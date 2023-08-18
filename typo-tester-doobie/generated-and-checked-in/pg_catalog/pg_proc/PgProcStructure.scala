@@ -7,6 +7,10 @@ package adventureworks
 package pg_catalog
 package pg_proc
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoOidVector
+import adventureworks.TypoPgNodeTree
+import adventureworks.TypoRegproc
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_shadow
 
+import adventureworks.TypoOffsetDateTime
 import typo.dsl.SqlExpr.OptField
 
 trait PgShadowViewFields[Row] {

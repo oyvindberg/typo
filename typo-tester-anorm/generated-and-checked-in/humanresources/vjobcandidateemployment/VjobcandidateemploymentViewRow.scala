@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package vjobcandidateemployment
 
+import adventureworks.TypoLocalDate
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import anorm.Column
 import anorm.RowParser

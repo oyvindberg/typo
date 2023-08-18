@@ -10,6 +10,7 @@ package person
 
 import io.circe.Decoder
 import io.circe.Encoder
+import testdb.hardcoded.Defaulted
 
 /** This class corresponds to a row in table `compositepk.person` which has not been persisted yet */
 case class PersonRowUnsaved(

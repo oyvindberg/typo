@@ -7,6 +7,8 @@ package adventureworks
 package humanresources
 package shift
 
+import adventureworks.TypoLocalDateTime
+import adventureworks.TypoLocalTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField

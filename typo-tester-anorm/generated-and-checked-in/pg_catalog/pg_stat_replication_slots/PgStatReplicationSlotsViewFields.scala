@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_replication_slots
 
+import adventureworks.TypoOffsetDateTime
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatReplicationSlotsViewFields[Row] {

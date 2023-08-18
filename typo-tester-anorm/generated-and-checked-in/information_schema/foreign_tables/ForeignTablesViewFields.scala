@@ -7,6 +7,7 @@ package adventureworks
 package information_schema
 package foreign_tables
 
+import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait ForeignTablesViewFields[Row] {

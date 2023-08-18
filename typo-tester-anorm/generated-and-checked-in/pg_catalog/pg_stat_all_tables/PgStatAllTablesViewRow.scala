@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_stat_all_tables
 
+import adventureworks.TypoOffsetDateTime
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

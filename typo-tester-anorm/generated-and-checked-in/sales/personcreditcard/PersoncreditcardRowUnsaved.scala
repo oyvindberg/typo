@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
 import play.api.libs.json.JsObject

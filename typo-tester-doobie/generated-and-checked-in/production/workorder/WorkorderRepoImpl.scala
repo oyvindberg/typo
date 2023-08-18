@@ -7,6 +7,8 @@ package adventureworks
 package production
 package workorder
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import doobie.free.connection.ConnectionIO

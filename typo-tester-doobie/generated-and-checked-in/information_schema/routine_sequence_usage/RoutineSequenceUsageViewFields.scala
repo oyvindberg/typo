@@ -7,6 +7,7 @@ package adventureworks
 package information_schema
 package routine_sequence_usage
 
+import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait RoutineSequenceUsageViewFields[Row] {

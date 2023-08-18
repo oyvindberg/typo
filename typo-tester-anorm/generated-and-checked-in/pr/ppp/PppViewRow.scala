@@ -7,6 +7,7 @@ package adventureworks
 package pr
 package ppp
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag

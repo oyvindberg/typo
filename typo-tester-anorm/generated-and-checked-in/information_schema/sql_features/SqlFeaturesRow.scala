@@ -7,6 +7,8 @@ package adventureworks
 package information_schema
 package sql_features
 
+import adventureworks.information_schema.CharacterData
+import adventureworks.information_schema.YesOrNo
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

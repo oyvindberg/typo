@@ -21,6 +21,7 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
+import typo.generated.TypoRegnamespace
 
 case class ViewColumnDependenciesSqlRow(
   /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"columnLabel":"view_schema","columnName":"view_schema","columnType":"Other","columnTypeName":"regnamespace","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */

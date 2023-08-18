@@ -7,6 +7,8 @@ package adventureworks
 package production
 package productsubcategory
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO

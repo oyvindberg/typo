@@ -7,6 +7,7 @@ package adventureworks
 package sa
 package spqh
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser

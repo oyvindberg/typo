@@ -7,6 +7,8 @@ package adventureworks
 package pg_catalog
 package pg_attribute
 
+import adventureworks.TypoAclItem
+import adventureworks.TypoAnyArray
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

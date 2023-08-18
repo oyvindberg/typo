@@ -21,6 +21,8 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
+import typo.generated.TypoOffsetDateTime
+import typo.generated.TypoRegtype
 
 case class PgPreparedStatementsViewRow(
   /** debug: {"table_catalog":"postgres","table_schema":"pg_catalog","table_name":"pg_prepared_statements","column_name":"name","ordinal_position":1,"is_nullable":"YES","data_type":"text","character_octet_length":1073741824,"udt_catalog":"postgres","udt_schema":"pg_catalog","udt_name":"text","dtd_identifier":"1","is_self_referencing":"NO","is_identity":"NO","identity_cycle":"NO","is_generated":"NEVER","is_updatable":"NO"} */

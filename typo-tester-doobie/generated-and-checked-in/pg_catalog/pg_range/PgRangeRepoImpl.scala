@@ -7,6 +7,7 @@ package adventureworks
 package pg_catalog
 package pg_range
 
+import adventureworks.TypoRegproc
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package salesorderheadersalesreason
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
 import doobie.free.connection.ConnectionIO

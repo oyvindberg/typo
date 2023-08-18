@@ -7,6 +7,7 @@ package adventureworks
 package information_schema
 package view_table_usage
 
+import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder

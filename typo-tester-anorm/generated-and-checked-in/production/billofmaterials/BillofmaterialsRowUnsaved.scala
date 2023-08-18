@@ -7,6 +7,8 @@ package adventureworks
 package production
 package billofmaterials
 
+import adventureworks.Defaulted
+import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import play.api.libs.json.JsObject

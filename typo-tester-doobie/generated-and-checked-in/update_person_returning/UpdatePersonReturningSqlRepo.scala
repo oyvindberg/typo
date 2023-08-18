@@ -6,6 +6,7 @@
 package adventureworks
 package update_person_returning
 
+import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import fs2.Stream
 

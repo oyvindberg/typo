@@ -7,6 +7,7 @@ package adventureworks
 package person
 package businessentityaddress
 
+import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId

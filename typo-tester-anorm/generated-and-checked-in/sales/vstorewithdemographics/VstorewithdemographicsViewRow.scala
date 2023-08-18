@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package vstorewithdemographics
 
+import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.Column

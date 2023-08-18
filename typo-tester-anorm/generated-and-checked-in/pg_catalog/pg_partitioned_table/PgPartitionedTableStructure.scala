@@ -7,6 +7,9 @@ package adventureworks
 package pg_catalog
 package pg_partitioned_table
 
+import adventureworks.TypoInt2Vector
+import adventureworks.TypoOidVector
+import adventureworks.TypoPgNodeTree
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

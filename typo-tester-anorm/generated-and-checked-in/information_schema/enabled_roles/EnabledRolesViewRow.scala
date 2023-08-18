@@ -7,6 +7,7 @@ package adventureworks
 package information_schema
 package enabled_roles
 
+import adventureworks.information_schema.SqlIdentifier
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
