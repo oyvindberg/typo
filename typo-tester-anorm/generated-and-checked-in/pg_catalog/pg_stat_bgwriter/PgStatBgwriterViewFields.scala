@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_stat_bgwriter
 
-import adventureworks.TypoOffsetDateTime
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatBgwriterViewFields[Row] {

@@ -7,8 +7,6 @@ package adventureworks
 package production
 package product
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId

@@ -107,6 +107,12 @@ templates:
   template-nocross:
     extends: template-common
     scala:
+      # strict: true doesn't work for scala 3.3 yet in newest bleep release
+      options: -Wunused:explicits -Wunused:implicits -Wunused:imports -Wunused:locals
+        -Wunused:params -Wunused:privates -Wvalue-discard -Xmax-inlines 64 -Ykind-projector
+        -deprecation -encoding utf8 -feature -language:experimental.macros -language:higherKinds
+        -language:implicitConversions -noindent -release:17 -source 3.0-migration
+        -unchecked
       version: 3.3.0
   template-kind-projector:
     scala:

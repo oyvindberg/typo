@@ -7,7 +7,6 @@ package adventureworks
 package production
 package culture
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success

@@ -7,7 +7,6 @@ package adventureworks
 package pu
 package sm
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import java.util.UUID

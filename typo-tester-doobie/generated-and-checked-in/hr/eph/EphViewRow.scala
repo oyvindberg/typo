@@ -7,7 +7,6 @@ package adventureworks
 package hr
 package eph
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.util.Read

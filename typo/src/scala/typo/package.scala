@@ -48,6 +48,7 @@ package object typo {
     )
     val customTypes = new CustomTypes(options.pkg)
     val genOrdering = new GenOrdering(customTypes, options.pkg)
+    val customTypeFiles = customTypes.All.map(CustomTypeFile(options, genOrdering))
     val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
     val enums = metaDb.enums.map(ComputedStringEnum(naming))
     val domains = metaDb.domains.map(ComputedDomain(naming, scalaTypeMapper))
@@ -63,7 +64,10 @@ package object typo {
     // note, these statements will force the evaluation of some of the lazy values
     val computedSqlFiles = metaDb.sqlFiles.map(sqlScript => ComputedSqlFile(sqlScript, options.pkg, naming, scalaTypeMapper, computeds.get))
     computeds.foreach { case (relName, lazyValue) =>
-      if (selector.include(relName)) lazyValue.get
+      if (selector.include(relName)) {
+        lazyValue.get
+        ()
+      }
     }
     // here we keep only the values which have been evaluated. as such, the selector pattern should be safe
     val computedRelations = computeds.flatMap { case (_, lazyValue) => lazyValue.getIfEvaluated }
@@ -83,7 +87,7 @@ package object typo {
         List(DefaultFile(default, options.jsonLibs).file),
         enums.map(enm => StringEnumFile(options, enm)),
         domains.map(d => DomainFile(d, options, genOrdering)),
-        customTypes.All.map(CustomTypeFile(options, genOrdering)),
+        customTypeFiles,
         relationFilesByName.map { case (_, f) => f },
         sqlFileFiles
       ).flatten

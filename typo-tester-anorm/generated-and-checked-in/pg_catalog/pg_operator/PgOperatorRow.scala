@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_operator
 
-import adventureworks.TypoRegproc
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

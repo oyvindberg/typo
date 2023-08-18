@@ -7,9 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_class
 
-import adventureworks.TypoAclItem
-import adventureworks.TypoPgNodeTree
-import adventureworks.TypoXid
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package pd
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.productdescription.ProductdescriptionId
 import java.util.UUID
 import typo.dsl.SqlExpr.FieldLikeNoHkt

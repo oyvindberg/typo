@@ -7,8 +7,6 @@ package adventureworks
 package humanresources
 package jobcandidate
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import anorm.Column
 import anorm.RowParser

@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package pm
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability

@@ -7,8 +7,6 @@ package adventureworks
 package humanresources
 package employee
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter

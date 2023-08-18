@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package salestaxrate
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
 import anorm.Column

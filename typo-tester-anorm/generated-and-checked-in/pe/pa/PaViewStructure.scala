@@ -7,7 +7,6 @@ package adventureworks
 package pe
 package pa
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import java.util.UUID
 import typo.dsl.SqlExpr.FieldLikeNoHkt

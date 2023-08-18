@@ -7,8 +7,6 @@ package adventureworks
 package humanresources
 package shift
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoLocalTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read

@@ -7,7 +7,6 @@ package adventureworks
 package purchasing
 package purchaseorderdetail
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import doobie.enumerated.Nullability

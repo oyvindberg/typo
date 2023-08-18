@@ -7,7 +7,6 @@ package adventureworks
 package information_schema
 package column_domain_usage
 
-import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait ColumnDomainUsageViewFields[Row] {

@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package customer
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import anorm.Column

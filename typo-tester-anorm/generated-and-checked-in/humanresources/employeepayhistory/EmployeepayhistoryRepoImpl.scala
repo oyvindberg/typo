@@ -7,8 +7,6 @@ package adventureworks
 package humanresources
 package employeepayhistory
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

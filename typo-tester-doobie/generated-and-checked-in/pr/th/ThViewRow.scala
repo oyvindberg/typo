@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package th
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.transactionhistory.TransactionhistoryId
 import doobie.enumerated.Nullability

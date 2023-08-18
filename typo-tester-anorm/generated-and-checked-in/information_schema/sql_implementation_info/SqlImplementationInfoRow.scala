@@ -7,8 +7,6 @@ package adventureworks
 package information_schema
 package sql_implementation_info
 
-import adventureworks.information_schema.CardinalNumber
-import adventureworks.information_schema.CharacterData
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

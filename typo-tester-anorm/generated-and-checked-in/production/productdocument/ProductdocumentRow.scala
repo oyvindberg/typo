@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productdocument
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
 import anorm.RowParser

@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package personcreditcard
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.creditcard.CreditcardId
 import typo.dsl.SqlExpr.Field

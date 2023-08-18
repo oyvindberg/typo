@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productsubcategory
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability

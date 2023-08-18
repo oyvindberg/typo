@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package pp
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
 import doobie.enumerated.Nullability
 import doobie.util.Read

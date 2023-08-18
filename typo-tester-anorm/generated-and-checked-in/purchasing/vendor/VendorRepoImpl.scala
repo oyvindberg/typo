@@ -7,8 +7,6 @@ package adventureworks
 package purchasing
 package vendor
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import anorm.NamedParameter

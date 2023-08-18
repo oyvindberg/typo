@@ -7,9 +7,6 @@ package adventureworks
 package humanresources
 package jobcandidate
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite

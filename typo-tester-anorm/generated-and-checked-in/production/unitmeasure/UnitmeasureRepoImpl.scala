@@ -7,8 +7,6 @@ package adventureworks
 package production
 package unitmeasure
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productlistpricehistory
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder

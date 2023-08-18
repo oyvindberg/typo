@@ -7,7 +7,6 @@ package adventureworks
 package pe
 package ct
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
 import anorm.Column

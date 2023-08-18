@@ -7,9 +7,6 @@ package adventureworks
 package sales
 package store
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO

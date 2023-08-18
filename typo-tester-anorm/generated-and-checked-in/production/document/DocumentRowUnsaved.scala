@@ -7,8 +7,6 @@ package adventureworks
 package production
 package document
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
 import java.util.UUID

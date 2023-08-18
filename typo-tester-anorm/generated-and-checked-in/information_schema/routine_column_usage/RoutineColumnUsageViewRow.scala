@@ -7,7 +7,6 @@ package adventureworks
 package information_schema
 package routine_column_usage
 
-import adventureworks.information_schema.SqlIdentifier
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

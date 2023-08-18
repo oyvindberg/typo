@@ -7,7 +7,6 @@ package adventureworks
 package sa
 package cu
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.currency.CurrencyId
 import anorm.Column

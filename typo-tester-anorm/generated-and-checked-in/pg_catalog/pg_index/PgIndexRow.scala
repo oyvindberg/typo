@@ -7,9 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_index
 
-import adventureworks.TypoInt2Vector
-import adventureworks.TypoOidVector
-import adventureworks.TypoPgNodeTree
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

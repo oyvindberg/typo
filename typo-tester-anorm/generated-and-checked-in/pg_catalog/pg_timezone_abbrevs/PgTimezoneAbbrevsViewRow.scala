@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_timezone_abbrevs
 
-import adventureworks.TypoInterval
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

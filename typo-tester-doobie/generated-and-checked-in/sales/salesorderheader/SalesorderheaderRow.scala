@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package salesorderheader
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber

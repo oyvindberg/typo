@@ -7,8 +7,6 @@ package adventureworks
 package humanresources
 package shift
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoLocalTime
 import adventureworks.public.Name
 import anorm.RowParser
 import anorm.Success

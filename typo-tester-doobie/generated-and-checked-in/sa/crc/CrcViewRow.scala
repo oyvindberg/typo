@@ -7,7 +7,6 @@ package adventureworks
 package sa
 package crc
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
 import doobie.enumerated.Nullability

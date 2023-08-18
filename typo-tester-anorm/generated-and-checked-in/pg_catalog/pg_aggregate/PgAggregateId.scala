@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_aggregate
 
-import adventureworks.TypoRegproc
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement

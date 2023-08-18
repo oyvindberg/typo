@@ -6,7 +6,6 @@
 package adventureworks
 package update_person
 
-import adventureworks.TypoLocalDateTime
 import java.sql.Connection
 
 trait UpdatePersonSqlRepo {

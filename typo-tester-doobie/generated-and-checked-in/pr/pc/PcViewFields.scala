@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package pc
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
 import java.util.UUID

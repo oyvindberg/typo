@@ -7,8 +7,6 @@ package adventureworks
 package information_schema
 package sql_parts
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.YesOrNo
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator

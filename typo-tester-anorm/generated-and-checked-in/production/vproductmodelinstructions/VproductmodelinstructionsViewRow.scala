@@ -7,8 +7,6 @@ package adventureworks
 package production
 package vproductmodelinstructions
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
 import anorm.Column

@@ -7,8 +7,6 @@ package adventureworks
 package production
 package scrapreason
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import io.circe.Decoder
 import io.circe.Encoder

@@ -6,7 +6,6 @@
 package adventureworks
 package update_person
 
-import adventureworks.TypoLocalDateTime
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 

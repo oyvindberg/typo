@@ -7,8 +7,6 @@ package adventureworks
 package information_schema
 package administrable_role_authorizations
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

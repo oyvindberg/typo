@@ -7,7 +7,6 @@ package adventureworks
 package sa
 package cc
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.sales.creditcard.CreditcardId
 import doobie.enumerated.Nullability
 import doobie.util.Read

@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_timezone_names
 
-import adventureworks.TypoInterval
 import typo.dsl.SqlExpr.OptField
 
 trait PgTimezoneNamesViewFields[Row] {

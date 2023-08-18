@@ -7,8 +7,6 @@ package adventureworks
 package person
 package emailaddress
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

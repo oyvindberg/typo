@@ -6,7 +6,6 @@
 package adventureworks
 package person_detail
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.free.connection.ConnectionIO
 import fs2.Stream

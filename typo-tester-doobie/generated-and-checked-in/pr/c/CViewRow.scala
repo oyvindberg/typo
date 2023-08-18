@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package c
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.public.Name
 import doobie.enumerated.Nullability

@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package shoppingcartitem
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import io.circe.Decoder
 import io.circe.Encoder

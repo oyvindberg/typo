@@ -7,9 +7,6 @@ package adventureworks
 package information_schema
 package tables
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.OptField
 
 trait TablesViewFields[Row] {

@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_attrdef
 
-import adventureworks.TypoPgNodeTree
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 

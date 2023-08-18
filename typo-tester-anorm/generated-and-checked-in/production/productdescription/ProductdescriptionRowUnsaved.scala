@@ -7,8 +7,6 @@ package adventureworks
 package production
 package productdescription
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import java.util.UUID
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

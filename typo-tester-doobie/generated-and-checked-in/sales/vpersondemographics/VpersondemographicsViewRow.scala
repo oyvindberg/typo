@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package vpersondemographics
 
-import adventureworks.TypoLocalDate
-import adventureworks.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.util.Read

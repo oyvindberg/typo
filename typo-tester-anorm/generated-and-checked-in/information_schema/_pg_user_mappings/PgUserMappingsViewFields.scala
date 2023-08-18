@@ -7,7 +7,6 @@ package adventureworks
 package information_schema
 package `_pg_user_mappings`
 
-import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait PgUserMappingsViewFields[Row] {

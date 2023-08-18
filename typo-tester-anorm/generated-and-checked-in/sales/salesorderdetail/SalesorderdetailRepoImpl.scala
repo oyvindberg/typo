@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package salesorderdetail
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

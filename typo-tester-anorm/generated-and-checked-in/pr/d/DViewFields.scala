@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package d
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag

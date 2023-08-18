@@ -7,7 +7,6 @@ package adventureworks
 package sa
 package soh
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.address.AddressId
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber

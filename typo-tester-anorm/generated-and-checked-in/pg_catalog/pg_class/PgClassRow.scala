@@ -7,9 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_class
 
-import adventureworks.TypoAclItem
-import adventureworks.TypoPgNodeTree
-import adventureworks.TypoXid
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

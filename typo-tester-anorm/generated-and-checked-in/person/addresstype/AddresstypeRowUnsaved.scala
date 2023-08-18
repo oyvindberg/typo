@@ -7,8 +7,6 @@ package adventureworks
 package person
 package addresstype
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import java.util.UUID
 import play.api.libs.json.JsObject

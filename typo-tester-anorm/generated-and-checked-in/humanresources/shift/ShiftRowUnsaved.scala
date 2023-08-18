@@ -7,9 +7,6 @@ package adventureworks
 package humanresources
 package shift
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoLocalTime
 import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

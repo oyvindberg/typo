@@ -12,9 +12,6 @@ import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import java.sql.Connection
-import testdb.hardcoded.Defaulted
-import testdb.hardcoded.myschema.Number
-import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder

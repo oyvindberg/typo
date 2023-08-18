@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package tha
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId
 import doobie.enumerated.Nullability
 import doobie.util.Read

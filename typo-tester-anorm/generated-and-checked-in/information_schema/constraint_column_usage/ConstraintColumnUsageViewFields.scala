@@ -7,7 +7,6 @@ package adventureworks
 package information_schema
 package constraint_column_usage
 
-import adventureworks.information_schema.SqlIdentifier
 import typo.dsl.SqlExpr.OptField
 
 trait ConstraintColumnUsageViewFields[Row] {

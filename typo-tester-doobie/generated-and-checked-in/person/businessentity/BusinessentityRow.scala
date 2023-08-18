@@ -7,7 +7,6 @@ package adventureworks
 package person
 package businessentity
 
-import adventureworks.TypoLocalDateTime
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder

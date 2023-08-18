@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package pch
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.Column
 import anorm.RowParser

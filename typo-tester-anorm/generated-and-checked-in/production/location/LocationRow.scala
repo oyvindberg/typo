@@ -7,7 +7,6 @@ package adventureworks
 package production
 package location
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.Column
 import anorm.RowParser

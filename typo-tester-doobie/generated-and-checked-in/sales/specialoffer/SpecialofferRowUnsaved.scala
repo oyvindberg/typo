@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package specialoffer
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
 import java.util.UUID

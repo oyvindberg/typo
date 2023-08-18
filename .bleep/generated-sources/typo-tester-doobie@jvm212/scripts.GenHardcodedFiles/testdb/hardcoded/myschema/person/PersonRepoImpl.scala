@@ -15,9 +15,6 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
 import fs2.Stream
-import testdb.hardcoded.Defaulted
-import testdb.hardcoded.myschema.Number
-import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 import typo.dsl.DeleteBuilder

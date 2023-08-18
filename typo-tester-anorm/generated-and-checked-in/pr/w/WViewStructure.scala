@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package w
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId

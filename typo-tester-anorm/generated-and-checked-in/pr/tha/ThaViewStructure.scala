@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package tha
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField

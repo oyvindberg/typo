@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productinventory
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability

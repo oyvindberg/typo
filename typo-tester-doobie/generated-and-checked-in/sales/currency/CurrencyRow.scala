@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package currency
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read

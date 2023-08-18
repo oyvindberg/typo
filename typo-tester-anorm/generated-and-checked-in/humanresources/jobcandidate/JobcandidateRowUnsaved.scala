@@ -7,9 +7,6 @@ package adventureworks
 package humanresources
 package jobcandidate
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

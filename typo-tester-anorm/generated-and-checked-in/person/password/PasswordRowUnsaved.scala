@@ -7,8 +7,6 @@ package adventureworks
 package person
 package password
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import java.util.UUID
 import play.api.libs.json.JsObject

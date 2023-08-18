@@ -7,8 +7,6 @@ package adventureworks
 package person
 package phonenumbertype
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite

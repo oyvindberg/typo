@@ -7,8 +7,6 @@ package adventureworks
 package sales
 package currencyrate
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import io.circe.Decoder
 import io.circe.Encoder

@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_replication_slots
 
-import adventureworks.TypoXid
 import typo.dsl.SqlExpr.OptField
 
 trait PgReplicationSlotsViewFields[Row] {

@@ -7,7 +7,6 @@ package adventureworks
 package person
 package phonenumbertype
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField

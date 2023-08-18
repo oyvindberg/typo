@@ -7,8 +7,6 @@ package adventureworks
 package information_schema
 package applicable_roles
 
-import adventureworks.information_schema.SqlIdentifier
-import adventureworks.information_schema.YesOrNo
 import typo.dsl.SqlExpr.OptField
 
 trait ApplicableRolesViewFields[Row] {

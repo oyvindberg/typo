@@ -7,8 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_locks
 
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoXid
 import typo.dsl.SqlExpr.OptField
 
 trait PgLocksViewFields[Row] {

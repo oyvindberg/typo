@@ -7,7 +7,6 @@ package adventureworks
 package sa
 package sr
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import adventureworks.sales.salesreason.SalesreasonId
 import typo.dsl.SqlExpr.FieldLikeNoHkt

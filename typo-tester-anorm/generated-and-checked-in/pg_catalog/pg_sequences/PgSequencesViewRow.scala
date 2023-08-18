@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_sequences
 
-import adventureworks.TypoRegtype
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

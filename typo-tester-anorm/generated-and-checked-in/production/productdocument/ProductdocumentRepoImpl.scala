@@ -7,8 +7,6 @@ package adventureworks
 package production
 package productdocument
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import anorm.NamedParameter
 import anorm.ParameterValue

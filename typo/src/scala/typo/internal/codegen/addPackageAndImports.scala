@@ -2,6 +2,7 @@ package typo
 package internal
 package codegen
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 /** imports are automatically written based on the qualified idents found in the code
@@ -9,6 +10,17 @@ import scala.collection.mutable
 object addPackageAndImports {
   def apply(knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]], file: sc.File): sc.File = {
     val newImports = mutable.Map.empty[sc.Ident, sc.Type.Qualified]
+
+    @tailrec
+    def lookupInPackages(packages: List[sc.QIdent], currentName: sc.Ident): Option[sc.Type.Qualified] =
+      packages match {
+        case pkg :: tail =>
+          knownNamesByPkg.get(pkg).flatMap(_.get(currentName)) match {
+            case Some(found) => Some(found)
+            case None        => lookupInPackages(tail, currentName)
+          }
+        case Nil => None
+      }
 
     val contents = file.contents
     val withShortenedNames = contents.mapTrees { tree =>
@@ -19,7 +31,7 @@ object addPackageAndImports {
           case currentQName =>
             val currentName = currentQName.value.name
             val shortenedQName = sc.Type.Qualified(currentName)
-            knownNamesByPkg(file.pkg).get(currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
+            lookupInPackages(file.superPkgs, currentName).orElse(sc.Type.BuiltIn.get(currentName)).orElse(newImports.get(currentName)) match {
               case Some(alreadyAvailable) =>
                 if (alreadyAvailable == currentQName) shortenedQName else currentQName
               case None =>

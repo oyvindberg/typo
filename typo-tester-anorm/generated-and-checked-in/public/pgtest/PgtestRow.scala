@@ -7,25 +7,6 @@ package adventureworks
 package public
 package pgtest
 
-import adventureworks.TypoBox
-import adventureworks.TypoCircle
-import adventureworks.TypoHStore
-import adventureworks.TypoInet
-import adventureworks.TypoInterval
-import adventureworks.TypoJson
-import adventureworks.TypoJsonb
-import adventureworks.TypoLine
-import adventureworks.TypoLineSegment
-import adventureworks.TypoLocalDate
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoLocalTime
-import adventureworks.TypoMoney
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoOffsetTime
-import adventureworks.TypoPath
-import adventureworks.TypoPoint
-import adventureworks.TypoPolygon
-import adventureworks.TypoXml
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

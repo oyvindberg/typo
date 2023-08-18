@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package psc
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.public.Name

@@ -6,7 +6,6 @@
 package adventureworks
 package update_person_returning
 
-import adventureworks.TypoLocalDateTime
 import doobie.free.connection.ConnectionIO
 import doobie.syntax.string.toSqlInterpolator
 import fs2.Stream

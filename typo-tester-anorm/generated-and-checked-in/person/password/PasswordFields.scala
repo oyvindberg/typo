@@ -7,7 +7,6 @@ package adventureworks
 package person
 package password
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import java.util.UUID
 import typo.dsl.SqlExpr.Field

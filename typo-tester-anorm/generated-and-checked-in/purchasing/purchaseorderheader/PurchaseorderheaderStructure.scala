@@ -7,7 +7,6 @@ package adventureworks
 package purchasing
 package purchaseorderheader
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
 import typo.dsl.SqlExpr.Field

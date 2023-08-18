@@ -7,8 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_prepared_statements
 
-import adventureworks.TypoOffsetDateTime
-import adventureworks.TypoRegtype
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation

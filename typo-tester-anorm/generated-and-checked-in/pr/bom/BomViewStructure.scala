@@ -7,7 +7,6 @@ package adventureworks
 package pr
 package bom
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.billofmaterials.BillofmaterialsId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId

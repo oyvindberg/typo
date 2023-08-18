@@ -7,7 +7,6 @@ package adventureworks
 package humanresources
 package vemployeedepartment
 
-import adventureworks.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import anorm.Column

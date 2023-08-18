@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_authid
 
-import adventureworks.TypoOffsetDateTime
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField

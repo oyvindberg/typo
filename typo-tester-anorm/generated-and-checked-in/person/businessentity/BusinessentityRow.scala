@@ -7,7 +7,6 @@ package adventureworks
 package person
 package businessentity
 
-import adventureworks.TypoLocalDateTime
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

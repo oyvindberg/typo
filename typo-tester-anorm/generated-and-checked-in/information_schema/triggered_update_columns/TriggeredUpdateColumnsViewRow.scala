@@ -7,7 +7,6 @@ package adventureworks
 package information_schema
 package triggered_update_columns
 
-import adventureworks.information_schema.SqlIdentifier
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

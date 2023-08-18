@@ -6,7 +6,6 @@
 package adventureworks
 package update_person_returning
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.util.Read

@@ -7,8 +7,6 @@ package adventureworks
 package information_schema
 package `_pg_foreign_servers`
 
-import adventureworks.information_schema.CharacterData
-import adventureworks.information_schema.SqlIdentifier
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

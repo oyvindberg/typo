@@ -7,8 +7,6 @@ package adventureworks
 package pr
 package i
 
-import adventureworks.TypoLocalDateTime
-import adventureworks.TypoXml
 import adventureworks.production.illustration.IllustrationId
 import typo.dsl.SqlExpr.OptField
 

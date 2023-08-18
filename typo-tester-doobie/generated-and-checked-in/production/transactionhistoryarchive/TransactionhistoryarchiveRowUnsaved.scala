@@ -7,8 +7,6 @@ package adventureworks
 package production
 package transactionhistoryarchive
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import io.circe.Decoder
 import io.circe.Encoder
 

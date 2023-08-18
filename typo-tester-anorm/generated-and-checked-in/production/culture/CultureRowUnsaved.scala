@@ -7,8 +7,6 @@ package adventureworks
 package production
 package culture
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.public.Name
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult

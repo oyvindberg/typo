@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_stats
 
-import adventureworks.TypoAnyArray
 import typo.dsl.SqlExpr.OptField
 
 trait PgStatsViewFields[Row] {

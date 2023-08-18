@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package currencyrate
 
-import adventureworks.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import anorm.Column
 import anorm.RowParser

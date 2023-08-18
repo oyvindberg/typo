@@ -7,7 +7,6 @@ package adventureworks
 package pg_catalog
 package pg_shadow
 
-import adventureworks.TypoOffsetDateTime
 import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta

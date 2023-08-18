@@ -7,8 +7,6 @@ package adventureworks
 package production
 package productmodelillustration
 
-import adventureworks.Defaulted
-import adventureworks.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
 import io.circe.Decoder
