@@ -133,8 +133,8 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         fromMetaDb(
           Options(
             pkg = "testdb.hardcoded",
-            List(jsonLib),
             Some(dbLib),
+            List(jsonLib),
             naming = pkg =>
               new Naming(pkg) {
                 override def enumValue(name: String): sc.Ident = sc.Ident("_" + name.toLowerCase)

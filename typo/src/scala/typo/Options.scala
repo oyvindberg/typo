@@ -2,8 +2,8 @@ package typo
 
 case class Options(
     pkg: String,
-    jsonLibs: List[JsonLibName],
     dbLib: Option[DbLibName],
+    jsonLibs: List[JsonLibName] = Nil,
     naming: sc.QIdent => Naming = new Naming(_),
     typeOverride: TypeOverride = TypeOverride.Empty,
     nullabilityOverride: NullabilityOverride = NullabilityOverride.Empty,

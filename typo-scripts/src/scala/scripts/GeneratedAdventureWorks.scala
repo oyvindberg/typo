@@ -34,8 +34,8 @@ object GeneratedAdventureWorks {
           ).foreach { case (dbLib, jsonLib, projectPath) =>
             val options = typo.Options(
               pkg = "adventureworks",
-              List(jsonLib),
               Some(dbLib),
+              List(jsonLib),
               typeOverride = typo.TypeOverride.sqlFileParam { case (_, "businessentityid") => "adventureworks.person.businessentity.BusinessentityId" },
               enableDsl = true,
               enableTestInserts = true
