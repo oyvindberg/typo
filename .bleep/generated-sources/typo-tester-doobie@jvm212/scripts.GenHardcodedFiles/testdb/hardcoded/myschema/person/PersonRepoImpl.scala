@@ -8,11 +8,14 @@ package hardcoded
 package myschema
 package person
 
+import cats.data.NonEmptyList
 import doobie.free.connection.ConnectionIO
+import doobie.free.connection.pure
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.fragments
 import doobie.util.meta.Meta
 import fs2.Stream
 import testdb.hardcoded.Defaulted
@@ -92,6 +95,25 @@ object PersonRepoImpl extends PersonRepo {
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
     sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person where "id" = ANY(${fromWrite(ids)(Write.fromPut(PersonId.arrayPut))})""".query(PersonRow.read).stream
   }
+  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
+    val where = fragments.whereAndOpt(
+      fieldValues.map {
+        case PersonFieldValue.id(value) => fr""""id" = ${fromWrite(value)(Write.fromPut(PersonId.put))}"""
+        case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"
+        case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
+        case PersonFieldValue.nickName(value) => fr"nick_name = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+        case PersonFieldValue.blogUrl(value) => fr"blog_url = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+        case PersonFieldValue.email(value) => fr"email = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
+        case PersonFieldValue.phone(value) => fr"phone = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"
+        case PersonFieldValue.likesPizza(value) => fr"likes_pizza = ${fromWrite(value)(Write.fromPut(Meta.BooleanMeta.put))}"
+        case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"
+        case PersonFieldValue.workEmail(value) => fr"work_email = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+        case PersonFieldValue.sector(value) => fr"sector = ${fromWrite(value)(Write.fromPut(Sector.put))}"
+        case PersonFieldValue.favoriteNumber(value) => fr"favorite_number = ${fromWrite(value)(Write.fromPut(Number.put))}"
+      }
+    )
+    sql"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number from myschema.person $where""".query(PersonRow.read).stream
+  }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val id = row.id
     sql"""update myschema.person
@@ -113,6 +135,30 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("myschema.person", PersonFields, PersonRow.read)
+  }
+  override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
+    NonEmptyList.fromList(fieldValues) match {
+      case None => pure(false)
+      case Some(nonEmpty) =>
+        val updates = fragments.set(
+          nonEmpty.map {
+            case PersonFieldValue.favouriteFootballClubId(value) => fr"favourite_football_club_id = $value"
+            case PersonFieldValue.name(value) => fr""""name" = $value"""
+            case PersonFieldValue.nickName(value) => fr"nick_name = $value"
+            case PersonFieldValue.blogUrl(value) => fr"blog_url = $value"
+            case PersonFieldValue.email(value) => fr"email = $value"
+            case PersonFieldValue.phone(value) => fr"phone = $value"
+            case PersonFieldValue.likesPizza(value) => fr"likes_pizza = $value"
+            case PersonFieldValue.maritalStatusId(value) => fr"marital_status_id = $value"
+            case PersonFieldValue.workEmail(value) => fr"work_email = $value"
+            case PersonFieldValue.sector(value) => fr"sector = $value::myschema.sector"
+            case PersonFieldValue.favoriteNumber(value) => fr"""favorite_number = $value::myschema."number""""
+          }
+        )
+        sql"""update myschema.person
+              $updates
+              where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".update.run.map(_ > 0)
+    }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)

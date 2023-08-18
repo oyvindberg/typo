@@ -45,6 +45,11 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     ids.flatMap(map.get).toList
   }
+  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]])(implicit c: Connection): List[MaritalStatusRow] = {
+    fieldValues.foldLeft(map.values) {
+      case (acc, MaritalStatusFieldValue.id(value)) => acc.filter(_.id == value)
+    }.toList
+  }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields, map)
   }

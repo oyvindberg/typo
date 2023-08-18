@@ -15,7 +15,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.util.UUID
 import typo.dsl.DeleteBuilder
@@ -78,7 +77,7 @@ object SpecialofferRepoImpl extends SpecialofferRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning specialofferid, description, discountpct, "type", category, startdate::text, enddate::text, minqty, maxqty, rowguid, modifieddate::text
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(SpecialofferRow.rowParser(1).single)
     }
     

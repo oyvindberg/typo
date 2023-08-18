@@ -22,7 +22,9 @@ trait FootballClubRepo {
   def selectAll: Stream[ConnectionIO, FootballClubRow]
   def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow]
+  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow]
   def update(row: FootballClubRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[FootballClubFields, FootballClubRow]
+  def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
 }

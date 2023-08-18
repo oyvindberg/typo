@@ -15,7 +15,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.util.UUID
 import typo.dsl.DeleteBuilder
@@ -73,7 +72,7 @@ object ShipmethodRepoImpl extends ShipmethodRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning shipmethodid, "name", shipbase, shiprate, rowguid, modifieddate::text
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ShipmethodRow.rowParser(1).single)
     }
     

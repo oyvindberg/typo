@@ -16,7 +16,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.util.UUID
 import typo.dsl.DeleteBuilder
@@ -108,7 +107,7 @@ object SalesorderheaderRepoImpl extends SalesorderheaderRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning salesorderid, revisionnumber, orderdate::text, duedate::text, shipdate::text, status, onlineorderflag, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, subtotal, taxamt, freight, totaldue, "comment", rowguid, modifieddate::text
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(SalesorderheaderRow.rowParser(1).single)
     }
     

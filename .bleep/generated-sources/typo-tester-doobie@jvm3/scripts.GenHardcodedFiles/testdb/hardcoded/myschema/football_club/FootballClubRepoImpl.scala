@@ -8,10 +8,13 @@ package hardcoded
 package myschema
 package football_club
 
+import cats.data.NonEmptyList
 import doobie.free.connection.ConnectionIO
+import doobie.free.connection.pure
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
+import doobie.util.fragments
 import doobie.util.meta.Meta
 import fs2.Stream
 import typo.dsl.DeleteBuilder
@@ -44,6 +47,15 @@ object FootballClubRepoImpl extends FootballClubRepo {
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".query(FootballClubRow.read).stream
   }
+  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow] = {
+    val where = fragments.whereAndOpt(
+      fieldValues.map {
+        case FootballClubFieldValue.id(value) => fr""""id" = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"""
+        case FootballClubFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
+      }
+    )
+    sql"""select "id", "name" from myschema.football_club $where""".query(FootballClubRow.read).stream
+  }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
     sql"""update myschema.football_club
@@ -55,6 +67,20 @@ object FootballClubRepoImpl extends FootballClubRepo {
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilder("myschema.football_club", FootballClubFields, FootballClubRow.read)
+  }
+  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean] = {
+    NonEmptyList.fromList(fieldValues) match {
+      case None => pure(false)
+      case Some(nonEmpty) =>
+        val updates = fragments.set(
+          nonEmpty.map {
+            case FootballClubFieldValue.name(value) => fr""""name" = $value"""
+          }
+        )
+        sql"""update myschema.football_club
+              $updates
+              where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
+    }
   }
   override def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")

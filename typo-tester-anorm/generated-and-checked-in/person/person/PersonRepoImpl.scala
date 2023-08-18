@@ -17,7 +17,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.util.UUID
 import typo.dsl.DeleteBuilder
@@ -79,7 +78,7 @@ object PersonRepoImpl extends PersonRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning businessentityid, persontype, namestyle, title, firstname, middlename, lastname, suffix, emailpromotion, additionalcontactinfo, demographics, rowguid, modifieddate::text
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(PersonRow.rowParser(1).single)
     }
     

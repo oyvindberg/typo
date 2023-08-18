@@ -22,7 +22,9 @@ trait PersonRepo {
   def selectAll(implicit c: Connection): List[PersonRow]
   def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow]
   def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow]
+  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow]
   def update(row: PersonRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PersonFields, PersonRow]
+  def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
 }

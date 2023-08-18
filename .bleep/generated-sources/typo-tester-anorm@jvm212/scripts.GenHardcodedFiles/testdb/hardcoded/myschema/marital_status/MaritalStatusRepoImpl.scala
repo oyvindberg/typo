@@ -8,6 +8,11 @@ package hardcoded
 package myschema
 package marital_status
 
+import anorm.NamedParameter
+import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SQL
+import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
@@ -49,6 +54,23 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
           from myschema.marital_status
           where "id" = ANY($ids)
        """.as(MaritalStatusRow.rowParser(1).*)
+    
+  }
+  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]])(implicit c: Connection): List[MaritalStatusRow] = {
+    fieldValues match {
+      case Nil => selectAll
+      case nonEmpty =>
+        val namedParameters = nonEmpty.map{
+          case MaritalStatusFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+        }
+        val quote = '"'.toString
+        val q = s"""select "id"
+                    from myschema.marital_status
+                    where ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
+                 """
+        SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap, RowParser.successful)
+          .as(MaritalStatusRow.rowParser(1).*)
+    }
     
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {

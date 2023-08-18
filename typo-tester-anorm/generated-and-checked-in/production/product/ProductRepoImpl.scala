@@ -16,7 +16,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.util.UUID
 import typo.dsl.DeleteBuilder
@@ -93,7 +92,7 @@ object ProductRepoImpl extends ProductRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning productid, "name", productnumber, makeflag, finishedgoodsflag, color, safetystocklevel, reorderpoint, standardcost, listprice, "size", sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, "class", "style", productsubcategoryid, productmodelid, sellstartdate::text, sellenddate::text, discontinueddate::text, rowguid, modifieddate::text
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(ProductRow.rowParser(1).single)
     }
     

@@ -50,6 +50,15 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
+    Stream.emits {
+      fieldValues.foldLeft(map.values) {
+        case (acc, PersonFieldValue.one(value)) => acc.filter(_.one == value)
+        case (acc, PersonFieldValue.two(value)) => acc.filter(_.two == value)
+        case (acc, PersonFieldValue.name(value)) => acc.filter(_.name == value)
+      }.toList
+    }
+  }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {
@@ -63,6 +72,23 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersonFields, map)
+  }
+  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
+    delay {
+      map.get(compositeId) match {
+        case Some(oldRow) =>
+          val updatedRow = fieldValues.foldLeft(oldRow) {
+            case (acc, PersonFieldValue.name(value)) => acc.copy(name = value)
+          }
+          if (updatedRow != oldRow) {
+            map.put(compositeId, updatedRow)
+            true
+          } else {
+            false
+          }
+        case None => false
+      }
+    }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     delay {

@@ -45,6 +45,12 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     ids.flatMap(map.get).toList
   }
+  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]])(implicit c: Connection): List[FootballClubRow] = {
+    fieldValues.foldLeft(map.values) {
+      case (acc, FootballClubFieldValue.id(value)) => acc.filter(_.id == value)
+      case (acc, FootballClubFieldValue.name(value)) => acc.filter(_.name == value)
+    }.toList
+  }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     map.get(row.id) match {
       case Some(`row`) => false
@@ -56,6 +62,21 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilderMock(UpdateParams.empty, FootballClubFields, map)
+  }
+  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean = {
+    map.get(id) match {
+      case Some(oldRow) =>
+        val updatedRow = fieldValues.foldLeft(oldRow) {
+          case (acc, FootballClubFieldValue.name(value)) => acc.copy(name = value)
+        }
+        if (updatedRow != oldRow) {
+          map.put(id, updatedRow)
+          true
+        } else {
+          false
+        }
+      case None => false
+    }
   }
   override def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     map.put(unsaved.id, unsaved)

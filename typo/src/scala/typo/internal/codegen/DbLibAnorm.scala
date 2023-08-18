@@ -185,19 +185,19 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         val sql = sc.s {
           code"""|select ${dbNames(cols, isRead = true)}
                  |from $relName
-                 |where $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(" AND ")}
+                 |where $${namedParameters.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(" AND ")}
                  |""".stripMargin
         }
         // the weird block and wildcard import is to avoid warnings in scala 2 and 3, and to get the implicit `on` in scala 3
         code"""${fieldValueOrIdsParam.name} match {
               |  case Nil => selectAll
               |  case nonEmpty =>
-              |    val namedParams = nonEmpty.map{
+              |    val namedParameters = nonEmpty.map{
               |      ${cases.mkCode("\n")}
               |    }
               |    val quote = '"'.toString
               |    val q = $sql
-              |    $SimpleSql($SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, $RowParser($Success(_)))
+              |    $SimpleSql($SQL(q), namedParameters.map(_.tupled).toMap, $RowParser.successful)
               |      .as(${rowParserFor(rowType)}.*)
               |}
               |""".stripMargin
@@ -222,7 +222,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
 
         val sql = sc.s {
           code"""update $relName
-                |set $${namedParams.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(", ")}
+                |set $${namedParameters.map(x => s"$$quote$${x.name}$$quote = {$${x.name}}").mkString(", ")}
                 |where $where
                 |""".stripMargin
         }
@@ -231,12 +231,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
         code"""${varargs.name} match {
               |  case Nil => false
               |  case nonEmpty =>
-              |    val namedParams = nonEmpty.map{
+              |    val namedParameters = nonEmpty.map{
               |      ${cases.mkCode("\n")}
               |    }
               |    val quote = '"'.toString
               |    val q = $sql
-              |    $SimpleSql($SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap ++ ${sc.Type.List}(${idCases.mkCode(", ")}), $RowParser($Success(_)))
+              |    $SimpleSql($SQL(q), namedParameters.map(_.tupled).toMap ++ ${sc.Type.List}(${idCases.mkCode(", ")}), $RowParser.successful)
               |      .executeUpdate() > 0
               |}
               |""".stripMargin
@@ -326,7 +326,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean) extends DbLib {
                |    .executeInsert(${rowParserFor(rowType)}.single)
                |} else {
                |  val q = $sql
-               |  $SimpleSql($SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, $RowParser($Success(_)))
+               |  $SimpleSql($SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, $RowParser.successful)
                |    .executeInsert(${rowParserFor(rowType)}.single)
                |}
                |"""

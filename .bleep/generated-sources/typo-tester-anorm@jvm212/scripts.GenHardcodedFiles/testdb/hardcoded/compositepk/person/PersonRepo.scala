@@ -21,7 +21,9 @@ trait PersonRepo {
   def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll(implicit c: Connection): List[PersonRow]
   def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow]
+  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow]
   def update(row: PersonRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PersonFields, PersonRow]
+  def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
 }

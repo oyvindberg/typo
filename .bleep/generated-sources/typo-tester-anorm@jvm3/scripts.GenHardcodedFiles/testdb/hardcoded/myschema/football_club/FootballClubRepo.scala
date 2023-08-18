@@ -21,7 +21,9 @@ trait FootballClubRepo {
   def selectAll(implicit c: Connection): List[FootballClubRow]
   def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow]
   def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow]
+  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]])(implicit c: Connection): List[FootballClubRow]
   def update(row: FootballClubRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[FootballClubFields, FootballClubRow]
+  def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow
 }

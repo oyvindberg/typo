@@ -22,7 +22,9 @@ trait PersonRepo {
   def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll: Stream[ConnectionIO, PersonRow]
   def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]]
+  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow]
   def update(row: PersonRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PersonFields, PersonRow]
+  def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: PersonRow): ConnectionIO[PersonRow]
 }

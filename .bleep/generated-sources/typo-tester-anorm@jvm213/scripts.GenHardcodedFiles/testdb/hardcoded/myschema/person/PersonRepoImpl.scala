@@ -14,7 +14,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import testdb.hardcoded.Defaulted
 import testdb.hardcoded.myschema.Number
@@ -78,7 +77,7 @@ object PersonRepoImpl extends PersonRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(PersonRow.rowParser(1).single)
     }
     
@@ -104,6 +103,34 @@ object PersonRepoImpl extends PersonRepo {
        """.as(PersonRow.rowParser(1).*)
     
   }
+  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow] = {
+    fieldValues match {
+      case Nil => selectAll
+      case nonEmpty =>
+        val namedParameters = nonEmpty.map{
+          case PersonFieldValue.id(value) => NamedParameter("id", ParameterValue.from(value))
+          case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
+          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+          case PersonFieldValue.nickName(value) => NamedParameter("nick_name", ParameterValue.from(value))
+          case PersonFieldValue.blogUrl(value) => NamedParameter("blog_url", ParameterValue.from(value))
+          case PersonFieldValue.email(value) => NamedParameter("email", ParameterValue.from(value))
+          case PersonFieldValue.phone(value) => NamedParameter("phone", ParameterValue.from(value))
+          case PersonFieldValue.likesPizza(value) => NamedParameter("likes_pizza", ParameterValue.from(value))
+          case PersonFieldValue.maritalStatusId(value) => NamedParameter("marital_status_id", ParameterValue.from(value))
+          case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
+          case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
+          case PersonFieldValue.favoriteNumber(value) => NamedParameter("favorite_number", ParameterValue.from(value))
+        }
+        val quote = '"'.toString
+        val q = s"""select "id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number
+                    from myschema.person
+                    where ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
+                 """
+        SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap, RowParser.successful)
+          .as(PersonRow.rowParser(1).*)
+    }
+    
+  }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val id = row.id
     SQL"""update myschema.person
@@ -123,6 +150,33 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("myschema.person", PersonFields, PersonRow.rowParser)
+  }
+  override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
+    fieldValues match {
+      case Nil => false
+      case nonEmpty =>
+        val namedParameters = nonEmpty.map{
+          case PersonFieldValue.favouriteFootballClubId(value) => NamedParameter("favourite_football_club_id", ParameterValue.from(value))
+          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+          case PersonFieldValue.nickName(value) => NamedParameter("nick_name", ParameterValue.from(value))
+          case PersonFieldValue.blogUrl(value) => NamedParameter("blog_url", ParameterValue.from(value))
+          case PersonFieldValue.email(value) => NamedParameter("email", ParameterValue.from(value))
+          case PersonFieldValue.phone(value) => NamedParameter("phone", ParameterValue.from(value))
+          case PersonFieldValue.likesPizza(value) => NamedParameter("likes_pizza", ParameterValue.from(value))
+          case PersonFieldValue.maritalStatusId(value) => NamedParameter("marital_status_id", ParameterValue.from(value))
+          case PersonFieldValue.workEmail(value) => NamedParameter("work_email", ParameterValue.from(value))
+          case PersonFieldValue.sector(value) => NamedParameter("sector", ParameterValue.from(value))
+          case PersonFieldValue.favoriteNumber(value) => NamedParameter("favorite_number", ParameterValue.from(value))
+        }
+        val quote = '"'.toString
+        val q = s"""update myschema.person
+                    set ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
+                    where "id" = {id}
+                 """
+        SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap ++ List(("id", ParameterValue.from(id))), RowParser.successful)
+          .executeUpdate() > 0
+    }
+    
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into myschema.person("id", favourite_football_club_id, "name", nick_name, blog_url, email, phone, likes_pizza, marital_status_id, work_email, sector, favorite_number)

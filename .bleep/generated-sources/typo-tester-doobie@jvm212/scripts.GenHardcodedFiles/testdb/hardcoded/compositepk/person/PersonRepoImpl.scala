@@ -8,11 +8,14 @@ package hardcoded
 package compositepk
 package person
 
+import cats.data.NonEmptyList
 import doobie.free.connection.ConnectionIO
+import doobie.free.connection.pure
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.fragments
 import doobie.util.meta.Meta
 import fs2.Stream
 import testdb.hardcoded.Defaulted
@@ -70,6 +73,16 @@ object PersonRepoImpl extends PersonRepo {
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
     sql"""select "one", two, "name" from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".query(PersonRow.read).option
   }
+  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
+    val where = fragments.whereAndOpt(
+      fieldValues.map {
+        case PersonFieldValue.one(value) => fr""""one" = ${fromWrite(value)(Write.fromPut(Meta.LongMeta.put))}"""
+        case PersonFieldValue.two(value) => fr"two = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"
+        case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
+      }
+    )
+    sql"""select "one", two, "name" from compositepk.person $where""".query(PersonRow.read).stream
+  }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update compositepk.person
@@ -81,6 +94,20 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("compositepk.person", PersonFields, PersonRow.read)
+  }
+  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
+    NonEmptyList.fromList(fieldValues) match {
+      case None => pure(false)
+      case Some(nonEmpty) =>
+        val updates = fragments.set(
+          nonEmpty.map {
+            case PersonFieldValue.name(value) => fr""""name" = $value"""
+          }
+        )
+        sql"""update compositepk.person
+              $updates
+              where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND two = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".update.run.map(_ > 0)
+    }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into compositepk.person("one", two, "name")

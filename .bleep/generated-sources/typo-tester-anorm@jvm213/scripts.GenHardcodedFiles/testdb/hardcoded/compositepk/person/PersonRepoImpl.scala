@@ -14,7 +14,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import testdb.hardcoded.Defaulted
 import typo.dsl.DeleteBuilder
@@ -60,7 +59,7 @@ object PersonRepoImpl extends PersonRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "one", two, "name"
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(PersonRow.rowParser(1).single)
     }
     
@@ -79,6 +78,25 @@ object PersonRepoImpl extends PersonRepo {
           where "one" = ${compositeId.one} AND two = ${compositeId.two}
        """.as(PersonRow.rowParser(1).singleOpt)
   }
+  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow] = {
+    fieldValues match {
+      case Nil => selectAll
+      case nonEmpty =>
+        val namedParameters = nonEmpty.map{
+          case PersonFieldValue.one(value) => NamedParameter("one", ParameterValue.from(value))
+          case PersonFieldValue.two(value) => NamedParameter("two", ParameterValue.from(value))
+          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+        }
+        val quote = '"'.toString
+        val q = s"""select "one", two, "name"
+                    from compositepk.person
+                    where ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
+                 """
+        SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap, RowParser.successful)
+          .as(PersonRow.rowParser(1).*)
+    }
+    
+  }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update compositepk.person
@@ -88,6 +106,23 @@ object PersonRepoImpl extends PersonRepo {
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("compositepk.person", PersonFields, PersonRow.rowParser)
+  }
+  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
+    fieldValues match {
+      case Nil => false
+      case nonEmpty =>
+        val namedParameters = nonEmpty.map{
+          case PersonFieldValue.name(value) => NamedParameter("name", ParameterValue.from(value))
+        }
+        val quote = '"'.toString
+        val q = s"""update compositepk.person
+                    set ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(", ")}
+                    where "one" = {one} AND two = {two}
+                 """
+        SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap ++ List(("one", ParameterValue.from(compositeId.one)), ("two", ParameterValue.from(compositeId.two))), RowParser.successful)
+          .executeUpdate() > 0
+    }
+    
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into compositepk.person("one", two, "name")

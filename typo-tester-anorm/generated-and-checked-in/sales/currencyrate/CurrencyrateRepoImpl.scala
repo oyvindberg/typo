@@ -15,7 +15,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -64,7 +63,7 @@ object CurrencyrateRepoImpl extends CurrencyrateRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning currencyrateid, currencyratedate::text, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, modifieddate::text
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(CurrencyrateRow.rowParser(1).single)
     }
     

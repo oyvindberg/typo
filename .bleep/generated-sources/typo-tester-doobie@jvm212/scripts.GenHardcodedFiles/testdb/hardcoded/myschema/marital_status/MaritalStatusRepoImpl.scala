@@ -12,6 +12,7 @@ import doobie.free.connection.ConnectionIO
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
+import doobie.util.fragments
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -42,6 +43,14 @@ object MaritalStatusRepoImpl extends MaritalStatusRepo {
   }
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status where "id" = ANY(${fromWrite(ids)(Write.fromPut(MaritalStatusId.arrayPut))})""".query(MaritalStatusRow.read).stream
+  }
+  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow] = {
+    val where = fragments.whereAndOpt(
+      fieldValues.map {
+        case MaritalStatusFieldValue.id(value) => fr""""id" = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"""
+      }
+    )
+    sql"""select "id" from myschema.marital_status $where""".query(MaritalStatusRow.read).stream
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilder("myschema.marital_status", MaritalStatusFields, MaritalStatusRow.read)

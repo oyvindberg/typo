@@ -142,6 +142,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
             header = header,
             enableDsl = true,
             enableTestInserts = true,
+            enableFieldValue = true,
             silentBanner = true
           ),
           metaDb,

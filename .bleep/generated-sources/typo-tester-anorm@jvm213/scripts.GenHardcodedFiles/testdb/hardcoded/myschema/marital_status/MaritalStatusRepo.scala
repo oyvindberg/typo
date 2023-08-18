@@ -21,6 +21,7 @@ trait MaritalStatusRepo {
   def selectAll(implicit c: Connection): List[MaritalStatusRow]
   def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow]
   def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow]
+  def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]])(implicit c: Connection): List[MaritalStatusRow]
   def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow
 }

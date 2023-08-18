@@ -17,7 +17,6 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
-import anorm.Success
 import java.sql.Connection
 import java.util.UUID
 import typo.dsl.DeleteBuilder
@@ -90,7 +89,7 @@ object EmployeeRepoImpl extends EmployeeRepo {
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning businessentityid, nationalidnumber, loginid, jobtitle, birthdate::text, maritalstatus, gender, hiredate::text, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate::text, organizationnode
                """
-      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser(Success(_)))
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(EmployeeRow.rowParser(1).single)
     }
     
